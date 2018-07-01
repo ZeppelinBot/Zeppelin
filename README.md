@@ -1,11 +1,11 @@
 ### Config format example
 
-Config files are currently located at `data/guilds/<guildId>.yml` (and `data/guilds/global.yml` for global plugins).
+Config files are currently located at `config/<guildId>.yml` (and `config/global.yml` for global plugins).
 
 ```yml
 levels:
-  50: mod
-  100: admin
+  50: "1234" # Mod role id
+  100: "5678" # Admin role id
 
 plugins:
   mod_plugin:

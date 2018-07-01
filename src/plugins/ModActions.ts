@@ -150,10 +150,10 @@ export class ModActionsPlugin extends Plugin {
    */
   @d.event("guildMemberAdd")
   async onGuildMemberAdd(member: Member) {
-    if (! this.configValue('alert_on_rejoin')) return;
+    if (!this.configValue("alert_on_rejoin")) return;
 
-    const alertChannelId = this.configValue('alert_channel');
-    if (! alertChannelId) return;
+    const alertChannelId = this.configValue("alert_channel");
+    if (!alertChannelId) return;
 
     const actions = await this.modActions.getByUserId(member.id);
 
@@ -213,12 +213,14 @@ export class ModActionsPlugin extends Plugin {
    * If the argument passed is a case id, display that case
    * If the argument passed is a user id, show all cases on that user
    */
-  @d.command("/showcase|case|cases|usercases/", "<caseNumberOrUserId:string>")
+  @d.command(/showcase|case|cases|usercases/, "<caseNumberOrUserId:string>")
   @d.permission("view")
   async showcaseCmd(msg: Message, args: any) {
     if (args.caseNumberOrUserId.length >= 17) {
       // Assume user id
-      const actions = await this.modActions.getByUserId(args.userId);
+      const actions = await this.modActions.getByUserId(
+        args.caseNumberOrUserId
+      );
 
       if (actions.length === 0) {
         msg.channel.createMessage("No cases found for the specified user!");
@@ -229,7 +231,9 @@ export class ModActionsPlugin extends Plugin {
       }
     } else {
       // Assume case id
-      const action = await this.modActions.findByCaseNumber(args.caseNumber);
+      const action = await this.modActions.findByCaseNumber(
+        args.caseNumberOrUserId
+      );
 
       if (!action) {
         msg.channel.createMessage("Case not found!");
@@ -255,7 +259,7 @@ export class ModActionsPlugin extends Plugin {
     if (!action) return;
 
     if (!channelId) {
-      channelId = this.configValue('action_log_channel');
+      channelId = this.configValue("action_log_channel");
     }
 
     if (!channelId) return;
@@ -295,10 +299,12 @@ export class ModActionsPlugin extends Plugin {
     if (notes.length) {
       notes.forEach((note: any) => {
         const noteDate = moment(note.created_at);
-        embed.addField(
-          `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
-          note.body
-        );
+        embed.fields.push({
+          name: `${note.mod_name} at ${noteDate.format(
+            "YYYY-MM-DD [at] HH:mm"
+          )}:`,
+          value: note.body
+        });
       });
     } else {
       embed.addField("!!! THIS CASE HAS NO NOTES !!!", "\u200B");
