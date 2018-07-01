@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "target": "ES2017",
+    "lib": [
+      "es6",
+      "es7",
+      "ES2017"
+    ],
+    "baseUrl": "./"
+  }
+}

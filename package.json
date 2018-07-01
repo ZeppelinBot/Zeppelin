@@ -1,0 +1,44 @@
+{
+  "name": "newmodbot",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "precommit": "lint-staged",
+    "postcommit": "git update-index --again",
+    "format": "prettier --write \"./**/*.ts\""
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/cli-table2": "^0.2.1",
+    "@types/knex": "0.0.64",
+    "@types/koa": "^2.0.43",
+    "@types/koa-router": "^7.0.27",
+    "@types/node": "^8.0.50",
+    "cli-table3": "^0.5.0",
+    "dotenv": "^4.0.0",
+    "eris": "^0.8.6",
+    "husky": "^0.14.3",
+    "knex": "^0.14.6",
+    "knub": "^9.3.0",
+    "lint-staged": "^7.2.0",
+    "mariasql": "^0.2.6",
+    "moment": "^2.20.1",
+    "prettier": "^1.8.2",
+    "randomstring": "^1.1.5",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.8.0",
+    "tslint-config-prettier": "^1.6.0",
+    "typescript": "^2.6.1"
+  }
+}
