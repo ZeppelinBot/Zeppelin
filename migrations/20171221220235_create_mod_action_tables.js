@@ -8,7 +8,7 @@ exports.up = async function(knex, Promise) {
       table.string('user_name', 128).notNullable();
       table.bigInteger('mod_id').index().unsigned().nullable().defaultTo(null);
       table.string('mod_name', 128).nullable().defaultTo(null);
-      table.string('action_type', 16).notNullable();
+      table.integer('action_type').unsigned().notNullable();
       table.bigInteger('audit_log_id').unique().nullable().defaultTo(null);
       table.dateTime('created_at').index().defaultTo(knex.raw('NOW()')).notNullable();
 
