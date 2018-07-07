@@ -9,7 +9,8 @@
     "start-watch": "nodemon",
     "precommit": "lint-staged",
     "postcommit": "git update-index --again",
-    "format": "prettier --write \"./**/*.ts\""
+    "format": "prettier --write \"./**/*.ts\"",
+    "db-rollback": "knex migrate:rollback"
   },
   "lint-staged": {
     "*.ts": [
@@ -27,7 +28,7 @@
     "dotenv": "^4.0.0",
     "eris": "^0.8.6",
     "knex": "^0.14.6",
-    "knub": "^9.4.4",
+    "knub": "^9.4.5",
     "mariasql": "^0.2.6",
     "moment-timezone": "^0.5.21",
     "ts-node": "^3.3.0",
