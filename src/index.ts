@@ -6,6 +6,11 @@ process.on("unhandledRejection", (reason, p) => {
   process.exit();
 });
 
+// Always use UTC
+// This is also set for the database in knexfile
+import moment from "moment-timezone";
+moment.tz.setDefault("UTC");
+
 import { Client } from "eris";
 import { Knub, logger } from "knub";
 import { BotControlPlugin } from "./plugins/BotControl";

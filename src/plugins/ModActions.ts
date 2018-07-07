@@ -7,7 +7,7 @@ import {
   TextChannel,
   User
 } from "eris";
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 import { GuildModActions } from "../data/GuildModActions";
 
 enum ActionType {

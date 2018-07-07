@@ -22,13 +22,14 @@
   "license": "ISC",
   "dependencies": {
     "@types/knex": "0.0.64",
+    "@types/moment-timezone": "^0.5.6",
     "@types/node": "^8.0.50",
     "dotenv": "^4.0.0",
     "eris": "^0.8.6",
     "knex": "^0.14.6",
     "knub": "^9.4.3",
     "mariasql": "^0.2.6",
-    "moment": "^2.20.1",
+    "moment-timezone": "^0.5.21",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.1"
   },
