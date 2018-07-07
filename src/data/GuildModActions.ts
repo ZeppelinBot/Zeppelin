@@ -1,4 +1,5 @@
 import knex from "../knex";
+import ModAction from "../models/ModAction";
 
 export class GuildModActions {
   protected guildId: string;
@@ -7,34 +8,42 @@ export class GuildModActions {
     this.guildId = guildId;
   }
 
-  find(id: number) {
-    return knex("mod_actions")
+  async find(id: number): Promise<ModAction> {
+    const result = await knex("mod_actions")
       .where("guild_id", this.guildId)
       .where("id", id)
       .first();
+
+    return result ? new ModAction(result) : null;
   }
 
-  findByCaseNumber(caseNumber: number) {
-    return knex("mod_actions")
+  async findByCaseNumber(caseNumber: number): Promise<ModAction> {
+    const result = await knex("mod_actions")
       .where("guild_id", this.guildId)
       .where("case_number", caseNumber)
       .first();
+
+    return result ? new ModAction(result) : null;
   }
 
-  getActionNotes(actionId: number) {
-    return knex("mod_action_notes")
+  async getActionNotes(actionId: number): Promise<ModAction[]> {
+    const results = await knex("mod_action_notes")
       .where("mod_action_id", actionId)
       .select();
+
+    return results.map(r => new ModAction(r));
   }
 
-  getByUserId(userId: string) {
-    return knex("mod_actions")
+  async getByUserId(userId: string): Promise<ModAction[]> {
+    const results = await knex("mod_actions")
       .where("guild_id", this.guildId)
       .where("user_id", userId)
       .select();
+
+    return results.map(r => new ModAction(r));
   }
 
-  create(data) {
+  async create(data): Promise<number> {
     return knex
       .insert({
         ...data,
