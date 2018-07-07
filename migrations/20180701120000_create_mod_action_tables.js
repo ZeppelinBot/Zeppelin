@@ -1,4 +1,4 @@
-exports.up = async function(knex, Promise) {
+exports.up = async function(knex) {
   if (! await knex.schema.hasTable('mod_actions')) {
     await knex.schema.createTable('mod_actions', table => {
       table.increments('id');
@@ -28,7 +28,7 @@ exports.up = async function(knex, Promise) {
   }
 };
 
-exports.down = async function(knex, Promise) {
+exports.down = async function(knex) {
   await knex.schema.dropTableIfExists('mod_action_notes');
   await knex.schema.dropTableIfExists('mod_actions');
 };
