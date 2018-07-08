@@ -1,4 +1,4 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, waitForReaction } from "knub";
 import {
   Guild,
   GuildAuditLogEntry,
@@ -9,11 +9,18 @@ import {
 } from "eris";
 import * as moment from "moment-timezone";
 import { GuildModActions } from "../data/GuildModActions";
-import { convertDelayStringToMS, errorMessage, successMessage } from "../utils";
+import {
+  convertDelayStringToMS,
+  errorMessage,
+  stripObjectToScalars,
+  successMessage
+} from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import Timer = NodeJS.Timer;
 import ModAction from "../models/ModAction";
 import { ModActionType } from "../data/ModActionType";
+import { GuildServerLogs } from "../data/GuildServerLogs";
+import { LogType } from "../data/LogType";
 
 const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => {
@@ -24,11 +31,14 @@ const sleep = (ms: number): Promise<void> => {
 export class ModActionsPlugin extends Plugin {
   protected modActions: GuildModActions;
   protected mutes: GuildMutes;
+  protected serverLogs: GuildServerLogs;
+
   protected muteClearIntervalId: Timer;
 
   async onLoad() {
     this.modActions = new GuildModActions(this.guildId);
     this.mutes = new GuildMutes(this.guildId);
+    this.serverLogs = new GuildServerLogs(this.guildId);
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
@@ -114,7 +124,8 @@ export class ModActionsPlugin extends Plugin {
         modId,
         ModActionType.Ban,
         auditLogId,
-        relevantAuditLogEntry.reason
+        relevantAuditLogEntry.reason,
+        true
       );
     } else {
       await this.createModAction(user.id, null, ModActionType.Ban);
@@ -140,7 +151,9 @@ export class ModActionsPlugin extends Plugin {
         user.id,
         modId,
         ModActionType.Unban,
-        auditLogId
+        auditLogId,
+        null,
+        true
       );
     } else {
       await this.createModAction(user.id, null, ModActionType.Unban);
@@ -212,17 +225,34 @@ export class ModActionsPlugin extends Plugin {
       .replace("{guildName}", this.guild.name)
       .replace("{reason}", args.reason);
 
-    if (this.configValue("dm_on_warn")) {
-      const dmChannel = await this.bot.getDMChannel(args.member.id);
-      await dmChannel.createMessage(warnMessage);
+    let failedToMessage = false;
+
+    try {
+      if (this.configValue("dm_on_warn")) {
+        const dmChannel = await this.bot.getDMChannel(args.member.id);
+        await dmChannel.createMessage(warnMessage);
+      }
+
+      if (this.configValue("message_on_warn")) {
+        const channel = this.guild.channels.get(
+          this.configValue("message_channel")
+        ) as TextChannel;
+        if (channel) {
+          await channel.createMessage(`<@!${args.member.id}> ${warnMessage}`);
+        }
+      }
+    } catch (e) {
+      failedToMessage = true;
     }
 
-    if (this.configValue("message_on_warn")) {
-      const channel = this.guild.channels.get(
-        this.configValue("message_channel")
-      ) as TextChannel;
-      if (channel) {
-        await channel.createMessage(`<@!${args.member.id}> ${warnMessage}`);
+    if (failedToMessage) {
+      const failedMsg = await msg.channel.createMessage(
+        "Failed to message the user. Log the warning anyway?"
+      );
+      const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"]);
+      failedMsg.delete();
+      if (!reply || reply.name === "❌") {
+        return;
       }
     }
 
@@ -235,6 +265,11 @@ export class ModActionsPlugin extends Plugin {
     );
 
     msg.channel.createMessage(successMessage("Member warned"));
+
+    this.serverLogs.log(LogType.MEMBER_WARN, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
   }
 
   @d.command("mute", "<member:Member> [time:string] [reason:string$]")
@@ -468,7 +503,8 @@ export class ModActionsPlugin extends Plugin {
     modId: string,
     actionType: ModActionType,
     auditLogId: string = null,
-    reason: string = null
+    reason: string = null,
+    automatic = false
   ): Promise<number> {
     const user = this.bot.users.get(userId);
     const userName = user
@@ -493,7 +529,10 @@ export class ModActionsPlugin extends Plugin {
       await this.createModActionNote(createdId, modId, reason);
     }
 
-    if (this.configValue("action_log_channel")) {
+    if (
+      this.configValue("action_log_channel") &&
+      (!automatic || this.configValue("log_automatic_actions"))
+    ) {
       try {
         await this.postModActionToActionLog(createdId);
       } catch (e) {} // tslint:disable-line
