@@ -1,5 +1,5 @@
 import knex from "../knex";
-import moment from "moment-timezone";
+import * as moment from "moment-timezone";
 import Mute from "../models/Mute";
 
 export class GuildMutes {
@@ -12,20 +12,20 @@ export class GuildMutes {
   async getExpiredMutes(): Promise<Mute[]> {
     const result = await knex("mutes")
       .where("guild_id", this.guildId)
-      .where("expires_at", "<=", "CURDATE()")
       .whereNotNull("expires_at")
+      .whereRaw("expires_at <= NOW()")
       .select();
 
     return result.map(r => new Mute(r));
   }
 
-  async findExistingMuteForUserId(userId: string): Promise<Mute[]> {
+  async findExistingMuteForUserId(userId: string): Promise<Mute> {
     const result = await knex("mutes")
       .where("guild_id", this.guildId)
       .where("user_id", userId)
       .first();
 
-    return result.map(r => new Mute(r));
+    return result ? new Mute(result) : null;
   }
 
   async addMute(userId, expiryTime) {
@@ -69,8 +69,8 @@ export class GuildMutes {
     }
   }
 
-  async unmute(userId) {
-    return knex
+  async clear(userId) {
+    return knex("mutes")
       .where("guild_id", this.guildId)
       .where("user_id", userId)
       .delete();

@@ -9,14 +9,11 @@ import {
 } from "eris";
 import * as moment from "moment-timezone";
 import { GuildModActions } from "../data/GuildModActions";
-
-enum ActionType {
-  Ban = 1,
-  Unban,
-  Note,
-  Warn,
-  Kick
-}
+import { convertDelayStringToMS, errorMessage, successMessage } from "../utils";
+import { GuildMutes } from "../data/GuildMutes";
+import Timer = NodeJS.Timer;
+import ModAction from "../models/ModAction";
+import { ModActionType } from "../data/ModActionType";
 
 const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => {
@@ -26,14 +23,29 @@ const sleep = (ms: number): Promise<void> => {
 
 export class ModActionsPlugin extends Plugin {
   protected modActions: GuildModActions;
+  protected mutes: GuildMutes;
+  protected muteClearIntervalId: Timer;
 
   async onLoad() {
     this.modActions = new GuildModActions(this.guildId);
+    this.mutes = new GuildMutes(this.guildId);
+
+    // Check for expired mutes every 5s
+    this.clearExpiredMutes();
+    this.muteClearIntervalId = setInterval(
+      () => this.clearExpiredMutes(),
+      5000
+    );
+  }
+
+  async onUnload() {
+    clearInterval(this.muteClearIntervalId);
   }
 
   getDefaultOptions() {
     return {
       config: {
+        mute_role: null,
         dm_on_warn: true,
         dm_on_mute: true,
         dm_on_kick: false,
@@ -44,9 +56,14 @@ export class ModActionsPlugin extends Plugin {
         message_on_ban: false,
         message_channel: null,
         warn_message: "You have received a warning on {guildName}: {reason}",
-        mute_message: "You have been muted on {guildName} for {reason}",
-        kick_message: "You have been kicked from {guildName} for {reason}",
-        ban_message: "You have been banned from {guildName} for {reason}",
+        mute_message:
+          "You have been muted on {guildName}. Reason given: {reason}",
+        timed_mute_message:
+          "You have been muted on {guildName} for {time}. Reason given: {reason}",
+        kick_message:
+          "You have been kicked from {guildName}. Reason given: {reason}",
+        ban_message:
+          "You have been banned from {guildName}. Reason given: {reason}",
         log_automatic_actions: true,
         action_log_channel: null,
         alert_on_rejoin: false,
@@ -88,31 +105,20 @@ export class ModActionsPlugin extends Plugin {
       user.id
     );
 
-    let modActionId;
-
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      modActionId = await this.createModAction(
+      await this.createModAction(
         user.id,
         modId,
-        ActionType.Ban,
-        auditLogId
+        ModActionType.Ban,
+        auditLogId,
+        relevantAuditLogEntry.reason
       );
-
-      if (relevantAuditLogEntry.reason) {
-        await this.createModActionNote(
-          modActionId,
-          modId,
-          relevantAuditLogEntry.reason
-        );
-      }
     } else {
-      modActionId = await this.createModAction(user.id, null, ActionType.Ban);
+      await this.createModAction(user.id, null, ModActionType.Ban);
     }
-
-    this.displayModAction(modActionId);
   }
 
   /**
@@ -126,23 +132,19 @@ export class ModActionsPlugin extends Plugin {
       user.id
     );
 
-    let modActionId;
-
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      modActionId = await this.createModAction(
+      await this.createModAction(
         user.id,
         modId,
-        ActionType.Unban,
+        ModActionType.Unban,
         auditLogId
       );
     } else {
-      modActionId = await this.createModAction(user.id, null, ActionType.Unban);
+      await this.createModAction(user.id, null, ModActionType.Unban);
     }
-
-    this.displayModAction(modActionId);
   }
 
   /**
@@ -168,9 +170,9 @@ export class ModActionsPlugin extends Plugin {
   }
 
   /**
-   * Update the specified case by adding more details to it
+   * Update the specified case by adding more notes/details to it
    */
-  @d.command("update", "<caseNumber:number> <note:string$>")
+  @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
   @d.permission("note")
   async updateCmd(msg: Message, args: any) {
     const action = await this.modActions.findByCaseNumber(args.caseNumber);
@@ -188,24 +190,128 @@ export class ModActionsPlugin extends Plugin {
     }
 
     await this.createModActionNote(action.id, msg.author.id, args.note);
-
-    this.displayModAction(action.id, msg.channel.id);
+    this.postModActionToActionLog(action.id); // Post updated action to action log
   }
 
-  /**
-   * Create a new NOTE type mod action and add the specified note to it
-   */
   @d.command("note", "<userId:string> <note:string$>")
   @d.permission("note")
   async noteCmd(msg: Message, args: any) {
-    const actionId = await this.createModAction(
+    await this.createModAction(
       args.userId,
       msg.author.id,
-      ActionType.Note
+      ModActionType.Note,
+      null,
+      args.note
     );
-    await this.createModActionNote(actionId, msg.author.id, args.note);
+  }
 
-    this.displayModAction(actionId, msg.channel.id);
+  @d.command("warn", "<member:Member> <reason:string$>")
+  @d.permission("warn")
+  async warnCmd(msg: Message, args: any) {
+    const warnMessage = this.configValue("warn_message")
+      .replace("{guildName}", this.guild.name)
+      .replace("{reason}", args.reason);
+
+    if (this.configValue("dm_on_warn")) {
+      const dmChannel = await this.bot.getDMChannel(args.member.id);
+      await dmChannel.createMessage(warnMessage);
+    }
+
+    if (this.configValue("message_on_warn")) {
+      const channel = this.guild.channels.get(
+        this.configValue("message_channel")
+      ) as TextChannel;
+      if (channel) {
+        await channel.createMessage(`<@!${args.member.id}> ${warnMessage}`);
+      }
+    }
+
+    await this.createModAction(
+      args.member.id,
+      msg.author.id,
+      ModActionType.Warn,
+      null,
+      args.reason
+    );
+
+    msg.channel.createMessage(successMessage("Member warned"));
+  }
+
+  @d.command("mute", "<member:Member> [time:string] [reason:string$]")
+  @d.permission("mute")
+  async muteCmd(msg: Message, args: any) {
+    if (!this.configValue("mute_role")) {
+      msg.channel.createMessage(
+        errorMessage("Cannot mute: no mute role specified")
+      );
+      return;
+    }
+
+    // Make sure we're allowed to mute this member
+    if (msg.member.id !== args.member.id) {
+      const ourLevel = this.getMemberLevel(msg.member);
+      const memberLevel = this.getMemberLevel(args.member);
+      if (ourLevel <= memberLevel) {
+        msg.channel.createMessage(
+          errorMessage("Cannot mute: insufficient permissions")
+        );
+        return;
+      }
+    }
+
+    // Convert mute time from e.g. "2h30m" to milliseconds
+    const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
+    if (muteTime == null && args.time) {
+      // Invalid muteTime -> assume it's actually part of the reason
+      args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
+    }
+
+    // Apply "muted" role
+    await args.member.addRole(this.configValue("mute_role"));
+    await this.mutes.addOrUpdateMute(args.member.id, muteTime);
+
+    // Log the action
+    await this.createModAction(
+      args.member.id,
+      msg.author.id,
+      ModActionType.Mute,
+      null,
+      args.reason
+    );
+
+    // Message the user informing them of the mute
+    if (args.reason) {
+      const muteMessage = this.configValue("mute_message")
+        .replace("{guildName}", this.guild.name)
+        .replace("{reason}", args.reason);
+
+      if (this.configValue("dm_on_mute")) {
+        const dmChannel = await this.bot.getDMChannel(args.member.id);
+        await dmChannel.createMessage(muteMessage);
+      }
+
+      if (
+        this.configValue("message_on_mute") &&
+        this.configValue("message_channel")
+      ) {
+        const channel = this.guild.channels.get(
+          this.configValue("message_channel")
+        ) as TextChannel;
+        await channel.createMessage(`<@!${args.member.id}> ${muteMessage}`);
+      }
+    }
+
+    // Confirm the action to the moderator
+    if (muteTime) {
+      const unmuteTime = moment()
+        .add(muteTime, "ms")
+        .format("YYYY-MM-DD HH:mm:ss");
+      msg.channel.createMessage(
+        successMessage(`Member muted until ${unmuteTime}`)
+      );
+    } else {
+      msg.channel.createMessage(successMessage(`Member muted indefinitely`));
+    }
   }
 
   /**
@@ -248,8 +354,11 @@ export class ModActionsPlugin extends Plugin {
    * Shows information about the specified action in a message embed.
    * If no channelId is specified, uses the channel id from config.
    */
-  protected async displayModAction(actionOrId: any, channelId: string = null) {
-    let action;
+  protected async displayModAction(
+    actionOrId: ModAction | number,
+    channelId: string
+  ) {
+    let action: ModAction;
     if (typeof actionOrId === "number") {
       action = await this.modActions.find(actionOrId);
     } else {
@@ -257,17 +366,12 @@ export class ModActionsPlugin extends Plugin {
     }
 
     if (!action) return;
-
-    if (!channelId) {
-      channelId = this.configValue("action_log_channel");
-    }
-
-    if (!channelId) return;
+    if (!this.guild.channels.get(channelId)) return;
 
     const notes = await this.modActions.getActionNotes(action.id);
 
     const createdAt = moment(action.created_at);
-    const actionTypeStr = ActionType[action.action_type].toUpperCase();
+    const actionTypeStr = ModActionType[action.action_type].toUpperCase();
 
     const embed: any = {
       title: `${actionTypeStr} - Case #${action.case_number}`,
@@ -307,7 +411,10 @@ export class ModActionsPlugin extends Plugin {
         });
       });
     } else {
-      embed.addField("!!! THIS CASE HAS NO NOTES !!!", "\u200B");
+      embed.fields.push({
+        name: "!!! THIS CASE HAS NO NOTES !!!",
+        value: "\u200B"
+      });
     }
 
     (this.bot.guilds
@@ -315,6 +422,17 @@ export class ModActionsPlugin extends Plugin {
       .channels.get(channelId) as TextChannel).createMessage({
       embed
     });
+  }
+
+  /**
+   * Posts the specified mod action to the guild's action log channel
+   */
+  protected async postModActionToActionLog(actionOrId: ModAction | number) {
+    const actionLogChannelId = this.configValue("action_log_channel");
+    if (!actionLogChannelId) return;
+    if (!this.guild.channels.get(actionLogChannelId)) return;
+
+    return this.displayModAction(actionOrId, actionLogChannelId);
   }
 
   /**
@@ -348,8 +466,9 @@ export class ModActionsPlugin extends Plugin {
   protected async createModAction(
     userId: string,
     modId: string,
-    actionType: ActionType,
-    auditLogId: string = null
+    actionType: ModActionType,
+    auditLogId: string = null,
+    reason: string = null
   ): Promise<number> {
     const user = this.bot.users.get(userId);
     const userName = user
@@ -361,7 +480,7 @@ export class ModActionsPlugin extends Plugin {
       ? `${mod.username}#${mod.discriminator}`
       : "Unknown#0000";
 
-    return this.modActions.create({
+    const createdId = await this.modActions.create({
       user_id: userId,
       user_name: userName,
       mod_id: modId,
@@ -369,6 +488,18 @@ export class ModActionsPlugin extends Plugin {
       action_type: actionType,
       audit_log_id: auditLogId
     });
+
+    if (reason) {
+      await this.createModActionNote(createdId, modId, reason);
+    }
+
+    if (this.configValue("action_log_channel")) {
+      try {
+        await this.postModActionToActionLog(createdId);
+      } catch (e) {} // tslint:disable-line
+    }
+
+    return createdId;
   }
 
   protected async createModActionNote(
@@ -384,7 +515,21 @@ export class ModActionsPlugin extends Plugin {
     return this.modActions.createNote(modActionId, {
       mod_id: modId,
       mod_name: modName,
-      body
+      body: body || ""
     });
+  }
+
+  protected async clearExpiredMutes() {
+    const expiredMutes = await this.mutes.getExpiredMutes();
+    for (const mute of expiredMutes) {
+      const member = this.guild.members.get(mute.user_id);
+      if (!member) continue;
+
+      try {
+        await member.removeRole(this.configValue("mute_role"));
+      } catch (e) {} // tslint:disable-line
+
+      await this.mutes.clear(member.id);
+    }
   }
 }
