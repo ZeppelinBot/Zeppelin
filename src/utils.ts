@@ -1,5 +1,4 @@
-import * as moment from "moment-timezone";
-import { ModActionType } from "./data/ModActionType";
+import at = require("lodash.at");
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -41,4 +40,37 @@ export function errorMessage(str) {
 
 export function uclower(str) {
   return str[0].toLowerCase() + str.slice(1);
+}
+
+export function stripObjectToScalars(obj, includedNested: string[]) {
+  const result = {};
+
+  for (const key in obj) {
+    if (
+      obj[key] == null ||
+      typeof obj[key] === "string" ||
+      typeof obj[key] === "number" ||
+      typeof obj[key] === "boolean"
+    ) {
+      result[key] = obj[key];
+    } else if (typeof obj[key] === "object") {
+      const prefix = `${key}.`;
+      const nestedNested = includedNested
+        .filter(p => p === key || p.startsWith(prefix))
+        .map(p => (p === key ? p : p.slice(prefix.length)));
+
+      if (nestedNested.length) {
+        result[key] = stripObjectToScalars(obj[key], nestedNested);
+      }
+    }
+  }
+
+  return result;
+}
+
+const stringFormatRegex = /{([^{}]+?)}/g;
+export function formatTemplateString(str: string, values) {
+  return str.replace(stringFormatRegex, (match, val) => {
+    return (at(values, val)[0] as string) || "";
+  });
 }

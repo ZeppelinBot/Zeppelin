@@ -16,6 +16,7 @@ import { Knub, logger } from "knub";
 import { BotControlPlugin } from "./plugins/BotControl";
 import { ModActionsPlugin } from "./plugins/ModActions";
 import { UtilityPlugin } from "./plugins/Utility";
+import { LogsPlugin } from "./plugins/Logs";
 import knex from "./knex";
 
 // Run latest database migrations
@@ -26,7 +27,8 @@ knex.migrate.latest().then(() => {
   const bot = new Knub(client, {
     plugins: {
       utility: UtilityPlugin,
-      mod_actions: ModActionsPlugin
+      mod_actions: ModActionsPlugin,
+      logs: LogsPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin
