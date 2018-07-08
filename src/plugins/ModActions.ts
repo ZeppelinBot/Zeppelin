@@ -11,7 +11,7 @@ import * as moment from "moment-timezone";
 import { GuildModActions } from "../data/GuildModActions";
 import {
   convertDelayStringToMS,
-  errorMessage,
+  errorMessage, formatTemplateString,
   stripObjectToScalars,
   successMessage
 } from "../utils";
@@ -316,9 +316,10 @@ export class ModActionsPlugin extends Plugin {
 
     // Message the user informing them of the mute
     if (args.reason) {
-      const muteMessage = this.configValue("mute_message")
-        .replace("{guildName}", this.guild.name)
-        .replace("{reason}", args.reason);
+      const muteMessage = formatTemplateString(this.configValue("mute_message"), {
+        guildName: this.guild.name,
+        reason: args.reason
+      });
 
       if (this.configValue("dm_on_mute")) {
         const dmChannel = await this.bot.getDMChannel(args.member.id);
