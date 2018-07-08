@@ -8,7 +8,7 @@ process.on("unhandledRejection", (reason, p) => {
 
 // Always use UTC
 // This is also set for the database in knexfile
-import moment from "moment-timezone";
+import * as moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
@@ -26,7 +26,7 @@ knex.migrate.latest().then(() => {
   const bot = new Knub(client, {
     plugins: {
       utility: UtilityPlugin,
-      mod_notes: ModActionsPlugin
+      mod_actions: ModActionsPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin
