@@ -368,6 +368,11 @@ export class ModActionsPlugin extends Plugin {
         )
       );
     }
+
+    this.serverLogs.log(LogType.MEMBER_MUTE, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
   }
 
   /**
@@ -590,6 +595,10 @@ export class ModActionsPlugin extends Plugin {
       } catch (e) {} // tslint:disable-line
 
       await this.mutes.clear(member.id);
+
+      this.serverLogs.log(LogType.MEMBER_UNMUTE, {
+        member: stripObjectToScalars(member, ["user"])
+      });
     }
   }
 }
