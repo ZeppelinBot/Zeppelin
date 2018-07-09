@@ -11,7 +11,8 @@ import * as moment from "moment-timezone";
 import { GuildModActions } from "../data/GuildModActions";
 import {
   convertDelayStringToMS,
-  errorMessage, formatTemplateString,
+  errorMessage,
+  formatTemplateString,
   stripObjectToScalars,
   successMessage
 } from "../utils";
@@ -315,25 +316,33 @@ export class ModActionsPlugin extends Plugin {
     );
 
     // Message the user informing them of the mute
+    let messagingFailed = false;
     if (args.reason) {
-      const muteMessage = formatTemplateString(this.configValue("mute_message"), {
-        guildName: this.guild.name,
-        reason: args.reason
-      });
+      const muteMessage = formatTemplateString(
+        this.configValue("mute_message"),
+        {
+          guildName: this.guild.name,
+          reason: args.reason
+        }
+      );
 
-      if (this.configValue("dm_on_mute")) {
-        const dmChannel = await this.bot.getDMChannel(args.member.id);
-        await dmChannel.createMessage(muteMessage);
-      }
+      try {
+        if (this.configValue("dm_on_mute")) {
+          const dmChannel = await this.bot.getDMChannel(args.member.id);
+          await dmChannel.createMessage(muteMessage);
+        }
 
-      if (
-        this.configValue("message_on_mute") &&
-        this.configValue("message_channel")
-      ) {
-        const channel = this.guild.channels.get(
+        if (
+          this.configValue("message_on_mute") &&
           this.configValue("message_channel")
-        ) as TextChannel;
-        await channel.createMessage(`<@!${args.member.id}> ${muteMessage}`);
+        ) {
+          const channel = this.guild.channels.get(
+            this.configValue("message_channel")
+          ) as TextChannel;
+          await channel.createMessage(`<@!${args.member.id}> ${muteMessage}`);
+        }
+      } catch (e) {
+        messagingFailed = true;
       }
     }
 
@@ -342,11 +351,22 @@ export class ModActionsPlugin extends Plugin {
       const unmuteTime = moment()
         .add(muteTime, "ms")
         .format("YYYY-MM-DD HH:mm:ss");
+
       msg.channel.createMessage(
-        successMessage(`Member muted until ${unmuteTime}`)
+        successMessage(
+          `Member muted until ${unmuteTime}${
+            messagingFailed ? " (failed to message user)" : ""
+          }`
+        )
       );
     } else {
-      msg.channel.createMessage(successMessage(`Member muted indefinitely`));
+      msg.channel.createMessage(
+        successMessage(
+          `Member muted indefinitely${
+            messagingFailed ? " (failed to message user)" : ""
+          }`
+        )
+      );
     }
   }
 
