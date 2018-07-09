@@ -7,7 +7,13 @@ module.exports = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     db: process.env.DB_DATABASE,
-    timezone: 'UTC',
     charset: 'utf8mb4'
+  },
+  pool: {
+    afterCreate(connection, callback) {
+      connection.query("SET time_zone = '+0:00';", err => {
+        callback(err, connection);
+      });
+    }
   }
 };
