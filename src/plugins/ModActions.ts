@@ -398,6 +398,10 @@ export class ModActionsPlugin extends Plugin {
   ): Promise<boolean> {
     let messageSent = false;
 
+    if (!useDM && !useChannel) {
+      return true;
+    }
+
     if (useDM) {
       try {
         const dmChannel = await this.bot.getDMChannel(user.id);
