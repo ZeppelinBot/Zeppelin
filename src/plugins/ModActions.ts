@@ -8,6 +8,7 @@ import {
   User
 } from "eris";
 import * as moment from "moment-timezone";
+import * as humanizeDuration from "humanize-duration";
 import { GuildModActions } from "../data/GuildModActions";
 import {
   convertDelayStringToMS,
@@ -284,6 +285,8 @@ export class ModActionsPlugin extends Plugin {
 
     // Convert mute time from e.g. "2h30m" to milliseconds
     const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
+    const timeUntilUnmute = muteTime && humanizeDuration(muteTime);
+
     if (muteTime == null && args.time) {
       // Invalid muteTime -> assume it's actually part of the reason
       args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
@@ -303,13 +306,18 @@ export class ModActionsPlugin extends Plugin {
     );
 
     // Message the user informing them of the mute
-    let messageSent = false;
+    let messageSent = true;
     if (args.reason) {
+      const template = muteTime
+        ? this.configValue("timed_mute_message")
+        : this.configValue("mute_message");
+
       const muteMessage = formatTemplateString(
-        this.configValue("mute_message"),
+        template,
         {
           guildName: this.guild.name,
-          reason: args.reason
+          reason: args.reason,
+          time: timeUntilUnmute
         }
       );
 
@@ -324,11 +332,7 @@ export class ModActionsPlugin extends Plugin {
     // Confirm the action to the moderator
     let response;
     if (muteTime) {
-      const unmuteTime = moment()
-        .add(muteTime, "ms")
-        .format("YYYY-MM-DD HH:mm:ss");
-
-      response = `Member muted until ${unmuteTime}`;
+      response = `Member muted for ${timeUntilUnmute}`;
     } else {
       response = `Member muted indefinitely`;
     }
