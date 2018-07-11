@@ -59,6 +59,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# windows folder options
+desktop.ini
+
 # Knub data
 /data
 /config
