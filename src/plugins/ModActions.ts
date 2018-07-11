@@ -272,15 +272,9 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Make sure we're allowed to mute this member
-    if (msg.member.id !== args.member.id) {
-      const ourLevel = this.getMemberLevel(msg.member);
-      const memberLevel = this.getMemberLevel(args.member);
-      if (ourLevel <= memberLevel) {
-        msg.channel.createMessage(
-          errorMessage("Cannot mute: insufficient permissions")
-        );
-        return;
-      }
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
+      return;
     }
 
     // Convert mute time from e.g. "2h30m" to milliseconds
@@ -380,6 +374,16 @@ export class ModActionsPlugin extends Plugin {
 
       this.displayModAction(action.id, msg.channel.id);
     }
+  }
+
+  protected canActOn(member1, member2) {
+    if (member1.id === member2.id) {
+      return true;
+    }
+
+    const ourLevel = this.getMemberLevel(member1);
+    const memberLevel = this.getMemberLevel(member2);
+    return (ourLevel > memberLevel);
   }
 
   /**
