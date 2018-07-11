@@ -258,7 +258,7 @@ export class ModActionsPlugin extends Plugin {
     await args.member.addRole(this.configValue("mute_role"), args.reason);
     await this.mutes.addOrUpdateMute(args.member.id, muteTime);
 
-    // Log the action
+    // Create a case for this action
     await this.createModAction(
       args.member.id,
       msg.author.id,
@@ -299,6 +299,7 @@ export class ModActionsPlugin extends Plugin {
     if (!messageSent) response += " (failed to message user)";
     msg.channel.createMessage(successMessage(response));
 
+    // Log the action
     this.serverLogs.log(LogType.MEMBER_MUTE, {
       mod: stripObjectToScalars(msg.member, ["user"]),
       member: stripObjectToScalars(args.member, ["user"])
