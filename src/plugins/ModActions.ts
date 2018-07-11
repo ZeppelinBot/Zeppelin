@@ -339,7 +339,7 @@ export class ModActionsPlugin extends Plugin {
 
   protected canActOn(member1, member2) {
     if (member1.id === member2.id) {
-      return true;
+      return false;
     }
 
     const ourLevel = this.getMemberLevel(member1);
