@@ -306,6 +306,98 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
+  @d.command("kick", "<member:Member> [reason:string$]")
+  @d.permission("kick")
+  async kickCmd(msg, args) {
+    // Make sure we're allowed to kick this member
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot kick: insufficient permissions"));
+      return;
+    }
+
+    // Attempt to message the user *before* kicking them, as doing it after may not be possible
+    let messageSent = true;
+    if (args.reason) {
+      const kickMessage = formatTemplateString(this.configValue("kick_message"), {
+        guildName: this.guild.name,
+        reason: args.reason
+      });
+
+      messageSent = await this.tryToMessageUser(
+        args.member.user,
+        kickMessage,
+        this.configValue("dm_on_kick"),
+        this.configValue("message_on_kick")
+      );
+    }
+
+    // Kick the user
+    args.member.kick(args.reason);
+
+    // Create a case for this action
+    await this.createModAction(
+      args.member.id,
+      msg.author.id,
+      ModActionType.Kick,
+      null,
+      args.reason
+    );
+
+    // Confirm the action to the moderator
+    let response = `Member kicked`;
+    if (!messageSent) response += " (failed to message user)";
+    msg.channel.createMessage(successMessage(response));
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_KICK, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
+  }
+
+  @d.command("ban", "<member:Member> [reason:string$]")
+  @d.permission("ban")
+  async banCmd(msg, args) {
+    // Make sure we're allowed to ban this member
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
+      return;
+    }
+
+    // Attempt to message the user *before* banning them, as doing it after may not be possible
+    let messageSent = true;
+    if (args.reason) {
+      const banMessage = formatTemplateString(this.configValue("ban_message"), {
+        guildName: this.guild.name,
+        reason: args.reason
+      });
+
+      messageSent = await this.tryToMessageUser(
+        args.member.user,
+        banMessage,
+        this.configValue("dm_on_ban"),
+        this.configValue("message_on_ban")
+      );
+    }
+
+    // Ban the user
+    args.member.ban(1, args.reason);
+
+    // Create a case for this action
+    await this.createModAction(args.member.id, msg.author.id, ModActionType.Ban, null, args.reason);
+
+    // Confirm the action to the moderator
+    let response = `Member banned`;
+    if (!messageSent) response += " (failed to message user)";
+    msg.channel.createMessage(successMessage(response));
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_BAN, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
+  }
+
   /**
    * Display a case or list of cases
    * If the argument passed is a case id, display that case
