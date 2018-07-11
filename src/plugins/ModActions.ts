@@ -226,27 +226,14 @@ export class ModActionsPlugin extends Plugin {
       .replace("{guildName}", this.guild.name)
       .replace("{reason}", args.reason);
 
-    let failedToMessage = false;
+    const messageSent = await this.tryToMessageUser(
+      args.member.user,
+      warnMessage,
+      this.configValue("dm_on_warn"),
+      this.configValue("message_on_warn")
+    );
 
-    try {
-      if (this.configValue("dm_on_warn")) {
-        const dmChannel = await this.bot.getDMChannel(args.member.id);
-        await dmChannel.createMessage(warnMessage);
-      }
-
-      if (this.configValue("message_on_warn")) {
-        const channel = this.guild.channels.get(
-          this.configValue("message_channel")
-        ) as TextChannel;
-        if (channel) {
-          await channel.createMessage(`<@!${args.member.id}> ${warnMessage}`);
-        }
-      }
-    } catch (e) {
-      failedToMessage = true;
-    }
-
-    if (failedToMessage) {
+    if (!messageSent) {
       const failedMsg = await msg.channel.createMessage(
         "Failed to message the user. Log the warning anyway?"
       );
@@ -316,7 +303,7 @@ export class ModActionsPlugin extends Plugin {
     );
 
     // Message the user informing them of the mute
-    let messagingFailed = false;
+    let messageSent = false;
     if (args.reason) {
       const muteMessage = formatTemplateString(
         this.configValue("mute_message"),
@@ -326,48 +313,28 @@ export class ModActionsPlugin extends Plugin {
         }
       );
 
-      try {
-        if (this.configValue("dm_on_mute")) {
-          const dmChannel = await this.bot.getDMChannel(args.member.id);
-          await dmChannel.createMessage(muteMessage);
-        }
-
-        if (
-          this.configValue("message_on_mute") &&
-          this.configValue("message_channel")
-        ) {
-          const channel = this.guild.channels.get(
-            this.configValue("message_channel")
-          ) as TextChannel;
-          await channel.createMessage(`<@!${args.member.id}> ${muteMessage}`);
-        }
-      } catch (e) {
-        messagingFailed = true;
-      }
+      messageSent = await this.tryToMessageUser(
+        args.member.user,
+        muteMessage,
+        this.configValue("dm_on_mute"),
+        this.configValue("message_on_mute")
+      );
     }
 
     // Confirm the action to the moderator
+    let response;
     if (muteTime) {
       const unmuteTime = moment()
         .add(muteTime, "ms")
         .format("YYYY-MM-DD HH:mm:ss");
 
-      msg.channel.createMessage(
-        successMessage(
-          `Member muted until ${unmuteTime}${
-            messagingFailed ? " (failed to message user)" : ""
-          }`
-        )
-      );
+      response = `Member muted until ${unmuteTime}`;
     } else {
-      msg.channel.createMessage(
-        successMessage(
-          `Member muted indefinitely${
-            messagingFailed ? " (failed to message user)" : ""
-          }`
-        )
-      );
+      response = `Member muted indefinitely`;
     }
+
+    if (!messageSent) response += " (failed to message user)";
+    msg.channel.createMessage(successMessage(response));
 
     this.serverLogs.log(LogType.MEMBER_MUTE, {
       mod: stripObjectToScalars(msg.member, ["user"]),
@@ -409,6 +376,39 @@ export class ModActionsPlugin extends Plugin {
 
       this.displayModAction(action.id, msg.channel.id);
     }
+  }
+
+  /**
+   * Attempts to message the specified user through DMs and/or the message channel.
+   * Returns a promise that resolves to a boolean indicating whether we were able to message them or not.
+   */
+  protected async tryToMessageUser(
+    user: User,
+    str: string,
+    useDM: boolean,
+    useChannel: boolean
+  ): Promise<boolean> {
+    let messageSent = false;
+
+    if (useDM) {
+      try {
+        const dmChannel = await this.bot.getDMChannel(user.id);
+        await dmChannel.createMessage(str);
+        messageSent = true;
+      } catch (e) {} // tslint:disable-line
+    }
+
+    if (useChannel && this.configValue("message_channel")) {
+      try {
+        const channel = this.guild.channels.get(
+          this.configValue("message_channel")
+        ) as TextChannel;
+        await channel.createMessage(`<@!${user.id}> ${str}`);
+        messageSent = true;
+      } catch (e) {} // tslint:disable-line
+    }
+
+    return messageSent;
   }
 
   /**
