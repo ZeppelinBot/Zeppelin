@@ -1,4 +1,4 @@
-import knex from "../knex";
+import * as knex from "../knex";
 import * as moment from "moment-timezone";
 import Mute from "../models/Mute";
 

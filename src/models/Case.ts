@@ -1,6 +1,6 @@
 import Model from "./Model";
 
-export default class ModAction extends Model {
+export default class Case extends Model {
   public id: number;
   public guild_id: string;
   public case_number: number;
@@ -8,7 +8,7 @@ export default class ModAction extends Model {
   public user_name: string;
   public mod_id: string;
   public mod_name: string;
-  public action_type: number;
+  public type: number;
   public audit_log_id: string;
   public created_at: string;
 }

@@ -1,4 +1,4 @@
-export enum ModActionType {
+export enum CaseType {
   Ban = 1,
   Unban,
   Note,

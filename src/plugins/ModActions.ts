@@ -2,7 +2,7 @@ import { Plugin, decorators as d, waitForReaction } from "knub";
 import { Guild, GuildAuditLogEntry, Member, Message, TextChannel, User } from "eris";
 import * as moment from "moment-timezone";
 import * as humanizeDuration from "humanize-duration";
-import { GuildModActions } from "../data/GuildModActions";
+import { GuildCases } from "../data/GuildCases";
 import {
   convertDelayStringToMS,
   errorMessage,
@@ -12,8 +12,8 @@ import {
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import Timer = NodeJS.Timer;
-import ModAction from "../models/ModAction";
-import { ModActionType } from "../data/ModActionType";
+import Case from "../models/Case";
+import { CaseType } from "../data/CaseType";
 import { GuildServerLogs } from "../data/GuildServerLogs";
 import { LogType } from "../data/LogType";
 
@@ -24,14 +24,14 @@ const sleep = (ms: number): Promise<void> => {
 };
 
 export class ModActionsPlugin extends Plugin {
-  protected modActions: GuildModActions;
+  protected cases: GuildCases;
   protected mutes: GuildMutes;
   protected serverLogs: GuildServerLogs;
 
   protected muteClearIntervalId: Timer;
 
   async onLoad() {
-    this.modActions = new GuildModActions(this.guildId);
+    this.cases = new GuildCases(this.guildId);
     this.mutes = new GuildMutes(this.guildId);
     this.serverLogs = new GuildServerLogs(this.guildId);
 
@@ -63,7 +63,7 @@ export class ModActionsPlugin extends Plugin {
         kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         log_automatic_actions: true,
-        action_log_channel: null,
+        case_log_channel: null,
         alert_on_rejoin: false,
         alert_channel: null
       },
@@ -104,16 +104,16 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createModAction(
+      await this.createCase(
         user.id,
         modId,
-        ModActionType.Ban,
+        CaseType.Ban,
         auditLogId,
         relevantAuditLogEntry.reason,
         true
       );
     } else {
-      await this.createModAction(user.id, null, ModActionType.Ban);
+      await this.createCase(user.id, null, CaseType.Ban);
     }
   }
 
@@ -132,9 +132,9 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createModAction(user.id, modId, ModActionType.Unban, auditLogId, null, true);
+      await this.createCase(user.id, modId, CaseType.Unban, auditLogId, null, true);
     } else {
-      await this.createModAction(user.id, null, ModActionType.Unban);
+      await this.createCase(user.id, null, CaseType.Unban);
     }
   }
 
@@ -148,7 +148,7 @@ export class ModActionsPlugin extends Plugin {
     const alertChannelId = this.configValue("alert_channel");
     if (!alertChannelId) return;
 
-    const actions = await this.modActions.getByUserId(member.id);
+    const actions = await this.cases.getByUserId(member.id);
 
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
@@ -166,7 +166,7 @@ export class ModActionsPlugin extends Plugin {
   @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
   @d.permission("note")
   async updateCmd(msg: Message, args: any) {
-    const action = await this.modActions.findByCaseNumber(args.caseNumber);
+    const action = await this.cases.findByCaseNumber(args.caseNumber);
     if (!action) {
       msg.channel.createMessage("Case not found!");
       return;
@@ -174,20 +174,20 @@ export class ModActionsPlugin extends Plugin {
 
     if (action.mod_id === null) {
       // If the action has no moderator information, assume the first one to update it did the action
-      await this.modActions.update(action.id, {
+      await this.cases.update(action.id, {
         mod_id: msg.author.id,
         mod_name: `${msg.author.username}#${msg.author.discriminator}`
       });
     }
 
-    await this.createModActionNote(action.id, msg.author.id, args.note);
-    this.postModActionToActionLog(action.id); // Post updated action to action log
+    await this.createCaseNote(action.id, msg.author.id, args.note);
+    this.postCaseToCaseLog(action.id); // Post updated case to case log
   }
 
   @d.command("note", "<userId:string> <note:string$>")
   @d.permission("note")
   async noteCmd(msg: Message, args: any) {
-    await this.createModAction(args.userId, msg.author.id, ModActionType.Note, null, args.note);
+    await this.createCase(args.userId, msg.author.id, CaseType.Note, null, args.note);
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
@@ -215,13 +215,7 @@ export class ModActionsPlugin extends Plugin {
       }
     }
 
-    await this.createModAction(
-      args.member.id,
-      msg.author.id,
-      ModActionType.Warn,
-      null,
-      args.reason
-    );
+    await this.createCase(args.member.id, msg.author.id, CaseType.Warn, null, args.reason);
 
     msg.channel.createMessage(successMessage("Member warned"));
 
@@ -259,13 +253,7 @@ export class ModActionsPlugin extends Plugin {
     await this.mutes.addOrUpdateMute(args.member.id, muteTime);
 
     // Create a case for this action
-    await this.createModAction(
-      args.member.id,
-      msg.author.id,
-      ModActionType.Mute,
-      null,
-      args.reason
-    );
+    await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
 
     // Message the user informing them of the mute
     let messageSent = true;
@@ -335,13 +323,7 @@ export class ModActionsPlugin extends Plugin {
     args.member.kick(args.reason);
 
     // Create a case for this action
-    await this.createModAction(
-      args.member.id,
-      msg.author.id,
-      ModActionType.Kick,
-      null,
-      args.reason
-    );
+    await this.createCase(args.member.id, msg.author.id, CaseType.Kick, null, args.reason);
 
     // Confirm the action to the moderator
     let response = `Member kicked`;
@@ -384,7 +366,7 @@ export class ModActionsPlugin extends Plugin {
     args.member.ban(1, args.reason);
 
     // Create a case for this action
-    await this.createModAction(args.member.id, msg.author.id, ModActionType.Ban, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseType.Ban, null, args.reason);
 
     // Confirm the action to the moderator
     let response = `Member banned`;
@@ -408,25 +390,25 @@ export class ModActionsPlugin extends Plugin {
   async showcaseCmd(msg: Message, args: any) {
     if (args.caseNumberOrUserId.length >= 17) {
       // Assume user id
-      const actions = await this.modActions.getByUserId(args.caseNumberOrUserId);
+      const actions = await this.cases.getByUserId(args.caseNumberOrUserId);
 
       if (actions.length === 0) {
         msg.channel.createMessage("No cases found for the specified user!");
       } else {
         for (const action of actions) {
-          await this.displayModAction(action, msg.channel.id);
+          await this.displayCase(action, msg.channel.id);
         }
       }
     } else {
       // Assume case id
-      const action = await this.modActions.findByCaseNumber(args.caseNumberOrUserId);
+      const action = await this.cases.findByCaseNumber(args.caseNumberOrUserId);
 
       if (!action) {
         msg.channel.createMessage("Case not found!");
         return;
       }
 
-      this.displayModAction(action.id, msg.channel.id);
+      this.displayCase(action.id, msg.channel.id);
     }
   }
 
@@ -479,36 +461,36 @@ export class ModActionsPlugin extends Plugin {
    * Shows information about the specified action in a message embed.
    * If no channelId is specified, uses the channel id from config.
    */
-  protected async displayModAction(actionOrId: ModAction | number, channelId: string) {
-    let action: ModAction;
-    if (typeof actionOrId === "number") {
-      action = await this.modActions.find(actionOrId);
+  protected async displayCase(caseOrCaseId: Case | number, channelId: string) {
+    let theCase: Case;
+    if (typeof caseOrCaseId === "number") {
+      theCase = await this.cases.find(caseOrCaseId);
     } else {
-      action = actionOrId;
+      theCase = caseOrCaseId;
     }
 
-    if (!action) return;
+    if (!theCase) return;
     if (!this.guild.channels.get(channelId)) return;
 
-    const notes = await this.modActions.getActionNotes(action.id);
+    const notes = await this.cases.getCaseNotes(theCase.id);
 
-    const createdAt = moment(action.created_at);
-    const actionTypeStr = ModActionType[action.action_type].toUpperCase();
+    const createdAt = moment(theCase.created_at);
+    const actionTypeStr = CaseType[theCase.type].toUpperCase();
 
     const embed: any = {
-      title: `${actionTypeStr} - Case #${action.case_number}`,
+      title: `${actionTypeStr} - Case #${theCase.case_number}`,
       footer: {
         text: `Case created at ${createdAt.format("YYYY-MM-DD [at] HH:mm")}`
       },
       fields: [
         {
           name: "User",
-          value: `${action.user_name}\n<@!${action.user_id}>`,
+          value: `${theCase.user_name}\n<@!${theCase.user_id}>`,
           inline: true
         },
         {
           name: "Moderator",
-          value: `${action.mod_name}\n<@!${action.mod_id}>`,
+          value: `${theCase.mod_name}\n<@!${theCase.mod_id}>`,
           inline: true
         }
       ]
@@ -537,20 +519,19 @@ export class ModActionsPlugin extends Plugin {
       });
     }
 
-    (this.bot.guilds.get(this.guildId).channels.get(channelId) as TextChannel).createMessage({
-      embed
-    });
+    const channel = this.guild.channels.get(channelId) as TextChannel;
+    channel.createMessage({ embed });
   }
 
   /**
    * Posts the specified mod action to the guild's action log channel
    */
-  protected async postModActionToActionLog(actionOrId: ModAction | number) {
-    const actionLogChannelId = this.configValue("action_log_channel");
-    if (!actionLogChannelId) return;
-    if (!this.guild.channels.get(actionLogChannelId)) return;
+  protected async postCaseToCaseLog(caseOrCaseId: Case | number) {
+    const caseLogChannelId = this.configValue("case_log_channel");
+    if (!caseLogChannelId) return;
+    if (!this.guild.channels.get(caseLogChannelId)) return;
 
-    return this.displayModAction(actionOrId, actionLogChannelId);
+    return this.displayCase(caseOrCaseId, caseLogChannelId);
   }
 
   /**
@@ -577,10 +558,10 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  protected async createModAction(
+  protected async createCase(
     userId: string,
     modId: string,
-    actionType: ModActionType,
+    caseType: CaseType,
     auditLogId: string = null,
     reason: string = null,
     automatic = false
@@ -591,36 +572,36 @@ export class ModActionsPlugin extends Plugin {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
-    const createdId = await this.modActions.create({
+    const createdId = await this.cases.create({
+      type: caseType,
       user_id: userId,
       user_name: userName,
       mod_id: modId,
       mod_name: modName,
-      action_type: actionType,
       audit_log_id: auditLogId
     });
 
     if (reason) {
-      await this.createModActionNote(createdId, modId, reason);
+      await this.createCaseNote(createdId, modId, reason);
     }
 
     if (
-      this.configValue("action_log_channel") &&
+      this.configValue("case_log_channel") &&
       (!automatic || this.configValue("log_automatic_actions"))
     ) {
       try {
-        await this.postModActionToActionLog(createdId);
+        await this.postCaseToCaseLog(createdId);
       } catch (e) {} // tslint:disable-line
     }
 
     return createdId;
   }
 
-  protected async createModActionNote(modActionId: number, modId: string, body: string) {
+  protected async createCaseNote(caseId: number, modId: string, body: string) {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
-    return this.modActions.createNote(modActionId, {
+    return this.cases.createNote(caseId, {
       mod_id: modId,
       mod_name: modName,
       body: body || ""
