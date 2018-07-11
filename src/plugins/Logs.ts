@@ -3,7 +3,7 @@ import { GuildServerLogs } from "../data/GuildServerLogs";
 import { LogType } from "../data/LogType";
 import { TextChannel } from "eris";
 import { formatTemplateString } from "../utils";
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 
 interface ILogChannel {
   include?: LogType[];

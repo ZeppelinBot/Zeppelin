@@ -1,5 +1,5 @@
 import { decorators as d, GlobalPlugin } from "knub";
-import * as child_process from "child_process";
+import child_process from "child_process";
 import { Message } from "eris";
 
 /**

@@ -1,4 +1,4 @@
-import * as EventEmitter from "events";
+import EventEmitter from "events";
 import { LogType } from "./LogType";
 
 // Use the same instance for the same guild, even if a new instance is created

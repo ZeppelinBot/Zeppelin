@@ -1,4 +1,4 @@
-import * as knex from "../knex";
+import knex from "../knex";
 import Case from "../models/Case";
 
 export class GuildCases {

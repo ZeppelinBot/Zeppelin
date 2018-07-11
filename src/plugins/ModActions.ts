@@ -1,7 +1,7 @@
 import { Plugin, decorators as d, waitForReaction } from "knub";
 import { Guild, GuildAuditLogEntry, Member, Message, TextChannel, User } from "eris";
-import * as moment from "moment-timezone";
-import * as humanizeDuration from "humanize-duration";
+import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
   convertDelayStringToMS,

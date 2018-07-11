@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "module": "commonjs",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
@@ -10,6 +11,8 @@
       "es7",
       "ES2017"
     ],
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }
