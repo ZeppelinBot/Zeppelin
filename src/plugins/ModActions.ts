@@ -255,7 +255,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Apply "muted" role
-    await args.member.addRole(this.configValue("mute_role"));
+    await args.member.addRole(this.configValue("mute_role"), args.reason);
     await this.mutes.addOrUpdateMute(args.member.id, muteTime);
 
     // Log the action
