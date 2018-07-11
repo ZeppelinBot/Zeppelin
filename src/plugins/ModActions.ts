@@ -1,12 +1,5 @@
 import { Plugin, decorators as d, waitForReaction } from "knub";
-import {
-  Guild,
-  GuildAuditLogEntry,
-  Member,
-  Message,
-  TextChannel,
-  User
-} from "eris";
+import { Guild, GuildAuditLogEntry, Member, Message, TextChannel, User } from "eris";
 import * as moment from "moment-timezone";
 import * as humanizeDuration from "humanize-duration";
 import { GuildModActions } from "../data/GuildModActions";
@@ -44,10 +37,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
-    this.muteClearIntervalId = setInterval(
-      () => this.clearExpiredMutes(),
-      5000
-    );
+    this.muteClearIntervalId = setInterval(() => this.clearExpiredMutes(), 5000);
   }
 
   async onUnload() {
@@ -68,14 +58,10 @@ export class ModActionsPlugin extends Plugin {
         message_on_ban: false,
         message_channel: null,
         warn_message: "You have received a warning on {guildName}: {reason}",
-        mute_message:
-          "You have been muted on {guildName}. Reason given: {reason}",
-        timed_mute_message:
-          "You have been muted on {guildName} for {time}. Reason given: {reason}",
-        kick_message:
-          "You have been kicked from {guildName}. Reason given: {reason}",
-        ban_message:
-          "You have been banned from {guildName}. Reason given: {reason}",
+        mute_message: "You have been muted on {guildName}. Reason given: {reason}",
+        timed_mute_message: "You have been muted on {guildName} for {time}. Reason given: {reason}",
+        kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
+        ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         log_automatic_actions: true,
         action_log_channel: null,
         alert_on_rejoin: false,
@@ -112,10 +98,7 @@ export class ModActionsPlugin extends Plugin {
   @d.event("guildBanAdd")
   async onGuildBanAdd(guild: Guild, user: User) {
     await sleep(1000); // Wait a moment for the audit log to update
-    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
-      "MEMBER_BAN_ADD",
-      user.id
-    );
+    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry("MEMBER_BAN_ADD", user.id);
 
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
@@ -149,14 +132,7 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createModAction(
-        user.id,
-        modId,
-        ModActionType.Unban,
-        auditLogId,
-        null,
-        true
-      );
+      await this.createModAction(user.id, modId, ModActionType.Unban, auditLogId, null, true);
     } else {
       await this.createModAction(user.id, null, ModActionType.Unban);
     }
@@ -177,9 +153,9 @@ export class ModActionsPlugin extends Plugin {
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
       alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${
-          member.user.discriminator
-        } \`${member.id}\`) joined with ${actions.length} prior record(s)`
+        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${
+          member.id
+        }\`) joined with ${actions.length} prior record(s)`
       );
     }
   }
@@ -211,13 +187,7 @@ export class ModActionsPlugin extends Plugin {
   @d.command("note", "<userId:string> <note:string$>")
   @d.permission("note")
   async noteCmd(msg: Message, args: any) {
-    await this.createModAction(
-      args.userId,
-      msg.author.id,
-      ModActionType.Note,
-      null,
-      args.note
-    );
+    await this.createModAction(args.userId, msg.author.id, ModActionType.Note, null, args.note);
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
@@ -265,9 +235,7 @@ export class ModActionsPlugin extends Plugin {
   @d.permission("mute")
   async muteCmd(msg: Message, args: any) {
     if (!this.configValue("mute_role")) {
-      msg.channel.createMessage(
-        errorMessage("Cannot mute: no mute role specified")
-      );
+      msg.channel.createMessage(errorMessage("Cannot mute: no mute role specified"));
       return;
     }
 
@@ -306,14 +274,11 @@ export class ModActionsPlugin extends Plugin {
         ? this.configValue("timed_mute_message")
         : this.configValue("mute_message");
 
-      const muteMessage = formatTemplateString(
-        template,
-        {
-          guildName: this.guild.name,
-          reason: args.reason,
-          time: timeUntilUnmute
-        }
-      );
+      const muteMessage = formatTemplateString(template, {
+        guildName: this.guild.name,
+        reason: args.reason,
+        time: timeUntilUnmute
+      });
 
       messageSent = await this.tryToMessageUser(
         args.member.user,
@@ -350,9 +315,7 @@ export class ModActionsPlugin extends Plugin {
   async showcaseCmd(msg: Message, args: any) {
     if (args.caseNumberOrUserId.length >= 17) {
       // Assume user id
-      const actions = await this.modActions.getByUserId(
-        args.caseNumberOrUserId
-      );
+      const actions = await this.modActions.getByUserId(args.caseNumberOrUserId);
 
       if (actions.length === 0) {
         msg.channel.createMessage("No cases found for the specified user!");
@@ -363,9 +326,7 @@ export class ModActionsPlugin extends Plugin {
       }
     } else {
       // Assume case id
-      const action = await this.modActions.findByCaseNumber(
-        args.caseNumberOrUserId
-      );
+      const action = await this.modActions.findByCaseNumber(args.caseNumberOrUserId);
 
       if (!action) {
         msg.channel.createMessage("Case not found!");
@@ -383,7 +344,7 @@ export class ModActionsPlugin extends Plugin {
 
     const ourLevel = this.getMemberLevel(member1);
     const memberLevel = this.getMemberLevel(member2);
-    return (ourLevel > memberLevel);
+    return ourLevel > memberLevel;
   }
 
   /**
@@ -412,9 +373,7 @@ export class ModActionsPlugin extends Plugin {
 
     if (useChannel && this.configValue("message_channel")) {
       try {
-        const channel = this.guild.channels.get(
-          this.configValue("message_channel")
-        ) as TextChannel;
+        const channel = this.guild.channels.get(this.configValue("message_channel")) as TextChannel;
         await channel.createMessage(`<@!${user.id}> ${str}`);
         messageSent = true;
       } catch (e) {} // tslint:disable-line
@@ -427,10 +386,7 @@ export class ModActionsPlugin extends Plugin {
    * Shows information about the specified action in a message embed.
    * If no channelId is specified, uses the channel id from config.
    */
-  protected async displayModAction(
-    actionOrId: ModAction | number,
-    channelId: string
-  ) {
+  protected async displayModAction(actionOrId: ModAction | number, channelId: string) {
     let action: ModAction;
     if (typeof actionOrId === "number") {
       action = await this.modActions.find(actionOrId);
@@ -477,9 +433,7 @@ export class ModActionsPlugin extends Plugin {
       notes.forEach((note: any) => {
         const noteDate = moment(note.created_at);
         embed.fields.push({
-          name: `${note.mod_name} at ${noteDate.format(
-            "YYYY-MM-DD [at] HH:mm"
-          )}:`,
+          name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
           value: note.body
         });
       });
@@ -490,9 +444,7 @@ export class ModActionsPlugin extends Plugin {
       });
     }
 
-    (this.bot.guilds
-      .get(this.guildId)
-      .channels.get(channelId) as TextChannel).createMessage({
+    (this.bot.guilds.get(this.guildId).channels.get(channelId) as TextChannel).createMessage({
       embed
     });
   }
@@ -515,11 +467,7 @@ export class ModActionsPlugin extends Plugin {
     actionType: string,
     userId: string
   ): Promise<GuildAuditLogEntry> {
-    const auditLogEntries = await this.bot.getGuildAuditLogs(
-      this.guildId,
-      5,
-      actionType
-    );
+    const auditLogEntries = await this.bot.getGuildAuditLogs(this.guildId, 5, actionType);
 
     auditLogEntries.entries.sort((a, b) => {
       if (a.createdAt > b.createdAt) return -1;
@@ -545,14 +493,10 @@ export class ModActionsPlugin extends Plugin {
     automatic = false
   ): Promise<number> {
     const user = this.bot.users.get(userId);
-    const userName = user
-      ? `${user.username}#${user.discriminator}`
-      : "Unknown#0000";
+    const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
 
     const mod = this.bot.users.get(modId);
-    const modName = mod
-      ? `${mod.username}#${mod.discriminator}`
-      : "Unknown#0000";
+    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
     const createdId = await this.modActions.create({
       user_id: userId,
@@ -579,15 +523,9 @@ export class ModActionsPlugin extends Plugin {
     return createdId;
   }
 
-  protected async createModActionNote(
-    modActionId: number,
-    modId: string,
-    body: string
-  ) {
+  protected async createModActionNote(modActionId: number, modId: string, body: string) {
     const mod = this.bot.users.get(modId);
-    const modName = mod
-      ? `${mod.username}#${mod.discriminator}`
-      : "Unknown#0000";
+    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
     return this.modActions.createNote(modActionId, {
       mod_id: modId,

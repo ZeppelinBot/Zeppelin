@@ -28,16 +28,14 @@ export class LogsPlugin extends Plugin {
             "⚠️ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was warned by {mod.user.username}#{mod.user.discriminator}",
           MEMBER_MUTE:
             "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted by {mod.user.username}#{mod.user.discriminator}",
-          MEMBER_UNMUTE:
-            "🔉 **{member.user.username}#{member.user.discriminator}** was unmuted",
+          MEMBER_UNMUTE: "🔉 **{member.user.username}#{member.user.discriminator}** was unmuted",
           MEMBER_KICK:
             "👢 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was kicked by {mod.user.username}#{mod.user.discriminator}",
           MEMBER_BAN:
             "🔨 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was banned by {mod.user.username}#{mod.user.discriminator}",
           MEMBER_JOIN:
             "📥 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined{new} (created {account_age})",
-          MEMBER_LEAVE:
-            "📤 **{member.user.username}#{member.user.discriminator}** left the server",
+          MEMBER_LEAVE: "📤 **{member.user.username}#{member.user.discriminator}** left the server",
           MEMBER_ROLE_ADD:
             "🔑 **{member.user.username}#{member.user.discriminator}** role added **{role.name}** by {mod.user.username}#{mod.user.discriminator}",
           MEMBER_ROLE_REMOVE:

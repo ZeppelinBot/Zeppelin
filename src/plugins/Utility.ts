@@ -21,9 +21,7 @@ export class UtilityPlugin extends Plugin {
   @d.command("roles")
   @d.permission("roles")
   async rolesCmd(msg: Message) {
-    const roles = (msg.channel as TextChannel).guild.roles.map(
-      role => `${role.name} ${role.id}`
-    );
+    const roles = (msg.channel as TextChannel).guild.roles.map(role => `${role.name} ${role.id}`);
     msg.channel.createMessage("```" + roles.join("\n") + "```");
   }
 }
