@@ -1,7 +1,8 @@
 {
   "MEMBER_WARN": "⚠️ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was warned by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted by {mod.user.username}#{mod.user.discriminator}",
-  "MEMBER_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** was unmuted",
+  "MEMBER_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was unmuted by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_MUTE_EXPIRED": "🔉 **{member.user.username}#{member.user.discriminator}**'s mute expired",
   "MEMBER_KICK": "👢 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was kicked by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_BAN": "🔨 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was banned by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_JOIN": "📥 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined{new} (created {account_age} ago)",

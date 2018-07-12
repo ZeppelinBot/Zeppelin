@@ -658,7 +658,7 @@ export class ModActionsPlugin extends Plugin {
 
       await this.mutes.clear(member.id);
 
-      this.serverLogs.log(LogType.MEMBER_UNMUTE, {
+      this.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
         member: stripObjectToScalars(member, ["user"])
       });
     }
