@@ -1,10 +1,11 @@
-import { Plugin } from "knub";
+import { decorators as d, Plugin } from "knub";
 import { GuildServerLogs } from "../data/GuildServerLogs";
 import { LogType } from "../data/LogType";
 import { TextChannel } from "eris";
-import { formatTemplateString } from "../utils";
+import { formatTemplateString, stripObjectToScalars } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
 
 interface ILogChannel {
   include?: LogType[];
@@ -71,5 +72,20 @@ export class LogsPlugin extends Plugin {
     } else {
       return formatted;
     }
+  }
+
+  @d.event("guildMemberAdd")
+  onMemberJoin(_, member) {
+    const newThreshold = moment().valueOf() - 1000 * 60 * 60;
+    const accountAge = humanizeDuration(moment().valueOf() - member.createdAt, {
+      largest: 2,
+      round: true
+    });
+
+    this.log(LogType.MEMBER_JOIN, {
+      member: stripObjectToScalars(member, ["user"]),
+      new: member.createdAt >= newThreshold ? " :new:" : "",
+      account_age: accountAge
+    });
   }
 }
