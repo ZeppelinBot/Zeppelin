@@ -252,7 +252,7 @@ export class ModActionsPlugin extends Plugin {
     await args.member.addRole(this.configValue("mute_role"), args.reason);
     await this.mutes.addOrUpdateMute(args.member.id, muteTime);
 
-    // Create a case for this action
+    // Create a case
     await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
 
     // Message the user informing them of the mute
@@ -289,6 +289,44 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_MUTE, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
+  }
+
+  @d.command("unmute", "<member:Member> [reason:string$]")
+  @d.permission("mute")
+  async unmuteCmd(msg: Message, args: any) {
+    if (!this.configValue("mute_role")) {
+      msg.channel.createMessage(errorMessage("Cannot unmute: no mute role specified"));
+      return;
+    }
+
+    // Make sure we're allowed to mute this member
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
+      return;
+    }
+
+    // Check if they're muted in the first place
+    const mute = await this.mutes.findExistingMuteForUserId(args.member.id);
+    if (!mute) {
+      msg.channel.createMessage(errorMessage("Cannot unmute: member is not muted"));
+      return;
+    }
+
+    // Remove "muted" role
+    await args.member.removeRole(this.configValue("mute_role"), args.reason);
+    await this.mutes.clear(args.member.id);
+
+    // Confirm the action to the moderator
+    msg.channel.createMessage(successMessage("Member unmuted"));
+
+    // Create a case
+    await this.createCase(args.member.id, msg.author.id, CaseType.Unmute, null, args.reason);
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_UNMUTE, {
       mod: stripObjectToScalars(msg.member, ["user"]),
       member: stripObjectToScalars(args.member, ["user"])
     });

@@ -4,5 +4,6 @@ export enum CaseType {
   Note,
   Warn,
   Kick,
-  Mute
+  Mute,
+  Unmute
 }
