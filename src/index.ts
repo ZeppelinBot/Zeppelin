@@ -17,6 +17,7 @@ import { BotControlPlugin } from "./plugins/BotControl";
 import { ModActionsPlugin } from "./plugins/ModActions";
 import { UtilityPlugin } from "./plugins/Utility";
 import { LogsPlugin } from "./plugins/Logs";
+import { PostPlugin } from "./plugins/Post";
 import knex from "./knex";
 
 // Run latest database migrations
@@ -28,7 +29,8 @@ knex.migrate.latest().then(() => {
     plugins: {
       utility: UtilityPlugin,
       mod_actions: ModActionsPlugin,
-      logs: LogsPlugin
+      logs: LogsPlugin,
+      post: PostPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin
