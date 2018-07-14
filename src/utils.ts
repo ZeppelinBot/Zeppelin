@@ -35,7 +35,7 @@ export function successMessage(str) {
 }
 
 export function errorMessage(str) {
-  return `❌ ${str}`;
+  return `⚠ ${str}`;
 }
 
 export function uclower(str) {
