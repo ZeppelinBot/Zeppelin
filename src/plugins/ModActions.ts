@@ -73,7 +73,8 @@ export class ModActionsPlugin extends Plugin {
         mute: false,
         kick: false,
         ban: false,
-        view: false
+        view: false,
+        addcase: false
       },
       overrides: [
         {
@@ -84,7 +85,8 @@ export class ModActionsPlugin extends Plugin {
             mute: true,
             kick: true,
             ban: true,
-            view: true
+            view: true,
+            addcase: true
           }
         }
       ]
@@ -415,6 +417,97 @@ export class ModActionsPlugin extends Plugin {
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(msg.member, ["user"]),
       member: stripObjectToScalars(args.member, ["user"])
+    });
+  }
+
+  @d.command("unban", "<userId:string> [reason:string$]")
+  @d.permission("ban")
+  async unbanCmd(msg: Message, args: any) {
+    try {
+      await this.guild.unbanMember(args.userId, args.reason);
+    } catch (e) {
+      msg.channel.createMessage(errorMessage("Failed to unban member"));
+      return;
+    }
+
+    // Confirm the action
+    msg.channel.createMessage(successMessage("Member unbanned!"));
+
+    // Create a case
+    this.createCase(args.userId, msg.author.id, CaseType.Unban, null, args.reason);
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_UNBAN, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      userId: args.userId
+    });
+  }
+
+  @d.command("forceban", "<userId:string> [reason:string$]")
+  @d.permission("ban")
+  async forcebanCmd(msg: Message, args: any) {
+    // If the user exists as a guild member, make sure we can act on them first
+    const member = this.guild.members.get(args.userId);
+    if (member && !this.canActOn(msg.member, member)) {
+      msg.channel.createMessage(
+        errorMessage("Cannot forceban this user: insufficient permissions")
+      );
+      return;
+    }
+
+    try {
+      await this.guild.banMember(args.userId, 1, args.reason);
+    } catch (e) {
+      msg.channel.createMessage(errorMessage("Failed to forceban member"));
+      return;
+    }
+
+    // Confirm the action
+    msg.channel.createMessage(successMessage("Member forcebanned!"));
+
+    // Create a case
+    this.createCase(args.userId, msg.author.id, CaseType.Ban, null, args.reason);
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      userId: args.userId
+    });
+  }
+
+  @d.command("addcase", "<type:string> <target:userId> [reason:string$]")
+  @d.permission("addcase")
+  async addcaseCmd(msg: Message, args: any) {
+    // Verify the user id is a valid snowflake-ish
+    if (!args.type.match(/^[0-9]{17,20}$/)) {
+      msg.channel.createMessage(errorMessage("Cannot add case: invalid user id"));
+      return;
+    }
+
+    // If the user exists as a guild member, make sure we can act on them first
+    const member = this.guild.members.get(args.userId);
+    if (member && !this.canActOn(msg.member, member)) {
+      msg.channel.createMessage(
+        errorMessage("Cannot add case on this user: insufficient permissions")
+      );
+      return;
+    }
+
+    // Verify the case type is valid
+    const type: string = args.type[0].toUpperCase() + args.type.slice(1).toLowerCase();
+    if (!CaseType[type]) {
+      msg.channel.createMessage(errorMessage("Cannot add case: invalid case type"));
+      return;
+    }
+
+    // Create the case
+    await this.createCase(args.userId, msg.author.id, CaseType[type], null, args.reason);
+
+    // Log the action
+    msg.channel.createMessage(successMessage("Case created!"));
+    this.serverLogs.log(LogType.CASE_CREATE, {
+      mod: stripObjectToScalars(msg.member, ["user"]),
+      userId: args.userId
     });
   }
 
