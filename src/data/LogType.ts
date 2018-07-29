@@ -17,7 +17,6 @@ export enum LogType {
 
   CHANNEL_CREATE,
   CHANNEL_DELETE,
-  CHANNEL_EDIT,
 
   ROLE_CREATE,
   ROLE_DELETE,

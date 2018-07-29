@@ -6,6 +6,7 @@ import { GuildCases } from "../data/GuildCases";
 import {
   convertDelayStringToMS,
   errorMessage,
+  findRelevantAuditLogEntry,
   formatTemplateString,
   stripObjectToScalars,
   successMessage
@@ -14,7 +15,7 @@ import { GuildMutes } from "../data/GuildMutes";
 import Timer = NodeJS.Timer;
 import Case from "../models/Case";
 import { CaseType } from "../data/CaseType";
-import { GuildServerLogs } from "../data/GuildServerLogs";
+import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 
 const sleep = (ms: number): Promise<void> => {
@@ -26,14 +27,14 @@ const sleep = (ms: number): Promise<void> => {
 export class ModActionsPlugin extends Plugin {
   protected cases: GuildCases;
   protected mutes: GuildMutes;
-  protected serverLogs: GuildServerLogs;
+  protected serverLogs: GuildLogs;
 
   protected muteClearIntervalId: Timer;
 
   async onLoad() {
     this.cases = new GuildCases(this.guildId);
     this.mutes = new GuildMutes(this.guildId);
-    this.serverLogs = new GuildServerLogs(this.guildId);
+    this.serverLogs = new GuildLogs(this.guildId);
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
@@ -100,7 +101,11 @@ export class ModActionsPlugin extends Plugin {
   @d.event("guildBanAdd")
   async onGuildBanAdd(guild: Guild, user: User) {
     await sleep(1000); // Wait a moment for the audit log to update
-    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry("MEMBER_BAN_ADD", user.id);
+    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
+      this.bot,
+      "MEMBER_BAN_ADD",
+      user.id
+    );
 
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
@@ -125,7 +130,8 @@ export class ModActionsPlugin extends Plugin {
    */
   @d.event("guildBanRemove")
   async onGuildBanRemove(guild: Guild, user: User) {
-    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
+    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
+      this.bot,
       "MEMBER_BAN_REMOVE",
       user.id
     );
@@ -251,6 +257,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Apply "muted" role
+    this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
     await args.member.addRole(this.configValue("mute_role"), args.reason);
     await this.mutes.addOrUpdateMute(args.member.id, muteTime);
 
@@ -318,6 +325,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Remove "muted" role
+    this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
     await args.member.removeRole(this.configValue("mute_role"), args.reason);
     await this.mutes.clear(args.member.id);
 
@@ -360,6 +368,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Kick the user
+    this.serverLogs.ignoreLog(LogType.MEMBER_KICK, args.member.id);
     args.member.kick(args.reason);
 
     // Create a case for this action
@@ -403,6 +412,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Ban the user
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
     args.member.ban(1, args.reason);
 
     // Create a case for this action
@@ -423,6 +433,8 @@ export class ModActionsPlugin extends Plugin {
   @d.command("unban", "<userId:string> [reason:string$]")
   @d.permission("ban")
   async unbanCmd(msg: Message, args: any) {
+    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.member.id);
+
     try {
       await this.guild.unbanMember(args.userId, args.reason);
     } catch (e) {
@@ -454,6 +466,8 @@ export class ModActionsPlugin extends Plugin {
       );
       return;
     }
+
+    this.serverLogs.ignoreLog(LogType.MEMBER_FORCEBAN, args.member.id);
 
     try {
       await this.guild.banMember(args.userId, 1, args.reason);
@@ -501,13 +515,22 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Create the case
-    await this.createCase(args.userId, msg.author.id, CaseType[type], null, args.reason);
+    const caseId = await this.createCase(
+      args.userId,
+      msg.author.id,
+      CaseType[type],
+      null,
+      args.reason
+    );
+    const theCase = await this.cases.find(caseId);
 
     // Log the action
     msg.channel.createMessage(successMessage("Case created!"));
     this.serverLogs.log(LogType.CASE_CREATE, {
       mod: stripObjectToScalars(msg.member, ["user"]),
-      userId: args.userId
+      userId: args.userId,
+      caseNum: theCase.case_number,
+      caseType: type.toUpperCase()
     });
   }
 
@@ -663,30 +686,6 @@ export class ModActionsPlugin extends Plugin {
     if (!this.guild.channels.get(caseLogChannelId)) return;
 
     return this.displayCase(caseOrCaseId, caseLogChannelId);
-  }
-
-  /**
-   * Attempts to find a relevant audit log entry for the given user and action. Only accepts audit log entries from the past 10 minutes.
-   */
-  protected async findRelevantAuditLogEntry(
-    actionType: string,
-    userId: string
-  ): Promise<GuildAuditLogEntry> {
-    const auditLogEntries = await this.bot.getGuildAuditLogs(this.guildId, 5, actionType);
-
-    auditLogEntries.entries.sort((a, b) => {
-      if (a.createdAt > b.createdAt) return -1;
-      if (a.createdAt > b.createdAt) return 1;
-      return 0;
-    });
-
-    const cutoffDate = new Date();
-    cutoffDate.setTime(cutoffDate.getTime() - 1000 * 15);
-    const cutoffTS = cutoffDate.getTime();
-
-    return auditLogEntries.entries.find(entry => {
-      return entry.target.id === userId && entry.createdAt >= cutoffTS;
-    });
   }
 
   protected async createCase(

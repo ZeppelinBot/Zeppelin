@@ -3,10 +3,38 @@
   "MEMBER_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was unmuted by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_MUTE_EXPIRED": "🔉 **{member.user.username}#{member.user.discriminator}**'s mute expired",
-  "MEMBER_KICK": "👢 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was kicked by {mod.user.username}#{mod.user.discriminator}",
-  "MEMBER_BAN": "🔨 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was banned by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_KICK": "👢 **{user.username}#{user.discriminator}** (`{user.id}`) was kicked by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_BAN": "🔨 **{user.username}#{user.discriminator}** (`{user.id}`) was banned by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_UNBAN": "🔓 **{user.username}#{user.discriminator}** (`{user.id}`) was unbanned by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_FORCEBAN": "🔨 User `{userId}` was forcebanned by {mod.user.username}#{mod.user.discriminator}",
   "MEMBER_JOIN": "📥 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined{new} (created {account_age} ago)",
-  "MEMBER_LEAVE": "📤 **{member.user.username}#{member.user.discriminator}** left the server",
-  "MEMBER_ROLE_ADD": "🔑 **{member.user.username}#{member.user.discriminator}** role added **{role.name}** by {mod.user.username}#{mod.user.discriminator}",
-  "MEMBER_ROLE_REMOVE": "🔑 **{member.user.username}#{member.user.discriminator}** role removed **{role.name}** by {mod.user.username}#{mod.user.discriminator}"
+  "MEMBER_LEAVE": "📤 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left the server",
+  "MEMBER_ROLE_ADD": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role added **{role.name}** by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_ROLE_REMOVE": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role removed **{role.name}** by {mod.user.username}#{mod.user.discriminator}",
+  "MEMBER_NICK_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their nickname from **{oldNick}** to **{newNick}**",
+  "MEMBER_USERNAME_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their username from **{oldName}** to **{newName}**",
+  "MEMBER_ROLES_RESTORE": "💿 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) roles were restored",
+
+  "CHANNEL_CREATE": "🖊 Channel **#{channel.name}** was created",
+  "CHANNEL_DELETE": "🗑 Channel **#{channel.name}** was deleted",
+  "CHANNEL_EDIT": "✏ Channel **#{channel.name}** was edited",
+
+  "ROLE_CREATE": "🖊 Role **{role.name}** was created",
+  "ROLE_DELETE": "🖊 Role **{role.name}** was deleted",
+  "ROLE_EDIT": "🖊 Role **{role.name}** was edited",
+
+  "MESSAGE_EDIT": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message edited in **{channel.name}**:\n`B:` {before}\n`A:` {after}",
+  "MESSAGE_DELETE": "🗑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message deleted in **{channel.name}**:\n{messageText}{attachments}",
+  "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **{channel.name}**",
+
+  "VOICE_CHANNEL_JOIN": "🔸 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined **{channel.name}**",
+  "VOICE_CHANNEL_MOVE": "🔸 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) moved **{oldChannel.name}** ➞ **{newChannel.name}**",
+  "VOICE_CHANNEL_LEAVE": "🔸 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left **{channel.name}**",
+
+  "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **{channel.name}**:\n`{command}`",
+
+  "SPAM_DELETE": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) triggered spam filter: **{filterName}**",
+  "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **{channel.name}**:\n`{messageText}`",
+
+  "CASE_CREATE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) manually created new **{caseType}** case (#{caseNum})"
 }

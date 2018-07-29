@@ -1,4 +1,5 @@
 import at = require("lodash.at");
+import { GuildAuditLogEntry } from "eris";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -42,7 +43,7 @@ export function uclower(str) {
   return str[0].toLowerCase() + str.slice(1);
 }
 
-export function stripObjectToScalars(obj, includedNested: string[]) {
+export function stripObjectToScalars(obj, includedNested: string[] = []) {
   const result = {};
 
   for (const key in obj) {
@@ -77,4 +78,37 @@ export function formatTemplateString(str: string, values) {
 
 export function isSnowflake(v: string): boolean {
   return /^\d{17,20}$/.test(v);
+}
+
+/**
+ * Attempts to find a relevant audit log entry for the given user and action
+ */
+export async function findRelevantAuditLogEntry(
+  bot,
+  actionType: number,
+  userId: string,
+  attempts: number = 3,
+  attemptDelay: number = 1500
+): Promise<GuildAuditLogEntry> {
+  const auditLogEntries = await this.bot.getGuildAuditLogs(this.guildId, 5, null, actionType);
+
+  auditLogEntries.entries.sort((a, b) => {
+    if (a.createdAt > b.createdAt) return -1;
+    if (a.createdAt > b.createdAt) return 1;
+    return 0;
+  });
+
+  const cutoffTS = Date.now() - 1000 * 60 * 2;
+
+  const relevantEntry = auditLogEntries.entries.find(entry => {
+    return entry.target.id === userId && entry.createdAt >= cutoffTS;
+  });
+
+  if (relevantEntry) {
+    return relevantEntry;
+  } else if (attempts > 0) {
+    return findRelevantAuditLogEntry(bot, actionType, userId, attempts - 1, attemptDelay);
+  } else {
+    return null;
+  }
 }

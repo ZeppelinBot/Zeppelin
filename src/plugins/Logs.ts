@@ -1,11 +1,21 @@
 import { decorators as d, Plugin } from "knub";
-import { GuildServerLogs } from "../data/GuildServerLogs";
+import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { TextChannel } from "eris";
-import { formatTemplateString, stripObjectToScalars } from "../utils";
+import {
+  Channel,
+  Constants as ErisConstants,
+  Member,
+  Message,
+  PrivateChannel,
+  TextChannel,
+  User
+} from "eris";
+import { findRelevantAuditLogEntry, formatTemplateString, stripObjectToScalars } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import isEqual from "lodash.isequal";
+import diff from "lodash.difference";
 
 interface ILogChannel {
   include?: LogType[];
@@ -16,8 +26,17 @@ interface ILogChannelMap {
   [channelId: string]: ILogChannel;
 }
 
+const unknownMember = {
+  id: 0,
+  user: {
+    id: 0,
+    username: "Unknown",
+    discriminator: "0000"
+  }
+};
+
 export class LogsPlugin extends Plugin {
-  protected serverLogs: GuildServerLogs;
+  protected serverLogs: GuildLogs;
   protected logListener;
 
   getDefaultOptions() {
@@ -33,7 +52,7 @@ export class LogsPlugin extends Plugin {
   }
 
   onLoad() {
-    this.serverLogs = new GuildServerLogs(this.guildId);
+    this.serverLogs = new GuildLogs(this.guildId);
 
     this.logListener = ({ type, data }) => this.log(type, data);
     this.serverLogs.on("log", this.logListener);
@@ -86,6 +105,181 @@ export class LogsPlugin extends Plugin {
       member: stripObjectToScalars(member, ["user"]),
       new: member.createdAt >= newThreshold ? " :new:" : "",
       account_age: accountAge
+    });
+  }
+
+  @d.event("guildMemberRemove")
+  onMemberLeave(_, member) {
+    this.log(LogType.MEMBER_LEAVE, {
+      member: stripObjectToScalars(member, ["user"])
+    });
+  }
+
+  @d.event("guildBanAdd")
+  async onMemberBan(_, user) {
+    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
+      this.bot,
+      ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
+      user.id
+    );
+
+    if (relevantAuditLogEntry) {
+      this.log(LogType.MEMBER_BAN, {
+        user: stripObjectToScalars(user),
+        mod: relevantAuditLogEntry.member
+      });
+    } else {
+      this.log(LogType.MEMBER_BAN, {
+        user: stripObjectToScalars(user),
+        mod: unknownMember
+      });
+    }
+  }
+
+  @d.event("guildBanRemove")
+  async onMemberUnban(_, user) {
+    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
+      this.bot,
+      ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
+      user.id
+    );
+
+    if (relevantAuditLogEntry) {
+      this.log(LogType.MEMBER_UNBAN, {
+        user: stripObjectToScalars(user),
+        mod: relevantAuditLogEntry.member
+      });
+    } else {
+      this.log(LogType.MEMBER_UNBAN, {
+        user: stripObjectToScalars(user),
+        mod: unknownMember
+      });
+    }
+  }
+
+  @d.event("guildMemberUpdate")
+  onMemberUpdate(_, member: Member, oldMember: Member) {
+    if (!oldMember) return;
+
+    if (member.nick !== oldMember.nick) {
+      this.log(LogType.MEMBER_NICK_CHANGE, {
+        member,
+        oldNick: oldMember.nick,
+        newNick: member.nick
+      });
+    }
+
+    if (!isEqual(oldMember.roles, member.roles)) {
+      const addedRoles = diff(oldMember.roles, member.roles);
+      const removedRoles = diff(member.roles, oldMember.roles);
+
+      if (addedRoles.length) {
+        this.log(LogType.MEMBER_ROLE_ADD, {
+          member,
+          role: this.guild.roles.get(addedRoles[0])
+        });
+      } else if (removedRoles.length) {
+        this.log(LogType.MEMBER_ROLE_REMOVE, {
+          member,
+          role: this.guild.roles.get(removedRoles[0])
+        });
+      }
+    }
+  }
+
+  @d.event("userUpdate")
+  onUserUpdate(user: User, oldUser: User) {
+    if (!oldUser) return;
+
+    if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
+      const member = this.guild.members.get(user.id) || { id: user.id, user };
+      this.log(LogType.MEMBER_USERNAME_CHANGE, {
+        member: stripObjectToScalars(member, ["user"]),
+        oldName: `${oldUser.username}#${oldUser.discriminator}`,
+        newName: `${user.username}#${user.discriminator}`
+      });
+    }
+  }
+
+  @d.event("channelCreate")
+  onChannelCreate(channel) {
+    this.log(LogType.CHANNEL_CREATE, {
+      channel: stripObjectToScalars(channel)
+    });
+  }
+
+  @d.event("channelDelete")
+  onChannelDelete(channel) {
+    this.log(LogType.CHANNEL_DELETE, {
+      channel: stripObjectToScalars(channel)
+    });
+  }
+
+  @d.event("guildRoleCreate")
+  onRoleCreate(role) {
+    this.log(LogType.ROLE_CREATE, {
+      role: stripObjectToScalars(role)
+    });
+  }
+
+  @d.event("guildRoleDelete")
+  onRoleDelete(role) {
+    this.log(LogType.ROLE_DELETE, {
+      role: stripObjectToScalars(role)
+    });
+  }
+
+  @d.event("messageUpdate")
+  onMessageUpdate(msg: Message, oldMsg: Message) {
+    if (oldMsg && msg.content === oldMsg.content) return;
+
+    this.log(LogType.MESSAGE_EDIT, {
+      member: stripObjectToScalars(msg.member, ["user"]),
+      channel: stripObjectToScalars(msg.channel),
+      before: oldMsg ? oldMsg.cleanContent || "" : "Unavailable due to restart",
+      after: msg.cleanContent || ""
+    });
+  }
+
+  @d.event("messageDelete")
+  onMessageDelete(msg: Message) {
+    this.log(LogType.MESSAGE_DELETE, {
+      member: stripObjectToScalars(msg.member, ["user"]),
+      channel: stripObjectToScalars(msg.channel),
+      messageText: msg.cleanContent || ""
+    });
+  }
+
+  @d.event("messageDeleteBulk")
+  onMessageDeleteBulk(messages: Message[]) {
+    this.log(LogType.MESSAGE_DELETE_BULK, {
+      count: messages.length,
+      channel: messages[0] ? messages[0].channel : null
+    });
+  }
+
+  @d.event("voiceChannelJoin")
+  onVoiceChannelJoin(member: Member, channel: Channel) {
+    this.log(LogType.VOICE_CHANNEL_JOIN, {
+      member: stripObjectToScalars(member, ["user"]),
+      channel: stripObjectToScalars(channel)
+    });
+  }
+
+  @d.event("voiceChannelLeave")
+  onVoiceChannelLeave(member: Member, channel: Channel) {
+    this.log(LogType.VOICE_CHANNEL_LEAVE, {
+      member: stripObjectToScalars(member, ["user"]),
+      channel: stripObjectToScalars(channel)
+    });
+  }
+
+  @d.event("voiceChannelSwitch")
+  onVoiceChannelSwitch(member: Member, oldChannel: Channel, newChannel: Channel) {
+    this.log(LogType.VOICE_CHANNEL_MOVE, {
+      member: stripObjectToScalars(member, ["user"]),
+      oldChannel: stripObjectToScalars(oldChannel),
+      newChannel: stripObjectToScalars(newChannel)
     });
   }
 }
