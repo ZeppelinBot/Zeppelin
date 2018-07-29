@@ -74,3 +74,7 @@ export function formatTemplateString(str: string, values) {
     return (at(values, val)[0] as string) || "";
   });
 }
+
+export function isSnowflake(v: string): boolean {
+  return /^\d{17,20}$/.test(v);
+}
