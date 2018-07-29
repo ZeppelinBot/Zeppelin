@@ -31,7 +31,7 @@
     "eris": "^0.8.6",
     "humanize-duration": "^3.15.0",
     "knex": "^0.14.6",
-    "knub": "^9.4.9",
+    "knub": "^9.4.11",
     "lodash.at": "^4.6.0",
     "mariasql": "^0.2.6",
     "moment-timezone": "^0.5.21",
