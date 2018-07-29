@@ -21,6 +21,7 @@ export class GuildLogs extends EventEmitter {
 
     super();
     this.guildId = guildId;
+    this.ignoredLogs = [];
 
     // Store the instance for this guild so it can be returned later if a new instance for this guild is requested
     guildInstances.set(guildId, this);

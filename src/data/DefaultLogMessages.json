@@ -24,17 +24,18 @@
   "ROLE_EDIT": "🖊 Role **{role.name}** was edited",
 
   "MESSAGE_EDIT": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message edited in **{channel.name}**:\n`B:` {before}\n`A:` {after}",
-  "MESSAGE_DELETE": "🗑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message deleted in **{channel.name}**:\n{messageText}{attachments}",
+  "MESSAGE_DELETE": "🗑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message deleted in **{channel.name}**:\n```{messageText}```",
   "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **{channel.name}**",
+  "MESSAGE_DELETE_BARE": "🗑 message (id `{messageId}`) deleted in **{channel.name}** (no more info available due to restart)",
 
   "VOICE_CHANNEL_JOIN": "🔸 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined **{channel.name}**",
   "VOICE_CHANNEL_MOVE": "🔹 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) moved **{oldChannel.name}** ➞ **{newChannel.name}**",
   "VOICE_CHANNEL_LEAVE": "♦ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left **{channel.name}**",
 
-  "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **{channel.name}**:\n`{command}`",
+  "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **#{channel.name}**:\n`{command}`",
 
   "SPAM_DELETE": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) triggered spam filter: **{filterName}**",
-  "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **{channel.name}**:\n`{messageText}`",
+  "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **#{channel.name}** (`{channel.id}`) {reason}:\n```{messageText}```",
 
   "CASE_CREATE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) manually created new **{caseType}** case (#{caseNum})"
 }

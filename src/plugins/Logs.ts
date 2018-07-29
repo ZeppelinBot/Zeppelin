@@ -1,15 +1,7 @@
 import { decorators as d, Plugin } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import {
-  Channel,
-  Constants as ErisConstants,
-  Member,
-  Message,
-  PrivateChannel,
-  TextChannel,
-  User
-} from "eris";
+import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
 import { findRelevantAuditLogEntry, formatTemplateString, stripObjectToScalars } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
@@ -98,7 +90,7 @@ export class LogsPlugin extends Plugin {
       round: true
     });
 
-    this.log(LogType.MEMBER_JOIN, {
+    this.serverLogs.log(LogType.MEMBER_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
       new: member.createdAt >= newThreshold ? " :new:" : "",
       account_age: accountAge
@@ -107,7 +99,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("guildMemberRemove")
   onMemberLeave(_, member) {
-    this.log(LogType.MEMBER_LEAVE, {
+    this.serverLogs.log(LogType.MEMBER_LEAVE, {
       member: stripObjectToScalars(member, ["user"])
     });
   }
@@ -121,7 +113,7 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.log(LogType.MEMBER_BAN, {
+    this.serverLogs.log(LogType.MEMBER_BAN, {
       user: stripObjectToScalars(user),
       mod: stripObjectToScalars(mod)
     });
@@ -136,7 +128,7 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.log(LogType.MEMBER_UNBAN, {
+    this.serverLogs.log(LogType.MEMBER_UNBAN, {
       user: stripObjectToScalars(user),
       mod: stripObjectToScalars(mod)
     });
@@ -147,7 +139,7 @@ export class LogsPlugin extends Plugin {
     if (!oldMember) return;
 
     if (member.nick !== oldMember.nick) {
-      this.log(LogType.MEMBER_NICK_CHANGE, {
+      this.serverLogs.log(LogType.MEMBER_NICK_CHANGE, {
         member,
         oldNick: oldMember.nick,
         newNick: member.nick
@@ -166,13 +158,13 @@ export class LogsPlugin extends Plugin {
       const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
       if (addedRoles.length) {
-        this.log(LogType.MEMBER_ROLE_ADD, {
+        this.serverLogs.log(LogType.MEMBER_ROLE_ADD, {
           member,
           role: this.guild.roles.get(addedRoles[0]),
           mod: stripObjectToScalars(mod)
         });
       } else if (removedRoles.length) {
-        this.log(LogType.MEMBER_ROLE_REMOVE, {
+        this.serverLogs.log(LogType.MEMBER_ROLE_REMOVE, {
           member,
           role: this.guild.roles.get(removedRoles[0]),
           mod: stripObjectToScalars(mod)
@@ -187,7 +179,7 @@ export class LogsPlugin extends Plugin {
 
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
       const member = this.guild.members.get(user.id) || { id: user.id, user };
-      this.log(LogType.MEMBER_USERNAME_CHANGE, {
+      this.serverLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
         member: stripObjectToScalars(member, ["user"]),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,
         newName: `${user.username}#${user.discriminator}`
@@ -197,28 +189,28 @@ export class LogsPlugin extends Plugin {
 
   @d.event("channelCreate")
   onChannelCreate(channel) {
-    this.log(LogType.CHANNEL_CREATE, {
+    this.serverLogs.log(LogType.CHANNEL_CREATE, {
       channel: stripObjectToScalars(channel)
     });
   }
 
   @d.event("channelDelete")
   onChannelDelete(channel) {
-    this.log(LogType.CHANNEL_DELETE, {
+    this.serverLogs.log(LogType.CHANNEL_DELETE, {
       channel: stripObjectToScalars(channel)
     });
   }
 
   @d.event("guildRoleCreate")
   onRoleCreate(_, role) {
-    this.log(LogType.ROLE_CREATE, {
+    this.serverLogs.log(LogType.ROLE_CREATE, {
       role: stripObjectToScalars(role)
     });
   }
 
   @d.event("guildRoleDelete")
   onRoleDelete(_, role) {
-    this.log(LogType.ROLE_DELETE, {
+    this.serverLogs.log(LogType.ROLE_DELETE, {
       role: stripObjectToScalars(role)
     });
   }
@@ -226,8 +218,9 @@ export class LogsPlugin extends Plugin {
   @d.event("messageUpdate")
   onMessageUpdate(msg: Message, oldMsg: Message) {
     if (oldMsg && msg.content === oldMsg.content) return;
+    if (msg.type !== 0) return;
 
-    this.log(LogType.MESSAGE_EDIT, {
+    this.serverLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(msg.member, ["user"]),
       channel: stripObjectToScalars(msg.channel),
       before: oldMsg ? oldMsg.content || "" : "Unavailable due to restart",
@@ -237,16 +230,33 @@ export class LogsPlugin extends Plugin {
 
   @d.event("messageDelete")
   onMessageDelete(msg: Message) {
-    this.log(LogType.MESSAGE_DELETE, {
-      member: stripObjectToScalars(msg.member, ["user"]),
-      channel: stripObjectToScalars(msg.channel),
-      messageText: msg.cleanContent || ""
-    });
+    if (msg.type !== 0) return;
+
+    if (msg.member) {
+      this.serverLogs.log(
+        LogType.MESSAGE_DELETE,
+        {
+          member: stripObjectToScalars(msg.member, ["user"]),
+          channel: stripObjectToScalars(msg.channel),
+          messageText: msg.cleanContent || ""
+        },
+        msg.id
+      );
+    } else {
+      this.serverLogs.log(
+        LogType.MESSAGE_DELETE_BARE,
+        {
+          messageId: msg.id,
+          channel: stripObjectToScalars(msg.channel)
+        },
+        msg.id
+      );
+    }
   }
 
   @d.event("messageDeleteBulk")
   onMessageDeleteBulk(messages: Message[]) {
-    this.log(LogType.MESSAGE_DELETE_BULK, {
+    this.serverLogs.log(LogType.MESSAGE_DELETE_BULK, {
       count: messages.length,
       channel: messages[0] ? messages[0].channel : null
     });
@@ -254,7 +264,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelJoin")
   onVoiceChannelJoin(member: Member, channel: Channel) {
-    this.log(LogType.VOICE_CHANNEL_JOIN, {
+    this.serverLogs.log(LogType.VOICE_CHANNEL_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel)
     });
@@ -262,7 +272,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelLeave")
   onVoiceChannelLeave(member: Member, channel: Channel) {
-    this.log(LogType.VOICE_CHANNEL_LEAVE, {
+    this.serverLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel)
     });
@@ -270,7 +280,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelSwitch")
   onVoiceChannelSwitch(member: Member, newChannel: Channel, oldChannel: Channel) {
-    this.log(LogType.VOICE_CHANNEL_MOVE, {
+    this.serverLogs.log(LogType.VOICE_CHANNEL_MOVE, {
       member: stripObjectToScalars(member, ["user"]),
       oldChannel: stripObjectToScalars(oldChannel),
       newChannel: stripObjectToScalars(newChannel)

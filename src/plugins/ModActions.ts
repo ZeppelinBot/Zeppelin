@@ -220,6 +220,12 @@ export class ModActionsPlugin extends Plugin {
   @d.command("warn", "<member:Member> <reason:string$>")
   @d.permission("warn")
   async warnCmd(msg: Message, args: any) {
+    // Make sure we're allowed to warn this member
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot warn: insufficient permissions"));
+      return;
+    }
+
     const warnMessage = this.configValue("warn_message")
       .replace("{guildName}", this.guild.name)
       .replace("{reason}", args.reason);
@@ -235,7 +241,7 @@ export class ModActionsPlugin extends Plugin {
       const failedMsg = await msg.channel.createMessage(
         "Failed to message the user. Log the warning anyway?"
       );
-      const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"]);
+      const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
       failedMsg.delete();
       if (!reply || reply.name === "❌") {
         return;
@@ -508,11 +514,11 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  @d.command("addcase", "<type:string> <target:userId> [reason:string$]")
+  @d.command("addcase", "<type:string> <target:string> [reason:string$]")
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
     // Verify the user id is a valid snowflake-ish
-    if (!args.type.match(/^[0-9]{17,20}$/)) {
+    if (!args.target.match(/^[0-9]{17,20}$/)) {
       msg.channel.createMessage(errorMessage("Cannot add case: invalid user id"));
       return;
     }
@@ -535,7 +541,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Create the case
     const caseId = await this.createCase(
-      args.userId,
+      args.target,
       msg.author.id,
       CaseType[type],
       null,
