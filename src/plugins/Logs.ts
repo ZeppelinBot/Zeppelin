@@ -26,13 +26,10 @@ interface ILogChannelMap {
   [channelId: string]: ILogChannel;
 }
 
-const unknownMember = {
+const unknownUser = {
   id: 0,
-  user: {
-    id: 0,
-    username: "Unknown",
-    discriminator: "0000"
-  }
+  username: "Unknown",
+  discriminator: "0000"
 };
 
 export class LogsPlugin extends Plugin {
@@ -62,7 +59,7 @@ export class LogsPlugin extends Plugin {
     this.serverLogs.removeListener("log", this.logListener);
   }
 
-  log(type, data) {
+  async log(type, data) {
     const logChannels: ILogChannelMap = this.configValue("channels");
     for (const [channelId, opts] of Object.entries(logChannels)) {
       const channel = this.guild.channels.get(channelId);
@@ -73,7 +70,7 @@ export class LogsPlugin extends Plugin {
         (opts.exclude && !opts.exclude.includes(type))
       ) {
         const message = this.getLogMessage(type, data);
-        if (message) channel.createMessage(message);
+        if (message) await channel.createMessage(message);
       }
     }
   }
@@ -118,47 +115,35 @@ export class LogsPlugin extends Plugin {
   @d.event("guildBanAdd")
   async onMemberBan(_, user) {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.bot,
+      this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id
     );
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    if (relevantAuditLogEntry) {
-      this.log(LogType.MEMBER_BAN, {
-        user: stripObjectToScalars(user),
-        mod: relevantAuditLogEntry.member
-      });
-    } else {
-      this.log(LogType.MEMBER_BAN, {
-        user: stripObjectToScalars(user),
-        mod: unknownMember
-      });
-    }
+    this.log(LogType.MEMBER_BAN, {
+      user: stripObjectToScalars(user),
+      mod: stripObjectToScalars(mod)
+    });
   }
 
   @d.event("guildBanRemove")
   async onMemberUnban(_, user) {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.bot,
+      this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id
     );
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    if (relevantAuditLogEntry) {
-      this.log(LogType.MEMBER_UNBAN, {
-        user: stripObjectToScalars(user),
-        mod: relevantAuditLogEntry.member
-      });
-    } else {
-      this.log(LogType.MEMBER_UNBAN, {
-        user: stripObjectToScalars(user),
-        mod: unknownMember
-      });
-    }
+    this.log(LogType.MEMBER_UNBAN, {
+      user: stripObjectToScalars(user),
+      mod: stripObjectToScalars(mod)
+    });
   }
 
   @d.event("guildMemberUpdate")
-  onMemberUpdate(_, member: Member, oldMember: Member) {
+  async onMemberUpdate(_, member: Member, oldMember: Member) {
     if (!oldMember) return;
 
     if (member.nick !== oldMember.nick) {
@@ -170,18 +155,27 @@ export class LogsPlugin extends Plugin {
     }
 
     if (!isEqual(oldMember.roles, member.roles)) {
-      const addedRoles = diff(oldMember.roles, member.roles);
-      const removedRoles = diff(member.roles, oldMember.roles);
+      const addedRoles = diff(member.roles, oldMember.roles);
+      const removedRoles = diff(oldMember.roles, member.roles);
+
+      const relevantAuditLogEntry = await findRelevantAuditLogEntry(
+        this.guild,
+        ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
+        member.id
+      );
+      const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
       if (addedRoles.length) {
         this.log(LogType.MEMBER_ROLE_ADD, {
           member,
-          role: this.guild.roles.get(addedRoles[0])
+          role: this.guild.roles.get(addedRoles[0]),
+          mod: stripObjectToScalars(mod)
         });
       } else if (removedRoles.length) {
         this.log(LogType.MEMBER_ROLE_REMOVE, {
           member,
-          role: this.guild.roles.get(removedRoles[0])
+          role: this.guild.roles.get(removedRoles[0]),
+          mod: stripObjectToScalars(mod)
         });
       }
     }
@@ -216,14 +210,14 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("guildRoleCreate")
-  onRoleCreate(role) {
+  onRoleCreate(_, role) {
     this.log(LogType.ROLE_CREATE, {
       role: stripObjectToScalars(role)
     });
   }
 
   @d.event("guildRoleDelete")
-  onRoleDelete(role) {
+  onRoleDelete(_, role) {
     this.log(LogType.ROLE_DELETE, {
       role: stripObjectToScalars(role)
     });
@@ -236,8 +230,8 @@ export class LogsPlugin extends Plugin {
     this.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(msg.member, ["user"]),
       channel: stripObjectToScalars(msg.channel),
-      before: oldMsg ? oldMsg.cleanContent || "" : "Unavailable due to restart",
-      after: msg.cleanContent || ""
+      before: oldMsg ? oldMsg.content || "" : "Unavailable due to restart",
+      after: msg.content || ""
     });
   }
 
@@ -275,7 +269,7 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("voiceChannelSwitch")
-  onVoiceChannelSwitch(member: Member, oldChannel: Channel, newChannel: Channel) {
+  onVoiceChannelSwitch(member: Member, newChannel: Channel, oldChannel: Channel) {
     this.log(LogType.VOICE_CHANNEL_MOVE, {
       member: stripObjectToScalars(member, ["user"]),
       oldChannel: stripObjectToScalars(oldChannel),

@@ -1,5 +1,5 @@
-import { Plugin, decorators as d, waitForReaction } from "knub";
-import { Guild, GuildAuditLogEntry, Member, Message, TextChannel, User } from "eris";
+import { decorators as d, Plugin, waitForReaction } from "knub";
+import { Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
@@ -8,21 +8,16 @@ import {
   errorMessage,
   findRelevantAuditLogEntry,
   formatTemplateString,
+  sleep,
   stripObjectToScalars,
   successMessage
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
-import Timer = NodeJS.Timer;
 import Case from "../models/Case";
 import { CaseType } from "../data/CaseType";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-
-const sleep = (ms: number): Promise<void> => {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms);
-  });
-};
+import Timer = NodeJS.Timer;
 
 export class ModActionsPlugin extends Plugin {
   protected cases: GuildCases;
@@ -102,8 +97,8 @@ export class ModActionsPlugin extends Plugin {
   async onGuildBanAdd(guild: Guild, user: User) {
     await sleep(1000); // Wait a moment for the audit log to update
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.bot,
-      "MEMBER_BAN_ADD",
+      this.guild,
+      ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id
     );
 
@@ -131,8 +126,8 @@ export class ModActionsPlugin extends Plugin {
   @d.event("guildBanRemove")
   async onGuildBanRemove(guild: Guild, user: User) {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.bot,
-      "MEMBER_BAN_REMOVE",
+      this.guild,
+      ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id
     );
 
@@ -150,7 +145,7 @@ export class ModActionsPlugin extends Plugin {
    * Show an alert if a member with prior notes joins the server
    */
   @d.event("guildMemberAdd")
-  async onGuildMemberAdd(member: Member) {
+  async onGuildMemberAdd(_, member: Member) {
     if (!this.configValue("alert_on_rejoin")) return;
 
     const alertChannelId = this.configValue("alert_channel");
@@ -165,6 +160,30 @@ export class ModActionsPlugin extends Plugin {
           member.id
         }\`) joined with ${actions.length} prior record(s)`
       );
+    }
+  }
+
+  @d.event("guildMemberRemove")
+  async onGuildMemberRemove(_, member: Member) {
+    const kickAuditLogEntry = await findRelevantAuditLogEntry(
+      this.guild,
+      ErisConstants.AuditLogActions.MEMBER_KICK,
+      member.id
+    );
+
+    if (kickAuditLogEntry) {
+      this.createCase(
+        member.id,
+        kickAuditLogEntry.user.id,
+        CaseType.Kick,
+        kickAuditLogEntry.id,
+        kickAuditLogEntry.reason,
+        true
+      );
+      this.serverLogs.log(LogType.MEMBER_KICK, {
+        user: stripObjectToScalars(member.user),
+        mod: stripObjectToScalars(kickAuditLogEntry.user)
+      });
     }
   }
 
@@ -228,7 +247,7 @@ export class ModActionsPlugin extends Plugin {
     msg.channel.createMessage(successMessage("Member warned"));
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
@@ -298,7 +317,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_MUTE, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
@@ -337,7 +356,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNMUTE, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
@@ -381,7 +400,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
@@ -425,7 +444,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_BAN, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
@@ -450,7 +469,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       userId: args.userId
     });
   }
@@ -484,7 +503,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       userId: args.userId
     });
   }
@@ -527,7 +546,7 @@ export class ModActionsPlugin extends Plugin {
     // Log the action
     msg.channel.createMessage(successMessage("Case created!"));
     this.serverLogs.log(LogType.CASE_CREATE, {
-      mod: stripObjectToScalars(msg.member, ["user"]),
+      mod: stripObjectToScalars(msg.member.user),
       userId: args.userId,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase()
