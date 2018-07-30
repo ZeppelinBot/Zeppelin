@@ -13,7 +13,7 @@
   "MEMBER_ROLE_REMOVE": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role removed **{role.name}** by {mod.username}#{mod.discriminator}",
   "MEMBER_NICK_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their nickname from **{oldNick}** to **{newNick}**",
   "MEMBER_USERNAME_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their username from **{oldName}** to **{newName}**",
-  "MEMBER_ROLES_RESTORE": "💿 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) roles were restored",
+  "MEMBER_RESTORE": "💿 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was restored",
 
   "CHANNEL_CREATE": "🖊 Channel **#{channel.name}** was created",
   "CHANNEL_DELETE": "🗑 Channel **#{channel.name}** was deleted",

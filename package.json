@@ -35,6 +35,7 @@
     "knub": "^9.4.13",
     "lodash.at": "^4.6.0",
     "lodash.difference": "^4.5.0",
+    "lodash.intersection": "^4.4.0",
     "lodash.isequal": "^4.5.0",
     "mariasql": "^0.2.6",
     "moment-timezone": "^0.5.21",
