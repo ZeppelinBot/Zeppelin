@@ -258,6 +258,11 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
+  public async muteMember(member: Member, muteTime: number = null, reason: string = null) {
+    await member.addRole(this.configValue("mute_role"), reason);
+    await this.mutes.addOrUpdateMute(member.id, muteTime);
+  }
+
   @d.command("mute", "<member:Member> [time:string] [reason:string$]")
   @d.permission("mute")
   async muteCmd(msg: Message, args: any) {
@@ -283,8 +288,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Apply "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
-    await args.member.addRole(this.configValue("mute_role"), args.reason);
-    await this.mutes.addOrUpdateMute(args.member.id, muteTime);
+    this.muteMember(args.member, muteTime, args.reason);
 
     // Create a case
     await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
@@ -713,7 +717,7 @@ export class ModActionsPlugin extends Plugin {
     return this.displayCase(caseOrCaseId, caseLogChannelId);
   }
 
-  protected async createCase(
+  public async createCase(
     userId: string,
     modId: string,
     caseType: CaseType,
@@ -770,6 +774,7 @@ export class ModActionsPlugin extends Plugin {
       if (!member) continue;
 
       try {
+        this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
         await member.removeRole(this.configValue("mute_role"));
       } catch (e) {} // tslint:disable-line
 

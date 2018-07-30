@@ -1,5 +1,8 @@
 import at = require("lodash.at");
-import { Guild, GuildAuditLogEntry } from "eris";
+import { Client, Guild, GuildAuditLogEntry, Message, TextChannel } from "eris";
+import url from "url";
+import tlds from "tlds";
+import emojiRegex from "emoji-regex";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -72,7 +75,8 @@ export function stripObjectToScalars(obj, includedNested: string[] = []) {
 const stringFormatRegex = /{([^{}]+?)}/g;
 export function formatTemplateString(str: string, values) {
   return str.replace(stringFormatRegex, (match, val) => {
-    return (at(values, val)[0] as string) || "";
+    const value = at(values, val)[0];
+    return typeof value === "string" || typeof value === "number" ? String(value) : "";
   });
 }
 
@@ -117,5 +121,108 @@ export async function findRelevantAuditLogEntry(
     return findRelevantAuditLogEntry(guild, actionType, userId, attempts - 1, attemptDelay);
   } else {
     return null;
+  }
+}
+
+const urlRegex = /(\S+\.\S+)/g;
+const protocolRegex = /^[a-z]+:\/\//;
+
+export function getUrlsInString(str: string): url.URL[] {
+  const matches = str.match(urlRegex) || [];
+  return matches.reduce((urls, match) => {
+    if (!protocolRegex.test(match)) {
+      match = `https://${match}`;
+    }
+
+    let matchUrl: url.URL;
+    try {
+      matchUrl = new url.URL(match);
+    } catch (e) {
+      return urls;
+    }
+
+    const hostnameParts = matchUrl.hostname.split(".");
+    const tld = hostnameParts[hostnameParts.length - 1];
+    if (tlds.includes(tld)) {
+      urls.push(matchUrl);
+    }
+
+    return urls;
+  }, []);
+}
+
+export function getInviteCodesInString(str: string): string[] {
+  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite)\/([a-z0-9]+)/gi;
+  const inviteCodes = [];
+  let match;
+
+  // tslint:disable-next-line
+  while ((match = inviteCodeRegex.exec(str)) !== null) {
+    inviteCodes.push(match[1]);
+  }
+
+  return inviteCodes;
+}
+
+export const unicodeEmojiRegex = emojiRegex();
+export const customEmojiRegex = /<:(?:.*?):(\d+)>/g;
+export const anyEmojiRegex = new RegExp(
+  `(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`,
+  "g"
+);
+
+export function getEmojiInString(str: string): string[] {
+  return str.match(anyEmojiRegex) || [];
+}
+
+export type MessageFilterFn = (msg: Message) => boolean;
+export type StopFn = (msg: Message) => boolean;
+
+export async function getMessages(
+  channel: TextChannel,
+  filter: MessageFilterFn = null,
+  maxCount: number = 50,
+  stopFn: StopFn = null
+): Promise<Message[]> {
+  let messages: Message[] = [];
+  let before;
+
+  if (!filter) {
+    filter = () => true;
+  }
+
+  while (true) {
+    const newMessages = await channel.getMessages(50, before);
+    if (newMessages.length === 0) break;
+
+    before = newMessages[newMessages.length - 1].id;
+
+    const filtered = newMessages.filter(filter);
+    messages.push(...filtered);
+
+    if (messages.length >= maxCount) {
+      messages = messages.slice(0, maxCount);
+      break;
+    }
+
+    if (stopFn && newMessages.some(stopFn)) {
+      break;
+    }
+  }
+
+  return messages;
+}
+
+export async function cleanMessagesInChannel(
+  bot: Client,
+  channel: TextChannel,
+  count: number,
+  userId: string = null,
+  reason: string = null
+) {
+  const messages = await getMessages(channel, msg => !userId || msg.author.id === userId, count);
+  const ids = messages.map(m => m.id);
+  if (ids) {
+    await bot.deleteMessages(channel.id, ids, reason);
   }
 }

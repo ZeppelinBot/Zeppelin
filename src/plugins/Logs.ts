@@ -158,17 +158,25 @@ export class LogsPlugin extends Plugin {
       const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
       if (addedRoles.length) {
-        this.serverLogs.log(LogType.MEMBER_ROLE_ADD, {
-          member,
-          role: this.guild.roles.get(addedRoles[0]),
-          mod: stripObjectToScalars(mod)
-        });
+        this.serverLogs.log(
+          LogType.MEMBER_ROLE_ADD,
+          {
+            member,
+            role: this.guild.roles.get(addedRoles[0]),
+            mod: stripObjectToScalars(mod)
+          },
+          member.id
+        );
       } else if (removedRoles.length) {
-        this.serverLogs.log(LogType.MEMBER_ROLE_REMOVE, {
-          member,
-          role: this.guild.roles.get(removedRoles[0]),
-          mod: stripObjectToScalars(mod)
-        });
+        this.serverLogs.log(
+          LogType.MEMBER_ROLE_REMOVE,
+          {
+            member,
+            role: this.guild.roles.get(removedRoles[0]),
+            mod: stripObjectToScalars(mod)
+          },
+          member.id
+        );
       }
     }
   }
@@ -230,7 +238,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("messageDelete")
   onMessageDelete(msg: Message) {
-    if (msg.type !== 0) return;
+    if (msg.type != null && msg.type !== 0) return;
 
     if (msg.member) {
       this.serverLogs.log(
@@ -256,10 +264,14 @@ export class LogsPlugin extends Plugin {
 
   @d.event("messageDeleteBulk")
   onMessageDeleteBulk(messages: Message[]) {
-    this.serverLogs.log(LogType.MESSAGE_DELETE_BULK, {
-      count: messages.length,
-      channel: messages[0] ? messages[0].channel : null
-    });
+    this.serverLogs.log(
+      LogType.MESSAGE_DELETE_BULK,
+      {
+        count: messages.length,
+        channel: messages[0] ? messages[0].channel : null
+      },
+      messages[0] && messages[0].id
+    );
   }
 
   @d.event("voiceChannelJoin")

@@ -21,12 +21,14 @@ import { PostPlugin } from "./plugins/Post";
 import { ReactionRolesPlugin } from "./plugins/ReactionRoles";
 import { CensorPlugin } from "./plugins/Censor";
 import { PersistPlugin } from "./plugins/Persist";
+import { SpamPlugin } from "./plugins/Spam";
 import knex from "./knex";
 
 // Run latest database migrations
 logger.info("Running database migrations");
 knex.migrate.latest().then(() => {
   const client = new Client(process.env.TOKEN);
+  client.setMaxListeners(100);
 
   const bot = new Knub(client, {
     plugins: {
@@ -36,7 +38,8 @@ knex.migrate.latest().then(() => {
       post: PostPlugin,
       reaction_roles: ReactionRolesPlugin,
       censor: CensorPlugin,
-      persist: PersistPlugin
+      persist: PersistPlugin,
+      spam: SpamPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin

@@ -1,51 +1,9 @@
-import { Plugin, decorators as d } from "knub";
+import { decorators as d, Plugin } from "knub";
 import { Invite, Message } from "eris";
-import url from "url";
-import tlds from "tlds";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { stripObjectToScalars } from "../utils";
-
-const urlRegex = /(\S+\.\S+)/g;
-const protocolRegex = /^[a-z]+:\/\//;
-
-const getInviteCodesInString = (str: string): string[] => {
-  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite)\/([a-z0-9]+)/gi;
-  const inviteCodes = [];
-  let match;
-
-  // tslint:disable-next-line
-  while ((match = inviteCodeRegex.exec(str)) !== null) {
-    inviteCodes.push(match[1]);
-  }
-
-  return inviteCodes;
-};
-
-const getUrlsInString = (str: string): url.URL[] => {
-  const matches = str.match(urlRegex) || [];
-  return matches.reduce((urls, match) => {
-    if (!protocolRegex.test(match)) {
-      match = `https://${match}`;
-    }
-
-    let matchUrl: url.URL;
-    try {
-      matchUrl = new url.URL(match);
-    } catch (e) {
-      return urls;
-    }
-
-    const hostnameParts = matchUrl.hostname.split(".");
-    const tld = hostnameParts[hostnameParts.length - 1];
-    if (tlds.includes(tld)) {
-      urls.push(matchUrl);
-    }
-
-    return urls;
-  }, []);
-};
+import { getInviteCodesInString, getUrlsInString, stripObjectToScalars } from "../utils";
 
 export class CensorPlugin extends Plugin {
   protected serverLogs: GuildLogs;
