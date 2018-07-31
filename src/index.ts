@@ -27,7 +27,9 @@ import knex from "./knex";
 // Run latest database migrations
 logger.info("Running database migrations");
 knex.migrate.latest().then(() => {
-  const client = new Client(process.env.TOKEN);
+  const client = new Client(process.env.TOKEN, {
+    getAllUsers: true
+  });
   client.setMaxListeners(100);
 
   const bot = new Knub(client, {
