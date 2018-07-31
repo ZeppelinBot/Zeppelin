@@ -226,3 +226,15 @@ export async function cleanMessagesInChannel(
     await bot.deleteMessages(channel.id, ids, reason);
   }
 }
+
+export function trimLines(str: string) {
+  return str
+    .trim()
+    .split("\n")
+    .map(l => l.trim())
+    .join("\n")
+    .trim();
+}
+
+export const emptyEmbedValue = "\u200b";
+export const embedPadding = "\n" + emptyEmbedValue;

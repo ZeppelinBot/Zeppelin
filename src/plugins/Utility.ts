@@ -1,14 +1,26 @@
 import { Plugin, decorators as d, reply } from "knub";
-import { Channel, Message, TextChannel, User } from "eris";
-import { errorMessage, getMessages, stripObjectToScalars, successMessage } from "../utils";
+import { Channel, Embed, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
+import {
+  embedPadding,
+  errorMessage,
+  getMessages,
+  stripObjectToScalars,
+  successMessage,
+  trimLines
+} from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
+import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
+import { GuildCases } from "../data/GuildCases";
+import { CaseType } from "../data/CaseType";
 
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
 
 export class UtilityPlugin extends Plugin {
   protected logs: GuildLogs;
+  protected cases: GuildCases;
 
   getDefaultOptions() {
     return {
@@ -17,7 +29,8 @@ export class UtilityPlugin extends Plugin {
         level: false,
         search: false,
         clean: false,
-        info: false
+        info: false,
+        server: true
       },
       overrides: [
         {
@@ -27,7 +40,8 @@ export class UtilityPlugin extends Plugin {
             level: true,
             search: true,
             clean: true,
-            info: true
+            info: true,
+            server: true
           }
         }
       ]
@@ -36,6 +50,7 @@ export class UtilityPlugin extends Plugin {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
+    this.cases = new GuildCases(this.guildId);
   }
 
   @d.command("roles")
@@ -122,8 +137,9 @@ export class UtilityPlugin extends Plugin {
       m => m.id !== msg.id,
       args.count
     );
-    if (messagesToClean.length > 0)
+    if (messagesToClean.length > 0) {
       await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+    }
 
     msg.channel.createMessage(
       successMessage(
@@ -147,8 +163,9 @@ export class UtilityPlugin extends Plugin {
       m => m.id !== msg.id && m.author.id === args.userId,
       args.count
     );
-    if (messagesToClean.length > 0)
+    if (messagesToClean.length > 0) {
       await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+    }
 
     msg.channel.createMessage(
       successMessage(
@@ -172,13 +189,144 @@ export class UtilityPlugin extends Plugin {
       m => m.id !== msg.id && m.author.bot,
       args.count
     );
-    if (messagesToClean.length > 0)
+    if (messagesToClean.length > 0) {
       await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+    }
 
     msg.channel.createMessage(
       successMessage(
         `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`
       )
     );
+  }
+
+  @d.command("info", "<userId:userId>")
+  @d.permission("info")
+  async infoCmd(msg: Message, args: { userId: string }) {
+    const embed: EmbedOptions = {
+      fields: []
+    };
+
+    const user = this.bot.users.get(args.userId);
+    if (user) {
+      const createdAt = moment(user.createdAt);
+      const accountAge = humanizeDuration(moment().valueOf() - user.createdAt, {
+        largest: 2,
+        round: true
+      });
+
+      embed.title = `${user.username}#${user.discriminator}`;
+      embed.thumbnail = { url: user.avatarURL };
+
+      embed.fields.push({
+        name: "User information",
+        value:
+          trimLines(`
+          ID: ${user.id}
+          Profile: <@!${user.id}>
+          Created: ${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+        `) + embedPadding
+      });
+    } else {
+      embed.title = `Unknown user`;
+    }
+
+    const member = this.guild.members.get(args.userId);
+    if (member) {
+      const joinedAt = moment(member.joinedAt);
+      const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+        largest: 2,
+        round: true
+      });
+      const roles = member.roles.map(id => this.guild.roles.get(id));
+
+      embed.fields.push({
+        name: "Member information",
+        value:
+          trimLines(`
+          Joined: ${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
+        `) + embedPadding
+      });
+    }
+
+    const cases = await this.cases.getByUserId(args.userId);
+    if (cases.length > 0) {
+      cases.sort((a, b) => {
+        return a.created_at < b.created_at ? -1 : 1;
+      });
+
+      const caseSummaries = cases.map(c => {
+        return `${CaseType[c.type]} (#${c.case_number})`;
+      });
+
+      embed.fields.push({
+        name: "Cases",
+        value: trimLines(`
+          Total cases: ${cases.length}
+          Summary: ${caseSummaries.join(", ")}
+        `)
+      });
+    }
+
+    msg.channel.createMessage({ embed });
+  }
+
+  @d.command("server")
+  @d.permission("server")
+  async serverCmd(msg: Message) {
+    await this.guild.fetchAllMembers();
+
+    const embed: EmbedOptions = {
+      fields: []
+    };
+
+    embed.thumbnail = { url: this.guild.iconURL };
+
+    const createdAt = moment(this.guild.createdAt);
+    const serverAge = humanizeDuration(moment().valueOf() - this.guild.createdAt, {
+      largest: 2,
+      round: true
+    });
+
+    embed.fields.push({
+      name: "Server information",
+      value:
+        trimLines(`
+        Created: ${serverAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+        Members: ${this.guild.memberCount}
+        ${this.guild.features.length > 0 ? "Features: " + this.guild.features.join(", ") : ""}
+      `) + embedPadding
+    });
+
+    const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
+    const voiceChannels = this.guild.channels.filter(channel => channel instanceof VoiceChannel);
+
+    embed.fields.push({
+      name: "Counts",
+      value:
+        trimLines(`
+        Roles: ${this.guild.roles.size}
+        Text channels: ${textChannels.length}
+        Voice channels: ${voiceChannels.length}
+      `) + embedPadding
+    });
+
+    const onlineMembers = this.guild.members.filter(m => m.status === "online");
+    const dndMembers = this.guild.members.filter(m => m.status === "dnd");
+    const idleMembers = this.guild.members.filter(m => m.status === "idle");
+    const offlineMembers = this.guild.members.filter(m => m.status === "offline");
+
+    embed.fields.push({
+      name: "Members",
+      value: trimLines(`
+        Online: **${onlineMembers.length}**
+        Idle: **${idleMembers.length}**
+        DND: **${dndMembers.length}**
+        Offline: **${offlineMembers.length}**
+      `)
+    });
+
+    msg.channel.createMessage({ embed });
   }
 }

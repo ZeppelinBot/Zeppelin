@@ -19,6 +19,17 @@ import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import Timer = NodeJS.Timer;
 
+enum IgnoredEventType {
+  Ban = 1,
+  Unban,
+  Kick
+}
+
+interface IIgnoredEvent {
+  type: IgnoredEventType;
+  userId: string;
+}
+
 export class ModActionsPlugin extends Plugin {
   protected cases: GuildCases;
   protected mutes: GuildMutes;
@@ -26,10 +37,14 @@ export class ModActionsPlugin extends Plugin {
 
   protected muteClearIntervalId: Timer;
 
+  protected ignoredEvents: IIgnoredEvent[];
+
   async onLoad() {
     this.cases = new GuildCases(this.guildId);
     this.mutes = new GuildMutes(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
+
+    this.ignoredEvents = [];
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
@@ -89,13 +104,37 @@ export class ModActionsPlugin extends Plugin {
     };
   }
 
+  ignoreEvent(type: IgnoredEventType, userId: any) {
+    this.ignoredEvents.push({ type, userId });
+
+    // Clear after expiry (15sec by default)
+    setTimeout(() => {
+      this.clearIgnoredEvent(type, userId);
+    }, 1000 * 15);
+  }
+
+  isEventIgnored(type: IgnoredEventType, userId: any) {
+    return this.ignoredEvents.some(info => type === info.type && userId === info.userId);
+  }
+
+  clearIgnoredEvent(type: IgnoredEventType, userId: any) {
+    this.ignoredEvents.splice(
+      this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId),
+      1
+    );
+  }
+
   /**
    * Add a BAN action automatically when a user is banned.
    * Attempts to find the ban's details in the audit log.
    */
   @d.event("guildBanAdd")
   async onGuildBanAdd(guild: Guild, user: User) {
-    await sleep(1000); // Wait a moment for the audit log to update
+    if (this.isEventIgnored(IgnoredEventType.Ban, user.id)) {
+      this.clearIgnoredEvent(IgnoredEventType.Ban, user.id);
+      return;
+    }
+
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
@@ -125,6 +164,11 @@ export class ModActionsPlugin extends Plugin {
    */
   @d.event("guildBanRemove")
   async onGuildBanRemove(guild: Guild, user: User) {
+    if (this.isEventIgnored(IgnoredEventType.Unban, user.id)) {
+      this.clearIgnoredEvent(IgnoredEventType.Unban, user.id);
+      return;
+    }
+
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
@@ -165,6 +209,11 @@ export class ModActionsPlugin extends Plugin {
 
   @d.event("guildMemberRemove")
   async onGuildMemberRemove(_, member: Member) {
+    if (this.isEventIgnored(IgnoredEventType.Kick, member.id)) {
+      this.clearIgnoredEvent(IgnoredEventType.Kick, member.id);
+      return;
+    }
+
     const kickAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_KICK,
@@ -398,6 +447,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Kick the user
     this.serverLogs.ignoreLog(LogType.MEMBER_KICK, args.member.id);
+    this.ignoreEvent(IgnoredEventType.Kick, args.member.id);
     args.member.kick(args.reason);
 
     // Create a case for this action
@@ -442,6 +492,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Ban the user
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
+    this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
     args.member.ban(1, args.reason);
 
     // Create a case for this action
@@ -462,9 +513,10 @@ export class ModActionsPlugin extends Plugin {
   @d.command("unban", "<userId:string> [reason:string$]")
   @d.permission("ban")
   async unbanCmd(msg: Message, args: any) {
-    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.member.id);
+    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userId);
 
     try {
+      this.ignoreEvent(IgnoredEventType.Unban, args.userId);
       await this.guild.unbanMember(args.userId, args.reason);
     } catch (e) {
       msg.channel.createMessage(errorMessage("Failed to unban member"));
@@ -496,7 +548,8 @@ export class ModActionsPlugin extends Plugin {
       return;
     }
 
-    this.serverLogs.ignoreLog(LogType.MEMBER_FORCEBAN, args.member.id);
+    this.ignoreEvent(IgnoredEventType.Ban, args.userId);
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.userId);
 
     try {
       await this.guild.banMember(args.userId, 1, args.reason);

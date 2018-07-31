@@ -113,10 +113,14 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.serverLogs.log(LogType.MEMBER_BAN, {
-      user: stripObjectToScalars(user),
-      mod: stripObjectToScalars(mod)
-    });
+    this.serverLogs.log(
+      LogType.MEMBER_BAN,
+      {
+        user: stripObjectToScalars(user),
+        mod: stripObjectToScalars(mod)
+      },
+      user.id
+    );
   }
 
   @d.event("guildBanRemove")
@@ -128,10 +132,14 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.serverLogs.log(LogType.MEMBER_UNBAN, {
-      user: stripObjectToScalars(user),
-      mod: stripObjectToScalars(mod)
-    });
+    this.serverLogs.log(
+      LogType.MEMBER_UNBAN,
+      {
+        mod: stripObjectToScalars(mod),
+        userId: user.id
+      },
+      user.id
+    );
   }
 
   @d.event("guildMemberUpdate")
