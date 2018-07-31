@@ -43,6 +43,16 @@ knex.migrate.latest().then(() => {
     },
     globalPlugins: {
       bot_control: BotControlPlugin
+    },
+
+    options: {
+      getEnabledPlugins(guildId, guildConfig): string[] {
+        const plugins = guildConfig.plugins || {};
+        const keys: string[] = Array.from(this.plugins.keys());
+        return keys.filter(pluginName => {
+          return plugins[pluginName] && plugins[pluginName].enabled !== false;
+        });
+      }
     }
   });
 
