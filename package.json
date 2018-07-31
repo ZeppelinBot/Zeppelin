@@ -33,7 +33,7 @@
     "escape-string-regexp": "^1.0.5",
     "humanize-duration": "^3.15.0",
     "knex": "^0.14.6",
-    "knub": "^9.6.1",
+    "knub": "^9.6.2",
     "lodash.at": "^4.6.0",
     "lodash.difference": "^4.5.0",
     "lodash.intersection": "^4.4.0",
