@@ -5,5 +5,6 @@ export enum CaseType {
   Warn,
   Kick,
   Mute,
-  Unmute
+  Unmute,
+  Expunged
 }
