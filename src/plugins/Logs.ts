@@ -10,8 +10,8 @@ import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 
 interface ILogChannel {
-  include?: LogType[];
-  exclude?: LogType[];
+  include?: string[];
+  exclude?: string[];
 }
 
 interface ILogChannelMap {
@@ -53,13 +53,15 @@ export class LogsPlugin extends Plugin {
 
   async log(type, data) {
     const logChannels: ILogChannelMap = this.configValue("channels");
+    const typeStr = LogType[type];
+
     for (const [channelId, opts] of Object.entries(logChannels)) {
       const channel = this.guild.channels.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
 
       if (
-        (opts.include && opts.include.includes(type)) ||
-        (opts.exclude && !opts.exclude.includes(type))
+        (opts.include && opts.include.includes(typeStr)) ||
+        (opts.exclude && !opts.exclude.includes(typeStr))
       ) {
         const message = this.getLogMessage(type, data);
         if (message) await channel.createMessage(message);
