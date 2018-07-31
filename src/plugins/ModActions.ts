@@ -308,7 +308,7 @@ export class ModActionsPlugin extends Plugin {
   }
 
   public async muteMember(member: Member, muteTime: number = null, reason: string = null) {
-    await member.addRole(this.configValue("mute_role"), reason);
+    await member.addRole(this.configValue("mute_role"));
     await this.mutes.addOrUpdateMute(member.id, muteTime);
   }
 
@@ -404,7 +404,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Remove "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
-    await args.member.removeRole(this.configValue("mute_role"), args.reason);
+    await args.member.removeRole(this.configValue("mute_role"));
     await this.mutes.clear(args.member.id);
 
     // Confirm the action to the moderator
@@ -517,7 +517,7 @@ export class ModActionsPlugin extends Plugin {
 
     try {
       this.ignoreEvent(IgnoredEventType.Unban, args.userId);
-      await this.guild.unbanMember(args.userId, args.reason);
+      await this.guild.unbanMember(args.userId);
     } catch (e) {
       msg.channel.createMessage(errorMessage("Failed to unban member"));
       return;
