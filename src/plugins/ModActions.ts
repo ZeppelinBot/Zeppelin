@@ -33,6 +33,8 @@ interface IIgnoredEvent {
   userId: string;
 }
 
+const CASE_LIST_REASON_MAX_LENGTH = 80;
+
 export class ModActionsPlugin extends Plugin {
   protected cases: GuildCases;
   protected mutes: GuildMutes;
@@ -703,7 +705,20 @@ export class ModActionsPlugin extends Plugin {
       const lines = [];
       for (const theCase of cases) {
         const firstNote = await this.cases.findFirstCaseNote(theCase.id);
-        const reason = firstNote ? disableLinkPreviews(firstNote.body) : "";
+        let reason = firstNote ? firstNote.body : "";
+
+        if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
+          const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 20).match(/(?:[.,!?\s]|$)/);
+          const nextWhitespaceIndex = match
+            ? CASE_LIST_REASON_MAX_LENGTH + match.index
+            : CASE_LIST_REASON_MAX_LENGTH;
+          if (nextWhitespaceIndex < reason.length) {
+            reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
+          }
+        }
+
+        reason = disableLinkPreviews(reason);
+
         lines.push(`Case \`#${theCase.case_number}\` __${CaseType[theCase.type]}__ ${reason}`);
       }
 
