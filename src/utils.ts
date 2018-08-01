@@ -249,7 +249,6 @@ export function getUserMentions(str: string) {
 
   // tslint:disable-next-line
   while ((match = regex.exec(str)) !== null) {
-    console.log("m", match);
     userIds.push(match[1]);
   }
 

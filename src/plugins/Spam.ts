@@ -1,7 +1,6 @@
 import { decorators as d, Plugin } from "knub";
 import { Message, TextChannel } from "eris";
 import {
-  cleanMessagesInChannel,
   getEmojiInString,
   getRoleMentions,
   getUrlsInString,
@@ -12,6 +11,7 @@ import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 import { ModActionsPlugin } from "./ModActions";
 import { CaseType } from "../data/CaseType";
+import { GuildSpamLogs } from "../data/GuildSpamLogs";
 
 enum RecentActionType {
   Message = 1,
@@ -35,6 +35,7 @@ const MAX_INTERVAL = 300;
 
 export class SpamPlugin extends Plugin {
   protected logs: GuildLogs;
+  protected spamLogs: GuildSpamLogs;
 
   protected recentActions: IRecentAction[];
 
@@ -56,6 +57,7 @@ export class SpamPlugin extends Plugin {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
+    this.spamLogs = new GuildSpamLogs(this.guildId);
     this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
     this.recentActions = [];
   }
@@ -112,6 +114,17 @@ export class SpamPlugin extends Plugin {
     this.recentActions = this.recentActions.filter(action => action.timestamp >= expiryTimestamp);
   }
 
+  async saveSpamLogs(messages: Message[]) {
+    const channel = messages[0].channel as TextChannel;
+    const header = `Server: ${this.guild.name} (${this.guild.id}), channel: #${channel.name} (${
+      channel.id
+    })`;
+    const logId = await this.spamLogs.createFromMessages(messages, header);
+
+    const url = this.knub.getGlobalConfig().url;
+    return url ? `${url}/spam-logs/${logId}` : `Log ID: ${logId}`;
+  }
+
   async detectSpam(
     msg: Message,
     type: RecentActionType,
@@ -137,13 +150,15 @@ export class SpamPlugin extends Plugin {
         const msgIds = recentActions.map(a => a.msg.id);
 
         await this.bot.deleteMessages(msg.channel.id, msgIds);
+        const logUrl = await this.saveSpamLogs(recentActions.map(a => a.msg));
 
         this.logs.log(LogType.SPAM_DELETE, {
           member: stripObjectToScalars(msg.member, ["user"]),
           channel: stripObjectToScalars(msg.channel),
           description,
           limit: spamConfig.count,
-          interval: spamConfig.interval
+          interval: spamConfig.interval,
+          logUrl
         });
       }
 

@@ -35,7 +35,7 @@
 
   "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **#{channel.name}**:\n`{command}`",
 
-  "SPAM_DELETE": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam deleted in **#{channel.name}**: {description} (more than {limit} in {interval}s)",
+  "SPAM_DELETE": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam deleted in **#{channel.name}**: {description} (more than {limit} in {interval}s) {logUrl}",
   "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **#{channel.name}** (`{channel.id}`) {reason}:\n```{messageText}```",
   "CLEAN": "🚿 **{mod.username}#{mod.discriminator}** (`{mod.id}`) cleaned **{count}** message(s) in **#{channel.name}**",
 

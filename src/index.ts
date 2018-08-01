@@ -22,6 +22,7 @@ import { ReactionRolesPlugin } from "./plugins/ReactionRoles";
 import { CensorPlugin } from "./plugins/Censor";
 import { PersistPlugin } from "./plugins/Persist";
 import { SpamPlugin } from "./plugins/Spam";
+import { LogServerPlugin } from "./plugins/LogServer";
 import knex from "./knex";
 
 // Run latest database migrations
@@ -44,7 +45,8 @@ knex.migrate.latest().then(() => {
       spam: SpamPlugin
     },
     globalPlugins: {
-      bot_control: BotControlPlugin
+      bot_control: BotControlPlugin,
+      log_server: LogServerPlugin
     },
 
     options: {
