@@ -3,7 +3,11 @@ require("dotenv").config();
 process.on("unhandledRejection", (reason, p) => {
   // tslint:disable-next-line
   console.error(reason);
-  process.exit();
+});
+
+process.on("uncaughtException", err => {
+  // tslint:disable-next-line
+  console.error(err);
 });
 
 // Always use UTC
