@@ -8,7 +8,7 @@ process.on("unhandledRejection", (reason, p) => {
 
 // Always use UTC
 // This is also set for the database in knexfile
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
