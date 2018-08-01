@@ -173,7 +173,7 @@ export class SpamPlugin extends Plugin {
         this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, msg.member.id);
         await modActionsPlugin.muteMember(
           msg.member,
-          spamConfig.muteTime ? spamConfig.muteTime * 1000 : 120 * 1000,
+          spamConfig.mute_time ? spamConfig.mute_time * 1000 : 120 * 1000,
           "Automatic spam detection"
         );
         await modActionsPlugin.createCase(
