@@ -241,8 +241,8 @@ export class LogsPlugin extends Plugin {
     this.serverLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(msg.member, ["user"]),
       channel: stripObjectToScalars(msg.channel),
-      before: oldMsg ? oldMsg.content || "" : "Unavailable due to restart",
-      after: msg.content || ""
+      before: oldMsg ? (oldMsg.cleanContent || oldMsg.content || "") : "Unavailable due to restart",
+      after: msg.cleanContent || msg.content || ""
     });
   }
 
@@ -256,7 +256,7 @@ export class LogsPlugin extends Plugin {
         {
           member: stripObjectToScalars(msg.member, ["user"]),
           channel: stripObjectToScalars(msg.channel),
-          messageText: msg.cleanContent || ""
+          messageText: msg.cleanContent || msg.content || ""
         },
         msg.id
       );
