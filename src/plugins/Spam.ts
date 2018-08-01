@@ -5,7 +5,8 @@ import {
   getRoleMentions,
   getUrlsInString,
   getUserMentions,
-  stripObjectToScalars
+  stripObjectToScalars,
+  trimLines
 } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
@@ -145,12 +146,12 @@ export class SpamPlugin extends Plugin {
     );
 
     if (recentActionsCount > spamConfig.count) {
-      if (spamConfig.clean !== false) {
-        const recentActions = this.getRecentActions(type, msg.author.id, msg.channel.id, since);
-        const msgIds = recentActions.map(a => a.msg.id);
+      const recentActions = this.getRecentActions(type, msg.author.id, msg.channel.id, since);
+      const logUrl = await this.saveSpamLogs(recentActions.map(a => a.msg));
 
+      if (spamConfig.clean !== false) {
+        const msgIds = recentActions.map(a => a.msg.id);
         await this.bot.deleteMessages(msg.channel.id, msgIds);
-        const logUrl = await this.saveSpamLogs(recentActions.map(a => a.msg));
 
         this.logs.log(LogType.SPAM_DELETE, {
           member: stripObjectToScalars(msg.member, ["user"]),
@@ -180,7 +181,12 @@ export class SpamPlugin extends Plugin {
           this.bot.user.id,
           CaseType.Mute,
           null,
-          "Automatic spam detection",
+          trimLines(`
+            Automatic spam detection: ${description} (over ${spamConfig.count} in ${
+            spamConfig.interval
+          }s)
+            ${logUrl}
+          `),
           true
         );
         this.logs.log(LogType.MEMBER_MUTE_SPAM, {
