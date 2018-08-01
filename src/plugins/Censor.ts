@@ -63,7 +63,7 @@ export class CensorPlugin extends Plugin {
   }
 
   async applyFiltersToMsg(msg: Message) {
-    if (msg.author.bot) return;
+    if (!msg.author || msg.author.bot) return;
     if (msg.type !== 0) return;
     if (!msg.content) return;
 

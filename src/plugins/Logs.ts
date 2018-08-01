@@ -235,13 +235,14 @@ export class LogsPlugin extends Plugin {
 
   @d.event("messageUpdate")
   onMessageUpdate(msg: Message, oldMsg: Message) {
+    if (!msg.author) return;
     if (oldMsg && msg.content === oldMsg.content) return;
     if (msg.type !== 0) return;
 
     this.serverLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(msg.member, ["user"]),
       channel: stripObjectToScalars(msg.channel),
-      before: oldMsg ? (oldMsg.cleanContent || oldMsg.content || "") : "Unavailable due to restart",
+      before: oldMsg ? oldMsg.cleanContent || oldMsg.content || "" : "Unavailable due to restart",
       after: msg.cleanContent || msg.content || ""
     });
   }
