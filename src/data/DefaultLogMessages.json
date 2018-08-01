@@ -8,6 +8,7 @@
   "MEMBER_BAN": "🔨 **{user.username}#{user.discriminator}** (`{user.id}`) was banned by {mod.username}#{mod.discriminator}",
   "MEMBER_UNBAN": "🔓 User (`{userId}`) was unbanned by {mod.username}#{mod.discriminator}",
   "MEMBER_FORCEBAN": "🔨 User (`{userId}`) was forcebanned by {mod.username}#{mod.discriminator}",
+  "MEMBER_SOFTBAN": "🔨 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was softbanned by {mod.username}#{mod.discriminator}",
   "MEMBER_JOIN": "📥 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined{new} (created {account_age} ago)",
   "MEMBER_LEAVE": "📤 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left the server",
   "MEMBER_ROLE_ADD": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role added **{role.name}** by {mod.username}#{mod.discriminator}",

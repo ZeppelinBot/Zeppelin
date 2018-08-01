@@ -5,12 +5,14 @@ import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
   convertDelayStringToMS,
+  disableLinkPreviews,
   errorMessage,
   findRelevantAuditLogEntry,
   formatTemplateString,
   sleep,
   stripObjectToScalars,
-  successMessage
+  successMessage,
+  trimLines
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import Case from "../models/Case";
@@ -60,7 +62,7 @@ export class ModActionsPlugin extends Plugin {
       config: {
         mute_role: null,
         dm_on_warn: true,
-        dm_on_mute: true,
+        dm_on_mute: false,
         dm_on_kick: false,
         dm_on_ban: false,
         message_on_warn: false,
@@ -242,28 +244,36 @@ export class ModActionsPlugin extends Plugin {
   @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
   @d.permission("note")
   async updateCmd(msg: Message, args: any) {
-    const action = await this.cases.findByCaseNumber(args.caseNumber);
-    if (!action) {
+    const theCase = await this.cases.findByCaseNumber(args.caseNumber);
+    if (!theCase) {
       msg.channel.createMessage("Case not found!");
       return;
     }
 
-    if (action.mod_id === null) {
+    if (theCase.mod_id === null) {
       // If the action has no moderator information, assume the first one to update it did the action
-      await this.cases.update(action.id, {
+      await this.cases.update(theCase.id, {
         mod_id: msg.author.id,
         mod_name: `${msg.author.username}#${msg.author.discriminator}`
       });
     }
 
-    await this.createCaseNote(action.id, msg.author.id, args.note);
-    this.postCaseToCaseLog(action.id); // Post updated case to case log
+    await this.createCaseNote(theCase.id, msg.author.id, args.note);
+    this.postCaseToCaseLog(theCase.id); // Post updated case to case log
+
+    if (msg.channel.id !== this.configValue("case_log_channel")) {
+      msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
+    }
   }
 
-  @d.command("note", "<userId:string> <note:string$>")
+  @d.command("note", "<userId:userId> <note:string$>")
   @d.permission("note")
   async noteCmd(msg: Message, args: any) {
+    const user = await this.bot.users.get(args.userId);
+    const userName = user ? `${user.username}#${user.discriminator}` : "member";
+
     await this.createCase(args.userId, msg.author.id, CaseType.Note, null, args.note);
+    msg.channel.createMessage(successMessage(`Note added on ${userName}`));
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
@@ -299,7 +309,9 @@ export class ModActionsPlugin extends Plugin {
 
     await this.createCase(args.member.id, msg.author.id, CaseType.Warn, null, args.reason);
 
-    msg.channel.createMessage(successMessage("Member warned"));
+    msg.channel.createMessage(
+      successMessage(`Warned **${args.member.user.username}#${args.member.user.discriminator}**`)
+    );
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(msg.member.user),
@@ -366,9 +378,13 @@ export class ModActionsPlugin extends Plugin {
     // Confirm the action to the moderator
     let response;
     if (muteTime) {
-      response = `Member muted for ${timeUntilUnmute}`;
+      response = `Muted **${args.member.user.username}#${
+        args.member.user.discriminator
+      }** for ${timeUntilUnmute}`;
     } else {
-      response = `Member muted indefinitely`;
+      response = `Muted **${args.member.user.username}#${
+        args.member.user.discriminator
+      }** indefinitely`;
     }
 
     if (!messageSent) response += " (failed to message user)";
@@ -408,7 +424,9 @@ export class ModActionsPlugin extends Plugin {
     await this.mutes.clear(args.member.id);
 
     // Confirm the action to the moderator
-    msg.channel.createMessage(successMessage("Member unmuted"));
+    msg.channel.createMessage(
+      successMessage(`Unmuted **${args.member.user.username}#${args.member.user.discriminator}**`)
+    );
 
     // Create a case
     await this.createCase(args.member.id, msg.author.id, CaseType.Unmute, null, args.reason);
@@ -454,7 +472,7 @@ export class ModActionsPlugin extends Plugin {
     await this.createCase(args.member.id, msg.author.id, CaseType.Kick, null, args.reason);
 
     // Confirm the action to the moderator
-    let response = `Member kicked`;
+    let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}**`;
     if (!messageSent) response += " (failed to message user)";
     msg.channel.createMessage(successMessage(response));
 
@@ -499,7 +517,7 @@ export class ModActionsPlugin extends Plugin {
     await this.createCase(args.member.id, msg.author.id, CaseType.Ban, null, args.reason);
 
     // Confirm the action to the moderator
-    let response = `Member banned`;
+    let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}**`;
     if (!messageSent) response += " (failed to message user)";
     msg.channel.createMessage(successMessage(response));
 
@@ -510,7 +528,42 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  @d.command("unban", "<userId:string> [reason:string$]")
+  @d.command("softban", "<member:Member> [reason:string$]")
+  @d.permission("ban")
+  async softbanCmd(msg, args) {
+    // Make sure we're allowed to ban this member
+    if (!this.canActOn(msg.member, args.member)) {
+      msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
+      return;
+    }
+
+    // Softban the user = ban, and immediately unban
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
+    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.member.id);
+    this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
+    this.ignoreEvent(IgnoredEventType.Unban, args.member.id);
+
+    await args.member.ban(1, args.reason);
+    await this.guild.unbanMember(args.member.id);
+
+    // Create a case for this action
+    await this.createCase(args.member.id, msg.author.id, CaseType.Softban, null, args.reason);
+
+    // Confirm the action to the moderator
+    msg.channel.createMessage(
+      successMessage(
+        `Softbanned **${args.member.user.username}#${args.member.user.discriminator}**`
+      )
+    );
+
+    // Log the action
+    this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
+      mod: stripObjectToScalars(msg.member.user),
+      member: stripObjectToScalars(args.member, ["user"])
+    });
+  }
+
+  @d.command("unban", "<userId:userId> [reason:string$]")
   @d.permission("ban")
   async unbanCmd(msg: Message, args: any) {
     this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userId);
@@ -536,7 +589,7 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  @d.command("forceban", "<userId:string> [reason:string$]")
+  @d.command("forceban", "<userId:userId> [reason:string$]")
   @d.permission("ban")
   async forcebanCmd(msg: Message, args: any) {
     // If the user exists as a guild member, make sure we can act on them first
@@ -571,7 +624,7 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  @d.command("addcase", "<type:string> <target:string> [reason:string$]")
+  @d.command("addcase", "<type:string> <target:userId> [reason:string$]")
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
     // Verify the user id is a valid snowflake-ish
@@ -621,30 +674,47 @@ export class ModActionsPlugin extends Plugin {
    * If the argument passed is a case id, display that case
    * If the argument passed is a user id, show all cases on that user
    */
-  @d.command(/showcase|case|cases|usercases/, "<caseNumberOrUserId:string>")
+  @d.command(/showcase|case/, "<caseNumber:number>")
   @d.permission("view")
-  async showcaseCmd(msg: Message, args: any) {
-    if (args.caseNumberOrUserId.length >= 17) {
-      // Assume user id
-      const actions = await this.cases.getByUserId(args.caseNumberOrUserId);
+  async showcaseCmd(msg: Message, args: { caseNumber: number }) {
+    // Assume case id
+    const theCase = await this.cases.findByCaseNumber(args.caseNumber);
 
-      if (actions.length === 0) {
-        msg.channel.createMessage("No cases found for the specified user!");
-      } else {
-        for (const action of actions) {
-          await this.displayCase(action, msg.channel.id);
-        }
-      }
+    if (!theCase) {
+      msg.channel.createMessage("Case not found!");
+      return;
+    }
+
+    this.displayCase(theCase.id, msg.channel.id);
+  }
+
+  @d.command(/cases|usercases/, "<userId:userId>")
+  @d.permission("view")
+  async usercasesCmd(msg: Message, args: { userId: string }) {
+    const cases = await this.cases.getByUserId(args.userId);
+    const user = this.bot.users.get(args.userId);
+    const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+    const prefix = this.knub.getGuildData(this.guildId).config.prefix;
+
+    if (cases.length === 0) {
+      msg.channel.createMessage("No cases found for the specified user!");
     } else {
-      // Assume case id
-      const action = await this.cases.findByCaseNumber(args.caseNumberOrUserId);
-
-      if (!action) {
-        msg.channel.createMessage("Case not found!");
-        return;
+      const lines = [];
+      for (const theCase of cases) {
+        const firstNote = await this.cases.findFirstCaseNote(theCase.id);
+        const reason = firstNote ? disableLinkPreviews(firstNote.body) : "";
+        lines.push(`Case \`#${theCase.case_number}\` __${CaseType[theCase.type]}__ ${reason}`);
       }
 
-      this.displayCase(action.id, msg.channel.id);
+      const finalMessage = trimLines(`
+        Cases for **${userName}**:
+        
+        ${lines.join("\n")}
+        
+        Use \`${prefix}case <num>\` to see more info about individual cases        
+      `);
+
+      msg.channel.createMessage(finalMessage);
     }
   }
 
