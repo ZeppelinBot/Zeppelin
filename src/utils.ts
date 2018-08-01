@@ -238,3 +238,33 @@ export function trimLines(str: string) {
 
 export const emptyEmbedValue = "\u200b";
 export const embedPadding = "\n" + emptyEmbedValue;
+
+export const userMentionRegex = /<@!?([0-9]+)>/g;
+export const roleMentionRegex = /<&([0-9]+)>/g;
+
+export function getUserMentions(str: string) {
+  const regex = new RegExp(userMentionRegex.source, "g");
+  const userIds = [];
+  let match;
+
+  // tslint:disable-next-line
+  while ((match = regex.exec(str)) !== null) {
+    console.log("m", match);
+    userIds.push(match[1]);
+  }
+
+  return userIds;
+}
+
+export function getRoleMentions(str: string) {
+  const regex = new RegExp(roleMentionRegex.source, "g");
+  const roleIds = [];
+  let match;
+
+  // tslint:disable-next-line
+  while ((match = regex.exec(str)) !== null) {
+    roleIds.push(match[1]);
+  }
+
+  return roleIds;
+}

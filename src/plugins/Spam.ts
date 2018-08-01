@@ -3,7 +3,9 @@ import { Message, TextChannel } from "eris";
 import {
   cleanMessagesInChannel,
   getEmojiInString,
+  getRoleMentions,
   getUrlsInString,
+  getUserMentions,
   stripObjectToScalars
 } from "../utils";
 import { LogType } from "../data/LogType";
@@ -24,9 +26,12 @@ interface IRecentAction {
   type: RecentActionType;
   userId: string;
   channelId: string;
+  msg: Message;
   timestamp: number;
   count: number;
 }
+
+const MAX_INTERVAL = 300;
 
 export class SpamPlugin extends Plugin {
   protected logs: GuildLogs;
@@ -63,6 +68,7 @@ export class SpamPlugin extends Plugin {
     type: RecentActionType,
     userId: string,
     channelId: string,
+    msg: Message,
     timestamp: number,
     count = 1
   ) {
@@ -70,8 +76,18 @@ export class SpamPlugin extends Plugin {
       type,
       userId,
       channelId,
+      msg,
       timestamp,
       count
+    });
+  }
+
+  getRecentActions(type: RecentActionType, userId: string, channelId: string, since: number) {
+    return this.recentActions.filter(action => {
+      if (action.timestamp < since) return false;
+      if (action.type !== type) return false;
+      if (action.channelId !== channelId) return false;
+      return true;
     });
   }
 
@@ -92,7 +108,7 @@ export class SpamPlugin extends Plugin {
 
   clearOldRecentActions() {
     // TODO: Figure out expiry time from longest interval in the config?
-    const expiryTimestamp = Date.now() - 1000 * 60 * 5;
+    const expiryTimestamp = Date.now() - 1000 * MAX_INTERVAL;
     this.recentActions = this.recentActions.filter(action => action.timestamp >= expiryTimestamp);
   }
 
@@ -105,26 +121,23 @@ export class SpamPlugin extends Plugin {
   ) {
     if (actionCount === 0) return;
 
-    this.addRecentAction(type, msg.author.id, msg.channel.id, msg.timestamp, actionCount);
-    const recentMessagesCount = this.getRecentActionCount(
+    const since = msg.timestamp - 1000 * spamConfig.interval;
+
+    this.addRecentAction(type, msg.author.id, msg.channel.id, msg, msg.timestamp, actionCount);
+    const recentActionsCount = this.getRecentActionCount(
       type,
       msg.author.id,
       msg.channel.id,
-      msg.timestamp - 1000 * spamConfig.interval
+      since
     );
 
-    if (recentMessagesCount > spamConfig.count) {
+    if (recentActionsCount > spamConfig.count) {
       if (spamConfig.clean !== false) {
-        const cleanCount =
-          type === RecentActionType.Message ? spamConfig.count : spamConfig.cleanCount || 20;
+        const recentActions = this.getRecentActions(type, msg.author.id, msg.channel.id, since);
+        const msgIds = recentActions.map(a => a.msg.id);
 
-        await cleanMessagesInChannel(
-          this.bot,
-          msg.channel as TextChannel,
-          cleanCount,
-          msg.author.id,
-          "Spam detected"
-        );
+        await this.bot.deleteMessages(msg.channel.id, msgIds);
+
         this.logs.log(LogType.SPAM_DELETE, {
           member: stripObjectToScalars(msg.member, ["user"]),
           channel: stripObjectToScalars(msg.channel),
@@ -135,6 +148,8 @@ export class SpamPlugin extends Plugin {
       }
 
       if (spamConfig.mute) {
+        // For muting the user, we use the ModActions plugin
+        // This means that spam mute functionality requires the ModActions plugin to be loaded
         const guildData = this.knub.getGuildData(this.guildId);
         const modActionsPlugin = guildData.loadedPlugins.get("mod_actions") as ModActionsPlugin;
         if (!modActionsPlugin) return;
@@ -176,12 +191,15 @@ export class SpamPlugin extends Plugin {
     }
 
     const maxMentions = this.configValueForMsg(msg, "max_mentions");
-    if (maxMentions && (msg.mentions.length || msg.roleMentions.length)) {
+    const mentions = msg.content
+      ? [...getUserMentions(msg.content), ...getRoleMentions(msg.content)]
+      : [];
+    if (maxMentions && mentions.length) {
       this.detectSpam(
         msg,
         RecentActionType.Mention,
         maxMentions,
-        msg.mentions.length + msg.roleMentions.length,
+        mentions.length,
         "too many mentions"
       );
     }
