@@ -5,7 +5,7 @@ import SpamLog from "../models/SpamLog";
 import { Message } from "eris";
 import { formatTemplateString, stripObjectToScalars, trimLines } from "../utils";
 
-const EXPIRY_DAYS = 7;
+const EXPIRY_DAYS = 90;
 const MESSAGE_FORMAT =
   "[{timestamp}] [{message.id}] {user.username}#{user.discriminator}: {message.content}{attachments}";
 
