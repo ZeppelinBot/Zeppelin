@@ -267,3 +267,10 @@ export function getRoleMentions(str: string) {
 
   return roleIds;
 }
+
+/**
+ * Disables link previews in the given string by wrapping links in < >
+ */
+export function disableLinkPreviews(str: string): string {
+  return str.replace(/(?<!\<)(https?:\/\/\S+)/gi, "<$1>");
+}

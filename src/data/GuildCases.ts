@@ -1,5 +1,6 @@
 import knex from "../knex";
 import Case from "../models/Case";
+import CaseNote from "../models/CaseNote";
 
 export class GuildCases {
   protected guildId: string;
@@ -26,12 +27,12 @@ export class GuildCases {
     return result ? new Case(result) : null;
   }
 
-  async getCaseNotes(caseId: number): Promise<Case[]> {
+  async getCaseNotes(caseId: number): Promise<CaseNote[]> {
     const results = await knex("case_notes")
       .where("case_id", caseId)
       .select();
 
-    return results.map(r => new Case(r));
+    return results.map(r => new CaseNote(r));
   }
 
   async getByUserId(userId: string): Promise<Case[]> {
@@ -41,6 +42,14 @@ export class GuildCases {
       .select();
 
     return results.map(r => new Case(r));
+  }
+
+  async findFirstCaseNote(caseId: number): Promise<CaseNote> {
+    const result = await knex("case_notes")
+      .where("case_id", caseId)
+      .first();
+
+    return result ? new CaseNote(result) : null;
   }
 
   async create(data): Promise<number> {
