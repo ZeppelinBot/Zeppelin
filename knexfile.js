@@ -12,6 +12,9 @@ module.exports = {
     database: process.env.DB_DATABASE,
     charset: 'utf8mb4',
     timezone: 'UTC',
+    supportBigNumbers: true,
+    bigNumberStrings: true,
+    dateStrings: true,
     typeCast(field, next) {
       if (field.type === 'DATETIME') {
         return moment(field.string()).format('YYYY-MM-DD HH:mm:ss');
