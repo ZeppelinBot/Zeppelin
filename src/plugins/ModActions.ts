@@ -20,6 +20,7 @@ import { CaseType } from "../data/CaseType";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import Timer = NodeJS.Timer;
+import { CaseTypeColors } from "../data/CaseTypeColors";
 
 enum IgnoredEventType {
   Ban = 1,
@@ -802,12 +803,8 @@ export class ModActionsPlugin extends Plugin {
       ]
     };
 
-    if (actionTypeStr === "BAN") {
-      embed.color = 0xe67e22;
-    } else if (actionTypeStr === "UNBAN") {
-      embed.color = 0x9b59b6;
-    } else if (actionTypeStr === "NOTE") {
-      embed.color = 0x3498db;
+    if (CaseTypeColors[theCase.type]) {
+      embed.color = CaseTypeColors[theCase.type];
     }
 
     if (notes.length) {
