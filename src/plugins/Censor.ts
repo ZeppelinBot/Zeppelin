@@ -4,6 +4,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { getInviteCodesInString, getUrlsInString, stripObjectToScalars } from "../utils";
+import { ZalgoRegex } from "../data/Zalgo";
 
 export class CensorPlugin extends Plugin {
   protected serverLogs: GuildLogs;
@@ -11,6 +12,7 @@ export class CensorPlugin extends Plugin {
   getDefaultOptions() {
     return {
       config: {
+        filter_zalgo: false,
         filter_invites: false,
         invite_guild_whitelist: null,
         invite_guild_blacklist: null,
@@ -30,6 +32,7 @@ export class CensorPlugin extends Plugin {
         {
           level: ">=50",
           config: {
+            filter_zalgo: false,
             filter_invites: false,
             filter_domains: false,
             blocked_tokens: null,
@@ -66,6 +69,15 @@ export class CensorPlugin extends Plugin {
     if (!msg.author || msg.author.bot) return;
     if (msg.type !== 0) return;
     if (!msg.content) return;
+
+    // Filter zalgo
+    if (this.configValueForMsg(msg, "filter_zalgo")) {
+      const result = ZalgoRegex.exec(msg.content);
+      if (result) {
+        this.censorMessage(msg, `zalgo detected`);
+        return;
+      }
+    }
 
     // Filter invites
     if (this.configValueForMsg(msg, "filter_invites")) {
