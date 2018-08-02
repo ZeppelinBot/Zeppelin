@@ -79,7 +79,9 @@ export class UtilityPlugin extends Plugin {
   @d.command("search", "<query:string$>")
   @d.permission("search")
   async searchCmd(msg: Message, args: { query: string }) {
-    const query = args.query.toLowerCase();
+    let [, query, inputPageNum] = args.query.match(/^(.*?)(?:\s([0-9]+))?$/);
+    query = query.toLowerCase();
+
     const matchingMembers = this.guild.members.filter(member => {
       const fullUsername = `${member.user.username}#${member.user.discriminator}`;
       if (member.nick && member.nick.toLowerCase().indexOf(query) !== -1) return true;
@@ -91,20 +93,35 @@ export class UtilityPlugin extends Plugin {
       let header;
       const resultText = matchingMembers.length === 1 ? "result" : "results";
 
-      if (matchingMembers.length > MAX_SEARCH_RESULTS) {
-        header = `Found ${matchingMembers.length} ${resultText} (showing ${MAX_SEARCH_RESULTS})`;
+      const paginated = matchingMembers.length > MAX_SEARCH_RESULTS;
+
+      const pageInputMatch = args.query.match(/\s([0-9]+)$/);
+      const inputPage = pageInputMatch ? parseInt(pageInputMatch[1], 10) : 1;
+      const lastPage = Math.ceil(matchingMembers.length / MAX_SEARCH_RESULTS);
+      const page = Math.min(lastPage, Math.max(1, inputPage));
+
+      const from = (page - 1) * MAX_SEARCH_RESULTS;
+      const to = Math.min(from + MAX_SEARCH_RESULTS, matchingMembers.length);
+
+      if (paginated) {
+        header = `Found ${matchingMembers.length} ${resultText} (showing ${from + 1}-${to})`;
       } else {
         header = `Found ${matchingMembers.length} ${resultText}`;
       }
 
-      const lines = matchingMembers.slice(0, MAX_SEARCH_RESULTS).map(member => {
+      let lines = matchingMembers.map(member => {
         return `${member.user.username}#${member.user.discriminator} (${member.id})`;
       });
       lines.sort((a, b) => {
         return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
       });
+      lines = lines.slice(from, to);
 
-      msg.channel.createMessage(`${header}\n\`\`\`${lines.join("\n")}\`\`\``);
+      const footer = paginated
+        ? "Add a page number to the end of the command to browse results"
+        : "";
+
+      msg.channel.createMessage(`${header}\n\`\`\`${lines.join("\n")}\`\`\`${footer}`);
     } else {
       msg.channel.createMessage(errorMessage("No results found"));
     }
