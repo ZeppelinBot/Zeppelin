@@ -52,7 +52,21 @@ export class SpamPlugin extends Plugin {
         max_emojis: null,
         max_newlines: null,
         max_duplicates: null
-      }
+      },
+      overrides: [
+        {
+          level: ">=50",
+          config: {
+            max_messages: null,
+            max_mentions: null,
+            max_links: null,
+            max_attachments: null,
+            max_emojis: null,
+            max_newlines: null,
+            max_duplicates: null
+          }
+        }
+      ]
     };
   }
 
