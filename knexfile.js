@@ -22,5 +22,12 @@ module.exports = {
 
       return next();
     }
+  },
+  pool: {
+    afterCreate(conn, cb) {
+      conn.query('SET time_zone = "+00:00";', err => {
+        cb(err, conn);
+      });
+    }
   }
 };
