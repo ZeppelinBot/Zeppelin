@@ -30,9 +30,9 @@
   "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **#{channel.name}**",
   "MESSAGE_DELETE_BARE": "🗑 Message (`{messageId}`) deleted in **#{channel.name}** (no more info available due to bot restart)",
 
-  "VOICE_CHANNEL_JOIN": "🔸 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined **{channel.name}**",
-  "VOICE_CHANNEL_MOVE": "🔹 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) moved **{oldChannel.name}** ➞ **{newChannel.name}**",
-  "VOICE_CHANNEL_LEAVE": "♦ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left **{channel.name}**",
+  "VOICE_CHANNEL_JOIN": "🎙 🔵 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined **{channel.name}**",
+  "VOICE_CHANNEL_MOVE": "🎙 ↔ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) moved from **{oldChannel.name}** to **{newChannel.name}**",
+  "VOICE_CHANNEL_LEAVE": "🎙 🔴 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left **{channel.name}**",
 
   "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **#{channel.name}**:\n`{command}`",
 
