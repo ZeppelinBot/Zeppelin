@@ -702,7 +702,7 @@ export class ModActionsPlugin extends Plugin {
     if (cases.length === 0) {
       msg.channel.createMessage("No cases found for the specified user!");
     } else {
-      if (args.expanded === "expanded") {
+      if (args.expanded && args.expanded.startsWith("expand")) {
         // Expanded view (= individual case embeds)
         for (const theCase of cases) {
           await this.displayCase(theCase.id, msg.channel.id);
