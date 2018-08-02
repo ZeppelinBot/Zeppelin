@@ -691,9 +691,9 @@ export class ModActionsPlugin extends Plugin {
     this.displayCase(theCase.id, msg.channel.id);
   }
 
-  @d.command(/cases|usercases/, "<userId:userId>")
+  @d.command(/cases|usercases/, "<userId:userId> [expanded:string]")
   @d.permission("view")
-  async usercasesCmd(msg: Message, args: { userId: string }) {
+  async usercasesCmd(msg: Message, args: { userId: string; expanded?: string }) {
     const cases = await this.cases.getByUserId(args.userId);
     const user = this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
@@ -702,27 +702,34 @@ export class ModActionsPlugin extends Plugin {
     if (cases.length === 0) {
       msg.channel.createMessage("No cases found for the specified user!");
     } else {
-      const lines = [];
-      for (const theCase of cases) {
-        const firstNote = await this.cases.findFirstCaseNote(theCase.id);
-        let reason = firstNote ? firstNote.body : "";
+      if (args.expanded === "expanded") {
+        // Expanded view (= individual case embeds)
+        for (const theCase of cases) {
+          await this.displayCase(theCase.id, msg.channel.id);
+        }
+      } else {
+        // Compact view (= regular message with a preview of each case)
+        const lines = [];
+        for (const theCase of cases) {
+          const firstNote = await this.cases.findFirstCaseNote(theCase.id);
+          let reason = firstNote ? firstNote.body : "";
 
-        if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
-          const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 20).match(/(?:[.,!?\s]|$)/);
-          const nextWhitespaceIndex = match
-            ? CASE_LIST_REASON_MAX_LENGTH + match.index
-            : CASE_LIST_REASON_MAX_LENGTH;
-          if (nextWhitespaceIndex < reason.length) {
-            reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
+          if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
+            const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 20).match(/(?:[.,!?\s]|$)/);
+            const nextWhitespaceIndex = match
+              ? CASE_LIST_REASON_MAX_LENGTH + match.index
+              : CASE_LIST_REASON_MAX_LENGTH;
+            if (nextWhitespaceIndex < reason.length) {
+              reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
+            }
           }
+
+          reason = disableLinkPreviews(reason);
+
+          lines.push(`Case \`#${theCase.case_number}\` __${CaseType[theCase.type]}__ ${reason}`);
         }
 
-        reason = disableLinkPreviews(reason);
-
-        lines.push(`Case \`#${theCase.case_number}\` __${CaseType[theCase.type]}__ ${reason}`);
-      }
-
-      const finalMessage = trimLines(`
+        const finalMessage = trimLines(`
         Cases for **${userName}**:
         
         ${lines.join("\n")}
@@ -730,7 +737,8 @@ export class ModActionsPlugin extends Plugin {
         Use \`${prefix}case <num>\` to see more info about individual cases        
       `);
 
-      msg.channel.createMessage(finalMessage);
+        msg.channel.createMessage(finalMessage);
+      }
     }
   }
 
@@ -838,7 +846,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     const channel = this.guild.channels.get(channelId) as TextChannel;
-    channel.createMessage({ embed });
+    await channel.createMessage({ embed });
   }
 
   /**
