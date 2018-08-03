@@ -3,7 +3,7 @@ import { errorMessage, isSnowflake } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Channel, Emoji, Message, TextChannel } from "eris";
 
-type ReactionRolePair = string[];
+type ReactionRolePair = [string, string];
 
 type CustomEmoji = {
   id: string;
@@ -86,14 +86,16 @@ export class ReactionRolesPlugin extends Plugin {
       .trim()
       .split("\n")
       .map(v => v.split("=").map(v => v.trim()))
-      .map(pair => {
-        const customEmojiMatch = pair[0].match(/^<:(?:.*?):(\d+)>$/);
-        if (customEmojiMatch) {
-          return [customEmojiMatch[1], pair[1]];
-        } else {
-          return pair;
+      .map(
+        (pair): ReactionRolePair => {
+          const customEmojiMatch = pair[0].match(/^<:(?:.*?):(\d+)>$/);
+          if (customEmojiMatch) {
+            return [customEmojiMatch[1], pair[1]];
+          } else {
+            return pair as ReactionRolePair;
+          }
         }
-      });
+      );
 
     // Verify the specified emojis and roles are valid
     for (const pair of newRolePairs) {
@@ -111,7 +113,9 @@ export class ReactionRolesPlugin extends Plugin {
     }
 
     const oldReactionRoles = await this.reactionRoles.getForMessage(targetMessage.id);
-    const oldRolePairs: ReactionRolePair[] = oldReactionRoles.map(r => [r.emoji, r.role_id]);
+    const oldRolePairs: ReactionRolePair[] = oldReactionRoles.map(
+      r => [r.emoji, r.role_id] as ReactionRolePair
+    );
 
     // Remove old reaction/role pairs that weren't included in the new pairs or were changed in some way
     const toRemove = oldRolePairs.filter(
