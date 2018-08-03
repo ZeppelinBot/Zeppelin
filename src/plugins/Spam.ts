@@ -104,6 +104,7 @@ export class SpamPlugin extends Plugin {
       if (action.timestamp < since) return false;
       if (action.type !== type) return false;
       if (action.channelId !== channelId) return false;
+      if (action.userId !== userId) return false;
       return true;
     });
   }
@@ -113,6 +114,7 @@ export class SpamPlugin extends Plugin {
       if (action.timestamp < since) return count;
       if (action.type !== type) return count;
       if (action.channelId !== channelId) return count;
+      if (action.userId !== userId) return false;
       return count + action.count;
     }, 0);
   }
