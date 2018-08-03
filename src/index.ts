@@ -6,6 +6,16 @@ process.on("unhandledRejection", (reason, p) => {
   process.exit(1);
 });
 
+process.on("uncaughtException", err => {
+  if (err.message && err.message.startsWith("DiscordHTTPError")) {
+    console.error(err);
+    return;
+  } else {
+    console.error(err);
+    process.exit(1);
+  }
+});
+
 // Always use UTC
 // This is also set for the database in knexfile
 import moment from "moment-timezone";
