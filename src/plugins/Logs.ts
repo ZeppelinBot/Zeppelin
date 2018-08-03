@@ -64,7 +64,8 @@ export class LogsPlugin extends Plugin {
         (opts.exclude && !opts.exclude.includes(typeStr))
       ) {
         const message = this.getLogMessage(type, data);
-        if (message) await channel.createMessage(message);
+        // TODO: Split log messages that are too long
+        if (message) await channel.createMessage(message).catch(() => {});
       }
     }
   }
