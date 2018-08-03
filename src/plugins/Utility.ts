@@ -1,5 +1,5 @@
 import { Plugin, decorators as d, reply } from "knub";
-import { Channel, Embed, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
+import { Channel, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
 import {
   embedPadding,
   errorMessage,
@@ -18,6 +18,8 @@ import { CaseType } from "../data/CaseType";
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
 
+const activeReloads: Map<string, TextChannel> = new Map();
+
 export class UtilityPlugin extends Plugin {
   protected logs: GuildLogs;
   protected cases: GuildCases;
@@ -30,7 +32,8 @@ export class UtilityPlugin extends Plugin {
         search: false,
         clean: false,
         info: false,
-        server: true
+        server: false,
+        reload_guild: false
       },
       overrides: [
         {
@@ -41,7 +44,8 @@ export class UtilityPlugin extends Plugin {
             search: true,
             clean: true,
             info: true,
-            server: true
+            server: true,
+            reload_guild: true
           }
         }
       ]
@@ -51,6 +55,11 @@ export class UtilityPlugin extends Plugin {
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
     this.cases = new GuildCases(this.guildId);
+
+    if (activeReloads && activeReloads.has(this.guildId)) {
+      activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));
+      activeReloads.delete(this.guildId);
+    }
   }
 
   @d.command("roles")
@@ -345,5 +354,15 @@ export class UtilityPlugin extends Plugin {
     });
 
     msg.channel.createMessage({ embed });
+  }
+
+  @d.command("reload_guild")
+  @d.permission("reload_guild")
+  reloadGuildCmd(msg: Message) {
+    if (activeReloads.has(this.guildId)) return;
+    activeReloads.set(this.guildId, msg.channel as TextChannel);
+
+    msg.channel.createMessage("Reloading...");
+    this.knub.reloadGuild(this.guildId);
   }
 }
