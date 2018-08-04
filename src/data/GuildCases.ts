@@ -9,6 +9,14 @@ export class GuildCases {
     this.guildId = guildId;
   }
 
+  async get(ids: number[]): Promise<Case[]> {
+    const result = await knex("cases")
+      .whereIn("id", ids)
+      .select();
+
+    return result.map(r => new Case(r));
+  }
+
   async find(id: number): Promise<Case> {
     const result = await knex("cases")
       .where("guild_id", this.guildId)

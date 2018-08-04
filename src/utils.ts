@@ -274,3 +274,5 @@ export function getRoleMentions(str: string) {
 export function disableLinkPreviews(str: string): string {
   return str.replace(/(?<!\<)(https?:\/\/\S+)/gi, "<$1>");
 }
+
+export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";

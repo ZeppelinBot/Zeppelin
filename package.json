@@ -35,6 +35,7 @@
     "knex": "0.12.6",
     "knub": "^9.6.4",
     "lodash.at": "^4.6.0",
+    "lodash.chunk": "^4.2.0",
     "lodash.difference": "^4.5.0",
     "lodash.intersection": "^4.4.0",
     "lodash.isequal": "^4.5.0",

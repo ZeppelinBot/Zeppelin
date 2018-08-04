@@ -2,9 +2,11 @@ import { decorators as d, Plugin, waitForReaction } from "knub";
 import { Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import chunk from "lodash.chunk";
 import { GuildCases } from "../data/GuildCases";
 import {
   convertDelayStringToMS,
+  DBDateFormat,
   disableLinkPreviews,
   errorMessage,
   findRelevantAuditLogEntry,
@@ -36,8 +38,8 @@ interface IIgnoredEvent {
 const CASE_LIST_REASON_MAX_LENGTH = 80;
 
 export class ModActionsPlugin extends Plugin {
+  public mutes: GuildMutes;
   protected cases: GuildCases;
-  protected mutes: GuildMutes;
   protected serverLogs: GuildLogs;
 
   protected muteClearIntervalId: Timer;
@@ -355,7 +357,14 @@ export class ModActionsPlugin extends Plugin {
     this.muteMember(args.member, muteTime, args.reason);
 
     // Create a case
-    await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
+    const caseId = await this.createCase(
+      args.member.id,
+      msg.author.id,
+      CaseType.Mute,
+      null,
+      args.reason
+    );
+    await this.mutes.setCaseId(args.member.id, caseId);
 
     // Message the user informing them of the mute
     let messageSent = true;
@@ -439,6 +448,78 @@ export class ModActionsPlugin extends Plugin {
       mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
+  }
+
+  @d.command("mutes")
+  @d.permission("view")
+  async mutesCmd(msg: Message) {
+    const lines = [];
+
+    // Active, logged mutes
+    const activeMutes = await this.mutes.getActiveMutes();
+    activeMutes.sort((a, b) => {
+      if (a.expires_at == null && b.expires_at != null) return 1;
+      if (b.expires_at == null && a.expires_at != null) return -1;
+      if (a.expires_at == null && b.expires_at == null) {
+        return a.created_at > b.created_at ? 1 : -1;
+      }
+      return a.expires_at > b.expires_at ? 1 : -1;
+    });
+
+    const caseIds = activeMutes.map(m => m.case_id).filter(v => !!v);
+    const cases = caseIds ? await this.cases.get(caseIds) : [];
+    const casesById = cases.reduce((map, c) => map.set(c.id, c), new Map());
+
+    lines.push(
+      ...activeMutes.map(mute => {
+        const user = this.bot.users.get(mute.user_id);
+        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+        const theCase = casesById[mute.case_id] || null;
+        const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
+
+        let line = `\`${caseName}\` **${username}** (\`${mute.user_id}\`)`;
+
+        if (mute.expires_at) {
+          const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
+          const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
+          line += ` (expires in ${humanizedTime})`;
+        } else {
+          line += ` (doesn't expire)`;
+        }
+
+        const mutedAt = moment(mute.created_at, DBDateFormat);
+        line += ` (muted at ${mutedAt.format("YYYY-MM-DD HH:mm:ss")})`;
+
+        return line;
+      })
+    );
+
+    // Manually added mute roles
+    const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
+    const manuallyMutedMembers = [];
+    const muteRole = this.configValue("mute_role");
+
+    if (muteRole) {
+      this.guild.members.forEach(member => {
+        if (muteUserIds.has(member.id)) return;
+        if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
+      });
+    }
+
+    lines.push(
+      ...manuallyMutedMembers.map(member => {
+        return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${
+          member.id
+        }\`)`;
+      })
+    );
+
+    const chunks = chunk(lines, 15);
+    for (const [i, chunkLines] of chunks.entries()) {
+      let body = chunkLines.join("\n");
+      if (i === 0) body = `Active mutes:\n\n${body}`;
+      msg.channel.createMessage(body);
+    }
   }
 
   @d.command("kick", "<member:Member> [reason:string$]")
