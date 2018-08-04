@@ -1,6 +1,9 @@
 import { decorators as d, GlobalPlugin } from "knub";
 import child_process from "child_process";
-import { Message } from "eris";
+import { GuildChannel, Message, TextChannel } from "eris";
+import { errorMessage, sleep, successMessage } from "../utils";
+
+let activeReload: [string, string] = null;
 
 /**
  * A global plugin that allows bot owners to control the bot
@@ -14,17 +17,32 @@ export class BotControlPlugin extends GlobalPlugin {
     };
   }
 
+  async onLoad() {
+    if (activeReload) {
+      const [guildId, channelId] = activeReload;
+      activeReload = null;
+
+      const guild = this.bot.guilds.get(guildId);
+      if (guild) {
+        const channel = guild.channels.get(channelId);
+        if (channel instanceof TextChannel) {
+          channel.createMessage(successMessage("Global plugins reloaded!"));
+        }
+      }
+    }
+  }
+
   isOwner(userId) {
     return this.configValue("owners").includes(userId);
   }
 
-  @d.command("bot_update")
-  async updateCmd(msg: Message) {
+  @d.command("bot_full_update")
+  async fullUpdateCmd(msg: Message) {
     if (!this.isOwner(msg.author.id)) return;
 
     const updateCmd = this.configValue("update_cmd");
     if (!updateCmd) {
-      msg.channel.createMessage("Update command not specified!");
+      msg.channel.createMessage(errorMessage("Update command not specified!"));
       return;
     }
 
@@ -36,11 +54,16 @@ export class BotControlPlugin extends GlobalPlugin {
     });
   }
 
-  @d.command("bot_reload")
-  async reloadCmd(msg: Message) {
+  @d.command("bot_reload_global_plugins")
+  async reloadGlobalPluginsCmd(msg: Message) {
     if (!this.isOwner(msg.author.id)) return;
+    if (activeReload) return;
 
-    msg.channel.createMessage("Reloading...");
-    this.knub.reloadGuild(this.guildId);
+    if (msg.channel) {
+      activeReload = [(msg.channel as GuildChannel).guild.id, msg.channel.id];
+      await msg.channel.createMessage("Reloading global plugins...");
+    }
+
+    this.knub.reloadAllGlobalPlugins();
   }
 }
