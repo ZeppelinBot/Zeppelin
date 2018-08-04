@@ -343,6 +343,8 @@ export class ModActionsPlugin extends Plugin {
       return;
     }
 
+    let messageSent = true;
+
     // Convert mute time from e.g. "2h30m" to milliseconds
     const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
     const timeUntilUnmute = muteTime && humanizeDuration(muteTime);
@@ -354,21 +356,31 @@ export class ModActionsPlugin extends Plugin {
 
     // Apply "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
-    this.muteMember(args.member, muteTime, args.reason);
+    await this.muteMember(args.member, muteTime, args.reason);
 
-    // Create a case
-    const caseId = await this.createCase(
-      args.member.id,
-      msg.author.id,
-      CaseType.Mute,
-      null,
-      args.reason
-    );
-    await this.mutes.setCaseId(args.member.id, caseId);
+    const mute = await this.mutes.findExistingMuteForUserId(args.member.id);
+    const hasOldCase = mute && mute.case_id != null;
+
+    if (hasOldCase) {
+      if (args.reason) {
+        await this.createCaseNote(mute.case_id, msg.author.id, args.reason);
+        this.postCaseToCaseLog(mute.case_id);
+      }
+    } else {
+      // Create a case
+      const caseId = await this.createCase(
+        args.member.id,
+        msg.author.id,
+        CaseType.Mute,
+        null,
+        args.reason
+      );
+      await this.mutes.setCaseId(args.member.id, caseId);
+    }
 
     // Message the user informing them of the mute
-    let messageSent = true;
-    if (args.reason) {
+    // Don't message them if we're updating an old mute
+    if (args.reason && !hasOldCase) {
       const template = muteTime
         ? this.configValue("timed_mute_message")
         : this.configValue("mute_message");
@@ -409,7 +421,7 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
-  @d.command("unmute", "<member:Member> [reason:string$]")
+  @d.command("unmute", "<member:Member> [time:string] [reason:string$]")
   @d.permission("mute")
   async unmuteCmd(msg: Message, args: any) {
     if (!this.configValue("mute_role")) {
@@ -430,15 +442,39 @@ export class ModActionsPlugin extends Plugin {
       return;
     }
 
-    // Remove "muted" role
-    this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
-    await args.member.removeRole(this.configValue("mute_role"));
-    await this.mutes.clear(args.member.id);
+    // Convert unmute time from e.g. "2h30m" to milliseconds
+    const unmuteTime = args.time ? convertDelayStringToMS(args.time) : null;
 
-    // Confirm the action to the moderator
-    msg.channel.createMessage(
-      successMessage(`Unmuted **${args.member.user.username}#${args.member.user.discriminator}**`)
-    );
+    if (unmuteTime == null && args.time) {
+      // Invalid unmuteTime -> assume it's actually part of the reason
+      args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
+    }
+
+    if (unmuteTime) {
+      // If we have an unmute time, just update the old mute to expire in that time
+      const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
+      this.mutes.addOrUpdateMute(args.member.id, unmuteTime);
+      args.reason = args.reason ? `Timed unmute: ${args.reason}` : "Timed unmute";
+
+      // Confirm the action to the moderator
+      msg.channel.createMessage(
+        successMessage(
+          `Unmuting **${args.member.user.username}#${
+            args.member.user.discriminator
+          }** in ${timeUntilUnmute}`
+        )
+      );
+    } else {
+      // Otherwise remove "muted" role immediately
+      this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
+      await args.member.removeRole(this.configValue("mute_role"));
+      await this.mutes.clear(args.member.id);
+
+      // Confirm the action to the moderator
+      msg.channel.createMessage(
+        successMessage(`Unmuted **${args.member.user.username}#${args.member.user.discriminator}**`)
+      );
+    }
 
     // Create a case
     await this.createCase(args.member.id, msg.author.id, CaseType.Unmute, null, args.reason);
