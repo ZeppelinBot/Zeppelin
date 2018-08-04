@@ -74,8 +74,8 @@ export function stripObjectToScalars(obj, includedNested: string[] = []) {
 
 const stringFormatRegex = /{([^{}]+?)}/g;
 export function formatTemplateString(str: string, values) {
-  return str.replace(stringFormatRegex, (match, val) => {
-    const value = at(values, val)[0];
+  return str.replace(stringFormatRegex, (match, prop) => {
+    const value = at(values, prop)[0];
     return typeof value === "string" || typeof value === "number" ? String(value) : "";
   });
 }

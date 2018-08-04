@@ -23,7 +23,13 @@ moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
 import { Knub, logger } from "knub";
+import knex from "./knex";
+
+// Global plugins
 import { BotControlPlugin } from "./plugins/BotControl";
+import { LogServerPlugin } from "./plugins/LogServer";
+
+// Guild plugins
 import { ModActionsPlugin } from "./plugins/ModActions";
 import { UtilityPlugin } from "./plugins/Utility";
 import { LogsPlugin } from "./plugins/Logs";
@@ -32,8 +38,7 @@ import { ReactionRolesPlugin } from "./plugins/ReactionRoles";
 import { CensorPlugin } from "./plugins/Censor";
 import { PersistPlugin } from "./plugins/Persist";
 import { SpamPlugin } from "./plugins/Spam";
-import { LogServerPlugin } from "./plugins/LogServer";
-import knex from "./knex";
+import { TagsPlugin } from "./plugins/Tags";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -52,7 +57,8 @@ knex.migrate.latest().then(() => {
       reaction_roles: ReactionRolesPlugin,
       censor: CensorPlugin,
       persist: PersistPlugin,
-      spam: SpamPlugin
+      spam: SpamPlugin,
+      tags: TagsPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin,
