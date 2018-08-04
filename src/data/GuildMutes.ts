@@ -69,6 +69,22 @@ export class GuildMutes {
     }
   }
 
+  async getActiveMutes(): Promise<Mute[]> {
+    const result = await knex("mutes")
+      .where("guild_id", this.guildId)
+      .where(q => q.whereRaw("expires_at > NOW()").orWhereNull("expires_at"))
+      .select();
+
+    return result.map(r => new Mute(r));
+  }
+
+  async setCaseId(userId, caseId) {
+    await knex("mutes")
+      .where("guild_id", this.guildId)
+      .where("user_id", userId)
+      .update({ case_id: caseId });
+  }
+
   async clear(userId) {
     return knex("mutes")
       .where("guild_id", this.guildId)

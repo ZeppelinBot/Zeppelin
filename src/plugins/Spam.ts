@@ -192,7 +192,7 @@ export class SpamPlugin extends Plugin {
           spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000,
           "Automatic spam detection"
         );
-        await modActionsPlugin.createCase(
+        const caseId = await modActionsPlugin.createCase(
           msg.member.id,
           this.bot.user.id,
           CaseType.Mute,
@@ -205,6 +205,8 @@ export class SpamPlugin extends Plugin {
           `),
           true
         );
+        await modActionsPlugin.mutes.setCaseId(msg.member.id, caseId);
+
         this.logs.log(LogType.MEMBER_MUTE_SPAM, {
           member: stripObjectToScalars(msg.member, ["user"]),
           channel: stripObjectToScalars(msg.channel),
