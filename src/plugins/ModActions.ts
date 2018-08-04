@@ -497,13 +497,13 @@ export class ModActionsPlugin extends Plugin {
       if (a.expires_at == null && b.expires_at != null) return 1;
       if (b.expires_at == null && a.expires_at != null) return -1;
       if (a.expires_at == null && b.expires_at == null) {
-        return a.created_at > b.created_at ? 1 : -1;
+        return a.created_at > b.created_at ? -1 : 1;
       }
       return a.expires_at > b.expires_at ? 1 : -1;
     });
 
     const caseIds = activeMutes.map(m => m.case_id).filter(v => !!v);
-    const cases = caseIds ? await this.cases.get(caseIds) : [];
+    const cases = caseIds.length ? await this.cases.get(caseIds) : [];
     const casesById = cases.reduce((map, c) => map.set(c.id, c), new Map());
 
     lines.push(
