@@ -17,7 +17,8 @@ module.exports = {
     dateStrings: true,
     typeCast(field, next) {
       if (field.type === 'DATETIME') {
-        return moment(field.string()).format('YYYY-MM-DD HH:mm:ss');
+        const val = field.string();
+        return val != null ? moment(val).format('YYYY-MM-DD HH:mm:ss') : null;
       }
 
       return next();
