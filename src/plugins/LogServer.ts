@@ -1,6 +1,7 @@
 import http, { ServerResponse } from "http";
 import { GlobalPlugin } from "knub";
 import { GuildSpamLogs } from "../data/GuildSpamLogs";
+import { sleep } from "../utils";
 
 const DEFAULT_PORT = 9920;
 const logUrlRegex = /^\/spam-logs\/([a-z0-9\-]+)\/?$/i;
@@ -17,7 +18,7 @@ export class LogServerPlugin extends GlobalPlugin {
   protected spamLogs: GuildSpamLogs;
   protected server: http.Server;
 
-  onLoad() {
+  async onLoad() {
     this.spamLogs = new GuildSpamLogs(null);
 
     this.server = http.createServer(async (req, res) => {
@@ -30,6 +31,19 @@ export class LogServerPlugin extends GlobalPlugin {
 
         res.setHeader("Content-Type", "text/plain; charset=UTF-8");
         res.end(log.body);
+      }
+    });
+
+    let retried = false;
+
+    this.server.on("error", async (err: any) => {
+      if (err.code === "EADDRINUSE" && !retried) {
+        console.log("Got EADDRINUSE, retrying in 2 sec...");
+        retried = true;
+        await sleep(2000);
+        this.server.listen(this.configValue("port", DEFAULT_PORT));
+      } else {
+        throw err;
       }
     });
 
