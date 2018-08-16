@@ -89,13 +89,7 @@ export class CensorPlugin extends Plugin {
       const inviteCodes = getInviteCodesInString(msg.content);
 
       let invites: Invite[] = await Promise.all(
-        inviteCodes.map(code => {
-          try {
-            return this.bot.getInvite(code);
-          } catch (e) {
-            return null;
-          }
-        })
+        inviteCodes.map(code => this.bot.getInvite(code).catch(() => null))
       );
 
       invites = invites.filter(v => !!v);
