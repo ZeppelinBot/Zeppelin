@@ -1,4 +1,4 @@
-import { decorators as d, Plugin, waitForReaction } from "knub";
+import { decorators as d, Plugin, waitForReaction, waitForReply } from "knub";
 import { Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
@@ -92,7 +92,8 @@ export class ModActionsPlugin extends Plugin {
         kick: false,
         ban: false,
         view: false,
-        addcase: false
+        addcase: false,
+        massban: true
       },
       overrides: [
         {
@@ -105,6 +106,12 @@ export class ModActionsPlugin extends Plugin {
             ban: true,
             view: true,
             addcase: true
+          }
+        },
+        {
+          level: ">=100",
+          permissions: {
+            massban: true
           }
         }
       ]
@@ -744,6 +751,89 @@ export class ModActionsPlugin extends Plugin {
     });
   }
 
+  @d.command("massban", "<userIds:string...>")
+  @d.permission("massban")
+  async massbanCmd(msg: Message, args: { userIds: string[] }) {
+    msg.channel.createMessage("Ban reason? `cancel` to cancel");
+    const banReasonReply = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
+    if (
+      !banReasonReply ||
+      !banReasonReply.content ||
+      banReasonReply.content.toLowerCase().trim() === "cancel"
+    ) {
+      msg.channel.createMessage("Cancelled");
+      return;
+    }
+
+    const banReason = banReasonReply.content;
+
+    if (args.userIds.length > 100) {
+      msg.channel.createMessage(errorMessage(`Can only massban max 100 users at once`));
+      return;
+    }
+
+    for (const userId of args.userIds) {
+      const member = this.guild.members.get(userId);
+      if (member && !this.canActOn(msg.member, member)) {
+        msg.channel.createMessage(
+          errorMessage("Cannot massban one or more users: insufficient permissions")
+        );
+        return;
+      }
+    }
+
+    args.userIds.forEach(userId => {
+      this.ignoreEvent(IgnoredEventType.Ban, userId);
+      this.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId);
+    });
+
+    const loadingMsg = await msg.channel.createMessage("Banning...");
+
+    const failedBans = [];
+    for (const userId of args.userIds) {
+      try {
+        await this.guild.banMember(userId);
+        await this.createCase(
+          userId,
+          msg.author.id,
+          CaseType.Ban,
+          null,
+          `Mass ban: ${banReason}`,
+          false,
+          false
+        );
+      } catch (e) {
+        failedBans.push(userId);
+      }
+    }
+
+    loadingMsg.delete();
+
+    const successfulBanCount = args.userIds.length - failedBans.length;
+    if (successfulBanCount === 0) {
+      msg.channel.createMessage(errorMessage("All bans failed. Make sure the IDs are valid."));
+    } else {
+      this.serverLogs.log(LogType.MASSBAN, {
+        mod: stripObjectToScalars(msg.author),
+        count: successfulBanCount
+      });
+
+      if (failedBans.length) {
+        msg.channel.createMessage(
+          successMessage(
+            `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(
+              " "
+            )}`
+          )
+        );
+      } else {
+        msg.channel.createMessage(
+          successMessage(`Banned ${successfulBanCount} users successfully`)
+        );
+      }
+    }
+  }
+
   @d.command("addcase", "<type:string> <target:userId> [reason:string$]")
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
@@ -983,7 +1073,8 @@ export class ModActionsPlugin extends Plugin {
     caseType: CaseType,
     auditLogId: string = null,
     reason: string = null,
-    automatic = false
+    automatic = false,
+    postInCaseLogOverride = null
   ): Promise<number> {
     const user = this.bot.users.get(userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
@@ -1006,7 +1097,8 @@ export class ModActionsPlugin extends Plugin {
 
     if (
       this.configValue("case_log_channel") &&
-      (!automatic || this.configValue("log_automatic_actions"))
+      (!automatic || this.configValue("log_automatic_actions")) &&
+      postInCaseLogOverride !== false
     ) {
       try {
         await this.postCaseToCaseLog(createdId);

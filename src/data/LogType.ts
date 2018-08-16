@@ -38,5 +38,7 @@ export enum LogType {
   CENSOR,
   CLEAN,
 
-  CASE_CREATE
+  CASE_CREATE,
+
+  MASSBAN
 }
