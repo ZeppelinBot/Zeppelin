@@ -1,7 +1,6 @@
 export enum LogType {
   MEMBER_WARN = 1,
   MEMBER_MUTE,
-  MEMBER_MUTE_SPAM,
   MEMBER_UNMUTE,
   MEMBER_MUTE_EXPIRED,
   MEMBER_KICK,
@@ -34,7 +33,7 @@ export enum LogType {
 
   COMMAND,
 
-  SPAM_DELETE,
+  SPAM_DETECTED,
   CENSOR,
   CLEAN,
 

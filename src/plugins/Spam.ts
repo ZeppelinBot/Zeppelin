@@ -5,6 +5,7 @@ import {
   getRoleMentions,
   getUrlsInString,
   getUserMentions,
+  sleep,
   stripObjectToScalars,
   trimLines
 } from "../utils";
@@ -38,7 +39,16 @@ export class SpamPlugin extends Plugin {
   protected logs: GuildLogs;
   protected spamLogs: GuildSpamLogs;
 
+  // Handle spam detection with a queue so we don't have overlapping detections on the same user
+  protected spamDetectionQueue: Promise<void>;
+
+  // List of recent potentially-spammy actions
   protected recentActions: IRecentAction[];
+
+  // A map of userId => channelId => msgId
+  // Keeps track of the last handled (= spam detected and acted on) message ID per user, per channel
+  // TODO: Prevent this from growing infinitely somehow
+  protected lastHandledMsgIds: Map<string, Map<string, string>>;
 
   private expiryInterval;
 
@@ -73,8 +83,12 @@ export class SpamPlugin extends Plugin {
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
     this.spamLogs = new GuildSpamLogs(this.guildId);
-    this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
+
     this.recentActions = [];
+    this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
+    this.lastHandledMsgIds = new Map();
+
+    this.spamDetectionQueue = Promise.resolve();
   }
 
   onUnload() {
@@ -89,14 +103,7 @@ export class SpamPlugin extends Plugin {
     timestamp: number,
     count = 1
   ) {
-    this.recentActions.push({
-      type,
-      userId,
-      channelId,
-      msg,
-      timestamp,
-      count
-    });
+    this.recentActions.push({ type, userId, channelId, msg, timestamp, count });
   }
 
   getRecentActions(type: RecentActionType, userId: string, channelId: string, since: number) {
@@ -133,16 +140,14 @@ export class SpamPlugin extends Plugin {
 
   async saveSpamLogs(messages: Message[]) {
     const channel = messages[0].channel as TextChannel;
-    const header = `Server: ${this.guild.name} (${this.guild.id}), channel: #${channel.name} (${
-      channel.id
-    })`;
+    const header = `Server: ${this.guild.name} (${this.guild.id}), channel: #${channel.name} (${channel.id})`;
     const logId = await this.spamLogs.createFromMessages(messages, header);
 
     const url = this.knub.getGlobalConfig().url;
     return url ? `${url}/spam-logs/${logId}` : `Log ID: ${logId}`;
   }
 
-  async detectSpam(
+  async logAndDetectSpam(
     msg: Message,
     type: RecentActionType,
     spamConfig: any,
@@ -151,107 +156,139 @@ export class SpamPlugin extends Plugin {
   ) {
     if (actionCount === 0) return;
 
-    const since = msg.timestamp - 1000 * spamConfig.interval;
-
-    this.addRecentAction(type, msg.author.id, msg.channel.id, msg, msg.timestamp, actionCount);
-    const recentActionsCount = this.getRecentActionCount(
-      type,
-      msg.author.id,
-      msg.channel.id,
-      since
-    );
-
-    if (recentActionsCount > spamConfig.count) {
-      const recentActions = this.getRecentActions(type, msg.author.id, msg.channel.id, since);
-      const logUrl = await this.saveSpamLogs(recentActions.map(a => a.msg));
-
-      if (spamConfig.clean !== false) {
-        const msgIds = recentActions.map(a => a.msg.id);
-        await this.bot.deleteMessages(msg.channel.id, msgIds);
-
-        this.logs.log(LogType.SPAM_DELETE, {
-          member: stripObjectToScalars(msg.member, ["user"]),
-          channel: stripObjectToScalars(msg.channel),
-          description,
-          limit: spamConfig.count,
-          interval: spamConfig.interval,
-          logUrl
-        });
+    // Make sure we're not handling some messages twice
+    if (this.lastHandledMsgIds.has(msg.author.id)) {
+      const channelMap = this.lastHandledMsgIds.get(msg.author.id);
+      if (channelMap.has(msg.channel.id)) {
+        const lastHandledMsgId = channelMap.get(msg.channel.id);
+        if (lastHandledMsgId >= msg.id) return;
       }
-
-      if (spamConfig.mute) {
-        // For muting the user, we use the ModActions plugin
-        // This means that spam mute functionality requires the ModActions plugin to be loaded
-        const guildData = this.knub.getGuildData(this.guildId);
-        const modActionsPlugin = guildData.loadedPlugins.get("mod_actions") as ModActionsPlugin;
-        if (!modActionsPlugin) return;
-
-        this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, msg.member.id);
-        await modActionsPlugin.muteMember(
-          msg.member,
-          spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000,
-          "Automatic spam detection"
-        );
-        const caseId = await modActionsPlugin.createCase(
-          msg.member.id,
-          this.bot.user.id,
-          CaseType.Mute,
-          null,
-          trimLines(`
-            Automatic spam detection: ${description} (over ${spamConfig.count} in ${
-            spamConfig.interval
-          }s)
-            ${logUrl}
-          `),
-          true
-        );
-        await modActionsPlugin.mutes.setCaseId(msg.member.id, caseId);
-
-        this.logs.log(LogType.MEMBER_MUTE_SPAM, {
-          member: stripObjectToScalars(msg.member, ["user"]),
-          channel: stripObjectToScalars(msg.channel),
-          description,
-          limit: spamConfig.count,
-          interval: spamConfig.interval
-        });
-      }
-
-      return;
     }
+
+    this.spamDetectionQueue = this.spamDetectionQueue.then(
+      async () => {
+        // Log this action...
+        this.addRecentAction(type, msg.author.id, msg.channel.id, msg, msg.timestamp, actionCount);
+
+        // ...and then check if it trips the spam filters
+        const since = msg.timestamp - 1000 * spamConfig.interval;
+        const recentActionsCount = this.getRecentActionCount(type, msg.author.id, msg.channel.id, since);
+
+        // If the user tripped the spam filter...
+        if (recentActionsCount > spamConfig.count) {
+          const recentActions = this.getRecentActions(type, msg.author.id, msg.channel.id, since);
+          let modActionsPlugin;
+
+          // Start by muting them, if enabled
+          if (spamConfig.mute) {
+            // We use the ModActions plugin for muting the user
+            // This means that spam mute functionality requires the ModActions plugin to be loaded
+            const guildData = this.knub.getGuildData(this.guildId);
+            modActionsPlugin = guildData.loadedPlugins.get("mod_actions") as ModActionsPlugin;
+            if (!modActionsPlugin) return;
+
+            const muteTime = spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000;
+
+            this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, msg.member.id);
+            modActionsPlugin.muteMember(msg.member, muteTime, "Automatic spam detection");
+          }
+
+          // Get the offending message IDs
+          // We also get the IDs of any messages after the last offending message, to account for lag before detection
+          const messages = recentActions.map(a => a.msg);
+          const msgIds = messages.map(m => m.id);
+          const lastDetectedMsgId = msgIds[msgIds.length - 1];
+          const additionalMessages = await this.bot.getMessages(msg.channel.id, 100, null, lastDetectedMsgId);
+          additionalMessages.forEach(m => msgIds.push(m.id));
+
+          // Then, if enabled, remove the spam messages
+          if (spamConfig.clean !== false) {
+            msgIds.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+            this.bot.deleteMessages(msg.channel.id, msgIds);
+          }
+
+          // Store the ID of the last handled message
+          const uniqueMessages = Array.from(new Set([...messages, ...additionalMessages]));
+          uniqueMessages.sort((a, b) => (a.id > b.id ? 1 : -1));
+          const lastHandledMsgId = uniqueMessages.reduce((last: string, m: Message): string => {
+            return !last || m.id > last ? m.id : last;
+          }, null);
+
+          if (!this.lastHandledMsgIds.has(msg.author.id)) {
+            this.lastHandledMsgIds.set(msg.author.id, new Map());
+          }
+
+          const channelMap = this.lastHandledMsgIds.get(msg.author.id);
+          channelMap.set(msg.channel.id, lastHandledMsgId);
+
+          // Clear the handled actions from recentActions
+          this.clearRecentUserActions(type, msg.author.id, msg.channel.id);
+
+          // Generate a log from the detected messages
+          const logUrl = await this.saveSpamLogs(uniqueMessages);
+
+          // Create a case and log the actions taken above
+          const caseType = spamConfig.mute ? CaseType.Mute : CaseType.Note;
+          const caseText = trimLines(`
+          Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
+          ${logUrl}
+        `);
+
+          this.logs.log(LogType.SPAM_DETECTED, {
+            member: stripObjectToScalars(msg.member, ["user"]),
+            channel: stripObjectToScalars(msg.channel),
+            description,
+            limit: spamConfig.count,
+            interval: spamConfig.interval,
+            logUrl
+          });
+
+          const caseId = await modActionsPlugin.createCase(
+            msg.member.id,
+            this.bot.user.id,
+            caseType,
+            null,
+            caseText,
+            true
+          );
+
+          // For mutes, also set the mute's case id (for !mutes)
+          if (spamConfig.mute) {
+            await modActionsPlugin.mutes.setCaseId(msg.member.id, caseId);
+          }
+        }
+      },
+      err => {
+        console.error("Error while detecting spam:");
+        console.error(err);
+      }
+    );
   }
 
   @d.event("messageCreate")
-  onMessageCreate(msg: Message) {
+  async onMessageCreate(msg: Message) {
     if (msg.author.bot) return;
 
     const maxMessages = this.configValueForMsg(msg, "max_messages");
     if (maxMessages) {
-      this.detectSpam(msg, RecentActionType.Message, maxMessages, 1, "too many messages");
+      this.logAndDetectSpam(msg, RecentActionType.Message, maxMessages, 1, "too many messages");
     }
 
     const maxMentions = this.configValueForMsg(msg, "max_mentions");
-    const mentions = msg.content
-      ? [...getUserMentions(msg.content), ...getRoleMentions(msg.content)]
-      : [];
+    const mentions = msg.content ? [...getUserMentions(msg.content), ...getRoleMentions(msg.content)] : [];
     if (maxMentions && mentions.length) {
-      this.detectSpam(
-        msg,
-        RecentActionType.Mention,
-        maxMentions,
-        mentions.length,
-        "too many mentions"
-      );
+      this.logAndDetectSpam(msg, RecentActionType.Mention, maxMentions, mentions.length, "too many mentions");
     }
 
     const maxLinks = this.configValueForMsg(msg, "max_links");
     if (maxLinks && msg.content) {
       const links = getUrlsInString(msg.content);
-      this.detectSpam(msg, RecentActionType.Link, maxLinks, links.length, "too many links");
+      this.logAndDetectSpam(msg, RecentActionType.Link, maxLinks, links.length, "too many links");
     }
 
     const maxAttachments = this.configValueForMsg(msg, "max_attachments");
     if (maxAttachments && msg.attachments.length) {
-      this.detectSpam(
+      this.logAndDetectSpam(
         msg,
         RecentActionType.Attachment,
         maxAttachments,
@@ -263,19 +300,13 @@ export class SpamPlugin extends Plugin {
     const maxEmoji = this.configValueForMsg(msg, "max_emoji");
     if (maxEmoji && msg.content) {
       const emojiCount = getEmojiInString(msg.content).length;
-      this.detectSpam(msg, RecentActionType.Emoji, maxEmoji, emojiCount, "too many emoji");
+      this.logAndDetectSpam(msg, RecentActionType.Emoji, maxEmoji, emojiCount, "too many emoji");
     }
 
     const maxNewlines = this.configValueForMsg(msg, "max_newlines");
     if (maxNewlines && msg.content) {
       const newlineCount = (msg.content.match(/\n/g) || []).length;
-      this.detectSpam(
-        msg,
-        RecentActionType.Newline,
-        maxNewlines,
-        newlineCount,
-        "too many newlines"
-      );
+      this.logAndDetectSpam(msg, RecentActionType.Newline, maxNewlines, newlineCount, "too many newlines");
     }
 
     // TODO: Max duplicates

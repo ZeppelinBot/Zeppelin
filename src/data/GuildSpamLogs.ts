@@ -25,6 +25,10 @@ export class GuildSpamLogs {
     this.guildId = guildId;
   }
 
+  generateNewLogId() {
+    return uuid();
+  }
+
   async find(id: string): Promise<SpamLog> {
     const result = await knex("spam_logs")
       .where("id", id)
@@ -42,9 +46,7 @@ export class GuildSpamLogs {
         user: stripObjectToScalars(msg.author),
         message: stripObjectToScalars(msg),
         timestamp: moment(msg.timestamp).format("YYYY-MM-DD HH:mm:ss zz"),
-        attachments: msg.attachments.length
-          ? ` (message contained ${msg.attachments.length} attachment(s))`
-          : ""
+        attachments: msg.attachments.length ? ` (message contained ${msg.attachments.length} attachment(s))` : ""
       });
     });
 
