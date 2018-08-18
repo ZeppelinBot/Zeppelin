@@ -1,7 +1,6 @@
 {
   "MEMBER_WARN": "⚠️ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was warned by {mod.username}#{mod.discriminator}",
   "MEMBER_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted by {mod.username}#{mod.discriminator}",
-  "MEMBER_MUTE_SPAM": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted for spam in **#{channel.name}**: {description} (more than {limit} in {interval}s)",
   "MEMBER_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was unmuted by {mod.username}#{mod.discriminator}",
   "MEMBER_MUTE_EXPIRED": "🔉 **{member.user.username}#{member.user.discriminator}**'s mute expired",
   "MEMBER_KICK": "👢 **{user.username}#{user.discriminator}** (`{user.id}`) was kicked by {mod.username}#{mod.discriminator}",
@@ -36,7 +35,7 @@
 
   "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **#{channel.name}**:\n`{command}`",
 
-  "SPAM_DELETE": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam deleted in **#{channel.name}**: {description} (more than {limit} in {interval}s)\n{logUrl}",
+  "SPAM_DETECTED": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam detected in **#{channel.name}**: {description} (more than {limit} in {interval}s)\n{logUrl}",
   "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **#{channel.name}** (`{channel.id}`) {reason}:\n```{messageText}```",
   "CLEAN": "🚿 **{mod.username}#{mod.discriminator}** (`{mod.id}`) cleaned **{count}** message(s) in **#{channel.name}**",
 
