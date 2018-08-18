@@ -1,6 +1,7 @@
 import { decorators as d, Plugin } from "knub";
-import { Message, TextChannel } from "eris";
+import { Channel, Message, TextChannel, User } from "eris";
 import {
+  formatTemplateString,
   getEmojiInString,
   getRoleMentions,
   getUrlsInString,
@@ -13,7 +14,8 @@ import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 import { ModActionsPlugin } from "./ModActions";
 import { CaseType } from "../data/CaseType";
-import { GuildSpamLogs } from "../data/GuildSpamLogs";
+import { GuildArchives } from "../data/GuildArchives";
+import moment from "moment-timezone";
 
 enum RecentActionType {
   Message = 1,
@@ -35,9 +37,21 @@ interface IRecentAction {
 
 const MAX_INTERVAL = 300;
 
+const ARCHIVE_EXPIRY_DAYS = 90;
+const ARCHIVE_HEADER_FORMAT = trimLines(`
+  Server: {guild.name} ({guild.id})
+  Channel: #{channel.name} ({channel.id})
+  User: {user.username}#{user.discriminator} ({user.id})
+`);
+const ARCHIVE_MESSAGE_FORMAT = "[MSG ID {message.id}] [{timestamp}] {user.username}: {message.content}{attachments}";
+const ARCHIVE_FOOTER_FORMAT = trimLines(`
+  Log file generated on {timestamp}
+  Expires at {expires}
+`);
+
 export class SpamPlugin extends Plugin {
   protected logs: GuildLogs;
-  protected spamLogs: GuildSpamLogs;
+  protected archives: GuildArchives;
 
   // Handle spam detection with a queue so we don't have overlapping detections on the same user
   protected spamDetectionQueue: Promise<void>;
@@ -82,7 +96,7 @@ export class SpamPlugin extends Plugin {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
-    this.spamLogs = new GuildSpamLogs(this.guildId);
+    this.archives = new GuildArchives(this.guildId);
 
     this.recentActions = [];
     this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
@@ -138,13 +152,31 @@ export class SpamPlugin extends Plugin {
     this.recentActions = this.recentActions.filter(action => action.timestamp >= expiryTimestamp);
   }
 
-  async saveSpamLogs(messages: Message[]) {
-    const channel = messages[0].channel as TextChannel;
-    const header = `Server: ${this.guild.name} (${this.guild.id}), channel: #${channel.name} (${channel.id})`;
-    const logId = await this.spamLogs.createFromMessages(messages, header);
+  async saveSpamArchives(messages: Message[], channel: Channel, user: User) {
+    const expiresAt = moment().add(ARCHIVE_EXPIRY_DAYS, "days");
+
+    const headerStr = formatTemplateString(ARCHIVE_HEADER_FORMAT, {
+      guild: this.guild,
+      channel,
+      user
+    });
+    const msgLines = messages.map(msg => {
+      return formatTemplateString(ARCHIVE_MESSAGE_FORMAT, {
+        message: msg,
+        timestamp: moment(msg.timestamp, "x").format("HH:mm:ss"),
+        user
+      });
+    });
+    const messagesStr = msgLines.join("\n");
+    const footerStr = formatTemplateString(ARCHIVE_FOOTER_FORMAT, {
+      timestamp: moment().format("YYYY-MM-DD [at] HH:mm:ss (Z)"),
+      expires: expiresAt.format("YYYY-MM-DD [at] HH:mm:ss (Z)")
+    });
+
+    const logId = await this.archives.create([headerStr, messagesStr, footerStr].join("\n\n"), expiresAt);
 
     const url = this.knub.getGlobalConfig().url;
-    return url ? `${url}/spam-logs/${logId}` : `Log ID: ${logId}`;
+    return url ? `${url}/archives/${logId}` : `Archive ID: ${logId}`;
   }
 
   async logAndDetectSpam(
@@ -225,7 +257,7 @@ export class SpamPlugin extends Plugin {
           this.clearRecentUserActions(type, msg.author.id, msg.channel.id);
 
           // Generate a log from the detected messages
-          const logUrl = await this.saveSpamLogs(uniqueMessages);
+          const logUrl = await this.saveSpamArchives(uniqueMessages, msg.channel, msg.author);
 
           // Create a case and log the actions taken above
           const caseType = spamConfig.mute ? CaseType.Mute : CaseType.Note;
