@@ -36,13 +36,13 @@ export class GuildLogs extends EventEmitter {
     this.emit("log", { type, data });
   }
 
-  ignoreLog(type: LogType, ignoreId: any, expiryTime: number = null) {
+  ignoreLog(type: LogType, ignoreId: any, timeout: number = null) {
     this.ignoredLogs.push({ type, ignoreId });
 
     // Clear after expiry (15sec by default)
     setTimeout(() => {
       this.clearIgnoredLog(type, ignoreId);
-    }, expiryTime || 1000 * 15);
+    }, timeout || 1000 * 15);
   }
 
   isLogIgnored(type: LogType, ignoreId: any) {
@@ -50,9 +50,6 @@ export class GuildLogs extends EventEmitter {
   }
 
   clearIgnoredLog(type: LogType, ignoreId: any) {
-    this.ignoredLogs.splice(
-      this.ignoredLogs.findIndex(info => type === info.type && ignoreId === info.ignoreId),
-      1
-    );
+    this.ignoredLogs.splice(this.ignoredLogs.findIndex(info => type === info.type && ignoreId === info.ignoreId), 1);
   }
 }
