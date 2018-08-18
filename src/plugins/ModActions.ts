@@ -118,13 +118,13 @@ export class ModActionsPlugin extends Plugin {
     };
   }
 
-  ignoreEvent(type: IgnoredEventType, userId: any) {
+  ignoreEvent(type: IgnoredEventType, userId: any, timeout: number = null) {
     this.ignoredEvents.push({ type, userId });
 
     // Clear after expiry (15sec by default)
     setTimeout(() => {
       this.clearIgnoredEvent(type, userId);
-    }, 1000 * 15);
+    }, timeout || 1000 * 15);
   }
 
   isEventIgnored(type: IgnoredEventType, userId: any) {
@@ -132,10 +132,7 @@ export class ModActionsPlugin extends Plugin {
   }
 
   clearIgnoredEvent(type: IgnoredEventType, userId: any) {
-    this.ignoredEvents.splice(
-      this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId),
-      1
-    );
+    this.ignoredEvents.splice(this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId), 1);
   }
 
   /**
@@ -159,14 +156,7 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createCase(
-        user.id,
-        modId,
-        CaseType.Ban,
-        auditLogId,
-        relevantAuditLogEntry.reason,
-        true
-      );
+      await this.createCase(user.id, modId, CaseType.Ban, auditLogId, relevantAuditLogEntry.reason, true);
     } else {
       await this.createCase(user.id, null, CaseType.Ban);
     }
@@ -214,9 +204,9 @@ export class ModActionsPlugin extends Plugin {
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
       alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${
-          member.id
-        }\`) joined with ${actions.length} prior record(s)`
+        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${
+          actions.length
+        } prior record(s)`
       );
     }
   }
@@ -309,9 +299,7 @@ export class ModActionsPlugin extends Plugin {
     );
 
     if (!messageSent) {
-      const failedMsg = await msg.channel.createMessage(
-        "Failed to message the user. Log the warning anyway?"
-      );
+      const failedMsg = await msg.channel.createMessage("Failed to message the user. Log the warning anyway?");
       const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
       failedMsg.delete();
       if (!reply || reply.name === "❌") {
@@ -375,22 +363,14 @@ export class ModActionsPlugin extends Plugin {
       }
     } else {
       // Create a case
-      const caseId = await this.createCase(
-        args.member.id,
-        msg.author.id,
-        CaseType.Mute,
-        null,
-        args.reason
-      );
+      const caseId = await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
       await this.mutes.setCaseId(args.member.id, caseId);
     }
 
     // Message the user informing them of the mute
     // Don't message them if we're updating an old mute
     if (args.reason && !hasOldCase) {
-      const template = muteTime
-        ? this.configValue("timed_mute_message")
-        : this.configValue("mute_message");
+      const template = muteTime ? this.configValue("timed_mute_message") : this.configValue("mute_message");
 
       const muteMessage = formatTemplateString(template, {
         guildName: this.guild.name,
@@ -409,13 +389,9 @@ export class ModActionsPlugin extends Plugin {
     // Confirm the action to the moderator
     let response;
     if (muteTime) {
-      response = `Muted **${args.member.user.username}#${
-        args.member.user.discriminator
-      }** for ${timeUntilUnmute}`;
+      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** for ${timeUntilUnmute}`;
     } else {
-      response = `Muted **${args.member.user.username}#${
-        args.member.user.discriminator
-      }** indefinitely`;
+      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** indefinitely`;
     }
 
     if (!messageSent) response += " (failed to message user)";
@@ -466,9 +442,7 @@ export class ModActionsPlugin extends Plugin {
       // Confirm the action to the moderator
       msg.channel.createMessage(
         successMessage(
-          `Unmuting **${args.member.user.username}#${
-            args.member.user.discriminator
-          }** in ${timeUntilUnmute}`
+          `Unmuting **${args.member.user.username}#${args.member.user.discriminator}** in ${timeUntilUnmute}`
         )
       );
     } else {
@@ -551,9 +525,7 @@ export class ModActionsPlugin extends Plugin {
 
     lines.push(
       ...manuallyMutedMembers.map(member => {
-        return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${
-          member.id
-        }\`)`;
+        return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
       })
     );
 
@@ -678,9 +650,7 @@ export class ModActionsPlugin extends Plugin {
 
     // Confirm the action to the moderator
     msg.channel.createMessage(
-      successMessage(
-        `Softbanned **${args.member.user.username}#${args.member.user.discriminator}**`
-      )
+      successMessage(`Softbanned **${args.member.user.username}#${args.member.user.discriminator}**`)
     );
 
     // Log the action
@@ -722,9 +692,7 @@ export class ModActionsPlugin extends Plugin {
     // If the user exists as a guild member, make sure we can act on them first
     const member = this.guild.members.get(args.userId);
     if (member && !this.canActOn(msg.member, member)) {
-      msg.channel.createMessage(
-        errorMessage("Cannot forceban this user: insufficient permissions")
-      );
+      msg.channel.createMessage(errorMessage("Cannot forceban this user: insufficient permissions"));
       return;
     }
 
@@ -754,65 +722,62 @@ export class ModActionsPlugin extends Plugin {
   @d.command("massban", "<userIds:string...>")
   @d.permission("massban")
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
+    // Limit to 100 users at once (arbitrary?)
+    if (args.userIds.length > 100) {
+      msg.channel.createMessage(errorMessage(`Can only massban max 100 users at once`));
+      return;
+    }
+
+    // Ask for ban reason (cleaner this way instead of trying to cram it into the args)
     msg.channel.createMessage("Ban reason? `cancel` to cancel");
     const banReasonReply = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
-    if (
-      !banReasonReply ||
-      !banReasonReply.content ||
-      banReasonReply.content.toLowerCase().trim() === "cancel"
-    ) {
+    if (!banReasonReply || !banReasonReply.content || banReasonReply.content.toLowerCase().trim() === "cancel") {
       msg.channel.createMessage("Cancelled");
       return;
     }
 
     const banReason = banReasonReply.content;
 
-    if (args.userIds.length > 100) {
-      msg.channel.createMessage(errorMessage(`Can only massban max 100 users at once`));
-      return;
-    }
-
+    // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
       const member = this.guild.members.get(userId);
       if (member && !this.canActOn(msg.member, member)) {
-        msg.channel.createMessage(
-          errorMessage("Cannot massban one or more users: insufficient permissions")
-        );
+        msg.channel.createMessage(errorMessage("Cannot massban one or more users: insufficient permissions"));
         return;
       }
     }
 
+    // Ignore automatic ban cases and logs for these users
+    // We'll create our own cases below and post a single "mass banned" log instead
     args.userIds.forEach(userId => {
-      this.ignoreEvent(IgnoredEventType.Ban, userId);
-      this.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId);
+      // Use longer timeouts since this can take a while
+      this.ignoreEvent(IgnoredEventType.Ban, userId, 120 * 1000);
+      this.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
     });
 
+    // Show a loading indicator since this can take a while
     const loadingMsg = await msg.channel.createMessage("Banning...");
 
+    // Ban each user and count failed bans (if any)
     const failedBans = [];
     for (const userId of args.userIds) {
       try {
         await this.guild.banMember(userId);
-        await this.createCase(
-          userId,
-          msg.author.id,
-          CaseType.Ban,
-          null,
-          `Mass ban: ${banReason}`,
-          false,
-          false
-        );
+        await this.createCase(userId, msg.author.id, CaseType.Ban, null, `Mass ban: ${banReason}`, false, false);
       } catch (e) {
         failedBans.push(userId);
       }
     }
 
+    // Clear loading indicator
     loadingMsg.delete();
 
     const successfulBanCount = args.userIds.length - failedBans.length;
     if (successfulBanCount === 0) {
+      // All bans failed - don't create a log entry and notify the user
       msg.channel.createMessage(errorMessage("All bans failed. Make sure the IDs are valid."));
     } else {
+      // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
       this.serverLogs.log(LogType.MASSBAN, {
         mod: stripObjectToScalars(msg.author),
         count: successfulBanCount
@@ -820,16 +785,10 @@ export class ModActionsPlugin extends Plugin {
 
       if (failedBans.length) {
         msg.channel.createMessage(
-          successMessage(
-            `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(
-              " "
-            )}`
-          )
+          successMessage(`Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`)
         );
       } else {
-        msg.channel.createMessage(
-          successMessage(`Banned ${successfulBanCount} users successfully`)
-        );
+        msg.channel.createMessage(successMessage(`Banned ${successfulBanCount} users successfully`));
       }
     }
   }
@@ -846,9 +805,7 @@ export class ModActionsPlugin extends Plugin {
     // If the user exists as a guild member, make sure we can act on them first
     const member = this.guild.members.get(args.userId);
     if (member && !this.canActOn(msg.member, member)) {
-      msg.channel.createMessage(
-        errorMessage("Cannot add case on this user: insufficient permissions")
-      );
+      msg.channel.createMessage(errorMessage("Cannot add case on this user: insufficient permissions"));
       return;
     }
 
@@ -860,13 +817,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Create the case
-    const caseId = await this.createCase(
-      args.target,
-      msg.author.id,
-      CaseType[type],
-      null,
-      args.reason
-    );
+    const caseId = await this.createCase(args.target, msg.author.id, CaseType[type], null, args.reason);
     const theCase = await this.cases.find(caseId);
 
     // Log the action
@@ -923,9 +874,7 @@ export class ModActionsPlugin extends Plugin {
 
           if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
             const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 20).match(/(?:[.,!?\s]|$)/);
-            const nextWhitespaceIndex = match
-              ? CASE_LIST_REASON_MAX_LENGTH + match.index
-              : CASE_LIST_REASON_MAX_LENGTH;
+            const nextWhitespaceIndex = match ? CASE_LIST_REASON_MAX_LENGTH + match.index : CASE_LIST_REASON_MAX_LENGTH;
             if (nextWhitespaceIndex < reason.length) {
               reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
             }
@@ -963,12 +912,7 @@ export class ModActionsPlugin extends Plugin {
    * Attempts to message the specified user through DMs and/or the message channel.
    * Returns a promise that resolves to a boolean indicating whether we were able to message them or not.
    */
-  protected async tryToMessageUser(
-    user: User,
-    str: string,
-    useDM: boolean,
-    useChannel: boolean
-  ): Promise<boolean> {
+  protected async tryToMessageUser(user: User, str: string, useDM: boolean, useChannel: boolean): Promise<boolean> {
     let messageSent = false;
 
     if (!useDM && !useChannel) {
