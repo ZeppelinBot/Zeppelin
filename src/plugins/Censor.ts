@@ -145,7 +145,7 @@ export class CensorPlugin extends Plugin {
     // Filter tokens
     const blockedTokens = this.configValueForMsg(msg, "blocked_tokens") || [];
     for (const token of blockedTokens) {
-      if (msg.content.includes(token)) {
+      if (msg.content.toLowerCase().includes(token.toLowerCase())) {
         this.censorMessage(msg, `blocked token (\`${token}\`) found`);
         return;
       }
