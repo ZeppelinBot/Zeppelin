@@ -1,4 +1,4 @@
-export enum CaseType {
+export enum CaseTypes {
   Ban = 1,
   Unban,
   Note,

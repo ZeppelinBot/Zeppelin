@@ -1,54 +1,57 @@
-import knex from "../knex";
-import ReactionRole from "../models/ReactionRole";
+import { ReactionRole } from "./entities/ReactionRole";
+import { BaseRepository } from "./BaseRepository";
+import { getRepository, Repository } from "typeorm";
 
-export class GuildReactionRoles {
-  protected guildId: string;
+export class GuildReactionRoles extends BaseRepository {
+  private reactionRoles: Repository<ReactionRole>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.reactionRoles = getRepository(ReactionRole);
   }
 
   async all(): Promise<ReactionRole[]> {
-    const results = await knex("reaction_roles")
-      .where("guild_id", this.guildId)
-      .select();
-
-    return results.map(r => new ReactionRole(r));
+    return this.reactionRoles.find({
+      where: {
+        guild_id: this.guildId
+      }
+    });
   }
 
   async getForMessage(messageId: string): Promise<ReactionRole[]> {
-    const results = await knex("reaction_roles")
-      .where("guild_id", this.guildId)
-      .where("message_id", messageId)
-      .select();
-
-    return results.map(r => new ReactionRole(r));
+    return this.reactionRoles.find({
+      where: {
+        guild_id: this.guildId,
+        message_id: messageId
+      }
+    });
   }
 
   async getByMessageAndEmoji(messageId: string, emoji: string): Promise<ReactionRole> {
-    const result = await knex("reaction_roles")
-      .where("guild_id", this.guildId)
-      .where("message_id", messageId)
-      .where("emoji", emoji)
-      .first();
-
-    return result ? new ReactionRole(result) : null;
+    return this.reactionRoles.findOne({
+      where: {
+        guild_id: this.guildId,
+        message_id: messageId,
+        emoji
+      }
+    });
   }
 
   async removeFromMessage(messageId: string, emoji: string = null) {
-    let query = knex("reaction_roles")
-      .where("guild_id", this.guildId)
-      .where("message_id", messageId);
+    const criteria: any = {
+      guild_id: this.guildId,
+      message_id: messageId
+    };
 
     if (emoji) {
-      query = query.where("emoji", emoji);
+      criteria.emoji = emoji;
     }
 
-    await query.delete();
+    await this.reactionRoles.delete(criteria);
   }
 
   async add(channelId: string, messageId: string, emoji: string, roleId: string) {
-    await knex("reaction_roles").insert({
+    await this.reactionRoles.insert({
       guild_id: this.guildId,
       channel_id: channelId,
       message_id: messageId,

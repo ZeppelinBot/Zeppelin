@@ -21,7 +21,7 @@ export class PersistPlugin extends Plugin {
   }
 
   onLoad() {
-    this.persistedData = new GuildPersistedData(this.guildId);
+    this.persistedData = GuildPersistedData.getInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
   }
 

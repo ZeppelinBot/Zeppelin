@@ -30,20 +30,17 @@ export class ReactionRolesPlugin extends Plugin {
   }
 
   async onLoad() {
-    this.reactionRoles = new GuildReactionRoles(this.guildId);
+    this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     return;
 
     // Pre-fetch all messages with reaction roles so we get their events
     const reactionRoles = await this.reactionRoles.all();
 
-    const channelMessages: Map<string, Set<string>> = reactionRoles.reduce(
-      (map: Map<string, Set<string>>, row) => {
-        if (!map.has(row.channel_id)) map.set(row.channel_id, new Set());
-        map.get(row.channel_id).add(row.message_id);
-        return map;
-      },
-      new Map()
-    );
+    const channelMessages: Map<string, Set<string>> = reactionRoles.reduce((map: Map<string, Set<string>>, row) => {
+      if (!map.has(row.channel_id)) map.set(row.channel_id, new Set());
+      map.get(row.channel_id).add(row.message_id);
+      return map;
+    }, new Map());
 
     const msgLoadPromises = [];
 
@@ -62,10 +59,7 @@ export class ReactionRolesPlugin extends Plugin {
 
   @d.command("reaction_roles", "<channel:channel> <messageId:string> <reactionRolePairs:string$>")
   @d.permission("manage")
-  async reactionRolesCmd(
-    msg: Message,
-    args: { channel: Channel; messageId: string; reactionRolePairs: string }
-  ) {
+  async reactionRolesCmd(msg: Message, args: { channel: Channel; messageId: string; reactionRolePairs: string }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Channel must be a text channel!"));
       return;
@@ -100,9 +94,7 @@ export class ReactionRolesPlugin extends Plugin {
     // Verify the specified emojis and roles are valid
     for (const pair of newRolePairs) {
       if (isSnowflake(pair[0]) && !guildEmojiIds.includes(pair[0])) {
-        msg.channel.createMessage(
-          errorMessage("I can only use regular emojis and custom emojis from this server")
-        );
+        msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
         return;
       }
 
@@ -113,9 +105,7 @@ export class ReactionRolesPlugin extends Plugin {
     }
 
     const oldReactionRoles = await this.reactionRoles.getForMessage(targetMessage.id);
-    const oldRolePairs: ReactionRolePair[] = oldReactionRoles.map(
-      r => [r.emoji, r.role_id] as ReactionRolePair
-    );
+    const oldRolePairs: ReactionRolePair[] = oldReactionRoles.map(r => [r.emoji, r.role_id] as ReactionRolePair);
 
     // Remove old reaction/role pairs that weren't included in the new pairs or were changed in some way
     const toRemove = oldRolePairs.filter(
@@ -154,10 +144,7 @@ export class ReactionRolesPlugin extends Plugin {
 
   @d.event("messageReactionAdd")
   async onAddReaction(msg: Message, emoji: CustomEmoji, userId: string) {
-    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(
-      msg.id,
-      emoji.id || emoji.name
-    );
+    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
     if (!matchingReactionRole) return;
 
     const member = this.guild.members.get(userId);
@@ -168,10 +155,7 @@ export class ReactionRolesPlugin extends Plugin {
 
   @d.event("messageReactionRemove")
   async onRemoveReaction(msg: Message, emoji: CustomEmoji, userId: string) {
-    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(
-      msg.id,
-      emoji.id || emoji.name
-    );
+    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
     if (!matchingReactionRole) return;
 
     const member = this.guild.members.get(userId);

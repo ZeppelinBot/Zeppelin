@@ -1,31 +1,32 @@
-import knex from "../knex";
 import moment from "moment-timezone";
-import Mute from "../models/Mute";
+import { Mute } from "./entities/Mute";
+import { BaseRepository } from "./BaseRepository";
+import { getRepository, Repository, Brackets } from "typeorm";
 
-export class GuildMutes {
-  protected guildId: string;
+export class GuildMutes extends BaseRepository {
+  private mutes: Repository<Mute>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.mutes = getRepository(Mute);
   }
 
   async getExpiredMutes(): Promise<Mute[]> {
-    const result = await knex("mutes")
-      .where("guild_id", this.guildId)
-      .whereNotNull("expires_at")
-      .whereRaw("expires_at <= NOW()")
-      .select();
-
-    return result.map(r => new Mute(r));
+    return this.mutes
+      .createQueryBuilder("mutes")
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .where("expires_at IS NOT NULL")
+      .where("expires_at <= NOW()")
+      .getMany();
   }
 
   async findExistingMuteForUserId(userId: string): Promise<Mute> {
-    const result = await knex("mutes")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .first();
-
-    return result ? new Mute(result) : null;
+    return this.mutes.findOne({
+      where: {
+        guild_id: this.guildId,
+        user_id: userId
+      }
+    });
   }
 
   async addMute(userId, expiryTime) {
@@ -35,13 +36,11 @@ export class GuildMutes {
           .format("YYYY-MM-DD HH:mm:ss")
       : null;
 
-    return knex
-      .insert({
-        guild_id: this.guildId,
-        user_id: userId,
-        expires_at: expiresAt
-      })
-      .into("mutes");
+    return this.mutes.insert({
+      guild_id: this.guildId,
+      user_id: userId,
+      expires_at: expiresAt
+    });
   }
 
   async updateExpiryTime(userId, newExpiryTime) {
@@ -51,12 +50,15 @@ export class GuildMutes {
           .format("YYYY-MM-DD HH:mm:ss")
       : null;
 
-    return knex("mutes")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .update({
+    return this.mutes.update(
+      {
+        guild_id: this.guildId,
+        user_id: userId
+      },
+      {
         expires_at: expiresAt
-      });
+      }
+    );
   }
 
   async addOrUpdateMute(userId, expiryTime) {
@@ -70,25 +72,33 @@ export class GuildMutes {
   }
 
   async getActiveMutes(): Promise<Mute[]> {
-    const result = await knex("mutes")
-      .where("guild_id", this.guildId)
-      .where(q => q.whereRaw("expires_at > NOW()").orWhereNull("expires_at"))
-      .select();
-
-    return result.map(r => new Mute(r));
+    return this.mutes
+      .createQueryBuilder("mutes")
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere(
+        new Brackets(qb => {
+          qb.where("expires_at > NOW()").orWhere("expires_at IS NULL");
+        })
+      )
+      .getMany();
   }
 
   async setCaseId(userId, caseId) {
-    await knex("mutes")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .update({ case_id: caseId });
+    await this.mutes.update(
+      {
+        guild_id: this.guildId,
+        user_id: userId
+      },
+      {
+        case_id: caseId
+      }
+    );
   }
 
   async clear(userId) {
-    return knex("mutes")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .delete();
+    await this.mutes.delete({
+      guild_id: this.guildId,
+      user_id: userId
+    });
   }
 }

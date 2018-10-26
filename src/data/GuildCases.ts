@@ -1,93 +1,78 @@
-import knex from "../knex";
-import Case from "../models/Case";
-import CaseNote from "../models/CaseNote";
+import { Case } from "./entities/Case";
+import { CaseNote } from "./entities/CaseNote";
+import { BaseRepository } from "./BaseRepository";
+import { getRepository, In, Repository } from "typeorm";
 
-export class GuildCases {
-  protected guildId: string;
+export class GuildCases extends BaseRepository {
+  private cases: Repository<Case>;
+  private caseNotes: Repository<CaseNote>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.cases = getRepository(Case);
+    this.caseNotes = getRepository(CaseNote);
   }
 
   async get(ids: number[]): Promise<Case[]> {
-    const result = await knex("cases")
-      .whereIn("id", ids)
-      .select();
-
-    return result.map(r => new Case(r));
+    return this.cases.find({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        id: In(ids)
+      }
+    });
   }
 
   async find(id: number): Promise<Case> {
-    const result = await knex("cases")
-      .where("guild_id", this.guildId)
-      .where("id", id)
-      .first();
-
-    return result ? new Case(result) : null;
+    return this.cases.findOne({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        id
+      }
+    });
   }
 
   async findByCaseNumber(caseNumber: number): Promise<Case> {
-    const result = await knex("cases")
-      .where("guild_id", this.guildId)
-      .where("case_number", caseNumber)
-      .first();
-
-    return result ? new Case(result) : null;
-  }
-
-  async getCaseNotes(caseId: number): Promise<CaseNote[]> {
-    const results = await knex("case_notes")
-      .where("case_id", caseId)
-      .select();
-
-    return results.map(r => new CaseNote(r));
+    return this.cases.findOne({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        case_number: caseNumber
+      }
+    });
   }
 
   async getByUserId(userId: string): Promise<Case[]> {
-    const results = await knex("cases")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .select();
-
-    return results.map(r => new Case(r));
-  }
-
-  async findFirstCaseNote(caseId: number): Promise<CaseNote> {
-    const result = await knex("case_notes")
-      .where("case_id", caseId)
-      .first();
-
-    return result ? new CaseNote(result) : null;
+    return this.cases.find({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        user_id: userId
+      }
+    });
   }
 
   async create(data): Promise<number> {
-    return knex
-      .insert({
-        ...data,
-        guild_id: this.guildId,
-        case_number: knex.raw(
-          "(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ?)",
-          this.guildId
-        )
-      })
-      .returning("id")
-      .into("cases")
-      .then(ids => Number(ids[0]));
+    const result = await this.cases.insert({
+      ...data,
+      guild_id: this.guildId,
+      case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`
+    });
+
+    return result.identifiers[0].id;
   }
 
   update(id, data) {
-    return knex("cases")
-      .where("id", id)
-      .update(data);
+    return this.cases.update(id, data);
   }
 
-  createNote(caseId: number, data: any) {
-    return knex
-      .insert({
-        ...data,
-        case_id: caseId
-      })
-      .into("case_notes")
-      .return();
+  async createNote(caseId: number, data: any): Promise<number> {
+    const result = await this.caseNotes.insert({
+      ...data,
+      case_id: caseId
+    });
+
+    return result.identifiers[0].id;
   }
 }

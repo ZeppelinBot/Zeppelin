@@ -1,3 +1,9 @@
+import path from "path";
+import yaml from "js-yaml";
+
+import _fs from "fs";
+const fs = _fs.promises;
+
 require("dotenv").config();
 
 process.on("unhandledRejection", (reason, p) => {
@@ -17,13 +23,12 @@ process.on("uncaughtException", err => {
 });
 
 // Always use UTC
-// This is also set for the database in knexfile
 import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
 import { Knub, logger } from "knub";
-import knex from "./knex";
+import { connect } from "./data/db";
 
 // Global plugins
 import { BotControlPlugin } from "./plugins/BotControl";
@@ -42,7 +47,9 @@ import { TagsPlugin } from "./plugins/Tags";
 
 // Run latest database migrations
 logger.info("Running database migrations");
-knex.migrate.latest().then(() => {
+connect().then(async conn => {
+  await conn.runMigrations();
+
   const client = new Client(process.env.TOKEN, {
     getAllUsers: true
   });
@@ -72,6 +79,25 @@ knex.migrate.latest().then(() => {
         return keys.filter(pluginName => {
           return plugins[pluginName] && plugins[pluginName].enabled !== false;
         });
+      },
+
+      async getConfig(id) {
+        const configFile = id ? `${id}.yml` : "global.yml";
+        const configPath = path.join("config", configFile);
+
+        try {
+          await fs.access(configPath);
+        } catch (e) {
+          return {};
+        }
+
+        const yamlString = await fs.readFile(configPath, { encoding: "utf8" });
+        return yaml.safeLoad(yamlString);
+      },
+
+      logFn: (level, msg) => {
+        if (level === "debug") return;
+        console.log(`[${level.toUpperCase()}] ${msg}`);
       }
     }
   });

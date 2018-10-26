@@ -1,19 +1,12 @@
 import { Plugin, decorators as d, reply } from "knub";
 import { Channel, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
-import {
-  embedPadding,
-  errorMessage,
-  getMessages,
-  stripObjectToScalars,
-  successMessage,
-  trimLines
-} from "../utils";
+import { embedPadding, errorMessage, getMessages, stripObjectToScalars, successMessage, trimLines } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
-import { CaseType } from "../data/CaseType";
+import { CaseTypes } from "../data/CaseTypes";
 
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
@@ -54,7 +47,7 @@ export class UtilityPlugin extends Plugin {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
-    this.cases = new GuildCases(this.guildId);
+    this.cases = GuildCases.getInstance(this.guildId);
 
     if (activeReloads && activeReloads.has(this.guildId)) {
       activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));
@@ -80,9 +73,7 @@ export class UtilityPlugin extends Plugin {
     }
 
     const level = this.getMemberLevel(member);
-    msg.channel.createMessage(
-      `The permission level of ${member.username}#${member.discriminator} is **${level}**`
-    );
+    msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
 
   @d.command("search", "<query:string$>")
@@ -126,9 +117,7 @@ export class UtilityPlugin extends Plugin {
       });
       lines = lines.slice(from, to);
 
-      const footer = paginated
-        ? "Add a page number to the end of the command to browse results"
-        : "";
+      const footer = paginated ? "Add a page number to the end of the command to browse results" : "";
 
       msg.channel.createMessage(`${header}\n\`\`\`${lines.join("\n")}\`\`\`${footer}`);
     } else {
@@ -152,25 +141,17 @@ export class UtilityPlugin extends Plugin {
   @d.permission("clean")
   async cleanAllCmd(msg: Message, args: { count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-      msg.channel.createMessage(
-        errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`)
-      );
+      msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
       return;
     }
 
-    const messagesToClean = await getMessages(
-      msg.channel as TextChannel,
-      m => m.id !== msg.id,
-      args.count
-    );
+    const messagesToClean = await getMessages(msg.channel as TextChannel, m => m.id !== msg.id, args.count);
     if (messagesToClean.length > 0) {
       await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
     }
 
     msg.channel.createMessage(
-      successMessage(
-        `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`
-      )
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
   }
 
@@ -178,9 +159,7 @@ export class UtilityPlugin extends Plugin {
   @d.permission("clean")
   async cleanUserCmd(msg: Message, args: { userId: string; count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-      msg.channel.createMessage(
-        errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`)
-      );
+      msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
       return;
     }
 
@@ -194,9 +173,7 @@ export class UtilityPlugin extends Plugin {
     }
 
     msg.channel.createMessage(
-      successMessage(
-        `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`
-      )
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
   }
 
@@ -204,9 +181,7 @@ export class UtilityPlugin extends Plugin {
   @d.permission("clean")
   async cleanBotCmd(msg: Message, args: { count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-      msg.channel.createMessage(
-        errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`)
-      );
+      msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
       return;
     }
 
@@ -220,9 +195,7 @@ export class UtilityPlugin extends Plugin {
     }
 
     msg.channel.createMessage(
-      successMessage(
-        `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`
-      )
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
   }
 
@@ -283,7 +256,7 @@ export class UtilityPlugin extends Plugin {
       });
 
       const caseSummaries = cases.map(c => {
-        return `${CaseType[c.type]} (#${c.case_number})`;
+        return `${CaseTypes[c.type]} (#${c.case_number})`;
       });
 
       embed.fields.push({

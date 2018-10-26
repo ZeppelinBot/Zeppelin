@@ -1,19 +1,18 @@
 import { decorators as d, Plugin } from "knub";
-import { Channel, Message, TextChannel, User } from "eris";
+import { Channel, Message, User } from "eris";
 import {
   formatTemplateString,
   getEmojiInString,
   getRoleMentions,
   getUrlsInString,
   getUserMentions,
-  sleep,
   stripObjectToScalars,
   trimLines
 } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 import { ModActionsPlugin } from "./ModActions";
-import { CaseType } from "../data/CaseType";
+import { CaseTypes } from "../data/CaseTypes";
 import { GuildArchives } from "../data/GuildArchives";
 import moment from "moment-timezone";
 
@@ -23,7 +22,8 @@ enum RecentActionType {
   Link,
   Attachment,
   Emoji,
-  Newline
+  Newline,
+  Censor
 }
 
 interface IRecentAction {
@@ -96,7 +96,7 @@ export class SpamPlugin extends Plugin {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
-    this.archives = new GuildArchives(this.guildId);
+    this.archives = GuildArchives.getInstance(this.guildId);
 
     this.recentActions = [];
     this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
@@ -260,7 +260,7 @@ export class SpamPlugin extends Plugin {
           const logUrl = await this.saveSpamArchives(uniqueMessages, msg.channel, msg.author);
 
           // Create a case and log the actions taken above
-          const caseType = spamConfig.mute ? CaseType.Mute : CaseType.Note;
+          const caseType = spamConfig.mute ? CaseTypes.Mute : CaseTypes.Note;
           const caseText = trimLines(`
           Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
           ${logUrl}
@@ -295,6 +295,14 @@ export class SpamPlugin extends Plugin {
         console.error(err);
       }
     );
+  }
+
+  // For interoperability with the Censor plugin
+  async logCensor(msg: Message) {
+    const spamConfig = this.configValueForMsg(msg, "max_censor");
+    if (spamConfig) {
+      this.logAndDetectSpam(msg, RecentActionType.Censor, spamConfig, 1, "too many censored messages");
+    }
   }
 
   @d.event("messageCreate")
