@@ -1,5 +1,5 @@
 import { Plugin, decorators as d } from "knub";
-import { Channel, Message, TextChannel } from "eris";
+import { Message } from "eris";
 import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 
@@ -29,7 +29,7 @@ export class TagsPlugin extends Plugin {
   }
 
   onLoad() {
-    this.tags = new GuildTags(this.guildId);
+    this.tags = GuildTags.getInstance(this.guildId);
   }
 
   @d.command("tag", "<tag:string> <body:string$>")

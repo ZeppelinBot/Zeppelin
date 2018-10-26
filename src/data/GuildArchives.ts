@@ -1,51 +1,52 @@
 import uuid from "uuid/v4"; // tslint:disable-line
 import moment from "moment-timezone";
-import knex from "../knex";
-import SpamLog from "../models/SpamLog";
+import { ArchiveEntry } from "./entities/ArchiveEntry";
+import { getRepository, Repository } from "typeorm";
+import { BaseRepository } from "./BaseRepository";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
-function deleteExpiredArchives() {
-  knex("archives")
-    .where("expires_at", "<=", knex.raw("NOW()"))
-    .delete();
-}
-
-deleteExpiredArchives();
-setInterval(deleteExpiredArchives, 1000 * 60 * 60); // Clean expired archives every hour
-
-export class GuildArchives {
-  protected guildId: string;
+export class GuildArchives extends BaseRepository {
+  protected archives: Repository<ArchiveEntry>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.archives = getRepository(ArchiveEntry);
+
+    // Clean expired archives at start and then every hour
+    this.deleteExpiredArchives();
+    setInterval(() => this.deleteExpiredArchives(), 1000 * 60 * 60);
   }
 
-  generateNewLogId() {
-    return uuid();
+  private deleteExpiredArchives() {
+    this.archives
+      .createQueryBuilder()
+      .where("expires_at <= NOW()")
+      .delete()
+      .execute();
   }
 
-  async find(id: string): Promise<SpamLog> {
-    const result = await knex("archives")
-      .where("id", id)
-      .first();
-
-    return result ? new SpamLog(result) : null;
+  async find(id: string): Promise<ArchiveEntry> {
+    return this.archives.findOne({
+      where: { id },
+      relations: this.getRelations()
+    });
   }
 
-  async create(body: string, expiresAt: moment.Moment = null) {
-    const id = this.generateNewLogId();
+  /**
+   * @returns ID of the created entry
+   */
+  async create(body: string, expiresAt: moment.Moment = null): Promise<string> {
     if (!expiresAt) {
       expiresAt = moment().add(DEFAULT_EXPIRY_DAYS, "days");
     }
 
-    await knex("archives").insert({
-      id,
+    const result = await this.archives.insert({
       guild_id: this.guildId,
       body,
       expires_at: expiresAt.format("YYYY-MM-DD HH:mm:ss")
     });
 
-    return id;
+    return result.identifiers[0].id;
   }
 }

@@ -11,14 +11,13 @@ import {
   errorMessage,
   findRelevantAuditLogEntry,
   formatTemplateString,
-  sleep,
   stripObjectToScalars,
   successMessage,
   trimLines
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
-import Case from "../models/Case";
-import { CaseType } from "../data/CaseType";
+import { Case } from "../data/entities/Case";
+import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import Timer = NodeJS.Timer;
@@ -47,8 +46,8 @@ export class ModActionsPlugin extends Plugin {
   protected ignoredEvents: IIgnoredEvent[];
 
   async onLoad() {
-    this.cases = new GuildCases(this.guildId);
-    this.mutes = new GuildMutes(this.guildId);
+    this.cases = GuildCases.getInstance(this.guildId);
+    this.mutes = GuildMutes.getInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
 
     this.ignoredEvents = [];
@@ -156,9 +155,9 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createCase(user.id, modId, CaseType.Ban, auditLogId, relevantAuditLogEntry.reason, true);
+      await this.createCase(user.id, modId, CaseTypes.Ban, auditLogId, relevantAuditLogEntry.reason, true);
     } else {
-      await this.createCase(user.id, null, CaseType.Ban);
+      await this.createCase(user.id, null, CaseTypes.Ban);
     }
   }
 
@@ -183,9 +182,9 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createCase(user.id, modId, CaseType.Unban, auditLogId, null, true);
+      await this.createCase(user.id, modId, CaseTypes.Unban, auditLogId, null, true);
     } else {
-      await this.createCase(user.id, null, CaseType.Unban);
+      await this.createCase(user.id, null, CaseTypes.Unban);
     }
   }
 
@@ -228,7 +227,7 @@ export class ModActionsPlugin extends Plugin {
       this.createCase(
         member.id,
         kickAuditLogEntry.user.id,
-        CaseType.Kick,
+        CaseTypes.Kick,
         kickAuditLogEntry.id,
         kickAuditLogEntry.reason,
         true
@@ -274,12 +273,13 @@ export class ModActionsPlugin extends Plugin {
     const user = await this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "member";
 
-    await this.createCase(args.userId, msg.author.id, CaseType.Note, null, args.note);
+    await this.createCase(args.userId, msg.author.id, CaseTypes.Note, null, args.note);
     msg.channel.createMessage(successMessage(`Note added on ${userName}`));
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
   @d.permission("warn")
+  @d.nonBlocking()
   async warnCmd(msg: Message, args: any) {
     // Make sure we're allowed to warn this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -307,7 +307,7 @@ export class ModActionsPlugin extends Plugin {
       }
     }
 
-    await this.createCase(args.member.id, msg.author.id, CaseType.Warn, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseTypes.Warn, null, args.reason);
 
     msg.channel.createMessage(
       successMessage(`Warned **${args.member.user.username}#${args.member.user.discriminator}**`)
@@ -363,7 +363,7 @@ export class ModActionsPlugin extends Plugin {
       }
     } else {
       // Create a case
-      const caseId = await this.createCase(args.member.id, msg.author.id, CaseType.Mute, null, args.reason);
+      const caseId = await this.createCase(args.member.id, msg.author.id, CaseTypes.Mute, null, args.reason);
       await this.mutes.setCaseId(args.member.id, caseId);
     }
 
@@ -458,7 +458,7 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Create a case
-    await this.createCase(args.member.id, msg.author.id, CaseType.Unmute, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseTypes.Unmute, null, args.reason);
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNMUTE, {
@@ -568,7 +568,7 @@ export class ModActionsPlugin extends Plugin {
     args.member.kick(args.reason);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseType.Kick, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseTypes.Kick, null, args.reason);
 
     // Confirm the action to the moderator
     let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}**`;
@@ -613,7 +613,7 @@ export class ModActionsPlugin extends Plugin {
     args.member.ban(1, args.reason);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseType.Ban, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseTypes.Ban, null, args.reason);
 
     // Confirm the action to the moderator
     let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}**`;
@@ -646,7 +646,7 @@ export class ModActionsPlugin extends Plugin {
     await this.guild.unbanMember(args.member.id);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseType.Softban, null, args.reason);
+    await this.createCase(args.member.id, msg.author.id, CaseTypes.Softban, null, args.reason);
 
     // Confirm the action to the moderator
     msg.channel.createMessage(
@@ -677,7 +677,7 @@ export class ModActionsPlugin extends Plugin {
     msg.channel.createMessage(successMessage("Member unbanned!"));
 
     // Create a case
-    this.createCase(args.userId, msg.author.id, CaseType.Unban, null, args.reason);
+    this.createCase(args.userId, msg.author.id, CaseTypes.Unban, null, args.reason);
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
@@ -710,7 +710,7 @@ export class ModActionsPlugin extends Plugin {
     msg.channel.createMessage(successMessage("Member forcebanned!"));
 
     // Create a case
-    this.createCase(args.userId, msg.author.id, CaseType.Ban, null, args.reason);
+    this.createCase(args.userId, msg.author.id, CaseTypes.Ban, null, args.reason);
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
@@ -721,6 +721,7 @@ export class ModActionsPlugin extends Plugin {
 
   @d.command("massban", "<userIds:string...>")
   @d.permission("massban")
+  @d.nonBlocking()
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
     // Limit to 100 users at once (arbitrary?)
     if (args.userIds.length > 100) {
@@ -763,7 +764,7 @@ export class ModActionsPlugin extends Plugin {
     for (const userId of args.userIds) {
       try {
         await this.guild.banMember(userId);
-        await this.createCase(userId, msg.author.id, CaseType.Ban, null, `Mass ban: ${banReason}`, false, false);
+        await this.createCase(userId, msg.author.id, CaseTypes.Ban, null, `Mass ban: ${banReason}`, false, false);
       } catch (e) {
         failedBans.push(userId);
       }
@@ -811,13 +812,13 @@ export class ModActionsPlugin extends Plugin {
 
     // Verify the case type is valid
     const type: string = args.type[0].toUpperCase() + args.type.slice(1).toLowerCase();
-    if (!CaseType[type]) {
+    if (!CaseTypes[type]) {
       msg.channel.createMessage(errorMessage("Cannot add case: invalid case type"));
       return;
     }
 
     // Create the case
-    const caseId = await this.createCase(args.target, msg.author.id, CaseType[type], null, args.reason);
+    const caseId = await this.createCase(args.target, msg.author.id, CaseTypes[type], null, args.reason);
     const theCase = await this.cases.find(caseId);
 
     // Log the action
@@ -852,7 +853,7 @@ export class ModActionsPlugin extends Plugin {
   @d.command(/cases|usercases/, "<userId:userId> [expanded:string]")
   @d.permission("view")
   async usercasesCmd(msg: Message, args: { userId: string; expanded?: string }) {
-    const cases = await this.cases.getByUserId(args.userId);
+    const cases = await this.cases.with("notes").getByUserId(args.userId);
     const user = this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
     const prefix = this.knub.getGuildData(this.guildId).config.prefix;
@@ -869,7 +870,8 @@ export class ModActionsPlugin extends Plugin {
         // Compact view (= regular message with a preview of each case)
         const lines = [];
         for (const theCase of cases) {
-          const firstNote = await this.cases.findFirstCaseNote(theCase.id);
+          theCase.notes.sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
+          const firstNote = theCase.notes[0];
           let reason = firstNote ? firstNote.body : "";
 
           if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
@@ -882,7 +884,7 @@ export class ModActionsPlugin extends Plugin {
 
           reason = disableLinkPreviews(reason);
 
-          lines.push(`Case \`#${theCase.case_number}\` __${CaseType[theCase.type]}__ ${reason}`);
+          lines.push(`Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`);
         }
 
         const finalMessage = trimLines(`
@@ -945,7 +947,7 @@ export class ModActionsPlugin extends Plugin {
   protected async displayCase(caseOrCaseId: Case | number, channelId: string) {
     let theCase: Case;
     if (typeof caseOrCaseId === "number") {
-      theCase = await this.cases.find(caseOrCaseId);
+      theCase = await this.cases.with("notes").find(caseOrCaseId);
     } else {
       theCase = caseOrCaseId;
     }
@@ -953,10 +955,8 @@ export class ModActionsPlugin extends Plugin {
     if (!theCase) return;
     if (!this.guild.channels.get(channelId)) return;
 
-    const notes = await this.cases.getCaseNotes(theCase.id);
-
     const createdAt = moment(theCase.created_at);
-    const actionTypeStr = CaseType[theCase.type].toUpperCase();
+    const actionTypeStr = CaseTypes[theCase.type].toUpperCase();
 
     const embed: any = {
       title: `${actionTypeStr} - Case #${theCase.case_number}`,
@@ -981,8 +981,8 @@ export class ModActionsPlugin extends Plugin {
       embed.color = CaseTypeColors[theCase.type];
     }
 
-    if (notes.length) {
-      notes.forEach((note: any) => {
+    if (theCase.notes.length) {
+      theCase.notes.forEach((note: any) => {
         const noteDate = moment(note.created_at);
         embed.fields.push({
           name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
@@ -1014,7 +1014,7 @@ export class ModActionsPlugin extends Plugin {
   public async createCase(
     userId: string,
     modId: string,
-    caseType: CaseType,
+    caseType: CaseTypes,
     auditLogId: string = null,
     reason: string = null,
     automatic = false,

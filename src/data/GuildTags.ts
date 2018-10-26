@@ -1,36 +1,40 @@
-import knex from "../knex";
-import moment from "moment-timezone";
-import Tag from "../models/Tag";
+import { Tag } from "./entities/Tag";
+import { getRepository, Repository } from "typeorm";
+import { BaseRepository } from "./BaseRepository";
 
-export class GuildTags {
-  protected guildId: string;
+export class GuildTags extends BaseRepository {
+  private tags: Repository<Tag>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.tags = getRepository(Tag);
   }
 
   async find(tag): Promise<Tag> {
-    const result = await knex("tags")
-      .where("guild_id", this.guildId)
-      .where("tag", tag)
-      .first();
-
-    return result ? new Tag(result) : null;
+    return this.tags.findOne({
+      where: {
+        guild_id: this.guildId,
+        tag
+      }
+    });
   }
 
   async createOrUpdate(tag, body, userId) {
     const existingTag = await this.find(tag);
     if (existingTag) {
-      await knex("tags")
-        .where("guild_id", this.guildId)
-        .where("tag", tag)
-        .update({
+      await this.tags
+        .createQueryBuilder()
+        .update()
+        .set({
           body,
           user_id: userId,
-          created_at: knex.raw("NOW()")
-        });
+          created_at: () => "NOW()"
+        })
+        .where("guild_id = :guildId", { guildId: this.guildId })
+        .where("tag = :tag", { tag })
+        .execute();
     } else {
-      await knex("tags").insert({
+      await this.tags.insert({
         guild_id: this.guildId,
         user_id: userId,
         tag,
@@ -40,9 +44,9 @@ export class GuildTags {
   }
 
   async delete(tag) {
-    await knex("tags")
-      .where("guild_id", this.guildId)
-      .where("tag", tag)
-      .delete();
+    await this.tags.delete({
+      guild_id: this.guildId,
+      tag
+    });
   }
 }

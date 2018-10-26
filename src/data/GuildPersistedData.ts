@@ -1,5 +1,6 @@
-import knex from "../knex";
-import PersistedData from "../models/PersistedData";
+import { PersistedData } from "./entities/PersistedData";
+import { BaseRepository } from "./BaseRepository";
+import { getRepository, Repository } from "typeorm";
 
 export interface IPartialPersistData {
   roles?: string[];
@@ -7,20 +8,21 @@ export interface IPartialPersistData {
   is_voice_muted?: boolean;
 }
 
-export class GuildPersistedData {
-  protected guildId: string;
+export class GuildPersistedData extends BaseRepository {
+  private persistedData: Repository<PersistedData>;
 
   constructor(guildId) {
-    this.guildId = guildId;
+    super(guildId);
+    this.persistedData = getRepository(PersistedData);
   }
 
   async find(userId: string) {
-    const result = await knex("persisted_data")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .first();
-
-    return result ? new PersistedData(result) : null;
+    return this.persistedData.findOne({
+      where: {
+        guild_id: this.guildId,
+        user_id: userId
+      }
+    });
   }
 
   async set(userId: string, data: IPartialPersistData = {}) {
@@ -31,12 +33,15 @@ export class GuildPersistedData {
 
     const existing = await this.find(userId);
     if (existing) {
-      await knex("persisted_data")
-        .where("guild_id", this.guildId)
-        .where("user_id", userId)
-        .update(finalData);
+      await this.persistedData.update(
+        {
+          guild_id: this.guildId,
+          user_id: userId
+        },
+        finalData
+      );
     } else {
-      await knex("persisted_data").insert({
+      await this.persistedData.insert({
         ...finalData,
         guild_id: this.guildId,
         user_id: userId
@@ -45,9 +50,9 @@ export class GuildPersistedData {
   }
 
   async clear(userId: string) {
-    await knex("persisted_data")
-      .where("guild_id", this.guildId)
-      .where("user_id", userId)
-      .delete();
+    await this.persistedData.delete({
+      guild_id: this.guildId,
+      user_id: userId
+    });
   }
 }
