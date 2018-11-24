@@ -229,4 +229,44 @@ export function disableCodeBlocks(content: string): string {
   return content.replace(/`/g, "`\u200b");
 }
 
+export function chunkLines(str: string, maxChunkLength = 2000): string[] {
+  if (str.length < maxChunkLength) {
+    return [str];
+  }
+
+  const chunks = [];
+
+  while (str.length) {
+    if (str.length <= maxChunkLength) {
+      chunks.push(str);
+      break;
+    }
+
+    const slice = str.slice(0, maxChunkLength);
+
+    const lastLineBreakIndex = slice.lastIndexOf("\n");
+    if (lastLineBreakIndex === -1) {
+      chunks.push(str.slice(0, maxChunkLength));
+      str = str.slice(maxChunkLength);
+    } else {
+      chunks.push(str.slice(0, lastLineBreakIndex));
+      str = str.slice(lastLineBreakIndex + 1);
+    }
+  }
+
+  return chunks;
+}
+
+/**
+ * Chunks a long message to multiple smaller messages, retaining leading and trailing line breaks
+ */
+export function chunkMessageLines(str: string): string[] {
+  const chunks = chunkLines(str, 1999);
+  return chunks.map(chunk => {
+    if (chunk[0] === "\n") chunk = "\u200b" + chunk;
+    if (chunk[chunk.length - 1] === "\n") chunk = chunk + "\u200b";
+    return chunk;
+  });
+}
+
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";

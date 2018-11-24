@@ -5,6 +5,8 @@ import humanizeDuration from "humanize-duration";
 import chunk from "lodash.chunk";
 import { GuildCases } from "../data/GuildCases";
 import {
+  chunkLines,
+  chunkMessageLines,
   convertDelayStringToMS,
   DBDateFormat,
   disableLinkPreviews,
@@ -862,6 +864,11 @@ export class ModActionsPlugin extends Plugin {
       msg.channel.createMessage("No cases found for the specified user!");
     } else {
       if (args.expanded && args.expanded.startsWith("expand")) {
+        if (cases.length > 8) {
+          msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
+          return;
+        }
+
         // Expanded view (= individual case embeds)
         for (const theCase of cases) {
           await this.displayCase(theCase.id, msg.channel.id);
@@ -889,13 +896,16 @@ export class ModActionsPlugin extends Plugin {
 
         const finalMessage = trimLines(`
         Cases for **${userName}**:
-        
+
         ${lines.join("\n")}
-        
-        Use \`${prefix}case <num>\` to see more info about individual cases        
+
+        Use \`${prefix}case <num>\` to see more info about individual cases
       `);
 
-        msg.channel.createMessage(finalMessage);
+        const finalMessageChunks = chunkMessageLines(finalMessage);
+        for (const msgChunk of finalMessageChunks) {
+          msg.channel.createMessage(msgChunk);
+        }
       }
     }
   }
