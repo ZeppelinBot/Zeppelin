@@ -2,12 +2,20 @@ import { decorators as d, Plugin } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
-import { findRelevantAuditLogEntry, formatTemplateString, stripObjectToScalars } from "../utils";
+import {
+  deactivateMentions,
+  disableCodeBlocks,
+  findRelevantAuditLogEntry,
+  formatTemplateString,
+  stripObjectToScalars
+} from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { SavedMessage } from "../data/entities/SavedMessage";
 
 interface ILogChannel {
   include?: string[];
@@ -26,7 +34,13 @@ const unknownUser = {
 
 export class LogsPlugin extends Plugin {
   protected serverLogs: GuildLogs;
+  protected savedMessages: GuildSavedMessages;
+
   protected logListener;
+
+  private onMessageDeleteFn;
+  private onMessageDeleteBulkFn;
+  private onMessageUpdateFn;
 
   getDefaultOptions() {
     return {
@@ -42,13 +56,22 @@ export class LogsPlugin extends Plugin {
 
   onLoad() {
     this.serverLogs = new GuildLogs(this.guildId);
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
 
     this.logListener = ({ type, data }) => this.log(type, data);
     this.serverLogs.on("log", this.logListener);
+
+    this.savedMessages.events.on("delete", this.onMessageDelete.bind(this));
+    this.savedMessages.events.on("deleteBulk", this.onMessageDeleteBulk.bind(this));
+    this.savedMessages.events.on("update", this.onMessageUpdate.bind(this));
   }
 
   onUnload() {
     this.serverLogs.removeListener("log", this.logListener);
+
+    this.savedMessages.events.off("delete", this.onMessageDelete.bind(this));
+    this.savedMessages.events.off("deleteBulk", this.onMessageDeleteBulk.bind(this));
+    this.savedMessages.events.off("update", this.onMessageUpdate.bind(this));
   }
 
   async log(type, data) {
@@ -59,10 +82,7 @@ export class LogsPlugin extends Plugin {
       const channel = this.guild.channels.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
 
-      if (
-        (opts.include && opts.include.includes(typeStr)) ||
-        (opts.exclude && !opts.exclude.includes(typeStr))
-      ) {
+      if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
         const message = this.getLogMessage(type, data);
         // TODO: Split log messages that are too long
         if (message) await channel.createMessage(message).catch(() => {});
@@ -234,55 +254,64 @@ export class LogsPlugin extends Plugin {
     });
   }
 
-  @d.event("messageUpdate")
-  onMessageUpdate(msg: Message, oldMsg: Message) {
-    if (!msg.author) return;
-    if (oldMsg && msg.content === oldMsg.content) return;
-    if (msg.type !== 0) return;
+  // Uses events from savesMessages
+  onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
+    if (oldSavedMessage && JSON.stringify(savedMessage.data) === JSON.stringify(oldSavedMessage.data)) return;
+
+    const member = this.guild.members.get(savedMessage.user_id);
+    const channel = this.guild.channels.get(savedMessage.channel_id);
+
+    const before = oldSavedMessage
+      ? disableCodeBlocks(deactivateMentions(oldSavedMessage.data.content || ""))
+      : "Unknown pre-edit content";
+    const after = disableCodeBlocks(deactivateMentions(savedMessage.data.content || ""));
 
     this.serverLogs.log(LogType.MESSAGE_EDIT, {
-      member: stripObjectToScalars(msg.member, ["user"]),
-      channel: stripObjectToScalars(msg.channel),
-      before: oldMsg ? oldMsg.cleanContent || oldMsg.content || "" : "Unavailable due to restart",
-      after: msg.cleanContent || msg.content || ""
+      member: stripObjectToScalars(member, ["user"]),
+      channel: stripObjectToScalars(channel),
+      before,
+      after
     });
   }
 
-  @d.event("messageDelete")
-  onMessageDelete(msg: Message) {
-    if (msg.type != null && msg.type !== 0) return;
+  // Uses events from savesMessages
+  onMessageDelete(savedMessage: SavedMessage) {
+    const member = this.guild.members.get(savedMessage.user_id);
+    const channel = this.guild.channels.get(savedMessage.channel_id);
 
-    if (msg.member) {
+    if (member) {
       this.serverLogs.log(
         LogType.MESSAGE_DELETE,
         {
-          member: stripObjectToScalars(msg.member, ["user"]),
-          channel: stripObjectToScalars(msg.channel),
-          messageText: msg.cleanContent || msg.content || ""
+          member: stripObjectToScalars(member, ["user"]),
+          channel: stripObjectToScalars(channel),
+          messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || ""))
         },
-        msg.id
+        savedMessage.id
       );
     } else {
       this.serverLogs.log(
         LogType.MESSAGE_DELETE_BARE,
         {
-          messageId: msg.id,
-          channel: stripObjectToScalars(msg.channel)
+          messageId: savedMessage.id,
+          channel: stripObjectToScalars(channel)
         },
-        msg.id
+        savedMessage.id
       );
     }
   }
 
-  @d.event("messageDeleteBulk")
-  onMessageDeleteBulk(messages: Message[]) {
+  // Uses events from savesMessages
+  onMessageDeleteBulk(savedMessages: SavedMessage[]) {
+    const channel = this.guild.channels.get(savedMessages[0].channel_id);
+
     this.serverLogs.log(
       LogType.MESSAGE_DELETE_BULK,
       {
-        count: messages.length,
-        channel: messages[0] ? messages[0].channel : null
+        count: savedMessages.length,
+        channel
       },
-      messages[0] && messages[0].id
+      savedMessages[0].id
     );
   }
 
