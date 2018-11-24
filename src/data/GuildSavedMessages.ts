@@ -1,7 +1,7 @@
 import { Brackets, getRepository, Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
-import EventEmitter from "events";
+import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
 
@@ -11,12 +11,12 @@ const RETENTION_PERIOD = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 export class GuildSavedMessages extends BaseRepository {
   private messages: Repository<SavedMessage>;
-  public events: EventEmitter;
+  public events: QueuedEventEmitter;
 
   constructor(guildId) {
     super(guildId);
     this.messages = getRepository(SavedMessage);
-    this.events = new EventEmitter();
+    this.events = new QueuedEventEmitter();
 
     this.cleanup();
     setInterval(() => this.cleanup(), CLEANUP_INTERVAL);
