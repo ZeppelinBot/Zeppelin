@@ -31,7 +31,7 @@ export class GuildTags extends BaseRepository {
           created_at: () => "NOW()"
         })
         .where("guild_id = :guildId", { guildId: this.guildId })
-        .where("tag = :tag", { tag })
+        .andWhere("tag = :tag", { tag })
         .execute();
     } else {
       await this.tags.insert({

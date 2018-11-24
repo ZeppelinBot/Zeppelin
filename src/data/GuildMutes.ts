@@ -15,8 +15,8 @@ export class GuildMutes extends BaseRepository {
     return this.mutes
       .createQueryBuilder("mutes")
       .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .where("expires_at IS NOT NULL")
-      .where("expires_at <= NOW()")
+      .andWhere("expires_at IS NOT NULL")
+      .andWhere("expires_at <= NOW()")
       .getMany();
   }
 
