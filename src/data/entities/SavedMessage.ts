@@ -30,4 +30,6 @@ export class SavedMessage {
   @Column() posted_at: string;
 
   @Column() deleted_at: string;
+
+  @Column() is_permanent: boolean;
 }
