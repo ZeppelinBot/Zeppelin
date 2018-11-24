@@ -83,6 +83,7 @@ export class GuildSavedMessages extends BaseRepository {
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
       .andWhere("is_bot = 1")
+      .andWhere("deleted_at IS NULL")
       .orderBy("id", "DESC")
       .limit(limit)
       .getMany();
@@ -94,6 +95,7 @@ export class GuildSavedMessages extends BaseRepository {
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
       .andWhere("id < :beforeId", { beforeId })
+      .andWhere("deleted_at IS NULL")
       .orderBy("id", "DESC")
       .limit(limit)
       .getMany();
@@ -105,6 +107,7 @@ export class GuildSavedMessages extends BaseRepository {
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
       .andWhere("user_id = :user_id", { user_id: userId })
+      .andWhere("deleted_at IS NULL")
       .orderBy("id", "DESC")
       .limit(limit)
       .getMany();
@@ -116,7 +119,8 @@ export class GuildSavedMessages extends BaseRepository {
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("user_id = :user_id", { user_id: userId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
-      .andWhere("id > :afterId", { afterId });
+      .andWhere("id > :afterId", { afterId })
+      .andWhere("deleted_at IS NULL");
 
     if (limit != null) {
       query = query.limit(limit);
