@@ -39,17 +39,7 @@ interface IRecentAction {
 
 const MAX_INTERVAL = 300;
 
-const ARCHIVE_EXPIRY_DAYS = 90;
-const ARCHIVE_HEADER_FORMAT = trimLines(`
-  Server: {guild.name} ({guild.id})
-  Channel: #{channel.name} ({channel.id})
-  User: {user.username}#{user.discriminator} ({user.id})
-`);
-const ARCHIVE_MESSAGE_FORMAT = "[MSG ID {id}] [{timestamp}] {user.username}: {content}{attachments}";
-const ARCHIVE_FOOTER_FORMAT = trimLines(`
-  Log file generated on {timestamp}
-  Expires at {expires}
-`);
+const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
 export class SpamPlugin extends Plugin {
   protected logs: GuildLogs;
@@ -163,31 +153,11 @@ export class SpamPlugin extends Plugin {
   }
 
   async saveSpamArchives(savedMessages: SavedMessage[], channel: Channel, user: User) {
-    const expiresAt = moment().add(ARCHIVE_EXPIRY_DAYS, "days");
-
-    const headerStr = formatTemplateString(ARCHIVE_HEADER_FORMAT, {
-      guild: this.guild,
-      channel,
-      user
-    });
-    const msgLines = savedMessages.map(msg => {
-      return formatTemplateString(ARCHIVE_MESSAGE_FORMAT, {
-        id: msg.id,
-        timestamp: moment(msg.posted_at).format("HH:mm:ss"),
-        content: msg.data.content,
-        user
-      });
-    });
-    const messagesStr = msgLines.join("\n");
-    const footerStr = formatTemplateString(ARCHIVE_FOOTER_FORMAT, {
-      timestamp: moment().format("YYYY-MM-DD [at] HH:mm:ss (Z)"),
-      expires: expiresAt.format("YYYY-MM-DD [at] HH:mm:ss (Z)")
-    });
-
-    const logId = await this.archives.create([headerStr, messagesStr, footerStr].join("\n\n"), expiresAt);
+    const expiresAt = moment().add(SPAM_ARCHIVE_EXPIRY_DAYS, "days");
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user, expiresAt);
 
     const url = this.knub.getGlobalConfig().url;
-    return url ? `${url}/archives/${logId}` : `Archive ID: ${logId}`;
+    return url ? `${url}/archives/${archiveId}` : `Archive ID: ${archiveId}`;
   }
 
   async logAndDetectSpam(
@@ -285,13 +255,13 @@ export class SpamPlugin extends Plugin {
           // Generate a log from the detected messages
           const channel = this.guild.channels.get(savedMessage.channel_id);
           const user = this.bot.users.get(savedMessage.user_id);
-          const logUrl = await this.saveSpamArchives(uniqueMessages, channel, user);
+          const archiveUrl = await this.saveSpamArchives(uniqueMessages, channel, user);
 
           // Create a case and log the actions taken above
           const caseType = spamConfig.mute ? CaseTypes.Mute : CaseTypes.Note;
           const caseText = trimLines(`
           Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
-          ${logUrl}
+          ${archiveUrl}
         `);
 
           this.logs.log(LogType.SPAM_DETECTED, {
@@ -300,7 +270,7 @@ export class SpamPlugin extends Plugin {
             description,
             limit: spamConfig.count,
             interval: spamConfig.interval,
-            logUrl
+            archiveUrl
           });
 
           const caseId = await modActionsPlugin.createCase(

@@ -1,12 +1,15 @@
 import { Plugin, decorators as d, reply } from "knub";
 import { Channel, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
-import { embedPadding, errorMessage, getMessages, stripObjectToScalars, successMessage, trimLines } from "../utils";
+import { embedPadding, errorMessage, stripObjectToScalars, successMessage, trimLines } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import { CaseTypes } from "../data/CaseTypes";
+import { SavedMessage } from "../data/entities/SavedMessage";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { GuildArchives } from "../data/GuildArchives";
 
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
@@ -16,6 +19,8 @@ const activeReloads: Map<string, TextChannel> = new Map();
 export class UtilityPlugin extends Plugin {
   protected logs: GuildLogs;
   protected cases: GuildCases;
+  protected savedMessages: GuildSavedMessages;
+  protected archives: GuildArchives;
 
   getDefaultOptions() {
     return {
@@ -48,6 +53,8 @@ export class UtilityPlugin extends Plugin {
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
     this.cases = GuildCases.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.archives = GuildArchives.getInstance(this.guildId);
 
     if (activeReloads && activeReloads.has(this.guildId)) {
       activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));
@@ -125,14 +132,22 @@ export class UtilityPlugin extends Plugin {
     }
   }
 
-  async cleanMessages(channel: Channel, messageIds: string[], mod: User) {
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE, messageIds[0]);
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, messageIds[0]);
-    await this.bot.deleteMessages(channel.id, messageIds);
+  async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
+
+    await this.bot.deleteMessages(channel.id, savedMessages.map(m => m.id));
+
+    savedMessages.reverse();
+    const user = this.bot.users.get(savedMessages[0].user_id);
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user);
+    const archiveUrl = `${this.knub.getGlobalConfig().url}/archives/${archiveId}`;
+
     this.logs.log(LogType.CLEAN, {
       mod: stripObjectToScalars(mod),
       channel: stripObjectToScalars(channel),
-      count: messageIds.length
+      count: savedMessages.length,
+      archiveUrl
     });
   }
 
@@ -145,9 +160,9 @@ export class UtilityPlugin extends Plugin {
       return;
     }
 
-    const messagesToClean = await getMessages(msg.channel as TextChannel, m => m.id !== msg.id, args.count);
+    const messagesToClean = await this.savedMessages.getLatestByChannelBeforeId(msg.channel.id, msg.id, args.count);
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
     msg.channel.createMessage(
@@ -163,13 +178,9 @@ export class UtilityPlugin extends Plugin {
       return;
     }
 
-    const messagesToClean = await getMessages(
-      msg.channel as TextChannel,
-      m => m.id !== msg.id && m.author.id === args.userId,
-      args.count
-    );
+    const messagesToClean = await this.savedMessages.getLatestByChannelAndUser(msg.channel.id, args.userId, args.count);
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
     msg.channel.createMessage(
@@ -185,13 +196,9 @@ export class UtilityPlugin extends Plugin {
       return;
     }
 
-    const messagesToClean = await getMessages(
-      msg.channel as TextChannel,
-      m => m.id !== msg.id && m.author.bot,
-      args.count
-    );
+    const messagesToClean = await this.savedMessages.getLatestBotMessagesByChannel(msg.channel.id, args.count);
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean.map(m => m.id), msg.author);
+      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
     msg.channel.createMessage(

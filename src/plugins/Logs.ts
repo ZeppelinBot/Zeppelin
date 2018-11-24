@@ -16,6 +16,7 @@ import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import { GuildArchives } from "../data/GuildArchives";
 
 interface ILogChannel {
   include?: string[];
@@ -33,8 +34,9 @@ const unknownUser = {
 };
 
 export class LogsPlugin extends Plugin {
-  protected serverLogs: GuildLogs;
+  protected guildLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
+  protected archives: GuildArchives;
 
   protected logListener;
 
@@ -55,11 +57,12 @@ export class LogsPlugin extends Plugin {
   }
 
   onLoad() {
-    this.serverLogs = new GuildLogs(this.guildId);
+    this.guildLogs = new GuildLogs(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.archives = GuildArchives.getInstance(this.guildId);
 
     this.logListener = ({ type, data }) => this.log(type, data);
-    this.serverLogs.on("log", this.logListener);
+    this.guildLogs.on("log", this.logListener);
 
     this.savedMessages.events.on("delete", this.onMessageDelete.bind(this));
     this.savedMessages.events.on("deleteBulk", this.onMessageDeleteBulk.bind(this));
@@ -67,7 +70,7 @@ export class LogsPlugin extends Plugin {
   }
 
   onUnload() {
-    this.serverLogs.removeListener("log", this.logListener);
+    this.guildLogs.removeListener("log", this.logListener);
 
     this.savedMessages.events.off("delete", this.onMessageDelete.bind(this));
     this.savedMessages.events.off("deleteBulk", this.onMessageDeleteBulk.bind(this));
@@ -113,7 +116,7 @@ export class LogsPlugin extends Plugin {
       round: true
     });
 
-    this.serverLogs.log(LogType.MEMBER_JOIN, {
+    this.guildLogs.log(LogType.MEMBER_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
       new: member.createdAt >= newThreshold ? " :new:" : "",
       account_age: accountAge
@@ -122,7 +125,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("guildMemberRemove")
   onMemberLeave(_, member) {
-    this.serverLogs.log(LogType.MEMBER_LEAVE, {
+    this.guildLogs.log(LogType.MEMBER_LEAVE, {
       member: stripObjectToScalars(member, ["user"])
     });
   }
@@ -136,7 +139,7 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.serverLogs.log(
+    this.guildLogs.log(
       LogType.MEMBER_BAN,
       {
         user: stripObjectToScalars(user),
@@ -155,7 +158,7 @@ export class LogsPlugin extends Plugin {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.serverLogs.log(
+    this.guildLogs.log(
       LogType.MEMBER_UNBAN,
       {
         mod: stripObjectToScalars(mod),
@@ -170,7 +173,7 @@ export class LogsPlugin extends Plugin {
     if (!oldMember) return;
 
     if (member.nick !== oldMember.nick) {
-      this.serverLogs.log(LogType.MEMBER_NICK_CHANGE, {
+      this.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
         member,
         oldNick: oldMember.nick || "<none>",
         newNick: member.nick
@@ -189,7 +192,7 @@ export class LogsPlugin extends Plugin {
       const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
       if (addedRoles.length) {
-        this.serverLogs.log(
+        this.guildLogs.log(
           LogType.MEMBER_ROLE_ADD,
           {
             member,
@@ -199,7 +202,7 @@ export class LogsPlugin extends Plugin {
           member.id
         );
       } else if (removedRoles.length) {
-        this.serverLogs.log(
+        this.guildLogs.log(
           LogType.MEMBER_ROLE_REMOVE,
           {
             member,
@@ -218,7 +221,7 @@ export class LogsPlugin extends Plugin {
 
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
       const member = this.guild.members.get(user.id) || { id: user.id, user };
-      this.serverLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
+      this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
         member: stripObjectToScalars(member, ["user"]),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,
         newName: `${user.username}#${user.discriminator}`
@@ -228,28 +231,28 @@ export class LogsPlugin extends Plugin {
 
   @d.event("channelCreate")
   onChannelCreate(channel) {
-    this.serverLogs.log(LogType.CHANNEL_CREATE, {
+    this.guildLogs.log(LogType.CHANNEL_CREATE, {
       channel: stripObjectToScalars(channel)
     });
   }
 
   @d.event("channelDelete")
   onChannelDelete(channel) {
-    this.serverLogs.log(LogType.CHANNEL_DELETE, {
+    this.guildLogs.log(LogType.CHANNEL_DELETE, {
       channel: stripObjectToScalars(channel)
     });
   }
 
   @d.event("guildRoleCreate")
   onRoleCreate(_, role) {
-    this.serverLogs.log(LogType.ROLE_CREATE, {
+    this.guildLogs.log(LogType.ROLE_CREATE, {
       role: stripObjectToScalars(role)
     });
   }
 
   @d.event("guildRoleDelete")
   onRoleDelete(_, role) {
-    this.serverLogs.log(LogType.ROLE_DELETE, {
+    this.guildLogs.log(LogType.ROLE_DELETE, {
       role: stripObjectToScalars(role)
     });
   }
@@ -266,7 +269,7 @@ export class LogsPlugin extends Plugin {
       : "Unknown pre-edit content";
     const after = disableCodeBlocks(deactivateMentions(savedMessage.data.content || ""));
 
-    this.serverLogs.log(LogType.MESSAGE_EDIT, {
+    this.guildLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel),
       before,
@@ -280,7 +283,7 @@ export class LogsPlugin extends Plugin {
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
     if (member) {
-      this.serverLogs.log(
+      this.guildLogs.log(
         LogType.MESSAGE_DELETE,
         {
           member: stripObjectToScalars(member, ["user"]),
@@ -290,7 +293,7 @@ export class LogsPlugin extends Plugin {
         savedMessage.id
       );
     } else {
-      this.serverLogs.log(
+      this.guildLogs.log(
         LogType.MESSAGE_DELETE_BARE,
         {
           messageId: savedMessage.id,
@@ -302,14 +305,18 @@ export class LogsPlugin extends Plugin {
   }
 
   // Uses events from savesMessages
-  onMessageDeleteBulk(savedMessages: SavedMessage[]) {
+  async onMessageDeleteBulk(savedMessages: SavedMessage[]) {
     const channel = this.guild.channels.get(savedMessages[0].channel_id);
+    const user = this.bot.users.get(savedMessages[0].user_id);
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user);
+    const baseUrl = this.knub.getGlobalConfig().url;
 
-    this.serverLogs.log(
+    this.guildLogs.log(
       LogType.MESSAGE_DELETE_BULK,
       {
         count: savedMessages.length,
-        channel
+        channel,
+        archiveUrl: `${baseUrl}/archives/${archiveId}`
       },
       savedMessages[0].id
     );
@@ -317,7 +324,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelJoin")
   onVoiceChannelJoin(member: Member, channel: Channel) {
-    this.serverLogs.log(LogType.VOICE_CHANNEL_JOIN, {
+    this.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel)
     });
@@ -325,7 +332,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelLeave")
   onVoiceChannelLeave(member: Member, channel: Channel) {
-    this.serverLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
+    this.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel)
     });
@@ -333,7 +340,7 @@ export class LogsPlugin extends Plugin {
 
   @d.event("voiceChannelSwitch")
   onVoiceChannelSwitch(member: Member, newChannel: Channel, oldChannel: Channel) {
-    this.serverLogs.log(LogType.VOICE_CHANNEL_MOVE, {
+    this.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
       member: stripObjectToScalars(member, ["user"]),
       oldChannel: stripObjectToScalars(oldChannel),
       newChannel: stripObjectToScalars(newChannel)

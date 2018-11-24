@@ -36,4 +36,10 @@ export class MessageSaverPlugin extends Plugin {
 
     await this.savedMessages.saveEditFromMsg(msg);
   }
+
+  @d.event("messageDeleteBulk", "guild", false)
+  async onMessageBulkDelete(messages: Message[]) {
+    const ids = messages.map(m => m.id);
+    await this.savedMessages.markBulkAsDeleted(ids);
+  }
 }
