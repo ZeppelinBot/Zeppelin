@@ -1,8 +1,16 @@
 import { Plugin, decorators as d } from "knub";
 import { Channel, Message, TextChannel } from "eris";
 import { errorMessage } from "../utils";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { ISavedMessageData } from "../data/entities/SavedMessage";
 
 export class PostPlugin extends Plugin {
+  protected savedMessages: GuildSavedMessages;
+
+  onLoad() {
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+  }
+
   getDefaultOptions() {
     return {
       permissions: {
@@ -33,7 +41,8 @@ export class PostPlugin extends Plugin {
       return;
     }
 
-    args.channel.createMessage(args.content);
+    const createdMsg = await args.channel.createMessage(args.content);
+    await this.savedMessages.createFromMsg(createdMsg, { is_permanent: true });
   }
 
   /**
@@ -54,6 +63,7 @@ export class PostPlugin extends Plugin {
       return;
     }
 
-    message.edit(args.content);
+    const edited = await message.edit(args.content);
+    await this.savedMessages.saveEditFromMsg(edited);
   }
 }
