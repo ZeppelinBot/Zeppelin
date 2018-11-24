@@ -2,6 +2,8 @@ import { Brackets, getRepository, Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import EventEmitter from "events";
+import { GuildChannel, Message } from "eris";
+import moment from "moment-timezone";
 
 const CLEANUP_INTERVAL = 5 * 60 * 1000;
 
@@ -18,6 +20,18 @@ export class GuildSavedMessages extends BaseRepository {
 
     this.cleanup();
     setInterval(() => this.cleanup(), CLEANUP_INTERVAL);
+  }
+
+  public msgToSavedMessageData(msg: Message): ISavedMessageData {
+    return {
+      attachments: msg.attachments,
+      author: {
+        username: msg.author.username,
+        discriminator: msg.author.discriminator
+      },
+      content: msg.content,
+      embeds: msg.embeds
+    };
   }
 
   async cleanup() {
@@ -60,11 +74,29 @@ export class GuildSavedMessages extends BaseRepository {
     try {
       await this.messages.insert({ ...data, guild_id: this.guildId });
     } catch (e) {
+      console.warn(e);
       return;
     }
 
     const inserted = await this.messages.findOne(data.id);
     this.events.emit("create", [inserted]);
+  }
+
+  async createFromMsg(msg: Message, overrides = {}) {
+    const savedMessageData = this.msgToSavedMessageData(msg);
+    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
+
+    const data = {
+      id: msg.id,
+      guild_id: (msg.channel as GuildChannel).guild.id,
+      channel_id: msg.channel.id,
+      user_id: msg.author.id,
+      is_bot: msg.author.bot,
+      data: savedMessageData,
+      posted_at: postedAt
+    };
+
+    return this.create({ ...data, ...overrides });
   }
 
   async markAsDeleted(id) {
@@ -82,7 +114,7 @@ export class GuildSavedMessages extends BaseRepository {
     this.events.emit("delete", [deleted]);
   }
 
-  async edit(id, newData: ISavedMessageData) {
+  async saveEdit(id, newData: ISavedMessageData) {
     const oldMessage = await this.messages.findOne(id);
     const newMessage = { ...oldMessage, data: newData };
 
@@ -94,5 +126,10 @@ export class GuildSavedMessages extends BaseRepository {
     );
 
     this.events.emit("edit", [newMessage, oldMessage]);
+  }
+
+  async saveEditFromMsg(msg: Message) {
+    const newData = this.msgToSavedMessageData(msg);
+    return this.saveEdit(msg.id, newData);
   }
 }
