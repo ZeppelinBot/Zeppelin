@@ -72,7 +72,7 @@ export class GuildSavedMessages extends BaseRepository {
 
   async create(data) {
     try {
-      await this.messages.insert({ ...data, guild_id: this.guildId });
+      await this.messages.insert(data);
     } catch (e) {
       console.warn(e);
       return;
