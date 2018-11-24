@@ -259,18 +259,20 @@ export class UtilityPlugin extends Plugin {
     const cases = await this.cases.getByUserId(args.userId);
     if (cases.length > 0) {
       cases.sort((a, b) => {
-        return a.created_at < b.created_at ? -1 : 1;
+        return a.created_at < b.created_at ? 1 : -1;
       });
 
-      const caseSummaries = cases.map(c => {
+      const caseSummary = cases.slice(0, 3).map(c => {
         return `${CaseTypes[c.type]} (#${c.case_number})`;
       });
+
+      const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 
       embed.fields.push({
         name: "Cases",
         value: trimLines(`
           Total cases: ${cases.length}
-          Summary: ${caseSummaries.join(", ")}
+          ${summaryText}: ${caseSummary.join(", ")}
         `)
       });
     }
