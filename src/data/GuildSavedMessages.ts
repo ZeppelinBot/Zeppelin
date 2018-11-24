@@ -186,10 +186,12 @@ export class GuildSavedMessages extends BaseRepository {
       .andWhere("id IN (:ids)", { ids })
       .execute();
 
-    return this.messages
+    const deleted = await this.messages
       .createQueryBuilder()
       .where("id IN (:ids)", { ids })
       .getMany();
+
+    this.events.emit("deleteBulk", [deleted]);
   }
 
   async saveEdit(id, newData: ISavedMessageData) {
