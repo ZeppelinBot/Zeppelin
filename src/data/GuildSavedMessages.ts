@@ -62,12 +62,12 @@ export class GuildSavedMessages extends BaseRepository {
   }
 
   find(id) {
-    return this.messages.findOne({
-      where: {
-        guild_id: this.guildId,
-        id
-      }
-    });
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("id = :id", { id })
+      .andWhere("deleted_at IS NULL")
+      .getOne();
   }
 
   async create(data) {
