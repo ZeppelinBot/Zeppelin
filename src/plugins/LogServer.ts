@@ -11,9 +11,6 @@ function notFound(res: ServerResponse) {
   res.end("Not Found");
 }
 
-/**
- * A global plugin that allows bot owners to control the bot
- */
 export class LogServerPlugin extends GlobalPlugin {
   protected archives: GuildArchives;
   protected server: http.Server;

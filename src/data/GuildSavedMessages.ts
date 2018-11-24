@@ -77,14 +77,52 @@ export class GuildSavedMessages extends BaseRepository {
       .getOne();
   }
 
-  getUserMessagesByChannelAfterId(userId, channelId, afterId) {
+  getLatestBotMessagesByChannel(channelId, limit) {
     return this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .where("user_id = :user_id", { user_id: userId })
-      .where("channel_id = :channel_id", { channel_id: channelId })
-      .where("id > :afterId", { afterId })
+      .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("is_bot = 1")
+      .orderBy("id", "DESC")
+      .limit(limit)
       .getMany();
+  }
+
+  getLatestByChannelBeforeId(channelId, beforeId, limit) {
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("id < :beforeId", { beforeId })
+      .orderBy("id", "DESC")
+      .limit(limit)
+      .getMany();
+  }
+
+  getLatestByChannelAndUser(channelId, userId, limit) {
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("user_id = :user_id", { user_id: userId })
+      .orderBy("id", "DESC")
+      .limit(limit)
+      .getMany();
+  }
+
+  getUserMessagesByChannelAfterId(userId, channelId, afterId, limit = null) {
+    let query = this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("user_id = :user_id", { user_id: userId })
+      .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("id > :afterId", { afterId });
+
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+
+    return query.getMany();
   }
 
   async create(data) {
@@ -135,6 +173,23 @@ export class GuildSavedMessages extends BaseRepository {
 
     const deleted = await this.messages.findOne(id);
     this.events.emit("delete", [deleted]);
+  }
+
+  async markBulkAsDeleted(ids) {
+    await this.messages
+      .createQueryBuilder()
+      .update()
+      .set({
+        deleted_at: () => "NOW(3)"
+      })
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("id IN (:ids)", { ids })
+      .execute();
+
+    return this.messages
+      .createQueryBuilder()
+      .where("id IN (:ids)", { ids })
+      .getMany();
   }
 
   async saveEdit(id, newData: ISavedMessageData) {

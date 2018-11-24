@@ -26,8 +26,8 @@
 
   "MESSAGE_EDIT": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message edited in **#{channel.name}**:\nBefore:```{before}```After:```{after}```",
   "MESSAGE_DELETE": "🗑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message deleted in **#{channel.name}**:\n```{messageText}```",
-  "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **#{channel.name}**",
-  "MESSAGE_DELETE_BARE": "🗑 Message (`{messageId}`) deleted in **#{channel.name}** (no more info available due to bot restart)",
+  "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **#{channel.name}** ({archiveUrl})",
+  "MESSAGE_DELETE_BARE": "🗑 Message (`{messageId}`) deleted in **#{channel.name}** (no more info available)",
 
   "VOICE_CHANNEL_JOIN": "🎙 🔵 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined **{channel.name}**",
   "VOICE_CHANNEL_MOVE": "🎙 ↔ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) moved from **{oldChannel.name}** to **{newChannel.name}**",
@@ -35,9 +35,9 @@
 
   "COMMAND": "🤖 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) used command in **#{channel.name}**:\n`{command}`",
 
-  "SPAM_DETECTED": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam detected in **#{channel.name}**: {description} (more than {limit} in {interval}s)\n{logUrl}",
+  "SPAM_DETECTED": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) spam detected in **#{channel.name}**: {description} (more than {limit} in {interval}s)\n{archiveUrl}",
   "CENSOR": "🛑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) censored message in **#{channel.name}** (`{channel.id}`) {reason}:\n```{messageText}```",
-  "CLEAN": "🚿 **{mod.username}#{mod.discriminator}** (`{mod.id}`) cleaned **{count}** message(s) in **#{channel.name}**",
+  "CLEAN": "🚿 **{mod.username}#{mod.discriminator}** (`{mod.id}`) cleaned **{count}** message(s) in **#{channel.name}**\n{archiveUrl}",
 
   "CASE_CREATE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) manually created new **{caseType}** case (#{caseNum})",
 

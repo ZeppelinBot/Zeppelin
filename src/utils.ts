@@ -173,58 +173,6 @@ export function getEmojiInString(str: string): string[] {
   return str.match(anyEmojiRegex) || [];
 }
 
-export type MessageFilterFn = (msg: Message) => boolean;
-export type StopFn = (msg: Message) => boolean;
-
-export async function getMessages(
-  channel: TextChannel,
-  filter: MessageFilterFn = null,
-  maxCount: number = 50,
-  stopFn: StopFn = null
-): Promise<Message[]> {
-  let messages: Message[] = [];
-  let before;
-
-  if (!filter) {
-    filter = () => true;
-  }
-
-  while (true) {
-    const newMessages = await channel.getMessages(50, before);
-    if (newMessages.length === 0) break;
-
-    before = newMessages[newMessages.length - 1].id;
-
-    const filtered = newMessages.filter(filter);
-    messages.push(...filtered);
-
-    if (messages.length >= maxCount) {
-      messages = messages.slice(0, maxCount);
-      break;
-    }
-
-    if (stopFn && newMessages.some(stopFn)) {
-      break;
-    }
-  }
-
-  return messages;
-}
-
-export async function cleanMessagesInChannel(
-  bot: Client,
-  channel: TextChannel,
-  count: number,
-  userId: string = null,
-  reason: string = null
-) {
-  const messages = await getMessages(channel, msg => !userId || msg.author.id === userId, count);
-  const ids = messages.map(m => m.id);
-  if (ids) {
-    await bot.deleteMessages(channel.id, ids, reason);
-  }
-}
-
 export function trimLines(str: string) {
   return str
     .trim()
