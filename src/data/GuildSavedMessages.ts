@@ -11,12 +11,16 @@ const RETENTION_PERIOD = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 export class GuildSavedMessages extends BaseRepository {
   private messages: Repository<SavedMessage>;
+  protected toBePermanent: Set<string>;
+
   public events: QueuedEventEmitter;
 
   constructor(guildId) {
     super(guildId);
     this.messages = getRepository(SavedMessage);
     this.events = new QueuedEventEmitter();
+
+    this.toBePermanent = new Set();
 
     this.cleanup();
     setInterval(() => this.cleanup(), CLEANUP_INTERVAL);
@@ -84,6 +88,12 @@ export class GuildSavedMessages extends BaseRepository {
   }
 
   async create(data) {
+    const isPermanent = this.toBePermanent.has(data.id);
+    if (isPermanent) {
+      data.is_permanent = true;
+      this.toBePermanent.delete(data.id);
+    }
+
     try {
       await this.messages.insert(data);
     } catch (e) {
@@ -144,5 +154,19 @@ export class GuildSavedMessages extends BaseRepository {
   async saveEditFromMsg(msg: Message) {
     const newData = this.msgToSavedMessageData(msg);
     return this.saveEdit(msg.id, newData);
+  }
+
+  async setPermanent(id: string) {
+    const savedMsg = await this.find(id);
+    if (savedMsg) {
+      await this.messages.update(
+        { id },
+        {
+          is_permanent: true
+        }
+      );
+    } else {
+      this.toBePermanent.add(id);
+    }
   }
 }

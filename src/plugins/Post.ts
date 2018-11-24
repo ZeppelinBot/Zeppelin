@@ -42,7 +42,7 @@ export class PostPlugin extends Plugin {
     }
 
     const createdMsg = await args.channel.createMessage(args.content);
-    await this.savedMessages.createFromMsg(createdMsg, { is_permanent: true });
+    await this.savedMessages.setPermanent(createdMsg.id);
   }
 
   /**
@@ -64,6 +64,5 @@ export class PostPlugin extends Plugin {
     }
 
     const edited = await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
-    await this.savedMessages.saveEditFromMsg(edited);
   }
 }

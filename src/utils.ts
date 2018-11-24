@@ -1,8 +1,9 @@
 import at = require("lodash.at");
-import { Client, Guild, GuildAuditLogEntry, Message, TextChannel } from "eris";
+import { Client, Guild, GuildAuditLogEntry, GuildChannel, Message, TextChannel } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
+import { GuildSavedMessages } from "./data/GuildSavedMessages";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -166,10 +167,7 @@ export function getInviteCodesInString(str: string): string[] {
 
 export const unicodeEmojiRegex = emojiRegex();
 export const customEmojiRegex = /<:(?:.*?):(\d+)>/g;
-export const anyEmojiRegex = new RegExp(
-  `(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`,
-  "g"
-);
+export const anyEmojiRegex = new RegExp(`(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`, "g");
 
 export function getEmojiInString(str: string): string[] {
   return str.match(anyEmojiRegex) || [];
@@ -273,6 +271,14 @@ export function getRoleMentions(str: string) {
  */
 export function disableLinkPreviews(str: string): string {
   return str.replace(/(?<!\<)(https?:\/\/\S+)/gi, "<$1>");
+}
+
+export function deactivateMentions(content: string): string {
+  return content.replace(/@/g, "@\u200b");
+}
+
+export function disableCodeBlocks(content: string): string {
+  return content.replace(/`/g, "`\u200b");
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
