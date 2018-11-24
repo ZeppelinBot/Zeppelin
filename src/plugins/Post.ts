@@ -48,22 +48,22 @@ export class PostPlugin extends Plugin {
   /**
    * Edit the specified message posted by the bot
    */
-  @d.command("edit", "<channel:channel> <messageId:string> <content:string$>")
+  @d.command("edit", "<messageId:string> <content:string$>")
   @d.permission("edit")
-  async editCmd(msg, args) {
-    const message = await this.bot.getMessage(args.channel.id, args.messageId);
+  async editCmd(msg, args: { messageId: string; content: string }) {
+    const savedMessage = await this.savedMessages.find(args.messageId);
 
-    if (!message) {
-      args.channel.createMessage(errorMessage("Unknown message"));
+    if (!savedMessage) {
+      msg.channel.createMessage(errorMessage("Unknown message"));
       return;
     }
 
-    if (message.author.id !== this.bot.user.id) {
-      args.channel.createMessage(errorMessage("Message wasn't posted by me"));
+    if (savedMessage.user_id !== this.bot.user.id) {
+      msg.channel.createMessage(errorMessage("Message wasn't posted by me"));
       return;
     }
 
-    const edited = await message.edit(args.content);
+    const edited = await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
     await this.savedMessages.saveEditFromMsg(edited);
   }
 }
