@@ -13,6 +13,7 @@ import { GuildArchives } from "../data/GuildArchives";
 
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
+const CLEAN_COMMAND_DELETE_DELAY = 5000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
@@ -136,7 +137,9 @@ export class UtilityPlugin extends Plugin {
     this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
     this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
 
-    await this.bot.deleteMessages(channel.id, savedMessages.map(m => m.id));
+    const idsToDelete = savedMessages.map(m => m.id);
+    await this.bot.deleteMessages(channel.id, idsToDelete);
+    await this.savedMessages.markBulkAsDeleted(idsToDelete);
 
     savedMessages.reverse();
     const user = this.bot.users.get(savedMessages[0].user_id);
@@ -165,9 +168,14 @@ export class UtilityPlugin extends Plugin {
       await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
-    msg.channel.createMessage(
+    const responseMsg = await msg.channel.createMessage(
       successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
+
+    setTimeout(() => {
+      msg.delete().catch(() => {});
+      responseMsg.delete().catch(() => {});
+    }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
   @d.command("clean user", "<userId:string> <count:number>")
@@ -183,9 +191,14 @@ export class UtilityPlugin extends Plugin {
       await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
-    msg.channel.createMessage(
+    const responseMsg = await msg.channel.createMessage(
       successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
+
+    setTimeout(() => {
+      msg.delete().catch(() => {});
+      responseMsg.delete().catch(() => {});
+    }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
   @d.command("clean bot", "<count:number>")
@@ -201,9 +214,14 @@ export class UtilityPlugin extends Plugin {
       await this.cleanMessages(msg.channel, messagesToClean, msg.author);
     }
 
-    msg.channel.createMessage(
+    const responseMsg = await msg.channel.createMessage(
       successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
     );
+
+    setTimeout(() => {
+      msg.delete().catch(() => {});
+      responseMsg.delete().catch(() => {});
+    }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
   @d.command("info", "<userId:userId>")
