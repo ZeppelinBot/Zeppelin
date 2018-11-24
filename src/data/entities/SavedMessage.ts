@@ -2,13 +2,13 @@ import { Entity, Column, PrimaryColumn } from "typeorm";
 import { Message } from "eris";
 
 export interface ISavedMessageData {
-  attachments: object[];
+  attachments?: object[];
   author: {
     username: string;
     discriminator: string;
   };
   content: string;
-  embeds: object[];
+  embeds?: object[];
 }
 
 @Entity("messages")

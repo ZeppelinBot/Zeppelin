@@ -23,15 +23,18 @@ export class GuildSavedMessages extends BaseRepository {
   }
 
   public msgToSavedMessageData(msg: Message): ISavedMessageData {
-    return {
-      attachments: msg.attachments,
+    const data: ISavedMessageData = {
       author: {
         username: msg.author.username,
         discriminator: msg.author.discriminator
       },
-      content: msg.content,
-      embeds: msg.embeds
+      content: msg.content
     };
+
+    if (msg.attachments.length) data.attachments = msg.attachments;
+    if (msg.embeds.length) data.embeds = msg.embeds;
+
+    return data;
   }
 
   async cleanup() {
