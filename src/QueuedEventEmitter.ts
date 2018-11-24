@@ -32,7 +32,7 @@ export class QueuedEventEmitter {
     const listeners = [...(this.listeners.get(eventName) || []), ...(this.listeners.get("*") || [])];
 
     listeners.forEach(listener => {
-      this.queue.add(listener.bind(null, args));
+      this.queue.add(listener.bind(null, ...args));
     });
   }
 }

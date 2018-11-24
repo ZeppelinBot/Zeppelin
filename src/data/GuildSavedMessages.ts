@@ -73,6 +73,16 @@ export class GuildSavedMessages extends BaseRepository {
       .getOne();
   }
 
+  getUserMessagesByChannelAfterId(userId, channelId, afterId) {
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .where("user_id = :user_id", { user_id: userId })
+      .where("channel_id = :channel_id", { channel_id: channelId })
+      .where("id > :afterId", { afterId })
+      .getMany();
+  }
+
   async create(data) {
     try {
       await this.messages.insert(data);
@@ -128,7 +138,7 @@ export class GuildSavedMessages extends BaseRepository {
       }
     );
 
-    this.events.emit("edit", [newMessage, oldMessage]);
+    this.events.emit("update", [newMessage, oldMessage]);
   }
 
   async saveEditFromMsg(msg: Message) {
