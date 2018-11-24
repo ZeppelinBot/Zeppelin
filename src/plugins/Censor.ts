@@ -5,9 +5,15 @@ import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { getInviteCodesInString, getUrlsInString, stripObjectToScalars } from "../utils";
 import { ZalgoRegex } from "../data/Zalgo";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { SavedMessage } from "../data/entities/SavedMessage";
 
 export class CensorPlugin extends Plugin {
   protected serverLogs: GuildLogs;
+  protected savedMessages: GuildSavedMessages;
+
+  private onMessageCreateFn;
+  private onMessageUpdateFn;
 
   getDefaultOptions() {
     return {
@@ -46,58 +52,94 @@ export class CensorPlugin extends Plugin {
 
   onLoad() {
     this.serverLogs = new GuildLogs(this.guildId);
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+
+    this.onMessageCreateFn = this.onMessageCreate.bind(this);
+    this.onMessageUpdateFn = this.onMessageUpdate.bind(this);
+    this.savedMessages.events.on("create", this.onMessageCreateFn);
+    this.savedMessages.events.on("update", this.onMessageUpdateFn);
   }
 
-  async censorMessage(msg: Message, reason: string) {
-    this.serverLogs.ignoreLog(LogType.MESSAGE_DELETE, msg.id);
+  onUnload() {
+    this.savedMessages.events.off("create", this.onMessageCreateFn);
+    this.savedMessages.events.off("update", this.onMessageUpdateFn);
+  }
+
+  async censorMessage(savedMessage: SavedMessage, reason: string) {
+    this.serverLogs.ignoreLog(LogType.MESSAGE_DELETE, savedMessage.id);
 
     try {
-      await msg.delete("Censored");
+      await this.bot.deleteMessage(savedMessage.channel_id, savedMessage.id, "Censored");
     } catch (e) {
       return;
     }
 
+    const member = this.guild.members.get(savedMessage.user_id);
+    const channel = this.guild.channels.get(savedMessage.channel_id);
+
     this.serverLogs.log(LogType.CENSOR, {
-      member: stripObjectToScalars(msg.member, ["user"]),
-      channel: stripObjectToScalars(msg.channel),
+      member: stripObjectToScalars(member, ["user"]),
+      channel: stripObjectToScalars(channel),
       reason,
-      messageText: msg.cleanContent
+      messageText: savedMessage.data.content
     });
   }
 
-  async applyFiltersToMsg(msg: Message) {
-    if (!msg.author || msg.author.bot) return;
-    if (msg.type !== 0) return;
-    if (!msg.content) return;
+  async applyFiltersToMsg(savedMessage: SavedMessage) {
+    if (!savedMessage.data.content) return;
 
     // Filter zalgo
-    if (this.configValueForMsg(msg, "filter_zalgo")) {
-      const result = ZalgoRegex.exec(msg.content);
+    const filterZalgo = this.configValueForMemberIdAndChannelId(
+      savedMessage.user_id,
+      savedMessage.channel_id,
+      "filter_zalgo"
+    );
+    if (filterZalgo) {
+      const result = ZalgoRegex.exec(savedMessage.data.content);
       if (result) {
-        this.censorMessage(msg, `zalgo detected`);
+        this.censorMessage(savedMessage, "zalgo detected");
         return;
       }
     }
 
     // Filter invites
-    if (this.configValueForMsg(msg, "filter_invites")) {
-      const inviteGuildWhitelist: string[] = this.configValueForMsg(msg, "invite_guild_whitelist");
-      const inviteGuildBlacklist: string[] = this.configValueForMsg(msg, "invite_guild_blacklist");
-      const inviteCodeWhitelist: string[] = this.configValueForMsg(msg, "invite_code_whitelist");
-      const inviteCodeBlacklist: string[] = this.configValueForMsg(msg, "invite_code_blacklist");
-
-      const inviteCodes = getInviteCodesInString(msg.content);
-
-      let invites: Invite[] = await Promise.all(
-        inviteCodes.map(code => this.bot.getInvite(code).catch(() => null))
+    const filterInvites = this.configValueForMemberIdAndChannelId(
+      savedMessage.user_id,
+      savedMessage.channel_id,
+      "filter_invites"
+    );
+    if (filterInvites) {
+      const inviteGuildWhitelist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "invite_guild_whitelist"
       );
+      const inviteGuildBlacklist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "invite_guild_blacklist"
+      );
+      const inviteCodeWhitelist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "invite_code_whitelist"
+      );
+      const inviteCodeBlacklist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "invite_code_blacklist"
+      );
+
+      const inviteCodes = getInviteCodesInString(savedMessage.data.content);
+
+      let invites: Invite[] = await Promise.all(inviteCodes.map(code => this.bot.getInvite(code).catch(() => null)));
 
       invites = invites.filter(v => !!v);
 
       for (const invite of invites) {
         if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
           this.censorMessage(
-            msg,
+            savedMessage,
             `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) not found in whitelist`
           );
           return;
@@ -105,80 +147,94 @@ export class CensorPlugin extends Plugin {
 
         if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild.id)) {
           this.censorMessage(
-            msg,
+            savedMessage,
             `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) found in blacklist`
           );
           return;
         }
 
         if (inviteCodeWhitelist && !inviteCodeWhitelist.includes(invite.code)) {
-          this.censorMessage(msg, `invite code (\`${invite.code}\`) not found in whitelist`);
+          this.censorMessage(savedMessage, `invite code (\`${invite.code}\`) not found in whitelist`);
           return;
         }
 
         if (inviteCodeBlacklist && inviteCodeBlacklist.includes(invite.code)) {
-          this.censorMessage(msg, `invite code (\`${invite.code}\`) found in blacklist`);
+          this.censorMessage(savedMessage, `invite code (\`${invite.code}\`) found in blacklist`);
           return;
         }
       }
     }
 
     // Filter domains
-    if (this.configValueForMsg(msg, "filter_domains")) {
-      const domainWhitelist: string[] = this.configValueForMsg(msg, "domain_whitelist");
-      const domainBlacklist: string[] = this.configValueForMsg(msg, "domain_blacklist");
+    const filterDomains = this.configValueForMemberIdAndChannelId(
+      savedMessage.user_id,
+      savedMessage.channel_id,
+      "filter_domains"
+    );
+    if (filterDomains) {
+      const domainWhitelist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "domain_whitelist"
+      );
+      const domainBlacklist: string[] = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "domain_blacklist"
+      );
 
-      const urls = getUrlsInString(msg.content);
+      const urls = getUrlsInString(savedMessage.data.content);
       for (const thisUrl of urls) {
         if (domainWhitelist && !domainWhitelist.includes(thisUrl.hostname)) {
-          this.censorMessage(msg, `domain (\`${thisUrl.hostname}\`) not found in whitelist`);
+          this.censorMessage(savedMessage, `domain (\`${thisUrl.hostname}\`) not found in whitelist`);
           return;
         }
 
         if (domainBlacklist && domainBlacklist.includes(thisUrl.hostname)) {
-          this.censorMessage(msg, `domain (\`${thisUrl.hostname}\`) found in blacklist`);
+          this.censorMessage(savedMessage, `domain (\`${thisUrl.hostname}\`) found in blacklist`);
           return;
         }
       }
     }
 
     // Filter tokens
-    const blockedTokens = this.configValueForMsg(msg, "blocked_tokens") || [];
+    const blockedTokens =
+      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_tokens") || [];
     for (const token of blockedTokens) {
-      if (msg.content.toLowerCase().includes(token.toLowerCase())) {
-        this.censorMessage(msg, `blocked token (\`${token}\`) found`);
+      if (savedMessage.data.content.toLowerCase().includes(token.toLowerCase())) {
+        this.censorMessage(savedMessage, `blocked token (\`${token}\`) found`);
         return;
       }
     }
 
     // Filter words
-    const blockedWords = this.configValueForMsg(msg, "blocked_words") || [];
+    const blockedWords =
+      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_words") || [];
     for (const word of blockedWords) {
       const regex = new RegExp(`\\b${escapeStringRegexp(word)}\\b`, "i");
-      if (regex.test(msg.content)) {
-        this.censorMessage(msg, `blocked word (\`${word}\`) found`);
+      if (regex.test(savedMessage.data.content)) {
+        this.censorMessage(savedMessage, `blocked word (\`${word}\`) found`);
         return;
       }
     }
 
     // Filter regex
-    const blockedRegex = this.configValueForMsg(msg, "blocked_regex") || [];
+    const blockedRegex =
+      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_regex") || [];
     for (const regexStr of blockedRegex) {
       const regex = new RegExp(regexStr);
-      if (regex.test(msg.content)) {
-        this.censorMessage(msg, `blocked regex (\`${regexStr}\`) found`);
+      if (regex.test(savedMessage.data.content)) {
+        this.censorMessage(savedMessage, `blocked regex (\`${regexStr}\`) found`);
         return;
       }
     }
   }
 
-  @d.event("messageCreate")
-  async onMessageCreate(msg: Message) {
-    this.applyFiltersToMsg(msg);
+  async onMessageCreate(savedMessage: SavedMessage) {
+    this.applyFiltersToMsg(savedMessage);
   }
 
-  @d.event("messageUpdate")
-  async onMessageUpdate(msg: Message) {
-    this.applyFiltersToMsg(msg);
+  async onMessageUpdate(savedMessage: SavedMessage) {
+    this.applyFiltersToMsg(savedMessage);
   }
 }
