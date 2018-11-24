@@ -21,7 +21,8 @@ export class GuildArchives extends BaseRepository {
   private deleteExpiredArchives() {
     this.archives
       .createQueryBuilder()
-      .where("expires_at <= NOW()")
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("expires_at <= NOW()")
       .delete()
       .execute();
   }

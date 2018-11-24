@@ -44,6 +44,7 @@ import { CensorPlugin } from "./plugins/Censor";
 import { PersistPlugin } from "./plugins/Persist";
 import { SpamPlugin } from "./plugins/Spam";
 import { TagsPlugin } from "./plugins/Tags";
+import { MessageSaverPlugin } from "./plugins/MessageSaver";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -57,6 +58,8 @@ connect().then(async conn => {
 
   const bot = new Knub(client, {
     plugins: {
+      messageSaver: MessageSaverPlugin,
+
       utility: UtilityPlugin,
       mod_actions: ModActionsPlugin,
       logs: LogsPlugin,
@@ -77,7 +80,7 @@ connect().then(async conn => {
         const plugins = guildConfig.plugins || {};
         const keys: string[] = Array.from(this.plugins.keys());
         return keys.filter(pluginName => {
-          return plugins[pluginName] && plugins[pluginName].enabled !== false;
+          return (plugins[pluginName] && plugins[pluginName].enabled !== false) || pluginName === "messageSaver";
         });
       },
 
