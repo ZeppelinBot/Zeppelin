@@ -28,11 +28,14 @@ export class QueuedEventEmitter {
     listeners.splice(listeners.indexOf(listener), 1);
   }
 
-  emit(eventName: string, args: any[] = []) {
+  emit(eventName: string, args: any[] = []): Promise<void> {
     const listeners = [...(this.listeners.get(eventName) || []), ...(this.listeners.get("*") || [])];
 
+    let promise: Promise<any> = Promise.resolve();
     listeners.forEach(listener => {
-      this.queue.add(listener.bind(null, ...args));
+      promise = this.queue.add(listener.bind(null, ...args));
     });
+
+    return promise;
   }
 }

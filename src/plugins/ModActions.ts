@@ -1,14 +1,10 @@
-import { decorators as d, Plugin, waitForReaction, waitForReply } from "knub";
+import { decorators as d, waitForReaction, waitForReply } from "knub";
 import { Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
-import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import chunk from "lodash.chunk";
 import { GuildCases } from "../data/GuildCases";
 import {
-  chunkLines,
   chunkMessageLines,
   convertDelayStringToMS,
-  DBDateFormat,
   disableLinkPreviews,
   errorMessage,
   findRelevantAuditLogEntry,
@@ -18,12 +14,14 @@ import {
   trimLines
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
-import { Case } from "../data/entities/Case";
 import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import Timer = NodeJS.Timer;
-import { CaseTypeColors } from "../data/CaseTypeColors";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { GuildActions } from "../data/GuildActions";
+import { Case } from "../data/entities/Case";
+import { Mute } from "../data/entities/Mute";
 
 enum IgnoredEventType {
   Ban = 1,
@@ -38,35 +36,26 @@ interface IIgnoredEvent {
 
 const CASE_LIST_REASON_MAX_LENGTH = 80;
 
-export class ModActionsPlugin extends Plugin {
-  public mutes: GuildMutes;
+export class ModActionsPlugin extends ZeppelinPlugin {
+  protected actions: GuildActions;
+  protected mutes: GuildMutes;
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
-
-  protected muteClearIntervalId: Timer;
 
   protected ignoredEvents: IIgnoredEvent[];
 
   async onLoad() {
-    this.cases = GuildCases.getInstance(this.guildId);
+    this.actions = GuildActions.getInstance(this.guildId);
     this.mutes = GuildMutes.getInstance(this.guildId);
+    this.cases = GuildCases.getInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
 
     this.ignoredEvents = [];
-
-    // Check for expired mutes every 5s
-    this.clearExpiredMutes();
-    this.muteClearIntervalId = setInterval(() => this.clearExpiredMutes(), 5000);
-  }
-
-  async onUnload() {
-    clearInterval(this.muteClearIntervalId);
   }
 
   getDefaultOptions() {
     return {
       config: {
-        mute_role: null,
         dm_on_warn: true,
         dm_on_mute: false,
         dm_on_kick: false,
@@ -81,8 +70,6 @@ export class ModActionsPlugin extends Plugin {
         timed_mute_message: "You have been muted on {guildName} for {time}. Reason given: {reason}",
         kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
-        log_automatic_actions: true,
-        case_log_channel: null,
         alert_on_rejoin: false,
         alert_channel: null
       },
@@ -157,9 +144,19 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createCase(user.id, modId, CaseTypes.Ban, auditLogId, relevantAuditLogEntry.reason, true);
+      this.actions.fire("createCase", {
+        userId: user.id,
+        modId,
+        type: CaseTypes.Ban,
+        auditLogId,
+        reason: relevantAuditLogEntry.reason,
+        automatic: true
+      });
     } else {
-      await this.createCase(user.id, null, CaseTypes.Ban);
+      this.actions.fire("createCase", {
+        userId: user.id,
+        type: CaseTypes.Ban
+      });
     }
   }
 
@@ -184,9 +181,19 @@ export class ModActionsPlugin extends Plugin {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      await this.createCase(user.id, modId, CaseTypes.Unban, auditLogId, null, true);
+      this.actions.fire("createCase", {
+        userId: user.id,
+        modId,
+        type: CaseTypes.Unban,
+        auditLogId,
+        automatic: true
+      });
     } else {
-      await this.createCase(user.id, null, CaseTypes.Unban);
+      this.actions.fire("createCase", {
+        userId: user.id,
+        type: CaseTypes.Unban,
+        automatic: true
+      });
     }
   }
 
@@ -226,14 +233,15 @@ export class ModActionsPlugin extends Plugin {
     );
 
     if (kickAuditLogEntry) {
-      this.createCase(
-        member.id,
-        kickAuditLogEntry.user.id,
-        CaseTypes.Kick,
-        kickAuditLogEntry.id,
-        kickAuditLogEntry.reason,
-        true
-      );
+      this.actions.fire("createCase", {
+        userId: member.id,
+        modId: kickAuditLogEntry.user.id,
+        type: CaseTypes.Kick,
+        auditLogId: kickAuditLogEntry.id,
+        reason: kickAuditLogEntry.reason,
+        automatic: true
+      });
+
       this.serverLogs.log(LogType.MEMBER_KICK, {
         user: stripObjectToScalars(member.user),
         mod: stripObjectToScalars(kickAuditLogEntry.user)
@@ -249,24 +257,16 @@ export class ModActionsPlugin extends Plugin {
   async updateCmd(msg: Message, args: any) {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
     if (!theCase) {
-      msg.channel.createMessage("Case not found!");
+      msg.channel.createMessage(errorMessage("Case not found"));
       return;
     }
 
-    if (theCase.mod_id === null) {
-      // If the action has no moderator information, assume the first one to update it did the action
-      await this.cases.update(theCase.id, {
-        mod_id: msg.author.id,
-        mod_name: `${msg.author.username}#${msg.author.discriminator}`
-      });
-    }
+    await this.actions.fire("createCaseNote", theCase, {
+      modId: msg.author.id,
+      note: args.note
+    });
 
-    await this.createCaseNote(theCase.id, msg.author.id, args.note);
-    this.postCaseToCaseLog(theCase.id); // Post updated case to case log
-
-    if (msg.channel.id !== this.configValue("case_log_channel")) {
-      msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
-    }
+    msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
   }
 
   @d.command("note", "<userId:userId> <note:string$>")
@@ -275,7 +275,13 @@ export class ModActionsPlugin extends Plugin {
     const user = await this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "member";
 
-    await this.createCase(args.userId, msg.author.id, CaseTypes.Note, null, args.note);
+    await this.actions.fire("createCase", {
+      userId: args.userId,
+      modId: msg.author.id,
+      type: CaseTypes.Note,
+      reason: args.note
+    });
+
     msg.channel.createMessage(successMessage(`Note added on ${userName}`));
   }
 
@@ -309,7 +315,12 @@ export class ModActionsPlugin extends Plugin {
       }
     }
 
-    await this.createCase(args.member.id, msg.author.id, CaseTypes.Warn, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Warn,
+      reason: args.reason
+    });
 
     msg.channel.createMessage(
       successMessage(`Warned **${args.member.user.username}#${args.member.user.discriminator}**`)
@@ -319,11 +330,6 @@ export class ModActionsPlugin extends Plugin {
       mod: stripObjectToScalars(msg.member.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
-  }
-
-  public async muteMember(member: Member, muteTime: number = null, reason: string = null) {
-    await member.addRole(this.configValue("mute_role"));
-    await this.mutes.addOrUpdateMute(member.id, muteTime);
   }
 
   @d.command("mute", "<member:Member> [time:string] [reason:string$]")
@@ -353,20 +359,35 @@ export class ModActionsPlugin extends Plugin {
 
     // Apply "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
-    await this.muteMember(args.member, muteTime, args.reason);
+    const mute: Mute = await this.actions.fire("mute", {
+      member: args.member,
+      muteTime
+    });
 
-    const mute = await this.mutes.findExistingMuteForUserId(args.member.id);
-    const hasOldCase = mute && mute.case_id != null;
+    if (!mute) {
+      msg.channel.createMessage(errorMessage("Could not mute the user"));
+      return;
+    }
+
+    const hasOldCase = mute.case_id != null;
 
     if (hasOldCase) {
       if (args.reason) {
-        await this.createCaseNote(mute.case_id, msg.author.id, args.reason);
-        this.postCaseToCaseLog(mute.case_id);
+        // Update old case
+        await this.actions.fire("createCaseNote", mute.case_id, {
+          modId: msg.author.id,
+          note: args.reason
+        });
       }
     } else {
-      // Create a case
-      const caseId = await this.createCase(args.member.id, msg.author.id, CaseTypes.Mute, null, args.reason);
-      await this.mutes.setCaseId(args.member.id, caseId);
+      // Create new case
+      const theCase: Case = await this.actions.fire("createCase", {
+        userId: args.member.id,
+        modId: msg.author.id,
+        type: CaseTypes.Mute,
+        reason: args.reason
+      });
+      await this.mutes.setCaseId(args.member.id, theCase.id);
     }
 
     // Message the user informing them of the mute
@@ -438,7 +459,7 @@ export class ModActionsPlugin extends Plugin {
     if (unmuteTime) {
       // If we have an unmute time, just update the old mute to expire in that time
       const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
-      this.mutes.addOrUpdateMute(args.member.id, unmuteTime);
+      await this.actions.fire("unmute", { member: args.member, unmuteTime });
       args.reason = args.reason ? `Timed unmute: ${args.reason}` : "Timed unmute";
 
       // Confirm the action to the moderator
@@ -450,8 +471,7 @@ export class ModActionsPlugin extends Plugin {
     } else {
       // Otherwise remove "muted" role immediately
       this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
-      await args.member.removeRole(this.configValue("mute_role"));
-      await this.mutes.clear(args.member.id);
+      await this.actions.fire("unmute", { member: args.member });
 
       // Confirm the action to the moderator
       msg.channel.createMessage(
@@ -460,7 +480,12 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Create a case
-    await this.createCase(args.member.id, msg.author.id, CaseTypes.Unmute, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Unmute,
+      reason: args.reason
+    });
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNMUTE, {
@@ -472,76 +497,12 @@ export class ModActionsPlugin extends Plugin {
   @d.command("mutes")
   @d.permission("view")
   async mutesCmd(msg: Message) {
-    const lines = [];
-
-    // Active, logged mutes
-    const activeMutes = await this.mutes.getActiveMutes();
-    activeMutes.sort((a, b) => {
-      if (a.expires_at == null && b.expires_at != null) return 1;
-      if (b.expires_at == null && a.expires_at != null) return -1;
-      if (a.expires_at == null && b.expires_at == null) {
-        return a.created_at > b.created_at ? -1 : 1;
-      }
-      return a.expires_at > b.expires_at ? 1 : -1;
-    });
-
-    const caseIds = activeMutes.map(m => m.case_id).filter(v => !!v);
-    const cases = caseIds.length ? await this.cases.get(caseIds) : [];
-    const casesById = cases.reduce((map, c) => map.set(c.id, c), new Map());
-
-    lines.push(
-      ...activeMutes.map(mute => {
-        const user = this.bot.users.get(mute.user_id);
-        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-        const theCase = casesById[mute.case_id] || null;
-        const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
-
-        let line = `\`${caseName}\` **${username}** (\`${mute.user_id}\`)`;
-
-        if (mute.expires_at) {
-          const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
-          const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
-          line += ` (expires in ${humanizedTime})`;
-        } else {
-          line += ` (doesn't expire)`;
-        }
-
-        const mutedAt = moment(mute.created_at, DBDateFormat);
-        line += ` (muted at ${mutedAt.format("YYYY-MM-DD HH:mm:ss")})`;
-
-        return line;
-      })
-    );
-
-    // Manually added mute roles
-    const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
-    const manuallyMutedMembers = [];
-    const muteRole = this.configValue("mute_role");
-
-    if (muteRole) {
-      this.guild.members.forEach(member => {
-        if (muteUserIds.has(member.id)) return;
-        if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
-      });
-    }
-
-    lines.push(
-      ...manuallyMutedMembers.map(member => {
-        return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
-      })
-    );
-
-    const chunks = chunk(lines, 15);
-    for (const [i, chunkLines] of chunks.entries()) {
-      let body = chunkLines.join("\n");
-      if (i === 0) body = `Active mutes:\n\n${body}`;
-      msg.channel.createMessage(body);
-    }
+    this.actions.fire("postMuteList", msg.channel);
   }
 
   @d.command("kick", "<member:Member> [reason:string$]")
   @d.permission("kick")
-  async kickCmd(msg, args) {
+  async kickCmd(msg, args: { member: Member; reason: string }) {
     // Make sure we're allowed to kick this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot kick: insufficient permissions"));
@@ -570,7 +531,12 @@ export class ModActionsPlugin extends Plugin {
     args.member.kick(args.reason);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseTypes.Kick, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Kick,
+      reason: args.reason
+    });
 
     // Confirm the action to the moderator
     let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}**`;
@@ -615,7 +581,12 @@ export class ModActionsPlugin extends Plugin {
     args.member.ban(1, args.reason);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseTypes.Ban, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Ban,
+      reason: args.reason
+    });
 
     // Confirm the action to the moderator
     let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}**`;
@@ -648,7 +619,12 @@ export class ModActionsPlugin extends Plugin {
     await this.guild.unbanMember(args.member.id);
 
     // Create a case for this action
-    await this.createCase(args.member.id, msg.author.id, CaseTypes.Softban, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Softban,
+      reason: args.reason
+    });
 
     // Confirm the action to the moderator
     msg.channel.createMessage(
@@ -679,7 +655,12 @@ export class ModActionsPlugin extends Plugin {
     msg.channel.createMessage(successMessage("Member unbanned!"));
 
     // Create a case
-    this.createCase(args.userId, msg.author.id, CaseTypes.Unban, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Unban,
+      reason: args.reason
+    });
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
@@ -712,7 +693,12 @@ export class ModActionsPlugin extends Plugin {
     msg.channel.createMessage(successMessage("Member forcebanned!"));
 
     // Create a case
-    this.createCase(args.userId, msg.author.id, CaseTypes.Ban, null, args.reason);
+    await this.actions.fire("createCase", {
+      userId: args.userId,
+      modId: msg.author.id,
+      type: CaseTypes.Ban,
+      reason: args.reason
+    });
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
@@ -766,7 +752,14 @@ export class ModActionsPlugin extends Plugin {
     for (const userId of args.userIds) {
       try {
         await this.guild.banMember(userId);
-        await this.createCase(userId, msg.author.id, CaseTypes.Ban, null, `Mass ban: ${banReason}`, false, false);
+
+        await this.actions.fire("createCase", {
+          userId,
+          modId: msg.author.id,
+          type: CaseTypes.Ban,
+          reason: `Mass ban: ${banReason}`,
+          postInCaseLog: false
+        });
       } catch (e) {
         failedBans.push(userId);
       }
@@ -820,11 +813,16 @@ export class ModActionsPlugin extends Plugin {
     }
 
     // Create the case
-    const caseId = await this.createCase(args.target, msg.author.id, CaseTypes[type], null, args.reason);
-    const theCase = await this.cases.find(caseId);
+    const theCase: Case = await this.actions.fire("createCase", {
+      userId: args.target,
+      modId: msg.author.id,
+      type: CaseTypes[type],
+      reason: args.reason
+    });
+
+    msg.channel.createMessage(successMessage("Case created!"));
 
     // Log the action
-    msg.channel.createMessage(successMessage("Case created!"));
     this.serverLogs.log(LogType.CASE_CREATE, {
       mod: stripObjectToScalars(msg.member.user),
       userId: args.userId,
@@ -845,11 +843,14 @@ export class ModActionsPlugin extends Plugin {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
 
     if (!theCase) {
-      msg.channel.createMessage("Case not found!");
+      msg.channel.createMessage(errorMessage("Case not found"));
       return;
     }
 
-    this.displayCase(theCase.id, msg.channel.id);
+    await this.actions.fire("postCase", {
+      caseId: theCase.id,
+      channel: msg.channel
+    });
   }
 
   @d.command(/cases|usercases/, "<userId:userId> [expanded:string]")
@@ -871,7 +872,10 @@ export class ModActionsPlugin extends Plugin {
 
         // Expanded view (= individual case embeds)
         for (const theCase of cases) {
-          await this.displayCase(theCase.id, msg.channel.id);
+          await this.actions.fire("postCase", {
+            caseId: theCase.id,
+            channel: msg.channel
+          });
         }
       } else {
         // Compact view (= regular message with a preview of each case)
@@ -948,147 +952,5 @@ export class ModActionsPlugin extends Plugin {
     }
 
     return messageSent;
-  }
-
-  /**
-   * Shows information about the specified action in a message embed.
-   * If no channelId is specified, uses the channel id from config.
-   */
-  protected async displayCase(caseOrCaseId: Case | number, channelId: string) {
-    let theCase: Case;
-    if (typeof caseOrCaseId === "number") {
-      theCase = await this.cases.with("notes").find(caseOrCaseId);
-    } else {
-      theCase = caseOrCaseId;
-    }
-
-    if (!theCase) return;
-    if (!this.guild.channels.get(channelId)) return;
-
-    const createdAt = moment(theCase.created_at);
-    const actionTypeStr = CaseTypes[theCase.type].toUpperCase();
-
-    const embed: any = {
-      title: `${actionTypeStr} - Case #${theCase.case_number}`,
-      footer: {
-        text: `Case created at ${createdAt.format("YYYY-MM-DD [at] HH:mm")}`
-      },
-      fields: [
-        {
-          name: "User",
-          value: `${theCase.user_name}\n<@!${theCase.user_id}>`,
-          inline: true
-        },
-        {
-          name: "Moderator",
-          value: `${theCase.mod_name}\n<@!${theCase.mod_id}>`,
-          inline: true
-        }
-      ]
-    };
-
-    if (CaseTypeColors[theCase.type]) {
-      embed.color = CaseTypeColors[theCase.type];
-    }
-
-    if (theCase.notes.length) {
-      theCase.notes.forEach((note: any) => {
-        const noteDate = moment(note.created_at);
-        embed.fields.push({
-          name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
-          value: note.body
-        });
-      });
-    } else {
-      embed.fields.push({
-        name: "!!! THIS CASE HAS NO NOTES !!!",
-        value: "\u200B"
-      });
-    }
-
-    const channel = this.guild.channels.get(channelId) as TextChannel;
-    await channel.createMessage({ embed });
-  }
-
-  /**
-   * Posts the specified mod action to the guild's action log channel
-   */
-  protected async postCaseToCaseLog(caseOrCaseId: Case | number) {
-    const caseLogChannelId = this.configValue("case_log_channel");
-    if (!caseLogChannelId) return;
-    if (!this.guild.channels.get(caseLogChannelId)) return;
-
-    return this.displayCase(caseOrCaseId, caseLogChannelId);
-  }
-
-  public async createCase(
-    userId: string,
-    modId: string,
-    caseType: CaseTypes,
-    auditLogId: string = null,
-    reason: string = null,
-    automatic = false,
-    postInCaseLogOverride = null
-  ): Promise<number> {
-    const user = this.bot.users.get(userId);
-    const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-
-    const mod = this.bot.users.get(modId);
-    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
-
-    const createdId = await this.cases.create({
-      type: caseType,
-      user_id: userId,
-      user_name: userName,
-      mod_id: modId,
-      mod_name: modName,
-      audit_log_id: auditLogId
-    });
-
-    if (reason) {
-      await this.createCaseNote(createdId, modId, reason);
-    }
-
-    if (
-      this.configValue("case_log_channel") &&
-      (!automatic || this.configValue("log_automatic_actions")) &&
-      postInCaseLogOverride !== false
-    ) {
-      try {
-        await this.postCaseToCaseLog(createdId);
-      } catch (e) {} // tslint:disable-line
-    }
-
-    return createdId;
-  }
-
-  protected async createCaseNote(caseId: number, modId: string, body: string) {
-    const mod = this.bot.users.get(modId);
-    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
-
-    return this.cases.createNote(caseId, {
-      mod_id: modId,
-      mod_name: modName,
-      body: body || ""
-    });
-  }
-
-  protected async clearExpiredMutes() {
-    const expiredMutes = await this.mutes.getExpiredMutes();
-    for (const mute of expiredMutes) {
-      const member = this.guild.members.get(mute.user_id);
-      if (!member) continue;
-
-      try {
-        this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
-        await member.removeRole(this.configValue("mute_role"));
-      } catch (e) {} // tslint:disable-line
-
-      await this.mutes.clear(member.id);
-
-      this.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
-        member: stripObjectToScalars(member, ["user"])
-      });
-    }
   }
 }

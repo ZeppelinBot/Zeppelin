@@ -3,7 +3,13 @@ import { Invite, Message } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { getInviteCodesInString, getUrlsInString, stripObjectToScalars } from "../utils";
+import {
+  deactivateMentions,
+  disableCodeBlocks,
+  getInviteCodesInString,
+  getUrlsInString,
+  stripObjectToScalars
+} from "../utils";
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
@@ -81,7 +87,7 @@ export class CensorPlugin extends Plugin {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel),
       reason,
-      messageText: savedMessage.data.content
+      messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content))
     });
   }
 
