@@ -29,18 +29,20 @@ export class GuildMutes extends BaseRepository {
     });
   }
 
-  async addMute(userId, expiryTime) {
+  async addMute(userId, expiryTime): Promise<Mute> {
     const expiresAt = expiryTime
       ? moment()
           .add(expiryTime, "ms")
           .format("YYYY-MM-DD HH:mm:ss")
       : null;
 
-    return this.mutes.insert({
+    const result = await this.mutes.insert({
       guild_id: this.guildId,
       user_id: userId,
       expires_at: expiresAt
     });
+
+    return this.mutes.findOne(result.identifiers[0].id);
   }
 
   async updateExpiryTime(userId, newExpiryTime) {
@@ -61,11 +63,12 @@ export class GuildMutes extends BaseRepository {
     );
   }
 
-  async addOrUpdateMute(userId, expiryTime) {
+  async addOrUpdateMute(userId, expiryTime): Promise<Mute> {
     const existingMute = await this.findExistingMuteForUserId(userId);
 
     if (existingMute) {
-      return this.updateExpiryTime(userId, expiryTime);
+      await this.updateExpiryTime(userId, expiryTime);
+      return this.findExistingMuteForUserId(userId);
     } else {
       return this.addMute(userId, expiryTime);
     }
@@ -83,7 +86,7 @@ export class GuildMutes extends BaseRepository {
       .getMany();
   }
 
-  async setCaseId(userId, caseId) {
+  async setCaseId(userId: string, caseId: number) {
     await this.mutes.update(
       {
         guild_id: this.guildId,

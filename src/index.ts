@@ -45,6 +45,8 @@ import { PersistPlugin } from "./plugins/Persist";
 import { SpamPlugin } from "./plugins/Spam";
 import { TagsPlugin } from "./plugins/Tags";
 import { MessageSaverPlugin } from "./plugins/MessageSaver";
+import { CasesPlugin } from "./plugins/Cases";
+import { MutesPlugin } from "./plugins/Mutes";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -56,10 +58,16 @@ connect().then(async conn => {
   });
   client.setMaxListeners(100);
 
+  const basePlugins = ["message_saver", "cases", "mutes"];
+
   const bot = new Knub(client, {
     plugins: {
-      messageSaver: MessageSaverPlugin,
+      // Base plugins (always enabled)
+      message_saver: MessageSaverPlugin,
+      cases: CasesPlugin,
+      mutes: MutesPlugin,
 
+      // Regular plugins
       utility: UtilityPlugin,
       mod_actions: ModActionsPlugin,
       logs: LogsPlugin,
@@ -80,7 +88,7 @@ connect().then(async conn => {
         const plugins = guildConfig.plugins || {};
         const keys: string[] = Array.from(this.plugins.keys());
         return keys.filter(pluginName => {
-          return (plugins[pluginName] && plugins[pluginName].enabled !== false) || pluginName === "messageSaver";
+          return basePlugins.includes(pluginName) || (plugins[pluginName] && plugins[pluginName].enabled !== false);
         });
       },
 

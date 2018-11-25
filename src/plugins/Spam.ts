@@ -1,7 +1,6 @@
-import { decorators as d, Plugin } from "knub";
-import { Channel, Message, User } from "eris";
+import { Plugin } from "knub";
+import { Channel, User } from "eris";
 import {
-  formatTemplateString,
   getEmojiInString,
   getRoleMentions,
   getUrlsInString,
@@ -11,12 +10,14 @@ import {
 } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
-import { ModActionsPlugin } from "./ModActions";
 import { CaseTypes } from "../data/CaseTypes";
 import { GuildArchives } from "../data/GuildArchives";
 import moment from "moment-timezone";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { GuildActions } from "../data/GuildActions";
+import { Case } from "../data/entities/Case";
+import { GuildMutes } from "../data/GuildMutes";
 
 enum RecentActionType {
   Message = 1,
@@ -42,9 +43,11 @@ const MAX_INTERVAL = 300;
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
 export class SpamPlugin extends Plugin {
+  protected actions: GuildActions;
   protected logs: GuildLogs;
   protected archives: GuildArchives;
   protected savedMessages: GuildSavedMessages;
+  protected mutes: GuildMutes;
 
   private onMessageCreateFn;
 
@@ -90,9 +93,11 @@ export class SpamPlugin extends Plugin {
   }
 
   onLoad() {
+    this.actions = GuildActions.getInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
     this.archives = GuildArchives.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.mutes = GuildMutes.getInstance(this.guildId);
 
     this.recentActions = [];
     this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);
@@ -198,22 +203,12 @@ export class SpamPlugin extends Plugin {
         // If the user tripped the spam filter...
         if (recentActionsCount > spamConfig.count) {
           const recentActions = this.getRecentActions(type, savedMessage.user_id, savedMessage.channel_id, since);
-          let modActionsPlugin;
 
           // Start by muting them, if enabled
-          if (spamConfig.mute) {
-            // We use the ModActions plugin for muting the user
-            // This means that spam mute functionality requires the ModActions plugin to be loaded
-            const guildData = this.knub.getGuildData(this.guildId);
-            modActionsPlugin = guildData.loadedPlugins.get("mod_actions") as ModActionsPlugin;
-            if (!modActionsPlugin) return;
-
+          if (spamConfig.mute && member) {
             const muteTime = spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000;
-
-            if (member) {
-              this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, savedMessage.user_id);
-              modActionsPlugin.muteMember(member, muteTime, "Automatic spam detection");
-            }
+            this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, savedMessage.user_id);
+            this.actions.fire("mute", { member, muteTime, reason: "Automatic spam detection" });
           }
 
           // Get the offending message IDs
@@ -273,18 +268,17 @@ export class SpamPlugin extends Plugin {
             archiveUrl
           });
 
-          const caseId = await modActionsPlugin.createCase(
-            savedMessage.user_id,
-            this.bot.user.id,
-            caseType,
-            null,
-            caseText,
-            true
-          );
+          const theCase: Case = await this.actions.fire("createCase", {
+            userId: savedMessage.user_id,
+            modId: this.bot.user.id,
+            type: caseType,
+            reason: caseText,
+            automatic: true
+          });
 
           // For mutes, also set the mute's case id (for !mutes)
           if (spamConfig.mute && member) {
-            await modActionsPlugin.mutes.setCaseId(savedMessage.user_id, caseId);
+            await this.mutes.setCaseId(savedMessage.user_id, theCase.id);
           }
         }
       },

@@ -53,26 +53,24 @@ export class GuildCases extends BaseRepository {
     });
   }
 
-  async create(data): Promise<number> {
+  async create(data): Promise<Case> {
     const result = await this.cases.insert({
       ...data,
       guild_id: this.guildId,
       case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`
     });
 
-    return result.identifiers[0].id;
+    return this.find(result.identifiers[0].id);
   }
 
   update(id, data) {
     return this.cases.update(id, data);
   }
 
-  async createNote(caseId: number, data: any): Promise<number> {
-    const result = await this.caseNotes.insert({
+  async createNote(caseId: number, data: any): Promise<void> {
+    await this.caseNotes.insert({
       ...data,
       case_id: caseId
     });
-
-    return result.identifiers[0].id;
   }
 }

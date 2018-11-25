@@ -63,6 +63,6 @@ export class PostPlugin extends Plugin {
       return;
     }
 
-    const edited = await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
+    await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
   }
 }
