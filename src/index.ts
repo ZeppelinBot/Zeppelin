@@ -4,6 +4,8 @@ import yaml from "js-yaml";
 import _fs from "fs";
 const fs = _fs.promises;
 
+import { SimpleError } from "./SimpleError";
+
 require("dotenv").config();
 
 process.on("unhandledRejection", (reason, p) => {
@@ -21,6 +23,16 @@ process.on("uncaughtException", err => {
     process.exit(1);
   }
 });
+
+// Verify required Node.js version
+const REQUIRED_NODE_VERSION = "10.14.2";
+const requiredParts = REQUIRED_NODE_VERSION.split(".").map(v => parseInt(v, 10));
+const actualVersionParts = process.versions.node.split(".").map(v => parseInt(v, 10));
+for (const [i, part] of actualVersionParts.entries()) {
+  if (part < requiredParts[i]) {
+    throw new SimpleError(`Unsupported Node.js version! Must be at least ${REQUIRED_NODE_VERSION}`);
+  }
+}
 
 // Always use UTC
 import moment from "moment-timezone";
