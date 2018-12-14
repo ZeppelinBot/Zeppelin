@@ -640,7 +640,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
   @d.command("unban", "<userId:userId> [reason:string$]")
   @d.permission("ban")
-  async unbanCmd(msg: Message, args: any) {
+  async unbanCmd(msg: Message, args: { userId: string; reason: string }) {
     this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userId);
 
     try {
@@ -656,7 +656,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Create a case
     await this.actions.fire("createCase", {
-      userId: args.member.id,
+      userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Unban,
       reason: args.reason
