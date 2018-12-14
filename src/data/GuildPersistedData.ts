@@ -29,7 +29,7 @@ export class GuildPersistedData extends BaseRepository {
     const finalData: any = {};
     if (data.roles) finalData.roles = data.roles.join(",");
     if (data.nickname) finalData.nickname = data.nickname;
-    if (data.is_voice_muted) finalData.is_voice_muted = data.is_voice_muted ? 1 : 0;
+    if (data.is_voice_muted != null) finalData.is_voice_muted = data.is_voice_muted ? 1 : 0;
 
     const existing = await this.find(userId);
     if (existing) {
