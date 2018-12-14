@@ -44,7 +44,7 @@ export class PersistPlugin extends Plugin {
       persistData.nickname = member.nick;
     }
 
-    if (this.configValue("persist_voice_mutes")) {
+    if (this.configValue("persist_voice_mutes") && member.voiceState.mute != null) {
       persist = true;
       persistData.is_voice_muted = member.voiceState.mute;
     }
