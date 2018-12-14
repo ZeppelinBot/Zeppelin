@@ -44,9 +44,9 @@ export class PersistPlugin extends Plugin {
       persistData.nickname = member.nick;
     }
 
-    if (this.configValue("persist_voice_mutes") && member.voiceState.mute != null) {
+    if (this.configValue("persist_voice_mutes") && member.voiceState.mute) {
       persist = true;
-      persistData.is_voice_muted = member.voiceState.mute;
+      persistData.is_voice_muted = true;
     }
 
     if (persist) {
@@ -83,6 +83,8 @@ export class PersistPlugin extends Plugin {
 
     if (restore) {
       await member.edit(toRestore, "Restored upon rejoin");
+      await this.persistedData.clear(member.id);
+
       this.logs.log(LogType.MEMBER_RESTORE, {
         member: stripObjectToScalars(member, ["user"])
       });
