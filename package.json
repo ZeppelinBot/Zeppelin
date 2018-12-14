@@ -5,12 +5,14 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts",
+    "start-dev": "ts-node src/index.ts",
     "start-watch": "nodemon",
     "precommit": "lint-staged",
     "postcommit": "git update-index --again",
     "format": "prettier --write \"./**/*.ts\"",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js"
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "build": "rimraf dist && tsc",
+    "start-prod": "cross-env NODE_ENV=production node dist/index.js"
   },
   "lint-staged": {
     "*.ts": [
@@ -24,6 +26,7 @@
   "dependencies": {
     "@types/lodash.at": "^4.6.3",
     "@types/moment-timezone": "^0.5.6",
+    "cross-env": "^5.2.0",
     "dotenv": "^4.0.0",
     "emoji-regex": "^7.0.0",
     "eris": "^0.8.6",
@@ -51,6 +54,7 @@
     "lint-staged": "^7.2.0",
     "nodemon": "^1.17.5",
     "prettier": "^1.8.2",
+    "rimraf": "^2.6.2",
     "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.6.0"
   }
