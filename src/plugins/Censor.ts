@@ -237,10 +237,12 @@ export class CensorPlugin extends Plugin {
   }
 
   async onMessageCreate(savedMessage: SavedMessage) {
+    if (savedMessage.is_bot) return;
     this.applyFiltersToMsg(savedMessage);
   }
 
   async onMessageUpdate(savedMessage: SavedMessage) {
+    if (savedMessage.is_bot) return;
     this.applyFiltersToMsg(savedMessage);
   }
 }
