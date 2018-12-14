@@ -1,7 +1,17 @@
 require('dotenv').config();
 
+const path = require('path');
+
 const moment = require('moment-timezone');
 moment.tz.setDefault('UTC');
+
+const entities = process.env.NODE_ENV === 'production'
+  ? path.resolve(__dirname, 'dist/data/entities/*.js')
+  : path.resolve(__dirname, 'src/data/entities/*.ts');
+
+const migrations = process.env.NODE_ENV === 'production'
+  ? path.resolve(__dirname, 'dist/migrations/*.js')
+  : path.resolve(__dirname, 'src/migrations/*.ts');
 
 module.exports = {
   type: "mysql",
@@ -16,7 +26,7 @@ module.exports = {
   synchronize: false,
 
   // Entities
-  entities: [`${__dirname}/src/data/entities/*.ts`],
+  entities: [entities],
 
   // Pool options
   extra: {
@@ -31,8 +41,8 @@ module.exports = {
   },
 
   // Migrations
-  migrations: ["src/migrations/*.ts"],
+  migrations: [migrations],
   cli: {
-    migrationsDir: "src/migrations"
+    migrationsDir: path.dirname(migrations)
   },
 };

@@ -69,6 +69,9 @@ desktop.ini
 # PHPStorm
 .idea/
 
+# Compiled files
+/dist
+
 # Misc
 /convert.js
 /startscript.js

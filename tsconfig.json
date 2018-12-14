@@ -6,14 +6,16 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "ES6",
+    "target": "es2017",
     "lib": [
-      "es6",
-      "es7",
-      "ES2017"
+      "es2017"
     ],
     "baseUrl": "./",
     "resolveJsonModule": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }
