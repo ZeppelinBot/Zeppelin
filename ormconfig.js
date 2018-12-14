@@ -31,8 +31,8 @@ module.exports = {
   },
 
   // Migrations
-  migrations: ["migrations/*.ts"],
+  migrations: ["src/migrations/*.ts"],
   cli: {
-    migrationsDir: "migrations"
+    migrationsDir: "src/migrations"
   },
 };
