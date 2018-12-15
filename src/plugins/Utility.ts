@@ -301,7 +301,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command("nickname", "<target:member> <nickname:string>")
+  @d.command(/nickname|nick/, "<target:member> <nickname:string>")
   @d.permission("nickname")
   async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
     if (!this.canActOn(msg.member, args.target)) {
