@@ -60,6 +60,7 @@ import { MessageSaverPlugin } from "./plugins/MessageSaver";
 import { CasesPlugin } from "./plugins/Cases";
 import { MutesPlugin } from "./plugins/Mutes";
 import { SlowmodePlugin } from "./plugins/Slowmode";
+import { StarboardPlugin } from "./plugins/Starboard";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -90,7 +91,8 @@ connect().then(async conn => {
       persist: PersistPlugin,
       spam: SpamPlugin,
       tags: TagsPlugin,
-      slowmode: SlowmodePlugin
+      slowmode: SlowmodePlugin,
+      starboard: StarboardPlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin,

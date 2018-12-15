@@ -81,8 +81,11 @@ export function formatTemplateString(str: string, values) {
   });
 }
 
+export const snowflakeRegex = /[1-9][0-9]{5,19}/;
+
+const isSnowflakeRegex = new RegExp(`^${snowflakeRegex}$`);
 export function isSnowflake(v: string): boolean {
-  return /^\d{17,20}$/.test(v);
+  return isSnowflakeRegex.test(v);
 }
 
 export function sleep(ms: number): Promise<void> {
@@ -166,11 +169,12 @@ export function getInviteCodesInString(str: string): string[] {
 }
 
 export const unicodeEmojiRegex = emojiRegex();
-export const customEmojiRegex = /<:(?:.*?):(\d+)>/g;
-export const anyEmojiRegex = new RegExp(`(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`, "g");
+export const customEmojiRegex = /<:(?:.*?):(\d+)>/;
+export const anyEmojiRegex = new RegExp(`(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`);
 
+const matchAllEmojiRegex = new RegExp(anyEmojiRegex.source, "g");
 export function getEmojiInString(str: string): string[] {
-  return str.match(anyEmojiRegex) || [];
+  return str.match(matchAllEmojiRegex) || [];
 }
 
 export function trimLines(str: string) {
