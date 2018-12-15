@@ -914,16 +914,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     }
   }
 
-  protected canActOn(member1, member2) {
-    if (member1.id === member2.id) {
-      return false;
-    }
-
-    const ourLevel = this.getMemberLevel(member1);
-    const memberLevel = this.getMemberLevel(member2);
-    return ourLevel > memberLevel;
-  }
-
   /**
    * Attempts to message the specified user through DMs and/or the message channel.
    * Returns a promise that resolves to a boolean indicating whether we were able to message them or not.
