@@ -5,9 +5,11 @@ import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User
 import {
   deactivateMentions,
   disableCodeBlocks,
+  disableLinkPreviews,
   findRelevantAuditLogEntry,
   formatTemplateString,
-  stripObjectToScalars
+  stripObjectToScalars,
+  useMediaUrls
 } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
@@ -283,12 +285,17 @@ export class LogsPlugin extends Plugin {
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
     if (member) {
+      const attachments = savedMessage.data.attachments
+        ? "\nAttachments:\n" + savedMessage.data.attachments.map((a: any) => a.url).join("\n")
+        : "";
+
       this.guildLogs.log(
         LogType.MESSAGE_DELETE,
         {
           member: stripObjectToScalars(member, ["user"]),
           channel: stripObjectToScalars(channel),
-          messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || ""))
+          messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
+          attachments: disableLinkPreviews(useMediaUrls(attachments))
         },
         savedMessage.id
       );

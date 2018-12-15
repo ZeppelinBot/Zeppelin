@@ -229,6 +229,10 @@ export function disableCodeBlocks(content: string): string {
   return content.replace(/`/g, "`\u200b");
 }
 
+export function useMediaUrls(content: string): string {
+  return content.replace(/cdn\.discordapp\.com/g, "media.discordapp.net");
+}
+
 export function chunkLines(str: string, maxChunkLength = 2000): string[] {
   if (str.length < maxChunkLength) {
     return [str];
