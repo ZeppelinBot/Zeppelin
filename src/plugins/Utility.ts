@@ -1,6 +1,6 @@
 import { Plugin, decorators as d, reply } from "knub";
 import { Channel, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
-import { embedPadding, errorMessage, stripObjectToScalars, successMessage, trimLines } from "../utils";
+import { embedPadding, errorMessage, noop, stripObjectToScalars, successMessage, trimLines } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import moment from "moment-timezone";
@@ -173,8 +173,8 @@ export class UtilityPlugin extends Plugin {
     );
 
     setTimeout(() => {
-      msg.delete().catch(() => {});
-      responseMsg.delete().catch(() => {});
+      msg.delete().catch(noop);
+      responseMsg.delete().catch(noop);
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
@@ -196,8 +196,8 @@ export class UtilityPlugin extends Plugin {
     );
 
     setTimeout(() => {
-      msg.delete().catch(() => {});
-      responseMsg.delete().catch(() => {});
+      msg.delete().catch(noop);
+      responseMsg.delete().catch(noop);
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
@@ -219,8 +219,8 @@ export class UtilityPlugin extends Plugin {
     );
 
     setTimeout(() => {
-      msg.delete().catch(() => {});
-      responseMsg.delete().catch(() => {});
+      msg.delete().catch(noop);
+      responseMsg.delete().catch(noop);
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
