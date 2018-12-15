@@ -200,6 +200,8 @@ export class GuildSavedMessages extends BaseRepository {
 
   async saveEdit(id, newData: ISavedMessageData) {
     const oldMessage = await this.messages.findOne(id);
+    if (!oldMessage) return;
+
     const newMessage = { ...oldMessage, data: newData };
 
     await this.messages.update(
