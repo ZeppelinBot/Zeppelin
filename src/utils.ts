@@ -269,4 +269,8 @@ export function chunkMessageLines(str: string): string[] {
   });
 }
 
+export function noop() {
+  // IT'S LITERALLY NOTHING
+}
+
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";

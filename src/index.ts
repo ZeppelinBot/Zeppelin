@@ -59,6 +59,7 @@ import { TagsPlugin } from "./plugins/Tags";
 import { MessageSaverPlugin } from "./plugins/MessageSaver";
 import { CasesPlugin } from "./plugins/Cases";
 import { MutesPlugin } from "./plugins/Mutes";
+import { SlowmodePlugin } from "./plugins/Slowmode";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -88,7 +89,8 @@ connect().then(async conn => {
       censor: CensorPlugin,
       persist: PersistPlugin,
       spam: SpamPlugin,
-      tags: TagsPlugin
+      tags: TagsPlugin,
+      slowmode: SlowmodePlugin
     },
     globalPlugins: {
       bot_control: BotControlPlugin,
