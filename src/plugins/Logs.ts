@@ -66,17 +66,22 @@ export class LogsPlugin extends Plugin {
     this.logListener = ({ type, data }) => this.log(type, data);
     this.guildLogs.on("log", this.logListener);
 
-    this.savedMessages.events.on("delete", this.onMessageDelete.bind(this));
-    this.savedMessages.events.on("deleteBulk", this.onMessageDeleteBulk.bind(this));
-    this.savedMessages.events.on("update", this.onMessageUpdate.bind(this));
+    this.onMessageDeleteFn = this.onMessageDelete.bind(this);
+    this.savedMessages.events.on("delete", this.onMessageDeleteFn);
+
+    this.onMessageDeleteBulkFn = this.onMessageDeleteBulk.bind(this);
+    this.savedMessages.events.on("deleteBulk", this.onMessageDeleteBulkFn);
+
+    this.onMessageUpdateFn = this.onMessageUpdate.bind(this);
+    this.savedMessages.events.on("update", this.onMessageUpdateFn);
   }
 
   onUnload() {
     this.guildLogs.removeListener("log", this.logListener);
 
-    this.savedMessages.events.off("delete", this.onMessageDelete.bind(this));
-    this.savedMessages.events.off("deleteBulk", this.onMessageDeleteBulk.bind(this));
-    this.savedMessages.events.off("update", this.onMessageUpdate.bind(this));
+    this.savedMessages.events.off("delete", this.onMessageDeleteFn);
+    this.savedMessages.events.off("deleteBulk", this.onMessageDeleteBulkFn);
+    this.savedMessages.events.off("update", this.onMessageUpdateFn);
   }
 
   async log(type, data) {
