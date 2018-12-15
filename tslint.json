@@ -18,6 +18,7 @@
     "curly": [true, "ignore-same-line"],
     "no-console": {
       "severity": "warning"
-    }
+    },
+    "no-bitwise": false
   }
 }
