@@ -1,5 +1,5 @@
-import { Plugin, decorators as d, reply } from "knub";
-import { Channel, EmbedOptions, Message, TextChannel, User, VoiceChannel } from "eris";
+import { decorators as d } from "knub";
+import { Channel, EmbedOptions, Member, Message, TextChannel, User, VoiceChannel } from "eris";
 import { embedPadding, errorMessage, noop, stripObjectToScalars, successMessage, trimLines } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -10,6 +10,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
@@ -17,7 +18,7 @@ const CLEAN_COMMAND_DELETE_DELAY = 5000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
-export class UtilityPlugin extends Plugin {
+export class UtilityPlugin extends ZeppelinPlugin {
   protected logs: GuildLogs;
   protected cases: GuildCases;
   protected savedMessages: GuildSavedMessages;
@@ -32,7 +33,8 @@ export class UtilityPlugin extends Plugin {
         clean: false,
         info: false,
         server: false,
-        reload_guild: false
+        reload_guild: false,
+        nickname: false
       },
       overrides: [
         {
@@ -44,7 +46,8 @@ export class UtilityPlugin extends Plugin {
             clean: true,
             info: true,
             server: true,
-            reload_guild: true
+            reload_guild: true,
+            nickname: true
           }
         }
       ]
@@ -296,6 +299,26 @@ export class UtilityPlugin extends Plugin {
     }
 
     msg.channel.createMessage({ embed });
+  }
+
+  @d.command("nickname", "<target:member> <nickname:string>")
+  @d.permission("nickname")
+  async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
+    if (!this.canActOn(msg.member, args.target)) {
+      msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
+      return;
+    }
+
+    try {
+      await args.target.edit({
+        nick: args.nickname
+      });
+    } catch (e) {
+      msg.channel.createMessage(errorMessage("Failed to change nickname"));
+      return;
+    }
+
+    msg.channel.createMessage(successMessage(`Changed nickname of <@!${args.target.id}> to ${args.nickname}`));
   }
 
   @d.command("server")
