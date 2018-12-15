@@ -62,6 +62,9 @@ export class CreateSlowmodeTables1544877081073 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await Promise.all([queryRunner.dropTable("slowmode_channels"), queryRunner.dropTable("slowmode_users")]);
+    await Promise.all([
+      queryRunner.dropTable("slowmode_channels", true),
+      queryRunner.dropTable("slowmode_users", true)
+    ]);
   }
 }
