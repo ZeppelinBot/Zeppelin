@@ -261,6 +261,9 @@ export class LogsPlugin extends Plugin {
 
   // Uses events from savesMessages
   onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
+    // Don't log edits from the bot user
+    if (savedMessage.user_id === this.bot.user.id) return;
+
     if (oldSavedMessage && JSON.stringify(savedMessage.data) === JSON.stringify(oldSavedMessage.data)) return;
 
     const member = this.guild.members.get(savedMessage.user_id);
@@ -281,6 +284,9 @@ export class LogsPlugin extends Plugin {
 
   // Uses events from savesMessages
   onMessageDelete(savedMessage: SavedMessage) {
+    // Don't log deletions from the bot user
+    if (savedMessage.user_id === this.bot.user.id) return;
+
     const member = this.guild.members.get(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
