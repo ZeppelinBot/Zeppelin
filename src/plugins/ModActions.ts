@@ -546,7 +546,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(msg.member.user),
-      member: stripObjectToScalars(args.member, ["user"])
+      user: stripObjectToScalars(args.member.user)
     });
   }
 
