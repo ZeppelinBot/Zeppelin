@@ -301,7 +301,16 @@ export class StarboardPlugin extends ZeppelinPlugin {
     } else if (msg.content) {
       const links = getUrlsInString(msg.content);
       for (const link of links) {
-        if (link.hostname === "i.imgur.com") {
+        const parts = link
+          .toString()
+          .replace(/\/$/, "")
+          .split(".");
+        const ext = parts[parts.length - 1].toLowerCase();
+
+        if (
+          (link.hostname === "i.imgur.com" || link.hostname === "cdn.discordapp.com") &&
+          ["jpeg", "jpg", "png", "gif", "webp"].includes(ext)
+        ) {
           embed.image = { url: link.toString() };
           break;
         }
