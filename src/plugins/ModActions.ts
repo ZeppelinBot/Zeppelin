@@ -282,7 +282,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       reason: args.note
     });
 
-    msg.channel.createMessage(successMessage(`Note added on ${userName} (Case #${createdCase.case_number})`));
+    msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
