@@ -275,14 +275,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const user = await this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "member";
 
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Note,
       reason: args.note
     });
 
-    msg.channel.createMessage(successMessage(`Note added on ${userName}`));
+    msg.channel.createMessage(successMessage(`Note added on ${userName} (Case #${createdCase.case_number})`));
   }
 
   @d.command("warn", "<member:Member> <reason:string$>")
@@ -315,7 +315,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       }
     }
 
-    await this.actions.fire("createCase", {
+    const createdCase: Case = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: msg.author.id,
       type: CaseTypes.Warn,
@@ -323,7 +323,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
 
     msg.channel.createMessage(
-      successMessage(`Warned **${args.member.user.username}#${args.member.user.discriminator}**`)
+      successMessage(
+        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${createdCase.case_number})`
+      )
     );
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
@@ -371,7 +373,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     const hasOldCase = mute.case_id != null;
 
+    let theCase;
+
     if (hasOldCase) {
+      theCase = await this.cases.find(mute.case_id);
+
       if (args.reason) {
         // Update old case
         await this.actions.fire("createCaseNote", mute.case_id, {
@@ -381,7 +387,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       }
     } else {
       // Create new case
-      const theCase: Case = await this.actions.fire("createCase", {
+      theCase = await this.actions.fire("createCase", {
         userId: args.member.id,
         modId: msg.author.id,
         type: CaseTypes.Mute,
@@ -412,9 +418,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Confirm the action to the moderator
     let response;
     if (muteTime) {
-      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** for ${timeUntilUnmute}`;
+      response = `Muted **${args.member.user.username}#${
+        args.member.user.discriminator
+      }** for ${timeUntilUnmute} (Case #${theCase.case_number})`;
     } else {
-      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** indefinitely`;
+      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** indefinitely (Case #${
+        theCase.case_number
+      })`;
     }
 
     if (!messageSent) response += " (failed to message user)";
@@ -456,6 +466,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
     }
 
+    // Create a case
+    const createdCase = await this.actions.fire("createCase", {
+      userId: args.member.id,
+      modId: msg.author.id,
+      type: CaseTypes.Unmute,
+      reason: args.reason
+    });
+
     if (unmuteTime) {
       // If we have an unmute time, just update the old mute to expire in that time
       const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
@@ -465,7 +483,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       // Confirm the action to the moderator
       msg.channel.createMessage(
         successMessage(
-          `Unmuting **${args.member.user.username}#${args.member.user.discriminator}** in ${timeUntilUnmute}`
+          `Unmuting **${args.member.user.username}#${args.member.user.discriminator}** in ${timeUntilUnmute} (Case #${
+            createdCase.case_number
+          })`
         )
       );
     } else {
@@ -475,17 +495,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
       // Confirm the action to the moderator
       msg.channel.createMessage(
-        successMessage(`Unmuted **${args.member.user.username}#${args.member.user.discriminator}**`)
+        successMessage(
+          `Unmuted **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+            createdCase.case_number
+          })`
+        )
       );
     }
-
-    // Create a case
-    await this.actions.fire("createCase", {
-      userId: args.member.id,
-      modId: msg.author.id,
-      type: CaseTypes.Unmute,
-      reason: args.reason
-    });
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNMUTE, {
@@ -531,7 +547,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     args.member.kick(args.reason);
 
     // Create a case for this action
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: msg.author.id,
       type: CaseTypes.Kick,
@@ -539,7 +555,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
 
     // Confirm the action to the moderator
-    let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}**`;
+    let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+      createdCase.case_number
+    })`;
     if (!messageSent) response += " (failed to message user)";
     msg.channel.createMessage(successMessage(response));
 
@@ -581,7 +599,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     args.member.ban(1, args.reason);
 
     // Create a case for this action
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: msg.author.id,
       type: CaseTypes.Ban,
@@ -589,7 +607,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
 
     // Confirm the action to the moderator
-    let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}**`;
+    let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+      createdCase.case_number
+    })`;
     if (!messageSent) response += " (failed to message user)";
     msg.channel.createMessage(successMessage(response));
 
@@ -619,7 +639,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     await this.guild.unbanMember(args.member.id);
 
     // Create a case for this action
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: msg.author.id,
       type: CaseTypes.Softban,
@@ -628,7 +648,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Confirm the action to the moderator
     msg.channel.createMessage(
-      successMessage(`Softbanned **${args.member.user.username}#${args.member.user.discriminator}**`)
+      successMessage(
+        `Softbanned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+          createdCase.case_number
+        })`
+      )
     );
 
     // Log the action
@@ -651,16 +675,16 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
-    // Confirm the action
-    msg.channel.createMessage(successMessage("Member unbanned!"));
-
     // Create a case
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Unban,
       reason: args.reason
     });
+
+    // Confirm the action
+    msg.channel.createMessage(successMessage(`Member unbanned (Case #${createdCase.case_number})`));
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
@@ -689,16 +713,16 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
-    // Confirm the action
-    msg.channel.createMessage(successMessage("Member forcebanned!"));
-
     // Create a case
-    await this.actions.fire("createCase", {
+    const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Ban,
       reason: args.reason
     });
+
+    // Confirm the action
+    msg.channel.createMessage(successMessage(`Member forcebanned (Case #${createdCase.case_number})`));
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
@@ -820,7 +844,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       reason: args.reason
     });
 
-    msg.channel.createMessage(successMessage("Case created!"));
+    msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));
 
     // Log the action
     this.serverLogs.log(LogType.CASE_CREATE, {
