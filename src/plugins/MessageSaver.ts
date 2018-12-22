@@ -91,6 +91,7 @@ export class MessageSaverPlugin extends Plugin {
 
   @d.command("save_messages_to_db", "<channel:channel> <ids:string...>")
   @d.permission("manage")
+  @d.nonBlocking()
   async saveMessageCmd(msg: Message, args: { channel: GuildChannel & TextChannel; ids: string[] }) {
     await msg.channel.createMessage("Saving specified messages...");
 
@@ -110,6 +111,7 @@ export class MessageSaverPlugin extends Plugin {
 
   @d.command("save_pins_to_db", "<channel:channel>")
   @d.permission("manage")
+  @d.nonBlocking()
   async savePinsCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
     await msg.channel.createMessage(`Saving pins from <#${args.channel.id}>...`);
 
