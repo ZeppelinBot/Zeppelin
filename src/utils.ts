@@ -1,9 +1,8 @@
 import at = require("lodash.at");
-import { Client, Guild, GuildAuditLogEntry, GuildChannel, Message, TextChannel } from "eris";
+import { Guild, GuildAuditLogEntry } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
-import { GuildSavedMessages } from "./data/GuildSavedMessages";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
