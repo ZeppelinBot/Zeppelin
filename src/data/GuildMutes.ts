@@ -42,7 +42,7 @@ export class GuildMutes extends BaseRepository {
       expires_at: expiresAt
     });
 
-    return this.mutes.findOne(result.identifiers[0].id);
+    return this.mutes.findOne({ where: result.identifiers[0] });
   }
 
   async updateExpiryTime(userId, newExpiryTime) {
