@@ -2,12 +2,21 @@ import { decorators as d, waitForReply, utils as knubUtils } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildStarboards } from "../data/GuildStarboards";
 import { GuildChannel, Message, TextChannel } from "eris";
-import { customEmojiRegex, errorMessage, getEmojiInString, noop, snowflakeRegex, successMessage } from "../utils";
+import {
+  customEmojiRegex,
+  errorMessage,
+  getEmojiInString,
+  getUrlsInString,
+  noop,
+  snowflakeRegex,
+  successMessage
+} from "../utils";
 import { Starboard } from "../data/entities/Starboard";
 import path from "path";
 import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import url from "url";
 
 export class StarboardPlugin extends ZeppelinPlugin {
   protected starboards: GuildStarboards;
@@ -289,6 +298,14 @@ export class StarboardPlugin extends ZeppelinPlugin {
       if (["jpeg", "jpg", "png", "gif", "webp"].includes(ext)) {
         embed.image = { url: attachment.url };
       }
+    } else if (msg.content) {
+      const links = getUrlsInString(msg.content);
+      for (const link of links) {
+        if (link.hostname === "i.imgur.com") {
+          embed.image = { url: link.toString() };
+          break;
+        }
+      }
     }
 
     const starboardMessage = await (channel as TextChannel).createMessage({ embed });
@@ -338,6 +355,8 @@ export class StarboardPlugin extends ZeppelinPlugin {
     msg.channel.createMessage(`Migrating pins from <#${channel.id}> to <#${args.starboardChannelId}>...`);
 
     const pins = await channel.getPins();
+    pins.reverse(); // Migrate pins starting from the oldest message
+
     for (const pin of pins) {
       const existingStarboardMessage = await this.starboards.getStarboardMessageByStarboardIdAndMessageId(
         starboard.id,
