@@ -157,9 +157,9 @@ export class SpamPlugin extends Plugin {
     this.recentActions = this.recentActions.filter(action => action.timestamp >= expiryTimestamp);
   }
 
-  async saveSpamArchives(savedMessages: SavedMessage[], channel: Channel, user: User) {
+  async saveSpamArchives(savedMessages: SavedMessage[], channel: Channel) {
     const expiresAt = moment().add(SPAM_ARCHIVE_EXPIRY_DAYS, "days");
-    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user, expiresAt);
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, expiresAt);
 
     const url = this.knub.getGlobalConfig().url;
     return url ? `${url}/archives/${archiveId}` : `Archive ID: ${archiveId}`;
@@ -249,8 +249,7 @@ export class SpamPlugin extends Plugin {
 
           // Generate a log from the detected messages
           const channel = this.guild.channels.get(savedMessage.channel_id);
-          const user = this.bot.users.get(savedMessage.user_id);
-          const archiveUrl = await this.saveSpamArchives(uniqueMessages, channel, user);
+          const archiveUrl = await this.saveSpamArchives(uniqueMessages, channel);
 
           // Create a case and log the actions taken above
           const caseType = spamConfig.mute ? CaseTypes.Mute : CaseTypes.Note;
