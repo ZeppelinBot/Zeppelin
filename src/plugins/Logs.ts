@@ -326,8 +326,7 @@ export class LogsPlugin extends Plugin {
   // Uses events from savesMessages
   async onMessageDeleteBulk(savedMessages: SavedMessage[]) {
     const channel = this.guild.channels.get(savedMessages[0].channel_id);
-    const user = this.bot.users.get(savedMessages[0].user_id);
-    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user);
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
     const baseUrl = this.knub.getGlobalConfig().url;
 
     this.guildLogs.log(

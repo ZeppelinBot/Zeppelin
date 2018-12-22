@@ -140,13 +140,20 @@ export class UtilityPlugin extends ZeppelinPlugin {
     this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
     this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
 
+    // Delete & archive in ID order
+    savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
     const idsToDelete = savedMessages.map(m => m.id);
+
+    // Make sure the deletions aren't double logged
+    idsToDelete.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
+
+    // Actually delete the messages
     await this.bot.deleteMessages(channel.id, idsToDelete);
     await this.savedMessages.markBulkAsDeleted(idsToDelete);
 
-    savedMessages.reverse();
-    const user = this.bot.users.get(savedMessages[0].user_id);
-    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, channel, user);
+    // Create an archive
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
     const archiveUrl = `${this.knub.getGlobalConfig().url}/archives/${archiveId}`;
 
     this.logs.log(LogType.CLEAN, {

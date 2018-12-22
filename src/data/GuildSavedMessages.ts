@@ -180,23 +180,31 @@ export class GuildSavedMessages extends BaseRepository {
     this.events.emit("delete", [deleted]);
   }
 
+  /**
+   * Marks the specified messages as deleted in the database (if they weren't already marked before).
+   * If any messages were marked as deleted, also emits the deleteBulk event.
+   */
   async markBulkAsDeleted(ids) {
+    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+
     await this.messages
       .createQueryBuilder()
       .update()
-      .set({
-        deleted_at: () => "NOW(3)"
-      })
+      .set({ deleted_at: deletedAt })
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("id IN (:ids)", { ids })
+      .andWhere("deleted_at IS NULL")
       .execute();
 
     const deleted = await this.messages
       .createQueryBuilder()
       .where("id IN (:ids)", { ids })
+      .where("deleted_at = :deletedAt", { deletedAt })
       .getMany();
 
-    this.events.emit("deleteBulk", [deleted]);
+    if (deleted.length) {
+      this.events.emit("deleteBulk", [deleted]);
+    }
   }
 
   async saveEdit(id, newData: ISavedMessageData) {
