@@ -36,8 +36,8 @@ export class CasesPlugin extends ZeppelinPlugin {
       );
     });
 
-    this.actions.register("createCaseNote", args => {
-      return this.createCaseNote(args.case || args.caseId, args.modId, args.note, args.automatic, args.postInCaseLog);
+    this.actions.register("createCaseNote", (caseOrCaseId, args) => {
+      return this.createCaseNote(caseOrCaseId, args.modId, args.note, args.automatic, args.postInCaseLog);
     });
 
     this.actions.register("postCase", async args => {
