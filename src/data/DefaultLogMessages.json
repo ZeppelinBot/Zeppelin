@@ -10,10 +10,10 @@
   "MEMBER_SOFTBAN": "🔨 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was softbanned by {mod.username}#{mod.discriminator}",
   "MEMBER_JOIN": "📥 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined{new} (created {account_age} ago)",
   "MEMBER_LEAVE": "📤 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) left the server",
-  "MEMBER_ROLE_ADD": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role added **{role.name}** by {mod.username}#{mod.discriminator}",
-  "MEMBER_ROLE_REMOVE": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) role removed **{role.name}** by {mod.username}#{mod.discriminator}",
-  "MEMBER_NICK_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their nickname from **{oldNick}** to **{newNick}**",
-  "MEMBER_USERNAME_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) changed their username from **{oldName}** to **{newName}**",
+  "MEMBER_ROLE_ADD": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`): role **{role.name}** added by {mod.username}#{mod.discriminator}",
+  "MEMBER_ROLE_REMOVE": "🔑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`): role **{role.name}** removed by {mod.username}#{mod.discriminator}",
+  "MEMBER_NICK_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`): nickname changed from **{oldNick}** to **{newNick}**",
+  "MEMBER_USERNAME_CHANGE": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`): username changed from **{oldName}** to **{newName}**",
   "MEMBER_RESTORE": "💿 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was restored",
 
   "CHANNEL_CREATE": "🖊 Channel **#{channel.name}** was created",
@@ -24,8 +24,8 @@
   "ROLE_DELETE": "🖊 Role **{role.name}** was deleted",
   "ROLE_EDIT": "🖊 Role **{role.name}** was edited",
 
-  "MESSAGE_EDIT": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message edited in **#{channel.name}**:\nBefore:```{before}```After:```{after}```",
-  "MESSAGE_DELETE": "🗑 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) message deleted in **#{channel.name}**:\n```{messageText}```{attachments}",
+  "MESSAGE_EDIT": "✏ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) edited their message in **#{channel.name}**:\nBefore:```{before}```After:```{after}```",
+  "MESSAGE_DELETE": "🗑 Message from **{member.user.username}#{member.user.discriminator}** (`{member.id}`) deleted in **#{channel.name}** (originally posted at **{messageDate}**):\n```{messageText}```{attachments}",
   "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in **#{channel.name}** ({archiveUrl})",
   "MESSAGE_DELETE_BARE": "🗑 Message (`{messageId}`) deleted in **#{channel.name}** (no more info available)",
 
