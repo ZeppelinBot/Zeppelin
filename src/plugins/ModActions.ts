@@ -337,11 +337,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   @d.command("mute", "<member:Member> [time:string] [reason:string$]")
   @d.permission("mute")
   async muteCmd(msg: Message, args: any) {
-    if (!this.configValue("mute_role")) {
-      msg.channel.createMessage(errorMessage("Cannot mute: no mute role specified"));
-      return;
-    }
-
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
@@ -440,11 +435,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   @d.command("unmute", "<member:Member> [time:string] [reason:string$]")
   @d.permission("mute")
   async unmuteCmd(msg: Message, args: any) {
-    if (!this.configValue("mute_role")) {
-      msg.channel.createMessage(errorMessage("Cannot unmute: no mute role specified"));
-      return;
-    }
-
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
