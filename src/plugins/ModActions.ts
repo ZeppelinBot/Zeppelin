@@ -867,7 +867,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
   }
 
-  @d.command(/cases|usercases/, "<userId:userId> [expanded:string]")
+  @d.command(/cases|usercases/, "<userId:userId> [expanded:string$]")
   @d.permission("view")
   async usercasesCmd(msg: Message, args: { userId: string; expanded?: string }) {
     const cases = await this.cases.with("notes").getByUserId(args.userId);
