@@ -308,10 +308,30 @@ export class UtilityPlugin extends ZeppelinPlugin {
     msg.channel.createMessage({ embed });
   }
 
+  @d.command(/(?:nickname|nick) reset/, "<target:member>")
+  @d.permission("nickname")
+  async nicknameResetCmd(msg: Message, args: { target: Member; nickname: string }) {
+    if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
+      msg.channel.createMessage(errorMessage("Cannot reset nickname: insufficient permissions"));
+      return;
+    }
+
+    try {
+      await args.target.edit({
+        nick: ""
+      });
+    } catch (e) {
+      msg.channel.createMessage(errorMessage("Failed to reset nickname"));
+      return;
+    }
+
+    msg.channel.createMessage(successMessage(`Nickname of <@!${args.target.id}> is now reset`));
+  }
+
   @d.command(/nickname|nick/, "<target:member> <nickname:string$>")
   @d.permission("nickname")
   async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
-    if (!this.canActOn(msg.member, args.target)) {
+    if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
       msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
