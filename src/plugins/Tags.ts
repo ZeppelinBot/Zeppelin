@@ -32,16 +32,7 @@ export class TagsPlugin extends Plugin {
     this.tags = GuildTags.getInstance(this.guildId);
   }
 
-  @d.command("tag", "<tag:string> <body:string$>")
-  @d.permission("create")
-  async tagCmd(msg: Message, args: { tag: string; body: string }) {
-    await this.tags.createOrUpdate(args.tag, args.body, msg.author.id);
-
-    const prefix = this.configValue("prefix");
-    msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
-  }
-
-  @d.command("tag_delete", "<tag:string>")
+  @d.command("tag delete", "<tag:string>")
   @d.permission("create")
   async deleteTagCmd(msg: Message, args: { tag: string }) {
     const tag = await this.tags.find(args.tag);
@@ -52,6 +43,15 @@ export class TagsPlugin extends Plugin {
 
     await this.tags.delete(args.tag);
     msg.channel.createMessage(successMessage("Tag deleted!"));
+  }
+
+  @d.command("tag", "<tag:string> <body:string$>")
+  @d.permission("create")
+  async tagCmd(msg: Message, args: { tag: string; body: string }) {
+    await this.tags.createOrUpdate(args.tag, args.body, msg.author.id);
+
+    const prefix = this.configValue("prefix");
+    msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
   }
 
   @d.event("messageCreate")
