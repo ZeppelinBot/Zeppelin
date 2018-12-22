@@ -220,36 +220,6 @@ export class StarboardPlugin extends ZeppelinPlugin {
   }
 
   /**
-   * When a reaction is removed from a message, check if there are any applicable starboards and if the message in
-   * question had already been posted there. If it has already been posted there, and the reaction count is now lower
-   * than the required threshold, remove the post from the starboard.
-   */
-  @d.event("messageReactionRemove")
-  async onMessageReactionRemove(msg: Message, emoji: { id: string; name: string }) {
-    if (!msg.author) {
-      // Message is not cached, fetch it
-      msg = await msg.channel.getMessage(msg.id);
-    }
-
-    const emojiStr = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
-    const applicableStarboards = await this.starboards.getStarboardsByEmoji(emojiStr);
-
-    for (const starboard of applicableStarboards) {
-      const existingSavedMessage = await this.starboards.getStarboardMessageByStarboardIdAndMessageId(
-        starboard.id,
-        msg.id
-      );
-      if (!existingSavedMessage) return;
-
-      const reactionsCount = await this.countReactions(msg, emojiStr);
-
-      if (reactionsCount < starboard.reactions_required) {
-        await this.removeMessageFromStarboard(msg.id, starboard);
-      }
-    }
-  }
-
-  /**
    * Counts the specific reactions in the message, ignoring the message author
    */
   async countReactions(msg: Message, reaction) {
@@ -335,6 +305,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
   /**
    * When a message is deleted, also delete it from any starboards it's been posted in.
    * This function is called in response to GuildSavedMessages events.
+   * TODO: When a message is removed from the starboard itself, i.e. the bot's embed is removed, also remove that message from the starboard_messages database table
    */
   async onMessageDelete(msg: SavedMessage) {
     const starboardMessages = await this.starboards.with("starboard").getStarboardMessagesByMessageId(msg.id);
