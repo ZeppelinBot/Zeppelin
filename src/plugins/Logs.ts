@@ -182,8 +182,8 @@ export class LogsPlugin extends Plugin {
     if (member.nick !== oldMember.nick) {
       this.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
         member,
-        oldNick: oldMember.nick || "<none>",
-        newNick: member.nick
+        oldNick: oldMember.nick != null ? oldMember.nick : "<none>",
+        newNick: member.nick != null ? member.nick : "<none>"
       });
     }
 
