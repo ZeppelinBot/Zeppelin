@@ -177,7 +177,10 @@ export class GuildSavedMessages extends BaseRepository {
       .execute();
 
     const deleted = await this.messages.findOne(id);
-    this.events.emit("delete", [deleted]);
+
+    if (deleted) {
+      this.events.emit("delete", [deleted]);
+    }
   }
 
   /**
