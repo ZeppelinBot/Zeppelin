@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
-import { Message } from "eris";
 
 export interface ISavedMessageData {
   attachments?: object[];
@@ -9,6 +8,7 @@ export interface ISavedMessageData {
   };
   content: string;
   embeds?: object[];
+  timestamp: number;
 }
 
 @Entity("messages")

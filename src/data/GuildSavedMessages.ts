@@ -32,7 +32,8 @@ export class GuildSavedMessages extends BaseRepository {
         username: msg.author.username,
         discriminator: msg.author.discriminator
       },
-      content: msg.content
+      content: msg.content,
+      timestamp: msg.timestamp
     };
 
     if (msg.attachments.length) data.attachments = msg.attachments;

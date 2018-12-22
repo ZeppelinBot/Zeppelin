@@ -51,7 +51,7 @@ export class LogsPlugin extends Plugin {
       config: {
         channels: {},
         format: {
-          timestamp: "HH:mm:ss",
+          timestamp: "YYYY-MM-DD HH:mm:ss",
           ...DefaultLogMessages
         }
       }
@@ -306,6 +306,7 @@ export class LogsPlugin extends Plugin {
           member: stripObjectToScalars(member, ["user"]),
           channel: stripObjectToScalars(channel),
           messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
+          messageDate: moment(savedMessage.data.timestamp, "x").format(this.configValue("format.timestamp")),
           attachments: disableLinkPreviews(useMediaUrls(attachments))
         },
         savedMessage.id
