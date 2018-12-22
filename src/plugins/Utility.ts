@@ -308,11 +308,17 @@ export class UtilityPlugin extends ZeppelinPlugin {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command(/nickname|nick/, "<target:member> <nickname:string>")
+  @d.command(/nickname|nick/, "<target:member> <nickname:string$>")
   @d.permission("nickname")
   async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
     if (!this.canActOn(msg.member, args.target)) {
       msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
+      return;
+    }
+
+    const nicknameLength = [...args.nickname].length;
+    if (nicknameLength < 2 || nicknameLength > 32) {
+      msg.channel.createMessage(errorMessage("Nickname must be between 2 and 32 characters long"));
       return;
     }
 
