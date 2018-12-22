@@ -319,4 +319,35 @@ export class StarboardPlugin extends ZeppelinPlugin {
       this.removeMessageFromStarboard(starboardMessage.message_id, starboardMessage.starboard);
     }
   }
+
+  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>")
+  @d.nonBlocking()
+  async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
+    const starboard = await this.starboards.getStarboardByChannelId(args.starboardChannelId);
+    if (!starboard) {
+      msg.channel.createMessage(errorMessage("The specified channel doesn't have a starboard!"));
+      return;
+    }
+
+    const channel = (await this.guild.channels.get(args.pinChannelId)) as GuildChannel & TextChannel;
+    if (!channel) {
+      msg.channel.createMessage(errorMessage("Could not find the specified channel to migrate pins from!"));
+      return;
+    }
+
+    msg.channel.createMessage(`Migrating pins from <#${channel.id}> to <#${args.starboardChannelId}>...`);
+
+    const pins = await channel.getPins();
+    for (const pin of pins) {
+      const existingStarboardMessage = await this.starboards.getStarboardMessageByStarboardIdAndMessageId(
+        starboard.id,
+        pin.id
+      );
+      if (existingStarboardMessage) continue;
+
+      await this.saveMessageToStarboard(pin, starboard);
+    }
+
+    msg.channel.createMessage(successMessage("Pins migrated!"));
+  }
 }
