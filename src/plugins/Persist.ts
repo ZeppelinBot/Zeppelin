@@ -31,7 +31,7 @@ export class PersistPlugin extends Plugin {
     const persistData: IPartialPersistData = {};
 
     const persistedRoles = this.configValue("persisted_roles");
-    if (persistedRoles.length) {
+    if (persistedRoles.length && member.roles) {
       const rolesToPersist = intersection(persistedRoles, member.roles);
       if (rolesToPersist.length) {
         persist = true;
@@ -44,7 +44,7 @@ export class PersistPlugin extends Plugin {
       persistData.nickname = member.nick;
     }
 
-    if (this.configValue("persist_voice_mutes") && member.voiceState.mute) {
+    if (this.configValue("persist_voice_mutes") && member.voiceState && member.voiceState.mute) {
       persist = true;
       persistData.is_voice_muted = true;
     }
