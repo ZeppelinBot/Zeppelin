@@ -1,5 +1,5 @@
 import { Plugin, decorators as d } from "knub";
-import { GuildChannel, Message, TextChannel, Constants as ErisConstants } from "eris";
+import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
 import { convertDelayStringToMS, errorMessage, noop, successMessage } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
@@ -114,6 +114,26 @@ export class SlowmodePlugin extends Plugin {
       msg.channel.createMessage(successMessage("Slowmode disabled!"));
       initMsg.delete().catch(noop);
     }
+  }
+
+  /**
+   * COMMAND: Clear slowmode from a specific user on a specific channel
+   */
+  @d.command("slowmode clear", "<channel:channel> <user:user>")
+  @d.permission("manage")
+  async clearSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel; user: User }) {
+    const channelSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
+    if (!channelSlowmode) {
+      msg.channel.createMessage(errorMessage("Channel doesn't have slowmode!"));
+      return;
+    }
+
+    await this.removeSlowmodeFromUserId(args.channel, args.user.id);
+    msg.channel.createMessage(
+      successMessage(
+        `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`
+      )
+    );
   }
 
   /**
