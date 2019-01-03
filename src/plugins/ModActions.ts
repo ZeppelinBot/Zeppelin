@@ -426,10 +426,18 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
-    this.serverLogs.log(LogType.MEMBER_MUTE, {
-      mod: stripObjectToScalars(msg.member.user),
-      member: stripObjectToScalars(args.member, ["user"])
-    });
+    if (muteTime) {
+      this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
+        mod: stripObjectToScalars(msg.member.user),
+        member: stripObjectToScalars(args.member, ["user"]),
+        time: timeUntilUnmute
+      });
+    } else {
+      this.serverLogs.log(LogType.MEMBER_MUTE, {
+        mod: stripObjectToScalars(msg.member.user),
+        member: stripObjectToScalars(args.member, ["user"])
+      });
+    }
   }
 
   @d.command("unmute", "<member:Member> [time:string] [reason:string$]")
@@ -478,6 +486,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           })`
         )
       );
+
+      // Log the action
+      this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
+        mod: stripObjectToScalars(msg.member.user),
+        member: stripObjectToScalars(args.member, ["user"]),
+        time: timeUntilUnmute
+      });
     } else {
       // Otherwise remove "muted" role immediately
       this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
@@ -491,13 +506,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           })`
         )
       );
-    }
 
-    // Log the action
-    this.serverLogs.log(LogType.MEMBER_UNMUTE, {
-      mod: stripObjectToScalars(msg.member.user),
-      member: stripObjectToScalars(args.member, ["user"])
-    });
+      // Log the action
+      this.serverLogs.log(LogType.MEMBER_UNMUTE, {
+        mod: stripObjectToScalars(msg.member.user),
+        member: stripObjectToScalars(args.member, ["user"])
+      });
+    }
   }
 
   @d.command("mutes")
