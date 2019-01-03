@@ -1,7 +1,9 @@
 {
   "MEMBER_WARN": "⚠️ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was warned by {mod.username}#{mod.discriminator}",
-  "MEMBER_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted by {mod.username}#{mod.discriminator}",
+  "MEMBER_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted indefinitely by {mod.username}#{mod.discriminator}",
+  "MEMBER_TIMED_MUTE": "🔇 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was muted for **{time}** by {mod.username}#{mod.discriminator}",
   "MEMBER_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was unmuted by {mod.username}#{mod.discriminator}",
+  "MEMBER_TIMED_UNMUTE": "🔉 **{member.user.username}#{member.user.discriminator}** (`{member.id}`) was scheduled to be unmuted in **{time}** by {mod.username}#{mod.discriminator}",
   "MEMBER_MUTE_EXPIRED": "🔉 **{member.user.username}#{member.user.discriminator}**'s mute expired",
   "MEMBER_KICK": "👢 **{user.username}#{user.discriminator}** (`{user.id}`) was kicked by {mod.username}#{mod.discriminator}",
   "MEMBER_BAN": "🔨 **{user.username}#{user.discriminator}** (`{user.id}`) was banned by {mod.username}#{mod.discriminator}",
