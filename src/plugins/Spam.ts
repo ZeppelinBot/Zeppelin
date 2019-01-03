@@ -43,6 +43,8 @@ const MAX_INTERVAL = 300;
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
 export class SpamPlugin extends Plugin {
+  public static pluginName = 'spam';
+
   protected actions: GuildActions;
   protected logs: GuildLogs;
   protected archives: GuildArchives;

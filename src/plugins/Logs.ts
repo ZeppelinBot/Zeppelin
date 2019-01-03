@@ -36,6 +36,8 @@ const unknownUser = {
 };
 
 export class LogsPlugin extends Plugin {
+  public static pluginName = 'logs';
+
   protected guildLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;

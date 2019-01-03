@@ -9,6 +9,8 @@ let activeReload: [string, string] = null;
  * A global plugin that allows bot owners to control the bot
  */
 export class BotControlPlugin extends GlobalPlugin {
+  public static pluginName = 'bot_control';
+
   getDefaultOptions() {
     return {
       config: {

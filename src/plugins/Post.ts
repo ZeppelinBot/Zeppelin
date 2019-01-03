@@ -5,6 +5,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { ISavedMessageData } from "../data/entities/SavedMessage";
 
 export class PostPlugin extends Plugin {
+  public static pluginName = 'post';
+
   protected savedMessages: GuildSavedMessages;
 
   onLoad() {

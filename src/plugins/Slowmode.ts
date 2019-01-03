@@ -5,6 +5,8 @@ import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
 
 export class SlowmodePlugin extends Plugin {
+  public static pluginName = 'slowmode';
+
   protected slowmodes: GuildSlowmodes;
   protected clearInterval;
 

@@ -75,29 +75,30 @@ connect().then(async conn => {
   const basePlugins = ["message_saver", "cases", "mutes"];
 
   const bot = new Knub(client, {
-    plugins: {
+    plugins: [
       // Base plugins (always enabled)
-      message_saver: MessageSaverPlugin,
-      cases: CasesPlugin,
-      mutes: MutesPlugin,
+      MessageSaverPlugin,
+      CasesPlugin,
+      MutesPlugin,
 
       // Regular plugins
-      utility: UtilityPlugin,
-      mod_actions: ModActionsPlugin,
-      logs: LogsPlugin,
-      post: PostPlugin,
-      reaction_roles: ReactionRolesPlugin,
-      censor: CensorPlugin,
-      persist: PersistPlugin,
-      spam: SpamPlugin,
-      tags: TagsPlugin,
-      slowmode: SlowmodePlugin,
-      starboard: StarboardPlugin
-    },
-    globalPlugins: {
-      bot_control: BotControlPlugin,
-      log_server: LogServerPlugin
-    },
+      UtilityPlugin,
+      ModActionsPlugin,
+      LogsPlugin,
+      PostPlugin,
+      ReactionRolesPlugin,
+      CensorPlugin,
+      PersistPlugin,
+      SpamPlugin,
+      TagsPlugin,
+      SlowmodePlugin,
+      StarboardPlugin
+    ],
+
+    globalPlugins: [
+      BotControlPlugin,
+      LogServerPlugin
+    ],
 
     options: {
       getEnabledPlugins(guildId, guildConfig): string[] {

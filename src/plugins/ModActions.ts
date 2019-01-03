@@ -37,6 +37,8 @@ interface IIgnoredEvent {
 const CASE_LIST_REASON_MAX_LENGTH = 80;
 
 export class ModActionsPlugin extends ZeppelinPlugin {
+  public static pluginName = 'mod_actions';
+
   protected actions: GuildActions;
   protected mutes: GuildMutes;
   protected cases: GuildCases;

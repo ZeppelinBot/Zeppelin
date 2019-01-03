@@ -10,6 +10,8 @@ import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 
 export class MutesPlugin extends ZeppelinPlugin {
+  public static pluginName = 'mutes';
+
   protected actions: GuildActions;
   protected mutes: GuildMutes;
   protected cases: GuildCases;

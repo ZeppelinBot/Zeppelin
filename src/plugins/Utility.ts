@@ -19,6 +19,8 @@ const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const activeReloads: Map<string, TextChannel> = new Map();
 
 export class UtilityPlugin extends ZeppelinPlugin {
+  public static pluginName = 'utility';
+
   protected logs: GuildLogs;
   protected cases: GuildCases;
   protected savedMessages: GuildSavedMessages;

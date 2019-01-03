@@ -7,6 +7,8 @@ import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
 
 export class PersistPlugin extends Plugin {
+  public static pluginName = 'persist';
+
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;
 
