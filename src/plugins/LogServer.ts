@@ -12,6 +12,8 @@ function notFound(res: ServerResponse) {
 }
 
 export class LogServerPlugin extends GlobalPlugin {
+  public static pluginName = 'log_server';
+
   protected archives: GuildArchives;
   protected server: http.Server;
 

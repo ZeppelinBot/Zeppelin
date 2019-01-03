@@ -16,9 +16,10 @@ import path from "path";
 import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
-import url from "url";
 
 export class StarboardPlugin extends ZeppelinPlugin {
+  public static pluginName = 'starboard';
+
   protected starboards: GuildStarboards;
   protected savedMessages: GuildSavedMessages;
 

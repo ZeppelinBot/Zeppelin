@@ -10,6 +10,8 @@ type CustomEmoji = {
 } & Emoji;
 
 export class ReactionRolesPlugin extends Plugin {
+  public static pluginName = 'reaction_roles';
+
   protected reactionRoles: GuildReactionRoles;
 
   getDefaultOptions() {

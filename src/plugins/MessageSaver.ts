@@ -4,6 +4,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
 
 export class MessageSaverPlugin extends Plugin {
+  public static pluginName = 'message_saver';
+
   protected savedMessages: GuildSavedMessages;
 
   getDefaultOptions() {

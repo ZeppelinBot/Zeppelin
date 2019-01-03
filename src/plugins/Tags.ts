@@ -4,6 +4,8 @@ import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 
 export class TagsPlugin extends Plugin {
+  public static pluginName = 'tags';
+
   protected tags: GuildTags;
 
   getDefaultOptions() {

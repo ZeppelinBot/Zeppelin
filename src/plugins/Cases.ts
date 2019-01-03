@@ -8,6 +8,8 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 
 export class CasesPlugin extends ZeppelinPlugin {
+  public static pluginName = 'cases';
+
   protected actions: GuildActions;
   protected cases: GuildCases;
 

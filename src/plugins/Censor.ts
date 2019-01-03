@@ -15,6 +15,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 
 export class CensorPlugin extends Plugin {
+  public static pluginName = 'censor';
+
   protected serverLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
 
