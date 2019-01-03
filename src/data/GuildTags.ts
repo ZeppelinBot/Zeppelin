@@ -10,6 +10,14 @@ export class GuildTags extends BaseRepository {
     this.tags = getRepository(Tag);
   }
 
+  async all(): Promise<Tag[]> {
+    return this.tags.find({
+      where: {
+        guild_id: this.guildId
+      }
+    });
+  }
+
   async find(tag): Promise<Tag> {
     return this.tags.findOne({
       where: {
