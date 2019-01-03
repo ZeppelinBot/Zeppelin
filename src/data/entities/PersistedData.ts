@@ -10,7 +10,7 @@ export class PersistedData {
   @PrimaryColumn()
   user_id: string;
 
-  @Column() roles: string;
+  @Column("simple-array") roles: string[];
 
   @Column() nickname: string;
 
