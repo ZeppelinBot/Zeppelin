@@ -52,8 +52,8 @@ export class CasesPlugin extends ZeppelinPlugin {
     this.actions.unregister("postCase");
   }
 
-  protected async resolveCase(caseOrCaseId: Case | number): Promise<Case> {
-    return caseOrCaseId instanceof Case ? caseOrCaseId : this.cases.with("notes").find(caseOrCaseId);
+  protected resolveCaseId(caseOrCaseId: Case | number): number {
+    return caseOrCaseId instanceof Case ? caseOrCaseId.id : caseOrCaseId;
   }
 
   /**
@@ -85,7 +85,7 @@ export class CasesPlugin extends ZeppelinPlugin {
     });
 
     if (reason) {
-      await this.createCaseNote(createdCase, modId, reason);
+      await this.createCaseNote(createdCase, modId, reason, automatic, false);
     }
 
     if (
@@ -114,7 +114,7 @@ export class CasesPlugin extends ZeppelinPlugin {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
-    const theCase = await this.resolveCase(caseOrCaseId);
+    const theCase = await this.cases.find(this.resolveCaseId(caseOrCaseId));
     if (!theCase) {
       this.throwPluginRuntimeError(`Unknown case ID: ${caseOrCaseId}`);
     }
@@ -144,7 +144,7 @@ export class CasesPlugin extends ZeppelinPlugin {
    * Returns a Discord embed for the specified case
    */
   public async getCaseEmbed(caseOrCaseId: Case | number): Promise<MessageContent> {
-    const theCase = await this.resolveCase(caseOrCaseId);
+    const theCase = await this.cases.with("notes").find(this.resolveCaseId(caseOrCaseId));
     if (!theCase) return null;
 
     const createdAt = moment(theCase.created_at);
