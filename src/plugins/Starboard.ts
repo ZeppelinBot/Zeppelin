@@ -287,7 +287,10 @@ export class StarboardPlugin extends ZeppelinPlugin {
       }
     }
 
-    const starboardMessage = await (channel as TextChannel).createMessage({ embed });
+    const starboardMessage = await (channel as TextChannel).createMessage({
+      content: `https://discordapp.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`,
+      embed
+    });
     await this.starboards.createStarboardMessage(starboard.id, msg.id, starboardMessage.id);
   }
 
