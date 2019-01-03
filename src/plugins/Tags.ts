@@ -4,7 +4,7 @@ import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 
 export class TagsPlugin extends Plugin {
-  public static pluginName = 'tags';
+  public static pluginName = "tags";
 
   protected tags: GuildTags;
 
@@ -32,6 +32,22 @@ export class TagsPlugin extends Plugin {
 
   onLoad() {
     this.tags = GuildTags.getInstance(this.guildId);
+  }
+
+  @d.command("tag list")
+  @d.permission("create")
+  async tagListCmd(msg: Message) {
+    const tags = await this.tags.all();
+    if (tags.length === 0) {
+      msg.channel.createMessage(`No tags created yet! Use \`tag create\` command to create one.`);
+      return;
+    }
+
+    const prefix = this.configValueForMsg(msg, "prefix");
+    const tagNames = tags.map(t => t.tag).sort();
+    msg.channel.createMessage(`
+      Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\`
+    `);
   }
 
   @d.command("tag delete", "<tag:string>")
