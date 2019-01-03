@@ -5,7 +5,7 @@ import { errorMessage, successMessage } from "../utils";
 
 export class ZeppelinPlugin extends Plugin {
   protected throwPluginRuntimeError(message: string) {
-    throw new PluginRuntimeError(message, this.pluginName, this.guildId);
+    throw new PluginRuntimeError(message, this.runtimePluginName, this.guildId);
   }
 
   protected canActOn(member1, member2) {
