@@ -168,10 +168,10 @@ export function getInviteCodesInString(str: string): string[] {
 }
 
 export const unicodeEmojiRegex = emojiRegex();
-export const customEmojiRegex = /<:(?:.*?):(\d+)>/;
-export const anyEmojiRegex = new RegExp(`(?:(?:${unicodeEmojiRegex.source})|(?:${customEmojiRegex.source}))`);
+export const customEmojiRegex = /<a?:(.*?):(\d+)>/;
 
-const matchAllEmojiRegex = new RegExp(anyEmojiRegex.source, "g");
+const matchAllEmojiRegex = new RegExp(`(${unicodeEmojiRegex.source})|(${customEmojiRegex.source})`, "g");
+
 export function getEmojiInString(str: string): string[] {
   return str.match(matchAllEmojiRegex) || [];
 }
