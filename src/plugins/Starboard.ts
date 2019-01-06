@@ -99,9 +99,11 @@ export class StarboardPlugin extends ZeppelinPlugin {
       }
 
       emoji = allEmojis[0];
-      if (emoji.match(customEmojiRegex)) {
+
+      const customEmojiMatch = emoji.match(customEmojiRegex);
+      if (customEmojiMatch) {
         // <:name:id> to name:id, as Eris puts them in the message reactions object
-        emoji = emoji.substr(2, emoji.length - 1);
+        emoji = `${customEmojiMatch[1]}:${customEmojiMatch[2]}`;
       }
     } while (emoji == null);
 
