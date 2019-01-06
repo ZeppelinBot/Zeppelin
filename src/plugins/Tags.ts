@@ -18,7 +18,7 @@ export class TagsPlugin extends Plugin {
     return {
       config: {
         prefix: "!!",
-        deleteWithCommand: true
+        delete_with_command: true
       },
 
       permissions: {
@@ -109,9 +109,11 @@ export class TagsPlugin extends Plugin {
     const responseMsg = await channel.createMessage(tag.body);
 
     // Save the command-response message pair once the message is in our database
-    this.savedMessages.onceMessageAvailable(responseMsg.id, async theMsg => {
-      await this.tags.addResponse(msg.id, responseMsg.id);
-    });
+    if (this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "delete_with_command")) {
+      this.savedMessages.onceMessageAvailable(responseMsg.id, async () => {
+        await this.tags.addResponse(msg.id, responseMsg.id);
+      });
+    }
   }
 
   async onMessageDelete(msg: SavedMessage) {
