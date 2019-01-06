@@ -11,12 +11,13 @@ export class QueuedEventEmitter {
     this.queue = new Queue();
   }
 
-  on(eventName: string, listener: Listener) {
+  on(eventName: string, listener: Listener): Listener {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, []);
     }
 
     this.listeners.get(eventName).push(listener);
+    return listener;
   }
 
   off(eventName: string, listener: Listener) {
@@ -26,6 +27,15 @@ export class QueuedEventEmitter {
 
     const listeners = this.listeners.get(eventName);
     listeners.splice(listeners.indexOf(listener), 1);
+  }
+
+  once(eventName: string, listener: Listener): Listener {
+    const handler = this.on(eventName, (...args) => {
+      const result = listener(...args);
+      this.off(eventName, handler);
+      return result;
+    });
+    return handler;
   }
 
   emit(eventName: string, args: any[] = []): Promise<void> {

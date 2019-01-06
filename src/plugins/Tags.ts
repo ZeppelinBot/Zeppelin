@@ -1,17 +1,24 @@
 import { Plugin, decorators as d } from "knub";
-import { Message } from "eris";
+import { Message, TextChannel } from "eris";
 import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { SavedMessage } from "../data/entities/SavedMessage";
 
 export class TagsPlugin extends Plugin {
   public static pluginName = "tags";
 
   protected tags: GuildTags;
+  protected savedMessages: GuildSavedMessages;
+
+  private onMessageCreateFn;
+  private onMessageDeleteFn;
 
   getDefaultOptions() {
     return {
       config: {
-        prefix: "!!"
+        prefix: "!!",
+        deleteWithCommand: true
       },
 
       permissions: {
@@ -32,6 +39,18 @@ export class TagsPlugin extends Plugin {
 
   onLoad() {
     this.tags = GuildTags.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+
+    this.onMessageCreateFn = this.onMessageCreate.bind(this);
+    this.savedMessages.events.on("create", this.onMessageCreateFn);
+
+    this.onMessageDeleteFn = this.onMessageDelete.bind(this);
+    this.savedMessages.events.on("delete", this.onMessageDeleteFn);
+  }
+
+  onUnload() {
+    this.savedMessages.events.off("create", this.onMessageCreateFn);
+    this.savedMessages.events.off("delete", this.onMessageDeleteFn);
   }
 
   @d.command("tag list")
@@ -72,20 +91,54 @@ export class TagsPlugin extends Plugin {
     msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
   }
 
-  @d.event("messageCreate")
-  @d.permission("use")
-  async onMessageCreate(msg: Message) {
-    if (!msg.content) return;
-    if (msg.type !== 0) return;
-    if (!msg.author || msg.author.bot) return;
+  async onMessageCreate(msg: SavedMessage) {
+    const member = this.guild.members.get(msg.user_id);
+    if (!this.hasPermission("use", { member, channelId: msg.channel_id })) return;
 
-    const prefix = this.configValueForMsg(msg, "prefix");
-    if (!msg.content.startsWith(prefix)) return;
+    if (!msg.data.content) return;
+    if (msg.is_bot) return;
 
-    const withoutPrefix = msg.content.slice(prefix.length);
+    const prefix = this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "prefix");
+    if (!msg.data.content.startsWith(prefix)) return;
+
+    const withoutPrefix = msg.data.content.slice(prefix.length);
     const tag = await this.tags.find(withoutPrefix);
     if (!tag) return;
 
-    msg.channel.createMessage(tag.body);
+    const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
+    const responseMsg = await channel.createMessage(tag.body);
+
+    // Save the command-response message pair once the message is in our database
+    this.savedMessages.onceMessageAvailable(responseMsg.id, async theMsg => {
+      await this.tags.addResponse(msg.id, responseMsg.id);
+    });
+  }
+
+  async onMessageDelete(msg: SavedMessage) {
+    // Command message was deleted -> delete the response as well
+    const commandMsgResponse = await this.tags.findResponseByCommandMessageId(msg.id);
+    if (commandMsgResponse) {
+      const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
+      if (!channel) return;
+
+      const responseMsg = await this.savedMessages.find(commandMsgResponse.response_message_id);
+      if (!responseMsg || responseMsg.deleted_at != null) return;
+
+      await channel.deleteMessage(commandMsgResponse.response_message_id);
+      return;
+    }
+
+    // Response was deleted -> delete the command message as well
+    const responseMsgResponse = await this.tags.findResponseByResponseMessageId(msg.id);
+    if (responseMsgResponse) {
+      const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
+      if (!channel) return;
+
+      const commandMsg = await this.savedMessages.find(responseMsgResponse.command_message_id);
+      if (!commandMsg || commandMsg.deleted_at != null) return;
+
+      await channel.deleteMessage(responseMsgResponse.command_message_id);
+      return;
+    }
   }
 }
