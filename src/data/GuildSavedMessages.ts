@@ -146,6 +146,7 @@ export class GuildSavedMessages extends BaseRepository {
 
     const inserted = await this.messages.findOne(data.id);
     this.events.emit("create", [inserted]);
+    this.events.emit(`create:${data.id}`, [inserted]);
   }
 
   async createFromMsg(msg: Message, overrides = {}) {
@@ -180,6 +181,7 @@ export class GuildSavedMessages extends BaseRepository {
 
     if (deleted) {
       this.events.emit("delete", [deleted]);
+      this.events.emit(`delete:${id}`, [deleted]);
     }
   }
 
@@ -227,6 +229,7 @@ export class GuildSavedMessages extends BaseRepository {
     );
 
     this.events.emit("update", [newMessage, oldMessage]);
+    this.events.emit(`update:${id}`, [newMessage, oldMessage]);
   }
 
   async saveEditFromMsg(msg: Message) {
@@ -245,6 +248,33 @@ export class GuildSavedMessages extends BaseRepository {
       );
     } else {
       this.toBePermanent.add(id);
+    }
+  }
+
+  async onceMessageAvailable(id: string, handler: (msg: SavedMessage) => any, timeout: number = 60 * 1000) {
+    let called = false;
+    let onceEventListener;
+    let timeoutFn;
+
+    const callHandler = async (msg: SavedMessage) => {
+      this.events.off(`create:${id}`, onceEventListener);
+      clearTimeout(timeoutFn);
+
+      if (called) return;
+      called = true;
+
+      await handler(msg);
+    };
+
+    onceEventListener = this.events.once(`create:${id}`, callHandler);
+    timeoutFn = setTimeout(() => {
+      called = true;
+      callHandler(null);
+    }, timeout);
+
+    const messageInDB = await this.find(id);
+    if (messageInDB) {
+      callHandler(messageInDB);
     }
   }
 }

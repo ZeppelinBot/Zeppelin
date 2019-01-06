@@ -1,13 +1,16 @@
 import { Tag } from "./entities/Tag";
 import { getRepository, Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
+import { TagResponse } from "./entities/TagResponse";
 
 export class GuildTags extends BaseRepository {
   private tags: Repository<Tag>;
+  private tagResponses: Repository<TagResponse>;
 
   constructor(guildId) {
     super(guildId);
     this.tags = getRepository(Tag);
+    this.tagResponses = getRepository(TagResponse);
   }
 
   async all(): Promise<Tag[]> {
@@ -55,6 +58,32 @@ export class GuildTags extends BaseRepository {
     await this.tags.delete({
       guild_id: this.guildId,
       tag
+    });
+  }
+
+  async findResponseByCommandMessageId(messageId: string): Promise<TagResponse> {
+    return this.tagResponses.findOne({
+      where: {
+        guild_id: this.guildId,
+        command_message_id: messageId
+      }
+    });
+  }
+
+  async findResponseByResponseMessageId(messageId: string): Promise<TagResponse> {
+    return this.tagResponses.findOne({
+      where: {
+        guild_id: this.guildId,
+        response_message_id: messageId
+      }
+    });
+  }
+
+  async addResponse(cmdMessageId, responseMessageId) {
+    await this.tagResponses.insert({
+      guild_id: this.guildId,
+      command_message_id: cmdMessageId,
+      response_message_id: responseMessageId
     });
   }
 }
