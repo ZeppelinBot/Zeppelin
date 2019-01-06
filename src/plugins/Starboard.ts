@@ -18,7 +18,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 
 export class StarboardPlugin extends ZeppelinPlugin {
-  public static pluginName = 'starboard';
+  public static pluginName = "starboard";
 
   protected starboards: GuildStarboards;
   protected savedMessages: GuildSavedMessages;
@@ -81,6 +81,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
       const existingStarboard = await this.starboards.getStarboardByChannelId(starboardChannel.id);
       if (existingStarboard) {
         msg.channel.createMessage("That channel already has a starboard. Try again?");
+        starboardChannel = null;
         continue;
       }
     } while (starboardChannel == null);
