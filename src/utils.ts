@@ -1,5 +1,5 @@
 import at = require("lodash.at");
-import { Guild, GuildAuditLogEntry } from "eris";
+import { Guild, GuildAuditLogEntry, TextableChannel } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -274,6 +274,13 @@ export function chunkMessageLines(str: string): string[] {
     if (chunk[chunk.length - 1] === "\n") chunk = chunk + "\u200b";
     return chunk;
   });
+}
+
+export async function createChunkedMessage(channel: TextableChannel, messageText: string) {
+  const chunks = chunkMessageLines(messageText);
+  for (const chunk of chunks) {
+    await channel.createMessage(chunk);
+  }
 }
 
 export function noop() {

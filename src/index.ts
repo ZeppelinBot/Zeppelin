@@ -61,6 +61,7 @@ import { CasesPlugin } from "./plugins/Cases";
 import { MutesPlugin } from "./plugins/Mutes";
 import { SlowmodePlugin } from "./plugins/Slowmode";
 import { StarboardPlugin } from "./plugins/Starboard";
+import { NameHistoryPlugin } from "./plugins/NameHistory";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -72,12 +73,13 @@ connect().then(async conn => {
   });
   client.setMaxListeners(100);
 
-  const basePlugins = ["message_saver", "cases", "mutes"];
+  const basePlugins = ["message_saver", "name_history", "cases", "mutes"];
 
   const bot = new Knub(client, {
     plugins: [
       // Base plugins (always enabled)
       MessageSaverPlugin,
+      NameHistoryPlugin,
       CasesPlugin,
       MutesPlugin,
 
@@ -95,10 +97,7 @@ connect().then(async conn => {
       StarboardPlugin
     ],
 
-    globalPlugins: [
-      BotControlPlugin,
-      LogServerPlugin
-    ],
+    globalPlugins: [BotControlPlugin, LogServerPlugin],
 
     options: {
       getEnabledPlugins(guildId, guildConfig): string[] {
