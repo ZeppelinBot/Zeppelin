@@ -893,7 +893,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const prefix = this.knub.getGuildData(this.guildId).config.prefix;
 
     if (cases.length === 0) {
-      msg.channel.createMessage("No cases found for the specified user!");
+      msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : 'the specified user'}`);
     } else {
       if (args.expanded && args.expanded.startsWith("expand")) {
         if (cases.length > 8) {
