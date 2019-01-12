@@ -173,8 +173,10 @@ export class MutesPlugin extends ZeppelinPlugin {
     await msg.channel.createMessage("Clearing mutes from banned users...");
 
     const activeMutes = await this.mutes.getActiveMutes();
-    const bans = await this.guild.getBans();
-    const bannedIds = bans.map(b => b.id);
+
+    // Mismatch in Eris docs and actual result here, based on Eris's code comments anyway
+    const bans: Array<{ reason: string; user: User }> = (await this.guild.getBans()) as any;
+    const bannedIds = bans.map(b => b.user.id);
 
     await msg.channel.createMessage(
       `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`
