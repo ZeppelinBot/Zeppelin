@@ -61,7 +61,7 @@ export class AutoReactions extends Plugin {
       const customEmojiMatch = reaction.match(customEmojiRegex);
       if (customEmojiMatch) {
         // Custom emoji
-        if (!guildEmojiIds.includes(customEmojiMatch[1])) {
+        if (!guildEmojiIds.includes(customEmojiMatch[2])) {
           msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
 
           return;
