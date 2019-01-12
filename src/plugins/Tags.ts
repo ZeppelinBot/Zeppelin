@@ -129,9 +129,9 @@ export class TagsPlugin extends Plugin {
     body = body.replace(/(?<!\\)%[a-zA-Z]+/g, () => variableValues[variableIndex++] || "");
 
     // Run functions
-    body = body.replace(/(?<!\\)\{([a-zA-Z]+)(\:(.+?))?\}/, (_, fn, args) => {
+    body = body.replace(/(?<!\\)\{([a-zA-Z]+)(?::?(.*?))?\}/, (_, fn, args) => {
       if (!TAG_FUNCTIONS[fn]) return "";
-      const fnArgs = args ? args.slice(1).split(/(?<!\\):/) : [];
+      const fnArgs = args ? args.split(/(?<!\\):/) : [];
 
       try {
         return TAG_FUNCTIONS[fn].apply(null, fnArgs);
