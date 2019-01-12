@@ -1,0 +1,113 @@
+import { Plugin, decorators as d } from "knub";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { SavedMessage } from "../data/entities/SavedMessage";
+import { GuildAutoReactions } from "../data/GuildAutoReactions";
+import { Message } from "eris";
+import {
+  CustomEmoji,
+  customEmojiRegex,
+  errorMessage,
+  isEmoji,
+  isSnowflake,
+  successMessage,
+  unicodeEmojiRegex
+} from "../utils";
+
+export class AutoReactions extends Plugin {
+  public static pluginName = "auto_reactions";
+
+  protected savedMessages: GuildSavedMessages;
+  protected autoReactions: GuildAutoReactions;
+
+  private onMessageCreateFn;
+
+  getDefaultOptions() {
+    return {
+      permissions: {
+        use: false
+      },
+
+      overrides: [
+        {
+          level: ">=100",
+          permissions: {
+            use: true
+          }
+        }
+      ]
+    };
+  }
+
+  onLoad() {
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.autoReactions = GuildAutoReactions.getInstance(this.guildId);
+
+    this.onMessageCreateFn = this.savedMessages.events.on("create", this.onMessageCreate.bind(this));
+  }
+
+  onUnload() {
+    this.savedMessages.events.off("create", this.onMessageCreateFn);
+  }
+
+  @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
+  async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
+    const guildEmojis = this.guild.emojis as CustomEmoji[];
+    const guildEmojiIds = guildEmojis.map(e => e.id);
+
+    const finalReactions = [];
+
+    for (const reaction of args.reactions) {
+      if (!isEmoji(reaction)) {
+        console.log("invalid:", reaction);
+        msg.channel.createMessage(errorMessage("One or more of the specified reactions were invalid!"));
+        return;
+      }
+
+      let savedValue;
+
+      const customEmojiMatch = reaction.match(customEmojiRegex);
+      if (customEmojiMatch) {
+        // Custom emoji
+        if (!guildEmojiIds.includes(customEmojiMatch[0])) {
+          msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
+
+          return;
+        }
+
+        savedValue = `${customEmojiMatch[0]}:${customEmojiMatch[1]}`;
+      } else {
+        // Unicode emoji
+        savedValue = reaction;
+      }
+
+      finalReactions.push(savedValue);
+    }
+
+    await this.autoReactions.set(args.channelId, finalReactions);
+    msg.channel.createMessage(successMessage(`Auto-reactions set for <#${args.channelId}>`));
+  }
+
+  @d.command("auto_reactions disable", "<channelId:channelId>")
+  async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
+    const autoReaction = await this.autoReactions.getForChannel(args.channelId);
+    if (!autoReaction) {
+      msg.channel.createMessage(errorMessage(`Auto-reactions aren't enabled in <#${args.channelId}>`));
+      return;
+    }
+
+    await this.autoReactions.removeFromChannel(args.channelId);
+    msg.channel.createMessage(successMessage(`Auto-reactions disabled in <#${args.channelId}>`));
+  }
+
+  async onMessageCreate(msg: SavedMessage) {
+    const autoReaction = await this.autoReactions.getForChannel(msg.channel_id);
+    if (!autoReaction) return;
+
+    const realMsg = await this.bot.getMessage(msg.channel_id, msg.id);
+    if (!realMsg) return;
+
+    for (const reaction of autoReaction.reactions) {
+      await realMsg.addReaction(reaction);
+    }
+  }
+}
