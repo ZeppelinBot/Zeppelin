@@ -10,7 +10,7 @@ import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 
 export class MutesPlugin extends ZeppelinPlugin {
-  public static pluginName = 'mutes';
+  public static pluginName = "mutes";
 
   protected actions: GuildActions;
   protected mutes: GuildMutes;
@@ -38,9 +38,7 @@ export class MutesPlugin extends ZeppelinPlugin {
     this.actions.register("unmute", args => {
       return this.unmuteMember(args.member, args.unmuteTime);
     });
-    this.actions.register("postMuteList", args => {
-      return this.postMuteList(args.channel);
-    });
+    this.actions.register("postMuteList", this.postMuteList.bind(this));
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
