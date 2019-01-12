@@ -928,7 +928,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           reason = disableLinkPreviews(reason);
 
           let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
-          if (theCase.notes.length > 1) line += ` (+ ${theCase.notes.length - 1} notes)`;
+          if (theCase.notes.length > 1)
+            line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
 
           lines.push(line);
         }
