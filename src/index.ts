@@ -63,6 +63,7 @@ import { SlowmodePlugin } from "./plugins/Slowmode";
 import { StarboardPlugin } from "./plugins/Starboard";
 import { NameHistoryPlugin } from "./plugins/NameHistory";
 import { AutoReactions } from "./plugins/AutoReactions";
+import { PingableRoles } from "./plugins/PingableRoles";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -96,7 +97,8 @@ connect().then(async conn => {
       TagsPlugin,
       SlowmodePlugin,
       StarboardPlugin,
-      AutoReactions
+      AutoReactions,
+      PingableRoles
     ],
 
     globalPlugins: [BotControlPlugin, LogServerPlugin],
