@@ -1,16 +1,12 @@
 import { Plugin, decorators as d } from "knub";
-import { errorMessage, isSnowflake } from "../utils";
+import { CustomEmoji, errorMessage, isSnowflake } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
-import { Channel, Emoji, Message, TextChannel } from "eris";
+import { Channel, Message, TextChannel } from "eris";
 
 type ReactionRolePair = [string, string];
 
-type CustomEmoji = {
-  id: string;
-} & Emoji;
-
 export class ReactionRolesPlugin extends Plugin {
-  public static pluginName = 'reaction_roles';
+  public static pluginName = "reaction_roles";
 
   protected reactionRoles: GuildReactionRoles;
 
@@ -81,7 +77,7 @@ export class ReactionRolesPlugin extends Plugin {
     const newRolePairs: ReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
-      .map(v => v.split("=").map(v => v.trim()))
+      .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
       .map(
         (pair): ReactionRolePair => {
           const customEmojiMatch = pair[0].match(/^<:(?:.*?):(\d+)>$/);

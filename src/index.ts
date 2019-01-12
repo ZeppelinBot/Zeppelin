@@ -62,6 +62,7 @@ import { MutesPlugin } from "./plugins/Mutes";
 import { SlowmodePlugin } from "./plugins/Slowmode";
 import { StarboardPlugin } from "./plugins/Starboard";
 import { NameHistoryPlugin } from "./plugins/NameHistory";
+import { AutoReactions } from "./plugins/AutoReactions";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -94,7 +95,8 @@ connect().then(async conn => {
       SpamPlugin,
       TagsPlugin,
       SlowmodePlugin,
-      StarboardPlugin
+      StarboardPlugin,
+      AutoReactions
     ],
 
     globalPlugins: [BotControlPlugin, LogServerPlugin],

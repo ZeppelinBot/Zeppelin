@@ -1,5 +1,5 @@
 import at = require("lodash.at");
-import { Guild, GuildAuditLogEntry, TextableChannel } from "eris";
+import { Emoji, Guild, GuildAuditLogEntry, TextableChannel } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -176,6 +176,10 @@ export function getEmojiInString(str: string): string[] {
   return str.match(matchAllEmojiRegex) || [];
 }
 
+export function isEmoji(str: string): boolean {
+  return str.match(`^(${unicodeEmojiRegex.source})|(${customEmojiRegex.source})$`) !== null;
+}
+
 export function trimLines(str: string) {
   return str
     .trim()
@@ -288,3 +292,7 @@ export function noop() {
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
+
+export type CustomEmoji = {
+  id: string;
+} & Emoji;
