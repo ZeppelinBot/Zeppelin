@@ -61,13 +61,13 @@ export class AutoReactions extends Plugin {
       const customEmojiMatch = reaction.match(customEmojiRegex);
       if (customEmojiMatch) {
         // Custom emoji
-        if (!guildEmojiIds.includes(customEmojiMatch[0])) {
+        if (!guildEmojiIds.includes(customEmojiMatch[1])) {
           msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
 
           return;
         }
 
-        savedValue = `${customEmojiMatch[0]}:${customEmojiMatch[1]}`;
+        savedValue = `${customEmojiMatch[1]}:${customEmojiMatch[2]}`;
       } else {
         // Unicode emoji
         savedValue = reaction;
