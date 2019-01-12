@@ -56,6 +56,8 @@ export class PingableRoles extends Plugin {
     }
 
     await this.pingableRoles.delete(args.channelId, args.role.id);
+    this.cache.delete(args.channelId);
+
     msg.channel.createMessage(
       successMessage(`**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`)
     );
@@ -73,6 +75,8 @@ export class PingableRoles extends Plugin {
     }
 
     await this.pingableRoles.add(args.channelId, args.role.id);
+    this.cache.delete(args.channelId);
+
     msg.channel.createMessage(successMessage(`**${args.role.name}** has been set as pingable in <#${args.channelId}>`));
   }
 
