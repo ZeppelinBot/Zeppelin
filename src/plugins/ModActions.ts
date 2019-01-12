@@ -5,6 +5,7 @@ import { GuildCases } from "../data/GuildCases";
 import {
   chunkMessageLines,
   convertDelayStringToMS,
+  createChunkedMessage,
   disableLinkPreviews,
   errorMessage,
   findRelevantAuditLogEntry,
@@ -34,10 +35,10 @@ interface IIgnoredEvent {
   userId: string;
 }
 
-const CASE_LIST_REASON_MAX_LENGTH = 80;
+const CASE_LIST_REASON_MAX_LENGTH = 300;
 
 export class ModActionsPlugin extends ZeppelinPlugin {
-  public static pluginName = 'mod_actions';
+  public static pluginName = "mod_actions";
 
   protected actions: GuildActions;
   protected mutes: GuildMutes;
@@ -893,7 +894,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const prefix = this.knub.getGuildData(this.guildId).config.prefix;
 
     if (cases.length === 0) {
-      msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : 'the specified user'}`);
+      msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
     } else {
       if (args.expanded && args.expanded.startsWith("expand")) {
         if (cases.length > 8) {
@@ -917,7 +918,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           let reason = firstNote ? firstNote.body : "";
 
           if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
-            const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 20).match(/(?:[.,!?\s]|$)/);
+            const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
             const nextWhitespaceIndex = match ? CASE_LIST_REASON_MAX_LENGTH + match.index : CASE_LIST_REASON_MAX_LENGTH;
             if (nextWhitespaceIndex < reason.length) {
               reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
@@ -926,7 +927,10 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
           reason = disableLinkPreviews(reason);
 
-          lines.push(`Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`);
+          let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
+          if (theCase.notes.length > 1) line += ` (+ ${theCase.notes.length - 1} notes)`;
+
+          lines.push(line);
         }
 
         const finalMessage = trimLines(`
@@ -937,10 +941,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         Use \`${prefix}case <num>\` to see more info about individual cases
       `);
 
-        const finalMessageChunks = chunkMessageLines(finalMessage);
-        for (const msgChunk of finalMessageChunks) {
-          msg.channel.createMessage(msgChunk);
-        }
+        createChunkedMessage(msg.channel, finalMessage);
       }
     }
   }
