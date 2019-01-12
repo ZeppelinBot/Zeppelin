@@ -77,7 +77,11 @@ export class MutesPlugin extends ZeppelinPlugin {
     if (unmuteTime) {
       await this.mutes.addOrUpdateMute(member.id, unmuteTime);
     } else {
-      await member.removeRole(this.configValue("mute_role"));
+      const muteRole = this.configValue("mute_role");
+      if (member.roles.includes(muteRole)) {
+        await member.removeRole(this.configValue("mute_role"));
+      }
+
       await this.mutes.clear(member.id);
     }
   }
@@ -149,6 +153,9 @@ export class MutesPlugin extends ZeppelinPlugin {
     }
   }
 
+  /**
+   * Clear active mute from the member if the member is banned
+   */
   @d.event("guildBanAdd")
   async onGuildBanAdd(_, user: User) {
     const mute = await this.mutes.findExistingMuteForUserId(user.id);
@@ -157,6 +164,9 @@ export class MutesPlugin extends ZeppelinPlugin {
     }
   }
 
+  /**
+   * COMMAND: Clear dangling mutes for members who have been banned
+   */
   @d.command("clear_banned_mutes")
   @d.permission("cleanup")
   async clearBannedMutesCmd(msg: Message) {
@@ -174,7 +184,49 @@ export class MutesPlugin extends ZeppelinPlugin {
       }
     }
 
-    msg.channel.createMessage(successMessage(`Cleared mutes from banned users!`));
+    msg.channel.createMessage(successMessage(`Cleared ${cleared} mutes from banned users!`));
+  }
+
+  /**
+   * Clear active mute from the member if the mute role is removed
+   */
+  @d.event("guildMemberUpdate")
+  async onGuildMemberUpdate(_, member: Member) {
+    const muteRole = this.configValue("mute_role");
+    if (!muteRole) return;
+
+    const mute = await this.mutes.findExistingMuteForUserId(member.id);
+    if (!mute) return;
+
+    if (!member.roles.includes(muteRole)) {
+      await this.mutes.clear(muteRole);
+    }
+  }
+
+  /**
+   * COMMAND: Clear dangling mutes for members whose mute role was removed by other means
+   */
+  @d.command("clear_mutes_without_role")
+  @d.permission("cleanup")
+  async clearMutesWithoutRoleCmd(msg: Message) {
+    const activeMutes = await this.mutes.getActiveMutes();
+    const muteRole = this.configValue("mute_role");
+    if (!muteRole) return;
+
+    await msg.channel.createMessage("Clearing mutes from members that don't have the mute role...");
+
+    let cleared = 0;
+    for (const mute of activeMutes) {
+      const member = this.guild.members.get(mute.user_id);
+      if (!member) continue;
+
+      if (!member.roles.includes(muteRole)) {
+        await this.mutes.clear(mute.user_id);
+        cleared++;
+      }
+    }
+
+    msg.channel.createMessage(successMessage(`Cleared ${cleared} mutes from members that don't have the mute role`));
   }
 
   protected async clearExpiredMutes() {
