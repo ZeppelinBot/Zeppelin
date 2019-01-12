@@ -4,6 +4,18 @@ import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
+
+const TAG_FUNCTIONS = {
+  countdown(toDate) {
+    const now = moment();
+    const target = moment(toDate, "YYYY-MM-DD HH:mm:ss");
+    const diff = target.diff(now);
+    const result = humanizeDuration(diff, { largest: 2, round: true });
+    return diff >= 0 ? result : `${result} ago`;
+  }
+};
 
 export class TagsPlugin extends Plugin {
   public static pluginName = "tags";
@@ -101,12 +113,35 @@ export class TagsPlugin extends Plugin {
     const prefix = this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "prefix");
     if (!msg.data.content.startsWith(prefix)) return;
 
-    const withoutPrefix = msg.data.content.slice(prefix.length);
-    const tag = await this.tags.find(withoutPrefix);
+    const tagNameMatch = msg.data.content.slice(prefix.length).match(/^\S+/);
+    if (tagNameMatch === null) return;
+
+    const tagName = tagNameMatch[0];
+    const tag = await this.tags.find(tagName);
     if (!tag) return;
 
+    let body = tag.body;
+
+    // Substitute variables (matched with Knub's argument parser -> supports quotes etc.)
+    const variableStr = msg.data.content.slice(prefix.length + tagName.length).trim();
+    const variableValues = this.commands.parseArguments(variableStr).map(v => v.value);
+    let variableIndex = 0;
+    body = body.replace(/(?<!\\)%[a-zA-Z]+/g, () => variableValues[variableIndex++] || "");
+
+    // Run functions
+    body = body.replace(/(?<!\\)\{([a-zA-Z]+)(\:(.+?))?\}/, (_, fn, args) => {
+      if (!TAG_FUNCTIONS[fn]) return "";
+      const fnArgs = args ? args.slice(1).split(/(?<!\\):/) : [];
+
+      try {
+        return TAG_FUNCTIONS[fn].apply(null, fnArgs);
+      } catch (e) {
+        return "";
+      }
+    });
+
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
-    const responseMsg = await channel.createMessage(tag.body);
+    const responseMsg = await channel.createMessage(body);
 
     // Save the command-response message pair once the message is in our database
     if (this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "delete_with_command")) {
