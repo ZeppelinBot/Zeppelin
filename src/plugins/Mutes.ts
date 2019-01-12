@@ -170,11 +170,15 @@ export class MutesPlugin extends ZeppelinPlugin {
   @d.command("clear_banned_mutes")
   @d.permission("cleanup")
   async clearBannedMutesCmd(msg: Message) {
+    await msg.channel.createMessage("Clearing mutes from banned users...");
+
     const activeMutes = await this.mutes.getActiveMutes();
     const bans = await this.guild.getBans();
     const bannedIds = bans.map(b => b.id);
 
-    await msg.channel.createMessage("Clearing mutes from banned users...");
+    await msg.channel.createMessage(
+      `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`
+    );
 
     let cleared = 0;
     for (const mute of activeMutes) {
