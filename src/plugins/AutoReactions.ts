@@ -3,15 +3,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
-import {
-  CustomEmoji,
-  customEmojiRegex,
-  errorMessage,
-  isEmoji,
-  isSnowflake,
-  successMessage,
-  unicodeEmojiRegex
-} from "../utils";
+import { CustomEmoji, customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
 
 export class AutoReactions extends Plugin {
   public static pluginName = "auto_reactions";
@@ -50,6 +42,7 @@ export class AutoReactions extends Plugin {
   }
 
   @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
+  @d.permission("use")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
     const guildEmojis = this.guild.emojis as CustomEmoji[];
     const guildEmojiIds = guildEmojis.map(e => e.id);
@@ -88,6 +81,7 @@ export class AutoReactions extends Plugin {
   }
 
   @d.command("auto_reactions disable", "<channelId:channelId>")
+  @d.permission("use")
   async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
     const autoReaction = await this.autoReactions.getForChannel(args.channelId);
     if (!autoReaction) {
