@@ -1,13 +1,14 @@
-import { Member, TextableChannel } from "eris";
+import { Member, Message, TextableChannel, User } from "eris";
 import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 import { GuildMutes } from "../data/GuildMutes";
-import { DBDateFormat, chunkMessageLines, stripObjectToScalars } from "../utils";
+import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
+import { decorators as d } from "knub";
 
 export class MutesPlugin extends ZeppelinPlugin {
   public static pluginName = "mutes";
@@ -22,7 +23,18 @@ export class MutesPlugin extends ZeppelinPlugin {
     return {
       config: {
         mute_role: null
-      }
+      },
+      permissions: {
+        cleanup: false
+      },
+      overrides: [
+        {
+          level: ">=100",
+          permissions: {
+            cleanup: true
+          }
+        }
+      ]
     };
   }
 
@@ -135,6 +147,34 @@ export class MutesPlugin extends ZeppelinPlugin {
     for (const chunk of chunks) {
       channel.createMessage(chunk);
     }
+  }
+
+  @d.event("guildBanAdd")
+  async onGuildBanAdd(_, user: User) {
+    const mute = await this.mutes.findExistingMuteForUserId(user.id);
+    if (mute) {
+      this.mutes.clear(user.id);
+    }
+  }
+
+  @d.command("clear_banned_mutes")
+  @d.permission("cleanup")
+  async clearBannedMutesCmd(msg: Message) {
+    const activeMutes = await this.mutes.getActiveMutes();
+    const bans = await this.guild.getBans();
+    const bannedIds = bans.map(b => b.id);
+
+    await msg.channel.createMessage("Clearing mutes from banned users...");
+
+    let cleared = 0;
+    for (const mute of activeMutes) {
+      if (bannedIds.includes(mute.user_id)) {
+        await this.mutes.clear(mute.user_id);
+        cleared++;
+      }
+    }
+
+    msg.channel.createMessage(successMessage(`Cleared mutes from banned users!`));
   }
 
   protected async clearExpiredMutes() {
