@@ -354,7 +354,7 @@ export class SpamPlugin extends Plugin {
     const maxEmoji = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_emoji"
+      "max_emojis"
     );
     if (maxEmoji && savedMessage.data.content) {
       const emojiCount = getEmojiInString(savedMessage.data.content).length;
