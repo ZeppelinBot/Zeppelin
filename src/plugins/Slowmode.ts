@@ -5,7 +5,7 @@ import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
 
 export class SlowmodePlugin extends Plugin {
-  public static pluginName = 'slowmode';
+  public static pluginName = "slowmode";
 
   protected slowmodes: GuildSlowmodes;
   protected clearInterval;
@@ -168,6 +168,7 @@ export class SlowmodePlugin extends Plugin {
    */
   @d.event("messageCreate")
   @d.permission("affected")
+  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     if (msg.author.bot) return;
 
