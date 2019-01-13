@@ -126,7 +126,8 @@ connect().then(async conn => {
 
       logFn: (level, msg) => {
         if (level === "debug") return;
-        console.log(`[${level.toUpperCase()}] ${msg}`);
+        const ts = moment().format("YYYY-MM-DD HH:mm:ss");
+        console.log(`[${ts}] [${level.toUpperCase()}] ${msg}`);
       }
     }
   });
