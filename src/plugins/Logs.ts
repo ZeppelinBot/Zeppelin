@@ -19,6 +19,7 @@ import diff from "lodash.difference";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
+import { GuildCases } from "../data/GuildCases";
 
 interface ILogChannel {
   include?: string[];
@@ -36,11 +37,12 @@ const unknownUser = {
 };
 
 export class LogsPlugin extends Plugin {
-  public static pluginName = 'logs';
+  public static pluginName = "logs";
 
   protected guildLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
+  protected cases: GuildCases;
 
   protected logListener;
 
@@ -64,6 +66,7 @@ export class LogsPlugin extends Plugin {
     this.guildLogs = new GuildLogs(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
     this.archives = GuildArchives.getInstance(this.guildId);
+    this.cases = GuildCases.getInstance(this.guildId);
 
     this.logListener = ({ type, data }) => this.log(type, data);
     this.guildLogs.on("log", this.logListener);
@@ -118,7 +121,7 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("guildMemberAdd")
-  onMemberJoin(_, member) {
+  async onMemberJoin(_, member) {
     const newThreshold = moment().valueOf() - 1000 * 60 * 60;
     const accountAge = humanizeDuration(moment().valueOf() - member.createdAt, {
       largest: 2,
@@ -130,6 +133,15 @@ export class LogsPlugin extends Plugin {
       new: member.createdAt >= newThreshold ? " :new:" : "",
       account_age: accountAge
     });
+
+    const cases = (await this.cases.getByUserId(member.id)).filter(c => !c.is_hidden);
+
+    if (cases.length) {
+      this.guildLogs.log(LogType.MEMBER_JOIN_WITH_PRIOR_RECORDS, {
+        member: stripObjectToScalars(member, ["user"]),
+        caseCount: cases.length
+      });
+    }
   }
 
   @d.event("guildMemberRemove")
