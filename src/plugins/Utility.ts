@@ -12,6 +12,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
+const { performance } = require("perf_hooks");
+
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
@@ -36,7 +38,8 @@ export class UtilityPlugin extends ZeppelinPlugin {
         info: false,
         server: false,
         reload_guild: false,
-        nickname: false
+        nickname: false,
+        ping: false
       },
       overrides: [
         {
@@ -48,8 +51,14 @@ export class UtilityPlugin extends ZeppelinPlugin {
             clean: true,
             info: true,
             server: true,
-            reload_guild: true,
             nickname: true
+          }
+        },
+        {
+          level: ">=100",
+          permissions: {
+            reload_guild: true,
+            ping: true
           }
         }
       ]
@@ -415,6 +424,36 @@ export class UtilityPlugin extends ZeppelinPlugin {
     });
 
     msg.channel.createMessage({ embed });
+  }
+
+  @d.command("ping")
+  @d.permission("ping")
+  async pingCmd(msg: Message) {
+    const times = [];
+    const messages: Message[] = [];
+
+    for (let i = 0; i < 4; i++) {
+      const start = performance.now();
+      const message = await msg.channel.createMessage(`Calculating ping... ${i + 1}`);
+      times.push(performance.now() - start);
+      messages.push(message);
+    }
+
+    const highest = Math.round(Math.max(...times));
+    const lowest = Math.round(Math.min(...times));
+    const mean = Math.round(times.reduce((t, v) => t + v, 0) / times.length);
+
+    msg.channel.createMessage(
+      trimLines(`
+      **Ping:**
+      Lowest: **${lowest}ms**
+      Highest: **${highest}ms**
+      Mean: **${mean}ms**
+    `)
+    );
+
+    // Clean up test messages
+    this.bot.deleteMessages(messages[0].channel.id, messages.map(m => m.id)).catch(noop);
   }
 
   @d.command("reload_guild")
