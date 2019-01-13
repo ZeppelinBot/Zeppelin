@@ -84,7 +84,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         ban: false,
         view: false,
         addcase: false,
-        massban: true
+        massban: true,
+        hidecase: false
       },
       overrides: [
         {
@@ -102,7 +103,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         {
           level: ">=100",
           permissions: {
-            massban: true
+            massban: true,
+            hidecase: true
           }
         }
       ]
@@ -885,10 +887,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
   }
 
-  @d.command(/cases|usercases/, "<userId:userId> [expanded:string$]")
+  @d.command(/cases|usercases/, "<userId:userId> [opts:string$]")
   @d.permission("view")
-  async usercasesCmd(msg: Message, args: { userId: string; expanded?: string }) {
+  async usercasesCmd(msg: Message, args: { userId: string; opts?: string }) {
     const cases = await this.cases.with("notes").getByUserId(args.userId);
+    const normalCases = cases.filter(c => !c.is_hidden);
+    const hiddenCases = cases.filter(c => c.is_hidden);
+
     const user = this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
     const prefix = this.knub.getGuildData(this.guildId).config.prefix;
@@ -896,14 +901,17 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     if (cases.length === 0) {
       msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
     } else {
-      if (args.expanded && args.expanded.startsWith("expand")) {
-        if (cases.length > 8) {
+      const showHidden = args.opts && args.opts.match(/\bhidden\b/);
+      const casesToDisplay = showHidden ? cases : normalCases;
+
+      if (args.opts && args.opts.match(/\bexpand\b/)) {
+        if (casesToDisplay.length > 8) {
           msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
           return;
         }
 
         // Expanded view (= individual case embeds)
-        for (const theCase of cases) {
+        for (const theCase of casesToDisplay) {
           await this.actions.fire("postCase", {
             caseId: theCase.id,
             channel: msg.channel
@@ -912,7 +920,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       } else {
         // Compact view (= regular message with a preview of each case)
         const lines = [];
-        for (const theCase of cases) {
+        for (const theCase of casesToDisplay) {
           theCase.notes.sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
           const firstNote = theCase.notes[0];
           let reason = firstNote ? firstNote.body : "";
@@ -928,10 +936,23 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           reason = disableLinkPreviews(reason);
 
           let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
-          if (theCase.notes.length > 1)
+          if (theCase.notes.length > 1) {
             line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
+          }
+
+          if (theCase.is_hidden) {
+            line += " *(hidden)*";
+          }
 
           lines.push(line);
+        }
+
+        if (!showHidden && hiddenCases.length) {
+          if (hiddenCases.length === 1) {
+            lines.push(`*+${hiddenCases.length} hidden case, use "hidden" to show it*`);
+          } else {
+            lines.push(`*+${hiddenCases.length} hidden cases, use "hidden" to show them*`);
+          }
         }
 
         const finalMessage = trimLines(`
@@ -945,6 +966,34 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         createChunkedMessage(msg.channel, finalMessage);
       }
     }
+  }
+
+  @d.command("hidecase", "<caseNum:number>")
+  @d.permission("hidecase")
+  async hideCaseCmd(msg: Message, args: { caseNum: number }) {
+    const theCase = await this.cases.findByCaseNumber(args.caseNum);
+    if (!theCase) {
+      msg.channel.createMessage(errorMessage("Case not found!"));
+      return;
+    }
+
+    await this.cases.setHidden(theCase.id, true);
+    msg.channel.createMessage(
+      successMessage(`Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`)
+    );
+  }
+
+  @d.command("unhidecase", "<caseNum:number>")
+  @d.permission("hidecase")
+  async unhideCaseCmd(msg: Message, args: { caseNum: number }) {
+    const theCase = await this.cases.findByCaseNumber(args.caseNum);
+    if (!theCase) {
+      msg.channel.createMessage(errorMessage("Case not found!"));
+      return;
+    }
+
+    await this.cases.setHidden(theCase.id, false);
+    msg.channel.createMessage(successMessage(`Case #${theCase.case_number} is no longer hidden!`));
   }
 
   /**

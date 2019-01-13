@@ -180,6 +180,10 @@ export class CasesPlugin extends ZeppelinPlugin {
       ]
     };
 
+    if (theCase.is_hidden) {
+      embed.title += " (hidden)";
+    }
+
     if (CaseTypeColors[theCase.type]) {
       embed.color = CaseTypeColors[theCase.type];
     }

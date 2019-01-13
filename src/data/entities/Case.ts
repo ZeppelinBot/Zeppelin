@@ -23,6 +23,8 @@ export class Case {
 
   @Column() created_at: string;
 
+  @Column() is_hidden: boolean;
+
   @OneToMany(type => CaseNote, note => note.case)
   notes: CaseNote[];
 }
