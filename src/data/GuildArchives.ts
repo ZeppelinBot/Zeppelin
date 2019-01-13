@@ -14,10 +14,6 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
 `);
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
   "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}";
-const MESSAGE_ARCHIVE_FOOTER_FORMAT = trimLines(`
-  Log file generated on {timestamp}
-  Expires at {expires}
-`);
 
 export class GuildArchives extends BaseRepository {
   protected archives: Repository<ArchiveEntry>;
@@ -35,6 +31,7 @@ export class GuildArchives extends BaseRepository {
     this.archives
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("expires_at IS NOT NULL")
       .andWhere("expires_at <= NOW()")
       .delete()
       .execute();
@@ -45,6 +42,15 @@ export class GuildArchives extends BaseRepository {
       where: { id },
       relations: this.getRelations()
     });
+  }
+
+  async makePermanent(id: string): Promise<void> {
+    await this.archives.update(
+      { id },
+      {
+        expires_at: null
+      }
+    );
   }
 
   /**
@@ -81,11 +87,7 @@ export class GuildArchives extends BaseRepository {
       });
     });
     const messagesStr = msgLines.join("\n");
-    const footerStr = formatTemplateString(MESSAGE_ARCHIVE_FOOTER_FORMAT, {
-      timestamp: moment().format("YYYY-MM-DD [at] HH:mm:ss (Z)"),
-      expires: expiresAt.format("YYYY-MM-DD [at] HH:mm:ss (Z)")
-    });
 
-    return this.create([headerStr, messagesStr, footerStr].join("\n\n"), expiresAt);
+    return this.create([headerStr, messagesStr].join("\n\n"), expiresAt);
   }
 }
