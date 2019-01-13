@@ -101,7 +101,7 @@ export class AutoReactions extends Plugin {
     if (!realMsg) return;
 
     for (const reaction of autoReaction.reactions) {
-      await realMsg.addReaction(reaction);
+      realMsg.addReaction(reaction);
     }
   }
 }

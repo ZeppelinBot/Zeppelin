@@ -81,6 +81,7 @@ export class PingableRoles extends Plugin {
   }
 
   @d.event("typingStart")
+  @d.nonBlocking()
   async onTypingStart(channel: TextableChannel, user: User) {
     const pingableRoles = await this.getPingableRolesForChannel(channel.id);
     if (pingableRoles.length === 0) return;
@@ -98,6 +99,7 @@ export class PingableRoles extends Plugin {
   }
 
   @d.event("messageCreate")
+  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     const pingableRoles = await this.getPingableRolesForChannel(msg.channel.id);
     if (pingableRoles.length === 0) return;

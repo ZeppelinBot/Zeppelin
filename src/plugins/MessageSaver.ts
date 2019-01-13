@@ -4,7 +4,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
 
 export class MessageSaverPlugin extends Plugin {
-  public static pluginName = 'message_saver';
+  public static pluginName = "message_saver";
 
   protected savedMessages: GuildSavedMessages;
 
@@ -30,6 +30,7 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageCreate", "guild", false)
+  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     // Only save regular chat messages
     if (msg.type !== 0) {
@@ -40,6 +41,7 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageDelete", "guild", false)
+  @d.nonBlocking()
   async onMessageDelete(msg: Message) {
     if (msg.type != null && msg.type !== 0) {
       return;
@@ -49,6 +51,7 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageUpdate", "guild", false)
+  @d.nonBlocking()
   async onMessageUpdate(msg: Message) {
     if (msg.type !== 0) {
       return;
@@ -58,6 +61,7 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageDeleteBulk", "guild", false)
+  @d.nonBlocking()
   async onMessageBulkDelete(messages: Message[]) {
     const ids = messages.map(m => m.id);
     await this.savedMessages.markBulkAsDeleted(ids);

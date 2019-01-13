@@ -7,7 +7,7 @@ import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
 
 export class PersistPlugin extends Plugin {
-  public static pluginName = 'persist';
+  public static pluginName = "persist";
 
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;
@@ -57,6 +57,7 @@ export class PersistPlugin extends Plugin {
   }
 
   @d.event("guildMemberAdd")
+  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     const persistedData = await this.persistedData.find(member.id);
     if (!persistedData) return;
