@@ -19,7 +19,7 @@ const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const activeReloads: Map<string, TextChannel> = new Map();
 
 export class UtilityPlugin extends ZeppelinPlugin {
-  public static pluginName = 'utility';
+  public static pluginName = "utility";
 
   protected logs: GuildLogs;
   protected cases: GuildCases;
@@ -292,9 +292,12 @@ export class UtilityPlugin extends ZeppelinPlugin {
         return a.created_at < b.created_at ? 1 : -1;
       });
 
-      const caseSummary = cases.slice(0, 3).map(c => {
-        return `${CaseTypes[c.type]} (#${c.case_number})`;
-      });
+      const caseSummary = cases
+        .filter(c => !c.is_hidden)
+        .slice(0, 3)
+        .map(c => {
+          return `${CaseTypes[c.type]} (#${c.case_number})`;
+        });
 
       const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 

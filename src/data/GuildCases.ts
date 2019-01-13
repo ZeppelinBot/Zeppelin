@@ -53,6 +53,15 @@ export class GuildCases extends BaseRepository {
     });
   }
 
+  async setHidden(id: number, hidden: boolean): Promise<void> {
+    await this.cases.update(
+      { id },
+      {
+        is_hidden: hidden
+      }
+    );
+  }
+
   async create(data): Promise<Case> {
     const result = await this.cases.insert({
       ...data,
