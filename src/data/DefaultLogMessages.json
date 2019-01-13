@@ -43,5 +43,7 @@
 
   "CASE_CREATE": "✏ **{mod.username}#{mod.discriminator}** (`{mod.id}`) manually created new **{caseType}** case (#{caseNum})",
 
-  "MASSBAN": "⚒ **{mod.username}#{mod.discriminator}** massbanned {count} users"
+  "MASSBAN": "⚒ **{mod.username}#{mod.discriminator}** massbanned {count} users",
+
+  "MEMBER_JOIN_WITH_PRIOR_RECORDS": "⚠ **{member.user.username}#{member.user.discriminator}** joined with prior records ({caseCount} case(s))"
 }
