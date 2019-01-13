@@ -10,7 +10,7 @@ require("dotenv").config();
 
 let recentErrors = 0;
 const RECENT_ERROR_EXIT_THRESHOLD = 5;
-setInterval(() => recentErrors--, 2500);
+setInterval(() => (recentErrors = Math.max(0, recentErrors - 1)), 2500);
 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason);
