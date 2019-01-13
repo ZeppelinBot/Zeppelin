@@ -432,12 +432,17 @@ export class UtilityPlugin extends ZeppelinPlugin {
   async pingCmd(msg: Message) {
     const times = [];
     const messages: Message[] = [];
+    let msgToMsgDelay = null;
 
     for (let i = 0; i < 4; i++) {
       const start = performance.now();
       const message = await msg.channel.createMessage(`Calculating ping... ${i + 1}`);
       times.push(performance.now() - start);
       messages.push(message);
+
+      if (msgToMsgDelay === null) {
+        msgToMsgDelay = message.timestamp - msg.timestamp;
+      }
     }
 
     const highest = Math.round(Math.max(...times));
@@ -450,6 +455,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
       Lowest: **${lowest}ms**
       Highest: **${highest}ms**
       Mean: **${mean}ms**
+      Time between ping command and first reply: **${msgToMsgDelay}ms**
     `)
     );
 
