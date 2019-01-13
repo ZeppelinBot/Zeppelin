@@ -428,6 +428,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
   @d.command("ping")
   @d.permission("ping")
+  @d.nonBlocking()
   async pingCmd(msg: Message) {
     const times = [];
     const messages: Message[] = [];
