@@ -8,20 +8,18 @@ import { SimpleError } from "./SimpleError";
 
 require("dotenv").config();
 
+let recentErrors = 0;
+const RECENT_ERROR_EXIT_THRESHOLD = 5;
+setInterval(() => recentErrors--, 2500);
+
 process.on("unhandledRejection", (reason, p) => {
-  // tslint:disable-next-line
   console.error(reason);
-  process.exit(1);
+  if (++recentErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
 });
 
 process.on("uncaughtException", err => {
-  if (err.message && err.message.startsWith("DiscordHTTPError")) {
-    console.error(err);
-    return;
-  } else {
-    console.error(err);
-    process.exit(1);
-  }
+  console.error(err);
+  if (++recentErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
 });
 
 // Verify required Node.js version
