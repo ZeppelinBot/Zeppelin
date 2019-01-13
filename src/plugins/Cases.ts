@@ -6,12 +6,14 @@ import moment from "moment-timezone";
 import { CaseTypeColors } from "../data/CaseTypeColors";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
+import { GuildArchives } from "../data/GuildArchives";
 
 export class CasesPlugin extends ZeppelinPlugin {
-  public static pluginName = 'cases';
+  public static pluginName = "cases";
 
   protected actions: GuildActions;
   protected cases: GuildCases;
+  protected archives: GuildArchives;
 
   getDefaultOptions() {
     return {
@@ -25,6 +27,7 @@ export class CasesPlugin extends ZeppelinPlugin {
   onLoad() {
     this.actions = GuildActions.getInstance(this.guildId);
     this.cases = GuildCases.getInstance(this.guildId);
+    this.archives = GuildArchives.getInstance(this.guildId);
 
     this.actions.register("createCase", args => {
       return this.createCase(
@@ -133,6 +136,12 @@ export class CasesPlugin extends ZeppelinPlugin {
         mod_id: modId,
         mod_name: modName
       });
+    }
+
+    const archiveLinkMatch = body && body.match(/\/archives\/([a-zA-Z0-9\-]+)/);
+    if (archiveLinkMatch) {
+      const archiveId = archiveLinkMatch[1];
+      this.archives.makePermanent(archiveId);
     }
 
     if ((!automatic || this.configValue("log_automatic_actions")) && postInCaseLogOverride !== false) {
