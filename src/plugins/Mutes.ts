@@ -4,7 +4,7 @@ import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 import { GuildMutes } from "../data/GuildMutes";
-import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage } from "../utils";
+import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage, errorMessage } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
@@ -233,6 +233,19 @@ export class MutesPlugin extends ZeppelinPlugin {
     }
 
     msg.channel.createMessage(successMessage(`Cleared ${cleared} mutes from members that don't have the mute role`));
+  }
+
+  @d.command("clear_mute", "<userId:string>")
+  @d.permission("cleanup")
+  async clearMuteCmd(msg: Message, args: { userId: string }) {
+    const mute = await this.mutes.findExistingMuteForUserId(args.userId);
+    if (!mute) {
+      msg.channel.createMessage(errorMessage("No active mutes found for that user id"));
+      return;
+    }
+
+    await this.mutes.clear(args.userId);
+    msg.channel.createMessage(successMessage(`Active mute cleared`));
   }
 
   protected async clearExpiredMutes() {
