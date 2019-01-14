@@ -1,10 +1,10 @@
 import path from "path";
 import yaml from "js-yaml";
 
-import _fs from "fs";
-const fs = _fs.promises;
+import fs from "fs";
+const fsp = fs.promises;
 
-import {Knub, logger, PluginError} from "knub";
+import { Knub, logger, PluginError } from "knub";
 import { SimpleError } from "./SimpleError";
 
 require("dotenv").config();
@@ -125,12 +125,12 @@ connect().then(async conn => {
         const configPath = path.join("config", configFile);
 
         try {
-          await fs.access(configPath);
+          await fsp.access(configPath);
         } catch (e) {
           return {};
         }
 
-        const yamlString = await fs.readFile(configPath, { encoding: "utf8" });
+        const yamlString = await fsp.readFile(configPath, { encoding: "utf8" });
         return yaml.safeLoad(yamlString);
       },
 
