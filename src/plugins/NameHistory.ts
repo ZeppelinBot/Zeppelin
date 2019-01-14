@@ -56,23 +56,11 @@ export class NameHistoryPlugin extends Plugin {
     createChunkedMessage(msg.channel, message);
   }
 
-  @d.event("userUpdate")
+  @d.event("userUpdate", null, false)
   async onUserUpdate(user: User, oldUser: { username: string; discriminator: string; avatar: string }) {
-    console.log("onUserUpdate", user.username, oldUser.username);
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
       const newUsername = `${user.username}#${user.discriminator}`;
       await this.nameHistory.addEntry(user.id, NameHistoryEntryTypes.Username, newUsername);
-    }
-  }
-
-  @d.event("presenceUpdate")
-  async onPresenceUpdate(other: Member | Relationship) {
-    const user = other.user;
-    const username = `${user.username}#${user.discriminator}`;
-
-    const lastEntry = await this.nameHistory.getLastEntryByType(user.id, NameHistoryEntryTypes.Username);
-    if (!lastEntry || lastEntry.value !== username) {
-      await this.nameHistory.addEntry(user.id, NameHistoryEntryTypes.Username, username);
     }
   }
 
