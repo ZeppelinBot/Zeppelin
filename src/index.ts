@@ -4,22 +4,33 @@ import yaml from "js-yaml";
 import _fs from "fs";
 const fs = _fs.promises;
 
+import {Knub, logger, PluginError} from "knub";
 import { SimpleError } from "./SimpleError";
 
 require("dotenv").config();
 
-let recentErrors = 0;
+let recentPluginErrors = 0;
 const RECENT_ERROR_EXIT_THRESHOLD = 5;
-setInterval(() => (recentErrors = Math.max(0, recentErrors - 1)), 2500);
+setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 2500);
 
 process.on("unhandledRejection", (reason, p) => {
   console.error(reason);
-  if (++recentErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
+
+  if (reason instanceof PluginError) {
+    if (++recentPluginErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
+  } else {
+    process.exit(1);
+  }
 });
 
 process.on("uncaughtException", err => {
   console.error(err);
-  if (++recentErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
+
+  if (err instanceof PluginError) {
+    if (++recentPluginErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
+  } else {
+    process.exit(1);
+  }
 });
 
 // Verify required Node.js version
@@ -37,7 +48,6 @@ import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
-import { Knub, logger } from "knub";
 import { connect } from "./data/db";
 
 // Global plugins
