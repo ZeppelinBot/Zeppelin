@@ -6,6 +6,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import fs from "fs";
 const fsp = fs.promises;
 
+const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
+
 export class PostPlugin extends Plugin {
   public static pluginName = "post";
 
@@ -70,6 +72,9 @@ export class PostPlugin extends Plugin {
     }
   }
 
+  /**
+   * COMMAND: Post a message with an embed as the bot to the specified channel
+   */
   @d.command("post_embed", "<channel:channel>", {
     options: [{ name: "title", type: "string" }, { name: "content", type: "string" }, { name: "color", type: "string" }]
   })
@@ -87,7 +92,7 @@ export class PostPlugin extends Plugin {
 
     let color = null;
     if (args.color) {
-      const colorMatch = args.color.match(/^#?([0-9a-f]{6})$/);
+      const colorMatch = args.color.match(COLOR_MATCH_REGEX);
       if (!colorMatch) {
         msg.channel.createMessage(errorMessage("Invalid color specified, use hex colors"));
         return;
@@ -106,13 +111,12 @@ export class PostPlugin extends Plugin {
   }
 
   /**
-   * Edit the specified message posted by the bot
+   * COMMAND: Edit the specified message posted by the bot
    */
   @d.command("edit", "<messageId:string> <content:string$>")
   @d.permission("edit")
   async editCmd(msg, args: { messageId: string; content: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
-
     if (!savedMessage) {
       msg.channel.createMessage(errorMessage("Unknown message"));
       return;
@@ -124,5 +128,43 @@ export class PostPlugin extends Plugin {
     }
 
     await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
+  }
+
+  /**
+   * COMMAND: Edit the specified message with an embed posted by the bot
+   */
+  @d.command("edit_embed", "<messageId:string>", {
+    options: [{ name: "title", type: "string" }, { name: "content", type: "string" }, { name: "color", type: "string" }]
+  })
+  @d.permission("edit")
+  async editEmbedCmd(msg: Message, args: { messageId: string; title?: string; content?: string; color?: string }) {
+    const savedMessage = await this.savedMessages.find(args.messageId);
+    if (!savedMessage) {
+      msg.channel.createMessage(errorMessage("Unknown message"));
+      return;
+    }
+
+    if (!args.title && !args.content) {
+      msg.channel.createMessage(errorMessage("Title or content required"));
+      return;
+    }
+
+    let color = null;
+    if (args.color) {
+      const colorMatch = args.color.match(COLOR_MATCH_REGEX);
+      if (!colorMatch) {
+        msg.channel.createMessage(errorMessage("Invalid color specified, use hex colors"));
+        return;
+      }
+
+      color = parseInt(colorMatch[1], 16);
+    }
+
+    const embed: EmbedBase = savedMessage.data.embeds[0];
+    if (args.title) embed.title = args.title;
+    if (args.content) embed.description = args.content;
+    if (color) embed.color = color;
+
+    await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, { embed });
   }
 }
