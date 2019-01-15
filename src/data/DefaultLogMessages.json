@@ -45,5 +45,5 @@
 
   "MASSBAN": "⚒ **{mod.username}#{mod.discriminator}** massbanned {count} users",
 
-  "MEMBER_JOIN_WITH_PRIOR_RECORDS": "⚠ **{member.user.username}#{member.user.discriminator}** joined with prior records ({caseCount} case(s))"
+  "MEMBER_JOIN_WITH_PRIOR_RECORDS": "⚠ **{member.user.username}#{member.user.discriminator}** (`{member.id}`) joined with prior records. Recent cases:\n{recentCaseSummary}"
 }
