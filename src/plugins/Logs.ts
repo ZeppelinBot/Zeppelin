@@ -134,12 +134,29 @@ export class LogsPlugin extends Plugin {
       account_age: accountAge
     });
 
-    const cases = (await this.cases.getByUserId(member.id)).filter(c => !c.is_hidden);
+    const cases = (await this.cases.with("notes").getByUserId(member.id)).filter(c => !c.is_hidden);
+    cases.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
     if (cases.length) {
+      const recentCaseLines = [];
+      const recentCases = cases.slice(0, 2);
+      for (const theCase of recentCases) {
+        recentCaseLines.push(this.cases.getSummaryText(theCase));
+      }
+
+      let recentCaseSummary = recentCaseLines.join("\n");
+      if (recentCases.length < cases.length) {
+        const remaining = cases.length - recentCases.length;
+        if (remaining === 1) {
+          recentCaseSummary += `\n*+${remaining} case*`;
+        } else {
+          recentCaseSummary += `\n*+${remaining} cases*`;
+        }
+      }
+
       this.guildLogs.log(LogType.MEMBER_JOIN_WITH_PRIOR_RECORDS, {
         member: stripObjectToScalars(member, ["user"]),
-        caseCount: cases.length
+        recentCaseSummary
       });
     }
   }

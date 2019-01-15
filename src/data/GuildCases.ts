@@ -2,6 +2,10 @@ import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
 import { BaseRepository } from "./BaseRepository";
 import { getRepository, In, Repository } from "typeorm";
+import { disableLinkPreviews } from "../utils";
+import { CaseTypes } from "./CaseTypes";
+
+const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
 export class GuildCases extends BaseRepository {
   private cases: Repository<Case>;
@@ -81,5 +85,31 @@ export class GuildCases extends BaseRepository {
       ...data,
       case_id: caseId
     });
+  }
+
+  getSummaryText(theCase: Case) {
+    const firstNote = theCase.notes[0];
+    let reason = firstNote ? firstNote.body : "";
+
+    if (reason.length > CASE_SUMMARY_REASON_MAX_LENGTH) {
+      const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
+      const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index : CASE_SUMMARY_REASON_MAX_LENGTH;
+      if (nextWhitespaceIndex < reason.length) {
+        reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
+      }
+    }
+
+    reason = disableLinkPreviews(reason);
+
+    let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
+    if (theCase.notes.length > 1) {
+      line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
+    }
+
+    if (theCase.is_hidden) {
+      line += " *(hidden)*";
+    }
+
+    return line;
   }
 }

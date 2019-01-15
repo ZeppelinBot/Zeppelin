@@ -922,29 +922,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         const lines = [];
         for (const theCase of casesToDisplay) {
           theCase.notes.sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
-          const firstNote = theCase.notes[0];
-          let reason = firstNote ? firstNote.body : "";
-
-          if (reason.length > CASE_LIST_REASON_MAX_LENGTH) {
-            const match = reason.slice(CASE_LIST_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
-            const nextWhitespaceIndex = match ? CASE_LIST_REASON_MAX_LENGTH + match.index : CASE_LIST_REASON_MAX_LENGTH;
-            if (nextWhitespaceIndex < reason.length) {
-              reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
-            }
-          }
-
-          reason = disableLinkPreviews(reason);
-
-          let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
-          if (theCase.notes.length > 1) {
-            line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
-          }
-
-          if (theCase.is_hidden) {
-            line += " *(hidden)*";
-          }
-
-          lines.push(line);
+          const caseSummary = this.cases.getSummaryText(theCase);
+          lines.push(caseSummary);
         }
 
         if (!showHidden && hiddenCases.length) {
