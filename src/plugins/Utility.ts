@@ -297,18 +297,16 @@ export class UtilityPlugin extends ZeppelinPlugin {
       });
     }
 
-    const cases = await this.cases.getByUserId(args.userId);
+    const cases = (await this.cases.getByUserId(args.userId)).filter(c => !c.is_hidden);
+
     if (cases.length > 0) {
       cases.sort((a, b) => {
         return a.created_at < b.created_at ? 1 : -1;
       });
 
-      const caseSummary = cases
-        .filter(c => !c.is_hidden)
-        .slice(0, 3)
-        .map(c => {
-          return `${CaseTypes[c.type]} (#${c.case_number})`;
-        });
+      const caseSummary = cases.slice(0, 3).map(c => {
+        return `${CaseTypes[c.type]} (#${c.case_number})`;
+      });
 
       const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 
