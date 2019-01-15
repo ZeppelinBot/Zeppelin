@@ -216,9 +216,6 @@ export class GuildSavedMessages extends BaseRepository {
     const oldMessage = await this.messages.findOne(id);
     if (!oldMessage) return;
 
-    // Ignore fake edit events
-    if (oldMessage.data.content === newData.content) return;
-
     const newMessage = { ...oldMessage, data: newData };
 
     await this.messages.update(
