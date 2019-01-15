@@ -1,8 +1,14 @@
-import at = require("lodash.at");
+import at from "lodash.at";
 import { Emoji, Guild, GuildAuditLogEntry, TextableChannel } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
+
+import fs from "fs";
+const fsp = fs.promises;
+
+import https from "https";
+import tmp from "tmp";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -285,6 +291,41 @@ export async function createChunkedMessage(channel: TextableChannel, messageText
   for (const chunk of chunks) {
     await channel.createMessage(chunk);
   }
+}
+
+/**
+ * Downloads the file from the given URL to a temporary file, with retry support
+ */
+export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path: string; deleteFn: () => void }> {
+  return new Promise(resolve => {
+    tmp.file((err, path, fd, deleteFn) => {
+      if (err) throw err;
+
+      const writeStream = fs.createWriteStream(path);
+
+      https
+        .get(attachmentUrl, res => {
+          res.pipe(writeStream);
+          writeStream.on("finish", () => {
+            writeStream.end();
+            resolve({
+              path,
+              deleteFn
+            });
+          });
+        })
+        .on("error", httpsErr => {
+          fsp.unlink(path);
+
+          if (retries === 0) {
+            throw httpsErr;
+          } else {
+            console.warn("File download failed, retrying. Error given:", httpsErr.message);
+            resolve(downloadFile(attachmentUrl, retries - 1));
+          }
+        });
+    });
+  });
 }
 
 export function noop() {

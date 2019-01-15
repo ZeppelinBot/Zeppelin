@@ -1,11 +1,13 @@
 import { Plugin, decorators as d } from "knub";
 import { Channel, Message, TextChannel } from "eris";
-import { errorMessage } from "../utils";
+import { errorMessage, downloadFile } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import { ISavedMessageData } from "../data/entities/SavedMessage";
+
+import fs from "fs";
+const fsp = fs.promises;
 
 export class PostPlugin extends Plugin {
-  public static pluginName = 'post';
+  public static pluginName = "post";
 
   protected savedMessages: GuildSavedMessages;
 
@@ -33,18 +35,39 @@ export class PostPlugin extends Plugin {
   }
 
   /**
-   * Post a message as the bot to the specified channel
+   * COMMAND: Post a message as the bot to the specified channel
    */
-  @d.command("post", "<channel:channel> <content:string$>")
+  @d.command("post", "<channel:channel> [content:string$]")
   @d.permission("post")
-  async postCmd(msg: Message, args: { channel: Channel; content: string }) {
+  async postCmd(msg: Message, args: { channel: Channel; content?: string }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Channel is not a text channel"));
       return;
     }
 
-    const createdMsg = await args.channel.createMessage(args.content);
+    const content = args.content || undefined;
+    let downloadedAttachment;
+    let file;
+
+    if (msg.attachments.length) {
+      downloadedAttachment = await downloadFile(msg.attachments[0].url);
+      file = {
+        name: msg.attachments[0].filename,
+        file: await fsp.readFile(downloadedAttachment.path)
+      };
+    }
+
+    if (content == null && file == null) {
+      msg.channel.createMessage(errorMessage("Text content or attachment required"));
+      return;
+    }
+
+    const createdMsg = await args.channel.createMessage(content, file);
     await this.savedMessages.setPermanent(createdMsg.id);
+
+    if (downloadedAttachment) {
+      downloadedAttachment.deleteFn();
+    }
   }
 
   /**
