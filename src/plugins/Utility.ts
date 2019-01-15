@@ -39,7 +39,8 @@ export class UtilityPlugin extends ZeppelinPlugin {
         server: false,
         reload_guild: false,
         nickname: false,
-        ping: false
+        ping: false,
+        source: false
       },
       overrides: [
         {
@@ -58,7 +59,8 @@ export class UtilityPlugin extends ZeppelinPlugin {
           level: ">=100",
           permissions: {
             reload_guild: true,
-            ping: true
+            ping: true,
+            source: true
           }
         }
       ]
@@ -165,7 +167,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
     // Create an archive
     const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
-    const archiveUrl = `${this.knub.getGlobalConfig().url}/archives/${archiveId}`;
+    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
 
     this.logs.log(LogType.CLEAN, {
       mod: stripObjectToScalars(mod),
@@ -461,6 +463,26 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
     // Clean up test messages
     this.bot.deleteMessages(messages[0].channel.id, messages.map(m => m.id)).catch(noop);
+  }
+
+  @d.command("source", "<messageId:string>")
+  @d.permission("source")
+  @d.nonBlocking()
+  async sourceCmd(msg: Message, args: { messageId: string }) {
+    const savedMessage = await this.savedMessages.find(args.messageId);
+    if (!savedMessage) {
+      msg.channel.createMessage(errorMessage("Unknown message"));
+      return;
+    }
+
+    if (!savedMessage.data.content) {
+      msg.channel.createMessage(errorMessage("Message content is empty"));
+      return;
+    }
+
+    const archiveId = await this.archives.create(savedMessage.data.content, moment().add(1, "hour"));
+    const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+    msg.channel.createMessage(`Message source: ${url}`);
   }
 
   @d.command("reload_guild")
