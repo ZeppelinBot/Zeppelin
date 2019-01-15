@@ -341,14 +341,14 @@ export class LogsPlugin extends Plugin {
   async onMessageDeleteBulk(savedMessages: SavedMessage[]) {
     const channel = this.guild.channels.get(savedMessages[0].channel_id);
     const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
-    const baseUrl = this.knub.getGlobalConfig().url;
+    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
 
     this.guildLogs.log(
       LogType.MESSAGE_DELETE_BULK,
       {
         count: savedMessages.length,
         channel,
-        archiveUrl: `${baseUrl}/archives/${archiveId}`
+        archiveUrl
       },
       savedMessages[0].id
     );

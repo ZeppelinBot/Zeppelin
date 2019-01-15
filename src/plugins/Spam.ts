@@ -43,7 +43,7 @@ const MAX_INTERVAL = 300;
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
 export class SpamPlugin extends Plugin {
-  public static pluginName = 'spam';
+  public static pluginName = "spam";
 
   protected actions: GuildActions;
   protected logs: GuildLogs;
@@ -163,8 +163,8 @@ export class SpamPlugin extends Plugin {
     const expiresAt = moment().add(SPAM_ARCHIVE_EXPIRY_DAYS, "days");
     const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild, expiresAt);
 
-    const url = this.knub.getGlobalConfig().url;
-    return url ? `${url}/archives/${archiveId}` : `Archive ID: ${archiveId}`;
+    const baseUrl = this.knub.getGlobalConfig().url;
+    return this.archives.getUrl(baseUrl, archiveId);
   }
 
   async logAndDetectSpam(
