@@ -65,9 +65,19 @@ export class NameHistoryPlugin extends Plugin {
   }
 
   @d.event("guildMemberUpdate")
-  async onGuildMemberUpdate(_, member: Member, oldMember: { nick: string; roles: string[] }) {
-    if (member.nick !== oldMember.nick) {
+  async onGuildMemberUpdate(_, member: Member) {
+    const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Nickname);
+    if (!latestEntry || latestEntry.value !== member.nick) {
       await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Nickname, member.nick);
+    }
+  }
+
+  @d.event("guildMemberAdd")
+  async onGuildMemberAdd(_, member: Member) {
+    const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
+    const username = `${member.user.username}#${member.user.discriminator}`;
+    if (!latestEntry || latestEntry.value !== username) {
+      await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Username, username);
     }
   }
 }
