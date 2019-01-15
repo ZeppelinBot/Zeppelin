@@ -90,4 +90,8 @@ export class GuildArchives extends BaseRepository {
 
     return this.create([headerStr, messagesStr].join("\n\n"), expiresAt);
   }
+
+  getUrl(baseUrl, archiveId) {
+    return baseUrl ? `${baseUrl}/archives/${archiveId}` : `Archive ID: ${archiveId}`;
+  }
 }
