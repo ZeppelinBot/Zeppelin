@@ -1,5 +1,5 @@
 import { Plugin, decorators as d } from "knub";
-import { Channel, Message, TextChannel } from "eris";
+import { Channel, EmbedBase, Message, TextChannel } from "eris";
 import { errorMessage, downloadFile } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
@@ -68,6 +68,41 @@ export class PostPlugin extends Plugin {
     if (downloadedAttachment) {
       downloadedAttachment.deleteFn();
     }
+  }
+
+  @d.command("post_embed", "<channel:channel>", {
+    options: [{ name: "title", type: "string" }, { name: "content", type: "string" }, { name: "color", type: "string" }]
+  })
+  @d.permission("post")
+  async postEmbedCmd(msg: Message, args: { channel: Channel; title?: string; content?: string; color?: string }) {
+    if (!(args.channel instanceof TextChannel)) {
+      msg.channel.createMessage(errorMessage("Channel is not a text channel"));
+      return;
+    }
+
+    if (!args.title && !args.content) {
+      msg.channel.createMessage(errorMessage("Title or content required"));
+      return;
+    }
+
+    let color = null;
+    if (args.color) {
+      const colorMatch = args.color.match(/^#?([0-9a-f]{6})$/);
+      if (!colorMatch) {
+        msg.channel.createMessage(errorMessage("Invalid color specified, use hex colors"));
+        return;
+      }
+
+      color = parseInt(colorMatch[1], 16);
+    }
+
+    const embed: EmbedBase = {};
+    if (args.title) embed.title = args.title;
+    if (args.content) embed.description = args.content;
+    if (color) embed.color = color;
+
+    const createdMsg = await args.channel.createMessage({ embed });
+    await this.savedMessages.setPermanent(createdMsg.id);
   }
 
   /**
