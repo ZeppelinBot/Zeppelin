@@ -43,6 +43,7 @@
     "mysql": "^2.16.0",
     "reflect-metadata": "^0.1.12",
     "tlds": "^1.203.1",
+    "tmp": "0.0.33",
     "ts-node": "^3.3.0",
     "typeorm": "^0.2.8",
     "typescript": "^3.2.2",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@types/node": "^10.12.0",
+    "@types/tmp": "0.0.33",
     "husky": "^0.14.3",
     "lint-staged": "^7.2.0",
     "nodemon": "^1.17.5",
