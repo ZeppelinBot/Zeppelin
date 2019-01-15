@@ -3,11 +3,13 @@ import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
 import {
+  createChunkedMessage,
   deactivateMentions,
   disableCodeBlocks,
   disableLinkPreviews,
   findRelevantAuditLogEntry,
   formatTemplateString,
+  noop,
   stripObjectToScalars,
   useMediaUrls
 } from "../utils";
@@ -99,8 +101,7 @@ export class LogsPlugin extends Plugin {
 
       if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
         const message = this.getLogMessage(type, data);
-        // TODO: Split log messages that are too long
-        if (message) await channel.createMessage(message).catch(() => {});
+        if (message) await createChunkedMessage(channel, message).catch(noop);
       }
     }
   }
