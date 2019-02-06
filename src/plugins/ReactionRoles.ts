@@ -80,9 +80,9 @@ export class ReactionRolesPlugin extends Plugin {
       .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
       .map(
         (pair): ReactionRolePair => {
-          const customEmojiMatch = pair[0].match(/^<:(?:.*?):(\d+)>$/);
+          const customEmojiMatch = pair[0].match(/^<:(.*?):(\d+)>$/);
           if (customEmojiMatch) {
-            return [customEmojiMatch[1], pair[1]];
+            return [`${customEmojiMatch[1]}:${customEmojiMatch[2]}`, pair[1]];
           } else {
             return pair as ReactionRolePair;
           }
