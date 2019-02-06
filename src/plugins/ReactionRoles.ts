@@ -3,7 +3,7 @@ import { CustomEmoji, errorMessage, isSnowflake } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Channel, Message, TextChannel } from "eris";
 
-type ReactionRolePair = [string, string];
+type ReactionRolePair = [string, string, string?];
 
 export class ReactionRolesPlugin extends Plugin {
   public static pluginName = "reaction_roles";
@@ -80,9 +80,9 @@ export class ReactionRolesPlugin extends Plugin {
       .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
       .map(
         (pair): ReactionRolePair => {
-          const customEmojiMatch = pair[0].match(/^<:(.*?):(\d+)>$/);
+          const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
           if (customEmojiMatch) {
-            return [`${customEmojiMatch[1]}:${customEmojiMatch[2]}`, pair[1]];
+            return [customEmojiMatch[2], pair[1], customEmojiMatch[1]];
           } else {
             return pair as ReactionRolePair;
           }
@@ -112,9 +112,11 @@ export class ReactionRolesPlugin extends Plugin {
     for (const rolePair of toRemove) {
       await this.reactionRoles.removeFromMessage(targetMessage.id, rolePair[0]);
 
-      for (const reaction of Object.values(targetMessage.reactions)) {
-        if (reaction.emoji.id === rolePair[0] || reaction.emoji.name === rolePair[0]) {
-          reaction.remove(this.bot.user.id);
+      for (const emoji of Object.keys(targetMessage.reactions)) {
+        const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
+
+        if (emojiId === rolePair[0]) {
+          targetMessage.removeReaction(emoji, this.bot.user.id);
         }
       }
     }
@@ -126,10 +128,9 @@ export class ReactionRolesPlugin extends Plugin {
     for (const rolePair of toAdd) {
       let emoji;
 
-      if (isSnowflake(rolePair[0])) {
+      if (rolePair[2]) {
         // Custom emoji
-        const guildEmoji = guildEmojis.find(e => e.id === emoji.id);
-        emoji = `${guildEmoji.name}:${guildEmoji.id}`;
+        emoji = `${rolePair[2]}:${rolePair[0]}`;
       } else {
         // Unicode emoji
         emoji = rolePair[0];
