@@ -112,7 +112,7 @@ export class ReactionRolesPlugin extends Plugin {
     for (const rolePair of toRemove) {
       await this.reactionRoles.removeFromMessage(targetMessage.id, rolePair[0]);
 
-      for (const reaction of targetMessage.reactions.values()) {
+      for (const reaction of Object.values(targetMessage.reactions)) {
         if (reaction.emoji.id === rolePair[0] || reaction.emoji.name === rolePair[0]) {
           reaction.remove(this.bot.user.id);
         }
