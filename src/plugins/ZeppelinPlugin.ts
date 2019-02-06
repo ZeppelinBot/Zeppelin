@@ -72,6 +72,6 @@ export class ZeppelinPlugin extends Plugin {
       throw new Error(`Invalid options:\n${validationErrors.join("\n")}`);
     }
 
-    return this.onLoad();
+    return super.runLoad();
   }
 }
