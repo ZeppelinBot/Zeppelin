@@ -83,6 +83,12 @@ connect().then(async conn => {
   });
   client.setMaxListeners(100);
 
+  client.on("debug", message => {
+    if (message.includes(" 429 ")) {
+      logger.info(`[RATELIMITED] ${message}`);
+    }
+  });
+
   const basePlugins = ["message_saver", "name_history", "cases", "mutes"];
 
   const bot = new Knub(client, {
