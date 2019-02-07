@@ -85,7 +85,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         view: false,
         addcase: false,
         massban: true,
-        hidecase: false
+        hidecase: false,
+        addcase_other: false
       },
       overrides: [
         {
@@ -104,7 +105,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           level: ">=100",
           permissions: {
             massban: true,
-            hidecase: true
+            hidecase: true,
+            addcase_other: true
           }
         }
       ]
@@ -823,7 +825,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     }
   }
 
-  @d.command("addcase", "<type:string> <target:userId> [reason:string$]")
+  @d.command("addcase", "<type:string> <target:userId> [reason:string$]", {
+    options: [{ name: "mod", type: "user" }]
+  })
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
     // Verify the user id is a valid snowflake-ish
@@ -846,10 +850,20 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
+    let modId = msg.author.id;
+    if (args.mod) {
+      if (!this.hasPermission("addcase_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      modId = args.mod.id;
+    }
+
     // Create the case
     const theCase: Case = await this.actions.fire("createCase", {
       userId: args.target,
-      modId: msg.author.id,
+      modId,
       type: CaseTypes[type],
       reason: args.reason
     });
