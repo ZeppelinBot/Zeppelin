@@ -135,6 +135,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Attempts to find the ban's details in the audit log.
    */
   @d.event("guildBanAdd")
+  @d.nonBlocking()
   async onGuildBanAdd(guild: Guild, user: User) {
     if (this.isEventIgnored(IgnoredEventType.Ban, user.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Ban, user.id);
@@ -172,6 +173,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Attempts to find the unban's details in the audit log.
    */
   @d.event("guildBanRemove")
+  @d.nonBlocking()
   async onGuildBanRemove(guild: Guild, user: User) {
     if (this.isEventIgnored(IgnoredEventType.Unban, user.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Unban, user.id);
@@ -227,6 +229,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   }
 
   @d.event("guildMemberRemove")
+  @d.nonBlocking()
   async onGuildMemberRemove(_, member: Member) {
     if (this.isEventIgnored(IgnoredEventType.Kick, member.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Kick, member.id);
