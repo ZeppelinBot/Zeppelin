@@ -86,7 +86,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         addcase: false,
         massban: true,
         hidecase: false,
-        addcase_other: false
+        act_as_other: false
       },
       overrides: [
         {
@@ -106,7 +106,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           permissions: {
             massban: true,
             hidecase: true,
-            addcase_other: true
+            act_as_other: true
           }
         }
       ]
@@ -292,7 +292,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
   }
 
-  @d.command("warn", "<member:Member> <reason:string$>")
+  @d.command("warn", "<member:Member> <reason:string$>", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("warn")
   @d.nonBlocking()
   async warnCmd(msg: Message, args: any) {
@@ -300,6 +302,17 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot warn: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     const warnMessage = this.configValue("warn_message")
@@ -324,7 +337,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     const createdCase: Case = await this.actions.fire("createCase", {
       userId: args.member.id,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Warn,
       reason: args.reason
     });
@@ -336,18 +349,31 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     );
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
 
-  @d.command("mute", "<member:Member> [time:string] [reason:string$]")
+  @d.command("mute", "<member:Member> [time:string] [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("mute")
-  async muteCmd(msg: Message, args: any) {
+  async muteCmd(msg: Message, args: { member: Member; time: string; reason: string; mod: Member }) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     let messageSent = true;
@@ -383,7 +409,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       if (args.reason) {
         // Update old case
         await this.actions.fire("createCaseNote", mute.case_id, {
-          modId: msg.author.id,
+          modId: mod.id,
           note: args.reason
         });
       }
@@ -391,7 +417,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       // Create new case
       theCase = await this.actions.fire("createCase", {
         userId: args.member.id,
-        modId: msg.author.id,
+        modId: mod.id,
         type: CaseTypes.Mute,
         reason: args.reason
       });
@@ -435,25 +461,38 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     if (muteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-        mod: stripObjectToScalars(msg.member.user),
+        mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"]),
         time: timeUntilUnmute
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_MUTE, {
-        mod: stripObjectToScalars(msg.member.user),
+        mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"])
       });
     }
   }
 
-  @d.command("unmute", "<member:Member> [time:string] [reason:string$]")
+  @d.command("unmute", "<member:Member> [time:string] [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("mute")
   async unmuteCmd(msg: Message, args: any) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     // Check if they're muted in the first place
@@ -474,7 +513,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Unmute,
       reason: args.reason
     });
@@ -496,7 +535,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
       // Log the action
       this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
-        mod: stripObjectToScalars(msg.member.user),
+        mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"]),
         time: timeUntilUnmute
       });
@@ -528,13 +567,26 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     this.actions.fire("postMuteList", msg.channel);
   }
 
-  @d.command("kick", "<member:Member> [reason:string$]")
+  @d.command("kick", "<member:Member> [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("kick")
-  async kickCmd(msg, args: { member: Member; reason: string }) {
+  async kickCmd(msg, args: { member: Member; reason: string; mod: Member }) {
     // Make sure we're allowed to kick this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot kick: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
@@ -561,7 +613,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Kick,
       reason: args.reason
     });
@@ -575,18 +627,31 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       user: stripObjectToScalars(args.member.user)
     });
   }
 
-  @d.command("ban", "<member:Member> [reason:string$]")
+  @d.command("ban", "<member:Member> [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("ban")
   async banCmd(msg, args) {
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
@@ -613,7 +678,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Ban,
       reason: args.reason
     });
@@ -627,18 +692,31 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_BAN, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
 
-  @d.command("softban", "<member:Member> [reason:string$]")
+  @d.command("softban", "<member:Member> [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("ban")
   async softbanCmd(msg, args) {
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     // Softban the user = ban, and immediately unban
@@ -653,7 +731,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Softban,
       reason: args.reason
     });
@@ -669,14 +747,27 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       member: stripObjectToScalars(args.member, ["user"])
     });
   }
 
-  @d.command("unban", "<userId:userId> [reason:string$]")
+  @d.command("unban", "<userId:userId> [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("ban")
-  async unbanCmd(msg: Message, args: { userId: string; reason: string }) {
+  async unbanCmd(msg: Message, args: { userId: string; reason: string; mod: Member }) {
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
+    }
+
     this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userId);
 
     try {
@@ -690,7 +781,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Unban,
       reason: args.reason
     });
@@ -700,12 +791,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       userId: args.userId
     });
   }
 
-  @d.command("forceban", "<userId:userId> [reason:string$]")
+  @d.command("forceban", "<userId:userId> [reason:string$]", {
+    options: [{ name: "mod", type: "member" }]
+  })
   @d.permission("ban")
   async forcebanCmd(msg: Message, args: any) {
     // If the user exists as a guild member, make sure we can act on them first
@@ -713,6 +806,17 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     if (member && !this.canActOn(msg.member, member)) {
       msg.channel.createMessage(errorMessage("Cannot forceban this user: insufficient permissions"));
       return;
+    }
+
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
     }
 
     this.ignoreEvent(IgnoredEventType.Ban, args.userId);
@@ -728,7 +832,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
-      modId: msg.author.id,
+      modId: mod.id,
       type: CaseTypes.Ban,
       reason: args.reason
     });
@@ -738,7 +842,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       userId: args.userId
     });
   }
@@ -826,7 +930,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   }
 
   @d.command("addcase", "<type:string> <target:userId> [reason:string$]", {
-    options: [{ name: "mod", type: "user" }]
+    options: [{ name: "mod", type: "member" }]
   })
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
@@ -843,6 +947,17 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
+    // The moderator who did the action is the message author or, if used, the specified --mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!this.hasPermission("act_as_other", { message: msg })) {
+        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        return;
+      }
+
+      mod = args.mod;
+    }
+
     // Verify the case type is valid
     const type: string = args.type[0].toUpperCase() + args.type.slice(1).toLowerCase();
     if (!CaseTypes[type]) {
@@ -850,20 +965,10 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
-    let modId = msg.author.id;
-    if (args.mod) {
-      if (!this.hasPermission("addcase_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
-        return;
-      }
-
-      modId = args.mod.id;
-    }
-
     // Create the case
     const theCase: Case = await this.actions.fire("createCase", {
       userId: args.target,
-      modId,
+      modId: mod.id,
       type: CaseTypes[type],
       reason: args.reason
     });
@@ -872,7 +977,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Log the action
     this.serverLogs.log(LogType.CASE_CREATE, {
-      mod: stripObjectToScalars(msg.member.user),
+      mod: stripObjectToScalars(mod.user),
       userId: args.userId,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase()
