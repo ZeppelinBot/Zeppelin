@@ -37,7 +37,8 @@ export class CasesPlugin extends ZeppelinPlugin {
         args.auditLogId,
         args.reason,
         args.automatic,
-        args.postInCaseLog
+        args.postInCaseLog,
+        args.ppId
       );
     });
 
@@ -72,7 +73,8 @@ export class CasesPlugin extends ZeppelinPlugin {
     auditLogId: string = null,
     reason: string = null,
     automatic = false,
-    postInCaseLogOverride = null
+    postInCaseLogOverride = null,
+    ppId = null
   ): Promise<Case> {
     const user = this.bot.users.get(userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
@@ -80,13 +82,21 @@ export class CasesPlugin extends ZeppelinPlugin {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
+    let ppName = null;
+    if (ppId) {
+      const pp = this.bot.users.get(ppId);
+      ppName = pp ? `${pp.username}#${pp.discriminator}` : "Unknown#0000";
+    }
+
     const createdCase = await this.cases.create({
       type,
       user_id: userId,
       user_name: userName,
       mod_id: modId,
       mod_name: modName,
-      audit_log_id: auditLogId
+      audit_log_id: auditLogId,
+      pp_id: ppId,
+      pp_name: ppName
     });
 
     if (reason) {
@@ -179,6 +189,10 @@ export class CasesPlugin extends ZeppelinPlugin {
         }
       ]
     };
+
+    if (theCase.pp_id) {
+      embed.fields[1].value += `\np.p. ${theCase.pp_name}\n<@!${theCase.pp_id}>`;
+    }
 
     if (theCase.is_hidden) {
       embed.title += " (hidden)";

@@ -339,7 +339,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Warn,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     msg.channel.createMessage(
@@ -419,7 +420,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         userId: args.member.id,
         modId: mod.id,
         type: CaseTypes.Mute,
-        reason: args.reason
+        reason: args.reason,
+        ppId: mod.id !== msg.author.id ? msg.author.id : null
       });
       await this.mutes.setCaseId(args.member.id, theCase.id);
     }
@@ -515,7 +517,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Unmute,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     if (unmuteTime) {
@@ -615,7 +618,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Kick,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     // Confirm the action to the moderator
@@ -680,7 +684,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Ban,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     // Confirm the action to the moderator
@@ -733,7 +738,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Softban,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     // Confirm the action to the moderator
@@ -783,7 +789,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.userId,
       modId: mod.id,
       type: CaseTypes.Unban,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     // Confirm the action
@@ -834,7 +841,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.userId,
       modId: mod.id,
       type: CaseTypes.Ban,
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     // Confirm the action
@@ -970,7 +978,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.target,
       modId: mod.id,
       type: CaseTypes[type],
-      reason: args.reason
+      reason: args.reason,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null
     });
 
     msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));

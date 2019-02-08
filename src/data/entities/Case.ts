@@ -25,6 +25,10 @@ export class Case {
 
   @Column() is_hidden: boolean;
 
+  @Column() pp_id: string;
+
+  @Column() pp_name: string;
+
   @OneToMany(type => CaseNote, note => note.case)
   notes: CaseNote[];
 }
