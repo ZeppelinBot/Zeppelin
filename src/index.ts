@@ -144,6 +144,12 @@ connect().then(async conn => {
         if (level === "debug") return;
         const ts = moment().format("YYYY-MM-DD HH:mm:ss");
         console.log(`[${ts}] [${level.toUpperCase()}] ${msg}`);
+      },
+
+      performanceDebug: {
+        enabled: true,
+        size: 30,
+        threshold: 200
       }
     }
   });

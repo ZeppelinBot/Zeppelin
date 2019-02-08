@@ -9,7 +9,7 @@ let activeReload: [string, string] = null;
  * A global plugin that allows bot owners to control the bot
  */
 export class BotControlPlugin extends GlobalPlugin {
-  public static pluginName = 'bot_control';
+  public static pluginName = "bot_control";
 
   getDefaultOptions() {
     return {
@@ -67,5 +67,18 @@ export class BotControlPlugin extends GlobalPlugin {
     }
 
     this.knub.reloadAllGlobalPlugins();
+  }
+
+  @d.command("perf")
+  async perfCmd(msg: Message) {
+    if (!this.isOwner(msg.author.id)) return;
+    const perfItems = this.knub.getPerformanceDebugItems();
+
+    if (perfItems.length) {
+      const content = "```" + perfItems.join("\n") + "```";
+      msg.channel.createMessage(content);
+    } else {
+      msg.channel.createMessage(errorMessage("No performance data"));
+    }
   }
 }
