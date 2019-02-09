@@ -35,14 +35,16 @@ export class TagsPlugin extends Plugin {
 
       permissions: {
         create: false,
-        use: true
+        use: true,
+        list: false
       },
 
       overrides: [
         {
           level: ">=50",
           permissions: {
-            create: true
+            create: true,
+            list: true
           }
         }
       ]
@@ -66,7 +68,7 @@ export class TagsPlugin extends Plugin {
   }
 
   @d.command("tag list")
-  @d.permission("create")
+  @d.permission("list")
   async tagListCmd(msg: Message) {
     const tags = await this.tags.all();
     if (tags.length === 0) {
