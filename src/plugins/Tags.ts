@@ -68,6 +68,8 @@ export class TagsPlugin extends Plugin {
   }
 
   @d.command("tag list")
+  @d.command("tags")
+  @d.command("taglist")
   @d.permission("list")
   async tagListCmd(msg: Message) {
     const tags = await this.tags.all();
