@@ -21,7 +21,7 @@ export class PostPlugin extends Plugin {
     return {
       permissions: {
         post: false,
-        edit: false
+        edit: false,
       },
 
       overrides: [
@@ -29,11 +29,15 @@ export class PostPlugin extends Plugin {
           level: ">=100",
           permissions: {
             post: true,
-            edit: true
-          }
-        }
-      ]
+            edit: true,
+          },
+        },
+      ],
     };
+  }
+
+  protected formatContent(str) {
+    return str.replace(/\\n/g, "\n");
   }
 
   /**
@@ -47,7 +51,7 @@ export class PostPlugin extends Plugin {
       return;
     }
 
-    const content = args.content || undefined;
+    const content = (args.content && this.formatContent(args.content)) || undefined;
     let downloadedAttachment;
     let file;
 
@@ -55,7 +59,7 @@ export class PostPlugin extends Plugin {
       downloadedAttachment = await downloadFile(msg.attachments[0].url);
       file = {
         name: msg.attachments[0].filename,
-        file: await fsp.readFile(downloadedAttachment.path)
+        file: await fsp.readFile(downloadedAttachment.path),
       };
     }
 
@@ -76,7 +80,11 @@ export class PostPlugin extends Plugin {
    * COMMAND: Post a message with an embed as the bot to the specified channel
    */
   @d.command("post_embed", "<channel:channel>", {
-    options: [{ name: "title", type: "string" }, { name: "content", type: "string" }, { name: "color", type: "string" }]
+    options: [
+      { name: "title", type: "string" },
+      { name: "content", type: "string" },
+      { name: "color", type: "string" },
+    ],
   })
   @d.permission("post")
   async postEmbedCmd(msg: Message, args: { channel: Channel; title?: string; content?: string; color?: string }) {
@@ -103,7 +111,7 @@ export class PostPlugin extends Plugin {
 
     const embed: EmbedBase = {};
     if (args.title) embed.title = args.title;
-    if (args.content) embed.description = args.content;
+    if (args.content) embed.description = this.formatContent(args.content);
     if (color) embed.color = color;
 
     const createdMsg = await args.channel.createMessage({ embed });
@@ -127,14 +135,18 @@ export class PostPlugin extends Plugin {
       return;
     }
 
-    await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, args.content);
+    await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, this.formatContent(args.content));
   }
 
   /**
    * COMMAND: Edit the specified message with an embed posted by the bot
    */
   @d.command("edit_embed", "<messageId:string>", {
-    options: [{ name: "title", type: "string" }, { name: "content", type: "string" }, { name: "color", type: "string" }]
+    options: [
+      { name: "title", type: "string" },
+      { name: "content", type: "string" },
+      { name: "color", type: "string" },
+    ],
   })
   @d.permission("edit")
   async editEmbedCmd(msg: Message, args: { messageId: string; title?: string; content?: string; color?: string }) {
@@ -162,7 +174,7 @@ export class PostPlugin extends Plugin {
 
     const embed: EmbedBase = savedMessage.data.embeds[0];
     if (args.title) embed.title = args.title;
-    if (args.content) embed.description = args.content;
+    if (args.content) embed.description = this.formatContent(args.content);
     if (color) embed.color = color;
 
     await this.bot.editMessage(savedMessage.channel_id, savedMessage.id, { embed });
