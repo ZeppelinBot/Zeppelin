@@ -6,7 +6,7 @@ import {
   getUrlsInString,
   getUserMentions,
   stripObjectToScalars,
-  trimLines
+  trimLines,
 } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
@@ -26,7 +26,8 @@ enum RecentActionType {
   Attachment,
   Emoji,
   Newline,
-  Censor
+  Censor,
+  Character,
 }
 
 interface IRecentAction {
@@ -75,8 +76,11 @@ export class SpamPlugin extends Plugin {
         max_attachments: null,
         max_emojis: null,
         max_newlines: null,
-        max_duplicates: null
+        max_duplicates: null,
+        max_characters: null,
       },
+
+      // Default override to make mods immune to the spam filter
       overrides: [
         {
           level: ">=50",
@@ -87,10 +91,11 @@ export class SpamPlugin extends Plugin {
             max_attachments: null,
             max_emojis: null,
             max_newlines: null,
-            max_duplicates: null
-          }
-        }
-      ]
+            max_duplicates: null,
+            max_characters: null,
+          },
+        },
+      ],
     };
   }
 
@@ -122,7 +127,7 @@ export class SpamPlugin extends Plugin {
     channelId: string,
     savedMessage: SavedMessage,
     timestamp: number,
-    count = 1
+    count = 1,
   ) {
     this.recentActions.push({ type, userId, channelId, savedMessage, timestamp, count });
   }
@@ -172,7 +177,7 @@ export class SpamPlugin extends Plugin {
     type: RecentActionType,
     spamConfig: any,
     actionCount: number,
-    description: string
+    description: string,
   ) {
     if (actionCount === 0) return;
 
@@ -199,7 +204,7 @@ export class SpamPlugin extends Plugin {
           type,
           savedMessage.user_id,
           savedMessage.channel_id,
-          since
+          since,
         );
 
         // If the user tripped the spam filter...
@@ -222,7 +227,7 @@ export class SpamPlugin extends Plugin {
           const additionalMessages = await this.savedMessages.getUserMessagesByChannelAfterId(
             savedMessage.user_id,
             savedMessage.channel_id,
-            lastDetectedMsgId
+            lastDetectedMsgId,
           );
           additionalMessages.forEach(m => msgIds.push(m.id));
 
@@ -266,7 +271,7 @@ export class SpamPlugin extends Plugin {
             description,
             limit: spamConfig.count,
             interval: spamConfig.interval,
-            archiveUrl
+            archiveUrl,
           });
 
           const theCase: Case = await this.actions.fire("createCase", {
@@ -274,7 +279,7 @@ export class SpamPlugin extends Plugin {
             modId: this.bot.user.id,
             type: caseType,
             reason: caseText,
-            automatic: true
+            automatic: true,
           });
 
           // For mutes, also set the mute's case id (for !mutes)
@@ -286,7 +291,7 @@ export class SpamPlugin extends Plugin {
       err => {
         console.error("Error while detecting spam:");
         console.error(err);
-      }
+      },
     );
   }
 
@@ -295,7 +300,7 @@ export class SpamPlugin extends Plugin {
     const spamConfig = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_censor"
+      "max_censor",
     );
     if (spamConfig) {
       this.logAndDetectSpam(savedMessage, RecentActionType.Censor, spamConfig, 1, "too many censored messages");
@@ -308,7 +313,7 @@ export class SpamPlugin extends Plugin {
     const maxMessages = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_messages"
+      "max_messages",
     );
     if (maxMessages) {
       this.logAndDetectSpam(savedMessage, RecentActionType.Message, maxMessages, 1, "too many messages");
@@ -317,7 +322,7 @@ export class SpamPlugin extends Plugin {
     const maxMentions = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_mentions"
+      "max_mentions",
     );
     const mentions = savedMessage.data.content
       ? [...getUserMentions(savedMessage.data.content), ...getRoleMentions(savedMessage.data.content)]
@@ -329,7 +334,7 @@ export class SpamPlugin extends Plugin {
     const maxLinks = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_links"
+      "max_links",
     );
     if (maxLinks && savedMessage.data.content) {
       const links = getUrlsInString(savedMessage.data.content);
@@ -339,7 +344,7 @@ export class SpamPlugin extends Plugin {
     const maxAttachments = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_attachments"
+      "max_attachments",
     );
     if (maxAttachments && savedMessage.data.attachments) {
       this.logAndDetectSpam(
@@ -347,14 +352,14 @@ export class SpamPlugin extends Plugin {
         RecentActionType.Attachment,
         maxAttachments,
         savedMessage.data.attachments.length,
-        "too many attachments"
+        "too many attachments",
       );
     }
 
     const maxEmoji = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_emojis"
+      "max_emojis",
     );
     if (maxEmoji && savedMessage.data.content) {
       const emojiCount = getEmojiInString(savedMessage.data.content).length;
@@ -364,11 +369,27 @@ export class SpamPlugin extends Plugin {
     const maxNewlines = this.configValueForMemberIdAndChannelId(
       savedMessage.user_id,
       savedMessage.channel_id,
-      "max_newlines"
+      "max_newlines",
     );
     if (maxNewlines && savedMessage.data.content) {
       const newlineCount = (savedMessage.data.content.match(/\n/g) || []).length;
       this.logAndDetectSpam(savedMessage, RecentActionType.Newline, maxNewlines, newlineCount, "too many newlines");
+    }
+
+    const maxCharacters = this.configValueForMemberIdAndChannelId(
+      savedMessage.user_id,
+      savedMessage.channel_id,
+      "max_characters",
+    );
+    if (maxCharacters && savedMessage.data.content) {
+      const characterCount = [...savedMessage.data.content.trim()].length;
+      this.logAndDetectSpam(
+        savedMessage,
+        RecentActionType.Character,
+        maxCharacters,
+        characterCount,
+        "too many characters",
+      );
     }
 
     // TODO: Max duplicates
