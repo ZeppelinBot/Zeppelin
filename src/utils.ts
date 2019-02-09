@@ -88,7 +88,7 @@ export function formatTemplateString(str: string, values) {
 
 export const snowflakeRegex = /[1-9][0-9]{5,19}/;
 
-const isSnowflakeRegex = new RegExp(`^${snowflakeRegex}$`);
+const isSnowflakeRegex = new RegExp(`^${snowflakeRegex.source}$`);
 export function isSnowflake(v: string): boolean {
   return isSnowflakeRegex.test(v);
 }
@@ -107,7 +107,7 @@ export async function findRelevantAuditLogEntry(
   actionType: number,
   userId: string,
   attempts: number = 3,
-  attemptDelay: number = 3000
+  attemptDelay: number = 3000,
 ): Promise<GuildAuditLogEntry> {
   const auditLogEntries = await guild.getAuditLogs(5, null, actionType);
 
@@ -184,6 +184,10 @@ export function getEmojiInString(str: string): string[] {
 
 export function isEmoji(str: string): boolean {
   return str.match(`^(${unicodeEmojiRegex.source})|(${customEmojiRegex.source})$`) !== null;
+}
+
+export function isUnicodeEmoji(str: string): boolean {
+  return str.match(`^${unicodeEmojiRegex.source}$`) !== null;
 }
 
 export function trimLines(str: string) {
@@ -310,7 +314,7 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
             writeStream.end();
             resolve({
               path,
-              deleteFn
+              deleteFn,
             });
           });
         })
