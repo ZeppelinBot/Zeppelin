@@ -1,11 +1,12 @@
-import { Plugin, decorators as d } from "knub";
+import { decorators as d } from "knub";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
-import { CustomEmoji, customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
+import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class AutoReactions extends Plugin {
+export class AutoReactions extends ZeppelinPlugin {
   public static pluginName = "auto_reactions";
 
   protected savedMessages: GuildSavedMessages;
@@ -16,17 +17,17 @@ export class AutoReactions extends Plugin {
   getDefaultOptions() {
     return {
       permissions: {
-        use: false
+        use: false,
       },
 
       overrides: [
         {
           level: ">=100",
           permissions: {
-            use: true
-          }
-        }
-      ]
+            use: true,
+          },
+        },
+      ],
     };
   }
 
@@ -44,9 +45,6 @@ export class AutoReactions extends Plugin {
   @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
   @d.permission("use")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
-    const guildEmojis = this.guild.emojis as CustomEmoji[];
-    const guildEmojiIds = guildEmojis.map(e => e.id);
-
     const finalReactions = [];
 
     for (const reaction of args.reactions) {
@@ -61,9 +59,8 @@ export class AutoReactions extends Plugin {
       const customEmojiMatch = reaction.match(customEmojiRegex);
       if (customEmojiMatch) {
         // Custom emoji
-        if (!guildEmojiIds.includes(customEmojiMatch[2])) {
+        if (!this.canUseEmoji(customEmojiMatch[2])) {
           msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
-
           return;
         }
 
