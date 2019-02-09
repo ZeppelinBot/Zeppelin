@@ -1,6 +1,7 @@
 import { IPluginOptions, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import Ajv, { ErrorObject } from "ajv";
+import { isSnowflake, isUnicodeEmoji } from "../utils";
 
 export class ZeppelinPlugin extends Plugin {
   protected configSchema: any;
@@ -73,5 +74,19 @@ export class ZeppelinPlugin extends Plugin {
     }
 
     return super.runLoad();
+  }
+
+  public canUseEmoji(snowflake): boolean {
+    if (isUnicodeEmoji(snowflake)) {
+      return true;
+    } else if (isSnowflake(snowflake)) {
+      for (const guild of this.bot.guilds.values()) {
+        if (guild.emojis.some(e => (e as any).id === snowflake)) {
+          return true;
+        }
+      }
+    } else {
+      throw new PluginRuntimeError(`Invalid emoji: ${snowflake}`, this.runtimePluginName, this.guildId);
+    }
   }
 }
