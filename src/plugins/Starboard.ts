@@ -9,7 +9,7 @@ import {
   getUrlsInString,
   noop,
   snowflakeRegex,
-  successMessage
+  successMessage,
 } from "../utils";
 import { Starboard } from "../data/entities/Starboard";
 import path from "path";
@@ -28,17 +28,17 @@ export class StarboardPlugin extends ZeppelinPlugin {
   getDefaultOptions() {
     return {
       permissions: {
-        manage: false
+        manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
           permissions: {
-            manage: true
-          }
-        }
-      ]
+            manage: true,
+          },
+        },
+      ],
     };
   }
 
@@ -64,7 +64,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
     const cancelMsg = () => msg.channel.createMessage("Cancelled");
 
     msg.channel.createMessage(
-      `⭐ Let's make a starboard! What channel should we use as the board? ("cancel" to cancel)`
+      `⭐ Let's make a starboard! What channel should we use as the board? ("cancel" to cancel)`,
     );
 
     let starboardChannel;
@@ -109,7 +109,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
     } while (emoji == null);
 
     msg.channel.createMessage(
-      `And how many reactions are required to immortalize a message in the starboard? ("cancel" to cancel)`
+      `And how many reactions are required to immortalize a message in the starboard? ("cancel" to cancel)`,
     );
 
     let requiredReactions;
@@ -136,7 +136,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
     } while (requiredReactions == null);
 
     msg.channel.createMessage(
-      `And finally, which channels can messages be starred in? "All" for any channel. ("cancel" to cancel)`
+      `And finally, which channels can messages be starred in? "All" for any channel. ("cancel" to cancel)`,
     );
 
     let channelWhitelist;
@@ -193,7 +193,12 @@ export class StarboardPlugin extends ZeppelinPlugin {
   async onMessageReactionAdd(msg: Message, emoji: { id: string; name: string }) {
     if (!msg.author) {
       // Message is not cached, fetch it
-      msg = await msg.channel.getMessage(msg.id);
+      try {
+        msg = await msg.channel.getMessage(msg.id);
+      } catch (e) {
+        // Sometimes we get this event for messages we can't fetch with getMessage; ignore silently
+        return;
+      }
     }
 
     const emojiStr = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
@@ -211,7 +216,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
       // If the message has already been posted to this starboard, we don't need to do anything else here
       const existingSavedMessage = await this.starboards.getStarboardMessageByStarboardIdAndMessageId(
         starboard.id,
-        msg.id
+        msg.id,
       );
       if (existingSavedMessage) return;
 
@@ -248,11 +253,11 @@ export class StarboardPlugin extends ZeppelinPlugin {
 
     const embed: any = {
       footer: {
-        text: `#${(msg.channel as GuildChannel).name} - ${time}`
+        text: `#${(msg.channel as GuildChannel).name} - ${time}`,
       },
       author: {
-        name: `${msg.author.username}#${msg.author.discriminator}`
-      }
+        name: `${msg.author.username}#${msg.author.discriminator}`,
+      },
     };
 
     if (msg.author.avatarURL) {
@@ -293,7 +298,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
 
     const starboardMessage = await (channel as TextChannel).createMessage({
       content: `https://discordapp.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`,
-      embed
+      embed,
     });
     await this.starboards.createStarboardMessage(starboard.id, msg.id, starboardMessage.id);
   }
@@ -347,7 +352,7 @@ export class StarboardPlugin extends ZeppelinPlugin {
     for (const pin of pins) {
       const existingStarboardMessage = await this.starboards.getStarboardMessageByStarboardIdAndMessageId(
         starboard.id,
-        pin.id
+        pin.id,
       );
       if (existingStarboardMessage) continue;
 
