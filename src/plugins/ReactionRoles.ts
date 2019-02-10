@@ -4,6 +4,7 @@ import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Channel, Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { SavedMessage } from "../data/entities/SavedMessage";
 
 type ReactionRolePair = [string, string, string?];
 
@@ -35,6 +36,9 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
   }
 
+  /**
+   * COMMAND: Clear reaction roles from the specified message
+   */
   @d.command("reaction_roles clear", "<messageId:string>")
   @d.permission("manage")
   async clearReactionRolesCmd(msg: Message, args: { messageId: string }) {
@@ -57,6 +61,39 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     await targetMessage.removeReactions();
 
     msg.channel.createMessage(successMessage("Reaction roles cleared"));
+  }
+
+  /**
+   * COMMAND: Refresh reaction roles in the specified message by removing all reactions and reapplying them
+   */
+  @d.command("reaction_roles refresh", "<messageId:string>")
+  @d.permission("manage")
+  async refreshReactionRolesCmd(msg: Message, args: { messageId: string }) {
+    const savedMessage = await this.savedMessages.find(args.messageId);
+    if (!savedMessage) {
+      msg.channel.createMessage(errorMessage("Unknown message"));
+      return;
+    }
+
+    const reactionRoles = await this.reactionRoles.getForMessage(savedMessage.id);
+    const reactionRoleEmojis = reactionRoles.map(r => r.emoji);
+
+    const channel = this.guild.channels.get(savedMessage.channel_id) as TextChannel;
+    const targetMessage = await channel.getMessage(savedMessage.id);
+    const existingReactions = targetMessage.reactions;
+
+    // Remove reactions
+    await targetMessage.removeReactions();
+
+    // Re-add reactions
+    for (const emoji of Object.keys(existingReactions)) {
+      const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
+      if (!reactionRoleEmojis.includes(emojiId)) continue;
+
+      await targetMessage.addReaction(emoji);
+    }
+
+    msg.channel.createMessage(successMessage("Reaction roles refreshed"));
   }
 
   @d.command("reaction_roles", "<messageId:string> <reactionRolePairs:string$>")
