@@ -19,8 +19,8 @@ export class CasesPlugin extends ZeppelinPlugin {
     return {
       config: {
         log_automatic_actions: true,
-        case_log_channel: null
-      }
+        case_log_channel: null,
+      },
     };
   }
 
@@ -38,16 +38,16 @@ export class CasesPlugin extends ZeppelinPlugin {
         args.reason,
         args.automatic,
         args.postInCaseLog,
-        args.ppId
+        args.ppId,
       );
     });
 
-    this.actions.register("createCaseNote", (caseOrCaseId, args) => {
-      return this.createCaseNote(caseOrCaseId, args.modId, args.note, args.automatic, args.postInCaseLog);
+    this.actions.register("createCaseNote", args => {
+      return this.createCaseNote(args.caseId, args.modId, args.note, args.automatic, args.postInCaseLog);
     });
 
     this.actions.register("postCase", async args => {
-      const embed = await this.getCaseEmbed(args.case || args.caseId);
+      const embed = await this.getCaseEmbed(args.caseId);
       return (args.channel as TextableChannel).createMessage(embed);
     });
   }
@@ -74,7 +74,7 @@ export class CasesPlugin extends ZeppelinPlugin {
     reason: string = null,
     automatic = false,
     postInCaseLogOverride = null,
-    ppId = null
+    ppId = null,
   ): Promise<Case> {
     const user = this.bot.users.get(userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
@@ -96,7 +96,7 @@ export class CasesPlugin extends ZeppelinPlugin {
       mod_name: modName,
       audit_log_id: auditLogId,
       pp_id: ppId,
-      pp_name: ppName
+      pp_name: ppName,
     });
 
     if (reason) {
@@ -124,7 +124,7 @@ export class CasesPlugin extends ZeppelinPlugin {
     modId: string,
     body: string,
     automatic = false,
-    postInCaseLogOverride = null
+    postInCaseLogOverride = null,
   ): Promise<void> {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
@@ -137,14 +137,14 @@ export class CasesPlugin extends ZeppelinPlugin {
     await this.cases.createNote(theCase.id, {
       mod_id: modId,
       mod_name: modName,
-      body: body || ""
+      body: body || "",
     });
 
     if (theCase.mod_id == null) {
       // If the case has no moderator information, assume the first one to add a note to it did the action
       await this.cases.update(theCase.id, {
         mod_id: modId,
-        mod_name: modName
+        mod_name: modName,
       });
     }
 
@@ -174,20 +174,20 @@ export class CasesPlugin extends ZeppelinPlugin {
     const embed: any = {
       title: `${actionTypeStr} - Case #${theCase.case_number}`,
       footer: {
-        text: `Case created at ${createdAt.format("YYYY-MM-DD [at] HH:mm")}`
+        text: `Case created at ${createdAt.format("YYYY-MM-DD [at] HH:mm")}`,
       },
       fields: [
         {
           name: "User",
           value: `${theCase.user_name}\n<@!${theCase.user_id}>`,
-          inline: true
+          inline: true,
         },
         {
           name: "Moderator",
           value: `${theCase.mod_name}\n<@!${theCase.mod_id}>`,
-          inline: true
-        }
-      ]
+          inline: true,
+        },
+      ],
     };
 
     if (theCase.pp_id) {
@@ -207,13 +207,13 @@ export class CasesPlugin extends ZeppelinPlugin {
         const noteDate = moment(note.created_at);
         embed.fields.push({
           name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
-          value: note.body
+          value: note.body,
         });
       });
     } else {
       embed.fields.push({
         name: "!!! THIS CASE HAS NO NOTES !!!",
-        value: "\u200B"
+        value: "\u200B",
       });
     }
 
