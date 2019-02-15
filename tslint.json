@@ -19,6 +19,7 @@
     "no-console": {
       "severity": "warning"
     },
-    "no-bitwise": false
+    "no-bitwise": false,
+    "interface-over-type-literal": false
   }
 }
