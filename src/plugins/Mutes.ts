@@ -22,19 +22,26 @@ export class MutesPlugin extends ZeppelinPlugin {
   getDefaultOptions() {
     return {
       config: {
-        mute_role: null
+        mute_role: null,
       },
       permissions: {
-        cleanup: false
+        view_list: false,
+        cleanup: false,
       },
       overrides: [
         {
+          level: ">=50",
+          permissions: {
+            view_list: true,
+          },
+        },
+        {
           level: ">=100",
           permissions: {
-            cleanup: true
-          }
-        }
-      ]
+            cleanup: true,
+          },
+        },
+      ],
     };
   }
 
@@ -50,7 +57,6 @@ export class MutesPlugin extends ZeppelinPlugin {
     this.actions.register("unmute", args => {
       return this.unmuteMember(args.member, args.unmuteTime);
     });
-    this.actions.register("postMuteList", this.postMuteList.bind(this));
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
@@ -60,7 +66,6 @@ export class MutesPlugin extends ZeppelinPlugin {
   onUnload() {
     this.actions.unregister("mute");
     this.actions.unregister("unmute");
-    this.actions.unregister("postMuteList");
 
     clearInterval(this.muteClearIntervalId);
   }
@@ -86,7 +91,9 @@ export class MutesPlugin extends ZeppelinPlugin {
     }
   }
 
-  public async postMuteList(channel: TextableChannel) {
+  @d.command("mutes")
+  @d.permission("view_list")
+  public async postMuteList(msg: Message) {
     const lines = [];
 
     // Active, logged mutes
@@ -108,24 +115,25 @@ export class MutesPlugin extends ZeppelinPlugin {
       ...activeMutes.map(mute => {
         const user = this.bot.users.get(mute.user_id);
         const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-        const theCase = muteCasesById[mute.case_id] || null;
+        const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 
-        let line = `\`${caseName}\` **${username}** (\`${mute.user_id}\`)`;
+        let line = `**${username}** (\`${mute.user_id}\`)   📔 ${caseName}`;
 
         if (mute.expires_at) {
           const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
           const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
-          line += ` (expires in ${humanizedTime})`;
+          line += `   ⏰ Expires in ${humanizedTime}`;
         } else {
-          line += ` (doesn't expire)`;
+          line += `   ⏰ Doesn't expire`;
         }
 
-        const mutedAt = moment(mute.created_at, DBDateFormat);
-        line += ` (muted at ${mutedAt.format("YYYY-MM-DD HH:mm:ss")})`;
+        const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
+        const humanizedTimeFromMute = humanizeDuration(timeFromMute, { largest: 2, round: true });
+        line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
 
         return line;
-      })
+      }),
     );
 
     // Manually added mute roles
@@ -143,13 +151,13 @@ export class MutesPlugin extends ZeppelinPlugin {
     lines.push(
       ...manuallyMutedMembers.map(member => {
         return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
-      })
+      }),
     );
 
-    const message = `Active mutes:\n\n${lines.join("\n")}`;
+    const message = `Active mutes (${activeMutes.length} total):\n\n${lines.join("\n")}`;
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
-      channel.createMessage(chunk);
+      msg.channel.createMessage(chunk);
     }
   }
 
@@ -179,7 +187,7 @@ export class MutesPlugin extends ZeppelinPlugin {
     const bannedIds = bans.map(b => b.user.id);
 
     await msg.channel.createMessage(
-      `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`
+      `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`,
     );
 
     let cleared = 0;
@@ -262,7 +270,7 @@ export class MutesPlugin extends ZeppelinPlugin {
       await this.mutes.clear(member.id);
 
       this.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
-        member: stripObjectToScalars(member, ["user"])
+        member: stripObjectToScalars(member, ["user"]),
       });
     }
   }

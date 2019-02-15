@@ -12,7 +12,7 @@ import {
   formatTemplateString,
   stripObjectToScalars,
   successMessage,
-  trimLines
+  trimLines,
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
@@ -27,7 +27,7 @@ import { Mute } from "../data/entities/Mute";
 enum IgnoredEventType {
   Ban = 1,
   Unban,
-  Kick
+  Kick,
 }
 
 interface IIgnoredEvent {
@@ -74,7 +74,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         alert_on_rejoin: false,
-        alert_channel: null
+        alert_channel: null,
       },
       permissions: {
         note: false,
@@ -86,7 +86,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         addcase: false,
         massban: true,
         hidecase: false,
-        act_as_other: false
+        act_as_other: false,
       },
       overrides: [
         {
@@ -98,18 +98,18 @@ export class ModActionsPlugin extends ZeppelinPlugin {
             kick: true,
             ban: true,
             view: true,
-            addcase: true
-          }
+            addcase: true,
+          },
         },
         {
           level: ">=100",
           permissions: {
             massban: true,
             hidecase: true,
-            act_as_other: true
-          }
-        }
-      ]
+            act_as_other: true,
+          },
+        },
+      ],
     };
   }
 
@@ -145,7 +145,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
-      user.id
+      user.id,
     );
 
     if (relevantAuditLogEntry) {
@@ -158,12 +158,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         type: CaseTypes.Ban,
         auditLogId,
         reason: relevantAuditLogEntry.reason,
-        automatic: true
+        automatic: true,
       });
     } else {
       this.actions.fire("createCase", {
         userId: user.id,
-        type: CaseTypes.Ban
+        type: CaseTypes.Ban,
       });
     }
   }
@@ -183,7 +183,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
-      user.id
+      user.id,
     );
 
     if (relevantAuditLogEntry) {
@@ -195,13 +195,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         modId,
         type: CaseTypes.Unban,
         auditLogId,
-        automatic: true
+        automatic: true,
       });
     } else {
       this.actions.fire("createCase", {
         userId: user.id,
         type: CaseTypes.Unban,
-        automatic: true
+        automatic: true,
       });
     }
   }
@@ -223,7 +223,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       alertChannel.send(
         `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${
           actions.length
-        } prior record(s)`
+        } prior record(s)`,
       );
     }
   }
@@ -239,7 +239,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const kickAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_KICK,
-      member.id
+      member.id,
     );
 
     if (kickAuditLogEntry) {
@@ -249,12 +249,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         type: CaseTypes.Kick,
         auditLogId: kickAuditLogEntry.id,
         reason: kickAuditLogEntry.reason,
-        automatic: true
+        automatic: true,
       });
 
       this.serverLogs.log(LogType.MEMBER_KICK, {
         user: stripObjectToScalars(member.user),
-        mod: stripObjectToScalars(kickAuditLogEntry.user)
+        mod: stripObjectToScalars(kickAuditLogEntry.user),
       });
     }
   }
@@ -271,9 +271,10 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
-    await this.actions.fire("createCaseNote", theCase, {
+    await this.actions.fire("createCaseNote", {
+      caseId: theCase.id,
       modId: msg.author.id,
-      note: args.note
+      note: args.note,
     });
 
     msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
@@ -289,14 +290,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Note,
-      reason: args.note
+      reason: args.note,
     });
 
     msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
   }
 
   @d.command("warn", "<member:Member> <reason:string$>", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("warn")
   @d.nonBlocking()
@@ -326,7 +327,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       args.member.user,
       warnMessage,
       this.configValue("dm_on_warn"),
-      this.configValue("message_on_warn")
+      this.configValue("message_on_warn"),
     );
 
     if (!messageSent) {
@@ -343,23 +344,23 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Warn,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     msg.channel.createMessage(
       successMessage(
-        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${createdCase.case_number})`
-      )
+        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${createdCase.case_number})`,
+      ),
     );
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"])
+      member: stripObjectToScalars(args.member, ["user"]),
     });
   }
 
   @d.command("mute", "<member:Member> [time:string] [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("mute")
   async muteCmd(msg: Message, args: { member: Member; time: string; reason: string; mod: Member }) {
@@ -395,7 +396,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
     const mute: Mute = await this.actions.fire("mute", {
       member: args.member,
-      muteTime
+      muteTime,
     });
 
     if (!mute) {
@@ -412,9 +413,10 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
       if (args.reason) {
         // Update old case
-        await this.actions.fire("createCaseNote", mute.case_id, {
+        await this.actions.fire("createCaseNote", {
+          caseId: mute.case_id,
           modId: mod.id,
-          note: args.reason
+          note: args.reason,
         });
       }
     } else {
@@ -424,7 +426,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         modId: mod.id,
         type: CaseTypes.Mute,
         reason: args.reason,
-        ppId: mod.id !== msg.author.id ? msg.author.id : null
+        ppId: mod.id !== msg.author.id ? msg.author.id : null,
       });
       await this.mutes.setCaseId(args.member.id, theCase.id);
     }
@@ -437,14 +439,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       const muteMessage = formatTemplateString(template, {
         guildName: this.guild.name,
         reason: args.reason,
-        time: timeUntilUnmute
+        time: timeUntilUnmute,
       });
 
       messageSent = await this.tryToMessageUser(
         args.member.user,
         muteMessage,
         this.configValue("dm_on_mute"),
-        this.configValue("message_on_mute")
+        this.configValue("message_on_mute"),
       );
     }
 
@@ -468,18 +470,18 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
         mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"]),
-        time: timeUntilUnmute
+        time: timeUntilUnmute,
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_MUTE, {
         mod: stripObjectToScalars(mod.user),
-        member: stripObjectToScalars(args.member, ["user"])
+        member: stripObjectToScalars(args.member, ["user"]),
       });
     }
   }
 
   @d.command("unmute", "<member:Member> [time:string] [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("mute")
   async unmuteCmd(msg: Message, args: any) {
@@ -521,7 +523,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Unmute,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     if (unmuteTime) {
@@ -535,15 +537,15 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         successMessage(
           `Unmuting **${args.member.user.username}#${args.member.user.discriminator}** in ${timeUntilUnmute} (Case #${
             createdCase.case_number
-          })`
-        )
+          })`,
+        ),
       );
 
       // Log the action
       this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
         mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"]),
-        time: timeUntilUnmute
+        time: timeUntilUnmute,
       });
     } else {
       // Otherwise remove "muted" role immediately
@@ -555,26 +557,20 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         successMessage(
           `Unmuted **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
             createdCase.case_number
-          })`
-        )
+          })`,
+        ),
       );
 
       // Log the action
       this.serverLogs.log(LogType.MEMBER_UNMUTE, {
         mod: stripObjectToScalars(msg.member.user),
-        member: stripObjectToScalars(args.member, ["user"])
+        member: stripObjectToScalars(args.member, ["user"]),
       });
     }
   }
 
-  @d.command("mutes")
-  @d.permission("view")
-  async mutesCmd(msg: Message) {
-    this.actions.fire("postMuteList", msg.channel);
-  }
-
   @d.command("kick", "<member:Member> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("kick")
   async kickCmd(msg, args: { member: Member; reason: string; mod: Member }) {
@@ -600,14 +596,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     if (args.reason) {
       const kickMessage = formatTemplateString(this.configValue("kick_message"), {
         guildName: this.guild.name,
-        reason: args.reason
+        reason: args.reason,
       });
 
       messageSent = await this.tryToMessageUser(
         args.member.user,
         kickMessage,
         this.configValue("dm_on_kick"),
-        this.configValue("message_on_kick")
+        this.configValue("message_on_kick"),
       );
     }
 
@@ -622,7 +618,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Kick,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     // Confirm the action to the moderator
@@ -635,12 +631,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(mod.user),
-      user: stripObjectToScalars(args.member.user)
+      user: stripObjectToScalars(args.member.user),
     });
   }
 
   @d.command("ban", "<member:Member> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("ban")
   async banCmd(msg, args) {
@@ -666,14 +662,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     if (args.reason) {
       const banMessage = formatTemplateString(this.configValue("ban_message"), {
         guildName: this.guild.name,
-        reason: args.reason
+        reason: args.reason,
       });
 
       messageSent = await this.tryToMessageUser(
         args.member.user,
         banMessage,
         this.configValue("dm_on_ban"),
-        this.configValue("message_on_ban")
+        this.configValue("message_on_ban"),
       );
     }
 
@@ -688,7 +684,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Ban,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     // Confirm the action to the moderator
@@ -701,12 +697,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"])
+      member: stripObjectToScalars(args.member, ["user"]),
     });
   }
 
   @d.command("softban", "<member:Member> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("ban")
   async softbanCmd(msg, args) {
@@ -742,7 +738,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Softban,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     // Confirm the action to the moderator
@@ -750,19 +746,19 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       successMessage(
         `Softbanned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
           createdCase.case_number
-        })`
-      )
+        })`,
+      ),
     );
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"])
+      member: stripObjectToScalars(args.member, ["user"]),
     });
   }
 
   @d.command("unban", "<userId:userId> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("ban")
   async unbanCmd(msg: Message, args: { userId: string; reason: string; mod: Member }) {
@@ -793,7 +789,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Unban,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     // Confirm the action
@@ -802,12 +798,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.userId
+      userId: args.userId,
     });
   }
 
   @d.command("forceban", "<userId:userId> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("ban")
   async forcebanCmd(msg: Message, args: any) {
@@ -845,7 +841,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes.Ban,
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     // Confirm the action
@@ -854,7 +850,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.userId
+      userId: args.userId,
     });
   }
 
@@ -909,7 +905,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
           modId: msg.author.id,
           type: CaseTypes.Ban,
           reason: `Mass ban: ${banReason}`,
-          postInCaseLog: false
+          postInCaseLog: false,
         });
       } catch (e) {
         failedBans.push(userId);
@@ -927,12 +923,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
       this.serverLogs.log(LogType.MASSBAN, {
         mod: stripObjectToScalars(msg.author),
-        count: successfulBanCount
+        count: successfulBanCount,
       });
 
       if (failedBans.length) {
         msg.channel.createMessage(
-          successMessage(`Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`)
+          successMessage(`Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`),
         );
       } else {
         msg.channel.createMessage(successMessage(`Banned ${successfulBanCount} users successfully`));
@@ -941,7 +937,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   }
 
   @d.command("addcase", "<type:string> <target:userId> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }]
+    options: [{ name: "mod", type: "member" }],
   })
   @d.permission("addcase")
   async addcaseCmd(msg: Message, args: any) {
@@ -982,7 +978,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       modId: mod.id,
       type: CaseTypes[type],
       reason: args.reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));
@@ -992,7 +988,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod: stripObjectToScalars(mod.user),
       userId: args.userId,
       caseNum: theCase.case_number,
-      caseType: type.toUpperCase()
+      caseType: type.toUpperCase(),
     });
   }
 
@@ -1014,7 +1010,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     await this.actions.fire("postCase", {
       caseId: theCase.id,
-      channel: msg.channel
+      channel: msg.channel,
     });
   }
 
@@ -1045,7 +1041,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         for (const theCase of casesToDisplay) {
           await this.actions.fire("postCase", {
             caseId: theCase.id,
-            channel: msg.channel
+            channel: msg.channel,
           });
         }
       } else {
@@ -1089,7 +1085,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     await this.cases.setHidden(theCase.id, true);
     msg.channel.createMessage(
-      successMessage(`Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`)
+      successMessage(`Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`),
     );
   }
 
