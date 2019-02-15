@@ -1,6 +1,14 @@
 import { decorators as d } from "knub";
 import { Channel, EmbedOptions, Member, Message, TextChannel, User, VoiceChannel } from "eris";
-import { embedPadding, errorMessage, noop, stripObjectToScalars, successMessage, trimLines } from "../utils";
+import {
+  chunkArray,
+  embedPadding,
+  errorMessage,
+  noop,
+  stripObjectToScalars,
+  successMessage,
+  trimLines,
+} from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import moment from "moment-timezone";
@@ -40,7 +48,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         reload_guild: false,
         nickname: false,
         ping: false,
-        source: false
+        source: false,
       },
       overrides: [
         {
@@ -52,18 +60,18 @@ export class UtilityPlugin extends ZeppelinPlugin {
             clean: true,
             info: true,
             server: true,
-            nickname: true
-          }
+            nickname: true,
+          },
         },
         {
           level: ">=100",
           permissions: {
             reload_guild: true,
             ping: true,
-            source: true
-          }
-        }
-      ]
+            source: true,
+          },
+        },
+      ],
     };
   }
 
@@ -79,11 +87,28 @@ export class UtilityPlugin extends ZeppelinPlugin {
     }
   }
 
-  @d.command("roles")
+  @d.command("roles", "[search:string$]")
   @d.permission("roles")
-  async rolesCmd(msg: Message) {
-    const roles = (msg.channel as TextChannel).guild.roles.map(role => `${role.name} ${role.id}`);
-    msg.channel.createMessage("```" + roles.join("\n") + "```");
+  async rolesCmd(msg: Message, args: { search?: string }) {
+    let roles = (msg.channel as TextChannel).guild.roles.map(role => `${role.name} ${role.id}`);
+    if (args.search) {
+      const searchStr = args.search.toLowerCase();
+      roles = roles.filter(r => r.toLowerCase().includes(searchStr));
+    }
+
+    const chunks = chunkArray(roles, 20);
+    for (const [i, chunk] of chunks.entries()) {
+      if (i === 0) {
+        msg.channel.createMessage(
+          trimLines(`
+          ${args.search ? "Total roles found" : "Total roles"}: ${roles.length}
+          \`\`\`py\n${chunk.join("\n")}\`\`\`
+        `),
+        );
+      } else {
+        msg.channel.createMessage("```py\n" + chunk.join("\n") + "```");
+      }
+    }
   }
 
   @d.command("level", "[userId:string]")
@@ -173,7 +198,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
       mod: stripObjectToScalars(mod),
       channel: stripObjectToScalars(channel),
       count: savedMessages.length,
-      archiveUrl
+      archiveUrl,
     });
   }
 
@@ -192,7 +217,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     }
 
     const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
     );
 
     setTimeout(() => {
@@ -215,7 +240,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     }
 
     const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
     );
 
     setTimeout(() => {
@@ -238,7 +263,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     }
 
     const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`)
+      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
     );
 
     setTimeout(() => {
@@ -251,7 +276,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
   @d.permission("info")
   async infoCmd(msg: Message, args: { userId: string }) {
     const embed: EmbedOptions = {
-      fields: []
+      fields: [],
     };
 
     const user = this.bot.users.get(args.userId);
@@ -259,7 +284,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
       const createdAt = moment(user.createdAt);
       const accountAge = humanizeDuration(moment().valueOf() - user.createdAt, {
         largest: 2,
-        round: true
+        round: true,
       });
 
       embed.title = `${user.username}#${user.discriminator}`;
@@ -272,7 +297,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
           ID: ${user.id}
           Profile: <@!${user.id}>
           Created: ${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
-        `) + embedPadding
+        `) + embedPadding,
       });
     } else {
       embed.title = `Unknown user`;
@@ -283,7 +308,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
       const joinedAt = moment(member.joinedAt);
       const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
         largest: 2,
-        round: true
+        round: true,
       });
       const roles = member.roles.map(id => this.guild.roles.get(id));
 
@@ -293,7 +318,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
           trimLines(`
           Joined: ${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})
           ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
-        `) + embedPadding
+        `) + embedPadding,
       });
     }
 
@@ -315,7 +340,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         value: trimLines(`
           Total cases: ${cases.length}
           ${summaryText}: ${caseSummary.join(", ")}
-        `)
+        `),
       });
     }
 
@@ -332,7 +357,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
     try {
       await args.target.edit({
-        nick: ""
+        nick: "",
       });
     } catch (e) {
       msg.channel.createMessage(errorMessage("Failed to reset nickname"));
@@ -358,7 +383,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
     try {
       await args.target.edit({
-        nick: args.nickname
+        nick: args.nickname,
       });
     } catch (e) {
       msg.channel.createMessage(errorMessage("Failed to change nickname"));
@@ -374,7 +399,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     await this.guild.fetchAllMembers();
 
     const embed: EmbedOptions = {
-      fields: []
+      fields: [],
     };
 
     embed.thumbnail = { url: this.guild.iconURL };
@@ -382,7 +407,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     const createdAt = moment(this.guild.createdAt);
     const serverAge = humanizeDuration(moment().valueOf() - this.guild.createdAt, {
       largest: 2,
-      round: true
+      round: true,
     });
 
     embed.fields.push({
@@ -392,7 +417,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         Created: ${serverAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
         Members: ${this.guild.memberCount}
         ${this.guild.features.length > 0 ? "Features: " + this.guild.features.join(", ") : ""}
-      `) + embedPadding
+      `) + embedPadding,
     });
 
     const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
@@ -405,7 +430,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         Roles: ${this.guild.roles.size}
         Text channels: ${textChannels.length}
         Voice channels: ${voiceChannels.length}
-      `) + embedPadding
+      `) + embedPadding,
     });
 
     const onlineMembers = this.guild.members.filter(m => m.status === "online");
@@ -420,7 +445,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         Idle: **${idleMembers.length}**
         DND: **${dndMembers.length}**
         Offline: **${offlineMembers.length}**
-      `)
+      `),
     });
 
     msg.channel.createMessage({ embed });
@@ -456,7 +481,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
       Highest: **${highest}ms**
       Mean: **${mean}ms**
       Time between ping command and first reply: **${msgToMsgDelay}ms**
-    `)
+    `),
     );
 
     // Clean up test messages

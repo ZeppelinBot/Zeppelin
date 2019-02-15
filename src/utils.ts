@@ -250,6 +250,21 @@ export function useMediaUrls(content: string): string {
   return content.replace(/cdn\.discordapp\.com/g, "media.discordapp.net");
 }
 
+export function chunkArray<T>(arr: T[], chunkSize): T[][] {
+  const chunks: T[][] = [];
+  let currentChunk = [];
+
+  for (let i = 0; i < arr.length; i++) {
+    currentChunk.push(arr[i]);
+    if ((i !== 0 && i % chunkSize === 0) || i === arr.length - 1) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+    }
+  }
+
+  return chunks;
+}
+
 export function chunkLines(str: string, maxChunkLength = 2000): string[] {
   if (str.length < maxChunkLength) {
     return [str];
