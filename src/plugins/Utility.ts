@@ -96,6 +96,12 @@ export class UtilityPlugin extends ZeppelinPlugin {
       roles = roles.filter(r => r.toLowerCase().includes(searchStr));
     }
 
+    roles.sort((a, b) => {
+      if (a.toLowerCase() > b.toLowerCase()) return 1;
+      if (a.toLowerCase() < b.toLowerCase()) return -1;
+      return 0;
+    });
+
     const chunks = chunkArray(roles, 20);
     for (const [i, chunk] of chunks.entries()) {
       if (i === 0) {
