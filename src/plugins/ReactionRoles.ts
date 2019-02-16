@@ -1,10 +1,11 @@
 import { decorators as d } from "knub";
-import { CustomEmoji, errorMessage, isSnowflake, noop, successMessage } from "../utils";
+import { CustomEmoji, errorMessage, isSnowflake, noop, sleep, successMessage } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Channel, Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import { Queue } from "../Queue";
 
 type ReactionRolePair = [string, string, string?];
 
@@ -13,6 +14,8 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
   protected reactionRoles: GuildReactionRoles;
   protected savedMessages: GuildSavedMessages;
+
+  protected reactionRemoveQueue: Queue;
 
   getDefaultOptions() {
     return {
@@ -34,6 +37,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   async onLoad() {
     this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.reactionRemoveQueue = new Queue();
   }
 
   /**
@@ -206,6 +210,9 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     }
 
     const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
-    msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
+    this.reactionRemoveQueue.add(async () => {
+      await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
+      await sleep(250);
+    });
   }
 }
