@@ -12,17 +12,17 @@ export class NameHistoryPlugin extends Plugin {
   getDefaultOptions() {
     return {
       permissions: {
-        view: false
+        view: false,
       },
 
       overrides: [
         {
           level: ">=50",
           permissions: {
-            view: true
-          }
-        }
-      ]
+            view: true,
+          },
+        },
+      ],
     };
   }
 
@@ -73,6 +73,7 @@ export class NameHistoryPlugin extends Plugin {
   }
 
   @d.event("guildMemberAdd")
+  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
     const username = `${member.user.username}#${member.user.discriminator}`;

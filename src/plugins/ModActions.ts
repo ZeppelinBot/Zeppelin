@@ -210,6 +210,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Show an alert if a member with prior notes joins the server
    */
   @d.event("guildMemberAdd")
+  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     if (!this.configValue("alert_on_rejoin")) return;
 

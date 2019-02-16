@@ -17,8 +17,8 @@ export class PersistPlugin extends Plugin {
       config: {
         persisted_roles: [],
         persist_nicknames: false,
-        persist_voice_mutes: false
-      }
+        persist_voice_mutes: false,
+      },
     };
   }
 
@@ -28,6 +28,7 @@ export class PersistPlugin extends Plugin {
   }
 
   @d.event("guildMemberRemove")
+  @d.nonBlocking()
   onGuildMemberRemove(_, member: Member) {
     let persist = false;
     const persistData: IPartialPersistData = {};
@@ -89,7 +90,7 @@ export class PersistPlugin extends Plugin {
       await this.persistedData.clear(member.id);
 
       this.logs.log(LogType.MEMBER_RESTORE, {
-        member: stripObjectToScalars(member, ["user"])
+        member: stripObjectToScalars(member, ["user"]),
       });
     }
   }
