@@ -224,6 +224,6 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
         await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
         await sleep(250);
       });
-    }, 2000);
+    }, 15 * 1000);
   }
 }
