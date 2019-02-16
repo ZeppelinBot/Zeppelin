@@ -194,7 +194,9 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     const member = this.guild.members.get(userId);
     if (!member) return;
 
-    member.addRole(matchingReactionRole.role_id);
+    member.addRole(matchingReactionRole.role_id).catch(() => {
+      console.warn(`Could not add role ${matchingReactionRole.role_id} to ${userId}`);
+    });
   }
 
   @d.event("messageReactionRemove")
@@ -205,6 +207,8 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     const member = this.guild.members.get(userId);
     if (!member) return;
 
-    member.removeRole(matchingReactionRole.role_id);
+    member.removeRole(matchingReactionRole.role_id).catch(() => {
+      console.warn(`Could not remove role ${matchingReactionRole.role_id} from ${userId}`);
+    });
   }
 }
