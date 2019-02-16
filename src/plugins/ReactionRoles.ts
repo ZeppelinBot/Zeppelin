@@ -209,10 +209,13 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
       });
     }
 
-    const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
-    this.reactionRemoveQueue.add(async () => {
-      await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
-      await sleep(250);
-    });
+    // Remove the reaction after a small delay
+    setTimeout(() => {
+      this.reactionRemoveQueue.add(async () => {
+        const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
+        await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
+        await sleep(250);
+      });
+    }, 2000);
   }
 }
