@@ -16,6 +16,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   protected savedMessages: GuildSavedMessages;
 
   protected reactionRemoveQueue: Queue;
+  protected pendingRoles: Set<string>;
 
   getDefaultOptions() {
     return {
@@ -38,6 +39,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
     this.reactionRemoveQueue = new Queue();
+    this.pendingRoles = new Set();
   }
 
   /**
@@ -199,6 +201,10 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     const member = this.guild.members.get(userId);
     if (!member) return;
 
+    const pendingKey = `${userId}-${matchingReactionRole.role_id}`;
+    if (this.pendingRoles.has(pendingKey)) return;
+    this.pendingRoles.add(pendingKey);
+
     if (member.roles.includes(matchingReactionRole.role_id)) {
       await member.removeRole(matchingReactionRole.role_id).catch(err => {
         console.warn(`Could not remove role ${matchingReactionRole.role_id} from ${userId}`, err && err.message);
@@ -212,6 +218,8 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     // Remove the reaction after a small delay
     setTimeout(() => {
       this.reactionRemoveQueue.add(async () => {
+        this.pendingRoles.delete(pendingKey);
+
         const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
         await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
         await sleep(250);
