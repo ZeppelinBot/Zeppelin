@@ -32,6 +32,7 @@ export class CensorPlugin extends Plugin {
         invite_guild_blacklist: null,
         invite_code_whitelist: null,
         invite_code_blacklist: null,
+        allow_group_dm_invites: false,
 
         filter_domains: false,
         domain_whitelist: null,
@@ -137,6 +138,11 @@ export class CensorPlugin extends Plugin {
         savedMessage.channel_id,
         "invite_code_blacklist",
       );
+      const allowGroupDMInvites: boolean = this.configValueForMemberIdAndChannelId(
+        savedMessage.user_id,
+        savedMessage.channel_id,
+        "allow_group_dm_invites",
+      );
 
       const inviteCodes = getInviteCodesInString(savedMessage.data.content);
 
@@ -145,6 +151,11 @@ export class CensorPlugin extends Plugin {
       invites = invites.filter(v => !!v);
 
       for (const invite of invites) {
+        if (!invite.guild && !allowGroupDMInvites) {
+          this.censorMessage(savedMessage, `group dm invites are not allowed`);
+          return;
+        }
+
         if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
           this.censorMessage(
             savedMessage,
