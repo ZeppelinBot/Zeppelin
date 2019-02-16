@@ -1,5 +1,5 @@
 import { decorators as d } from "knub";
-import { CustomEmoji, errorMessage, isSnowflake, successMessage } from "../utils";
+import { CustomEmoji, errorMessage, isSnowflake, noop, successMessage } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Channel, Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -187,6 +187,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   }
 
   @d.event("messageReactionAdd")
+  @d.nonBlocking()
   async onAddReaction(msg: Message, emoji: CustomEmoji, userId: string) {
     const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
     if (!matchingReactionRole) return;
@@ -194,21 +195,17 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     const member = this.guild.members.get(userId);
     if (!member) return;
 
-    member.addRole(matchingReactionRole.role_id).catch(() => {
-      console.warn(`Could not add role ${matchingReactionRole.role_id} to ${userId}`);
-    });
-  }
+    if (member.roles.includes(matchingReactionRole.role_id)) {
+      await member.removeRole(matchingReactionRole.role_id).catch(err => {
+        console.warn(`Could not remove role ${matchingReactionRole.role_id} from ${userId}`, err && err.message);
+      });
+    } else {
+      await member.addRole(matchingReactionRole.role_id).catch(err => {
+        console.warn(`Could not add role ${matchingReactionRole.role_id} to ${userId}`, err && err.message);
+      });
+    }
 
-  @d.event("messageReactionRemove")
-  async onRemoveReaction(msg: Message, emoji: CustomEmoji, userId: string) {
-    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
-    if (!matchingReactionRole) return;
-
-    const member = this.guild.members.get(userId);
-    if (!member) return;
-
-    member.removeRole(matchingReactionRole.role_id).catch(() => {
-      console.warn(`Could not remove role ${matchingReactionRole.role_id} from ${userId}`);
-    });
+    const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
+    msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
   }
 }
