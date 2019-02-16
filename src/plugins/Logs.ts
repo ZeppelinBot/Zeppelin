@@ -11,7 +11,7 @@ import {
   formatTemplateString,
   noop,
   stripObjectToScalars,
-  useMediaUrls
+  useMediaUrls,
 } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
@@ -26,6 +26,8 @@ import { GuildCases } from "../data/GuildCases";
 interface ILogChannel {
   include?: string[];
   exclude?: string[];
+  batched?: boolean;
+  batch_time?: number;
 }
 
 interface ILogChannelMap {
@@ -35,7 +37,7 @@ interface ILogChannelMap {
 const unknownUser = {
   id: 0,
   username: "Unknown",
-  discriminator: "0000"
+  discriminator: "0000",
 };
 
 export class LogsPlugin extends Plugin {
@@ -48,6 +50,8 @@ export class LogsPlugin extends Plugin {
 
   protected logListener;
 
+  protected batches: Map<string, string[]>;
+
   private onMessageDeleteFn;
   private onMessageDeleteBulkFn;
   private onMessageUpdateFn;
@@ -58,9 +62,9 @@ export class LogsPlugin extends Plugin {
         channels: {},
         format: {
           timestamp: "YYYY-MM-DD HH:mm:ss",
-          ...DefaultLogMessages
-        }
-      }
+          ...DefaultLogMessages,
+        },
+      },
     };
   }
 
@@ -72,6 +76,8 @@ export class LogsPlugin extends Plugin {
 
     this.logListener = ({ type, data }) => this.log(type, data);
     this.guildLogs.on("log", this.logListener);
+
+    this.batches = new Map();
 
     this.onMessageDeleteFn = this.onMessageDelete.bind(this);
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);
@@ -101,7 +107,24 @@ export class LogsPlugin extends Plugin {
 
       if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
         const message = this.getLogMessage(type, data);
-        if (message) await createChunkedMessage(channel, message).catch(noop);
+        if (message) {
+          if (opts.batched) {
+            // If we're batching log messages, gather all log messages within the set batch_time into a single message
+            if (!this.batches.has(channel.id)) {
+              this.batches.set(channel.id, []);
+              setTimeout(async () => {
+                const batchedMessage = this.batches.get(channel.id).join("\n");
+                this.batches.delete(channel.id);
+                createChunkedMessage(channel, batchedMessage).catch(noop);
+              }, opts.batch_time || 2000);
+            }
+
+            this.batches.get(channel.id).push(message);
+          } else {
+            // If we're not batching log messages, just send them immediately
+            await createChunkedMessage(channel, message).catch(noop);
+          }
+        }
       }
     }
   }
@@ -126,13 +149,13 @@ export class LogsPlugin extends Plugin {
     const newThreshold = moment().valueOf() - 1000 * 60 * 60;
     const accountAge = humanizeDuration(moment().valueOf() - member.createdAt, {
       largest: 2,
-      round: true
+      round: true,
     });
 
     this.guildLogs.log(LogType.MEMBER_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
       new: member.createdAt >= newThreshold ? " :new:" : "",
-      account_age: accountAge
+      account_age: accountAge,
     });
 
     const cases = (await this.cases.with("notes").getByUserId(member.id)).filter(c => !c.is_hidden);
@@ -157,7 +180,7 @@ export class LogsPlugin extends Plugin {
 
       this.guildLogs.log(LogType.MEMBER_JOIN_WITH_PRIOR_RECORDS, {
         member: stripObjectToScalars(member, ["user"]),
-        recentCaseSummary
+        recentCaseSummary,
       });
     }
   }
@@ -165,7 +188,7 @@ export class LogsPlugin extends Plugin {
   @d.event("guildMemberRemove")
   onMemberLeave(_, member) {
     this.guildLogs.log(LogType.MEMBER_LEAVE, {
-      member: stripObjectToScalars(member, ["user"])
+      member: stripObjectToScalars(member, ["user"]),
     });
   }
 
@@ -175,7 +198,7 @@ export class LogsPlugin extends Plugin {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
-      user.id
+      user.id,
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
@@ -183,9 +206,9 @@ export class LogsPlugin extends Plugin {
       LogType.MEMBER_BAN,
       {
         user: stripObjectToScalars(user),
-        mod: stripObjectToScalars(mod)
+        mod: stripObjectToScalars(mod),
       },
-      user.id
+      user.id,
     );
   }
 
@@ -195,7 +218,7 @@ export class LogsPlugin extends Plugin {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
-      user.id
+      user.id,
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
@@ -203,9 +226,9 @@ export class LogsPlugin extends Plugin {
       LogType.MEMBER_UNBAN,
       {
         mod: stripObjectToScalars(mod),
-        userId: user.id
+        userId: user.id,
       },
-      user.id
+      user.id,
     );
   }
 
@@ -218,7 +241,7 @@ export class LogsPlugin extends Plugin {
       this.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
         member,
         oldNick: oldMember.nick != null ? oldMember.nick : "<none>",
-        newNick: member.nick != null ? member.nick : "<none>"
+        newNick: member.nick != null ? member.nick : "<none>",
       });
     }
 
@@ -229,7 +252,7 @@ export class LogsPlugin extends Plugin {
       const relevantAuditLogEntry = await findRelevantAuditLogEntry(
         this.guild,
         ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
-        member.id
+        member.id,
       );
       const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
@@ -239,9 +262,9 @@ export class LogsPlugin extends Plugin {
           {
             member,
             role: this.guild.roles.get(addedRoles[0]),
-            mod: stripObjectToScalars(mod)
+            mod: stripObjectToScalars(mod),
           },
-          member.id
+          member.id,
         );
       } else if (removedRoles.length) {
         this.guildLogs.log(
@@ -249,9 +272,9 @@ export class LogsPlugin extends Plugin {
           {
             member,
             role: this.guild.roles.get(removedRoles[0]),
-            mod: stripObjectToScalars(mod)
+            mod: stripObjectToScalars(mod),
           },
-          member.id
+          member.id,
         );
       }
     }
@@ -266,7 +289,7 @@ export class LogsPlugin extends Plugin {
       this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
         member: stripObjectToScalars(member, ["user"]),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,
-        newName: `${user.username}#${user.discriminator}`
+        newName: `${user.username}#${user.discriminator}`,
       });
     }
   }
@@ -274,28 +297,28 @@ export class LogsPlugin extends Plugin {
   @d.event("channelCreate")
   onChannelCreate(channel) {
     this.guildLogs.log(LogType.CHANNEL_CREATE, {
-      channel: stripObjectToScalars(channel)
+      channel: stripObjectToScalars(channel),
     });
   }
 
   @d.event("channelDelete")
   onChannelDelete(channel) {
     this.guildLogs.log(LogType.CHANNEL_DELETE, {
-      channel: stripObjectToScalars(channel)
+      channel: stripObjectToScalars(channel),
     });
   }
 
   @d.event("guildRoleCreate")
   onRoleCreate(_, role) {
     this.guildLogs.log(LogType.ROLE_CREATE, {
-      role: stripObjectToScalars(role)
+      role: stripObjectToScalars(role),
     });
   }
 
   @d.event("guildRoleDelete")
   onRoleDelete(_, role) {
     this.guildLogs.log(LogType.ROLE_DELETE, {
-      role: stripObjectToScalars(role)
+      role: stripObjectToScalars(role),
     });
   }
 
@@ -318,7 +341,7 @@ export class LogsPlugin extends Plugin {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel),
       before,
-      after
+      after,
     });
   }
 
@@ -342,18 +365,18 @@ export class LogsPlugin extends Plugin {
           channel: stripObjectToScalars(channel),
           messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
           messageDate: moment(savedMessage.data.timestamp, "x").format(this.configValue("format.timestamp")),
-          attachments: disableLinkPreviews(useMediaUrls(attachments))
+          attachments: disableLinkPreviews(useMediaUrls(attachments)),
         },
-        savedMessage.id
+        savedMessage.id,
       );
     } else {
       this.guildLogs.log(
         LogType.MESSAGE_DELETE_BARE,
         {
           messageId: savedMessage.id,
-          channel: stripObjectToScalars(channel)
+          channel: stripObjectToScalars(channel),
         },
-        savedMessage.id
+        savedMessage.id,
       );
     }
   }
@@ -369,9 +392,9 @@ export class LogsPlugin extends Plugin {
       {
         count: savedMessages.length,
         channel,
-        archiveUrl
+        archiveUrl,
       },
-      savedMessages[0].id
+      savedMessages[0].id,
     );
   }
 
@@ -379,7 +402,7 @@ export class LogsPlugin extends Plugin {
   onVoiceChannelJoin(member: Member, channel: Channel) {
     this.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
       member: stripObjectToScalars(member, ["user"]),
-      channel: stripObjectToScalars(channel)
+      channel: stripObjectToScalars(channel),
     });
   }
 
@@ -387,7 +410,7 @@ export class LogsPlugin extends Plugin {
   onVoiceChannelLeave(member: Member, channel: Channel) {
     this.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
       member: stripObjectToScalars(member, ["user"]),
-      channel: stripObjectToScalars(channel)
+      channel: stripObjectToScalars(channel),
     });
   }
 
@@ -396,7 +419,7 @@ export class LogsPlugin extends Plugin {
     this.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
       member: stripObjectToScalars(member, ["user"]),
       oldChannel: stripObjectToScalars(oldChannel),
-      newChannel: stripObjectToScalars(newChannel)
+      newChannel: stripObjectToScalars(newChannel),
     });
   }
 }
