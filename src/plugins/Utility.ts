@@ -6,8 +6,10 @@ import {
   embedPadding,
   errorMessage,
   isSnowflake,
+  multiSorter,
   noop,
   simpleClosestStringMatch,
+  sorter,
   stripObjectToScalars,
   successMessage,
   trimLines,
@@ -177,18 +179,59 @@ export class UtilityPlugin extends ZeppelinPlugin {
     msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
 
-  @d.command("search", "<query:string$>")
+  @d.command("search", "[query:string$]", {
+    options: [
+      {
+        name: "page",
+        type: "number",
+      },
+      {
+        name: "role",
+        type: "string",
+      },
+      {
+        name: "voice",
+        type: "bool",
+      },
+      {
+        name: "sort",
+        type: "string",
+      },
+    ],
+  })
   @d.permission("search")
-  async searchCmd(msg: Message, args: { query: string }) {
-    let [, query, inputPageNum] = args.query.match(/^(.*?)(?:\s([0-9]+))?$/);
-    query = query.toLowerCase();
+  async searchCmd(
+    msg: Message,
+    args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string },
+  ) {
+    let matchingMembers = Array.from(this.guild.members.values());
 
-    const matchingMembers = this.guild.members.filter(member => {
-      const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-      if (member.nick && member.nick.toLowerCase().indexOf(query) !== -1) return true;
-      if (fullUsername.toLowerCase().indexOf(query) !== -1) return true;
-      return false;
-    });
+    if (args.role) {
+      const roleIds = args.role.split(",");
+      matchingMembers = matchingMembers.filter(member => {
+        for (const role of roleIds) {
+          if (!member.roles.includes(role)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    if (args.voice) {
+      matchingMembers = matchingMembers.filter(m => m.voiceState.channelID != null);
+    }
+
+    if (args.query) {
+      let [, query] = args.query.match(/^(.*?)(?:\s([0-9]+))?$/);
+      query = query.toLowerCase();
+
+      matchingMembers = matchingMembers.filter(member => {
+        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+        if (member.nick && member.nick.toLowerCase().indexOf(query) !== -1) return true;
+        if (fullUsername.toLowerCase().indexOf(query) !== -1) return true;
+        return false;
+      });
+    }
 
     if (matchingMembers.length > 0) {
       let header;
@@ -196,8 +239,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
       const paginated = matchingMembers.length > MAX_SEARCH_RESULTS;
 
-      const pageInputMatch = args.query.match(/\s([0-9]+)$/);
-      const inputPage = pageInputMatch ? parseInt(pageInputMatch[1], 10) : 1;
+      const inputPage = args.page || 1;
       const lastPage = Math.ceil(matchingMembers.length / MAX_SEARCH_RESULTS);
       const page = Math.min(lastPage, Math.max(1, inputPage));
 
@@ -210,17 +252,28 @@ export class UtilityPlugin extends ZeppelinPlugin {
         header = `Found ${matchingMembers.length} ${resultText}`;
       }
 
-      let lines = matchingMembers.map(member => {
-        return `${member.user.username}#${member.user.discriminator} (${member.id})`;
-      });
-      lines.sort((a, b) => {
-        return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
-      });
-      lines = lines.slice(from, to);
+      const pageMembers = matchingMembers.slice(from, to);
 
-      const footer = paginated ? "Add a page number to the end of the command to browse results" : "";
+      const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+      const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
-      msg.channel.createMessage(`${header}\n\`\`\`${lines.join("\n")}\`\`\`${footer}`);
+      if (sortBy === "id") {
+        pageMembers.sort(sorter(m => BigInt(m.id), realSortDir));
+      } else {
+        pageMembers.sort(
+          multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
+        );
+      }
+
+      const longestId = pageMembers.reduce((longest, member) => Math.max(longest, member.id.length), 0);
+      const lines = pageMembers.map(member => {
+        const paddedId = member.id.padEnd(longestId, " ");
+        return `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+      });
+
+      const footer = paginated ? "Use --page=n to browse results" : "";
+
+      msg.channel.createMessage(`${header}\n\`\`\`js\n${lines.join("\n")}\`\`\`${footer}`);
     } else {
       msg.channel.createMessage(errorMessage("No results found"));
     }
