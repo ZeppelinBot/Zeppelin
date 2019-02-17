@@ -383,6 +383,46 @@ export function simpleClosestStringMatch<T>(searchStr, haystack: T[], getter = n
   return itemsWithRankings[0][0];
 }
 
+type sorterDirection = "ASC" | "DESC";
+type sorterGetterFn = (any) => any;
+type sorterGetterFnWithDirection = [sorterGetterFn, sorterDirection];
+type sorterGetterResolvable = string | sorterGetterFn;
+type sorterGetterResolvableWithDirection = [sorterGetterResolvable, sorterDirection];
+type sorterFn = (a: any, b: any) => number;
+
+function resolveGetter(getter: sorterGetterResolvable): sorterGetterFn {
+  if (typeof getter === "string") {
+    return obj => obj[getter];
+  }
+
+  return getter;
+}
+
+export function multiSorter(getters: Array<sorterGetterResolvable | sorterGetterResolvableWithDirection>): sorterFn {
+  const resolvedGetters: sorterGetterFnWithDirection[] = getters.map(getter => {
+    if (Array.isArray(getter)) {
+      return [resolveGetter(getter[0]), getter[1]] as sorterGetterFnWithDirection;
+    } else {
+      return [resolveGetter(getter), "ASC"] as sorterGetterFnWithDirection;
+    }
+  });
+
+  return (a, b) => {
+    for (const getter of resolvedGetters) {
+      const aVal = getter[0](a);
+      const bVal = getter[0](b);
+      if (aVal > bVal) return getter[1] === "ASC" ? 1 : -1;
+      if (aVal < bVal) return getter[1] === "ASC" ? -1 : 1;
+    }
+
+    return 0;
+  };
+}
+
+export function sorter(getter: sorterGetterResolvable, direction: sorterDirection = "ASC"): sorterFn {
+  return multiSorter([[getter, direction]]);
+}
+
 export function noop() {
   // IT'S LITERALLY NOTHING
 }
