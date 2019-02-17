@@ -22,8 +22,8 @@ export class GuildCases extends BaseRepository {
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
-        id: In(ids)
-      }
+        id: In(ids),
+      },
     });
   }
 
@@ -32,8 +32,8 @@ export class GuildCases extends BaseRepository {
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
-        id
-      }
+        id,
+      },
     });
   }
 
@@ -42,8 +42,21 @@ export class GuildCases extends BaseRepository {
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
-        case_number: caseNumber
-      }
+        case_number: caseNumber,
+      },
+    });
+  }
+
+  async findLatestByModId(modId: string): Promise<Case> {
+    return this.cases.findOne({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        mod_id: modId,
+      },
+      order: {
+        case_number: "DESC",
+      },
     });
   }
 
@@ -52,8 +65,8 @@ export class GuildCases extends BaseRepository {
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
-        user_id: userId
-      }
+        user_id: userId,
+      },
     });
   }
 
@@ -61,8 +74,8 @@ export class GuildCases extends BaseRepository {
     await this.cases.update(
       { id },
       {
-        is_hidden: hidden
-      }
+        is_hidden: hidden,
+      },
     );
   }
 
@@ -70,7 +83,7 @@ export class GuildCases extends BaseRepository {
     const result = await this.cases.insert({
       ...data,
       guild_id: this.guildId,
-      case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`
+      case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
     });
 
     return this.find(result.identifiers[0].id);
@@ -83,7 +96,7 @@ export class GuildCases extends BaseRepository {
   async createNote(caseId: number, data: any): Promise<void> {
     await this.caseNotes.insert({
       ...data,
-      case_id: caseId
+      case_id: caseId,
     });
   }
 
