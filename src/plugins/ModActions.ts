@@ -261,10 +261,31 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    */
   @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
   @d.permission("note")
-  async updateCmd(msg: Message, args: any) {
+  async updateSpecificCmd(msg: Message, args: { caseNumber: number; note: string }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
     if (!theCase) {
       msg.channel.createMessage(errorMessage("Case not found"));
+      return;
+    }
+
+    await this.actions.fire("createCaseNote", {
+      caseId: theCase.id,
+      modId: msg.author.id,
+      note: args.note,
+    });
+
+    msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
+  }
+
+  /**
+   * Update the latest case
+   */
+  @d.command(/update|updatecase/, "<note:string$>")
+  @d.permission("note")
+  async updateLatestCmd(msg: Message, args: { note: string }) {
+    const theCase = await this.cases.findLatestByModId(msg.author.id);
+    if (!theCase) {
+      msg.channel.createMessage(errorMessage("No latest case"));
       return;
     }
 
