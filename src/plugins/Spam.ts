@@ -79,6 +79,7 @@ export class SpamPlugin extends Plugin {
         max_newlines: null,
         max_duplicates: null,
         max_characters: null,
+        max_voice_moves: null,
       },
 
       // Default override to make mods immune to the spam filter
@@ -94,6 +95,7 @@ export class SpamPlugin extends Plugin {
             max_newlines: null,
             max_duplicates: null,
             max_characters: null,
+            max_voice_moves: null,
           },
         },
       ],
@@ -471,7 +473,7 @@ export class SpamPlugin extends Plugin {
   @d.event("voiceChannelJoin")
   @d.event("voiceChannelSwitch")
   onVoiceChannelSwitch(member: Member, channel: Channel) {
-    const spamConfig = this.configValueForMemberIdAndChannelId(member.id, channel.id, "max_voice_move");
+    const spamConfig = this.configValueForMemberIdAndChannelId(member.id, channel.id, "max_voice_moves");
     if (spamConfig) {
       this.logAndDetectOtherSpam(
         RecentActionType.VoiceChannelMove,
