@@ -142,10 +142,13 @@ export class UtilityPlugin extends ZeppelinPlugin {
       });
     }
 
+    const longestId = roles.reduce((longest, role) => Math.max(longest, role.id.length), 0);
+
     const chunks = chunkArray(roles, 20);
     for (const [i, chunk] of chunks.entries()) {
       const roleLines = chunk.map(role => {
-        let line = `${role.id} ${role.name}`;
+        const paddedId = role.id.padEnd(longestId, " ");
+        let line = `${paddedId} ${role.name}`;
         if (role._memberCount != null) {
           line += role._memberCount === 1 ? ` (${role._memberCount} member)` : ` (${role._memberCount} members)`;
         }
