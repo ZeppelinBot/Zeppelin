@@ -6,9 +6,10 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es2017",
+    "target": "esnext",
     "lib": [
-      "es2017"
+      "es2017",
+      "esnext"
     ],
     "baseUrl": "./",
     "resolveJsonModule": true,
