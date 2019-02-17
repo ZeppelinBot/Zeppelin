@@ -8,6 +8,8 @@ import { Queue } from "../Queue";
 
 type ReactionRolePair = [string, string, string?];
 
+const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
+
 export class ReactionRolesPlugin extends ZeppelinPlugin {
   public static pluginName = "reaction_roles";
 
@@ -16,9 +18,16 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
   protected reactionRemoveQueue: Queue;
   protected pendingRoles: Set<string>;
+  protected pendingRefreshes: Set<string>;
+
+  private autoRefreshTimeout;
 
   getDefaultOptions() {
     return {
+      config: {
+        auto_refresh_interval: null,
+      },
+
       permissions: {
         manage: false,
       },
@@ -39,6 +48,66 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
     this.reactionRemoveQueue = new Queue();
     this.pendingRoles = new Set();
+    this.pendingRefreshes = new Set();
+
+    let autoRefreshInterval = this.configValue("auto_refresh_interval");
+    if (autoRefreshInterval != null) {
+      autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
+      this.autoRefreshLoop(autoRefreshInterval);
+    }
+  }
+
+  async onUnload() {
+    if (this.autoRefreshTimeout) {
+      clearTimeout(this.autoRefreshTimeout);
+    }
+  }
+
+  async autoRefreshLoop(interval: number) {
+    this.autoRefreshTimeout = setTimeout(async () => {
+      // Refresh reaction roles on all reaction role messages
+      const reactionRoles = await this.reactionRoles.all();
+      const idPairs = new Set(reactionRoles.map(r => `${r.channel_id}-${r.message_id}`));
+      for (const pair of idPairs) {
+        const [channelId, messageId] = pair.split("-");
+        await this.refreshReactionRoles(channelId, messageId);
+      }
+
+      // Then restart the loop
+      this.autoRefreshLoop(interval);
+    }, interval);
+  }
+
+  async refreshReactionRoles(channelId: string, messageId: string) {
+    const pendingKey = `${channelId}-${messageId}`;
+    if (this.pendingRefreshes.has(pendingKey)) return;
+    this.pendingRefreshes.add(pendingKey);
+
+    try {
+      const reactionRoles = await this.reactionRoles.getForMessage(messageId);
+      const reactionRoleEmojis = reactionRoles.map(r => r.emoji);
+
+      const channel = this.guild.channels.get(channelId) as TextChannel;
+      const targetMessage = await channel.getMessage(messageId);
+      const existingReactions = targetMessage.reactions;
+
+      // Remove reactions
+      const removeSleep = sleep(1250);
+      await targetMessage.removeReactions();
+      await removeSleep;
+
+      // Re-add reactions
+      for (const emoji of Object.keys(existingReactions)) {
+        const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
+        if (!reactionRoleEmojis.includes(emojiId)) continue;
+
+        const sleepTime = sleep(1250); // Make sure we only add 1 reaction per second so as not to hit rate limits
+        await targetMessage.addReaction(emoji);
+        await sleepTime;
+      }
+    } finally {
+      this.pendingRefreshes.delete(pendingKey);
+    }
   }
 
   /**
@@ -80,23 +149,12 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
       return;
     }
 
-    const reactionRoles = await this.reactionRoles.getForMessage(savedMessage.id);
-    const reactionRoleEmojis = reactionRoles.map(r => r.emoji);
-
-    const channel = this.guild.channels.get(savedMessage.channel_id) as TextChannel;
-    const targetMessage = await channel.getMessage(savedMessage.id);
-    const existingReactions = targetMessage.reactions;
-
-    // Remove reactions
-    await targetMessage.removeReactions();
-
-    // Re-add reactions
-    for (const emoji of Object.keys(existingReactions)) {
-      const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
-      if (!reactionRoleEmojis.includes(emojiId)) continue;
-
-      await targetMessage.addReaction(emoji);
+    if (this.pendingRefreshes.has(`${savedMessage.channel_id}-${savedMessage.id}`)) {
+      msg.channel.createMessage(errorMessage("Another refresh in progress"));
+      return;
     }
+
+    await this.refreshReactionRoles(savedMessage.channel_id, savedMessage.id);
 
     msg.channel.createMessage(successMessage("Reaction roles refreshed"));
   }
