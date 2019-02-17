@@ -1,5 +1,5 @@
 import { decorators as d } from "knub";
-import { Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
+import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
   channelMentionRegex,
   chunkArray,
@@ -508,6 +508,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
 
     const embed: EmbedOptions = {
       fields: [],
+      color: parseInt("6b80cf", 16),
     };
 
     embed.thumbnail = { url: this.guild.iconURL };
@@ -518,26 +519,35 @@ export class UtilityPlugin extends ZeppelinPlugin {
       round: true,
     });
 
+    const owner = this.bot.users.get(this.guild.ownerID);
+    const ownerName = owner ? `${owner.username}#${owner.discriminator}` : "Unknown#0000";
+
     embed.fields.push({
-      name: "Server information",
+      name: `Server information - ${this.guild.name}`,
       value:
         trimLines(`
-        Created: ${serverAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
-        Members: ${this.guild.memberCount}
+        Created: **${serverAge} ago** (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+        Owner: **${ownerName}** (${this.guild.ownerID})
+        Large: **${this.guild.large ? "yes" : "no"}**
+        Voice region: **${this.guild.region}**
         ${this.guild.features.length > 0 ? "Features: " + this.guild.features.join(", ") : ""}
       `) + embedPadding,
     });
 
+    const categories = this.guild.channels.filter(channel => channel instanceof CategoryChannel);
     const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
     const voiceChannels = this.guild.channels.filter(channel => channel instanceof VoiceChannel);
 
     embed.fields.push({
       name: "Counts",
+      inline: true,
       value:
         trimLines(`
-        Roles: ${this.guild.roles.size}
-        Text channels: ${textChannels.length}
-        Voice channels: ${voiceChannels.length}
+        Roles: **${this.guild.roles.size}**
+        Categories: **${categories.length}**
+        Text channels: **${textChannels.length}**
+        Voice channels: **${voiceChannels.length}**
+        Emojis: **${this.guild.emojis.length}**
       `) + embedPadding,
     });
 
@@ -545,14 +555,18 @@ export class UtilityPlugin extends ZeppelinPlugin {
     const dndMembers = this.guild.members.filter(m => m.status === "dnd");
     const idleMembers = this.guild.members.filter(m => m.status === "idle");
     const offlineMembers = this.guild.members.filter(m => m.status === "offline");
+    const notOfflineMembers = this.guild.members.filter(m => m.status !== "offline");
 
     embed.fields.push({
       name: "Members",
+      inline: true,
       value: trimLines(`
+        Total: **${this.guild.memberCount}**
         Online: **${onlineMembers.length}**
         Idle: **${idleMembers.length}**
         DND: **${dndMembers.length}**
         Offline: **${offlineMembers.length}**
+        Not offline: **${notOfflineMembers.length}**
       `),
     });
 
