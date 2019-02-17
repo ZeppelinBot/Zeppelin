@@ -203,7 +203,7 @@ export const emptyEmbedValue = "\u200b";
 export const embedPadding = "\n" + emptyEmbedValue;
 
 export const userMentionRegex = /<@!?([0-9]+)>/g;
-export const roleMentionRegex = /<&([0-9]+)>/g;
+export const roleMentionRegex = /<@&([0-9]+)>/g;
 
 export function getUserMentions(str: string) {
   const regex = new RegExp(userMentionRegex.source, "g");
