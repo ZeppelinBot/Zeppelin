@@ -1,10 +1,13 @@
 import { decorators as d } from "knub";
 import { Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
+  channelMentionRegex,
   chunkArray,
   embedPadding,
   errorMessage,
+  isSnowflake,
   noop,
+  simpleClosestStringMatch,
   stripObjectToScalars,
   successMessage,
   trimLines,
@@ -49,6 +52,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
         nickname: false,
         ping: false,
         source: false,
+        vcmove: false,
       },
       overrides: [
         {
@@ -61,6 +65,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
             info: true,
             server: true,
             nickname: true,
+            vcmove: true,
           },
         },
         {
@@ -551,6 +556,63 @@ export class UtilityPlugin extends ZeppelinPlugin {
     const archiveId = await this.archives.create(savedMessage.data.content, moment().add(1, "hour"));
     const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
     msg.channel.createMessage(`Message source: ${url}`);
+  }
+
+  @d.command("vcmove", "<member:Member> <channel:string$>")
+  @d.permission("vcmove")
+  async vcmoveCmd(msg: Message, args: { member: Member; channel: string }) {
+    let channel: VoiceChannel;
+
+    if (isSnowflake(args.channel)) {
+      // Snowflake -> resolve channel directly
+      const potentialChannel = this.guild.channels.get(args.channel);
+      if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
+        msg.channel.createMessage(errorMessage("Unknown or non-voice channel"));
+        return;
+      }
+
+      channel = potentialChannel;
+    } else if (channelMentionRegex.test(args.channel)) {
+      // Channel mention -> parse channel id and resolve channel from that
+      const channelId = args.channel.match(channelMentionRegex)[1];
+      const potentialChannel = this.guild.channels.get(channelId);
+      if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
+        msg.channel.createMessage(errorMessage("Unknown or non-voice channel"));
+        return;
+      }
+
+      channel = potentialChannel;
+    } else {
+      // Search string -> find closest matching voice channel name
+      const voiceChannels = this.guild.channels.filter(theChannel => {
+        return theChannel instanceof VoiceChannel;
+      }) as VoiceChannel[];
+      const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
+      if (!closestMatch) {
+        msg.channel.createMessage(errorMessage("No matching voice channels"));
+        return;
+      }
+
+      channel = closestMatch;
+    }
+
+    if (!args.member.voiceState || !args.member.voiceState.channelID) {
+      msg.channel.createMessage(errorMessage("Member is not in a voice channel"));
+      return;
+    }
+
+    try {
+      await args.member.edit({
+        channelID: channel.id,
+      });
+    } catch (e) {
+      msg.channel.createMessage(errorMessage("Failed to move member"));
+      return;
+    }
+
+    msg.channel.createMessage(
+      successMessage(`**${args.member.user.username}#${args.member.user.discriminator}** moved to **${channel.name}**`),
+    );
   }
 
   @d.command("reload_guild")

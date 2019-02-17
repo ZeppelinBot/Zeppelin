@@ -204,6 +204,7 @@ export const embedPadding = "\n" + emptyEmbedValue;
 
 export const userMentionRegex = /<@!?([0-9]+)>/g;
 export const roleMentionRegex = /<@&([0-9]+)>/g;
+export const channelMentionRegex = /<#([0-9]+)>/g;
 
 export function getUserMentions(str: string) {
   const regex = new RegExp(userMentionRegex.source, "g");
@@ -345,6 +346,41 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
         });
     });
   });
+}
+
+type ItemWithRanking<T> = [T, number];
+export function simpleClosestStringMatch<T>(searchStr, haystack: T[], getter = null): T {
+  const normalizedSearchStr = searchStr.toLowerCase();
+
+  // See if any haystack item contains a part of the search string
+  const itemsWithRankings: Array<ItemWithRanking<T>> = haystack.map(item => {
+    const itemStr: string = getter ? getter(item) : item;
+    const normalizedItemStr = itemStr.toLowerCase();
+
+    let i = 0;
+    do {
+      if (!normalizedItemStr.includes(normalizedSearchStr.slice(0, i + 1))) break;
+      i++;
+    } while (i < normalizedSearchStr.length);
+
+    if (i > 0 && normalizedItemStr.startsWith(normalizedSearchStr.slice(0, i))) {
+      // Slightly prioritize items that *start* with the search string
+      i += 0.5;
+    }
+
+    return [item, i] as ItemWithRanking<T>;
+  });
+
+  // Sort by best match
+  itemsWithRankings.sort((a, b) => {
+    return a[1] > b[1] ? -1 : 1;
+  });
+
+  if (itemsWithRankings[0][1] === 0) {
+    return null;
+  }
+
+  return itemsWithRankings[0][0];
 }
 
 export function noop() {
