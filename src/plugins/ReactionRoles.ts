@@ -1,10 +1,9 @@
 import { decorators as d } from "knub";
-import { CustomEmoji, errorMessage, isSnowflake, noop, sleep, successMessage } from "../utils";
+import { CustomEmoji, errorMessage, noop, sleep, successMessage } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
-import { Channel, Message, TextChannel } from "eris";
+import { Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import { SavedMessage } from "../data/entities/SavedMessage";
 import { Queue } from "../Queue";
 
 type ReactionRolePair = [string, string, string?];
