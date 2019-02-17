@@ -14,7 +14,7 @@ export class SlowmodePlugin extends Plugin {
     return {
       permissions: {
         manage: false,
-        affected: true
+        affected: true,
       },
 
       overrides: [
@@ -22,10 +22,10 @@ export class SlowmodePlugin extends Plugin {
           level: ">=50",
           permissions: {
             manage: true,
-            affected: false
-          }
-        }
-      ]
+            affected: false,
+          },
+        },
+      ],
     };
   }
 
@@ -109,8 +109,8 @@ export class SlowmodePlugin extends Plugin {
     if (failedUsers.length) {
       msg.channel.createMessage(
         successMessage(
-          `Slowmode disabled! Failed to remove slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`
-        )
+          `Slowmode disabled! Failed to remove slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
+        ),
       );
     } else {
       msg.channel.createMessage(successMessage("Slowmode disabled!"));
@@ -133,8 +133,8 @@ export class SlowmodePlugin extends Plugin {
     await this.removeSlowmodeFromUserId(args.channel, args.user.id);
     msg.channel.createMessage(
       successMessage(
-        `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`
-      )
+        `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
+      ),
     );
   }
 
@@ -157,7 +157,7 @@ export class SlowmodePlugin extends Plugin {
 
     const humanizedSlowmodeTime = humanizeDuration(seconds * 1000);
     msg.channel.createMessage(
-      successMessage(`Slowmode enabled for <#${channel.id}> (1 message in ${humanizedSlowmodeTime})`)
+      successMessage(`Slowmode enabled for <#${channel.id}> (1 message in ${humanizedSlowmodeTime})`),
     );
   }
 
@@ -168,7 +168,6 @@ export class SlowmodePlugin extends Plugin {
    */
   @d.event("messageCreate")
   @d.permission("affected")
-  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     if (msg.author.bot) return;
 

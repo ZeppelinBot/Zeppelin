@@ -59,7 +59,6 @@ export class StarboardPlugin extends ZeppelinPlugin {
    */
   @d.command("starboard create")
   @d.permission("manage")
-  @d.nonBlocking()
   async setupCmd(msg: Message) {
     const cancelMsg = () => msg.channel.createMessage("Cancelled");
 
@@ -330,7 +329,6 @@ export class StarboardPlugin extends ZeppelinPlugin {
   }
 
   @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>")
-  @d.nonBlocking()
   async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
     const starboard = await this.starboards.getStarboardByChannelId(args.starboardChannelId);
     if (!starboard) {
