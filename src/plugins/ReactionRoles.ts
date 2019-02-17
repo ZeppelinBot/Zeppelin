@@ -193,7 +193,6 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   }
 
   @d.event("messageReactionAdd")
-  @d.nonBlocking()
   async onAddReaction(msg: Message, emoji: CustomEmoji, userId: string) {
     const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
     if (!matchingReactionRole) return;

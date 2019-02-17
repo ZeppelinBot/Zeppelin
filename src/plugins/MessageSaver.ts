@@ -11,17 +11,17 @@ export class MessageSaverPlugin extends Plugin {
   getDefaultOptions() {
     return {
       permissions: {
-        manage: false
+        manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
           permissions: {
-            manage: true
-          }
-        }
-      ]
+            manage: true,
+          },
+        },
+      ],
     };
   }
 
@@ -30,7 +30,6 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageCreate", "guild", false)
-  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     // Only save regular chat messages
     if (msg.type !== 0) {
@@ -41,7 +40,6 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageDelete", "guild", false)
-  @d.nonBlocking()
   async onMessageDelete(msg: Message) {
     if (msg.type != null && msg.type !== 0) {
       return;
@@ -51,7 +49,6 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageUpdate", "guild", false)
-  @d.nonBlocking()
   async onMessageUpdate(msg: Message) {
     if (msg.type !== 0) {
       return;
@@ -61,7 +58,6 @@ export class MessageSaverPlugin extends Plugin {
   }
 
   @d.event("messageDeleteBulk", "guild", false)
-  @d.nonBlocking()
   async onMessageBulkDelete(messages: Message[]) {
     const ids = messages.map(m => m.id);
     await this.savedMessages.markBulkAsDeleted(ids);
@@ -91,13 +87,12 @@ export class MessageSaverPlugin extends Plugin {
 
     return {
       savedCount: ids.length - failed.length,
-      failed
+      failed,
     };
   }
 
   @d.command("save_messages_to_db", "<channel:channel> <ids:string...>")
   @d.permission("manage")
-  @d.nonBlocking()
   async saveMessageCmd(msg: Message, args: { channel: GuildChannel & TextChannel; ids: string[] }) {
     await msg.channel.createMessage("Saving specified messages...");
 
@@ -107,8 +102,8 @@ export class MessageSaverPlugin extends Plugin {
       msg.channel.createMessage(
         successMessage(
           `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}
-        `
-        )
+        `,
+        ),
       );
     } else {
       msg.channel.createMessage(successMessage(`Saved ${savedCount} messages!`));
@@ -117,7 +112,6 @@ export class MessageSaverPlugin extends Plugin {
 
   @d.command("save_pins_to_db", "<channel:channel>")
   @d.permission("manage")
-  @d.nonBlocking()
   async savePinsCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
     await msg.channel.createMessage(`Saving pins from <#${args.channel.id}>...`);
 
@@ -128,8 +122,8 @@ export class MessageSaverPlugin extends Plugin {
       msg.channel.createMessage(
         successMessage(
           `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}
-        `
-        )
+        `,
+        ),
       );
     } else {
       msg.channel.createMessage(successMessage(`Saved ${savedCount} messages!`));

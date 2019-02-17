@@ -28,7 +28,6 @@ export class PersistPlugin extends Plugin {
   }
 
   @d.event("guildMemberRemove")
-  @d.nonBlocking()
   onGuildMemberRemove(_, member: Member) {
     let persist = false;
     const persistData: IPartialPersistData = {};
@@ -58,7 +57,6 @@ export class PersistPlugin extends Plugin {
   }
 
   @d.event("guildMemberAdd")
-  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     const persistedData = await this.persistedData.find(member.id);
     if (!persistedData) return;

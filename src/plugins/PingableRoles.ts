@@ -17,17 +17,17 @@ export class PingableRoles extends Plugin {
   getDefaultOptions() {
     return {
       permissions: {
-        use: false
+        use: false,
       },
 
       overrides: [
         {
           level: ">=100",
           permissions: {
-            use: true
-          }
-        }
-      ]
+            use: true,
+          },
+        },
+      ],
     };
   }
 
@@ -59,7 +59,7 @@ export class PingableRoles extends Plugin {
     this.cache.delete(args.channelId);
 
     msg.channel.createMessage(
-      successMessage(`**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`)
+      successMessage(`**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`),
     );
   }
 
@@ -69,7 +69,7 @@ export class PingableRoles extends Plugin {
     const existingPingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
     if (existingPingableRole) {
       msg.channel.createMessage(
-        errorMessage(`**${args.role.name}** is already set as pingable in <#${args.channelId}>`)
+        errorMessage(`**${args.role.name}** is already set as pingable in <#${args.channelId}>`),
       );
       return;
     }
@@ -81,7 +81,6 @@ export class PingableRoles extends Plugin {
   }
 
   @d.event("typingStart")
-  @d.nonBlocking()
   async onTypingStart(channel: TextableChannel, user: User) {
     const pingableRoles = await this.getPingableRolesForChannel(channel.id);
     if (pingableRoles.length === 0) return;
@@ -99,7 +98,6 @@ export class PingableRoles extends Plugin {
   }
 
   @d.event("messageCreate")
-  @d.nonBlocking()
   async onMessageCreate(msg: Message) {
     const pingableRoles = await this.getPingableRolesForChannel(msg.channel.id);
     if (pingableRoles.length === 0) return;
@@ -118,9 +116,9 @@ export class PingableRoles extends Plugin {
 
       role.edit(
         {
-          mentionable: true
+          mentionable: true,
         },
-        "Enable pingable role"
+        "Enable pingable role",
       );
     }
   }
@@ -132,9 +130,9 @@ export class PingableRoles extends Plugin {
 
       role.edit(
         {
-          mentionable: false
+          mentionable: false,
         },
-        "Disable pingable role"
+        "Disable pingable role",
       );
     }
   }

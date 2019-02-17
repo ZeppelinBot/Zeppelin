@@ -135,7 +135,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Attempts to find the ban's details in the audit log.
    */
   @d.event("guildBanAdd")
-  @d.nonBlocking()
   async onGuildBanAdd(guild: Guild, user: User) {
     if (this.isEventIgnored(IgnoredEventType.Ban, user.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Ban, user.id);
@@ -173,7 +172,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Attempts to find the unban's details in the audit log.
    */
   @d.event("guildBanRemove")
-  @d.nonBlocking()
   async onGuildBanRemove(guild: Guild, user: User) {
     if (this.isEventIgnored(IgnoredEventType.Unban, user.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Unban, user.id);
@@ -210,7 +208,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * Show an alert if a member with prior notes joins the server
    */
   @d.event("guildMemberAdd")
-  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     if (!this.configValue("alert_on_rejoin")) return;
 
@@ -230,7 +227,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   }
 
   @d.event("guildMemberRemove")
-  @d.nonBlocking()
   async onGuildMemberRemove(_, member: Member) {
     if (this.isEventIgnored(IgnoredEventType.Kick, member.id)) {
       this.clearIgnoredEvent(IgnoredEventType.Kick, member.id);
@@ -301,7 +297,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("warn")
-  @d.nonBlocking()
   async warnCmd(msg: Message, args: any) {
     // Make sure we're allowed to warn this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -857,7 +852,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
   @d.command("massban", "<userIds:string...>")
   @d.permission("massban")
-  @d.nonBlocking()
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
     // Limit to 100 users at once (arbitrary?)
     if (args.userIds.length > 100) {

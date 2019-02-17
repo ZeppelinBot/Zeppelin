@@ -193,7 +193,6 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("guildBanAdd")
-  @d.nonBlocking()
   async onMemberBan(_, user) {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
@@ -213,7 +212,6 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("guildBanRemove")
-  @d.nonBlocking()
   async onMemberUnban(_, user) {
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
       this.guild,
@@ -233,7 +231,6 @@ export class LogsPlugin extends Plugin {
   }
 
   @d.event("guildMemberUpdate")
-  @d.nonBlocking()
   async onMemberUpdate(_, member: Member, oldMember: Member) {
     if (!oldMember) return;
 

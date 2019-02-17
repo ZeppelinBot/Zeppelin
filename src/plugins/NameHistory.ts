@@ -73,7 +73,6 @@ export class NameHistoryPlugin extends Plugin {
   }
 
   @d.event("guildMemberAdd")
-  @d.nonBlocking()
   async onGuildMemberAdd(_, member: Member) {
     const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
     const username = `${member.user.username}#${member.user.discriminator}`;
