@@ -225,8 +225,7 @@ export class UtilityPlugin extends ZeppelinPlugin {
     }
 
     if (args.query) {
-      let [, query] = args.query.match(/^(.*?)(?:\s([0-9]+))?$/);
-      query = query.toLowerCase();
+      const query = args.query.toLowerCase();
 
       matchingMembers = matchingMembers.filter(member => {
         const fullUsername = `${member.user.username}#${member.user.discriminator}`;
@@ -255,18 +254,18 @@ export class UtilityPlugin extends ZeppelinPlugin {
         header = `Found ${matchingMembers.length} ${resultText}`;
       }
 
-      const pageMembers = matchingMembers.slice(from, to);
-
       const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
       const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
       if (sortBy === "id") {
-        pageMembers.sort(sorter(m => BigInt(m.id), realSortDir));
+        matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
       } else {
-        pageMembers.sort(
+        matchingMembers.sort(
           multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
         );
       }
+
+      const pageMembers = matchingMembers.slice(from, to);
 
       const longestId = pageMembers.reduce((longest, member) => Math.max(longest, member.id.length), 0);
       const lines = pageMembers.map(member => {
