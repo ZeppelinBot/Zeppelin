@@ -1,6 +1,6 @@
 import { Plugin, decorators as d } from "knub";
-import { Channel, EmbedBase, Message, TextChannel } from "eris";
-import { errorMessage, downloadFile } from "../utils";
+import { Channel, EmbedBase, Message, Role, TextChannel } from "eris";
+import { errorMessage, downloadFile, roleMentionRegex, getRoleMentions } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
 import fs from "fs";
@@ -43,15 +43,22 @@ export class PostPlugin extends Plugin {
   /**
    * COMMAND: Post a message as the bot to the specified channel
    */
-  @d.command("post", "<channel:channel> [content:string$]")
+  @d.command("post", "<channel:channel> [content:string$]", {
+    options: [
+      {
+        name: "enable-mentions",
+        type: "bool",
+      },
+    ],
+  })
   @d.permission("post")
-  async postCmd(msg: Message, args: { channel: Channel; content?: string }) {
+  async postCmd(msg: Message, args: { channel: Channel; content?: string; "enable-mentions": boolean }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Channel is not a text channel"));
       return;
     }
 
-    const content = (args.content && this.formatContent(args.content)) || undefined;
+    const content: string = (args.content && this.formatContent(args.content)) || undefined;
     let downloadedAttachment;
     let file;
 
@@ -68,8 +75,30 @@ export class PostPlugin extends Plugin {
       return;
     }
 
+    const rolesMadeMentionable: Role[] = [];
+    if (args["enable-mentions"] && content) {
+      const mentionedRoleIds = getRoleMentions(content);
+      if (mentionedRoleIds != null) {
+        for (const roleId of mentionedRoleIds) {
+          const role = this.guild.roles.get(roleId);
+          if (role && !role.mentionable) {
+            await role.edit({
+              mentionable: true,
+            });
+            rolesMadeMentionable.push(role);
+          }
+        }
+      }
+    }
+
     const createdMsg = await args.channel.createMessage(content, file);
     await this.savedMessages.setPermanent(createdMsg.id);
+
+    for (const role of rolesMadeMentionable) {
+      role.edit({
+        mentionable: false,
+      });
+    }
 
     if (downloadedAttachment) {
       downloadedAttachment.deleteFn();
