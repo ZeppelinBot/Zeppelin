@@ -527,26 +527,8 @@ export class UtilityPlugin extends ZeppelinPlugin {
         trimLines(`
         Created: **${serverAge} ago** (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
         Owner: **${ownerName}** (${this.guild.ownerID})
-        Large: **${this.guild.large ? "yes" : "no"}**
         Voice region: **${this.guild.region}**
         ${this.guild.features.length > 0 ? "Features: " + this.guild.features.join(", ") : ""}
-      `) + embedPadding,
-    });
-
-    const categories = this.guild.channels.filter(channel => channel instanceof CategoryChannel);
-    const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
-    const voiceChannels = this.guild.channels.filter(channel => channel instanceof VoiceChannel);
-
-    embed.fields.push({
-      name: "Counts",
-      inline: true,
-      value:
-        trimLines(`
-        Roles: **${this.guild.roles.size}**
-        Categories: **${categories.length}**
-        Text channels: **${textChannels.length}**
-        Voice channels: **${voiceChannels.length}**
-        Emojis: **${this.guild.emojis.length}**
       `) + embedPadding,
     });
 
@@ -567,6 +549,23 @@ export class UtilityPlugin extends ZeppelinPlugin {
         Offline: **${offlineMembers.length}**
         Not offline: **${notOfflineMembers.length}**
       `),
+    });
+
+    const categories = this.guild.channels.filter(channel => channel instanceof CategoryChannel);
+    const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
+    const voiceChannels = this.guild.channels.filter(channel => channel instanceof VoiceChannel);
+
+    embed.fields.push({
+      name: "Other stats",
+      inline: true,
+      value:
+        trimLines(`
+        Roles: **${this.guild.roles.size}**
+        Categories: **${categories.length}**
+        Text channels: **${textChannels.length}**
+        Voice channels: **${voiceChannels.length}**
+        Emojis: **${this.guild.emojis.length}**
+      `) + embedPadding,
     });
 
     msg.channel.createMessage({ embed });
