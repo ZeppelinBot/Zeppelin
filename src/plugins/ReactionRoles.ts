@@ -30,6 +30,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
       permissions: {
         manage: false,
+        fallback_command: false,
       },
 
       overrides: [
