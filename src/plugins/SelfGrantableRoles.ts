@@ -53,7 +53,8 @@ export class SelfGrantableRoles extends Plugin {
     const rolesToRemove: Set<Role> = new Set();
 
     // Match given role names with actual grantable roles
-    for (const roleName of args.roleNames) {
+    const roleNames = args.roleNames.map(n => n.split(/[\s,]+/)).flat();
+    for (const roleName of roleNames) {
       const normalized = roleName.toLowerCase();
       let matched = false;
 
@@ -126,7 +127,8 @@ export class SelfGrantableRoles extends Plugin {
     const rolesToGrant: Set<Role> = new Set();
 
     // Match given role names with actual grantable roles
-    for (const roleName of args.roleNames) {
+    const roleNames = args.roleNames.map(n => n.split(/[\s,]+/)).flat();
+    for (const roleName of roleNames) {
       const normalized = roleName.toLowerCase();
       let matched = false;
 
@@ -198,7 +200,8 @@ export class SelfGrantableRoles extends Plugin {
       return;
     }
 
-    const aliases = [role.name].concat(args.aliases || []);
+    const aliases = (args.aliases || []).map(n => n.split(/[\s,]+/)).flat();
+    aliases.unshift(role.name);
     const normalizedAliases = aliases.map(a => a.toLowerCase());
     const uniqueAliases = Array.from(new Set(normalizedAliases).values());
 
