@@ -72,6 +72,7 @@ import { StarboardPlugin } from "./plugins/Starboard";
 import { NameHistoryPlugin } from "./plugins/NameHistory";
 import { AutoReactions } from "./plugins/AutoReactions";
 import { PingableRoles } from "./plugins/PingableRoles";
+import { SelfGrantableRoles } from "./plugins/SelfGrantableRoles";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -79,7 +80,7 @@ connect().then(async conn => {
   await conn.runMigrations();
 
   const client = new Client(process.env.TOKEN, {
-    getAllUsers: true
+    getAllUsers: true,
   });
   client.setMaxListeners(100);
 
@@ -112,7 +113,8 @@ connect().then(async conn => {
       SlowmodePlugin,
       StarboardPlugin,
       AutoReactions,
-      PingableRoles
+      PingableRoles,
+      SelfGrantableRoles,
     ],
 
     globalPlugins: [BotControlPlugin, LogServerPlugin],
@@ -149,9 +151,9 @@ connect().then(async conn => {
       performanceDebug: {
         enabled: true,
         size: 30,
-        threshold: 200
-      }
-    }
+        threshold: 200,
+      },
+    },
   });
 
   logger.info("Starting the bot");
