@@ -3,7 +3,7 @@ import { GuildSelfGrantableRoles } from "../data/GuildSelfGrantableRoles";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
 import { chunkArray, errorMessage, sorter, successMessage } from "../utils";
 
-export class SelfGrantableRoles extends Plugin {
+export class SelfGrantableRolesPlugin extends Plugin {
   public static pluginName = "self_grantable_roles";
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;

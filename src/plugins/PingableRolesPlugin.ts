@@ -1,5 +1,4 @@
 import { Plugin, decorators as d } from "knub";
-import { SavedMessage } from "../data/entities/SavedMessage";
 import { Message, Role, TextableChannel, User } from "eris";
 import { GuildPingableRoles } from "../data/GuildPingableRoles";
 import { PingableRole } from "../data/entities/PingableRole";
@@ -7,7 +6,7 @@ import { errorMessage, successMessage } from "../utils";
 
 const TIMEOUT = 10 * 1000;
 
-export class PingableRoles extends Plugin {
+export class PingableRolesPlugin extends Plugin {
   public static pluginName = "pingable_roles";
 
   protected pingableRoles: GuildPingableRoles;
