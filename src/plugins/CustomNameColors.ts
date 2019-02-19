@@ -1,12 +1,11 @@
-import { decorators as d } from "knub";
+import { Plugin, decorators as d } from "knub";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
-import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { CustomEmoji, customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
 
-export class AutoReactions extends ZeppelinPlugin {
+export class AutoReactions extends Plugin {
   public static pluginName = "auto_reactions";
 
   protected savedMessages: GuildSavedMessages;
@@ -45,6 +44,9 @@ export class AutoReactions extends ZeppelinPlugin {
   @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
   @d.permission("use")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
+    const guildEmojis = this.guild.emojis as CustomEmoji[];
+    const guildEmojiIds = guildEmojis.map(e => e.id);
+
     const finalReactions = [];
 
     for (const reaction of args.reactions) {
@@ -59,8 +61,9 @@ export class AutoReactions extends ZeppelinPlugin {
       const customEmojiMatch = reaction.match(customEmojiRegex);
       if (customEmojiMatch) {
         // Custom emoji
-        if (!this.canUseEmoji(customEmojiMatch[2])) {
+        if (!guildEmojiIds.includes(customEmojiMatch[2])) {
           msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from this server"));
+
           return;
         }
 

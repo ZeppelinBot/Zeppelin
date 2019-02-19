@@ -70,9 +70,10 @@ import { MutesPlugin } from "./plugins/Mutes";
 import { SlowmodePlugin } from "./plugins/Slowmode";
 import { StarboardPlugin } from "./plugins/Starboard";
 import { NameHistoryPlugin } from "./plugins/NameHistory";
-import { AutoReactions } from "./plugins/AutoReactions";
-import { PingableRoles } from "./plugins/PingableRoles";
-import { SelfGrantableRoles } from "./plugins/SelfGrantableRoles";
+import { AutoReactionsPlugin } from "./plugins/AutoReactionsPlugin";
+import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
+import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
+import { RemindersPlugin } from "./plugins/Reminders";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -112,9 +113,10 @@ connect().then(async conn => {
       TagsPlugin,
       SlowmodePlugin,
       StarboardPlugin,
-      AutoReactions,
-      PingableRoles,
-      SelfGrantableRoles,
+      AutoReactionsPlugin,
+      PingableRolesPlugin,
+      SelfGrantableRolesPlugin,
+      RemindersPlugin,
     ],
 
     globalPlugins: [BotControlPlugin, LogServerPlugin],
