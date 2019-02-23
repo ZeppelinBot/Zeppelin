@@ -2,6 +2,7 @@ import { decorators as d, GlobalPlugin } from "knub";
 import child_process from "child_process";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { errorMessage, sleep, successMessage } from "../utils";
+import { ReactionRolesPlugin } from "./ReactionRoles";
 
 let activeReload: [string, string] = null;
 
@@ -14,8 +15,8 @@ export class BotControlPlugin extends GlobalPlugin {
   getDefaultOptions() {
     return {
       config: {
-        owners: []
-      }
+        owners: [],
+      },
     };
   }
 
@@ -79,6 +80,19 @@ export class BotControlPlugin extends GlobalPlugin {
       msg.channel.createMessage(content);
     } else {
       msg.channel.createMessage(errorMessage("No performance data"));
+    }
+  }
+
+  @d.command("refresh_reaction_roles_globally")
+  async refreshAllReactionRolesCmd(msg: Message) {
+    if (!this.isOwner(msg.author.id)) return;
+
+    const guilds = this.knub.getLoadedGuilds();
+    for (const guild of guilds) {
+      if (guild.loadedPlugins.has("reaction_roles")) {
+        const rrPlugin = guild.loadedPlugins.get("reaction_roles") as ReactionRolesPlugin;
+        rrPlugin.runAutoRefresh();
+      }
     }
   }
 }
