@@ -1138,16 +1138,23 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     }
   }
 
-  @d.command("cases")
+  @d.command("cases", null, {
+    options: [{ name: "mod", type: "Member" }],
+  })
   @d.permission("view")
-  async recentCasesCmd(msg: Message) {
-    const recentCases = await this.cases.with("notes").getRecent(5);
+  async recentCasesCmd(msg: Message, args: { mod?: Member }) {
+    const modId = args.mod ? args.mod.id : msg.author.id;
+    const recentCases = await this.cases.with("notes").getRecentByModId(modId, 5);
+
+    const mod = this.bot.users.get(modId);
+    const modName = mod ? `${mod.username}#${mod.discriminator}` : modId;
+
     if (recentCases.length === 0) {
-      msg.channel.createMessage(errorMessage("No cases"));
+      msg.channel.createMessage(errorMessage(`No cases by **${modName}**`));
     } else {
       const lines = recentCases.map(c => this.cases.getSummaryText(c));
       const finalMessage = trimLines(`
-        Most recent 5 cases:
+        Most recent 5 cases by **${modName}**:
 
         ${lines.join("\n")}
 

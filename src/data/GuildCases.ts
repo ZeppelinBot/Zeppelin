@@ -70,11 +70,12 @@ export class GuildCases extends BaseRepository {
     });
   }
 
-  async getRecent(count: number): Promise<Case[]> {
+  async getRecentByModId(modId: string, count: number): Promise<Case[]> {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
+        mod_id: modId,
         is_hidden: 0,
       },
       take: count,
