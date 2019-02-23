@@ -977,7 +977,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("addcase")
-  async addcaseCmd(msg: Message, args: any) {
+  async addcaseCmd(msg: Message, args: { type: string; target: string; reason?: string; mod?: Member }) {
     // Verify the user id is a valid snowflake-ish
     if (!args.target.match(/^[0-9]{17,20}$/)) {
       msg.channel.createMessage(errorMessage("Cannot add case: invalid user id"));
@@ -985,7 +985,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     }
 
     // If the user exists as a guild member, make sure we can act on them first
-    const member = this.guild.members.get(args.userId);
+    const member = this.guild.members.get(args.target);
     if (member && !this.canActOn(msg.member, member)) {
       msg.channel.createMessage(errorMessage("Cannot add case on this user: insufficient permissions"));
       return;
@@ -1020,12 +1020,19 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
-    msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));
+    const user = member ? member.user : this.bot.users.get(args.target);
+    if (user) {
+      msg.channel.createMessage(
+        successMessage(`Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`),
+      );
+    } else {
+      msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));
+    }
 
     // Log the action
     this.serverLogs.log(LogType.CASE_CREATE, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.userId,
+      userId: args.target,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase(),
     });
