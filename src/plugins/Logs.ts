@@ -253,22 +253,48 @@ export class LogsPlugin extends Plugin {
       );
       const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-      if (addedRoles.length) {
+      if (addedRoles.length && removedRoles.length) {
+        // Roles added *and* removed
         this.guildLogs.log(
-          LogType.MEMBER_ROLE_ADD,
+          LogType.MEMBER_ROLE_CHANGES,
           {
             member,
-            role: this.guild.roles.get(addedRoles[0]),
+            addedRoles: addedRoles
+              .map(roleId => this.guild.roles.get(roleId))
+              .map(r => r.name)
+              .join(", "),
+            removedRoles: removedRoles
+              .map(roleId => this.guild.roles.get(roleId))
+              .map(r => r.name)
+              .join(", "),
             mod: stripObjectToScalars(mod),
           },
           member.id,
         );
-      } else if (removedRoles.length) {
+      } else if (addedRoles.length) {
+        // Roles added
+        this.guildLogs.log(
+          LogType.MEMBER_ROLE_ADD,
+          {
+            member,
+            roles: addedRoles
+              .map(roleId => this.guild.roles.get(roleId))
+              .map(r => r.name)
+              .join(", "),
+            mod: stripObjectToScalars(mod),
+          },
+          member.id,
+        );
+      } else if (removedRoles.length && !addedRoles.length) {
+        // Roles removed
         this.guildLogs.log(
           LogType.MEMBER_ROLE_REMOVE,
           {
             member,
-            role: this.guild.roles.get(removedRoles[0]),
+            roles: removedRoles
+              .map(roleId => this.guild.roles.get(roleId))
+              .map(r => r.name)
+              .join(", "),
             mod: stripObjectToScalars(mod),
           },
           member.id,
