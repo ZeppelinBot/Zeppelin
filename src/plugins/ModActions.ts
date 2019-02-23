@@ -1039,7 +1039,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     const user = this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-    const prefix = this.knub.getGuildData(this.guildId).config.prefix;
 
     if (cases.length === 0) {
       msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
@@ -1082,11 +1081,31 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
         ${lines.join("\n")}
 
-        Use \`${prefix}case <num>\` to see more info about individual cases
+        Use the \`case <num>\` command to see more info about individual cases
       `);
 
         createChunkedMessage(msg.channel, finalMessage);
       }
+    }
+  }
+
+  @d.command("cases")
+  @d.permission("view")
+  async recentCasesCmd(msg: Message) {
+    const recentCases = await this.cases.with("notes").getRecent(5);
+    if (recentCases.length === 0) {
+      msg.channel.createMessage(errorMessage("No cases"));
+    } else {
+      const lines = recentCases.map(c => this.cases.getSummaryText(c));
+      const finalMessage = trimLines(`
+        Most recent 5 cases:
+
+        ${lines.join("\n")}
+
+        Use the \`case <num>\` command to see more info about individual cases
+        Use the \`cases <user>\` command to see a specific user's cases
+      `);
+      createChunkedMessage(msg.channel, finalMessage);
     }
   }
 

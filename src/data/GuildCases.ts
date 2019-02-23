@@ -70,6 +70,20 @@ export class GuildCases extends BaseRepository {
     });
   }
 
+  async getRecent(count: number): Promise<Case[]> {
+    return this.cases.find({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        is_hidden: 0,
+      },
+      take: count,
+      order: {
+        case_number: "DESC",
+      },
+    });
+  }
+
   async setHidden(id: number, hidden: boolean): Promise<void> {
     await this.cases.update(
       { id },
