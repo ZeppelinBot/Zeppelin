@@ -62,7 +62,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   async onLoad() {
     this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.reactionRemoveQueue = new Queue(1500);
+    this.reactionRemoveQueue = new Queue(3000);
     this.pendingRoleChanges = new Map();
     this.pendingRefreshes = new Set();
 
@@ -346,7 +346,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     setTimeout(() => {
       this.reactionRemoveQueue.add(async () => {
         const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
-        const wait = sleep(1000);
+        const wait = sleep(1500);
         await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
         await wait;
       });
