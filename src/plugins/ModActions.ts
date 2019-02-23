@@ -1,5 +1,5 @@
 import { decorators as d, waitForReaction, waitForReply } from "knub";
-import { Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
+import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
@@ -128,6 +128,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
   clearIgnoredEvent(type: IgnoredEventType, userId: any) {
     this.ignoredEvents.splice(this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId), 1);
+  }
+
+  formatReasonWithAttachments(reason: string, attachments: Attachment[]) {
+    const attachmentUrls = attachments.map(a => a.url);
+    return ((reason || "") + "\n" + attachmentUrls.join("\n")).trim();
   }
 
   /**
@@ -303,12 +308,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
   async noteCmd(msg: Message, args: any) {
     const user = await this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "member";
+    const reason = this.formatReasonWithAttachments(args.note, msg.attachments);
 
     const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
       modId: msg.author.id,
       type: CaseTypes.Note,
-      reason: args.note,
+      reason,
     });
 
     msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
@@ -336,9 +342,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     const warnMessage = this.configValue("warn_message")
       .replace("{guildName}", this.guild.name)
-      .replace("{reason}", args.reason);
+      .replace("{reason}", reason);
 
     const messageSent = await this.tryToMessageUser(
       args.member.user,
@@ -360,7 +368,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Warn,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -409,6 +417,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Apply "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
     const mute: Mute = await this.actions.fire("mute", {
@@ -433,7 +443,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         await this.actions.fire("createCaseNote", {
           caseId: mute.case_id,
           modId: mod.id,
-          note: args.reason,
+          note: reason,
         });
       }
     } else {
@@ -442,7 +452,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         userId: args.member.id,
         modId: mod.id,
         type: CaseTypes.Mute,
-        reason: args.reason,
+        reason,
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
       });
       await this.mutes.setCaseId(args.member.id, theCase.id);
@@ -450,12 +460,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
     // Message the user informing them of the mute
     // Don't message them if we're updating an old mute
-    if (args.reason && !hasOldCase) {
+    if (reason && !hasOldCase) {
       const template = muteTime ? this.configValue("timed_mute_message") : this.configValue("mute_message");
 
       const muteMessage = formatTemplateString(template, {
         guildName: this.guild.name,
-        reason: args.reason,
+        reason,
         time: timeUntilUnmute,
       });
 
@@ -534,12 +544,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Unmute,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -547,7 +559,6 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       // If we have an unmute time, just update the old mute to expire in that time
       const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
       await this.actions.fire("unmute", { member: args.member, unmuteTime });
-      args.reason = args.reason ? `Timed unmute: ${args.reason}` : "Timed unmute";
 
       // Confirm the action to the moderator
       msg.channel.createMessage(
@@ -608,12 +619,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
     let messageSent = true;
     if (args.reason) {
       const kickMessage = formatTemplateString(this.configValue("kick_message"), {
         guildName: this.guild.name,
-        reason: args.reason,
+        reason,
       });
 
       messageSent = await this.tryToMessageUser(
@@ -627,14 +640,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Kick the user
     this.serverLogs.ignoreLog(LogType.MEMBER_KICK, args.member.id);
     this.ignoreEvent(IgnoredEventType.Kick, args.member.id);
-    args.member.kick(args.reason);
+    args.member.kick(reason);
 
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Kick,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -656,7 +669,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("ban")
-  async banCmd(msg, args) {
+  async banCmd(msg, args: { member: Member; reason?: string; mod?: Member }) {
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
@@ -674,12 +687,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Attempt to message the user *before* banning them, as doing it after may not be possible
     let messageSent = true;
-    if (args.reason) {
+    if (reason) {
       const banMessage = formatTemplateString(this.configValue("ban_message"), {
         guildName: this.guild.name,
-        reason: args.reason,
+        reason,
       });
 
       messageSent = await this.tryToMessageUser(
@@ -693,14 +708,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     // Ban the user
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
     this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
-    args.member.ban(1, args.reason);
+    args.member.ban(1, reason);
 
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Ban,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -740,13 +755,15 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Softban the user = ban, and immediately unban
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
     this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.member.id);
     this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
     this.ignoreEvent(IgnoredEventType.Unban, args.member.id);
 
-    await args.member.ban(1, args.reason);
+    await args.member.ban(1, reason);
     await this.guild.unbanMember(args.member.id);
 
     // Create a case for this action
@@ -754,7 +771,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Softban,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -800,12 +817,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.userId,
       modId: mod.id,
       type: CaseTypes.Unban,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -842,11 +861,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     this.ignoreEvent(IgnoredEventType.Ban, args.userId);
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.userId);
 
     try {
-      await this.guild.banMember(args.userId, 1, args.reason);
+      await this.guild.banMember(args.userId, 1, reason);
     } catch (e) {
       msg.channel.createMessage(errorMessage("Failed to forceban member"));
       return;
@@ -857,7 +878,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userId: args.userId,
       modId: mod.id,
       type: CaseTypes.Ban,
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
@@ -888,7 +909,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
-    const banReason = banReasonReply.content;
+    const banReason = this.formatReasonWithAttachments(banReasonReply.content, msg.attachments);
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
@@ -988,12 +1009,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       return;
     }
 
+    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     // Create the case
     const theCase: Case = await this.actions.fire("createCase", {
       userId: args.target,
       modId: mod.id,
       type: CaseTypes[type],
-      reason: args.reason,
+      reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
