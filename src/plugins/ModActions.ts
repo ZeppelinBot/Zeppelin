@@ -84,7 +84,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         ban: false,
         view: false,
         addcase: false,
-        massban: true,
+        massban: false,
         hidecase: false,
         act_as_other: false,
       },
