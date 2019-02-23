@@ -35,6 +35,19 @@ interface IIgnoredEvent {
   userId: string;
 }
 
+enum MessageResult {
+  Ignored = 1,
+  Failed,
+  DirectMessaged,
+  ChannelMessaged,
+}
+
+const MessageResultText = {
+  [MessageResult.Failed]: "failed to message user",
+  [MessageResult.DirectMessaged]: "user messaged in DMs",
+  [MessageResult.ChannelMessaged]: "user messaged with a ping",
+};
+
 export class ModActionsPlugin extends ZeppelinPlugin {
   public static pluginName = "mod_actions";
 
@@ -346,14 +359,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       .replace("{guildName}", this.guild.name)
       .replace("{reason}", reason);
 
-    const messageSent = await this.tryToMessageUser(
+    const userMessageResult = await this.tryToMessageUser(
       args.member.user,
       warnMessage,
       this.configValue("dm_on_warn"),
       this.configValue("message_on_warn"),
     );
 
-    if (!messageSent) {
+    if (userMessageResult === MessageResult.Failed) {
       const failedMsg = await msg.channel.createMessage("Failed to message the user. Log the warning anyway?");
       const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
       failedMsg.delete();
@@ -370,9 +383,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
+    let messageResultText = MessageResultText[userMessageResult];
+    if (messageResultText) messageResultText = ` (${messageResultText})`;
+
     msg.channel.createMessage(
       successMessage(
-        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${createdCase.case_number})`,
+        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+          createdCase.case_number
+        })${messageResultText}`,
       ),
     );
 
@@ -404,7 +422,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
-    let messageSent = true;
+    let userMessageResult: MessageResult = MessageResult.Ignored;
 
     // Convert mute time from e.g. "2h30m" to milliseconds
     const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
@@ -467,7 +485,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
         time: timeUntilUnmute,
       });
 
-      messageSent = await this.tryToMessageUser(
+      userMessageResult = await this.tryToMessageUser(
         args.member.user,
         muteMessage,
         this.configValue("dm_on_mute"),
@@ -487,7 +505,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       })`;
     }
 
-    if (!messageSent) response += " (failed to message user)";
+    const messageResultText = MessageResultText[userMessageResult];
+    if (messageResultText) response += ` (${messageResultText})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -620,14 +639,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
-    let messageSent = true;
+    let userMessageResult: MessageResult = MessageResult.Ignored;
     if (args.reason) {
       const kickMessage = formatTemplateString(this.configValue("kick_message"), {
         guildName: this.guild.name,
         reason,
       });
 
-      messageSent = await this.tryToMessageUser(
+      userMessageResult = await this.tryToMessageUser(
         args.member.user,
         kickMessage,
         this.configValue("dm_on_kick"),
@@ -653,7 +672,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
-    if (!messageSent) response += " (failed to message user)";
+    const messageResultText = MessageResultText[userMessageResult];
+    if (messageResultText) response += ` (${messageResultText})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -688,14 +708,14 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
-    let messageSent = true;
+    let userMessageResult: MessageResult = MessageResult.Ignored;
     if (reason) {
       const banMessage = formatTemplateString(this.configValue("ban_message"), {
         guildName: this.guild.name,
         reason,
       });
 
-      messageSent = await this.tryToMessageUser(
+      userMessageResult = await this.tryToMessageUser(
         args.member.user,
         banMessage,
         this.configValue("dm_on_ban"),
@@ -721,7 +741,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
-    if (!messageSent) response += " (failed to message user)";
+    const messageResultText = MessageResultText[userMessageResult];
+    if (messageResultText) response += ` (${messageResultText})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -1167,20 +1188,23 @@ export class ModActionsPlugin extends ZeppelinPlugin {
 
   /**
    * Attempts to message the specified user through DMs and/or the message channel.
-   * Returns a promise that resolves to a boolean indicating whether we were able to message them or not.
+   * Returns a promise that resolves to a status constant indicating the result.
    */
-  protected async tryToMessageUser(user: User, str: string, useDM: boolean, useChannel: boolean): Promise<boolean> {
-    let messageSent = false;
-
+  protected async tryToMessageUser(
+    user: User,
+    str: string,
+    useDM: boolean,
+    useChannel: boolean,
+  ): Promise<MessageResult> {
     if (!useDM && !useChannel) {
-      return true;
+      return MessageResult.Ignored;
     }
 
     if (useDM) {
       try {
         const dmChannel = await this.bot.getDMChannel(user.id);
         await dmChannel.createMessage(str);
-        messageSent = true;
+        return MessageResult.DirectMessaged;
       } catch (e) {} // tslint:disable-line
     }
 
@@ -1188,10 +1212,10 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       try {
         const channel = this.guild.channels.get(this.configValue("message_channel")) as TextChannel;
         await channel.createMessage(`<@!${user.id}> ${str}`);
-        messageSent = true;
+        return MessageResult.ChannelMessaged;
       } catch (e) {} // tslint:disable-line
     }
 
-    return messageSent;
+    return MessageResult.Failed;
   }
 }
