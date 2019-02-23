@@ -62,7 +62,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   async onLoad() {
     this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.reactionRemoveQueue = new Queue(3000);
+    this.reactionRemoveQueue = new Queue();
     this.pendingRoleChanges = new Map();
     this.pendingRefreshes = new Set();
 
