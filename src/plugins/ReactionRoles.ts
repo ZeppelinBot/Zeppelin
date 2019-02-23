@@ -1,14 +1,29 @@
-import { decorators as d } from "knub";
-import { CustomEmoji, errorMessage, noop, sleep, successMessage } from "../utils";
+import { decorators as d, logger } from "knub";
+import { CustomEmoji, errorMessage, isSnowflake, noop, sleep, successMessage } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
+import { ReactionRole } from "../data/entities/ReactionRole";
+import Timeout = NodeJS.Timeout;
 
 type ReactionRolePair = [string, string, string?];
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
+const CLEAR_ROLES_EMOJI = "❌";
+const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 1500;
+
+type RoleChangeMode = "+" | "-";
+
+type PendingMemberRoleChanges = {
+  timeout: Timeout;
+  applyFn: () => void;
+  changes: Array<{
+    mode: RoleChangeMode;
+    roleId: string;
+  }>;
+};
 
 export class ReactionRolesPlugin extends ZeppelinPlugin {
   public static pluginName = "reaction_roles";
@@ -17,7 +32,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   protected savedMessages: GuildSavedMessages;
 
   protected reactionRemoveQueue: Queue;
-  protected pendingRoles: Set<string>;
+  protected pendingRoleChanges: Map<string, PendingMemberRoleChanges>;
   protected pendingRefreshes: Set<string>;
 
   private autoRefreshTimeout;
@@ -47,8 +62,8 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   async onLoad() {
     this.reactionRoles = GuildReactionRoles.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.reactionRemoveQueue = new Queue();
-    this.pendingRoles = new Set();
+    this.reactionRemoveQueue = new Queue(1500);
+    this.pendingRoleChanges = new Map();
     this.pendingRefreshes = new Set();
 
     let autoRefreshInterval = this.configValue("auto_refresh_interval");
@@ -66,19 +81,24 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
   async autoRefreshLoop(interval: number) {
     this.autoRefreshTimeout = setTimeout(async () => {
-      // Refresh reaction roles on all reaction role messages
-      const reactionRoles = await this.reactionRoles.all();
-      const idPairs = new Set(reactionRoles.map(r => `${r.channel_id}-${r.message_id}`));
-      for (const pair of idPairs) {
-        const [channelId, messageId] = pair.split("-");
-        await this.refreshReactionRoles(channelId, messageId);
-      }
-
-      // Then restart the loop
+      await this.runAutoRefresh();
       this.autoRefreshLoop(interval);
     }, interval);
   }
 
+  async runAutoRefresh() {
+    // Refresh reaction roles on all reaction role messages
+    const reactionRoles = await this.reactionRoles.all();
+    const idPairs = new Set(reactionRoles.map(r => `${r.channel_id}-${r.message_id}`));
+    for (const pair of idPairs) {
+      const [channelId, messageId] = pair.split("-");
+      await this.refreshReactionRoles(channelId, messageId);
+    }
+  }
+
+  /**
+   * Refreshes the reaction roles in a message. Basically just calls applyReactionRoleReactionsToMessage().
+   */
   async refreshReactionRoles(channelId: string, messageId: string) {
     const pendingKey = `${channelId}-${messageId}`;
     if (this.pendingRefreshes.has(pendingKey)) return;
@@ -86,29 +106,80 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
     try {
       const reactionRoles = await this.reactionRoles.getForMessage(messageId);
-      const reactionRoleEmojis = reactionRoles.map(r => r.emoji);
-
-      const channel = this.guild.channels.get(channelId) as TextChannel;
-      const targetMessage = await channel.getMessage(messageId);
-      const existingReactions = targetMessage.reactions;
-
-      // Remove reactions
-      const removeSleep = sleep(1250);
-      await targetMessage.removeReactions();
-      await removeSleep;
-
-      // Re-add reactions
-      for (const emoji of Object.keys(existingReactions)) {
-        const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
-        if (!reactionRoleEmojis.includes(emojiId)) continue;
-
-        const sleepTime = sleep(1250); // Make sure we only add 1 reaction per second so as not to hit rate limits
-        await targetMessage.addReaction(emoji);
-        await sleepTime;
-      }
+      await this.applyReactionRoleReactionsToMessage(channelId, messageId, reactionRoles);
     } finally {
       this.pendingRefreshes.delete(pendingKey);
     }
+  }
+
+  /**
+   * Applies the reactions from the specified reaction roles to a message
+   */
+  async applyReactionRoleReactionsToMessage(channelId: string, messageId: string, reactionRoles: ReactionRole[]) {
+    const channel = this.guild.channels.get(channelId) as TextChannel;
+    const targetMessage = await channel.getMessage(messageId);
+
+    // Remove old reactions, if any
+    const removeSleep = sleep(1250);
+    await targetMessage.removeReactions();
+    await removeSleep;
+
+    // Add reaction role reactions
+    for (const rr of reactionRoles) {
+      const emoji = isSnowflake(rr.emoji) ? `foo:${rr.emoji}` : rr.emoji;
+
+      const sleepTime = sleep(1250); // Make sure we only add 1 reaction per ~second so as not to hit rate limits
+      await targetMessage.addReaction(emoji);
+      await sleepTime;
+    }
+
+    // Add the "clear reactions" button
+    await targetMessage.addReaction(CLEAR_ROLES_EMOJI);
+  }
+
+  /**
+   * Adds a pending role change for a member. After a delay, all pending role changes for a member are applied at once.
+   * This delay is refreshed any time new pending changes are added (i.e. "debounced").
+   */
+  async addMemberPendingRoleChange(memberId: string, mode: RoleChangeMode, roleId: string) {
+    if (!this.pendingRoleChanges.has(memberId)) {
+      const newPendingRoleChangeObj: PendingMemberRoleChanges = {
+        timeout: null,
+        changes: [],
+        applyFn: async () => {
+          const member = await this.guild.members.get(memberId);
+          if (member) {
+            const newRoleIds = new Set(member.roles);
+            for (const change of newPendingRoleChangeObj.changes) {
+              if (change.mode === "+") newRoleIds.add(change.roleId);
+              else newRoleIds.delete(change.roleId);
+            }
+
+            try {
+              await member.edit({
+                roles: Array.from(newRoleIds.values()),
+              });
+            } catch (e) {
+              logger.warn(
+                `Failed to apply role changes to ${member.username}#${member.discriminator} (${member.id}): ${
+                  e.message
+                }`,
+              );
+            }
+
+            this.pendingRoleChanges.delete(memberId);
+          }
+        },
+      };
+
+      this.pendingRoleChanges.set(memberId, newPendingRoleChangeObj);
+    }
+
+    const pendingRoleChangeObj = this.pendingRoleChanges.get(memberId);
+    pendingRoleChangeObj.changes.push({ mode, roleId });
+
+    if (pendingRoleChangeObj.timeout) clearTimeout(pendingRoleChangeObj.timeout);
+    setTimeout(() => pendingRoleChangeObj.applyFn(), ROLE_CHANGE_BATCH_DEBOUNCE_TIME);
   }
 
   /**
@@ -139,7 +210,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
   }
 
   /**
-   * COMMAND: Refresh reaction roles in the specified message by removing all reactions and reapplying them
+   * COMMAND: Refresh reaction roles in the specified message by removing all reactions and re-adding them
    */
   @d.command("reaction_roles refresh", "<messageId:string>")
   @d.permission("manage")
@@ -160,6 +231,12 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     msg.channel.createMessage(successMessage("Reaction roles refreshed"));
   }
 
+  /**
+   * COMMAND: Initialize reaction roles on a message.
+   * The second parameter, reactionRolePairs, is a list of emoji/role pairs separated by a newline. For example:
+   * :zep_twitch: = 473086848831455234
+   * :zep_ps4: = 543184300250759188
+   */
   @d.command("reaction_roles", "<messageId:string> <reactionRolePairs:string$>")
   @d.permission("manage")
   async reactionRolesCmd(msg: Message, args: { messageId: string; reactionRolePairs: string }) {
@@ -181,9 +258,12 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
       return;
     }
 
+    // Clear old reaction roles for the message from the DB
+    await this.reactionRoles.removeFromMessage(targetMessage.id);
+
     // Turn "emoji = role" pairs into an array of tuples of the form [emoji, roleId]
     // Emoji is either a unicode emoji or the snowflake of a custom emoji
-    const newRolePairs: ReactionRolePair[] = args.reactionRolePairs
+    const emojiRolePairs: ReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
       .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
@@ -198,8 +278,15 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
         },
       );
 
-    // Verify the specified emojis and roles are valid
-    for (const pair of newRolePairs) {
+    // Verify the specified emojis and roles are valid and usable
+    for (const pair of emojiRolePairs) {
+      if (pair[0] === CLEAR_ROLES_EMOJI) {
+        msg.channel.createMessage(
+          errorMessage(`The emoji for clearing roles (${CLEAR_ROLES_EMOJI}) is reserved and cannot be used`),
+        );
+        return;
+      }
+
       if (!this.canUseEmoji(pair[0])) {
         msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from servers I'm on"));
         return;
@@ -211,76 +298,58 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
       }
     }
 
-    const oldReactionRoles = await this.reactionRoles.getForMessage(targetMessage.id);
-    const oldRolePairs: ReactionRolePair[] = oldReactionRoles.map(r => [r.emoji, r.role_id] as ReactionRolePair);
-
-    // Remove old reaction/role pairs that weren't included in the new pairs or were changed in some way
-    const toRemove = oldRolePairs.filter(
-      pair => !newRolePairs.find(oldPair => oldPair[0] === pair[0] && oldPair[1] === pair[1]),
-    );
-    for (const rolePair of toRemove) {
-      await this.reactionRoles.removeFromMessage(targetMessage.id, rolePair[0]);
-
-      for (const emoji of Object.keys(targetMessage.reactions)) {
-        const emojiId = emoji.includes(":") ? emoji.split(":")[1] : emoji;
-
-        if (emojiId === rolePair[0]) {
-          targetMessage.removeReaction(emoji, this.bot.user.id);
-        }
-      }
+    // Save the new reaction roles to the database
+    for (const pair of emojiRolePairs) {
+      await this.reactionRoles.add(channel.id, targetMessage.id, pair[0], pair[1]);
     }
 
-    // Add new/changed reaction/role pairs
-    const toAdd = newRolePairs.filter(
-      pair => !oldRolePairs.find(oldPair => oldPair[0] === pair[0] && oldPair[1] === pair[1]),
-    );
-    for (const rolePair of toAdd) {
-      let emoji;
+    // Apply the reactions themselves
+    const reactionRoles = await this.reactionRoles.getForMessage(targetMessage.id);
+    await this.applyReactionRoleReactionsToMessage(targetMessage.channel.id, targetMessage.id, reactionRoles);
 
-      if (rolePair[2]) {
-        // Custom emoji
-        emoji = `${rolePair[2]}:${rolePair[0]}`;
-      } else {
-        // Unicode emoji
-        emoji = rolePair[0];
-      }
-
-      await targetMessage.addReaction(emoji);
-      await this.reactionRoles.add(channel.id, targetMessage.id, rolePair[0], rolePair[1]);
-    }
+    msg.channel.createMessage(successMessage("Reaction roles added"));
   }
 
+  /**
+   * When a reaction is added to a message with reaction roles, see which role that reaction matches (if any) and queue
+   * those role changes for the member. Multiple role changes in rapid succession are batched and applied at once.
+   * Reacting with CLEAR_ROLES_EMOJI will queue a removal of all roles granted by this message's reaction roles.
+   */
   @d.event("messageReactionAdd")
   async onAddReaction(msg: Message, emoji: CustomEmoji, userId: string) {
-    const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
-    if (!matchingReactionRole) return;
+    // Make sure this message has reaction roles on it
+    const reactionRoles = await this.reactionRoles.getForMessage(msg.id);
+    if (reactionRoles.length === 0) return;
 
     const member = this.guild.members.get(userId);
     if (!member) return;
 
-    const pendingKey = `${userId}-${matchingReactionRole.role_id}`;
-    if (this.pendingRoles.has(pendingKey)) return;
-    this.pendingRoles.add(pendingKey);
+    if (emoji.name === CLEAR_ROLES_EMOJI) {
+      // User reacted with "clear roles" emoji -> clear their roles
+      const reactionRoleRoleIds = reactionRoles.map(rr => rr.role_id);
+      for (const roleId of reactionRoleRoleIds) {
+        this.addMemberPendingRoleChange(userId, "-", roleId);
+      }
 
-    if (member.roles.includes(matchingReactionRole.role_id)) {
-      await member.removeRole(matchingReactionRole.role_id).catch(err => {
-        console.warn(`Could not remove role ${matchingReactionRole.role_id} from ${userId}`, err && err.message);
+      this.reactionRemoveQueue.add(async () => {
+        await msg.channel.removeMessageReaction(msg.id, CLEAR_ROLES_EMOJI, userId);
       });
     } else {
-      await member.addRole(matchingReactionRole.role_id).catch(err => {
-        console.warn(`Could not add role ${matchingReactionRole.role_id} to ${userId}`, err && err.message);
-      });
+      // User reacted with a reaction role emoji -> add the role
+      const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
+      if (!matchingReactionRole) return;
+
+      this.addMemberPendingRoleChange(userId, "+", matchingReactionRole.role_id);
     }
 
     // Remove the reaction after a small delay
     setTimeout(() => {
       this.reactionRemoveQueue.add(async () => {
-        this.pendingRoles.delete(pendingKey);
-
         const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
+        const wait = sleep(1000);
         await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
-        await sleep(250);
+        await wait;
       });
-    }, 15 * 1000);
+    }, 1500);
   }
 }
