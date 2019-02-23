@@ -1013,9 +1013,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    * If the argument passed is a case id, display that case
    * If the argument passed is a user id, show all cases on that user
    */
-  @d.command(/showcase|case/, "<caseNumber:number>")
+  @d.command("case", "<caseNumber:number>")
   @d.permission("view")
-  async showcaseCmd(msg: Message, args: { caseNumber: number }) {
+  async showCaseCmd(msg: Message, args: { caseNumber: number }) {
     // Assume case id
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
 
@@ -1030,9 +1030,9 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     });
   }
 
-  @d.command(/cases|usercases/, "<userId:userId> [opts:string$]")
+  @d.command("cases", "<userId:userId> [opts:string$]")
   @d.permission("view")
-  async usercasesCmd(msg: Message, args: { userId: string; opts?: string }) {
+  async userCasesCmd(msg: Message, args: { userId: string; opts?: string }) {
     const cases = await this.cases.with("notes").getByUserId(args.userId);
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
