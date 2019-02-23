@@ -1,7 +1,7 @@
 import { decorators as d, GlobalPlugin } from "knub";
 import child_process from "child_process";
 import { GuildChannel, Message, TextChannel } from "eris";
-import { errorMessage, sleep, successMessage } from "../utils";
+import { createChunkedMessage, errorMessage, sleep, sorter, successMessage } from "../utils";
 import { ReactionRolesPlugin } from "./ReactionRoles";
 
 let activeReload: [string, string] = null;
@@ -93,6 +93,96 @@ export class BotControlPlugin extends GlobalPlugin {
         const rrPlugin = guild.loadedPlugins.get("reaction_roles") as ReactionRolesPlugin;
         rrPlugin.runAutoRefresh();
       }
+    }
+  }
+
+  @d.command("guilds")
+  async serversCmd(msg: Message) {
+    if (!this.isOwner(msg.author.id)) return;
+
+    const joinedGuilds = Array.from(this.bot.guilds.values());
+    const loadedGuilds = this.knub.getLoadedGuilds();
+    const loadedGuildsMap = loadedGuilds.reduce((map, guildData) => map.set(guildData.id, guildData), new Map());
+
+    joinedGuilds.sort(sorter(g => g.name.toLowerCase()));
+    const longestId = joinedGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
+    const lines = joinedGuilds.map(g => {
+      const paddedId = g.id.padEnd(longestId, " ");
+      return `\`${paddedId}\` **${g.name}** (${loadedGuildsMap.has(g.id) ? "initialized" : "not initialized"}) (${
+        g.memberCount
+      } members)`;
+    });
+    createChunkedMessage(msg.channel, lines.join("\n"));
+  }
+
+  @d.command("leave_guild", "<guildId:string>")
+  async leaveGuildCmd(msg: Message, args: { guildId: string }) {
+    if (!this.isOwner(msg.author.id)) return;
+
+    if (!this.bot.guilds.has(args.guildId)) {
+      msg.channel.createMessage(errorMessage("I am not in that guild"));
+      return;
+    }
+
+    const guildToLeave = this.bot.guilds.get(args.guildId);
+    const guildName = guildToLeave.name;
+
+    try {
+      await this.bot.leaveGuild(args.guildId);
+    } catch (e) {
+      msg.channel.createMessage(errorMessage(`Failed to leave guild: ${e.message}`));
+      return;
+    }
+
+    msg.channel.createMessage(successMessage(`Left guild **${guildName}**`));
+  }
+
+  @d.command("reload_guild", "<guildId:string>")
+  async reloadGuildCmd(msg: Message, args: { guildId: string }) {
+    if (!this.isOwner(msg.author.id)) return;
+
+    if (!this.bot.guilds.has(args.guildId)) {
+      msg.channel.createMessage(errorMessage("I am not in that guild"));
+      return;
+    }
+
+    try {
+      await this.knub.reloadGuild(args.guildId);
+    } catch (e) {
+      msg.channel.createMessage(errorMessage(`Failed to reload guild: ${e.message}`));
+      return;
+    }
+
+    const guild = this.bot.guilds.get(args.guildId);
+    msg.channel.createMessage(successMessage(`Reloaded guild **${guild.name}**`));
+  }
+
+  @d.command("reload_all_guilds")
+  async reloadAllGuilds(msg: Message) {
+    if (!this.isOwner(msg.author.id)) return;
+
+    const failedReloads: Map<string, string> = new Map();
+    let reloadCount = 0;
+
+    const loadedGuilds = this.knub.getLoadedGuilds();
+    for (const guildData of loadedGuilds) {
+      try {
+        await this.knub.reloadGuild(guildData.id);
+        reloadCount++;
+      } catch (e) {
+        failedReloads.set(guildData.id, e.message);
+      }
+    }
+
+    if (failedReloads.size) {
+      const errorLines = Array.from(failedReloads.entries()).map(([guildId, err]) => {
+        const guild = this.bot.guilds.get(guildId);
+        const guildName = guild ? guild.name : "Unknown";
+        return `${guildName} (${guildId}): ${err}`;
+      });
+      createChunkedMessage(msg.channel, `Reloaded ${reloadCount} guild(s). Errors:\n${errorLines.join("\n")}`);
+    } else {
+      msg.channel.createMessage(successMessage(`Reloaded ${reloadCount} guild(s)`));
     }
   }
 }
