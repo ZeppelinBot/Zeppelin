@@ -1,9 +1,15 @@
 type QueueFn = (...args: any[]) => Promise<any>;
 
+const DEFAULT_TIMEOUT = 10 * 1000;
+
 export class Queue {
   protected running: boolean = false;
   protected queue: QueueFn[] = [];
-  protected timeout: number = 10 * 1000;
+  protected timeout: number;
+
+  constructor(timeout = DEFAULT_TIMEOUT) {
+    this.timeout = timeout;
+  }
 
   public add(fn) {
     const promise = new Promise(resolve => {
