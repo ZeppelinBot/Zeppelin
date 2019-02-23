@@ -35,8 +35,6 @@ interface IIgnoredEvent {
   userId: string;
 }
 
-const CASE_LIST_REASON_MAX_LENGTH = 300;
-
 export class ModActionsPlugin extends ZeppelinPlugin {
   public static pluginName = "mod_actions";
 
