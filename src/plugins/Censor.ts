@@ -1,4 +1,4 @@
-import { decorators as d, Plugin } from "knub";
+import { decorators as d, IPluginOptions, Plugin } from "knub";
 import { Invite, Message } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
@@ -13,8 +13,27 @@ import {
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class CensorPlugin extends Plugin {
+interface ICensorPluginConfig {
+  filter_zalgo: boolean;
+  filter_invites: boolean;
+  invite_guild_whitelist: string[];
+  invite_guild_blacklist: string[];
+  invite_code_whitelist: string[];
+  invite_code_blacklist: string[];
+  allow_group_dm_invites: boolean;
+
+  filter_domains: boolean;
+  domain_whitelist: string[];
+  domain_blacklist: string[];
+
+  blocked_tokens: string[];
+  blocked_words: string[];
+  blocked_regex: string[];
+}
+
+export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
   public static pluginName = "censor";
 
   protected serverLogs: GuildLogs;
@@ -23,7 +42,7 @@ export class CensorPlugin extends Plugin {
   private onMessageCreateFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<ICensorPluginConfig> {
     return {
       config: {
         filter_zalgo: false,
@@ -42,6 +61,8 @@ export class CensorPlugin extends Plugin {
         blocked_words: null,
         blocked_regex: null,
       },
+
+      permissions: {},
 
       overrides: [
         {
@@ -97,12 +118,10 @@ export class CensorPlugin extends Plugin {
   async applyFiltersToMsg(savedMessage: SavedMessage) {
     if (!savedMessage.data.content) return;
 
+    const config = this.getConfigForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id);
+
     // Filter zalgo
-    const filterZalgo = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "filter_zalgo",
-    );
+    const filterZalgo = config.filter_zalgo;
     if (filterZalgo) {
       const result = ZalgoRegex.exec(savedMessage.data.content);
       if (result) {
@@ -112,37 +131,13 @@ export class CensorPlugin extends Plugin {
     }
 
     // Filter invites
-    const filterInvites = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "filter_invites",
-    );
+    const filterInvites = config.filter_invites;
     if (filterInvites) {
-      const inviteGuildWhitelist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "invite_guild_whitelist",
-      );
-      const inviteGuildBlacklist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "invite_guild_blacklist",
-      );
-      const inviteCodeWhitelist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "invite_code_whitelist",
-      );
-      const inviteCodeBlacklist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "invite_code_blacklist",
-      );
-      const allowGroupDMInvites: boolean = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "allow_group_dm_invites",
-      );
+      const inviteGuildWhitelist = config.invite_guild_whitelist;
+      const inviteGuildBlacklist = config.invite_guild_blacklist;
+      const inviteCodeWhitelist = config.invite_code_whitelist;
+      const inviteCodeBlacklist = config.invite_code_blacklist;
+      const allowGroupDMInvites = config.allow_group_dm_invites;
 
       const inviteCodes = getInviteCodesInString(savedMessage.data.content);
 
@@ -185,22 +180,10 @@ export class CensorPlugin extends Plugin {
     }
 
     // Filter domains
-    const filterDomains = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "filter_domains",
-    );
+    const filterDomains = config.filter_domains;
     if (filterDomains) {
-      const domainWhitelist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "domain_whitelist",
-      );
-      const domainBlacklist: string[] = this.configValueForMemberIdAndChannelId(
-        savedMessage.user_id,
-        savedMessage.channel_id,
-        "domain_blacklist",
-      );
+      const domainWhitelist = config.domain_whitelist;
+      const domainBlacklist = config.domain_blacklist;
 
       const urls = getUrlsInString(savedMessage.data.content);
       for (const thisUrl of urls) {
@@ -217,8 +200,7 @@ export class CensorPlugin extends Plugin {
     }
 
     // Filter tokens
-    const blockedTokens =
-      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_tokens") || [];
+    const blockedTokens = config.blocked_tokens || [];
     for (const token of blockedTokens) {
       if (savedMessage.data.content.toLowerCase().includes(token.toLowerCase())) {
         this.censorMessage(savedMessage, `blocked token (\`${token}\`) found`);
@@ -227,8 +209,7 @@ export class CensorPlugin extends Plugin {
     }
 
     // Filter words
-    const blockedWords =
-      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_words") || [];
+    const blockedWords = config.blocked_words || [];
     for (const word of blockedWords) {
       const regex = new RegExp(`\\b${escapeStringRegexp(word)}\\b`, "i");
       if (regex.test(savedMessage.data.content)) {
@@ -238,8 +219,7 @@ export class CensorPlugin extends Plugin {
     }
 
     // Filter regex
-    const blockedRegex =
-      this.configValueForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id, "blocked_regex") || [];
+    const blockedRegex = config.blocked_regex || [];
     for (const regexStr of blockedRegex) {
       const regex = new RegExp(regexStr, "i");
       if (regex.test(savedMessage.data.content)) {

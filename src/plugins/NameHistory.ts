@@ -1,16 +1,23 @@
-import { Plugin, decorators as d } from "knub";
+import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildNameHistory } from "../data/GuildNameHistory";
-import { Member, Message, Relationship, User } from "eris";
+import { Member, Message, User } from "eris";
 import { NameHistoryEntryTypes } from "../data/NameHistoryEntryTypes";
 import { createChunkedMessage, errorMessage, trimLines } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class NameHistoryPlugin extends Plugin {
+interface INameHistoryPluginPermissions {
+  view: boolean;
+}
+
+export class NameHistoryPlugin extends ZeppelinPlugin<IBasePluginConfig, INameHistoryPluginPermissions> {
   public static pluginName = "name_history";
 
   protected nameHistory: GuildNameHistory;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, INameHistoryPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         view: false,
       },

@@ -7,20 +7,28 @@ import { CaseTypeColors } from "../data/CaseTypeColors";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 import { GuildArchives } from "../data/GuildArchives";
+import { IPluginOptions } from "knub";
 
-export class CasesPlugin extends ZeppelinPlugin {
+interface ICasesPluginConfig {
+  log_automatic_actions: boolean;
+  case_log_channel: string;
+}
+
+export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   public static pluginName = "cases";
 
   protected actions: GuildActions;
   protected cases: GuildCases;
   protected archives: GuildArchives;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<ICasesPluginConfig> {
     return {
       config: {
         log_automatic_actions: true,
         case_log_channel: null,
       },
+
+      permissions: {},
     };
   }
 
@@ -103,11 +111,9 @@ export class CasesPlugin extends ZeppelinPlugin {
       await this.createCaseNote(createdCase, modId, reason, automatic, false);
     }
 
-    if (
-      this.configValue("case_log_channel") &&
-      (!automatic || this.configValue("log_automatic_actions")) &&
-      postInCaseLogOverride !== false
-    ) {
+    const config = this.getConfig();
+
+    if (config.case_log_channel && (!automatic || config.log_automatic_actions) && postInCaseLogOverride !== false) {
       try {
         await this.postCaseToCaseLogChannel(createdCase);
       } catch (e) {} // tslint:disable-line
@@ -154,7 +160,7 @@ export class CasesPlugin extends ZeppelinPlugin {
       this.archives.makePermanent(archiveId);
     }
 
-    if ((!automatic || this.configValue("log_automatic_actions")) && postInCaseLogOverride !== false) {
+    if ((!automatic || this.getConfig().log_automatic_actions) && postInCaseLogOverride !== false) {
       try {
         await this.postCaseToCaseLogChannel(theCase.id);
       } catch (e) {} // tslint:disable-line
@@ -225,7 +231,7 @@ export class CasesPlugin extends ZeppelinPlugin {
    * Returns silently if the case log channel isn't specified or is invalid.
    */
   public postToCaseLogChannel(content: MessageContent, file: MessageFile = null): Promise<Message> {
-    const caseLogChannelId = this.configValue("case_log_channel");
+    const caseLogChannelId = this.getConfig().case_log_channel;
     if (!caseLogChannelId) return;
 
     const caseLogChannel = this.guild.channels.get(caseLogChannelId);

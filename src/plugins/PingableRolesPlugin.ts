@@ -1,20 +1,27 @@
-import { Plugin, decorators as d } from "knub";
+import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { Message, Role, TextableChannel, User } from "eris";
 import { GuildPingableRoles } from "../data/GuildPingableRoles";
 import { PingableRole } from "../data/entities/PingableRole";
 import { errorMessage, successMessage } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 const TIMEOUT = 10 * 1000;
 
-export class PingableRolesPlugin extends Plugin {
+interface IPingableRolesPluginPermissions {
+  use: boolean;
+}
+
+export class PingableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, IPingableRolesPluginPermissions> {
   public static pluginName = "pingable_roles";
 
   protected pingableRoles: GuildPingableRoles;
   protected cache: Map<string, PingableRole[]>;
   protected timeouts: Map<string, any>;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IPingableRolesPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         use: false,
       },

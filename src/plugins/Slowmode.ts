@@ -1,17 +1,25 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
 import { convertDelayStringToMS, errorMessage, noop, successMessage } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class SlowmodePlugin extends Plugin {
+interface ISlowmodePluginPermissions {
+  manage: boolean;
+  affected: boolean;
+}
+
+export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodePluginPermissions> {
   public static pluginName = "slowmode";
 
   protected slowmodes: GuildSlowmodes;
   protected clearInterval;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, ISlowmodePluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         manage: false,
         affected: true,

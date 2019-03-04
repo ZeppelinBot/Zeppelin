@@ -1,4 +1,4 @@
-import { decorators as d, waitForReply, utils as knubUtils } from "knub";
+import { decorators as d, waitForReply, utils as knubUtils, IBasePluginConfig, IPluginOptions } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildStarboards } from "../data/GuildStarboards";
 import { GuildChannel, Message, TextChannel } from "eris";
@@ -17,7 +17,11 @@ import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 
-export class StarboardPlugin extends ZeppelinPlugin {
+interface IStarboardPluginPermissions {
+  manage: boolean;
+}
+
+export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboardPluginPermissions> {
   public static pluginName = "starboard";
 
   protected starboards: GuildStarboards;
@@ -25,8 +29,10 @@ export class StarboardPlugin extends ZeppelinPlugin {
 
   private onMessageDeleteFn;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IStarboardPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         manage: false,
       },

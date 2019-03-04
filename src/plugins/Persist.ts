@@ -1,24 +1,33 @@
-import { Plugin, decorators as d } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { GuildPersistedData, IPartialPersistData } from "../data/GuildPersistedData";
 import intersection from "lodash.intersection";
 import { Member, MemberOptions } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class PersistPlugin extends Plugin {
+interface IPersistPluginConfig {
+  persisted_roles: string[];
+  persist_nicknames: boolean;
+  persist_voice_mutes: boolean;
+}
+
+export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
   public static pluginName = "persist";
 
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IPersistPluginConfig> {
     return {
       config: {
         persisted_roles: [],
         persist_nicknames: false,
         persist_voice_mutes: false,
       },
+
+      permissions: {},
     };
   }
 
@@ -31,8 +40,9 @@ export class PersistPlugin extends Plugin {
   onGuildMemberRemove(_, member: Member) {
     let persist = false;
     const persistData: IPartialPersistData = {};
+    const config = this.getConfig();
 
-    const persistedRoles = this.configValue("persisted_roles");
+    const persistedRoles = config.persisted_roles;
     if (persistedRoles.length && member.roles) {
       const rolesToPersist = intersection(persistedRoles, member.roles);
       if (rolesToPersist.length) {
@@ -41,12 +51,12 @@ export class PersistPlugin extends Plugin {
       }
     }
 
-    if (this.configValue("persist_nicknames") && member.nick) {
+    if (config.persist_nicknames && member.nick) {
       persist = true;
       persistData.nickname = member.nick;
     }
 
-    if (this.configValue("persist_voice_mutes") && member.voiceState && member.voiceState.mute) {
+    if (config.persist_voice_mutes && member.voiceState && member.voiceState.mute) {
       persist = true;
       persistData.is_voice_muted = true;
     }
@@ -63,8 +73,9 @@ export class PersistPlugin extends Plugin {
 
     let restore = false;
     const toRestore: MemberOptions = {};
+    const config = this.getConfig();
 
-    const persistedRoles = this.configValue("persisted_roles");
+    const persistedRoles = config.persisted_roles;
     if (persistedRoles.length) {
       const rolesToRestore = intersection(persistedRoles, persistedData.roles);
       if (rolesToRestore.length) {
@@ -73,12 +84,12 @@ export class PersistPlugin extends Plugin {
       }
     }
 
-    if (this.configValue("persist_nicknames") && persistedData.nickname) {
+    if (config.persist_nicknames && persistedData.nickname) {
       restore = true;
       toRestore.nick = persistedData.nickname;
     }
 
-    if (this.configValue("persist_voice_mutes") && persistedData.is_voice_muted) {
+    if (config.persist_voice_mutes && persistedData.is_voice_muted) {
       restore = true;
       toRestore.mute = true;
     }

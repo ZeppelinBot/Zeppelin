@@ -1,4 +1,4 @@
-import { Member, Message, TextableChannel, User } from "eris";
+import { Member, Message, User } from "eris";
 import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -8,9 +8,18 @@ import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage, 
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
-import { decorators as d } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 
-export class MutesPlugin extends ZeppelinPlugin {
+interface IMutesPluginConfig {
+  mute_role: string;
+}
+
+interface IMutesPluginPermissions {
+  view_list: boolean;
+  cleanup: boolean;
+}
+
+export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPluginPermissions> {
   public static pluginName = "mutes";
 
   protected actions: GuildActions;
@@ -19,7 +28,7 @@ export class MutesPlugin extends ZeppelinPlugin {
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IMutesPluginConfig, IMutesPluginPermissions> {
     return {
       config: {
         mute_role: null,
@@ -71,7 +80,7 @@ export class MutesPlugin extends ZeppelinPlugin {
   }
 
   public async muteMember(member: Member, muteTime: number = null) {
-    const muteRole = this.configValue("mute_role");
+    const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
     await member.addRole(muteRole);
@@ -82,9 +91,9 @@ export class MutesPlugin extends ZeppelinPlugin {
     if (unmuteTime) {
       await this.mutes.addOrUpdateMute(member.id, unmuteTime);
     } else {
-      const muteRole = this.configValue("mute_role");
+      const muteRole = this.getConfig().mute_role;
       if (member.roles.includes(muteRole)) {
-        await member.removeRole(this.configValue("mute_role"));
+        await member.removeRole(muteRole);
       }
 
       await this.mutes.clear(member.id);
@@ -139,7 +148,7 @@ export class MutesPlugin extends ZeppelinPlugin {
     // Manually added mute roles
     const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
     const manuallyMutedMembers = [];
-    const muteRole = this.configValue("mute_role");
+    const muteRole = this.getConfig().mute_role;
 
     if (muteRole) {
       this.guild.members.forEach(member => {
@@ -206,7 +215,7 @@ export class MutesPlugin extends ZeppelinPlugin {
    */
   @d.event("guildMemberUpdate")
   async onGuildMemberUpdate(_, member: Member) {
-    const muteRole = this.configValue("mute_role");
+    const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
     const mute = await this.mutes.findExistingMuteForUserId(member.id);
@@ -224,7 +233,7 @@ export class MutesPlugin extends ZeppelinPlugin {
   @d.permission("cleanup")
   async clearMutesWithoutRoleCmd(msg: Message) {
     const activeMutes = await this.mutes.getActiveMutes();
-    const muteRole = this.configValue("mute_role");
+    const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
     await msg.channel.createMessage("Clearing mutes from members that don't have the mute role...");
@@ -264,7 +273,7 @@ export class MutesPlugin extends ZeppelinPlugin {
 
       try {
         this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
-        await member.removeRole(this.configValue("mute_role"));
+        await member.removeRole(this.getConfig().mute_role);
       } catch (e) {} // tslint:disable-line
 
       await this.mutes.clear(member.id);

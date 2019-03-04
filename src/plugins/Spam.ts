@@ -1,4 +1,4 @@
-import { decorators as d, Plugin } from "knub";
+import { decorators as d, IPluginOptions, Plugin } from "knub";
 import { Channel, Member, User } from "eris";
 import {
   getEmojiInString,
@@ -18,6 +18,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildActions } from "../data/GuildActions";
 import { Case } from "../data/entities/Case";
 import { GuildMutes } from "../data/GuildMutes";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 enum RecentActionType {
   Message = 1,
@@ -44,7 +45,28 @@ const MAX_INTERVAL = 300;
 
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
-export class SpamPlugin extends Plugin {
+interface IBaseSingleSpamConfig {
+  interval: number;
+  count: number;
+  mute?: boolean;
+  mute_time?: number;
+  clean?: boolean;
+}
+
+interface ISpamPluginConfig {
+  max_censor: IBaseSingleSpamConfig;
+  max_messages: IBaseSingleSpamConfig;
+  max_mentions: IBaseSingleSpamConfig;
+  max_links: IBaseSingleSpamConfig;
+  max_attachments: IBaseSingleSpamConfig;
+  max_emojis: IBaseSingleSpamConfig;
+  max_newlines: IBaseSingleSpamConfig;
+  max_duplicates: IBaseSingleSpamConfig;
+  max_characters: IBaseSingleSpamConfig;
+  max_voice_moves: IBaseSingleSpamConfig;
+}
+
+export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
   public static pluginName = "spam";
 
   protected actions: GuildActions;
@@ -68,9 +90,10 @@ export class SpamPlugin extends Plugin {
 
   private expiryInterval;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<ISpamPluginConfig> {
     return {
       config: {
+        max_censor: null,
         max_messages: null,
         max_mentions: null,
         max_links: null,
@@ -81,6 +104,8 @@ export class SpamPlugin extends Plugin {
         max_characters: null,
         max_voice_moves: null,
       },
+
+      permissions: {},
 
       // Default override to make mods immune to the spam filter
       overrides: [
@@ -178,7 +203,7 @@ export class SpamPlugin extends Plugin {
   async logAndDetectMessageSpam(
     savedMessage: SavedMessage,
     type: RecentActionType,
-    spamConfig: any,
+    spamConfig: IBaseSingleSpamConfig,
     actionCount: number,
     description: string,
   ) {
@@ -360,11 +385,9 @@ export class SpamPlugin extends Plugin {
 
   // For interoperability with the Censor plugin
   async logCensor(savedMessage: SavedMessage) {
-    const spamConfig = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_censor",
-    );
+    const config = this.getConfigForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id);
+    const spamConfig = config.max_censor;
+
     if (spamConfig) {
       this.logAndDetectMessageSpam(savedMessage, RecentActionType.Censor, spamConfig, 1, "too many censored messages");
     }
@@ -373,20 +396,14 @@ export class SpamPlugin extends Plugin {
   async onMessageCreate(savedMessage: SavedMessage) {
     if (savedMessage.is_bot) return;
 
-    const maxMessages = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_messages",
-    );
+    const config = this.getConfigForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id);
+
+    const maxMessages = config.max_messages;
     if (maxMessages) {
       this.logAndDetectMessageSpam(savedMessage, RecentActionType.Message, maxMessages, 1, "too many messages");
     }
 
-    const maxMentions = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_mentions",
-    );
+    const maxMentions = config.max_mentions;
     const mentions = savedMessage.data.content
       ? [...getUserMentions(savedMessage.data.content), ...getRoleMentions(savedMessage.data.content)]
       : [];
@@ -400,21 +417,13 @@ export class SpamPlugin extends Plugin {
       );
     }
 
-    const maxLinks = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_links",
-    );
-    if (maxLinks && savedMessage.data.content) {
+    const maxLinks = config.max_links;
+    if (maxLinks && savedMessage.data.content && typeof savedMessage.data.content === "string") {
       const links = getUrlsInString(savedMessage.data.content);
       this.logAndDetectMessageSpam(savedMessage, RecentActionType.Link, maxLinks, links.length, "too many links");
     }
 
-    const maxAttachments = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_attachments",
-    );
+    const maxAttachments = config.max_attachments;
     if (maxAttachments && savedMessage.data.attachments) {
       this.logAndDetectMessageSpam(
         savedMessage,
@@ -425,21 +434,13 @@ export class SpamPlugin extends Plugin {
       );
     }
 
-    const maxEmoji = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_emojis",
-    );
+    const maxEmoji = config.max_emojis;
     if (maxEmoji && savedMessage.data.content) {
       const emojiCount = getEmojiInString(savedMessage.data.content).length;
       this.logAndDetectMessageSpam(savedMessage, RecentActionType.Emoji, maxEmoji, emojiCount, "too many emoji");
     }
 
-    const maxNewlines = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_newlines",
-    );
+    const maxNewlines = config.max_newlines;
     if (maxNewlines && savedMessage.data.content) {
       const newlineCount = (savedMessage.data.content.match(/\n/g) || []).length;
       this.logAndDetectMessageSpam(
@@ -451,11 +452,7 @@ export class SpamPlugin extends Plugin {
       );
     }
 
-    const maxCharacters = this.configValueForMemberIdAndChannelId(
-      savedMessage.user_id,
-      savedMessage.channel_id,
-      "max_characters",
-    );
+    const maxCharacters = config.max_characters;
     if (maxCharacters && savedMessage.data.content) {
       const characterCount = [...savedMessage.data.content.trim()].length;
       this.logAndDetectMessageSpam(
@@ -473,11 +470,12 @@ export class SpamPlugin extends Plugin {
   @d.event("voiceChannelJoin")
   @d.event("voiceChannelSwitch")
   onVoiceChannelSwitch(member: Member, channel: Channel) {
-    const spamConfig = this.configValueForMemberIdAndChannelId(member.id, channel.id, "max_voice_moves");
-    if (spamConfig) {
+    const config = this.getConfigForMemberIdAndChannelId(member.id, channel.id);
+    const maxVoiceMoves = config.max_voice_moves;
+    if (maxVoiceMoves) {
       this.logAndDetectOtherSpam(
         RecentActionType.VoiceChannelMove,
-        spamConfig,
+        maxVoiceMoves,
         member.id,
         1,
         "0",

@@ -1,4 +1,4 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, IPluginOptions } from "knub";
 import { Message, TextChannel } from "eris";
 import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
@@ -6,6 +6,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 const TAG_FUNCTIONS = {
   countdown(toDate) {
@@ -14,10 +15,21 @@ const TAG_FUNCTIONS = {
     const diff = target.diff(now);
     const result = humanizeDuration(diff, { largest: 2, round: true });
     return diff >= 0 ? result : `${result} ago`;
-  }
+  },
 };
 
-export class TagsPlugin extends Plugin {
+interface ITagsPluginConfig {
+  prefix: string;
+  delete_with_command: boolean;
+}
+
+interface ITagsPluginPermissions {
+  create: boolean;
+  use: boolean;
+  list: boolean;
+}
+
+export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPermissions> {
   public static pluginName = "tags";
 
   protected tags: GuildTags;
@@ -26,17 +38,17 @@ export class TagsPlugin extends Plugin {
   private onMessageCreateFn;
   private onMessageDeleteFn;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<ITagsPluginConfig, ITagsPluginPermissions> {
     return {
       config: {
         prefix: "!!",
-        delete_with_command: true
+        delete_with_command: true,
       },
 
       permissions: {
         create: false,
         use: true,
-        list: false
+        list: false,
       },
 
       overrides: [
@@ -44,10 +56,10 @@ export class TagsPlugin extends Plugin {
           level: ">=50",
           permissions: {
             create: true,
-            list: true
-          }
-        }
-      ]
+            list: true,
+          },
+        },
+      ],
     };
   }
 
@@ -78,7 +90,7 @@ export class TagsPlugin extends Plugin {
       return;
     }
 
-    const prefix = this.configValueForMsg(msg, "prefix");
+    const prefix = this.getConfigForMsg(msg).prefix;
     const tagNames = tags.map(t => t.tag).sort();
     msg.channel.createMessage(`
       Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\`
@@ -103,7 +115,7 @@ export class TagsPlugin extends Plugin {
   async tagCmd(msg: Message, args: { tag: string; body: string }) {
     await this.tags.createOrUpdate(args.tag, args.body, msg.author.id);
 
-    const prefix = this.configValue("prefix");
+    const prefix = this.getConfig().prefix;
     msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
   }
 
@@ -114,7 +126,7 @@ export class TagsPlugin extends Plugin {
     if (!msg.data.content) return;
     if (msg.is_bot) return;
 
-    const prefix = this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "prefix");
+    const prefix = this.getConfigForMemberIdAndChannelId(msg.user_id, msg.channel_id).prefix;
     if (!msg.data.content.startsWith(prefix)) return;
 
     const tagNameMatch = msg.data.content.slice(prefix.length).match(/^\S+/);
@@ -148,7 +160,7 @@ export class TagsPlugin extends Plugin {
     const responseMsg = await channel.createMessage(body);
 
     // Save the command-response message pair once the message is in our database
-    if (this.configValueForMemberIdAndChannelId(msg.user_id, msg.channel_id, "delete_with_command")) {
+    if (this.getConfigForMemberIdAndChannelId(msg.user_id, msg.channel_id).delete_with_command) {
       this.savedMessages.onceMessageAvailable(responseMsg.id, async () => {
         await this.tags.addResponse(msg.id, responseMsg.id);
       });
