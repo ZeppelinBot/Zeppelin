@@ -1,14 +1,20 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { Channel, EmbedBase, Message, Role, TextChannel } from "eris";
-import { errorMessage, downloadFile, roleMentionRegex, getRoleMentions } from "../utils";
+import { errorMessage, downloadFile, getRoleMentions } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 import fs from "fs";
 const fsp = fs.promises;
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 
-export class PostPlugin extends Plugin {
+interface IPostPluginPermissions {
+  post: boolean;
+  edit: boolean;
+}
+
+export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPermissions> {
   public static pluginName = "post";
 
   protected savedMessages: GuildSavedMessages;
@@ -17,8 +23,10 @@ export class PostPlugin extends Plugin {
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
   }
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IPostPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         post: false,
         edit: false,

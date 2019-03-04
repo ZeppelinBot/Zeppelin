@@ -1,5 +1,5 @@
 import http, { ServerResponse } from "http";
-import { GlobalPlugin } from "knub";
+import { GlobalPlugin, IPluginOptions } from "knub";
 import { GuildArchives } from "../data/GuildArchives";
 import { sleep } from "../utils";
 import moment from "moment-timezone";
@@ -12,11 +12,25 @@ function notFound(res: ServerResponse) {
   res.end("Not Found");
 }
 
-export class LogServerPlugin extends GlobalPlugin {
+interface ILogServerPluginConfig {
+  port: number;
+}
+
+export class LogServerPlugin extends GlobalPlugin<ILogServerPluginConfig> {
   public static pluginName = "log_server";
 
   protected archives: GuildArchives;
   protected server: http.Server;
+
+  protected getDefaultOptions(): IPluginOptions<ILogServerPluginConfig> {
+    return {
+      config: {
+        port: DEFAULT_PORT,
+      },
+
+      permissions: {},
+    };
+  }
 
   async onLoad() {
     this.archives = new GuildArchives(null);
@@ -55,6 +69,7 @@ export class LogServerPlugin extends GlobalPlugin {
       }
     });
 
+    const port = this.getConfig().port;
     let retried = false;
 
     this.server.on("error", async (err: any) => {
@@ -62,13 +77,13 @@ export class LogServerPlugin extends GlobalPlugin {
         console.log("Got EADDRINUSE, retrying in 2 sec...");
         retried = true;
         await sleep(2000);
-        this.server.listen(this.configValue("port", DEFAULT_PORT));
+        this.server.listen(port);
       } else {
         throw err;
       }
     });
 
-    this.server.listen(this.configValue("port", DEFAULT_PORT));
+    this.server.listen(port);
   }
 
   async onUnload() {

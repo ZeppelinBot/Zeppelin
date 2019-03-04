@@ -1,9 +1,12 @@
-import { IPluginOptions, Plugin } from "knub";
+import { IBasePluginConfig, IBasePluginPermissions, IPluginOptions, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import Ajv, { ErrorObject } from "ajv";
 import { isSnowflake, isUnicodeEmoji } from "../utils";
 
-export class ZeppelinPlugin extends Plugin {
+export class ZeppelinPlugin<
+  TConfig extends {} = IBasePluginConfig,
+  TPermissions extends {} = IBasePluginPermissions
+> extends Plugin<TConfig, TPermissions> {
   protected configSchema: any;
   protected permissionsSchema: any;
 

@@ -1,4 +1,4 @@
-import { decorators as d, waitForReaction, waitForReply } from "knub";
+import { decorators as d, IPluginOptions, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
@@ -48,7 +48,39 @@ const MessageResultText = {
   [MessageResult.ChannelMessaged]: "user messaged with a ping",
 };
 
-export class ModActionsPlugin extends ZeppelinPlugin {
+interface IModActionsPluginConfig {
+  dm_on_warn: boolean;
+  dm_on_mute: boolean;
+  dm_on_kick: boolean;
+  dm_on_ban: boolean;
+  message_on_warn: boolean;
+  message_on_mute: boolean;
+  message_on_kick: boolean;
+  message_on_ban: boolean;
+  message_channel: string;
+  warn_message: string;
+  mute_message: string;
+  timed_mute_message: string;
+  kick_message: string;
+  ban_message: string;
+  alert_on_rejoin: boolean;
+  alert_channel: string;
+}
+
+interface IModActionsPluginPermissions {
+  note: boolean;
+  warn: boolean;
+  mute: boolean;
+  kick: boolean;
+  ban: boolean;
+  view: boolean;
+  addcase: boolean;
+  massban: boolean;
+  hidecase: boolean;
+  act_as_other: boolean;
+}
+
+export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IModActionsPluginPermissions> {
   public static pluginName = "mod_actions";
 
   protected actions: GuildActions;
@@ -67,7 +99,7 @@ export class ModActionsPlugin extends ZeppelinPlugin {
     this.ignoredEvents = [];
   }
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IModActionsPluginConfig, IModActionsPluginPermissions> {
     return {
       config: {
         dm_on_warn: true,
@@ -225,9 +257,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
    */
   @d.event("guildMemberAdd")
   async onGuildMemberAdd(_, member: Member) {
-    if (!this.configValue("alert_on_rejoin")) return;
+    const config = this.getConfig();
 
-    const alertChannelId = this.configValue("alert_channel");
+    if (!config.alert_on_rejoin) return;
+
+    const alertChannelId = config.alert_channel;
     if (!alertChannelId) return;
 
     const actions = await this.cases.getByUserId(member.id);
@@ -353,17 +387,16 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    const warnMessage = this.configValue("warn_message")
-      .replace("{guildName}", this.guild.name)
-      .replace("{reason}", reason);
+    const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
 
     const userMessageResult = await this.tryToMessageUser(
       args.member.user,
       warnMessage,
-      this.configValue("dm_on_warn"),
-      this.configValue("message_on_warn"),
+      config.dm_on_warn,
+      config.message_on_warn,
     );
 
     if (userMessageResult === MessageResult.Failed) {
@@ -474,10 +507,12 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       await this.mutes.setCaseId(args.member.id, theCase.id);
     }
 
+    const config = this.getConfig();
+
     // Message the user informing them of the mute
     // Don't message them if we're updating an old mute
     if (reason && !hasOldCase) {
-      const template = muteTime ? this.configValue("timed_mute_message") : this.configValue("mute_message");
+      const template = muteTime ? config.timed_mute_message : config.mute_message;
 
       const muteMessage = formatTemplateString(template, {
         guildName: this.guild.name,
@@ -488,8 +523,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userMessageResult = await this.tryToMessageUser(
         args.member.user,
         muteMessage,
-        this.configValue("dm_on_mute"),
-        this.configValue("message_on_mute"),
+        config.dm_on_mute,
+        config.message_on_mute,
       );
     }
 
@@ -636,12 +671,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
     let userMessageResult: MessageResult = MessageResult.Ignored;
     if (args.reason) {
-      const kickMessage = formatTemplateString(this.configValue("kick_message"), {
+      const kickMessage = formatTemplateString(config.kick_message, {
         guildName: this.guild.name,
         reason,
       });
@@ -649,8 +685,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userMessageResult = await this.tryToMessageUser(
         args.member.user,
         kickMessage,
-        this.configValue("dm_on_kick"),
-        this.configValue("message_on_kick"),
+        config.dm_on_kick,
+        config.message_on_kick,
       );
     }
 
@@ -705,12 +741,13 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       mod = args.mod;
     }
 
+    const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
     let userMessageResult: MessageResult = MessageResult.Ignored;
     if (reason) {
-      const banMessage = formatTemplateString(this.configValue("ban_message"), {
+      const banMessage = formatTemplateString(config.ban_message, {
         guildName: this.guild.name,
         reason,
       });
@@ -718,8 +755,8 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       userMessageResult = await this.tryToMessageUser(
         args.member.user,
         banMessage,
-        this.configValue("dm_on_ban"),
-        this.configValue("message_on_ban"),
+        config.dm_on_ban,
+        config.message_on_ban,
       );
     }
 
@@ -1215,9 +1252,11 @@ export class ModActionsPlugin extends ZeppelinPlugin {
       } catch (e) {} // tslint:disable-line
     }
 
-    if (useChannel && this.configValue("message_channel")) {
+    const messageChannel = this.getConfig().message_channel;
+
+    if (useChannel && messageChannel) {
       try {
-        const channel = this.guild.channels.get(this.configValue("message_channel")) as TextChannel;
+        const channel = this.guild.channels.get(messageChannel) as TextChannel;
         await channel.createMessage(`<@!${user.id}> ${str}`);
         return MessageResult.ChannelMessaged;
       } catch (e) {} // tslint:disable-line

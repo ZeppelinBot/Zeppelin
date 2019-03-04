@@ -1,4 +1,4 @@
-import { decorators as d, logger } from "knub";
+import { decorators as d, IPluginOptions, logger } from "knub";
 import { CustomEmoji, errorMessage, isSnowflake, noop, sleep, successMessage } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Message, TextChannel } from "eris";
@@ -25,7 +25,16 @@ type PendingMemberRoleChanges = {
   }>;
 };
 
-export class ReactionRolesPlugin extends ZeppelinPlugin {
+interface IReactionRolesPluginConfig {
+  auto_refresh_interval: number;
+}
+
+interface IReactionRolesPluginPermissions {
+  manage: boolean;
+  fallback_command: boolean;
+}
+
+export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConfig, IReactionRolesPluginPermissions> {
   public static pluginName = "reaction_roles";
 
   protected reactionRoles: GuildReactionRoles;
@@ -37,7 +46,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
 
   private autoRefreshTimeout;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IReactionRolesPluginConfig, IReactionRolesPluginPermissions> {
     return {
       config: {
         auto_refresh_interval: null,
@@ -66,7 +75,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin {
     this.pendingRoleChanges = new Map();
     this.pendingRefreshes = new Set();
 
-    let autoRefreshInterval = this.configValue("auto_refresh_interval");
+    let autoRefreshInterval = this.getConfig().auto_refresh_interval;
     if (autoRefreshInterval != null) {
       autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
       this.autoRefreshLoop(autoRefreshInterval);

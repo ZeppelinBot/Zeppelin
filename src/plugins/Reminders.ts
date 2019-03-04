@@ -1,4 +1,4 @@
-import { decorators as d } from "knub";
+import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildReminders } from "../data/GuildReminders";
 import { Message, TextChannel } from "eris";
@@ -9,7 +9,11 @@ import { convertDelayStringToMS, createChunkedMessage, errorMessage, sorter, suc
 const REMINDER_LOOP_TIME = 10 * 1000;
 const MAX_TRIES = 3;
 
-export class RemindersPlugin extends ZeppelinPlugin {
+interface IRemindersPluginPermissions {
+  use: boolean;
+}
+
+export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IRemindersPluginPermissions> {
   public static pluginName = "reminders";
 
   protected reminders: GuildReminders;
@@ -17,8 +21,10 @@ export class RemindersPlugin extends ZeppelinPlugin {
 
   private postRemindersTimeout;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IRemindersPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         use: false,
       },

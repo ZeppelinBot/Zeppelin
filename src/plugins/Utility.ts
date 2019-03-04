@@ -1,4 +1,4 @@
-import { decorators as d } from "knub";
+import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
   channelMentionRegex,
@@ -33,7 +33,21 @@ const CLEAN_COMMAND_DELETE_DELAY = 5000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
-export class UtilityPlugin extends ZeppelinPlugin {
+interface IUtilityPluginPermissions {
+  roles: boolean;
+  level: boolean;
+  search: boolean;
+  clean: boolean;
+  info: boolean;
+  server: boolean;
+  reload_guild: boolean;
+  nickname: boolean;
+  ping: boolean;
+  source: boolean;
+  vcmove: boolean;
+}
+
+export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPluginPermissions> {
   public static pluginName = "utility";
 
   protected logs: GuildLogs;
@@ -41,8 +55,10 @@ export class UtilityPlugin extends ZeppelinPlugin {
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IUtilityPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         roles: false,
         level: false,

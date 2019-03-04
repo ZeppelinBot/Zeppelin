@@ -1,4 +1,4 @@
-import { decorators as d } from "knub";
+import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
@@ -6,7 +6,11 @@ import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class AutoReactionsPlugin extends ZeppelinPlugin {
+interface IAutoReactionsPluginPermissions {
+  use: boolean;
+}
+
+export class AutoReactionsPlugin extends ZeppelinPlugin<IBasePluginConfig, IAutoReactionsPluginPermissions> {
   public static pluginName = "auto_reactions";
 
   protected savedMessages: GuildSavedMessages;
@@ -14,8 +18,10 @@ export class AutoReactionsPlugin extends ZeppelinPlugin {
 
   private onMessageCreateFn;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IAutoReactionsPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         use: false,
       },

@@ -1,4 +1,4 @@
-import { decorators as d, Plugin } from "knub";
+import { decorators as d, IPluginOptions, Plugin } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
@@ -22,6 +22,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 interface ILogChannel {
   include?: string[];
@@ -40,7 +41,24 @@ const unknownUser = {
   discriminator: "0000",
 };
 
-export class LogsPlugin extends Plugin {
+interface IChannelConfig {
+  include?: string[];
+  exclude?: string[];
+  batched?: boolean;
+  batch_time?: number;
+}
+
+interface ILogsPluginConfig {
+  channels: {
+    [key: string]: IChannelConfig;
+  };
+  format: {
+    [key: string]: string;
+    timestamp: string;
+  };
+}
+
+export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   public static pluginName = "logs";
 
   protected guildLogs: GuildLogs;
@@ -56,7 +74,7 @@ export class LogsPlugin extends Plugin {
   private onMessageDeleteBulkFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<ILogsPluginConfig> {
     return {
       config: {
         channels: {},
@@ -65,6 +83,8 @@ export class LogsPlugin extends Plugin {
           ...DefaultLogMessages,
         },
       },
+
+      permissions: {},
     };
   }
 
@@ -98,7 +118,7 @@ export class LogsPlugin extends Plugin {
   }
 
   async log(type, data) {
-    const logChannels: ILogChannelMap = this.configValue("channels");
+    const logChannels: ILogChannelMap = this.getConfig().channels;
     const typeStr = LogType[type];
 
     for (const [channelId, opts] of Object.entries(logChannels)) {
@@ -130,12 +150,13 @@ export class LogsPlugin extends Plugin {
   }
 
   getLogMessage(type, data): string {
-    const format = this.configValue(`format.${LogType[type]}`, "");
+    const config = this.getConfig();
+    const format = config.format[LogType[type]] || "";
     if (format === "") return;
 
     const formatted = formatTemplateString(format, data);
 
-    const timestampFormat = this.configValue("format.timestamp");
+    const timestampFormat = config.format.timestamp;
     if (timestampFormat) {
       const timestamp = moment().format(timestampFormat);
       return `\`[${timestamp}]\` ${formatted}`;
@@ -387,7 +408,7 @@ export class LogsPlugin extends Plugin {
           member: stripObjectToScalars(member, ["user"]),
           channel: stripObjectToScalars(channel),
           messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
-          messageDate: moment(savedMessage.data.timestamp, "x").format(this.configValue("format.timestamp")),
+          messageDate: moment(savedMessage.data.timestamp, "x").format(this.getConfig().format.timestamp),
           attachments: disableLinkPreviews(useMediaUrls(attachments)),
         },
         savedMessage.id,

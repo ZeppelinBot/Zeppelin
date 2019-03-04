@@ -1,15 +1,24 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildSelfGrantableRoles } from "../data/GuildSelfGrantableRoles";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
 import { chunkArray, errorMessage, sorter, successMessage } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-export class SelfGrantableRolesPlugin extends Plugin {
+interface ISelfGrantableRolesPluginPermissions {
+  manage: boolean;
+  use: boolean;
+  ignore_cooldown: boolean;
+}
+
+export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, ISelfGrantableRolesPluginPermissions> {
   public static pluginName = "self_grantable_roles";
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, ISelfGrantableRolesPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         manage: false,
         use: false,

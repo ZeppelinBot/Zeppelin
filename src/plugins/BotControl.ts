@@ -1,4 +1,4 @@
-import { decorators as d, GlobalPlugin } from "knub";
+import { decorators as d, GlobalPlugin, IPluginOptions } from "knub";
 import child_process from "child_process";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { createChunkedMessage, errorMessage, noop, sleep, sorter, successMessage } from "../utils";
@@ -6,17 +6,25 @@ import { ReactionRolesPlugin } from "./ReactionRoles";
 
 let activeReload: [string, string] = null;
 
+interface IBotControlPluginConfig {
+  owners: string[];
+  update_cmd: string;
+}
+
 /**
  * A global plugin that allows bot owners to control the bot
  */
-export class BotControlPlugin extends GlobalPlugin {
+export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   public static pluginName = "bot_control";
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBotControlPluginConfig> {
     return {
       config: {
         owners: [],
+        update_cmd: null,
       },
+
+      permissions: {},
     };
   }
 
@@ -36,14 +44,14 @@ export class BotControlPlugin extends GlobalPlugin {
   }
 
   isOwner(userId) {
-    return this.configValue("owners").includes(userId);
+    return this.getConfig().owners.includes(userId);
   }
 
   @d.command("bot_full_update")
   async fullUpdateCmd(msg: Message) {
     if (!this.isOwner(msg.author.id)) return;
 
-    const updateCmd = this.configValue("update_cmd");
+    const updateCmd = this.getConfig().update_cmd;
     if (!updateCmd) {
       msg.channel.createMessage(errorMessage("Update command not specified!"));
       return;

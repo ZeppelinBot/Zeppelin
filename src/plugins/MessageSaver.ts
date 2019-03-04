@@ -1,15 +1,21 @@
-import { Plugin, decorators as d } from "knub";
+import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
 
-export class MessageSaverPlugin extends Plugin {
+interface IMessageSaverPluginPermissions {
+  manage: boolean;
+}
+
+export class MessageSaverPlugin extends Plugin<IBasePluginConfig, IMessageSaverPluginPermissions> {
   public static pluginName = "message_saver";
 
   protected savedMessages: GuildSavedMessages;
 
-  getDefaultOptions() {
+  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IMessageSaverPluginPermissions> {
     return {
+      config: {},
+
       permissions: {
         manage: false,
       },
