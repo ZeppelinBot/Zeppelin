@@ -35,18 +35,17 @@ interface IIgnoredEvent {
   userId: string;
 }
 
-enum MessageResult {
+enum MessageResultStatus {
   Ignored = 1,
   Failed,
   DirectMessaged,
   ChannelMessaged,
 }
 
-const MessageResultText = {
-  [MessageResult.Failed]: "failed to message user",
-  [MessageResult.DirectMessaged]: "user messaged in DMs",
-  [MessageResult.ChannelMessaged]: "user messaged with a ping",
-};
+interface IMessageResult {
+  status: MessageResultStatus;
+  text?: string;
+}
 
 interface IModActionsPluginConfig {
   dm_on_warn: boolean;
@@ -399,7 +398,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       config.message_on_warn,
     );
 
-    if (userMessageResult === MessageResult.Failed) {
+    if (userMessageResult.status === MessageResultStatus.Failed) {
       const failedMsg = await msg.channel.createMessage("Failed to message the user. Log the warning anyway?");
       const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
       failedMsg.delete();
@@ -416,8 +415,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
-    let messageResultText = MessageResultText[userMessageResult];
-    if (messageResultText) messageResultText = ` (${messageResultText})`;
+    const messageResultText = userMessageResult.text ? ` (${userMessageResult.text})` : "";
 
     msg.channel.createMessage(
       successMessage(
@@ -455,7 +453,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       mod = args.mod;
     }
 
-    let userMessageResult: MessageResult = MessageResult.Ignored;
+    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
 
     // Convert mute time from e.g. "2h30m" to milliseconds
     const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
@@ -540,8 +538,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       })`;
     }
 
-    const messageResultText = MessageResultText[userMessageResult];
-    if (messageResultText) response += ` (${messageResultText})`;
+    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -675,7 +672,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
-    let userMessageResult: MessageResult = MessageResult.Ignored;
+    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
     if (args.reason) {
       const kickMessage = formatTemplateString(config.kick_message, {
         guildName: this.guild.name,
@@ -708,8 +705,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
-    const messageResultText = MessageResultText[userMessageResult];
-    if (messageResultText) response += ` (${messageResultText})`;
+
+    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -745,7 +742,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
-    let userMessageResult: MessageResult = MessageResult.Ignored;
+    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
     if (reason) {
       const banMessage = formatTemplateString(config.ban_message, {
         guildName: this.guild.name,
@@ -778,8 +775,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
-    const messageResultText = MessageResultText[userMessageResult];
-    if (messageResultText) response += ` (${messageResultText})`;
+
+    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
@@ -1239,16 +1236,19 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     str: string,
     useDM: boolean,
     useChannel: boolean,
-  ): Promise<MessageResult> {
+  ): Promise<IMessageResult> {
     if (!useDM && !useChannel) {
-      return MessageResult.Ignored;
+      return { status: MessageResultStatus.Ignored };
     }
 
     if (useDM) {
       try {
         const dmChannel = await this.bot.getDMChannel(user.id);
         await dmChannel.createMessage(str);
-        return MessageResult.DirectMessaged;
+        return {
+          status: MessageResultStatus.DirectMessaged,
+          text: "user notified with a direct message",
+        };
       } catch (e) {} // tslint:disable-line
     }
 
@@ -1258,10 +1258,16 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       try {
         const channel = this.guild.channels.get(messageChannel) as TextChannel;
         await channel.createMessage(`<@!${user.id}> ${str}`);
-        return MessageResult.ChannelMessaged;
+        return {
+          status: MessageResultStatus.ChannelMessaged,
+          text: `user notified in <#${channel.id}>`,
+        };
       } catch (e) {} // tslint:disable-line
     }
 
-    return MessageResult.Failed;
+    return {
+      status: MessageResultStatus.Failed,
+      text: "failed to message user",
+    };
   }
 }
