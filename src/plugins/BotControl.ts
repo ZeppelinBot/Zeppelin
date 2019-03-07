@@ -1,7 +1,7 @@
 import { decorators as d, GlobalPlugin, IPluginOptions } from "knub";
 import child_process from "child_process";
 import { GuildChannel, Message, TextChannel } from "eris";
-import { createChunkedMessage, errorMessage, noop, sleep, sorter, successMessage } from "../utils";
+import { createChunkedMessage, errorMessage, noop, sorter, successMessage } from "../utils";
 import { ReactionRolesPlugin } from "./ReactionRoles";
 
 let activeReload: [string, string] = null;
@@ -98,7 +98,7 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
     const guilds = this.knub.getLoadedGuilds();
     for (const guild of guilds) {
       if (guild.loadedPlugins.has("reaction_roles")) {
-        const rrPlugin = guild.loadedPlugins.get("reaction_roles") as ReactionRolesPlugin;
+        const rrPlugin = (guild.loadedPlugins.get("reaction_roles") as unknown) as ReactionRolesPlugin;
         rrPlugin.runAutoRefresh().catch(noop);
       }
     }
