@@ -199,6 +199,10 @@ export function trimLines(str: string) {
     .trim();
 }
 
+export function asSingleLine(str: string) {
+  return trimLines(str).replace(/\n/g, " ");
+}
+
 export const emptyEmbedValue = "\u200b";
 export const embedPadding = "\n" + emptyEmbedValue;
 

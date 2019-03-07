@@ -1,5 +1,6 @@
-import { decorators as d, IPluginOptions, Plugin } from "knub";
-import { Channel, Member, User } from "eris";
+import { decorators as d, IPluginOptions } from "knub";
+import { Channel, Member } from "eris";
+import humanizeDuration from "humanize-duration";
 import {
   getEmojiInString,
   getRoleMentions,
@@ -240,8 +241,10 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           const recentActions = this.getRecentActions(type, savedMessage.user_id, savedMessage.channel_id, since);
 
           // Start by muting them, if enabled
+          let timeUntilUnmute;
           if (spamConfig.mute && member) {
             const muteTime = spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000;
+            timeUntilUnmute = humanizeDuration(muteTime);
             this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, savedMessage.user_id);
             this.actions.fire("mute", { member, muteTime, reason: "Automatic spam detection" });
           }
@@ -288,10 +291,14 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
 
           // Create a case and log the actions taken above
           const caseType = spamConfig.mute ? CaseTypes.Mute : CaseTypes.Note;
-          const caseText = trimLines(`
-          Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
-          ${archiveUrl}
-        `);
+          let caseText = trimLines(`
+            Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
+            ${archiveUrl}
+          `);
+
+          if (spamConfig.mute) {
+            caseText = `__[Muted for ${timeUntilUnmute}]__ ${caseText}`;
+          }
 
           this.logs.log(LogType.MESSAGE_SPAM_DETECTED, {
             member: stripObjectToScalars(member, ["user"]),
