@@ -1,7 +1,7 @@
 import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
 import { GuildSelfGrantableRoles } from "../data/GuildSelfGrantableRoles";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
-import { chunkArray, errorMessage, sorter, successMessage } from "../utils";
+import { asSingleLine, chunkArray, errorMessage, sorter, successMessage, trimLines } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 interface ISelfGrantableRolesPluginPermissions {
@@ -62,19 +62,29 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
     const rolesToRemove: Set<Role> = new Set();
 
     // Match given role names with actual grantable roles
-    const roleNames = args.roleNames.map(n => n.split(/[\s,]+/)).flat();
+    const roleNames = new Set(
+      args.roleNames
+        .map(n => n.split(/[\s,]+/))
+        .flat()
+        .map(v => v.toLowerCase()),
+    );
     for (const roleName of roleNames) {
-      const normalized = roleName.toLowerCase();
       let matched = false;
 
       for (const grantableRole of channelGrantableRoles) {
-        if (grantableRole.aliases.includes(normalized)) {
-          if (this.guild.roles.has(grantableRole.role_id)) {
+        let matchedAlias = false;
+
+        for (const alias of grantableRole.aliases) {
+          const normalizedAlias = alias.toLowerCase();
+          if (roleName === normalizedAlias && this.guild.roles.has(grantableRole.role_id)) {
             rolesToRemove.add(this.guild.roles.get(grantableRole.role_id));
             matched = true;
+            matchedAlias = true;
             break;
           }
         }
+
+        if (matchedAlias) break;
       }
 
       if (!matched) {
@@ -122,7 +132,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
 
   @d.command("role", "<roleNames:string...>")
   @d.permission("use")
-  @d.cooldown(2500, "ignore_cooldown")
+  @d.cooldown(1500, "ignore_cooldown")
   async roleCmd(msg: Message, args: { roleNames: string[] }) {
     const lock = await this.locks.acquire(`grantableRoles:${msg.author.id}`);
 
@@ -136,19 +146,30 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
     const rolesToGrant: Set<Role> = new Set();
 
     // Match given role names with actual grantable roles
-    const roleNames = args.roleNames.map(n => n.split(/[\s,]+/)).flat();
+    const roleNames = new Set(
+      args.roleNames
+        .map(n => n.split(/[\s,]+/))
+        .flat()
+        .map(v => v.toLowerCase()),
+    );
+
     for (const roleName of roleNames) {
-      const normalized = roleName.toLowerCase();
       let matched = false;
 
       for (const grantableRole of channelGrantableRoles) {
-        if (grantableRole.aliases.includes(normalized)) {
-          if (this.guild.roles.has(grantableRole.role_id)) {
+        let matchedAlias = false;
+
+        for (const alias of grantableRole.aliases) {
+          const normalizedAlias = alias.toLowerCase();
+          if (roleName === normalizedAlias && this.guild.roles.has(grantableRole.role_id)) {
             rolesToGrant.add(this.guild.roles.get(grantableRole.role_id));
             matched = true;
+            matchedAlias = true;
             break;
           }
         }
+
+        if (matchedAlias) break;
       }
 
       if (!matched) {
@@ -195,6 +216,45 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
     lock.unlock();
   }
 
+  @d.command("role help")
+  @d.command("role")
+  @d.cooldown(5000, "ignore_cooldown")
+  async roleHelpCmd(msg: Message) {
+    const channelGrantableRoles = await this.selfGrantableRoles.getForChannel(msg.channel.id);
+    if (channelGrantableRoles.length === 0) return;
+
+    const prefix = this.guildConfig.prefix;
+    const firstRole = channelGrantableRoles[0].aliases[0];
+    const secondRole = channelGrantableRoles[1] ? channelGrantableRoles[1].aliases[0] : null;
+
+    const help1 = asSingleLine(`
+      To give yourself a role, type e.g. \`${prefix}role ${firstRole}\` where **${firstRole}** is the role you want.
+      ${secondRole ? `You can also add multiple roles at once, e.g. \`${prefix}role ${firstRole} ${secondRole}\`` : ""}
+    `);
+
+    const help2 = asSingleLine(`
+      To remove a role, type \`!role remove ${firstRole}\`,
+      again replacing **${firstRole}** with the role you want to remove.
+    `);
+
+    const helpMessage = trimLines(`
+      ${help1}
+
+      ${help2}
+
+      **Available roles:**
+      ${channelGrantableRoles.map(r => r.aliases[0]).join(", ")}
+    `);
+
+    const helpEmbed = {
+      title: "How to get roles",
+      description: helpMessage,
+      color: parseInt("42bff4", 16),
+    };
+
+    msg.channel.createMessage({ embed: helpEmbed });
+  }
+
   @d.command("self_grantable_roles add", "<channel:channel> <roleId:string> [aliases:string...]")
   @d.permission("manage")
   async addSelfGrantableRoleCmd(msg: Message, args: { channel: GuildChannel; roleId: string; aliases?: string[] }) {
@@ -210,9 +270,8 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
     }
 
     const aliases = (args.aliases || []).map(n => n.split(/[\s,]+/)).flat();
-    aliases.unshift(role.name);
-    const normalizedAliases = aliases.map(a => a.toLowerCase());
-    const uniqueAliases = Array.from(new Set(normalizedAliases).values());
+    aliases.push(role.name.replace(/\s+/g, ""));
+    const uniqueAliases = Array.from(new Set(aliases).values());
 
     // Remove existing self grantable role on that channel, if one exists
     await this.selfGrantableRoles.delete(args.channel.id, role.id);
