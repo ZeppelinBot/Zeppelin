@@ -3,13 +3,12 @@ import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextCha
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
-  chunkMessageLines,
   convertDelayStringToMS,
   createChunkedMessage,
-  disableLinkPreviews,
   errorMessage,
   findRelevantAuditLogEntry,
   formatTemplateString,
+  asSingleLine,
   stripObjectToScalars,
   successMessage,
   trimLines,
@@ -483,23 +482,22 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     let theCase;
 
     if (hasOldCase) {
+      // Update old case
       theCase = await this.cases.find(mute.case_id);
-
-      if (args.reason) {
-        // Update old case
-        await this.actions.fire("createCaseNote", {
-          caseId: mute.case_id,
-          modId: mod.id,
-          note: reason,
-        });
-      }
+      const caseNote = `__[Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}]__ ${reason}`.trim();
+      await this.actions.fire("createCaseNote", {
+        caseId: mute.case_id,
+        modId: mod.id,
+        note: caseNote,
+      });
     } else {
       // Create new case
+      const caseNote = `__[Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}]__ ${reason}`.trim();
       theCase = await this.actions.fire("createCase", {
         userId: args.member.id,
         modId: mod.id,
         type: CaseTypes.Mute,
-        reason,
+        reason: caseNote,
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
       });
       await this.mutes.setCaseId(args.member.id, theCase.id);
@@ -529,13 +527,29 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     // Confirm the action to the moderator
     let response;
     if (muteTime) {
-      response = `Muted **${args.member.user.username}#${
-        args.member.user.discriminator
-      }** for ${timeUntilUnmute} (Case #${theCase.case_number})`;
+      if (hasOldCase) {
+        response = asSingleLine(`
+          Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
+          mute to ${timeUntilUnmute} (Case #${theCase.case_number})
+        `);
+      } else {
+        response = asSingleLine(`
+          Muted **${args.member.user.username}#${args.member.user.discriminator}**
+          for ${timeUntilUnmute} (Case #${theCase.case_number})
+        `);
+      }
     } else {
-      response = `Muted **${args.member.user.username}#${args.member.user.discriminator}** indefinitely (Case #${
-        theCase.case_number
-      })`;
+      if (hasOldCase) {
+        response = asSingleLine(`
+          Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
+          mute to indefinite (Case #${theCase.case_number})
+        `);
+      } else {
+        response = asSingleLine(`
+          Muted **${args.member.user.username}#${args.member.user.discriminator}**
+          indefinitely (Case #${theCase.case_number})
+        `);
+      }
     }
 
     if (userMessageResult.text) response += ` (${userMessageResult.text})`;
@@ -587,6 +601,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
 
     // Convert unmute time from e.g. "2h30m" to milliseconds
     const unmuteTime = args.time ? convertDelayStringToMS(args.time) : null;
+    const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
 
     if (unmuteTime == null && args.time) {
       // Invalid unmuteTime -> assume it's actually part of the reason
@@ -594,19 +609,19 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     }
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+    const caseNote = unmuteTime ? `__[Scheduled unmute in ${timeUntilUnmute}]__ ${reason}` : reason;
 
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
       userId: args.member.id,
       modId: mod.id,
       type: CaseTypes.Unmute,
-      reason,
+      reason: caseNote,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
     if (unmuteTime) {
       // If we have an unmute time, just update the old mute to expire in that time
-      const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
       await this.actions.fire("unmute", { member: args.member, unmuteTime });
 
       // Confirm the action to the moderator
