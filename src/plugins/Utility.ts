@@ -433,7 +433,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
         largest: 2,
         round: true,
       });
-      const roles = member.roles.map(id => this.guild.roles.get(id));
+      const roles = member.roles.map(id => this.guild.roles.get(id)).filter(r => !!r);
 
       embed.fields.push({
         name: "Member information",
