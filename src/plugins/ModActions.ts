@@ -1144,7 +1144,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       const showHidden = args.opts && args.opts.match(/\bhidden\b/);
       const casesToDisplay = showHidden ? cases : normalCases;
 
-      if (args.opts && (args.opts.match(/\bexpand\b/) || args.opts.match(/\be\b/)) {
+      if (args.opts && (args.opts.match(/\bexpand\b/) || args.opts.match(/\be\b/))) {
         if (casesToDisplay.length > 8) {
           msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
           return;
