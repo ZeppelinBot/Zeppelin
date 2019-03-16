@@ -18,8 +18,8 @@ export class GuildSlowmodes extends BaseRepository {
     return this.slowmodeChannels.findOne({
       where: {
         guild_id: this.guildId,
-        channel_id: channelId
-      }
+        channel_id: channelId,
+      },
     });
   }
 
@@ -29,25 +29,25 @@ export class GuildSlowmodes extends BaseRepository {
       await this.slowmodeChannels.update(
         {
           guild_id: this.guildId,
-          channel_id: channelId
+          channel_id: channelId,
         },
         {
-          slowmode_seconds: seconds
-        }
+          slowmode_seconds: seconds,
+        },
       );
     } else {
       await this.slowmodeChannels.insert({
         guild_id: this.guildId,
         channel_id: channelId,
-        slowmode_seconds: seconds
+        slowmode_seconds: seconds,
       });
     }
   }
 
-  async clearChannelSlowmode(channelId): Promise<void> {
+  async deleteChannelSlowmode(channelId): Promise<void> {
     await this.slowmodeChannels.delete({
       guild_id: this.guildId,
-      channel_id: channelId
+      channel_id: channelId,
     });
   }
 
@@ -55,7 +55,7 @@ export class GuildSlowmodes extends BaseRepository {
     return this.slowmodeUsers.findOne({
       guild_id: this.guildId,
       channel_id: channelId,
-      user_id: userId
+      user_id: userId,
     });
   }
 
@@ -77,11 +77,11 @@ export class GuildSlowmodes extends BaseRepository {
         {
           guild_id: this.guildId,
           channel_id: channelId,
-          user_id: userId
+          user_id: userId,
         },
         {
-          expires_at: expiresAt
-        }
+          expires_at: expiresAt,
+        },
       );
     } else {
       // Add new
@@ -89,7 +89,7 @@ export class GuildSlowmodes extends BaseRepository {
         guild_id: this.guildId,
         channel_id: channelId,
         user_id: userId,
-        expires_at: expiresAt
+        expires_at: expiresAt,
       });
     }
   }
@@ -98,7 +98,7 @@ export class GuildSlowmodes extends BaseRepository {
     await this.slowmodeUsers.delete({
       guild_id: this.guildId,
       channel_id: channelId,
-      user_id: userId
+      user_id: userId,
     });
   }
 
@@ -106,8 +106,8 @@ export class GuildSlowmodes extends BaseRepository {
     return this.slowmodeUsers.find({
       where: {
         guild_id: this.guildId,
-        channel_id: channelId
-      }
+        channel_id: channelId,
+      },
     });
   }
 

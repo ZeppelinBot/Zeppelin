@@ -1,24 +1,30 @@
-import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
 import { convertDelayStringToMS, errorMessage, noop, successMessage } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
+interface ISlowmodePluginConfig {
+  use_native_slowmode: boolean;
+}
+
 interface ISlowmodePluginPermissions {
   manage: boolean;
   affected: boolean;
 }
 
-export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodePluginPermissions> {
+export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowmodePluginPermissions> {
   public static pluginName = "slowmode";
 
   protected slowmodes: GuildSlowmodes;
   protected clearInterval;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, ISlowmodePluginPermissions> {
+  getDefaultOptions(): IPluginOptions<ISlowmodePluginConfig, ISlowmodePluginPermissions> {
     return {
-      config: {},
+      config: {
+        use_native_slowmode: true,
+      },
 
       permissions: {
         manage: false,
@@ -47,10 +53,10 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
   }
 
   /**
-   * Applies slowmode to the specified user id on the specified channel.
+   * Applies a bot-maintained slowmode to the specified user id on the specified channel.
    * This sets the channel permissions so the user is unable to send messages there, and saves the slowmode in the db.
    */
-  async applySlowmodeToUserId(channel: GuildChannel & TextChannel, userId: string) {
+  async applyBotSlowmodeToUserId(channel: GuildChannel & TextChannel, userId: string) {
     // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
     const existingOverride = channel.permissionOverwrites.get(userId);
     const newDeniedPermissions =
@@ -63,10 +69,10 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
   }
 
   /**
-   * Removes slowmode from the specified user id on the specified channel.
+   * Clears bot-maintained slowmode from the specified user id on the specified channel.
    * This reverts the channel permissions changed above and clears the database entry.
    */
-  async removeSlowmodeFromUserId(channel: GuildChannel & TextChannel, userId: string) {
+  async clearBotSlowmodeFromUserId(channel: GuildChannel & TextChannel, userId: string) {
     // We only need to tweak permissions if there is an existing permission override
     // In most cases there should be, since one is created in applySlowmodeToUserId()
     const existingOverride = channel.permissionOverwrites.get(userId);
@@ -85,39 +91,61 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
   }
 
   /**
-   * COMMAND: Disable slowmode on the specified channel. This also removes any currently applied slowmodes on the channel.
+   * Disable slowmode on the specified channel. Clears any existing slowmode perms.
    */
-  @d.command("slowmode disable", "<channel:channel>")
-  @d.permission("manage")
-  async disableSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
-    const slowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
-    if (!slowmode) {
-      msg.channel.createMessage(errorMessage("Channel is not on slowmode!"));
-      return;
-    }
-
+  async disableBotSlowmodeForChannel(channel: GuildChannel & TextChannel) {
     // Disable channel slowmode
-    const initMsg = await msg.channel.createMessage("Disabling slowmode...");
-    await this.slowmodes.clearChannelSlowmode(args.channel.id);
+    await this.slowmodes.deleteChannelSlowmode(channel.id);
 
     // Remove currently applied slowmodes
-    const users = await this.slowmodes.getChannelSlowmodeUsers(args.channel.id);
+    const users = await this.slowmodes.getChannelSlowmodeUsers(channel.id);
     const failedUsers = [];
 
     for (const slowmodeUser of users) {
       try {
-        await this.removeSlowmodeFromUserId(args.channel, slowmodeUser.user_id);
+        await this.clearBotSlowmodeFromUserId(channel, slowmodeUser.user_id);
       } catch (e) {
         // Removing the slowmode failed. Record this so the permissions can be changed manually, and remove the database entry.
         failedUsers.push(slowmodeUser.user_id);
-        await this.slowmodes.clearSlowmodeUser(args.channel.id, slowmodeUser.user_id);
+        await this.slowmodes.clearSlowmodeUser(channel.id, slowmodeUser.user_id);
       }
+    }
+
+    return { failedUsers };
+  }
+
+  /**
+   * COMMAND: Disable slowmode on the specified channel
+   */
+  @d.command("slowmode disable", "<channel:channel>")
+  @d.permission("manage")
+  async disableSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
+    const botSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
+    const hasNativeSlowmode = args.channel.rateLimitPerUser;
+
+    if (!botSlowmode && hasNativeSlowmode === 0) {
+      msg.channel.createMessage(errorMessage("Channel is not on slowmode!"));
+      return;
+    }
+
+    const initMsg = await msg.channel.createMessage("Disabling slowmode...");
+
+    // Disable bot-maintained slowmode
+    let failedUsers = [];
+    if (botSlowmode) {
+      const result = await this.disableBotSlowmodeForChannel(args.channel);
+      failedUsers = result.failedUsers;
+    }
+
+    // Disable native slowmode
+    if (hasNativeSlowmode) {
+      await args.channel.edit({ rateLimitPerUser: 0 });
     }
 
     if (failedUsers.length) {
       msg.channel.createMessage(
         successMessage(
-          `Slowmode disabled! Failed to remove slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
+          `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
         ),
       );
     } else {
@@ -138,7 +166,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
       return;
     }
 
-    await this.removeSlowmodeFromUserId(args.channel, args.user.id);
+    await this.clearBotSlowmodeFromUserId(args.channel, args.user.id);
     msg.channel.createMessage(
       successMessage(
         `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
@@ -147,7 +175,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
   }
 
   /**
-   * COMMAND: Enable slowmode on the specified channel
+   * COMMAND: Set slowmode for the specified channel
    */
   @d.command("slowmode", "<channel:channel> <time:string>")
   @d.command("slowmode", "<time:string>")
@@ -161,16 +189,43 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
     }
 
     const seconds = Math.ceil(convertDelayStringToMS(args.time) / 1000);
-    await this.slowmodes.setChannelSlowmode(channel.id, seconds);
+    const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= 120;
+
+    if (useNativeSlowmode) {
+      // Native slowmode
+
+      // If there is an existing bot-maintained slowmode, disable that first
+      const existingBotSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
+      if (existingBotSlowmode) {
+        await this.disableBotSlowmodeForChannel(channel);
+      }
+
+      // Set slowmode
+      channel.edit({
+        rateLimitPerUser: seconds,
+      });
+    } else {
+      // Bot-maintained slowmode
+
+      // If there is an existing native slowmode, disable that first
+      if (channel.rateLimitPerUser) {
+        await channel.edit({
+          rateLimitPerUser: 0,
+        });
+      }
+
+      await this.slowmodes.setChannelSlowmode(channel.id, seconds);
+    }
 
     const humanizedSlowmodeTime = humanizeDuration(seconds * 1000);
+    const slowmodeType = useNativeSlowmode ? "native slowmode" : "bot-maintained slowmode";
     msg.channel.createMessage(
-      successMessage(`Slowmode enabled for <#${channel.id}> (1 message in ${humanizedSlowmodeTime})`),
+      successMessage(`Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`),
     );
   }
 
   /**
-   * EVENT: On every new message, check if the channel has slowmode. If it does, apply slowmode to the user.
+   * EVENT: On every message, check if the channel has a bot-maintained slowmode. If it does, apply slowmode to the user.
    * If the user already had slowmode but was still able to send a message (e.g. sending a lot of messages at once),
    * remove the messages sent after slowmode was applied.
    */
@@ -188,11 +243,11 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
       return;
     }
 
-    await this.applySlowmodeToUserId(msg.channel as GuildChannel & TextChannel, msg.author.id);
+    await this.applyBotSlowmodeToUserId(msg.channel as GuildChannel & TextChannel, msg.author.id);
   }
 
   /**
-   * Clears all expired slowmodes in this guild
+   * Clears all expired bot-maintained user slowmodes in this guild
    */
   async clearExpiredSlowmodes() {
     const expiredSlowmodeUsers = await this.slowmodes.getExpiredSlowmodeUsers();
@@ -203,7 +258,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<IBasePluginConfig, ISlowmodeP
         continue;
       }
 
-      await this.removeSlowmodeFromUserId(channel as GuildChannel & TextChannel, user.user_id);
+      await this.clearBotSlowmodeFromUserId(channel as GuildChannel & TextChannel, user.user_id);
     }
   }
 }
