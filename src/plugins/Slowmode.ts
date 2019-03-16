@@ -1,9 +1,11 @@
 import { decorators as d, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
-import { convertDelayStringToMS, errorMessage, noop, successMessage } from "../utils";
+import { convertDelayStringToMS, createChunkedMessage, errorMessage, noop, successMessage } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { SavedMessage } from "../data/entities/SavedMessage";
+import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
@@ -18,7 +20,10 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
   public static pluginName = "slowmode";
 
   protected slowmodes: GuildSlowmodes;
+  protected savedMessages: GuildSavedMessages;
   protected clearInterval;
+
+  private onMessageCreateFn;
 
   getDefaultOptions(): IPluginOptions<ISlowmodePluginConfig, ISlowmodePluginPermissions> {
     return {
@@ -45,11 +50,16 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
 
   onLoad() {
     this.slowmodes = GuildSlowmodes.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
     this.clearInterval = setInterval(() => this.clearExpiredSlowmodes(), 2000);
+
+    this.onMessageCreateFn = this.onMessageCreate.bind(this);
+    this.savedMessages.events.on("create", this.onMessageCreateFn);
   }
 
   onUnload() {
     clearInterval(this.clearInterval);
+    this.savedMessages.events.off("create", this.onMessageCreateFn);
   }
 
   /**
@@ -174,6 +184,44 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
     );
   }
 
+  @d.command("slowmode list")
+  @d.permission("manage")
+  async slowmodeListCmd(msg: Message) {
+    const channels = this.guild.channels;
+    const slowmodes: Array<{ channel: GuildChannel; seconds: number; native: boolean }> = [];
+
+    for (const channel of channels.values()) {
+      if (!(channel instanceof TextChannel)) continue;
+
+      // Bot slowmode
+      const botSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
+      if (botSlowmode) {
+        slowmodes.push({ channel, seconds: botSlowmode.slowmode_seconds, native: false });
+        continue;
+      }
+
+      // Native slowmode
+      if (channel.rateLimitPerUser) {
+        slowmodes.push({ channel, seconds: channel.rateLimitPerUser, native: true });
+        continue;
+      }
+    }
+
+    if (slowmodes.length) {
+      const lines = slowmodes.map(slowmode => {
+        const humanized = humanizeDuration(slowmode.seconds * 1000);
+
+        const type = slowmode.native ? "native slowmode" : "bot slowmode";
+
+        return `<#${slowmode.channel.id}> **${humanized}** ${type}`;
+      });
+
+      createChunkedMessage(msg.channel, lines.join("\n"));
+    } else {
+      msg.channel.createMessage(errorMessage("No active slowmodes!"));
+    }
+  }
+
   /**
    * COMMAND: Set slowmode for the specified channel
    */
@@ -229,21 +277,39 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
    * If the user already had slowmode but was still able to send a message (e.g. sending a lot of messages at once),
    * remove the messages sent after slowmode was applied.
    */
-  @d.event("messageCreate")
-  @d.permission("affected")
-  async onMessageCreate(msg: Message) {
-    if (msg.author.bot) return;
+  async onMessageCreate(msg: SavedMessage) {
+    if (msg.is_bot) return;
 
-    const channelSlowmode = await this.slowmodes.getChannelSlowmode(msg.channel.id);
-    if (!channelSlowmode) return;
+    const channel = this.guild.channels.get(msg.channel_id) as GuildChannel & TextChannel;
+    if (!channel) return;
 
-    const userHasSlowmode = await this.slowmodes.userHasSlowmode(msg.channel.id, msg.author.id);
+    // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
+    const thisMsgLock = await this.locks.acquire(`message-${msg.id}`);
+    if (thisMsgLock.interrupted) return;
+
+    // Make sure this user is affected by the slowmode
+    const member = this.guild.members.get(msg.user_id);
+    const isAffected = this.hasPermission("affected", { channelId: channel.id, userId: msg.user_id, member });
+    if (!isAffected) return thisMsgLock.unlock();
+
+    // Check if this channel even *has* a bot-maintained slowmode
+    const channelSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
+    if (!channelSlowmode) return thisMsgLock.unlock();
+
+    // Delete any extra messages sent after a slowmode was already applied
+    const userHasSlowmode = await this.slowmodes.userHasSlowmode(channel.id, msg.user_id);
     if (userHasSlowmode) {
-      msg.delete();
-      return;
+      const message = await channel.getMessage(msg.id);
+      if (message) {
+        message.delete();
+        return thisMsgLock.interrupt();
+      }
+
+      return thisMsgLock.unlock();
     }
 
-    await this.applyBotSlowmodeToUserId(msg.channel as GuildChannel & TextChannel, msg.author.id);
+    await this.applyBotSlowmodeToUserId(channel, msg.user_id);
+    thisMsgLock.unlock();
   }
 
   /**
