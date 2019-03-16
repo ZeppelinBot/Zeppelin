@@ -174,6 +174,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
       formatted = await renderTemplate(format, {
         ...data,
         userMention: user => {
+          if (!user) return "";
           if (user.user) user = user.user;
 
           const member = this.guild.members.get(user.id);
@@ -186,6 +187,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
           }
         },
         channelMention: channel => {
+          if (!channel) return "";
           return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
         },
       });
