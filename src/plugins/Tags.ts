@@ -1,4 +1,4 @@
-import { decorators as d, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions, logger } from "knub";
 import { Message, TextChannel } from "eris";
 import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
@@ -195,10 +195,19 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     const tagArgs = this.commands.parseArguments(variableStr).map(v => v.value);
 
     // Format the string
-    body = await renderTemplate(body, {
-      args: tagArgs,
-      ...this.tagFunctions,
-    });
+    try {
+      body = await renderTemplate(body, {
+        args: tagArgs,
+        ...this.tagFunctions,
+      });
+    } catch (e) {
+      if (e instanceof TemplateParseError) {
+        logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tag.body}`);
+        return;
+      } else {
+        throw e;
+      }
+    }
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
     const responseMsg = await channel.createMessage(body);
