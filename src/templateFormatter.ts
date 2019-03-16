@@ -348,6 +348,10 @@ const baseValues = {
     mod = parseInt(mod, 10) - 1;
     return cases[Math.max(0, mod % cases.length)];
   },
+  choose(...cases) {
+    const mod = Math.floor(Math.random() * cases.length) + 1;
+    return baseValues.cases(mod, ...cases);
+  },
 };
 
 export async function renderTemplate(template: string, values = {}, includeBaseValues = true) {
