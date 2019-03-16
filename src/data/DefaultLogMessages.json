@@ -41,7 +41,7 @@
 
   "MESSAGE_SPAM_DETECTED": "🛑 <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) spam detected in <#{channel.id}> (**#{channel.name}**, `{channel.id}`): {description} (more than {limit} in {interval}s)\n{archiveUrl}",
   "OTHER_SPAM_DETECTED": "🛑 <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) spam detected: {description} (more than {limit} in {interval}s)",
-  "CENSOR": "🛑 <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) censored message in <#{channel.id}> (**#{channel.name}**, `{channel.id}`): {reason}:\n```{messageText}```",
+  "CENSOR": "🛑 Censored message from <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) in <#{channel.id}> (**#{channel.name}**, `{channel.id}`): {reason}:\n```{messageText}```",
   "CLEAN": "🚿 **{mod.username}#{mod.discriminator}** (`{mod.id}`) cleaned **{count}** message(s) in <#{channel.id}> (**#{channel.name}**, `{channel.id}`)\n{archiveUrl}",
 
   "CASE_CREATE": "✏ **{mod.username}#{mod.discriminator}** (`{mod.id}`) manually created new **{caseType}** case (#{caseNum})",
