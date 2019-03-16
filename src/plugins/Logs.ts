@@ -1,4 +1,4 @@
-import { decorators as d, IPluginOptions, Plugin } from "knub";
+import { decorators as d, IPluginOptions, logger, Plugin } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
@@ -22,7 +22,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { renderTemplate } from "../templateFormatter";
+import { renderTemplate, TemplateParseError } from "../templateFormatter";
 
 interface ILogChannel {
   include?: string[];
@@ -169,7 +169,34 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
     const format = config.format[LogType[type]] || "";
     if (format === "") return;
 
-    const formatted = await renderTemplate(format, data);
+    let formatted;
+    try {
+      formatted = await renderTemplate(format, {
+        ...data,
+        userMention: user => {
+          if (user.user) user = user.user;
+
+          const member = this.guild.members.get(user.id);
+          if (this.hasPermission("pinged", { member, userId: user.id })) {
+            // Ping/mention the user
+            return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
+          } else {
+            // No ping/mention
+            return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
+          }
+        },
+        channelMention: channel => {
+          return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+        },
+      });
+    } catch (e) {
+      if (e instanceof TemplateParseError) {
+        logger.error(`Error when parsing template:\nError: ${e.message}\nTemplate: ${format}`);
+        return;
+      } else {
+        throw e;
+      }
+    }
 
     const timestampFormat = config.format.timestamp;
     if (timestampFormat) {

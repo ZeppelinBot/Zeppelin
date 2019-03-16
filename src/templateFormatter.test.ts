@@ -94,3 +94,8 @@ test("Supports base values in renderTemplate", async () => {
   const result = await renderTemplate('{if("", "+", "-")} {if(1, "+", "-")}');
   expect(result).toBe("- +");
 });
+
+test("Edge case #1", async () => {
+  const result = await renderTemplate("{foo} {bar()}");
+  // No "Unclosed function" exception = success
+});
