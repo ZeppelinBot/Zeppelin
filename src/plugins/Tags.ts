@@ -8,6 +8,8 @@ import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate } from "../templateFormatter";
+import { escapeBacktickString } from "jest-snapshot/build/utils";
+import { GuildArchives } from "../data/GuildArchives";
 
 const TAG_FUNCTIONS = {
   countdown(toDate) {
@@ -33,6 +35,7 @@ interface ITagsPluginPermissions {
 export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPermissions> {
   public static pluginName = "tags";
 
+  protected archives: GuildArchives;
   protected tags: GuildTags;
   protected savedMessages: GuildSavedMessages;
 
@@ -65,6 +68,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
   }
 
   onLoad() {
+    this.archives = GuildArchives.getInstance(this.guildId);
     this.tags = GuildTags.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
 
@@ -118,6 +122,20 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
     const prefix = this.getConfig().prefix;
     msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
+  }
+
+  @d.command("tag", "<tag:string>")
+  async tagSourceCmd(msg: Message, args: { tag: string }) {
+    const tag = await this.tags.find(args.tag);
+    if (!tag) {
+      msg.channel.createMessage(errorMessage("No tag with that name"));
+      return;
+    }
+
+    const archiveId = await this.archives.create(tag.body, moment().add(10, "minutes"));
+    const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+    msg.channel.createMessage(`Tag source:\n${url}`);
   }
 
   async onMessageCreate(msg: SavedMessage) {
