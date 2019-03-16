@@ -342,6 +342,12 @@ const baseValues = {
       return result / parseFloat(arg);
     }, args[0]);
   },
+  cases(mod, ...cases) {
+    if (cases.length === 0) return "";
+    if (isNaN(mod)) return "";
+    mod = parseInt(mod, 10) - 1;
+    return cases[Math.max(0, mod % cases.length)];
+  },
 };
 
 export async function renderTemplate(template: string, values = {}, includeBaseValues = true) {

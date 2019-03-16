@@ -196,9 +196,17 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
     // Format the string
     try {
+      const dynamicVars = {};
       body = await renderTemplate(body, {
         args: tagArgs,
         ...this.tagFunctions,
+        set(name, val) {
+          if (typeof name !== "string") return;
+          dynamicVars[name] = val;
+        },
+        get(name) {
+          return dynamicVars[name] == null ? "" : dynamicVars[name];
+        },
       });
     } catch (e) {
       if (e instanceof TemplateParseError) {
