@@ -1,4 +1,4 @@
-import { decorators as d, IPluginOptions, waitForReaction, waitForReply } from "knub";
+import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
@@ -1259,6 +1259,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       try {
         const dmChannel = await this.bot.getDMChannel(user.id);
         await dmChannel.createMessage(str);
+        logger.info(`Sent DM to ${user.id}: ${str}`);
         return {
           status: MessageResultStatus.DirectMessaged,
           text: "user notified with a direct message",
