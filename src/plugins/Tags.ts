@@ -137,6 +137,13 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     msg.channel.createMessage(successMessage("Tag deleted!"));
   }
 
+  @d.command("tag eval", "<body:string$>")
+  @d.permission("create")
+  async evalTagCmd(msg: Message, args: { body: string }) {
+    const rendered = await this.renderTag(args.body);
+    msg.channel.createMessage(rendered);
+  }
+
   @d.command("tag", "<tag:string> <body:string$>")
   @d.permission("create")
   async tagCmd(msg: Message, args: { tag: string; body: string }) {
@@ -171,6 +178,34 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     msg.channel.createMessage(`Tag source:\n${url}`);
   }
 
+  async renderTag(body, args = []) {
+    const dynamicVars = {};
+    const maxTagFnCalls = 25;
+    let tagFnCalls = 0;
+
+    const data = {
+      args,
+      ...this.tagFunctions,
+      set(name, val) {
+        if (typeof name !== "string") return;
+        dynamicVars[name] = val;
+      },
+      get(name) {
+        return dynamicVars[name] == null ? "" : dynamicVars[name];
+      },
+      tag: async (name, ...subTagArgs) => {
+        if (tagFnCalls++ > maxTagFnCalls) return "\\_recursion\\_";
+        if (typeof name !== "string") return "";
+        if (name === "") return "";
+        const subTag = await this.tags.find(name);
+        if (!subTag) return "";
+        return renderTemplate(subTag.body, { ...data, args: subTagArgs });
+      },
+    };
+
+    return renderTemplate(body, data);
+  }
+
   async onMessageCreate(msg: SavedMessage) {
     const member = this.guild.members.get(msg.user_id);
     if (!this.hasPermission("use", { member, channelId: msg.channel_id })) return;
@@ -196,31 +231,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
     // Format the string
     try {
-      const dynamicVars = {};
-      const maxTagFnCalls = 25;
-      let tagFnCalls = 0;
-
-      const data = {
-        args: tagArgs,
-        ...this.tagFunctions,
-        set(name, val) {
-          if (typeof name !== "string") return;
-          dynamicVars[name] = val;
-        },
-        get(name) {
-          return dynamicVars[name] == null ? "" : dynamicVars[name];
-        },
-        tag: async (name, ...args) => {
-          if (tagFnCalls++ > maxTagFnCalls) return "\\_recursion\\_";
-          if (typeof name !== "string") return "";
-          if (name === "") return "";
-          const subTag = await this.tags.find(name);
-          if (!subTag) return "";
-          return renderTemplate(subTag.body, { ...data, args });
-        },
-      };
-
-      body = await renderTemplate(body, data);
+      body = await this.renderTag(body, tagArgs);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tag.body}`);
