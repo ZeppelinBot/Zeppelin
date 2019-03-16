@@ -3,7 +3,7 @@ import at from "lodash.at";
 const TEMPLATE_CACHE_SIZE = 100;
 const templateCache: Map<string, ParsedTemplate> = new Map();
 
-class TemplateParseError extends Error {}
+export class TemplateParseError extends Error {}
 
 interface ITemplateVar {
   identifier: string;
@@ -196,7 +196,6 @@ export function parseTemplate(str: string): ParsedTemplate {
         }
 
         const newVar = newTemplateVar();
-        if (currentVar) newVar._parent = currentVar;
         currentVar = newVar;
         rootVar = newVar;
         inVar = true;
