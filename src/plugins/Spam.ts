@@ -441,10 +441,10 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
       );
     }
 
-    const maxEmoji = config.max_emojis;
-    if (maxEmoji && savedMessage.data.content) {
+    const maxEmojis = config.max_emojis;
+    if (maxEmojis && savedMessage.data.content) {
       const emojiCount = getEmojiInString(savedMessage.data.content).length;
-      this.logAndDetectMessageSpam(savedMessage, RecentActionType.Emoji, maxEmoji, emojiCount, "too many emoji");
+      this.logAndDetectMessageSpam(savedMessage, RecentActionType.Emoji, maxEmojis, emojiCount, "too many emoji");
     }
 
     const maxNewlines = config.max_newlines;
