@@ -59,7 +59,7 @@ export function parseTemplate(str: string): ParsedTemplate {
   const dumpArg = () => {
     if (!currentVar) return;
 
-    if (currentVar._state.currentArg !== null && currentVar._state.currentArg !== "") {
+    if (currentVar._state.currentArgType) {
       if (currentVar._state.currentArgType === "number") {
         if (isNaN(currentVar._state.currentArg as any)) {
           throw new TemplateParseError(`Invalid numeric argument: ${currentVar._state.currentArg}`);
@@ -271,6 +271,9 @@ const baseValues = {
   },
   not(arg) {
     return !arg;
+  },
+  concat(...args) {
+    return [...args].join("");
   },
 };
 

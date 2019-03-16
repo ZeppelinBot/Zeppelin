@@ -99,3 +99,13 @@ test("Edge case #1", async () => {
   const result = await renderTemplate("{foo} {bar()}");
   // No "Unclosed function" exception = success
 });
+
+test("Parses empty string args as empty strings", async () => {
+  const result = parseTemplate('{foo("")}');
+  expect(result).toEqual([
+    {
+      identifier: "foo",
+      args: [""],
+    },
+  ]);
+});
