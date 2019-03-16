@@ -197,7 +197,10 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     // Format the string
     try {
       const dynamicVars = {};
-      body = await renderTemplate(body, {
+      const maxTagFnCalls = 25;
+      let tagFnCalls = 0;
+
+      const data = {
         args: tagArgs,
         ...this.tagFunctions,
         set(name, val) {
@@ -207,7 +210,17 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
         get(name) {
           return dynamicVars[name] == null ? "" : dynamicVars[name];
         },
-      });
+        tag: async (name, ...args) => {
+          if (tagFnCalls++ > maxTagFnCalls) return "\\_recursion\\_";
+          if (typeof name !== "string") return "";
+          if (name === "") return "";
+          const subTag = await this.tags.find(name);
+          if (!subTag) return "";
+          return renderTemplate(subTag.body, { ...data, args });
+        },
+      };
+
+      body = await renderTemplate(body, data);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tag.body}`);
@@ -218,6 +231,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     }
 
     if (body.trim() === "") return;
+    if (body.length > 2048) return;
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
     const responseMsg = await channel.createMessage(body);
