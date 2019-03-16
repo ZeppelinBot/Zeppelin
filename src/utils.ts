@@ -1,4 +1,3 @@
-import at from "lodash.at";
 import { Emoji, Guild, GuildAuditLogEntry, TextableChannel } from "eris";
 import url from "url";
 import tlds from "tlds";
@@ -76,14 +75,6 @@ export function stripObjectToScalars(obj, includedNested: string[] = []) {
   }
 
   return result;
-}
-
-const stringFormatRegex = /{([^{}]+?)}/g;
-export function formatTemplateString(str: string, values) {
-  return str.replace(stringFormatRegex, (match, prop) => {
-    const value = at(values, prop)[0];
-    return typeof value === "string" || typeof value === "number" ? String(value) : "";
-  });
 }
 
 export const snowflakeRegex = /[1-9][0-9]{5,19}/;
