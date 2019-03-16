@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest src",
     "start-dev": "ts-node src/index.ts",
     "start-watch": "nodemon",
     "precommit": "lint-staged",
@@ -51,9 +51,15 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.11",
     "@types/node": "^10.12.0",
     "@types/tmp": "0.0.33",
+    "babel-jest": "^24.5.0",
     "husky": "^0.14.3",
+    "jest": "^24.5.0",
     "lint-staged": "^7.2.0",
     "nodemon": "^1.17.5",
     "prettier": "^1.16.4",
