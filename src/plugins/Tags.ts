@@ -7,6 +7,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { renderTemplate } from "../templateFormatter";
 
 const TAG_FUNCTIONS = {
   countdown(toDate) {
@@ -140,20 +141,12 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
     // Substitute variables (matched with Knub's argument parser -> supports quotes etc.)
     const variableStr = msg.data.content.slice(prefix.length + tagName.length).trim();
-    const variableValues = this.commands.parseArguments(variableStr).map(v => v.value);
-    let variableIndex = 0;
-    body = body.replace(/(?<!\\)%[a-zA-Z]+/g, () => variableValues[variableIndex++] || "");
+    const tagArgs = this.commands.parseArguments(variableStr).map(v => v.value);
 
-    // Run functions
-    body = body.replace(/(?<!\\)\{([a-zA-Z]+)(?::?(.*?))?\}/, (_, fn, args) => {
-      if (!TAG_FUNCTIONS[fn]) return "";
-      const fnArgs = args ? args.split(/(?<!\\):/) : [];
-
-      try {
-        return TAG_FUNCTIONS[fn].apply(null, fnArgs);
-      } catch (e) {
-        return "";
-      }
+    // Format the string
+    body = await renderTemplate(body, {
+      args: tagArgs,
+      ...TAG_FUNCTIONS,
     });
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
