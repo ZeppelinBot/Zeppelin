@@ -8,7 +8,6 @@ import {
   disableCodeBlocks,
   disableLinkPreviews,
   findRelevantAuditLogEntry,
-  formatTemplateString,
   noop,
   stripObjectToScalars,
   useMediaUrls,
@@ -23,6 +22,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { renderTemplate } from "../templateFormatter";
 
 interface ILogChannel {
   include?: string[];
@@ -58,7 +58,11 @@ interface ILogsPluginConfig {
   };
 }
 
-export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
+interface ILogsPluginPermissions {
+  pinged: boolean;
+}
+
+export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPermissions> {
   public static pluginName = "logs";
 
   protected guildLogs: GuildLogs;
@@ -74,7 +78,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   private onMessageDeleteBulkFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions(): IPluginOptions<ILogsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<ILogsPluginConfig, ILogsPluginPermissions> {
     return {
       config: {
         channels: {},
@@ -84,7 +88,18 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         },
       },
 
-      permissions: {},
+      permissions: {
+        pinged: true,
+      },
+
+      overrides: [
+        {
+          level: ">=50",
+          permissions: {
+            pinged: false,
+          },
+        },
+      ],
     };
   }
 
@@ -126,7 +141,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       if (!channel || !(channel instanceof TextChannel)) continue;
 
       if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
-        const message = this.getLogMessage(type, data);
+        const message = await this.getLogMessage(type, data);
         if (message) {
           if (opts.batched) {
             // If we're batching log messages, gather all log messages within the set batch_time into a single message
@@ -149,12 +164,12 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     }
   }
 
-  getLogMessage(type, data): string {
+  async getLogMessage(type, data): Promise<string> {
     const config = this.getConfig();
     const format = config.format[LogType[type]] || "";
     if (format === "") return;
 
-    const formatted = formatTemplateString(format, data);
+    const formatted = await renderTemplate(format, data);
 
     const timestampFormat = config.format.timestamp;
     if (timestampFormat) {

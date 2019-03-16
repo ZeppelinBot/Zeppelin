@@ -7,7 +7,6 @@ import {
   createChunkedMessage,
   errorMessage,
   findRelevantAuditLogEntry,
-  formatTemplateString,
   asSingleLine,
   stripObjectToScalars,
   successMessage,
@@ -17,11 +16,11 @@ import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import Timer = NodeJS.Timer;
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 import { Case } from "../data/entities/Case";
 import { Mute } from "../data/entities/Mute";
+import { renderTemplate } from "../templateFormatter";
 
 enum IgnoredEventType {
   Ban = 1,
@@ -510,7 +509,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     if (reason && !hasOldCase) {
       const template = muteTime ? config.timed_mute_message : config.mute_message;
 
-      const muteMessage = formatTemplateString(template, {
+      const muteMessage = await renderTemplate(template, {
         guildName: this.guild.name,
         reason,
         time: timeUntilUnmute,
@@ -689,7 +688,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
     let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
     if (args.reason) {
-      const kickMessage = formatTemplateString(config.kick_message, {
+      const kickMessage = await renderTemplate(config.kick_message, {
         guildName: this.guild.name,
         reason,
       });
@@ -759,7 +758,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     // Attempt to message the user *before* banning them, as doing it after may not be possible
     let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
     if (reason) {
-      const banMessage = formatTemplateString(config.ban_message, {
+      const banMessage = await renderTemplate(config.ban_message, {
         guildName: this.guild.name,
         reason,
       });
