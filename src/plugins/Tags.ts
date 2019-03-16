@@ -209,6 +209,8 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
       }
     }
 
+    if (body.trim() === "") return;
+
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
     const responseMsg = await channel.createMessage(body);
 
