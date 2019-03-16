@@ -28,7 +28,7 @@
   "ROLE_EDIT": "🖊 Role **{role.name}** (`{role.id}`) was edited",
 
   "MESSAGE_EDIT": "✏ <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) edited their message in <#{channel.id}> (**#{channel.name}**, `{channel.id}`):\nBefore:```{before}```After:```{after}```",
-  "MESSAGE_DELETE": "🗑 Message from **{member.user.username}#{member.user.discriminator}** (`{member.id}`) deleted in <#{channel.id}> (**#{channel.name}**, `{channel.id}`) (originally posted at **{messageDate}**):\n```{messageText}```{attachments}",
+  "MESSAGE_DELETE": "🗑 Message from <@!{member.id}> (**{member.user.username}#{member.user.discriminator}**, `{member.id}`) deleted in <#{channel.id}> (**#{channel.name}**, `{channel.id}`) (originally posted at **{messageDate}**):\n```{messageText}```{attachments}",
   "MESSAGE_DELETE_BULK": "🗑 **{count}** messages deleted in <#{channel.id}> (**#{channel.name}**, `{channel.id}`) ({archiveUrl})",
   "MESSAGE_DELETE_BARE": "🗑 Message (`{messageId}`) deleted in <#{channel.id}> (**#{channel.name}**, `{channel.id}`) (no more info available)",
 
