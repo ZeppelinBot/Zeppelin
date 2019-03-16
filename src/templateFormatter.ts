@@ -133,7 +133,7 @@ export function parseTemplate(str: string): ParsedTemplate {
 
             currentVar._state.currentArgType = "string";
             currentVar._state.inQuote = true;
-          } else if (char.match(/\d/)) {
+          } else if (char.match(/(\d|-)/)) {
             // A number can start a string argument, but only if we haven't committed to some other type of argument already
             if (currentVar._state.currentArgType !== null) {
               throw new TemplateParseError(`Unexpected char ${char} at ${i}`);
@@ -273,6 +273,74 @@ const baseValues = {
   },
   concat(...args) {
     return [...args].join("");
+  },
+  eq(...args) {
+    if (args.length < 2) return true;
+    for (let i = 1; i < args.length; i++) {
+      if (args[i] !== args[i - 1]) return false;
+    }
+    return true;
+  },
+  gt(arg1, arg2) {
+    return arg1 > arg2;
+  },
+  gte(arg1, arg2) {
+    return arg1 >= arg2;
+  },
+  lt(arg1, arg2) {
+    return arg1 < arg2;
+  },
+  lte(arg1, arg2) {
+    return arg1 <= arg2;
+  },
+  slice(arg1, start, end) {
+    if (typeof arg1 !== "string") return "";
+    if (isNaN(start)) return "";
+    if (end != null && isNaN(end)) return "";
+    return arg1.slice(parseInt(start, 10), end && parseInt(end, 10));
+  },
+  rand(from, to) {
+    if (isNaN(from)) return 0;
+
+    if (to == null) {
+      to = from;
+      from = 1;
+    }
+
+    if (isNaN(to)) return 0;
+
+    if (to > from) {
+      [from, to] = [to, from];
+    }
+
+    return Math.round(Math.random() * (to - from) + from);
+  },
+  add(...args) {
+    return args.reduce((result, arg) => {
+      if (isNaN(arg)) return result;
+      return result + parseFloat(arg);
+    }, 0);
+  },
+  sub(...args) {
+    if (args.length === 0) return 0;
+    return args.slice(1).reduce((result, arg) => {
+      if (isNaN(arg)) return result;
+      return result - parseFloat(arg);
+    }, args[0]);
+  },
+  mul(...args) {
+    if (args.length === 0) return 0;
+    return args.slice(1).reduce((result, arg) => {
+      if (isNaN(arg)) return result;
+      return result * parseFloat(arg);
+    }, args[0]);
+  },
+  div(...args) {
+    if (args.length === 0) return 0;
+    return args.slice(1).reduce((result, arg) => {
+      if (isNaN(arg) || parseFloat(arg) === 0) return result;
+      return result / parseFloat(arg);
+    }, args[0]);
   },
 };
 
