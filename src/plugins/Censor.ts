@@ -115,8 +115,12 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
     });
   }
 
-  async applyFiltersToMsg(savedMessage: SavedMessage) {
-    if (!savedMessage.data.content) return;
+  /**
+   * Applies word censor filters to the message, if any apply.
+   * @return {boolean} Indicates whether the message was removed
+   */
+  async applyFiltersToMsg(savedMessage: SavedMessage): Promise<boolean> {
+    if (!savedMessage.data.content) return false;
 
     const config = this.getConfigForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id);
 
@@ -126,7 +130,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       const result = ZalgoRegex.exec(savedMessage.data.content);
       if (result) {
         this.censorMessage(savedMessage, "zalgo detected");
-        return;
+        return true;
       }
     }
 
@@ -148,7 +152,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       for (const invite of invites) {
         if (!invite.guild && !allowGroupDMInvites) {
           this.censorMessage(savedMessage, `group dm invites are not allowed`);
-          return;
+          return true;
         }
 
         if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
@@ -156,7 +160,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
             savedMessage,
             `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) not found in whitelist`,
           );
-          return;
+          return true;
         }
 
         if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild.id)) {
@@ -164,17 +168,17 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
             savedMessage,
             `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) found in blacklist`,
           );
-          return;
+          return true;
         }
 
         if (inviteCodeWhitelist && !inviteCodeWhitelist.includes(invite.code)) {
           this.censorMessage(savedMessage, `invite code (\`${invite.code}\`) not found in whitelist`);
-          return;
+          return true;
         }
 
         if (inviteCodeBlacklist && inviteCodeBlacklist.includes(invite.code)) {
           this.censorMessage(savedMessage, `invite code (\`${invite.code}\`) found in blacklist`);
-          return;
+          return true;
         }
       }
     }
@@ -189,12 +193,12 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       for (const thisUrl of urls) {
         if (domainWhitelist && !domainWhitelist.includes(thisUrl.hostname)) {
           this.censorMessage(savedMessage, `domain (\`${thisUrl.hostname}\`) not found in whitelist`);
-          return;
+          return true;
         }
 
         if (domainBlacklist && domainBlacklist.includes(thisUrl.hostname)) {
           this.censorMessage(savedMessage, `domain (\`${thisUrl.hostname}\`) found in blacklist`);
-          return;
+          return true;
         }
       }
     }
@@ -204,7 +208,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
     for (const token of blockedTokens) {
       if (savedMessage.data.content.toLowerCase().includes(token.toLowerCase())) {
         this.censorMessage(savedMessage, `blocked token (\`${token}\`) found`);
-        return;
+        return true;
       }
     }
 
@@ -214,7 +218,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       const regex = new RegExp(`\\b${escapeStringRegexp(word)}\\b`, "i");
       if (regex.test(savedMessage.data.content)) {
         this.censorMessage(savedMessage, `blocked word (\`${word}\`) found`);
-        return;
+        return true;
       }
     }
 
@@ -224,18 +228,36 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       const regex = new RegExp(regexStr, "i");
       if (regex.test(savedMessage.data.content)) {
         this.censorMessage(savedMessage, `blocked regex (\`${regexStr}\`) found`);
-        return;
+        return true;
       }
     }
+
+    return false;
   }
 
   async onMessageCreate(savedMessage: SavedMessage) {
     if (savedMessage.is_bot) return;
-    this.applyFiltersToMsg(savedMessage);
+    const lock = await this.locks.acquire(`message-${savedMessage.id}`);
+
+    const wasDeleted = await this.applyFiltersToMsg(savedMessage);
+
+    if (wasDeleted) {
+      lock.interrupt();
+    } else {
+      lock.unlock();
+    }
   }
 
   async onMessageUpdate(savedMessage: SavedMessage) {
     if (savedMessage.is_bot) return;
-    this.applyFiltersToMsg(savedMessage);
+    const lock = await this.locks.acquire(`message-${savedMessage.id}`);
+
+    const wasDeleted = await this.applyFiltersToMsg(savedMessage);
+
+    if (wasDeleted) {
+      lock.interrupt();
+    } else {
+      lock.unlock();
+    }
   }
 }
