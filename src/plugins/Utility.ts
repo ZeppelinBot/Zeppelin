@@ -685,6 +685,13 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
       return;
     }
 
+    if (args.member.voiceState.channelID === channel.id) {
+      msg.channel.createMessage(errorMessage("Member is already on that channel!"));
+      return;
+    }
+
+    const oldVoiceChannel = this.guild.channels.get(args.member.voiceState.channelID);
+
     try {
       await args.member.edit({
         channelID: channel.id,
@@ -693,6 +700,13 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
       msg.channel.createMessage(errorMessage("Failed to move member"));
       return;
     }
+
+    this.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
+      mod: stripObjectToScalars(msg.author),
+      member: stripObjectToScalars(args.member, ["user"]),
+      oldChannel: stripObjectToScalars(oldVoiceChannel),
+      newChannel: stripObjectToScalars(channel),
+    });
 
     msg.channel.createMessage(
       successMessage(`**${args.member.user.username}#${args.member.user.discriminator}** moved to **${channel.name}**`),
