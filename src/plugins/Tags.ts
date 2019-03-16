@@ -1,4 +1,4 @@
-import { Plugin, decorators as d, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { Message, TextChannel } from "eris";
 import { errorMessage, successMessage } from "../utils";
 import { GuildTags } from "../data/GuildTags";
@@ -7,19 +7,8 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { renderTemplate } from "../templateFormatter";
-import { escapeBacktickString } from "jest-snapshot/build/utils";
+import { parseTemplate, renderTemplate, TemplateParseError } from "../templateFormatter";
 import { GuildArchives } from "../data/GuildArchives";
-
-const TAG_FUNCTIONS = {
-  countdown(toDate) {
-    const now = moment();
-    const target = moment(toDate, "YYYY-MM-DD HH:mm:ss");
-    const diff = target.diff(now);
-    const result = humanizeDuration(diff, { largest: 2, round: true });
-    return diff >= 0 ? result : `${result} ago`;
-  },
-};
 
 interface ITagsPluginConfig {
   prefix: string;
@@ -41,6 +30,8 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
   private onMessageCreateFn;
   private onMessageDeleteFn;
+
+  protected tagFunctions;
 
   getDefaultOptions(): IPluginOptions<ITagsPluginConfig, ITagsPluginPermissions> {
     return {
@@ -77,6 +68,37 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
     this.onMessageDeleteFn = this.onMessageDelete.bind(this);
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);
+
+    this.tagFunctions = {
+      countdown(toDate) {
+        if (typeof toDate !== "string") return "";
+
+        const now = moment();
+        const target = moment(toDate, "YYYY-MM-DD HH:mm:ss");
+        if (!target.isValid()) return "";
+
+        const diff = target.diff(now);
+        const result = humanizeDuration(diff, { largest: 2, round: true });
+        return diff >= 0 ? result : `${result} ago`;
+      },
+
+      mention: input => {
+        if (typeof input !== "string") return "";
+        if (input.match(/^<(@#)(!&)\d+>$/)) {
+          return input;
+        }
+
+        if (this.guild.members.has(input) || this.bot.users.has(input)) {
+          return `<@!${input}>`;
+        }
+
+        if (this.guild.channels.has(input) || this.bot.channelGuildMap[input]) {
+          return `<#${input}>`;
+        }
+
+        return input;
+      },
+    };
   }
 
   onUnload() {
@@ -118,6 +140,17 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
   @d.command("tag", "<tag:string> <body:string$>")
   @d.permission("create")
   async tagCmd(msg: Message, args: { tag: string; body: string }) {
+    try {
+      parseTemplate(args.body);
+    } catch (e) {
+      if (e instanceof TemplateParseError) {
+        msg.channel.createMessage(errorMessage(`Invalid tag syntax: ${e.message}`));
+        return;
+      } else {
+        throw e;
+      }
+    }
+
     await this.tags.createOrUpdate(args.tag, args.body, msg.author.id);
 
     const prefix = this.getConfig().prefix;
@@ -164,7 +197,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     // Format the string
     body = await renderTemplate(body, {
       args: tagArgs,
-      ...TAG_FUNCTIONS,
+      ...this.tagFunctions,
     });
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;

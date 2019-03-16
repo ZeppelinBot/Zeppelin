@@ -94,9 +94,7 @@ export function parseTemplate(str: string): ParsedTemplate {
     inVar = false;
   };
 
-  let i = -1;
-  for (const char of chars) {
-    i++;
+  for (const [i, char] of chars.entries()) {
     if (inVar) {
       if (currentVar) {
         if (currentVar._state.inArg) {
@@ -130,7 +128,7 @@ export function parseTemplate(str: string): ParsedTemplate {
           } else if (char === '"') {
             // A double quote can start a string argument, but only if we haven't committed to some other type of argument already
             if (currentVar._state.currentArgType !== null) {
-              throw new TemplateParseError(`Unexpected char: ${char} at ${i}`);
+              throw new TemplateParseError(`Unexpected char ${char} at ${i}`);
             }
 
             currentVar._state.currentArgType = "string";
@@ -138,7 +136,7 @@ export function parseTemplate(str: string): ParsedTemplate {
           } else if (char.match(/\d/)) {
             // A number can start a string argument, but only if we haven't committed to some other type of argument already
             if (currentVar._state.currentArgType !== null) {
-              throw new TemplateParseError(`Unexpected char: ${char}`);
+              throw new TemplateParseError(`Unexpected char ${char} at ${i}`);
             }
 
             currentVar._state.currentArgType = "number";
@@ -153,7 +151,7 @@ export function parseTemplate(str: string): ParsedTemplate {
             currentVar._state.currentArg = newVar;
             currentVar = newVar;
           } else {
-            throw new TemplateParseError(`Unexpected char: ${char}`);
+            throw new TemplateParseError(`Unexpected char ${char} at ${i}`);
           }
         } else {
           if (char === "(") {
@@ -180,7 +178,7 @@ export function parseTemplate(str: string): ParsedTemplate {
         if (char === "}") {
           exitInjectedVar();
         } else {
-          throw new TemplateParseError(`Unexpected char: ${char}`);
+          throw new TemplateParseError(`Unexpected char ${char} at ${i}`);
         }
       }
     } else {
@@ -233,10 +231,11 @@ async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
       }
     }
 
-    return value(...args);
+    const result = await value(...args);
+    return result == null ? "" : result;
   }
 
-  return value;
+  return value == null ? "" : value;
 }
 
 export async function renderParsedTemplate(parsedTemplate: ParsedTemplate, values: any) {
