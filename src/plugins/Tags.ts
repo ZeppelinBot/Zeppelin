@@ -242,7 +242,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
     }
 
     if (body.trim() === "") return;
-    if (body.length > 2048) return;
+    if (body.length > 2000) return;
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
     const responseMsg = await channel.createMessage(body);
