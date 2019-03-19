@@ -8,10 +8,11 @@ import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage, 
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
-import { decorators as d, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions, logger } from "knub";
 
 interface IMutesPluginConfig {
   mute_role: string;
+  move_to_voice_channel: string;
 }
 
 interface IMutesPluginPermissions {
@@ -32,6 +33,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
     return {
       config: {
         mute_role: null,
+        move_to_voice_channel: null,
       },
       permissions: {
         view_list: false,
@@ -83,7 +85,22 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
+    // Add muted role
     await member.addRole(muteRole);
+
+    // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
+    const moveToVoiceChannelId = this.getConfig().move_to_voice_channel;
+    if (moveToVoiceChannelId && member.voiceState.channelID) {
+      try {
+        await member.edit({
+          channelID: moveToVoiceChannelId,
+        });
+      } catch (e) {
+        logger.warn(`Could not move user ${member.id} to voice channel ${moveToVoiceChannelId} when muting`);
+      }
+    }
+
+    // Create & return mute record
     return this.mutes.addOrUpdateMute(member.id, muteTime);
   }
 
