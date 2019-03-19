@@ -417,9 +417,9 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
         name: "User information",
         value:
           trimLines(`
-          ID: ${user.id}
+          ID: **${user.id}**
           Profile: <@!${user.id}>
-          Created: ${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+          Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
         `) + embedPadding,
       });
     } else {
@@ -439,10 +439,23 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
         name: "Member information",
         value:
           trimLines(`
-          Joined: ${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})
+          Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
           ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
         `) + embedPadding,
       });
+
+      const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
+      if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
+        embed.fields.push({
+          name: "Voice information",
+          value:
+            trimLines(`
+          ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
+          ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
+          ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
+        `) + embedPadding,
+        });
+      }
     }
 
     const cases = (await this.cases.getByUserId(args.userId)).filter(c => !c.is_hidden);
@@ -461,7 +474,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
       embed.fields.push({
         name: "Cases",
         value: trimLines(`
-          Total cases: ${cases.length}
+          Total cases: **${cases.length}**
           ${summaryText}: ${caseSummary.join(", ")}
         `),
       });
