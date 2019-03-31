@@ -195,6 +195,7 @@ export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboar
    * the required threshold. If they do, post the message in the starboard channel.
    */
   @d.event("messageReactionAdd")
+  @d.lock("starboardReaction")
   async onMessageReactionAdd(msg: Message, emoji: { id: string; name: string }) {
     if (!msg.author) {
       // Message is not cached, fetch it
