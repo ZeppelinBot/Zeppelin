@@ -74,6 +74,8 @@ import { AutoReactionsPlugin } from "./plugins/AutoReactionsPlugin";
 import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
 import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
 import { RemindersPlugin } from "./plugins/Reminders";
+import { convertDelayStringToMS } from "./utils";
+import { CommandValueTypeError } from "knub/dist/commandUtils";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -154,6 +156,17 @@ connect().then(async conn => {
         enabled: true,
         size: 30,
         threshold: 200,
+      },
+
+      customArgumentTypes: {
+        delay(value) {
+          const result = convertDelayStringToMS(value);
+          if (result == null) {
+            throw new CommandValueTypeError(`Could not convert ${value} to a delay`);
+          }
+
+          return result;
+        },
       },
     },
   });
