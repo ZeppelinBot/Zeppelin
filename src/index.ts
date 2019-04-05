@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError } from "knub";
+import { Knub, logger, PluginError, CommandArgumentTypeError } from "knub";
 import { SimpleError } from "./SimpleError";
 
 require("dotenv").config();
@@ -75,7 +75,6 @@ import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
 import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
 import { RemindersPlugin } from "./plugins/Reminders";
 import { convertDelayStringToMS } from "./utils";
-import { CommandValueTypeError } from "knub/dist/commandUtils";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -162,7 +161,7 @@ connect().then(async conn => {
         delay(value) {
           const result = convertDelayStringToMS(value);
           if (result == null) {
-            throw new CommandValueTypeError(`Could not convert ${value} to a delay`);
+            throw new CommandArgumentTypeError(`Could not convert ${value} to a delay`);
           }
 
           return result;
