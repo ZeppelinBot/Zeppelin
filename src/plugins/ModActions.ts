@@ -429,11 +429,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     });
   }
 
-  @d.command("mute", "<member:Member> [time:string] [reason:string$]", {
+  @d.command("mute", "<member:Member> <time:delay> <reason:string$>", {
+    overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("mute")
-  async muteCmd(msg: Message, args: { member: Member; time: string; reason: string; mod: Member }) {
+  async muteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod: Member }) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
@@ -453,22 +454,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
 
     let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
 
-    // Convert mute time from e.g. "2h30m" to milliseconds
-    const muteTime = args.time ? convertDelayStringToMS(args.time) : null;
-    const timeUntilUnmute = muteTime && humanizeDuration(muteTime);
-
-    if (muteTime == null && args.time) {
-      // Invalid muteTime -> assume it's actually part of the reason
-      args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
-    }
-
+    const timeUntilUnmute = args.time && humanizeDuration(args.time);
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Apply "muted" role
     this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
     const mute: Mute = await this.actions.fire("mute", {
       member: args.member,
-      muteTime,
+      muteTime: args.time,
     });
 
     if (!mute) {
@@ -483,7 +476,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     if (hasOldCase) {
       // Update old case
       theCase = await this.cases.find(mute.case_id);
-      const caseNote = `__[Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}]__ ${reason}`.trim();
+      const caseNote = `__[Mute updated to ${args.time ? timeUntilUnmute : "indefinite"}]__ ${reason}`.trim();
       await this.actions.fire("createCaseNote", {
         caseId: mute.case_id,
         modId: mod.id,
@@ -491,7 +484,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       });
     } else {
       // Create new case
-      const caseNote = `__[Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}]__ ${reason}`.trim();
+      const caseNote = `__[Muted ${args.time ? `for ${timeUntilUnmute}` : "indefinitely"}]__ ${reason}`.trim();
       theCase = await this.actions.fire("createCase", {
         userId: args.member.id,
         modId: mod.id,
@@ -507,7 +500,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     // Message the user informing them of the mute
     // Don't message them if we're updating an old mute
     if (reason && !hasOldCase) {
-      const template = muteTime ? config.timed_mute_message : config.mute_message;
+      const template = args.time ? config.timed_mute_message : config.mute_message;
 
       const muteMessage = await renderTemplate(template, {
         guildName: this.guild.name,
@@ -525,7 +518,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
 
     // Confirm the action to the moderator
     let response;
-    if (muteTime) {
+    if (args.time) {
       if (hasOldCase) {
         response = asSingleLine(`
           Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
@@ -555,7 +548,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     msg.channel.createMessage(successMessage(response));
 
     // Log the action
-    if (muteTime) {
+    if (args.time) {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
         mod: stripObjectToScalars(mod.user),
         member: stripObjectToScalars(args.member, ["user"]),
@@ -569,11 +562,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     }
   }
 
-  @d.command("unmute", "<member:Member> [time:string] [reason:string$]", {
+  @d.command("unmute", "<member:Member> <time:delay> <reason:string$>", {
+    overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("mute")
-  async unmuteCmd(msg: Message, args: any) {
+  async unmuteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod?: Member }) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
@@ -599,16 +593,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     }
 
     // Convert unmute time from e.g. "2h30m" to milliseconds
-    const unmuteTime = args.time ? convertDelayStringToMS(args.time) : null;
-    const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
-
-    if (unmuteTime == null && args.time) {
-      // Invalid unmuteTime -> assume it's actually part of the reason
-      args.reason = `${args.time} ${args.reason ? args.reason : ""}`.trim();
-    }
+    const timeUntilUnmute = args.time && humanizeDuration(args.time);
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
-    const caseNote = unmuteTime ? `__[Scheduled unmute in ${timeUntilUnmute}]__ ${reason}` : reason;
+    const caseNote = args.time ? `__[Scheduled unmute in ${timeUntilUnmute}]__ ${reason}` : reason;
 
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
@@ -619,9 +607,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
-    if (unmuteTime) {
+    if (args.time) {
       // If we have an unmute time, just update the old mute to expire in that time
-      await this.actions.fire("unmute", { member: args.member, unmuteTime });
+      await this.actions.fire("unmute", { member: args.member, unmuteTime: args.time });
 
       // Confirm the action to the moderator
       msg.channel.createMessage(
