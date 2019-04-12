@@ -324,8 +324,9 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     });
   }
 
-  @d.command("clean", "<count:number>")
-  @d.command("clean all", "<count:number>")
+  @d.command("clean", "<count:number>", {
+    aliases: ["clean all"],
+  })
   @d.permission("can_clean")
   async cleanAllCmd(msg: Message, args: { count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
