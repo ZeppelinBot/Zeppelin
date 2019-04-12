@@ -4,6 +4,7 @@ import { BaseRepository } from "./BaseRepository";
 import { getRepository, In, Repository } from "typeorm";
 import { disableLinkPreviews } from "../utils";
 import { CaseTypes } from "./CaseTypes";
+import moment = require("moment-timezone");
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
@@ -129,7 +130,8 @@ export class GuildCases extends BaseRepository {
 
     reason = disableLinkPreviews(reason);
 
-    let line = `Case \`#${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
+    const timestamp = moment(theCase.created_at).format("YYYY-MM-DD");
+    let line = `\`[${timestamp}]\` \`Case #${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
     if (theCase.notes.length > 1) {
       line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
     }
