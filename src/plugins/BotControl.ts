@@ -23,8 +23,6 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
         owners: [],
         update_cmd: null,
       },
-
-      permissions: {},
     };
   }
 

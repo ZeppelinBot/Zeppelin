@@ -6,11 +6,11 @@ import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-interface IAutoReactionsPluginPermissions {
-  use: boolean;
+interface IAutoReactionsPluginConfig {
+  can_manage: boolean;
 }
 
-export class AutoReactionsPlugin extends ZeppelinPlugin<IBasePluginConfig, IAutoReactionsPluginPermissions> {
+export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConfig> {
   public static pluginName = "auto_reactions";
 
   protected savedMessages: GuildSavedMessages;
@@ -18,19 +18,17 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IBasePluginConfig, IAuto
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IAutoReactionsPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IAutoReactionsPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        use: false,
+      config: {
+        can_manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
-          permissions: {
-            use: true,
+          config: {
+            can_manage: true,
           },
         },
       ],
@@ -55,7 +53,6 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IBasePluginConfig, IAuto
 
     for (const reaction of args.reactions) {
       if (!isEmoji(reaction)) {
-        console.log("invalid:", reaction);
         msg.channel.createMessage(errorMessage("One or more of the specified reactions were invalid!"));
         return;
       }

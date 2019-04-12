@@ -1,41 +1,39 @@
-import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { GuildSelfGrantableRoles } from "../data/GuildSelfGrantableRoles";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
 import { asSingleLine, chunkArray, errorMessage, sorter, successMessage, trimLines } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-interface ISelfGrantableRolesPluginPermissions {
-  manage: boolean;
-  use: boolean;
-  ignore_cooldown: boolean;
+interface ISelfGrantableRolesPluginConfig {
+  can_manage: boolean;
+  can_use: boolean;
+  can_ignore_cooldown: boolean;
 }
 
-export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, ISelfGrantableRolesPluginPermissions> {
+export class SelfGrantableRolesPlugin extends ZeppelinPlugin<ISelfGrantableRolesPluginConfig> {
   public static pluginName = "self_grantable_roles";
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, ISelfGrantableRolesPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<ISelfGrantableRolesPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        manage: false,
-        use: false,
-        ignore_cooldown: false,
+      config: {
+        can_manage: false,
+        can_use: false,
+        can_ignore_cooldown: false,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            ignore_cooldown: true,
+          config: {
+            can_ignore_cooldown: true,
           },
         },
         {
           level: ">=100",
-          permissions: {
-            manage: true,
+          config: {
+            can_manage: true,
           },
         },
       ],
@@ -47,8 +45,8 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
   }
 
   @d.command("role remove", "<roleNames:string...>")
-  @d.permission("use")
-  @d.cooldown(2500, "ignore_cooldown")
+  @d.permission("can_use")
+  @d.cooldown(2500, "can_ignore_cooldown")
   async roleRemoveCmd(msg: Message, args: { roleNames: string[] }) {
     const lock = await this.locks.acquire(`grantableRoles:${msg.author.id}`);
 
@@ -131,8 +129,8 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
   }
 
   @d.command("role", "<roleNames:string...>")
-  @d.permission("use")
-  @d.cooldown(1500, "ignore_cooldown")
+  @d.permission("can_use")
+  @d.cooldown(1500, "can_ignore_cooldown")
   async roleCmd(msg: Message, args: { roleNames: string[] }) {
     const lock = await this.locks.acquire(`grantableRoles:${msg.author.id}`);
 
@@ -218,7 +216,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
 
   @d.command("role help")
   @d.command("role")
-  @d.cooldown(5000, "ignore_cooldown")
+  @d.cooldown(5000, "can_ignore_cooldown")
   async roleHelpCmd(msg: Message) {
     const channelGrantableRoles = await this.selfGrantableRoles.getForChannel(msg.channel.id);
     if (channelGrantableRoles.length === 0) return;
@@ -256,7 +254,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
   }
 
   @d.command("self_grantable_roles add", "<channel:channel> <roleId:string> [aliases:string...]")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async addSelfGrantableRoleCmd(msg: Message, args: { channel: GuildChannel; roleId: string; aliases?: string[] }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Invalid channel (must be a text channel)"));
@@ -285,7 +283,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
   }
 
   @d.command("self_grantable_roles delete", "<channel:channel> <roleId:string>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async deleteSelfGrantableRoleCmd(msg: Message, args: { channel: GuildChannel; roleId: string }) {
     await this.selfGrantableRoles.delete(args.channel.id, args.roleId);
 
@@ -297,7 +295,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, 
   }
 
   @d.command("self_grantable_roles", "<channel:channel>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async selfGrantableRolesCmd(msg: Message, args: { channel: GuildChannel }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Invalid channel (must be a text channel)"));

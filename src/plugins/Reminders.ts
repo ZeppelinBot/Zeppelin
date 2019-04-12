@@ -1,4 +1,4 @@
-import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildReminders } from "../data/GuildReminders";
 import { Message, TextChannel } from "eris";
@@ -9,11 +9,11 @@ import { convertDelayStringToMS, createChunkedMessage, errorMessage, sorter, suc
 const REMINDER_LOOP_TIME = 10 * 1000;
 const MAX_TRIES = 3;
 
-interface IRemindersPluginPermissions {
-  use: boolean;
+interface IRemindersPluginConfig {
+  can_use: boolean;
 }
 
-export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IRemindersPluginPermissions> {
+export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
   public static pluginName = "reminders";
 
   protected reminders: GuildReminders;
@@ -21,19 +21,17 @@ export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IReminder
 
   private postRemindersTimeout;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IRemindersPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IRemindersPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        use: false,
+      config: {
+        can_use: false,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            use: true,
+          config: {
+            can_use: true,
           },
         },
       ],
@@ -72,7 +70,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IReminder
 
   @d.command("remind", "<time:string> <reminder:string$>")
   @d.command("remindme", "<time:string> <reminder:string$>")
-  @d.permission("use")
+  @d.permission("can_use")
   async addReminderCmd(msg: Message, args: { time: string; reminder: string }) {
     const now = moment();
 
@@ -115,7 +113,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IReminder
   }
 
   @d.command("reminders")
-  @d.permission("use")
+  @d.permission("can_use")
   async reminderListCmd(msg: Message) {
     const reminders = await this.reminders.getRemindersByUserId(msg.author.id);
     if (reminders.length === 0) {
@@ -136,7 +134,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IBasePluginConfig, IReminder
 
   @d.command("reminders delete", "<num:number>")
   @d.command("reminders d", "<num:number>")
-  @d.permission("use")
+  @d.permission("can_use")
   async deleteReminderCmd(msg: Message, args: { num: number }) {
     const reminders = await this.reminders.getRemindersByUserId(msg.author.id);
     reminders.sort(sorter("remind_at"));

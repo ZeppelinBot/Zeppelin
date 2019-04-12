@@ -1,5 +1,5 @@
 import http, { ServerResponse } from "http";
-import { GlobalPlugin, IPluginOptions } from "knub";
+import { GlobalPlugin, IPluginOptions, logger } from "knub";
 import { GuildArchives } from "../data/GuildArchives";
 import { sleep } from "../utils";
 import moment from "moment-timezone";
@@ -27,8 +27,6 @@ export class LogServerPlugin extends GlobalPlugin<ILogServerPluginConfig> {
       config: {
         port: DEFAULT_PORT,
       },
-
-      permissions: {},
     };
   }
 
@@ -74,7 +72,7 @@ export class LogServerPlugin extends GlobalPlugin<ILogServerPluginConfig> {
 
     this.server.on("error", async (err: any) => {
       if (err.code === "EADDRINUSE" && !retried) {
-        console.log("Got EADDRINUSE, retrying in 2 sec...");
+        logger.info("Got EADDRINUSE, retrying in 2 sec...");
         retried = true;
         await sleep(2000);
         this.server.listen(port);

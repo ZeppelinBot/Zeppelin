@@ -62,22 +62,20 @@ interface IModActionsPluginConfig {
   ban_message: string;
   alert_on_rejoin: boolean;
   alert_channel: string;
+
+  can_note: boolean;
+  can_warn: boolean;
+  can_mute: boolean;
+  can_kick: boolean;
+  can_ban: boolean;
+  can_view: boolean;
+  can_addcase: boolean;
+  can_massban: boolean;
+  can_hidecase: boolean;
+  can_act_as_other: boolean;
 }
 
-interface IModActionsPluginPermissions {
-  note: boolean;
-  warn: boolean;
-  mute: boolean;
-  kick: boolean;
-  ban: boolean;
-  view: boolean;
-  addcase: boolean;
-  massban: boolean;
-  hidecase: boolean;
-  act_as_other: boolean;
-}
-
-export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IModActionsPluginPermissions> {
+export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   public static pluginName = "mod_actions";
 
   protected actions: GuildActions;
@@ -96,7 +94,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     this.ignoredEvents = [];
   }
 
-  getDefaultOptions(): IPluginOptions<IModActionsPluginConfig, IModActionsPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IModActionsPluginConfig> {
     return {
       config: {
         dm_on_warn: true,
@@ -115,38 +113,37 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
-      },
-      permissions: {
-        note: false,
-        warn: false,
-        mute: false,
-        kick: false,
-        ban: false,
-        view: false,
-        addcase: false,
-        massban: false,
-        hidecase: false,
-        act_as_other: false,
+
+        can_note: false,
+        can_warn: false,
+        can_mute: false,
+        can_kick: false,
+        can_ban: false,
+        can_view: false,
+        can_addcase: false,
+        can_massban: false,
+        can_hidecase: false,
+        can_act_as_other: false,
       },
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            note: true,
-            warn: true,
-            mute: true,
-            kick: true,
-            ban: true,
-            view: true,
-            addcase: true,
+          config: {
+            can_note: true,
+            can_warn: true,
+            can_mute: true,
+            can_kick: true,
+            can_ban: true,
+            can_view: true,
+            can_addcase: true,
           },
         },
         {
           level: ">=100",
-          permissions: {
-            massban: true,
-            hidecase: true,
-            act_as_other: true,
+          config: {
+            can_massban: true,
+            can_hidecase: true,
+            can_act_as_other: true,
           },
         },
       ],
@@ -307,7 +304,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
    * Update the specified case by adding more notes/details to it
    */
   @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
-  @d.permission("note")
+  @d.permission("can_note")
   async updateSpecificCmd(msg: Message, args: { caseNumber: number; note: string }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
     if (!theCase) {
@@ -328,7 +325,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
    * Update the latest case
    */
   @d.command(/update|updatecase/, "<note:string$>")
-  @d.permission("note")
+  @d.permission("can_note")
   async updateLatestCmd(msg: Message, args: { note: string }) {
     const theCase = await this.cases.findLatestByModId(msg.author.id);
     if (!theCase) {
@@ -346,7 +343,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   }
 
   @d.command("note", "<userId:userId> <note:string$>")
-  @d.permission("note")
+  @d.permission("can_note")
   async noteCmd(msg: Message, args: any) {
     const user = await this.bot.users.get(args.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "member";
@@ -365,7 +362,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("warn", "<member:Member> <reason:string$>", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("warn")
+  @d.permission("can_warn")
   async warnCmd(msg: Message, args: any) {
     // Make sure we're allowed to warn this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -433,7 +430,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("mute")
+  @d.permission("can_mute")
   async muteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod: Member }) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -566,7 +563,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
     overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("mute")
+  @d.permission("can_mute")
   async unmuteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod?: Member }) {
     // Make sure we're allowed to mute this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -651,7 +648,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("kick", "<member:Member> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("kick")
+  @d.permission("can_kick")
   async kickCmd(msg, args: { member: Member; reason: string; mod: Member }) {
     // Make sure we're allowed to kick this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -721,7 +718,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("ban", "<member:Member> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("ban")
+  @d.permission("can_ban")
   async banCmd(msg, args: { member: Member; reason?: string; mod?: Member }) {
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -791,7 +788,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("softban", "<member:Member> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("ban")
+  @d.permission("can_ban")
   async softbanCmd(msg, args) {
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, args.member)) {
@@ -849,7 +846,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("unban", "<userId:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("ban")
+  @d.permission("can_ban")
   async unbanCmd(msg: Message, args: { userId: string; reason: string; mod: Member }) {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
@@ -896,7 +893,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("forceban", "<userId:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("ban")
+  @d.permission("can_ban")
   async forcebanCmd(msg: Message, args: any) {
     // If the user exists as a guild member, make sure we can act on them first
     const member = this.guild.members.get(args.userId);
@@ -948,7 +945,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   }
 
   @d.command("massban", "<userIds:string...>")
-  @d.permission("massban")
+  @d.permission("can_massban")
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
     // Limit to 100 users at once (arbitrary?)
     if (args.userIds.length > 100) {
@@ -1031,7 +1028,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("addcase", "<type:string> <target:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
-  @d.permission("addcase")
+  @d.permission("can_addcase")
   async addcaseCmd(msg: Message, args: { type: string; target: string; reason?: string; mod?: Member }) {
     // Verify the user id is a valid snowflake-ish
     if (!args.target.match(/^[0-9]{17,20}$/)) {
@@ -1099,7 +1096,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
    * If the argument passed is a user id, show all cases on that user
    */
   @d.command("case", "<caseNumber:number>")
-  @d.permission("view")
+  @d.permission("can_view")
   async showCaseCmd(msg: Message, args: { caseNumber: number }) {
     // Assume case id
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
@@ -1116,7 +1113,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   }
 
   @d.command("cases", "<userId:userId> [opts:string$]")
-  @d.permission("view")
+  @d.permission("can_view")
   async userCasesCmd(msg: Message, args: { userId: string; opts?: string }) {
     const cases = await this.cases.with("notes").getByUserId(args.userId);
     const normalCases = cases.filter(c => !c.is_hidden);
@@ -1177,7 +1174,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   @d.command("cases", null, {
     options: [{ name: "mod", type: "Member" }],
   })
-  @d.permission("view")
+  @d.permission("can_view")
   async recentCasesCmd(msg: Message, args: { mod?: Member }) {
     const modId = args.mod ? args.mod.id : msg.author.id;
     const recentCases = await this.cases.with("notes").getRecentByModId(modId, 5);
@@ -1202,7 +1199,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   }
 
   @d.command("hidecase", "<caseNum:number>")
-  @d.permission("hidecase")
+  @d.permission("can_hidecase")
   async hideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);
     if (!theCase) {
@@ -1217,7 +1214,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig, IM
   }
 
   @d.command("unhidecase", "<caseNum:number>")
-  @d.permission("hidecase")
+  @d.permission("can_hidecase")
   async unhideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);
     if (!theCase) {

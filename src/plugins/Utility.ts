@@ -1,4 +1,4 @@
-import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
   channelMentionRegex,
@@ -33,21 +33,21 @@ const CLEAN_COMMAND_DELETE_DELAY = 5000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
-interface IUtilityPluginPermissions {
-  roles: boolean;
-  level: boolean;
-  search: boolean;
-  clean: boolean;
-  info: boolean;
-  server: boolean;
-  reload_guild: boolean;
-  nickname: boolean;
-  ping: boolean;
-  source: boolean;
-  vcmove: boolean;
+interface IUtilityPluginConfig {
+  can_roles: boolean;
+  can_level: boolean;
+  can_search: boolean;
+  can_clean: boolean;
+  can_info: boolean;
+  can_server: boolean;
+  can_reload_guild: boolean;
+  can_nickname: boolean;
+  can_ping: boolean;
+  can_source: boolean;
+  can_vcmove: boolean;
 }
 
-export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPluginPermissions> {
+export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
   public static pluginName = "utility";
 
   protected logs: GuildLogs;
@@ -55,43 +55,41 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IUtilityPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IUtilityPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        roles: false,
-        level: false,
-        search: false,
-        clean: false,
-        info: false,
-        server: false,
-        reload_guild: false,
-        nickname: false,
-        ping: false,
-        source: false,
-        vcmove: false,
+      config: {
+        can_roles: false,
+        can_level: false,
+        can_search: false,
+        can_clean: false,
+        can_info: false,
+        can_server: false,
+        can_reload_guild: false,
+        can_nickname: false,
+        can_ping: false,
+        can_source: false,
+        can_vcmove: false,
       },
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            roles: true,
-            level: true,
-            search: true,
-            clean: true,
-            info: true,
-            server: true,
-            nickname: true,
-            vcmove: true,
+          config: {
+            can_roles: true,
+            can_level: true,
+            can_search: true,
+            can_clean: true,
+            can_info: true,
+            can_server: true,
+            can_nickname: true,
+            can_vcmove: true,
           },
         },
         {
           level: ">=100",
-          permissions: {
-            reload_guild: true,
-            ping: true,
-            source: true,
+          config: {
+            can_reload_guild: true,
+            can_ping: true,
+            can_source: true,
           },
         },
       ],
@@ -118,7 +116,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
       },
     ],
   })
-  @d.permission("roles")
+  @d.permission("can_roles")
   async rolesCmd(msg: Message, args: { search?: string; counts?: boolean }) {
     let roles: Array<{ _memberCount?: number } & Role> = Array.from((msg.channel as TextChannel).guild.roles.values());
     if (args.search) {
@@ -185,7 +183,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("level", "[userId:string]")
-  @d.permission("level")
+  @d.permission("can_level")
   async levelCmd(msg: Message, args) {
     const member = args.userId ? this.guild.members.get(args.userId) : msg.member;
 
@@ -218,7 +216,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
       },
     ],
   })
-  @d.permission("search")
+  @d.permission("can_search")
   async searchCmd(
     msg: Message,
     args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string },
@@ -327,7 +325,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
 
   @d.command("clean", "<count:number>")
   @d.command("clean all", "<count:number>")
-  @d.permission("clean")
+  @d.permission("can_clean")
   async cleanAllCmd(msg: Message, args: { count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
       msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
@@ -350,7 +348,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("clean user", "<userId:userid> <count:number>")
-  @d.permission("clean")
+  @d.permission("can_clean")
   async cleanUserCmd(msg: Message, args: { userId: string; count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
       msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
@@ -373,7 +371,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("clean bot", "<count:number>")
-  @d.permission("clean")
+  @d.permission("can_clean")
   async cleanBotCmd(msg: Message, args: { count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
       msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
@@ -396,7 +394,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("info", "<userId:userId>")
-  @d.permission("info")
+  @d.permission("can_info")
   async infoCmd(msg: Message, args: { userId: string }) {
     const embed: EmbedOptions = {
       fields: [],
@@ -484,7 +482,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command(/(?:nickname|nick) reset/, "<target:member>")
-  @d.permission("nickname")
+  @d.permission("can_nickname")
   async nicknameResetCmd(msg: Message, args: { target: Member; nickname: string }) {
     if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
       msg.channel.createMessage(errorMessage("Cannot reset nickname: insufficient permissions"));
@@ -504,7 +502,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command(/nickname|nick/, "<target:member> <nickname:string$>")
-  @d.permission("nickname")
+  @d.permission("can_nickname")
   async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
     if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
       msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
@@ -530,7 +528,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("server")
-  @d.permission("server")
+  @d.permission("can_server")
   async serverCmd(msg: Message) {
     await this.guild.fetchAllMembers();
 
@@ -601,7 +599,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("ping")
-  @d.permission("ping")
+  @d.permission("can_ping")
   async pingCmd(msg: Message) {
     const times = [];
     const messages: Message[] = [];
@@ -637,7 +635,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("source", "<messageId:string>")
-  @d.permission("source")
+  @d.permission("can_source")
   async sourceCmd(msg: Message, args: { messageId: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {
@@ -656,7 +654,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("vcmove", "<member:Member> <channel:string$>")
-  @d.permission("vcmove")
+  @d.permission("can_vcmove")
   async vcmoveCmd(msg: Message, args: { member: Member; channel: string }) {
     let channel: VoiceChannel;
 
@@ -727,7 +725,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IBasePluginConfig, IUtilityPlu
   }
 
   @d.command("reload_guild")
-  @d.permission("reload_guild")
+  @d.permission("can_reload_guild")
   reloadGuildCmd(msg: Message) {
     if (activeReloads.has(this.guildId)) return;
     activeReloads.set(this.guildId, msg.channel as TextChannel);

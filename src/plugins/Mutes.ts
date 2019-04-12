@@ -13,14 +13,12 @@ import { decorators as d, IPluginOptions, logger } from "knub";
 interface IMutesPluginConfig {
   mute_role: string;
   move_to_voice_channel: string;
+
+  can_view_list: boolean;
+  can_cleanup: boolean;
 }
 
-interface IMutesPluginPermissions {
-  view_list: boolean;
-  cleanup: boolean;
-}
-
-export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPluginPermissions> {
+export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   public static pluginName = "mutes";
 
   protected actions: GuildActions;
@@ -29,27 +27,26 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  getDefaultOptions(): IPluginOptions<IMutesPluginConfig, IMutesPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IMutesPluginConfig> {
     return {
       config: {
         mute_role: null,
         move_to_voice_channel: null,
-      },
-      permissions: {
-        view_list: false,
-        cleanup: false,
+
+        can_view_list: false,
+        can_cleanup: false,
       },
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            view_list: true,
+          config: {
+            can_view_list: true,
           },
         },
         {
           level: ">=100",
-          permissions: {
-            cleanup: true,
+          config: {
+            can_cleanup: true,
           },
         },
       ],
@@ -118,7 +115,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
   }
 
   @d.command("mutes")
-  @d.permission("view_list")
+  @d.permission("can_view_list")
   public async postMuteList(msg: Message) {
     const lines = [];
 
@@ -202,7 +199,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
    * COMMAND: Clear dangling mutes for members who have been banned
    */
   @d.command("clear_banned_mutes")
-  @d.permission("cleanup")
+  @d.permission("can_cleanup")
   async clearBannedMutesCmd(msg: Message) {
     await msg.channel.createMessage("Clearing mutes from banned users...");
 
@@ -247,7 +244,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
    * COMMAND: Clear dangling mutes for members whose mute role was removed by other means
    */
   @d.command("clear_mutes_without_role")
-  @d.permission("cleanup")
+  @d.permission("can_cleanup")
   async clearMutesWithoutRoleCmd(msg: Message) {
     const activeMutes = await this.mutes.getActiveMutes();
     const muteRole = this.getConfig().mute_role;
@@ -270,7 +267,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig, IMutesPlugin
   }
 
   @d.command("clear_mute", "<userId:string>")
-  @d.permission("cleanup")
+  @d.permission("can_cleanup")
   async clearMuteCmd(msg: Message, args: { userId: string }) {
     const mute = await this.mutes.findExistingMuteForUserId(args.userId);
     if (!mute) {
