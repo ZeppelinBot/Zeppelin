@@ -114,9 +114,11 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     }
   }
 
-  @d.command("mutes")
+  @d.command("mutes", [], {
+    options: [{ name: "age", type: "delay" }],
+  })
   @d.permission("can_view_list")
-  public async postMuteList(msg: Message) {
+  public async muteListCmd(msg: Message, args: { age?: number }) {
     const lines = [];
 
     // Active, logged mutes
@@ -130,12 +132,25 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       return a.expires_at > b.expires_at ? 1 : -1;
     });
 
-    const caseIds = activeMutes.map(m => m.case_id).filter(v => !!v);
+    let filteredMutes = activeMutes;
+    let hasFilters = false;
+
+    if (args.age) {
+      const cutoff = moment()
+        .subtract(args.age, "ms")
+        .format(DBDateFormat);
+      filteredMutes = filteredMutes.filter(m => m.created_at <= cutoff);
+      hasFilters = true;
+    }
+
+    let totalMutes = filteredMutes.length;
+
+    const caseIds = filteredMutes.map(m => m.case_id).filter(v => !!v);
     const muteCases = caseIds.length ? await this.cases.get(caseIds) : [];
     const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
     lines.push(
-      ...activeMutes.map(mute => {
+      ...filteredMutes.map(mute => {
         const user = this.bot.users.get(mute.user_id);
         const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
@@ -159,25 +174,31 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       }),
     );
 
-    // Manually added mute roles
-    const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
-    const manuallyMutedMembers = [];
-    const muteRole = this.getConfig().mute_role;
+    // Manually added mute roles (but only if no filters have been specified)
+    if (!hasFilters) {
+      const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
+      const manuallyMutedMembers = [];
+      const muteRole = this.getConfig().mute_role;
 
-    if (muteRole) {
-      this.guild.members.forEach(member => {
-        if (muteUserIds.has(member.id)) return;
-        if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
-      });
+      if (muteRole) {
+        this.guild.members.forEach(member => {
+          if (muteUserIds.has(member.id)) return;
+          if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
+        });
+      }
+
+      totalMutes += manuallyMutedMembers.length;
+
+      lines.push(
+        ...manuallyMutedMembers.map(member => {
+          return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
+        }),
+      );
     }
 
-    lines.push(
-      ...manuallyMutedMembers.map(member => {
-        return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
-      }),
-    );
-
-    const message = `Active mutes (${activeMutes.length} total):\n\n${lines.join("\n")}`;
+    const message = hasFilters
+      ? `Results (${totalMutes} total):\n\n${lines.join("\n")}`
+      : `Active mutes (${totalMutes} total):\n\n${lines.join("\n")}`;
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
       msg.channel.createMessage(chunk);
