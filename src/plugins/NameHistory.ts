@@ -1,32 +1,30 @@
-import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { GuildNameHistory } from "../data/GuildNameHistory";
 import { Member, Message, User } from "eris";
 import { NameHistoryEntryTypes } from "../data/NameHistoryEntryTypes";
 import { createChunkedMessage, errorMessage, trimLines } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
-interface INameHistoryPluginPermissions {
-  view: boolean;
+interface INameHistoryPluginConfig {
+  can_view: boolean;
 }
 
-export class NameHistoryPlugin extends ZeppelinPlugin<IBasePluginConfig, INameHistoryPluginPermissions> {
+export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> {
   public static pluginName = "name_history";
 
   protected nameHistory: GuildNameHistory;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, INameHistoryPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<INameHistoryPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        view: false,
+      config: {
+        can_view: false,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            view: true,
+          config: {
+            can_view: true,
           },
         },
       ],
@@ -38,7 +36,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<IBasePluginConfig, INameHi
   }
 
   @d.command("names", "<userId:userId>")
-  @d.permission("view")
+  @d.permission("can_view")
   async namesCmd(msg: Message, args: { userId: string }) {
     const names = await this.nameHistory.getByUserId(args.userId);
     if (!names) {

@@ -106,8 +106,6 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
         max_voice_moves: null,
       },
 
-      permissions: {},
-
       // Default override to make mods immune to the spam filter
       overrides: [
         {

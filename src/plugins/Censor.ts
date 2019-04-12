@@ -1,5 +1,5 @@
-import { decorators as d, IPluginOptions, Plugin } from "knub";
-import { Invite, Message } from "eris";
+import { IPluginOptions } from "knub";
+import { Invite } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -61,8 +61,6 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
         blocked_words: null,
         blocked_regex: null,
       },
-
-      permissions: {},
 
       overrides: [
         {

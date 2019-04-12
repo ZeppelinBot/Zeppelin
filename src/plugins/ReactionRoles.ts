@@ -27,14 +27,11 @@ type PendingMemberRoleChanges = {
 
 interface IReactionRolesPluginConfig {
   auto_refresh_interval: number;
+
+  can_manage: boolean;
 }
 
-interface IReactionRolesPluginPermissions {
-  manage: boolean;
-  fallback_command: boolean;
-}
-
-export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConfig, IReactionRolesPluginPermissions> {
+export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConfig> {
   public static pluginName = "reaction_roles";
 
   protected reactionRoles: GuildReactionRoles;
@@ -46,22 +43,19 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
 
   private autoRefreshTimeout;
 
-  getDefaultOptions(): IPluginOptions<IReactionRolesPluginConfig, IReactionRolesPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IReactionRolesPluginConfig> {
     return {
       config: {
         auto_refresh_interval: null,
-      },
 
-      permissions: {
-        manage: false,
-        fallback_command: false,
+        can_manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
-          permissions: {
-            manage: true,
+          config: {
+            can_manage: true,
           },
         },
       ],
@@ -195,7 +189,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
    * COMMAND: Clear reaction roles from the specified message
    */
   @d.command("reaction_roles clear", "<messageId:string>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async clearReactionRolesCmd(msg: Message, args: { messageId: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {
@@ -222,7 +216,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
    * COMMAND: Refresh reaction roles in the specified message by removing all reactions and re-adding them
    */
   @d.command("reaction_roles refresh", "<messageId:string>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async refreshReactionRolesCmd(msg: Message, args: { messageId: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {
@@ -247,7 +241,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
    * :zep_ps4: = 543184300250759188
    */
   @d.command("reaction_roles", "<messageId:string> <reactionRolePairs:string$>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async reactionRolesCmd(msg: Message, args: { messageId: string; reactionRolePairs: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {

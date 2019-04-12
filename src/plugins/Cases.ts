@@ -27,8 +27,6 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
         log_automatic_actions: true,
         case_log_channel: null,
       },
-
-      permissions: {},
     };
   }
 

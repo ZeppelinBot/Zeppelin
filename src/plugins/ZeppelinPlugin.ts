@@ -1,12 +1,9 @@
-import { IBasePluginConfig, IBasePluginPermissions, IPluginOptions, Plugin } from "knub";
+import { IBasePluginConfig, IPluginOptions, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import Ajv, { ErrorObject } from "ajv";
 import { isSnowflake, isUnicodeEmoji } from "../utils";
 
-export class ZeppelinPlugin<
-  TConfig extends {} = IBasePluginConfig,
-  TPermissions extends {} = IBasePluginPermissions
-> extends Plugin<TConfig, TPermissions> {
+export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
   protected configSchema: any;
   protected permissionsSchema: any;
 
@@ -39,26 +36,6 @@ export class ZeppelinPlugin<
         for (const override of options.overrides) {
           if (override.config) {
             const isValid = validate(override.config);
-            if (!isValid) return validate.errors;
-          }
-        }
-      }
-    }
-
-    // Validate permission values
-    if (this.permissionsSchema) {
-      const ajv = new Ajv();
-      const validate = ajv.compile(this.permissionsSchema);
-
-      if (options.permissions) {
-        const isValid = validate(options.permissions);
-        if (!isValid) return validate.errors;
-      }
-
-      if (options.overrides) {
-        for (const override of options.overrides) {
-          if (override.permissions) {
-            const isValid = validate(override.permissions);
             if (!isValid) return validate.errors;
           }
         }

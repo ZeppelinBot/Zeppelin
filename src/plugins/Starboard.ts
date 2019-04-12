@@ -17,11 +17,11 @@ import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 
-interface IStarboardPluginPermissions {
-  manage: boolean;
+interface IStarboardPluginConfig {
+  can_manage: boolean;
 }
 
-export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboardPluginPermissions> {
+export class StarboardPlugin extends ZeppelinPlugin<IStarboardPluginConfig> {
   public static pluginName = "starboard";
 
   protected starboards: GuildStarboards;
@@ -29,19 +29,17 @@ export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboar
 
   private onMessageDeleteFn;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IStarboardPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IStarboardPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        manage: false,
+      config: {
+        can_manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
-          permissions: {
-            manage: true,
+          config: {
+            can_manage: true,
           },
         },
       ],
@@ -64,7 +62,7 @@ export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboar
    * An interactive setup for creating a starboard
    */
   @d.command("starboard create")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async setupCmd(msg: Message) {
     const cancelMsg = () => msg.channel.createMessage("Cancelled");
 
@@ -177,7 +175,7 @@ export class StarboardPlugin extends ZeppelinPlugin<IBasePluginConfig, IStarboar
    * Deletes the starboard from the specified channel. The already-posted starboard messages are retained.
    */
   @d.command("starboard delete", "<channelId:channelId>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async deleteCmd(msg: Message, args: { channelId: string }) {
     const starboard = await this.starboards.getStarboardByChannelId(args.channelId);
     if (!starboard) {

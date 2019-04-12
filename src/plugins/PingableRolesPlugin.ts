@@ -1,5 +1,5 @@
-import { decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
-import { Message, Role, TextableChannel, User } from "eris";
+import { decorators as d, IPluginOptions } from "knub";
+import { Message, Role, TextableChannel } from "eris";
 import { GuildPingableRoles } from "../data/GuildPingableRoles";
 import { PingableRole } from "../data/entities/PingableRole";
 import { errorMessage, successMessage } from "../utils";
@@ -7,30 +7,28 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 const TIMEOUT = 10 * 1000;
 
-interface IPingableRolesPluginPermissions {
-  use: boolean;
+interface IPingableRolesPluginConfig {
+  can_manage: boolean;
 }
 
-export class PingableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, IPingableRolesPluginPermissions> {
+export class PingableRolesPlugin extends ZeppelinPlugin<IPingableRolesPluginConfig> {
   public static pluginName = "pingable_roles";
 
   protected pingableRoles: GuildPingableRoles;
   protected cache: Map<string, PingableRole[]>;
   protected timeouts: Map<string, any>;
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IPingableRolesPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IPingableRolesPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        use: false,
+      config: {
+        can_manage: false,
       },
 
       overrides: [
         {
           level: ">=100",
-          permissions: {
-            use: true,
+          config: {
+            can_manage: true,
           },
         },
       ],
@@ -53,7 +51,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, IPing
   }
 
   @d.command("pingable_role disable", "<channelId:channelId> <role:role>")
-  @d.permission("use")
+  @d.permission("can_manage")
   async disablePingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const pingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
     if (!pingableRole) {
@@ -70,7 +68,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, IPing
   }
 
   @d.command("pingable_role", "<channelId:channelId> <role:role>")
-  @d.permission("use")
+  @d.permission("can_manage")
   async setPingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const existingPingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
     if (existingPingableRole) {
@@ -87,7 +85,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IBasePluginConfig, IPing
   }
 
   @d.event("typingStart")
-  async onTypingStart(channel: TextableChannel, user: User) {
+  async onTypingStart(channel: TextableChannel) {
     const pingableRoles = await this.getPingableRolesForChannel(channel.id);
     if (pingableRoles.length === 0) return;
 

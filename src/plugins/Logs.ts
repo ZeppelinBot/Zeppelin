@@ -1,7 +1,7 @@
-import { decorators as d, IPluginOptions, logger, Plugin } from "knub";
+import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { Channel, Constants as ErisConstants, Member, Message, TextChannel, User } from "eris";
+import { Channel, Constants as ErisConstants, Member, TextChannel, User } from "eris";
 import {
   createChunkedMessage,
   deactivateMentions,
@@ -56,13 +56,11 @@ interface ILogsPluginConfig {
     [key: string]: string;
     timestamp: string;
   };
+
+  ping_user: boolean;
 }
 
-interface ILogsPluginPermissions {
-  pinged: boolean;
-}
-
-export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPermissions> {
+export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   public static pluginName = "logs";
 
   protected guildLogs: GuildLogs;
@@ -78,7 +76,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
   private onMessageDeleteBulkFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions(): IPluginOptions<ILogsPluginConfig, ILogsPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<ILogsPluginConfig> {
     return {
       config: {
         channels: {},
@@ -86,17 +84,14 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
           timestamp: "YYYY-MM-DD HH:mm:ss",
           ...DefaultLogMessages,
         },
-      },
-
-      permissions: {
-        pinged: true,
+        ping_user: true,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            pinged: false,
+          config: {
+            ping_user: false,
           },
         },
       ],
@@ -178,7 +173,9 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig, ILogsPluginPer
           if (user.user) user = user.user;
 
           const member = this.guild.members.get(user.id);
-          if (this.hasPermission("pinged", { member, userId: user.id })) {
+          const memberConfig = this.getMatchingConfig({ member, userId: user.id });
+
+          if (memberConfig.ping_user) {
             // Ping/mention the user
             return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
           } else {

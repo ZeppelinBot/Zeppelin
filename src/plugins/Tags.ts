@@ -13,15 +13,13 @@ import { GuildArchives } from "../data/GuildArchives";
 interface ITagsPluginConfig {
   prefix: string;
   delete_with_command: boolean;
+
+  can_create: boolean;
+  can_use: boolean;
+  can_list: boolean;
 }
 
-interface ITagsPluginPermissions {
-  create: boolean;
-  use: boolean;
-  list: boolean;
-}
-
-export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPermissions> {
+export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
   public static pluginName = "tags";
 
   protected archives: GuildArchives;
@@ -33,25 +31,23 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
 
   protected tagFunctions;
 
-  getDefaultOptions(): IPluginOptions<ITagsPluginConfig, ITagsPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<ITagsPluginConfig> {
     return {
       config: {
         prefix: "!!",
         delete_with_command: true,
-      },
 
-      permissions: {
-        create: false,
-        use: true,
-        list: false,
+        can_create: false,
+        can_use: true,
+        can_list: false,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            create: true,
-            list: true,
+          config: {
+            can_create: true,
+            can_list: true,
           },
         },
       ],
@@ -109,7 +105,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
   @d.command("tag list")
   @d.command("tags")
   @d.command("taglist")
-  @d.permission("list")
+  @d.permission("can_list")
   async tagListCmd(msg: Message) {
     const tags = await this.tags.all();
     if (tags.length === 0) {
@@ -125,7 +121,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
   }
 
   @d.command("tag delete", "<tag:string>")
-  @d.permission("create")
+  @d.permission("can_create")
   async deleteTagCmd(msg: Message, args: { tag: string }) {
     const tag = await this.tags.find(args.tag);
     if (!tag) {
@@ -138,14 +134,14 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig, ITagsPluginPer
   }
 
   @d.command("tag eval", "<body:string$>")
-  @d.permission("create")
+  @d.permission("can_create")
   async evalTagCmd(msg: Message, args: { body: string }) {
     const rendered = await this.renderTag(args.body);
     msg.channel.createMessage(rendered);
   }
 
   @d.command("tag", "<tag:string> <body:string$>")
-  @d.permission("create")
+  @d.permission("can_create")
   async tagCmd(msg: Message, args: { tag: string; body: string }) {
     try {
       parseTemplate(args.body);

@@ -1,4 +1,4 @@
-import { Plugin, decorators as d, IBasePluginConfig, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import { Channel, EmbedBase, Message, Role, TextChannel } from "eris";
 import { errorMessage, downloadFile, getRoleMentions } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
@@ -9,12 +9,11 @@ const fsp = fs.promises;
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 
-interface IPostPluginPermissions {
-  post: boolean;
-  edit: boolean;
+interface IPostPluginConfig {
+  can_post: boolean;
 }
 
-export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPermissions> {
+export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
   public static pluginName = "post";
 
   protected savedMessages: GuildSavedMessages;
@@ -23,21 +22,17 @@ export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPer
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
   }
 
-  getDefaultOptions(): IPluginOptions<IBasePluginConfig, IPostPluginPermissions> {
+  getDefaultOptions(): IPluginOptions<IPostPluginConfig> {
     return {
-      config: {},
-
-      permissions: {
-        post: false,
-        edit: false,
+      config: {
+        can_post: false,
       },
 
       overrides: [
         {
           level: ">=100",
-          permissions: {
-            post: true,
-            edit: true,
+          config: {
+            can_post: true,
           },
         },
       ],
@@ -59,7 +54,7 @@ export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPer
       },
     ],
   })
-  @d.permission("post")
+  @d.permission("can_post")
   async postCmd(msg: Message, args: { channel: Channel; content?: string; "enable-mentions": boolean }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Channel is not a text channel"));
@@ -123,7 +118,7 @@ export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPer
       { name: "color", type: "string" },
     ],
   })
-  @d.permission("post")
+  @d.permission("can_post")
   async postEmbedCmd(msg: Message, args: { channel: Channel; title?: string; content?: string; color?: string }) {
     if (!(args.channel instanceof TextChannel)) {
       msg.channel.createMessage(errorMessage("Channel is not a text channel"));
@@ -159,7 +154,7 @@ export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPer
    * COMMAND: Edit the specified message posted by the bot
    */
   @d.command("edit", "<messageId:string> <content:string$>")
-  @d.permission("edit")
+  @d.permission("can_post")
   async editCmd(msg, args: { messageId: string; content: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {
@@ -185,7 +180,7 @@ export class PostPlugin extends ZeppelinPlugin<IBasePluginConfig, IPostPluginPer
       { name: "color", type: "string" },
     ],
   })
-  @d.permission("edit")
+  @d.permission("can_post")
   async editEmbedCmd(msg: Message, args: { messageId: string; title?: string; content?: string; color?: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {

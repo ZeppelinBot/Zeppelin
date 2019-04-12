@@ -9,14 +9,12 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
+
+  can_manage: boolean;
+  is_affected: boolean;
 }
 
-interface ISlowmodePluginPermissions {
-  manage: boolean;
-  affected: boolean;
-}
-
-export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowmodePluginPermissions> {
+export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   public static pluginName = "slowmode";
 
   protected slowmodes: GuildSlowmodes;
@@ -25,23 +23,21 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<ISlowmodePluginConfig, ISlowmodePluginPermissions> {
+  getDefaultOptions(): IPluginOptions<ISlowmodePluginConfig> {
     return {
       config: {
         use_native_slowmode: true,
-      },
 
-      permissions: {
-        manage: false,
-        affected: true,
+        can_manage: false,
+        is_affected: true,
       },
 
       overrides: [
         {
           level: ">=50",
-          permissions: {
-            manage: true,
-            affected: false,
+          config: {
+            can_manage: true,
+            is_affected: false,
           },
         },
       ],
@@ -128,7 +124,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
    * COMMAND: Disable slowmode on the specified channel
    */
   @d.command("slowmode disable", "<channel:channel>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async disableSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
     const botSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
     const hasNativeSlowmode = args.channel.rateLimitPerUser;
@@ -168,7 +164,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
    * COMMAND: Clear slowmode from a specific user on a specific channel
    */
   @d.command("slowmode clear", "<channel:channel> <user:user>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async clearSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel; user: User }) {
     const channelSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
     if (!channelSlowmode) {
@@ -185,7 +181,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
   }
 
   @d.command("slowmode list")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async slowmodeListCmd(msg: Message) {
     const channels = this.guild.channels;
     const slowmodes: Array<{ channel: GuildChannel; seconds: number; native: boolean }> = [];
@@ -227,7 +223,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig, ISlowm
    */
   @d.command("slowmode", "<channel:channel> <time:string>")
   @d.command("slowmode", "<time:string>")
-  @d.permission("manage")
+  @d.permission("can_manage")
   async slowmodeCmd(msg: Message, args: { channel?: GuildChannel & TextChannel; time: string }) {
     const channel = args.channel || msg.channel;
 

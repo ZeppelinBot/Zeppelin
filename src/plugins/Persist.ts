@@ -26,8 +26,6 @@ export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
         persist_nicknames: false,
         persist_voice_mutes: false,
       },
-
-      permissions: {},
     };
   }
 
