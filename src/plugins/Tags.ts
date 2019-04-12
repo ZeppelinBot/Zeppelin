@@ -102,9 +102,9 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
     this.savedMessages.events.off("delete", this.onMessageDeleteFn);
   }
 
-  @d.command("tag list")
-  @d.command("tags")
-  @d.command("taglist")
+  @d.command("tag list", [], {
+    aliases: ["tags", "taglist"],
+  })
   @d.permission("can_list")
   async tagListCmd(msg: Message) {
     const tags = await this.tags.all();

@@ -68,8 +68,9 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
     this.postRemindersTimeout = setTimeout(() => this.postDueRemindersLoop(), REMINDER_LOOP_TIME);
   }
 
-  @d.command("remind", "<time:string> <reminder:string$>")
-  @d.command("remindme", "<time:string> <reminder:string$>")
+  @d.command("remind", "<time:string> <reminder:string$>", {
+    aliases: ["remindme"],
+  })
   @d.permission("can_use")
   async addReminderCmd(msg: Message, args: { time: string; reminder: string }) {
     const now = moment();
@@ -132,8 +133,9 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
     createChunkedMessage(msg.channel, lines.join("\n"));
   }
 
-  @d.command("reminders delete", "<num:number>")
-  @d.command("reminders d", "<num:number>")
+  @d.command("reminders delete", "<num:number>", {
+    aliases: ["reminders d"],
+  })
   @d.permission("can_use")
   async deleteReminderCmd(msg: Message, args: { num: number }) {
     const reminders = await this.reminders.getRemindersByUserId(msg.author.id);

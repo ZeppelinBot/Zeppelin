@@ -223,8 +223,9 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   /**
    * COMMAND: Set slowmode for the specified channel
    */
-  @d.command("slowmode", "<channel:channel> <time:string>")
-  @d.command("slowmode", "<time:string>")
+  @d.command("slowmode", "<channel:channel> <time:string>", {
+    overloads: ["<time:string>"],
+  })
   @d.permission("can_manage")
   async slowmodeCmd(msg: Message, args: { channel?: GuildChannel & TextChannel; time: string }) {
     const channel = args.channel || msg.channel;
