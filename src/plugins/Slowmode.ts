@@ -7,6 +7,8 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
+const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60 * 1000; // 6 hours
+
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
 
@@ -233,7 +235,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     }
 
     const seconds = Math.ceil(convertDelayStringToMS(args.time) / 1000);
-    const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= 120;
+    const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= NATIVE_SLOWMODE_LIMIT;
 
     if (useNativeSlowmode) {
       // Native slowmode
