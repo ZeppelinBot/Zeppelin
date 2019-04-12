@@ -197,6 +197,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
   }
 
   @d.command("search", "[query:string$]", {
+    aliases: ["s"],
     options: [
       {
         name: "page",
