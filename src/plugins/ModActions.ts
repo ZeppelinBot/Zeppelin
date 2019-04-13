@@ -303,7 +303,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   /**
    * Update the specified case by adding more notes/details to it
    */
-  @d.command(/update|updatecase/, "<caseNumber:number> <note:string$>")
+  @d.command("update", "<caseNumber:number> <note:string$>")
   @d.permission("can_note")
   async updateSpecificCmd(msg: Message, args: { caseNumber: number; note: string }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
