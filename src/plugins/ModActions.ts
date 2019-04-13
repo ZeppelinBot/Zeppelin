@@ -1099,9 +1099,22 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("cases", "<userId:userId> [opts:string$]")
+  @d.command("cases", "<userId:userId> [opts:string$]", {
+    options: [
+      {
+        name: "expand",
+        type: "boolean",
+        shortcut: "e",
+      },
+      {
+        name: "hidden",
+        type: "boolean",
+        shortcut: "h",
+      },
+    ],
+  })
   @d.permission("can_view")
-  async userCasesCmd(msg: Message, args: { userId: string; opts?: string }) {
+  async userCasesCmd(msg: Message, args: { userId: string; opts?: string; expand?: boolean; hidden?: boolean }) {
     const cases = await this.cases.with("notes").getByUserId(args.userId);
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
@@ -1112,10 +1125,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     if (cases.length === 0) {
       msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
     } else {
-      const showHidden = args.opts && args.opts.match(/\bhidden\b/);
+      const showHidden = args.hidden || (args.opts && args.opts.match(/\bhidden\b/));
       const casesToDisplay = showHidden ? cases : normalCases;
 
-      if (args.opts && args.opts.match(/\b(expand|e)\b/)) {
+      if (args.expand || (args.opts && args.opts.match(/\b(expand|e)\b/))) {
         if (casesToDisplay.length > 8) {
           msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
           return;
@@ -1139,9 +1152,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
         if (!showHidden && hiddenCases.length) {
           if (hiddenCases.length === 1) {
-            lines.push(`*+${hiddenCases.length} hidden case, use "hidden" to show it*`);
+            lines.push(`*+${hiddenCases.length} hidden case, use "--hidden" to show it*`);
           } else {
-            lines.push(`*+${hiddenCases.length} hidden cases, use "hidden" to show them*`);
+            lines.push(`*+${hiddenCases.length} hidden cases, use "--hidden" to show them*`);
           }
         }
 
@@ -1154,6 +1167,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       `);
 
         createChunkedMessage(msg.channel, finalMessage);
+      }
+
+      if ((args.opts && args.opts.match(/\bhidden\b/)) || (args.opts && args.opts.match(/\b(expand|e)\b/))) {
+        msg.channel.createMessage(
+          `<@!${
+            msg.author.id
+          }> **Note:** expand/hidden have been replaced with --expand/--hidden (and -e/-h as shortcuts)`,
+        );
       }
     }
   }
