@@ -373,7 +373,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -441,7 +441,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -574,7 +574,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -659,7 +659,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -729,7 +729,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -799,7 +799,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -851,7 +851,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -905,7 +905,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
@@ -1046,7 +1046,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
-      if (!this.hasPermission("act_as_other", { message: msg })) {
+      if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
