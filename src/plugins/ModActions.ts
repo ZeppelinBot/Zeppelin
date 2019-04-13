@@ -301,35 +301,22 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   }
 
   /**
-   * Update the specified case by adding more notes/details to it
+   * Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it
    */
-  @d.command("update", "<caseNumber:number> <note:string$>")
+  @d.command("update", "<caseNumber:number> <note:string$>", {
+    overloads: ["<note:string$>"],
+  })
   @d.permission("can_note")
-  async updateSpecificCmd(msg: Message, args: { caseNumber: number; note: string }) {
-    const theCase = await this.cases.findByCaseNumber(args.caseNumber);
-    if (!theCase) {
-      msg.channel.createMessage(errorMessage("Case not found"));
-      return;
+  async updateSpecificCmd(msg: Message, args: { caseNumber?: number; note: string }) {
+    let theCase: Case;
+    if (args.caseNumber != null) {
+      theCase = await this.cases.findByCaseNumber(args.caseNumber);
+    } else {
+      theCase = await this.cases.findLatestByModId(msg.author.id);
     }
 
-    await this.actions.fire("createCaseNote", {
-      caseId: theCase.id,
-      modId: msg.author.id,
-      note: args.note,
-    });
-
-    msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
-  }
-
-  /**
-   * Update the latest case
-   */
-  @d.command(/update|updatecase/, "<note:string$>")
-  @d.permission("can_note")
-  async updateLatestCmd(msg: Message, args: { note: string }) {
-    const theCase = await this.cases.findLatestByModId(msg.author.id);
     if (!theCase) {
-      msg.channel.createMessage(errorMessage("No latest case"));
+      msg.channel.createMessage(errorMessage("Case not found"));
       return;
     }
 
