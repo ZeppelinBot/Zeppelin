@@ -4,11 +4,17 @@ import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildActions } from "../data/GuildActions";
 import { GuildMutes } from "../data/GuildMutes";
-import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage, errorMessage } from "../utils";
+import { DBDateFormat, chunkMessageLines, stripObjectToScalars, successMessage, errorMessage, sleep } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 import { decorators as d, IPluginOptions, logger } from "knub";
+import { Mute } from "../data/entities/Mute";
+
+interface IMuteWithDetails extends Mute {
+  member?: Member;
+  banned?: boolean;
+}
 
 interface IMutesPluginConfig {
   mute_role: string;
@@ -115,10 +121,10 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   }
 
   @d.command("mutes", [], {
-    options: [{ name: "age", type: "delay" }],
+    options: [{ name: "age", type: "delay" }, { name: "left", type: "boolean" }],
   })
   @d.permission("can_view_list")
-  public async muteListCmd(msg: Message, args: { age?: number }) {
+  public async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
     const lines = [];
 
     // Active, logged mutes
@@ -132,9 +138,11 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       return a.expires_at > b.expires_at ? 1 : -1;
     });
 
-    let filteredMutes = activeMutes;
+    let filteredMutes: IMuteWithDetails[] = activeMutes;
     let hasFilters = false;
+    let bannedIds: string[] = null;
 
+    // Filter: mute age
     if (args.age) {
       const cutoff = moment()
         .subtract(args.age, "ms")
@@ -143,38 +151,76 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       hasFilters = true;
     }
 
+    // Fetch some extra details for each mute: the muted member, and whether they've been banned
+    for (const [index, mute] of filteredMutes.entries()) {
+      const muteWithDetails = { ...mute };
+
+      let member = this.guild.members.get(mute.user_id);
+      if (!member) {
+        try {
+          member = await this.bot.getRESTGuildMember(this.guildId, mute.user_id);
+          this.guild.members.add(member);
+        } catch (e) {} // tslint:disable-line
+      }
+
+      if (!member) {
+        if (!bannedIds) {
+          const bans = await this.guild.getBans();
+          bannedIds = bans.map(u => u.id);
+        }
+
+        muteWithDetails.banned = bannedIds.includes(mute.user_id);
+      } else {
+        muteWithDetails.member = member;
+      }
+
+      filteredMutes[index] = muteWithDetails;
+    }
+
+    // Filter: left the server
+    if (args.left != null) {
+      filteredMutes = filteredMutes.filter(m => (args.left && !m.member) || (!args.left && m.member));
+      hasFilters = true;
+    }
+
+    // Mute count
     let totalMutes = filteredMutes.length;
 
+    // Create a message lines for each mute
     const caseIds = filteredMutes.map(m => m.case_id).filter(v => !!v);
     const muteCases = caseIds.length ? await this.cases.get(caseIds) : [];
     const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
-    lines.push(
-      ...filteredMutes.map(mute => {
-        const user = this.bot.users.get(mute.user_id);
-        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-        const theCase = muteCasesById.get(mute.case_id);
-        const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
+    for (const mute of filteredMutes) {
+      const user = this.bot.users.get(mute.user_id);
+      const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+      const theCase = muteCasesById.get(mute.case_id);
+      const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 
-        let line = `**${username}** (\`${mute.user_id}\`)   📔 ${caseName}`;
+      let line = `<@!${mute.user_id}> (**${username}**, \`${mute.user_id}\`)   📋 ${caseName}`;
 
-        if (mute.expires_at) {
-          const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
-          const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
-          line += `   ⏰ Expires in ${humanizedTime}`;
-        } else {
-          line += `   ⏰ Doesn't expire`;
-        }
+      if (mute.expires_at) {
+        const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
+        const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
+        line += `   ⏰ Expires in ${humanizedTime}`;
+      } else {
+        line += `   ⏰ Doesn't expire`;
+      }
 
-        const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
-        const humanizedTimeFromMute = humanizeDuration(timeFromMute, { largest: 2, round: true });
-        line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
+      const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
+      const humanizedTimeFromMute = humanizeDuration(timeFromMute, { largest: 2, round: true });
+      line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
 
-        return line;
-      }),
-    );
+      if (mute.banned) {
+        line += `   🔨 User was banned`;
+      } else if (!mute.member) {
+        line += `   ❌ Has left the server`;
+      }
 
-    // Manually added mute roles (but only if no filters have been specified)
+      lines.push(line);
+    }
+
+    // Find manually added mute roles and create a mesage line for each (but only if no filters have been specified)
     if (!hasFilters) {
       const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
       const manuallyMutedMembers = [];
@@ -191,14 +237,22 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
       lines.push(
         ...manuallyMutedMembers.map(member => {
-          return `\`Manual mute\` **${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
+          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${
+            member.id
+          }\`)   🔧 Manual mute`;
         }),
       );
     }
 
-    const message = hasFilters
-      ? `Results (${totalMutes} total):\n\n${lines.join("\n")}`
-      : `Active mutes (${totalMutes} total):\n\n${lines.join("\n")}`;
+    let message;
+    if (totalMutes > 0) {
+      message = hasFilters
+        ? `Results (${totalMutes} total):\n\n${lines.join("\n")}`.trim()
+        : `Active mutes (${totalMutes} total):\n\n${lines.join("\n")}`.trim();
+    } else {
+      message = hasFilters ? "No mutes found with the specified filters!" : "No active mutes!";
+    }
+
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
       msg.channel.createMessage(chunk);
