@@ -1,8 +1,9 @@
-import { decorators as d, IPluginOptions } from "knub";
+import { decorators as d, getCommandSignature, IPluginOptions } from "knub";
 import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
   channelMentionRegex,
   chunkArray,
+  createChunkedMessage,
   embedPadding,
   errorMessage,
   isSnowflake,
@@ -24,6 +25,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ICommandDefinition } from "knub/dist/CommandManager";
 
 const { performance } = require("perf_hooks");
 
@@ -45,6 +47,7 @@ interface IUtilityPluginConfig {
   can_ping: boolean;
   can_source: boolean;
   can_vcmove: boolean;
+  can_help: boolean;
 }
 
 export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
@@ -69,6 +72,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         can_ping: false,
         can_source: false,
         can_vcmove: false,
+        can_help: false,
       },
       overrides: [
         {
@@ -82,6 +86,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
             can_server: true,
             can_nickname: true,
             can_vcmove: true,
+            can_help: true,
           },
         },
         {
@@ -737,6 +742,55 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     msg.channel.createMessage(
       successMessage(`**${args.member.user.username}#${args.member.user.discriminator}** moved to **${channel.name}**`),
     );
+  }
+
+  @d.command("help", "<command:string$>")
+  @d.permission("can_help")
+  helpCmd(msg: Message, args: { command: string }) {
+    const searchStr = args.command.toLowerCase();
+
+    const matchingCommands: ICommandDefinition[] = [];
+
+    const guildData = this.knub.getGuildData(this.guildId);
+    for (const plugin of guildData.loadedPlugins.values()) {
+      if (!(plugin instanceof ZeppelinPlugin)) continue;
+
+      const commands = plugin.getRegisteredCommands();
+      for (const command of commands) {
+        const trigger = command.trigger.source.toLowerCase();
+        if (trigger.startsWith(searchStr)) {
+          matchingCommands.push(command);
+        }
+      }
+    }
+
+    const totalResults = matchingCommands.length;
+    const limitedResults = matchingCommands.slice(0, 15);
+    const signatures = limitedResults.map(command => {
+      return (
+        "`" +
+        getCommandSignature(
+          guildData.config.prefix,
+          command.trigger.source,
+          command.parameters,
+          command.config.options,
+        ) +
+        "`"
+      );
+    });
+
+    if (totalResults === 0) {
+      msg.channel.createMessage("No matching commands found!");
+      return;
+    }
+
+    let message =
+      totalResults !== limitedResults.length
+        ? `Results (${totalResults} total, showing first ${limitedResults.length}):`
+        : `Results:`;
+
+    message += `\n\n${signatures.join("\n")}`;
+    createChunkedMessage(msg.channel, message);
   }
 
   @d.command("reload_guild")

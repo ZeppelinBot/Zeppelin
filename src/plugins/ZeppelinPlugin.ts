@@ -69,4 +69,8 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
       throw new PluginRuntimeError(`Invalid emoji: ${snowflake}`, this.runtimePluginName, this.guildId);
     }
   }
+
+  public getRegisteredCommands() {
+    return this.commands.commands;
+  }
 }
