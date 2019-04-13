@@ -1,6 +1,9 @@
 import { BaseRepository } from "./BaseRepository";
 import { Member, TextableChannel } from "eris";
 import { CaseTypes } from "./CaseTypes";
+import { ICaseDetails } from "./GuildCases";
+import { Case } from "./entities/Case";
+import { INotifyUserResult } from "../utils";
 
 type KnownActions = "mute" | "unmute";
 
@@ -9,28 +12,30 @@ type UnknownAction<T extends string> = T extends KnownActions ? never : T;
 
 type ActionFn<T> = (args: T) => any | Promise<any>;
 
-type MuteActionArgs = { member: Member; muteTime?: number; reason?: string };
-type UnmuteActionArgs = { member: Member; unmuteTime?: number; reason?: string };
-type CreateCaseActionArgs = {
-  userId: string;
-  modId: string;
-  type: CaseTypes;
-  auditLogId?: string;
-  reason?: string;
-  automatic?: boolean;
-  postInCaseLog?: boolean;
-  ppId?: string;
-};
+type MuteActionArgs = { member: Member; muteTime?: number; reason?: string; caseDetails?: ICaseDetails };
+type UnmuteActionArgs = { member: Member; unmuteTime?: number; reason?: string; caseDetails?: ICaseDetails };
+type CreateCaseActionArgs = ICaseDetails;
 type CreateCaseNoteActionArgs = {
   caseId: number;
   modId: string;
   note: string;
   automatic?: boolean;
   postInCaseLog?: boolean;
+  noteDetails?: string[];
 };
 type PostCaseActionArgs = {
   caseId: number;
   channel: TextableChannel;
+};
+
+export type MuteActionResult = {
+  case: Case;
+  notifyResult: INotifyUserResult;
+  updatedExistingMute: boolean;
+};
+
+export type UnmuteActionResult = {
+  case: Case;
 };
 
 export class GuildActions extends BaseRepository {
@@ -63,8 +68,8 @@ export class GuildActions extends BaseRepository {
     this.actions.delete(actionName);
   }
 
-  public fire(actionName: "mute", args: MuteActionArgs): Promise<any>;
-  public fire(actionName: "unmute", args: UnmuteActionArgs): Promise<any>;
+  public fire(actionName: "mute", args: MuteActionArgs): Promise<MuteActionResult>;
+  public fire(actionName: "unmute", args: UnmuteActionArgs): Promise<UnmuteActionResult>;
   public fire(actionName: "createCase", args: CreateCaseActionArgs): Promise<any>;
   public fire(actionName: "createCaseNote", args: CreateCaseNoteActionArgs): Promise<any>;
   public fire(actionName: "postCase", args: PostCaseActionArgs): Promise<any>;
