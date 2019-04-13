@@ -1,3 +1,4 @@
+import has from "lodash.has";
 import at from "lodash.at";
 
 const TEMPLATE_CACHE_SIZE = 100;
@@ -218,7 +219,7 @@ export function parseTemplate(str: string): ParsedTemplate {
 }
 
 async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
-  const value = at(values, theVar.identifier)[0];
+  const value = has(values, theVar.identifier) && at(values, theVar.identifier)[0];
 
   if (typeof value === "function") {
     const args = [];
