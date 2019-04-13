@@ -215,12 +215,17 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         name: "sort",
         type: "string",
       },
+      {
+        name: "case-sensitive",
+        type: "boolean",
+        shortcut: "cs",
+      },
     ],
   })
   @d.permission("can_search")
   async searchCmd(
     msg: Message,
-    args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string },
+    args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string; "case-sensitive"?: boolean },
   ) {
     let matchingMembers = Array.from(this.guild.members.values());
 
@@ -240,12 +245,18 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }
 
     if (args.query) {
-      const query = args.query.toLowerCase();
+      const query = args["case-sensitive"] ? args.query : args.query.toLowerCase();
 
       matchingMembers = matchingMembers.filter(member => {
-        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (member.nick && member.nick.toLowerCase().indexOf(query) !== -1) return true;
-        if (fullUsername.toLowerCase().indexOf(query) !== -1) return true;
+        const nick = args["case-sensitive"] ? member.nick : member.nick && member.nick.toLowerCase();
+
+        const fullUsername = args["case-sensitive"]
+          ? `${member.user.username}#${member.user.discriminator}`
+          : `${member.user.username}#${member.user.discriminator}`.toLowerCase();
+
+        if (nick && nick.indexOf(query) !== -1) return true;
+        if (fullUsername.indexOf(query) !== -1) return true;
+
         return false;
       });
     }
@@ -285,7 +296,9 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       const longestId = pageMembers.reduce((longest, member) => Math.max(longest, member.id.length), 0);
       const lines = pageMembers.map(member => {
         const paddedId = member.id.padEnd(longestId, " ");
-        return `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+        let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+        if (member.nick) line += ` (${member.nick})`;
+        return line;
       });
 
       const footer = paginated ? "Use --page=n to browse results" : "";
