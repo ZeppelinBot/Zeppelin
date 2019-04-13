@@ -1,4 +1,4 @@
-import { Emoji, Guild, GuildAuditLogEntry, TextableChannel } from "eris";
+import { Client, Emoji, Guild, GuildAuditLogEntry, TextableChannel, TextChannel, User } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -8,6 +8,7 @@ const fsp = fs.promises;
 
 import https from "https";
 import tmp from "tmp";
+import { logger } from "knub";
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -428,3 +429,68 @@ export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
 export type CustomEmoji = {
   id: string;
 } & Emoji;
+
+export interface INotifyUserConfig {
+  useDM?: boolean;
+  useChannel?: boolean;
+  channelId?: string;
+}
+
+export enum NotifyUserStatus {
+  Ignored = 1,
+  Failed,
+  DirectMessaged,
+  ChannelMessaged,
+}
+
+export interface INotifyUserResult {
+  status: NotifyUserStatus;
+  text?: string;
+}
+
+export async function notifyUser(
+  bot: Client,
+  guild: Guild,
+  user: User,
+  body: string,
+  config: INotifyUserConfig,
+): Promise<INotifyUserResult> {
+  if (!config.useDM && !config.useChannel) {
+    return { status: NotifyUserStatus.Ignored };
+  }
+
+  if (config.useDM) {
+    try {
+      const dmChannel = await bot.getDMChannel(user.id);
+      await dmChannel.createMessage(body);
+      logger.info(`Notified ${user.id} via DM: ${body}`);
+      return {
+        status: NotifyUserStatus.DirectMessaged,
+        text: "user notified with a direct message",
+      };
+    } catch (e) {} // tslint:disable-line
+  }
+
+  if (config.useChannel && config.channelId) {
+    try {
+      const channel = guild.channels.get(config.channelId);
+      if (channel instanceof TextChannel) {
+        await channel.createMessage(`<@!${user.id}> ${body}`);
+        return {
+          status: NotifyUserStatus.ChannelMessaged,
+          text: `user notified in <#${channel.id}>`,
+        };
+      }
+    } catch (e) {} // tslint:disable-line
+  }
+
+  return {
+    status: NotifyUserStatus.Failed,
+    text: "failed to message user",
+  };
+}
+
+export function ucfirst(str) {
+  if (typeof str !== "string" || str === "") return str;
+  return str[0].toUpperCase() + str.slice(1);
+}

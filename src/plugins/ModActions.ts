@@ -3,11 +3,13 @@ import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextCha
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
-  convertDelayStringToMS,
+  asSingleLine,
   createChunkedMessage,
   errorMessage,
   findRelevantAuditLogEntry,
-  asSingleLine,
+  INotifyUserResult,
+  notifyUser,
+  NotifyUserStatus,
   stripObjectToScalars,
   successMessage,
   trimLines,
@@ -17,9 +19,8 @@ import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { GuildActions } from "../data/GuildActions";
+import { GuildActions, MuteActionResult } from "../data/GuildActions";
 import { Case } from "../data/entities/Case";
-import { Mute } from "../data/entities/Mute";
 import { renderTemplate } from "../templateFormatter";
 
 enum IgnoredEventType {
@@ -33,31 +34,15 @@ interface IIgnoredEvent {
   userId: string;
 }
 
-enum MessageResultStatus {
-  Ignored = 1,
-  Failed,
-  DirectMessaged,
-  ChannelMessaged,
-}
-
-interface IMessageResult {
-  status: MessageResultStatus;
-  text?: string;
-}
-
 interface IModActionsPluginConfig {
   dm_on_warn: boolean;
-  dm_on_mute: boolean;
   dm_on_kick: boolean;
   dm_on_ban: boolean;
   message_on_warn: boolean;
-  message_on_mute: boolean;
   message_on_kick: boolean;
   message_on_ban: boolean;
   message_channel: string;
   warn_message: string;
-  mute_message: string;
-  timed_mute_message: string;
   kick_message: string;
   ban_message: string;
   alert_on_rejoin: boolean;
@@ -98,17 +83,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     return {
       config: {
         dm_on_warn: true,
-        dm_on_mute: false,
         dm_on_kick: false,
         dm_on_ban: false,
         message_on_warn: false,
-        message_on_mute: false,
         message_on_kick: false,
         message_on_ban: false,
         message_channel: null,
         warn_message: "You have received a warning on {guildName}: {reason}",
-        mute_message: "You have been muted on {guildName}. Reason given: {reason}",
-        timed_mute_message: "You have been muted on {guildName} for {time}. Reason given: {reason}",
         kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         alert_on_rejoin: false,
@@ -307,7 +288,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     overloads: ["<note:string$>"],
   })
   @d.permission("can_note")
-  async updateSpecificCmd(msg: Message, args: { caseNumber?: number; note: string }) {
+  async updateCmd(msg: Message, args: { caseNumber?: number; note: string }) {
     let theCase: Case;
     if (args.caseNumber != null) {
       theCase = await this.cases.findByCaseNumber(args.caseNumber);
@@ -323,6 +304,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     await this.actions.fire("createCaseNote", {
       caseId: theCase.id,
       modId: msg.author.id,
+      note: args.note,
+    });
+
+    this.serverLogs.log(LogType.CASE_UPDATE, {
+      mod: msg.author,
+      caseNumber: theCase.case_number,
+      caseType: CaseTypes[theCase.type],
       note: args.note,
     });
 
@@ -373,14 +361,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
 
-    const userMessageResult = await this.tryToMessageUser(
-      args.member.user,
-      warnMessage,
-      config.dm_on_warn,
-      config.message_on_warn,
-    );
+    const userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, warnMessage, {
+      useDM: config.dm_on_warn,
+      useChannel: config.message_on_warn,
+    });
 
-    if (userMessageResult.status === MessageResultStatus.Failed) {
+    if (userMessageResult.status === NotifyUserStatus.Failed) {
       const failedMsg = await msg.channel.createMessage("Failed to message the user. Log the warning anyway?");
       const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
       failedMsg.delete();
@@ -427,6 +413,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
+    let pp = null;
+
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
@@ -434,116 +422,60 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       }
 
       mod = args.mod;
+      pp = msg.author;
     }
-
-    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
 
     const timeUntilUnmute = args.time && humanizeDuration(args.time);
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    // Apply "muted" role
-    this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
-    const mute: Mute = await this.actions.fire("mute", {
-      member: args.member,
-      muteTime: args.time,
-    });
+    let muteResult: MuteActionResult;
 
-    if (!mute) {
+    try {
+      muteResult = await this.actions.fire("mute", {
+        member: args.member,
+        muteTime: args.time,
+        reason,
+        caseDetails: {
+          modId: mod.id,
+          ppId: pp && pp.id,
+        },
+      });
+    } catch (e) {
+      logger.error(`Failed to mute user ${args.member.id}: ${e.message}`);
       msg.channel.createMessage(errorMessage("Could not mute the user"));
       return;
-    }
-
-    const hasOldCase = mute.case_id != null;
-
-    let theCase;
-
-    if (hasOldCase) {
-      // Update old case
-      theCase = await this.cases.find(mute.case_id);
-      const caseNote = `__[Mute updated to ${args.time ? timeUntilUnmute : "indefinite"}]__ ${reason}`.trim();
-      await this.actions.fire("createCaseNote", {
-        caseId: mute.case_id,
-        modId: mod.id,
-        note: caseNote,
-      });
-    } else {
-      // Create new case
-      const caseNote = `__[Muted ${args.time ? `for ${timeUntilUnmute}` : "indefinitely"}]__ ${reason}`.trim();
-      theCase = await this.actions.fire("createCase", {
-        userId: args.member.id,
-        modId: mod.id,
-        type: CaseTypes.Mute,
-        reason: caseNote,
-        ppId: mod.id !== msg.author.id ? msg.author.id : null,
-      });
-      await this.mutes.setCaseId(args.member.id, theCase.id);
-    }
-
-    const config = this.getConfig();
-
-    // Message the user informing them of the mute
-    // Don't message them if we're updating an old mute
-    if (reason && !hasOldCase) {
-      const template = args.time ? config.timed_mute_message : config.mute_message;
-
-      const muteMessage = await renderTemplate(template, {
-        guildName: this.guild.name,
-        reason,
-        time: timeUntilUnmute,
-      });
-
-      userMessageResult = await this.tryToMessageUser(
-        args.member.user,
-        muteMessage,
-        config.dm_on_mute,
-        config.message_on_mute,
-      );
     }
 
     // Confirm the action to the moderator
     let response;
     if (args.time) {
-      if (hasOldCase) {
+      if (muteResult.updatedExistingMute) {
         response = asSingleLine(`
           Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
-          mute to ${timeUntilUnmute} (Case #${theCase.case_number})
+          mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
         `);
       } else {
         response = asSingleLine(`
           Muted **${args.member.user.username}#${args.member.user.discriminator}**
-          for ${timeUntilUnmute} (Case #${theCase.case_number})
+          for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
         `);
       }
     } else {
-      if (hasOldCase) {
+      if (muteResult.updatedExistingMute) {
         response = asSingleLine(`
           Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
-          mute to indefinite (Case #${theCase.case_number})
+          mute to indefinite (Case #${muteResult.case.case_number})
         `);
       } else {
         response = asSingleLine(`
           Muted **${args.member.user.username}#${args.member.user.discriminator}**
-          indefinitely (Case #${theCase.case_number})
+          indefinitely (Case #${muteResult.case.case_number})
         `);
       }
     }
 
-    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
+    if (muteResult.notifyResult.text) response += ` (${muteResult.notifyResult.text})`;
     msg.channel.createMessage(successMessage(response));
-
-    // Log the action
-    if (args.time) {
-      this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-        mod: stripObjectToScalars(mod.user),
-        member: stripObjectToScalars(args.member, ["user"]),
-        time: timeUntilUnmute,
-      });
-    } else {
-      this.serverLogs.log(LogType.MEMBER_MUTE, {
-        mod: stripObjectToScalars(mod.user),
-        member: stripObjectToScalars(args.member, ["user"]),
-      });
-    }
   }
 
   @d.command("unmute", "<member:Member> <time:delay> <reason:string$>", {
@@ -559,76 +491,57 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     // The moderator who did the action is the message author or, if used, the specified --mod
-    let mod = msg.member;
+    let mod = msg.author;
+    let pp = null;
+
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
         msg.channel.createMessage(errorMessage("No permission for --mod"));
         return;
       }
 
-      mod = args.mod;
+      mod = args.mod.user;
+      pp = msg.author;
     }
 
     // Check if they're muted in the first place
-    const mute = await this.mutes.findExistingMuteForUserId(args.member.id);
-    if (!mute) {
+    if (!(await this.mutes.isMuted(args.member.id))) {
       msg.channel.createMessage(errorMessage("Cannot unmute: member is not muted"));
       return;
     }
 
-    // Convert unmute time from e.g. "2h30m" to milliseconds
-    const timeUntilUnmute = args.time && humanizeDuration(args.time);
-
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
-    const caseNote = args.time ? `__[Scheduled unmute in ${timeUntilUnmute}]__ ${reason}` : reason;
 
-    // Create a case
-    const createdCase = await this.actions.fire("createCase", {
-      userId: args.member.id,
-      modId: mod.id,
-      type: CaseTypes.Unmute,
-      reason: caseNote,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+    const result = await this.actions.fire("unmute", {
+      member: args.member,
+      unmuteTime: args.time,
+      caseDetails: {
+        modId: mod.id,
+        ppId: pp && pp.id,
+        reason,
+      },
     });
 
+    // Confirm the action to the moderator
     if (args.time) {
-      // If we have an unmute time, just update the old mute to expire in that time
-      await this.actions.fire("unmute", { member: args.member, unmuteTime: args.time });
-
-      // Confirm the action to the moderator
+      const timeUntilUnmute = args.time && humanizeDuration(args.time);
       msg.channel.createMessage(
         successMessage(
-          `Unmuting **${args.member.user.username}#${args.member.user.discriminator}** in ${timeUntilUnmute} (Case #${
-            createdCase.case_number
-          })`,
+          asSingleLine(`
+          Unmuting **${args.member.user.username}#${args.member.user.discriminator}**
+          in ${timeUntilUnmute} (Case #${result.case.case_number})
+        `),
         ),
       );
-
-      // Log the action
-      this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
-        mod: stripObjectToScalars(mod.user),
-        member: stripObjectToScalars(args.member, ["user"]),
-        time: timeUntilUnmute,
-      });
     } else {
-      // Otherwise remove "muted" role immediately
-      this.serverLogs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
-      await this.actions.fire("unmute", { member: args.member });
-
-      // Confirm the action to the moderator
       msg.channel.createMessage(
         successMessage(
-          `Unmuted **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
-            createdCase.case_number
-          })`,
+          asSingleLine(`
+          Unmuted **${args.member.user.username}#${args.member.user.discriminator}**
+          (Case #${result.case.case_number})
+        `),
         ),
       );
-
-      // Log the action
-      this.serverLogs.log(LogType.MEMBER_UNMUTE, {
-        mod: stripObjectToScalars(msg.member.user),
-        member: stripObjectToScalars(args.member, ["user"]),
-      });
     }
   }
 
@@ -658,19 +571,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
-    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
+    let userMessageResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
     if (args.reason) {
       const kickMessage = await renderTemplate(config.kick_message, {
         guildName: this.guild.name,
         reason,
       });
 
-      userMessageResult = await this.tryToMessageUser(
-        args.member.user,
-        kickMessage,
-        config.dm_on_kick,
-        config.message_on_kick,
-      );
+      userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, kickMessage, {
+        useDM: config.dm_on_kick,
+        useChannel: config.message_on_kick,
+        channelId: config.message_channel,
+      });
     }
 
     // Kick the user
@@ -728,19 +640,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
-    let userMessageResult: IMessageResult = { status: MessageResultStatus.Ignored };
+    let userMessageResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
     if (reason) {
       const banMessage = await renderTemplate(config.ban_message, {
         guildName: this.guild.name,
         reason,
       });
 
-      userMessageResult = await this.tryToMessageUser(
-        args.member.user,
-        banMessage,
-        config.dm_on_ban,
-        config.message_on_ban,
-      );
+      userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, banMessage, {
+        useDM: config.dm_on_ban,
+        useChannel: config.message_on_ban,
+        channelId: config.message_channel,
+      });
     }
 
     // Ban the user
@@ -1232,50 +1143,5 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     await this.cases.setHidden(theCase.id, false);
     msg.channel.createMessage(successMessage(`Case #${theCase.case_number} is no longer hidden!`));
-  }
-
-  /**
-   * Attempts to message the specified user through DMs and/or the message channel.
-   * Returns a promise that resolves to a status constant indicating the result.
-   */
-  protected async tryToMessageUser(
-    user: User,
-    str: string,
-    useDM: boolean,
-    useChannel: boolean,
-  ): Promise<IMessageResult> {
-    if (!useDM && !useChannel) {
-      return { status: MessageResultStatus.Ignored };
-    }
-
-    if (useDM) {
-      try {
-        const dmChannel = await this.bot.getDMChannel(user.id);
-        await dmChannel.createMessage(str);
-        logger.info(`Sent DM to ${user.id}: ${str}`);
-        return {
-          status: MessageResultStatus.DirectMessaged,
-          text: "user notified with a direct message",
-        };
-      } catch (e) {} // tslint:disable-line
-    }
-
-    const messageChannel = this.getConfig().message_channel;
-
-    if (useChannel && messageChannel) {
-      try {
-        const channel = this.guild.channels.get(messageChannel) as TextChannel;
-        await channel.createMessage(`<@!${user.id}> ${str}`);
-        return {
-          status: MessageResultStatus.ChannelMessaged,
-          text: `user notified in <#${channel.id}>`,
-        };
-      } catch (e) {} // tslint:disable-line
-    }
-
-    return {
-      status: MessageResultStatus.Failed,
-      text: "failed to message user",
-    };
   }
 }

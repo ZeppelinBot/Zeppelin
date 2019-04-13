@@ -24,9 +24,14 @@ export class GuildMutes extends BaseRepository {
     return this.mutes.findOne({
       where: {
         guild_id: this.guildId,
-        user_id: userId
-      }
+        user_id: userId,
+      },
     });
+  }
+
+  async isMuted(userId: string): Promise<boolean> {
+    const mute = await this.findExistingMuteForUserId(userId);
+    return mute != null;
   }
 
   async addMute(userId, expiryTime): Promise<Mute> {
@@ -39,7 +44,7 @@ export class GuildMutes extends BaseRepository {
     const result = await this.mutes.insert({
       guild_id: this.guildId,
       user_id: userId,
-      expires_at: expiresAt
+      expires_at: expiresAt,
     });
 
     return this.mutes.findOne({ where: result.identifiers[0] });
@@ -55,23 +60,12 @@ export class GuildMutes extends BaseRepository {
     return this.mutes.update(
       {
         guild_id: this.guildId,
-        user_id: userId
+        user_id: userId,
       },
       {
-        expires_at: expiresAt
-      }
+        expires_at: expiresAt,
+      },
     );
-  }
-
-  async addOrUpdateMute(userId, expiryTime): Promise<Mute> {
-    const existingMute = await this.findExistingMuteForUserId(userId);
-
-    if (existingMute) {
-      await this.updateExpiryTime(userId, expiryTime);
-      return this.findExistingMuteForUserId(userId);
-    } else {
-      return this.addMute(userId, expiryTime);
-    }
   }
 
   async getActiveMutes(): Promise<Mute[]> {
@@ -81,7 +75,7 @@ export class GuildMutes extends BaseRepository {
       .andWhere(
         new Brackets(qb => {
           qb.where("expires_at > NOW()").orWhere("expires_at IS NULL");
-        })
+        }),
       )
       .getMany();
   }
@@ -90,18 +84,18 @@ export class GuildMutes extends BaseRepository {
     await this.mutes.update(
       {
         guild_id: this.guildId,
-        user_id: userId
+        user_id: userId,
       },
       {
-        case_id: caseId
-      }
+        case_id: caseId,
+      },
     );
   }
 
   async clear(userId) {
     await this.mutes.delete({
       guild_id: this.guildId,
-      user_id: userId
+      user_id: userId,
     });
   }
 }

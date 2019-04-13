@@ -49,4 +49,6 @@ export enum LogType {
 
   MEMBER_ROLE_CHANGES,
   VOICE_CHANNEL_FORCE_MOVE,
+
+  CASE_UPDATE,
 }

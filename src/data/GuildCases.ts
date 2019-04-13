@@ -8,6 +8,22 @@ import moment = require("moment-timezone");
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
+/**
+ * Used as a config object for functions that create cases
+ */
+export interface ICaseDetails {
+  userId?: string;
+  modId?: string;
+  ppId?: string;
+  type?: CaseTypes;
+  auditLogId?: string;
+  reason?: string;
+  automatic?: boolean;
+  postInCaseLogOverride?: boolean;
+  noteDetails?: string[];
+  extraNotes?: string[];
+}
+
 export class GuildCases extends BaseRepository {
   private cases: Repository<Case>;
   private caseNotes: Repository<CaseNote>;

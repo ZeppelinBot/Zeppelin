@@ -1,5 +1,5 @@
 import { Message, MessageContent, MessageFile, TextableChannel, TextChannel } from "eris";
-import { GuildCases } from "../data/GuildCases";
+import { GuildCases, ICaseDetails } from "../data/GuildCases";
 import { CaseTypes } from "../data/CaseTypes";
 import { Case } from "../data/entities/Case";
 import moment from "moment-timezone";
@@ -36,20 +36,18 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
     this.archives = GuildArchives.getInstance(this.guildId);
 
     this.actions.register("createCase", args => {
-      return this.createCase(
-        args.userId,
-        args.modId,
-        args.type,
-        args.auditLogId,
-        args.reason,
-        args.automatic,
-        args.postInCaseLog,
-        args.ppId,
-      );
+      return this.createCase(args);
     });
 
     this.actions.register("createCaseNote", args => {
-      return this.createCaseNote(args.caseId, args.modId, args.note, args.automatic, args.postInCaseLog);
+      return this.createCaseNote(
+        args.caseId,
+        args.modId,
+        args.note,
+        args.automatic,
+        args.postInCaseLog,
+        args.noteDetails,
+      );
     });
 
     this.actions.register("postCase", async args => {
@@ -72,46 +70,47 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
    * Creates a new case and, depending on config, posts it in the case log channel
    * @return {Number} The ID of the created case
    */
-  public async createCase(
-    userId: string,
-    modId: string,
-    type: CaseTypes,
-    auditLogId: string = null,
-    reason: string = null,
-    automatic = false,
-    postInCaseLogOverride = null,
-    ppId = null,
-  ): Promise<Case> {
-    const user = this.bot.users.get(userId);
+  public async createCase(opts: ICaseDetails): Promise<Case> {
+    const user = this.bot.users.get(opts.userId);
     const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
 
-    const mod = this.bot.users.get(modId);
+    const mod = this.bot.users.get(opts.modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
 
     let ppName = null;
-    if (ppId) {
-      const pp = this.bot.users.get(ppId);
+    if (opts.ppId) {
+      const pp = this.bot.users.get(opts.ppId);
       ppName = pp ? `${pp.username}#${pp.discriminator}` : "Unknown#0000";
     }
 
     const createdCase = await this.cases.create({
-      type,
-      user_id: userId,
+      type: opts.type,
+      user_id: opts.userId,
       user_name: userName,
-      mod_id: modId,
+      mod_id: opts.modId,
       mod_name: modName,
-      audit_log_id: auditLogId,
-      pp_id: ppId,
+      audit_log_id: opts.auditLogId,
+      pp_id: opts.ppId,
       pp_name: ppName,
     });
 
-    if (reason) {
-      await this.createCaseNote(createdCase, modId, reason, automatic, false);
+    if (opts.reason || opts.noteDetails.length) {
+      await this.createCaseNote(createdCase, opts.modId, opts.reason || "", opts.automatic, false, opts.noteDetails);
+    }
+
+    if (opts.extraNotes) {
+      for (const extraNote of opts.extraNotes) {
+        await this.createCaseNote(createdCase, opts.modId, extraNote, opts.automatic, false);
+      }
     }
 
     const config = this.getConfig();
 
-    if (config.case_log_channel && (!automatic || config.log_automatic_actions) && postInCaseLogOverride !== false) {
+    if (
+      config.case_log_channel &&
+      (!opts.automatic || config.log_automatic_actions) &&
+      opts.postInCaseLogOverride !== false
+    ) {
       try {
         await this.postCaseToCaseLogChannel(createdCase);
       } catch (e) {} // tslint:disable-line
@@ -129,6 +128,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
     body: string,
     automatic = false,
     postInCaseLogOverride = null,
+    noteDetails: string[] = null,
   ): Promise<void> {
     const mod = this.bot.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
@@ -136,6 +136,11 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
     const theCase = await this.cases.find(this.resolveCaseId(caseOrCaseId));
     if (!theCase) {
       this.throwPluginRuntimeError(`Unknown case ID: ${caseOrCaseId}`);
+    }
+
+    // Add note details to the beginning of the note
+    if (noteDetails && noteDetails.length) {
+      body = noteDetails.map(d => `__[${d}]__`).join(" ") + " " + body;
     }
 
     await this.cases.createNote(theCase.id, {
