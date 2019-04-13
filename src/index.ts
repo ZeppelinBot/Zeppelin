@@ -81,8 +81,9 @@ logger.info("Running database migrations");
 connect().then(async conn => {
   await conn.runMigrations();
 
-  const client = new Client(process.env.TOKEN, {
+  const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: true,
+    restMode: true,
   });
   client.setMaxListeners(100);
 
