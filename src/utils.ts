@@ -10,12 +10,18 @@ import https from "https";
 import tmp from "tmp";
 import { logger } from "knub";
 
+const delayStringMultipliers = {
+  w: 1000 * 60 * 60 * 24 * 7,
+  d: 1000 * 60 * 60 * 24,
+  h: 1000 * 60 * 60,
+  m: 1000 * 60,
+  s: 1000,
+};
+
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
- * @param {String} str
- * @returns {Number}
  */
-export function convertDelayStringToMS(str) {
+export function convertDelayStringToMS(str, defaultUnit = "m"): number {
   const regex = /^([0-9]+)\s*([wdhms])?[a-z]*\s*/;
   let match;
   let ms = 0;
@@ -24,12 +30,7 @@ export function convertDelayStringToMS(str) {
 
   // tslint:disable-next-line
   while (str !== "" && (match = str.match(regex)) !== null) {
-    if (match[2] === "w") ms += match[1] * 1000 * 60 * 60 * 24 * 7;
-    else if (match[2] === "d") ms += match[1] * 1000 * 60 * 60 * 24;
-    else if (match[2] === "h") ms += match[1] * 1000 * 60 * 60;
-    else if (match[2] === "s") ms += match[1] * 1000;
-    else if (match[2] === "m" || !match[2]) ms += match[1] * 1000 * 60;
-
+    ms += match[1] * ((match[2] && delayStringMultipliers[match[2]]) || delayStringMultipliers[defaultUnit]);
     str = str.slice(match[0].length);
   }
 
