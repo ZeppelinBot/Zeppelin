@@ -94,7 +94,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
       pp_name: ppName,
     });
 
-    if (opts.reason || opts.noteDetails.length) {
+    if (opts.reason || (opts.noteDetails && opts.noteDetails.length)) {
       await this.createCaseNote(createdCase, opts.modId, opts.reason || "", opts.automatic, false, opts.noteDetails);
     }
 
