@@ -77,6 +77,16 @@ export class GuildCases extends BaseRepository {
     });
   }
 
+  async findByAuditLogId(auditLogId: string): Promise<Case> {
+    return this.cases.findOne({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        audit_log_id: auditLogId,
+      },
+    });
+  }
+
   async getByUserId(userId: string): Promise<Case[]> {
     return this.cases.find({
       relations: this.getRelations(),
