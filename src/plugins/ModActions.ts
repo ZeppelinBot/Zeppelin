@@ -13,6 +13,7 @@ import {
   stripObjectToScalars,
   successMessage,
   trimLines,
+  ucfirst,
   unknownUser,
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
@@ -382,6 +383,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       type: CaseTypes.Warn,
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
     });
 
     const messageResultText = userMessageResult.text ? ` (${userMessageResult.text})` : "";
@@ -598,6 +600,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       type: CaseTypes.Kick,
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
     });
 
     // Confirm the action to the moderator
@@ -667,6 +670,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       type: CaseTypes.Ban,
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
     });
 
     // Confirm the action to the moderator
