@@ -24,6 +24,8 @@ import { GuildActions, MuteActionResult } from "../data/GuildActions";
 import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
 
+// Foobar
+
 enum IgnoredEventType {
   Ban = 1,
   Unban,
