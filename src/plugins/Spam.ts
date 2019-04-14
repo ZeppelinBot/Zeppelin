@@ -241,7 +241,9 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           // Start by muting them, if enabled
           let muteResult: MuteActionResult;
           if (spamConfig.mute && member) {
-            const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time) : 120 * 1000;
+            const muteTime = spamConfig.mute_time
+              ? convertDelayStringToMS(spamConfig.mute_time.toString())
+              : 120 * 1000;
             muteResult = await this.actions.fire("mute", {
               member,
               muteTime,
