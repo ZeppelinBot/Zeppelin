@@ -263,14 +263,10 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.guildLogs.log(
-      LogType.MEMBER_BAN,
-      {
-        user: stripObjectToScalars(user),
-        mod: stripObjectToScalars(mod),
-      },
-      user.id,
-    );
+    this.guildLogs.log(LogType.MEMBER_BAN, {
+      mod: stripObjectToScalars(mod),
+      user: stripObjectToScalars(user),
+    }, user.id);
   }
 
   @d.event("guildBanRemove")

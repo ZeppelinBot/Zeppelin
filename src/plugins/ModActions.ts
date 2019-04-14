@@ -610,7 +610,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"]),
+      user: stripObjectToScalars(args.member.user),
     });
   }
 
@@ -679,7 +679,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"]),
+      user: stripObjectToScalars(args.member.user),
     });
   }
 
