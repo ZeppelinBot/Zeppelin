@@ -494,3 +494,9 @@ export function ucfirst(str) {
   if (typeof str !== "string" || str === "") return str;
   return str[0].toUpperCase() + str.slice(1);
 }
+
+export const unknownUser = {
+  id: "0",
+  username: "Unknown",
+  discriminator: "0000",
+};

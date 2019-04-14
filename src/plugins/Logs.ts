@@ -10,6 +10,7 @@ import {
   findRelevantAuditLogEntry,
   noop,
   stripObjectToScalars,
+  unknownUser,
   useMediaUrls,
 } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
@@ -34,12 +35,6 @@ interface ILogChannel {
 interface ILogChannelMap {
   [channelId: string]: ILogChannel;
 }
-
-const unknownUser = {
-  id: 0,
-  username: "Unknown",
-  discriminator: "0000",
-};
 
 interface IChannelConfig {
   include?: string[];
@@ -263,10 +258,14 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     );
     const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
 
-    this.guildLogs.log(LogType.MEMBER_BAN, {
-      mod: stripObjectToScalars(mod),
-      user: stripObjectToScalars(user),
-    }, user.id);
+    this.guildLogs.log(
+      LogType.MEMBER_BAN,
+      {
+        mod: stripObjectToScalars(mod),
+        user: stripObjectToScalars(user),
+      },
+      user.id,
+    );
   }
 
   @d.event("guildBanRemove")
