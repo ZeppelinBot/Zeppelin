@@ -13,6 +13,7 @@ import {
   stripObjectToScalars,
   successMessage,
   trimLines,
+  unknownUser,
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
@@ -763,7 +764,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       this.ignoreEvent(IgnoredEventType.Unban, args.userId);
       await this.guild.unbanMember(args.userId);
     } catch (e) {
-      msg.channel.createMessage(errorMessage("Failed to unban member"));
+      msg.channel.createMessage(errorMessage("Failed to unban member; are you sure they're banned?"));
       return;
     }
 
@@ -1030,8 +1031,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
-    const user = this.bot.users.get(args.userId);
-    const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+    const user = this.bot.users.get(args.userId) || unknownUser;
+    const userName = `${user.username}#${user.discriminator}`;
 
     if (cases.length === 0) {
       msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
