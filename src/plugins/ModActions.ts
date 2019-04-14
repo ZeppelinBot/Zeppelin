@@ -267,14 +267,23 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     );
 
     if (kickAuditLogEntry) {
-      this.actions.fire("createCase", {
-        userId: member.id,
-        modId: kickAuditLogEntry.user.id,
-        type: CaseTypes.Kick,
-        auditLogId: kickAuditLogEntry.id,
-        reason: kickAuditLogEntry.reason,
-        automatic: true,
-      });
+      const existingCaseForThisEntry = await this.cases.findByAuditLogId(kickAuditLogEntry.id);
+      if (existingCaseForThisEntry) {
+        logger.warn(
+          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${
+            existingCaseForThisEntry.id
+          }`,
+        );
+      } else {
+        this.actions.fire("createCase", {
+          userId: member.id,
+          modId: kickAuditLogEntry.user.id,
+          type: CaseTypes.Kick,
+          auditLogId: kickAuditLogEntry.id,
+          reason: kickAuditLogEntry.reason,
+          automatic: true,
+        });
+      }
 
       this.serverLogs.log(LogType.MEMBER_KICK, {
         user: stripObjectToScalars(member.user),
