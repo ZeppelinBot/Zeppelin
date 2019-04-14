@@ -317,11 +317,11 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
           {
             member,
             addedRoles: addedRoles
-              .map(roleId => this.guild.roles.get(roleId))
+              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name)
               .join(", "),
             removedRoles: removedRoles
-              .map(roleId => this.guild.roles.get(roleId))
+              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name)
               .join(", "),
             mod: stripObjectToScalars(mod),
