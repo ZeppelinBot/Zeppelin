@@ -235,7 +235,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
       return;
     }
 
-    const seconds = Math.ceil(convertDelayStringToMS(args.time) / 1000);
+    const seconds = Math.ceil(convertDelayStringToMS(args.time, "s") / 1000);
     const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= NATIVE_SLOWMODE_LIMIT;
 
     if (useNativeSlowmode) {
