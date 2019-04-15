@@ -7,7 +7,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
-const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60 * 1000; // 6 hours
+const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
