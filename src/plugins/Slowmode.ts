@@ -288,7 +288,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
     // Make sure this user is affected by the slowmode
     const member = this.guild.members.get(msg.user_id);
-    const isAffected = this.hasPermission("affected", { channelId: channel.id, userId: msg.user_id, member });
+    const isAffected = this.hasPermission("is_affected", { channelId: channel.id, userId: msg.user_id, member });
     if (!isAffected) return thisMsgLock.unlock();
 
     // Check if this channel even *has* a bot-maintained slowmode
