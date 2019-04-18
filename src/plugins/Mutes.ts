@@ -14,6 +14,7 @@ import {
   stripObjectToScalars,
   successMessage,
   ucfirst,
+  unknownUser,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -90,10 +91,10 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     this.serverLogs = new GuildLogs(this.guildId);
 
     this.actions.register("mute", args => {
-      return this.muteMember(args.member, args.muteTime, args.reason, args.caseDetails);
+      return this.muteUser(args.userId, args.muteTime, args.reason, args.caseDetails);
     });
     this.actions.register("unmute", args => {
-      return this.unmuteMember(args.member, args.unmuteTime, args.caseDetails);
+      return this.unmuteUser(args.userId, args.unmuteTime, args.caseDetails);
     });
 
     // Check for expired mutes every 5s
@@ -108,8 +109,21 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     clearInterval(this.muteClearIntervalId);
   }
 
-  public async muteMember(
-    member: Member,
+  async resolveMember(userId: string) {
+    if (this.guild.members.has(userId)) {
+      return this.guild.members.get(userId);
+    }
+
+    try {
+      const member = await this.bot.getRESTGuildMember(this.guildId, userId);
+      return member;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public async muteUser(
+    userId: string,
     muteTime: number = null,
     reason: string = null,
     caseDetails: ICaseDetails = {},
@@ -124,32 +138,37 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       caseDetails.modId = this.bot.user.id;
     }
 
-    // Apply mute role if it's missing
-    if (!member.roles.includes(muteRole)) {
-      await member.addRole(muteRole);
-    }
+    const user = this.bot.users.get(userId) || { ...unknownUser, id: userId };
+    const member = await this.resolveMember(userId);
 
-    // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
-    const moveToVoiceChannelId = this.getConfig().move_to_voice_channel;
-    if (moveToVoiceChannelId && member.voiceState.channelID) {
-      try {
-        await member.edit({ channelID: moveToVoiceChannelId });
-      } catch (e) {
-        logger.warn(`Could not move user ${member.id} to voice channel ${moveToVoiceChannelId} when muting`);
+    if (member) {
+      // Apply mute role if it's missing
+      if (!member.roles.includes(muteRole)) {
+        await member.addRole(muteRole);
+      }
+
+      // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
+      const moveToVoiceChannelId = this.getConfig().move_to_voice_channel;
+      if (moveToVoiceChannelId && member.voiceState.channelID) {
+        try {
+          await member.edit({ channelID: moveToVoiceChannelId });
+        } catch (e) {
+          logger.warn(`Could not move user ${member.id} to voice channel ${moveToVoiceChannelId} when muting`);
+        }
       }
     }
 
     // If the user is already muted, update the duration of their existing mute
-    const existingMute = await this.mutes.findExistingMuteForUserId(member.id);
+    const existingMute = await this.mutes.findExistingMuteForUserId(user.id);
     let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
 
     if (existingMute) {
-      await this.mutes.updateExpiryTime(member.id, muteTime);
+      await this.mutes.updateExpiryTime(user.id, muteTime);
     } else {
-      await this.mutes.addMute(member.id, muteTime);
+      await this.mutes.addMute(user.id, muteTime);
 
       // If it's a new mute, attempt to message the user
-      const config = this.getMatchingConfig({ member });
+      const config = this.getMatchingConfig({ member, userId });
       const template = muteTime ? config.timed_mute_message : config.mute_message;
 
       const muteMessage =
@@ -160,12 +179,16 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
           time: timeUntilUnmute,
         }));
 
-      if (muteMessage) {
-        notifyResult = await notifyUser(this.bot, this.guild, member.user, muteMessage, {
-          useDM: config.dm_on_mute,
-          useChannel: config.message_on_mute,
-          channelId: config.message_channel,
-        });
+      if (reason && muteMessage) {
+        if (user instanceof User) {
+          notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
+            useDM: config.dm_on_mute,
+            useChannel: config.message_on_mute,
+            channelId: config.message_channel,
+          });
+        } else {
+          notifyResult = { status: NotifyUserStatus.Failed };
+        }
       }
     }
 
@@ -189,7 +212,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       }
 
       theCase = await this.actions.fire("createCase", {
-        userId: member.id,
+        userId,
         modId: caseDetails.modId,
         type: CaseTypes.Mute,
         reason,
@@ -197,20 +220,21 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
         noteDetails,
         extraNotes: caseDetails.extraNotes,
       });
-      await this.mutes.setCaseId(member.id, theCase.id);
+      await this.mutes.setCaseId(user.id, theCase.id);
     }
 
     // Log the action
+    const mod = this.bot.users.get(caseDetails.modId) || { ...unknownUser, id: caseDetails.modId };
     if (muteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-        mod: stripObjectToScalars(caseDetails.modId),
-        member: stripObjectToScalars(member, ["user"]),
+        mod: stripObjectToScalars(mod),
+        user: stripObjectToScalars(user),
         time: timeUntilUnmute,
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_MUTE, {
-        mod: stripObjectToScalars(caseDetails.modId),
-        member: stripObjectToScalars(member, ["user"]),
+        mod: stripObjectToScalars(mod),
+        user: stripObjectToScalars(user),
       });
     }
 
@@ -221,21 +245,26 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     };
   }
 
-  public async unmuteMember(member: Member, unmuteTime: number = null, caseDetails: ICaseDetails = {}) {
-    const existingMute = await this.mutes.findExistingMuteForUserId(member.id);
+  public async unmuteUser(userId: string, unmuteTime: number = null, caseDetails: ICaseDetails = {}) {
+    const existingMute = await this.mutes.findExistingMuteForUserId(userId);
     if (!existingMute) return;
+
+    const user = this.bot.users.get(userId) || { ...unknownUser, id: userId };
+    const member = await this.resolveMember(userId);
 
     if (unmuteTime) {
       // Schedule timed unmute (= just set the mute's duration)
-      await this.mutes.updateExpiryTime(member.id, unmuteTime);
+      await this.mutes.updateExpiryTime(userId, unmuteTime);
     } else {
       // Unmute immediately
-      const muteRole = this.getConfig().mute_role;
-      if (member.roles.includes(muteRole)) {
-        await member.removeRole(muteRole);
+      if (member) {
+        const muteRole = this.getConfig().mute_role;
+        if (member.roles.includes(muteRole)) {
+          await member.removeRole(muteRole);
+        }
       }
 
-      await this.mutes.clear(member.id);
+      await this.mutes.clear(userId);
     }
 
     const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
@@ -249,7 +278,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     }
 
     const createdCase = await this.actions.fire("createCase", {
-      userId: member.id,
+      userId,
       modId: caseDetails.modId,
       type: CaseTypes.Unmute,
       reason: caseDetails.reason,
@@ -262,13 +291,13 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     if (unmuteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
         mod: stripObjectToScalars(mod),
-        member: stripObjectToScalars(member, ["user"]),
+        user: stripObjectToScalars(user),
         time: timeUntilUnmute,
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_UNMUTE, {
         mod: stripObjectToScalars(mod),
-        member: stripObjectToScalars(member, ["user"]),
+        user: stripObjectToScalars(user),
       });
     }
 
@@ -413,6 +442,22 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
       msg.channel.createMessage(chunk);
+    }
+  }
+
+  /**
+   * Reapply active mutes on join
+   */
+  @d.event("guildMemberAdd")
+  async onGuildMemberAdd(_, member: Member) {
+    const mute = await this.mutes.findExistingMuteForUserId(member.id);
+    if (mute) {
+      const muteRole = this.getConfig().mute_role;
+      await member.addRole(muteRole);
+
+      this.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {
+        member: stripObjectToScalars(member, ["user"]),
+      });
     }
   }
 

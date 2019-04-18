@@ -51,4 +51,6 @@ export enum LogType {
   VOICE_CHANNEL_FORCE_MOVE,
 
   CASE_UPDATE,
+
+  MEMBER_MUTE_REJOIN,
 }

@@ -155,6 +155,24 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     return ((reason || "") + " " + attachmentUrls.join(" ")).trim();
   }
 
+  async resolveMember(userId: string): Promise<{ member: Member; isBanned?: boolean }> {
+    let member = this.guild.members.get(userId);
+
+    if (!member) {
+      try {
+        member = await this.bot.getRESTGuildMember(this.guildId, userId);
+      } catch (e) {} // tslint:disable-line
+    }
+
+    if (!member) {
+      const bans = (await this.guild.getBans()) as any;
+      const isBanned = bans.some(b => b.user.id === userId);
+      return { member, isBanned };
+    }
+
+    return { member };
+  }
+
   /**
    * Add a BAN action automatically when a user is banned.
    * Attempts to find the ban's details in the audit log.
@@ -345,13 +363,25 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
   }
 
-  @d.command("warn", "<member:Member> <reason:string$>", {
+  @d.command("warn", "<userId:string> <reason:string$>", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_warn")
-  async warnCmd(msg: Message, args: any) {
+  async warnCmd(msg: Message, args: { userId: string; reason: string; mod?: Member }) {
+    const { member: memberToWarn, isBanned } = await this.resolveMember(args.userId);
+
+    if (!memberToWarn) {
+      if (isBanned) {
+        this.sendErrorMessage(msg.channel, `User is banned`);
+      } else {
+        this.sendErrorMessage(msg.channel, `User not found on the server`);
+      }
+
+      return;
+    }
+
     // Make sure we're allowed to warn this member
-    if (!this.canActOn(msg.member, args.member)) {
+    if (!this.canActOn(msg.member, memberToWarn)) {
       msg.channel.createMessage(errorMessage("Cannot warn: insufficient permissions"));
       return;
     }
@@ -372,7 +402,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
 
-    const userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, warnMessage, {
+    const userMessageResult = await notifyUser(this.bot, this.guild, memberToWarn.user, warnMessage, {
       useDM: config.dm_on_warn,
       useChannel: config.message_on_warn,
     });
@@ -387,7 +417,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     const createdCase: Case = await this.actions.fire("createCase", {
-      userId: args.member.id,
+      userId: memberToWarn.id,
       modId: mod.id,
       type: CaseTypes.Warn,
       reason,
@@ -399,7 +429,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     msg.channel.createMessage(
       successMessage(
-        `Warned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${
           createdCase.case_number
         })${messageResultText}`,
       ),
@@ -407,18 +437,33 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"]),
+      member: stripObjectToScalars(memberToWarn, ["user"]),
     });
   }
 
-  @d.command("mute", "<member:Member> <time:delay> <reason:string$>", {
-    overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
+  @d.command("mute", "<userId:userId> <time:delay> <reason:string$>", {
+    overloads: ["<userId:userId> <time:delay>", "<userId:userId> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_mute")
-  async muteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod: Member }) {
+  async muteCmd(msg: Message, args: { userId: string; time?: number; reason?: string; mod: Member }) {
+    const user = this.bot.users.get(args.userId) || { ...unknownUser, id: args.userId };
+    const { member: memberToMute, isBanned } = await this.resolveMember(user.id);
+
+    if (!memberToMute) {
+      const notOnServerMsg = isBanned
+        ? await msg.channel.createMessage("User is banned. Apply a mute to them anyway?")
+        : await msg.channel.createMessage("User is not on the server. Apply a mute to them anyway?");
+
+      const reply = await waitForReaction(this.bot, notOnServerMsg, ["✅", "❌"], msg.author.id);
+      notOnServerMsg.delete();
+      if (!reply || reply.name === "❌") {
+        return;
+      }
+    }
+
     // Make sure we're allowed to mute this member
-    if (!this.canActOn(msg.member, args.member)) {
+    if (memberToMute && !this.canActOn(msg.member, memberToMute)) {
       msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
       return;
     }
@@ -444,7 +489,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     try {
       muteResult = await this.actions.fire("mute", {
-        member: args.member,
+        userId: user.id,
         muteTime: args.time,
         reason,
         caseDetails: {
@@ -453,7 +498,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         },
       });
     } catch (e) {
-      logger.error(`Failed to mute user ${args.member.id}: ${e.message}`);
+      logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
       msg.channel.createMessage(errorMessage("Could not mute the user"));
       return;
     }
@@ -463,24 +508,24 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     if (args.time) {
       if (muteResult.updatedExistingMute) {
         response = asSingleLine(`
-          Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
+          Updated **${user.username}#${user.discriminator}**'s
           mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
         `);
       } else {
         response = asSingleLine(`
-          Muted **${args.member.user.username}#${args.member.user.discriminator}**
+          Muted **${user.username}#${user.discriminator}**
           for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
         `);
       }
     } else {
       if (muteResult.updatedExistingMute) {
         response = asSingleLine(`
-          Updated **${args.member.user.username}#${args.member.user.discriminator}**'s
+          Updated **${user.username}#${user.discriminator}**'s
           mute to indefinite (Case #${muteResult.case.case_number})
         `);
       } else {
         response = asSingleLine(`
-          Muted **${args.member.user.username}#${args.member.user.discriminator}**
+          Muted **${user.username}#${user.discriminator}**
           indefinitely (Case #${muteResult.case.case_number})
         `);
       }
@@ -490,14 +535,36 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     msg.channel.createMessage(successMessage(response));
   }
 
-  @d.command("unmute", "<member:Member> <time:delay> <reason:string$>", {
-    overloads: ["<member:Member> <time:delay>", "<member:Member> [reason:string$]"],
+  @d.command("unmute", "<userId:userId> <time:delay> <reason:string$>", {
+    overloads: ["<userId:userId> <time:delay>", "<userId:userId> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_mute")
-  async unmuteCmd(msg: Message, args: { member: Member; time?: number; reason?: string; mod?: Member }) {
-    // Make sure we're allowed to mute this member
-    if (!this.canActOn(msg.member, args.member)) {
+  async unmuteCmd(msg: Message, args: { userId: string; time?: number; reason?: string; mod?: Member }) {
+    // Check if they're muted in the first place
+    if (!(await this.mutes.isMuted(args.userId))) {
+      msg.channel.createMessage(errorMessage("Cannot unmute: member is not muted"));
+      return;
+    }
+
+    // Find the server member to unmute
+    const user = this.bot.users.get(args.userId) || { ...unknownUser, id: args.userId };
+    const { member: memberToUnmute, isBanned } = await this.resolveMember(user.id);
+
+    if (!memberToUnmute) {
+      const notOnServerMsg = isBanned
+        ? await msg.channel.createMessage("User is banned. Unmute them anyway?")
+        : await msg.channel.createMessage("User is not on the server. Unmute them anyway?");
+
+      const reply = await waitForReaction(this.bot, notOnServerMsg, ["✅", "❌"], msg.author.id);
+      notOnServerMsg.delete();
+      if (!reply || reply.name === "❌") {
+        return;
+      }
+    }
+
+    // Make sure we're allowed to unmute this member
+    if (memberToUnmute && !this.canActOn(msg.member, memberToUnmute)) {
       msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
       return;
     }
@@ -516,16 +583,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       pp = msg.author;
     }
 
-    // Check if they're muted in the first place
-    if (!(await this.mutes.isMuted(args.member.id))) {
-      msg.channel.createMessage(errorMessage("Cannot unmute: member is not muted"));
-      return;
-    }
-
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     const result = await this.actions.fire("unmute", {
-      member: args.member,
+      userId: user.id,
       unmuteTime: args.time,
       caseDetails: {
         modId: mod.id,
@@ -540,7 +601,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       msg.channel.createMessage(
         successMessage(
           asSingleLine(`
-          Unmuting **${args.member.user.username}#${args.member.user.discriminator}**
+          Unmuting **${user.username}#${user.discriminator}**
           in ${timeUntilUnmute} (Case #${result.case.case_number})
         `),
         ),
@@ -549,7 +610,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       msg.channel.createMessage(
         successMessage(
           asSingleLine(`
-          Unmuted **${args.member.user.username}#${args.member.user.discriminator}**
+          Unmuted **${user.username}#${user.discriminator}**
           (Case #${result.case.case_number})
         `),
         ),
@@ -557,13 +618,25 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
   }
 
-  @d.command("kick", "<member:Member> [reason:string$]", {
+  @d.command("kick", "<userId:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_kick")
-  async kickCmd(msg, args: { member: Member; reason: string; mod: Member }) {
+  async kickCmd(msg, args: { userId: string; reason: string; mod: Member }) {
+    const { member: memberToKick, isBanned } = await this.resolveMember(args.userId);
+
+    if (!memberToKick) {
+      if (isBanned) {
+        this.sendErrorMessage(msg.channel, `User is banned`);
+      } else {
+        this.sendErrorMessage(msg.channel, `User not found on the server`);
+      }
+
+      return;
+    }
+
     // Make sure we're allowed to kick this member
-    if (!this.canActOn(msg.member, args.member)) {
+    if (!this.canActOn(msg.member, memberToKick)) {
       msg.channel.createMessage(errorMessage("Cannot kick: insufficient permissions"));
       return;
     }
@@ -590,7 +663,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         reason,
       });
 
-      userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, kickMessage, {
+      userMessageResult = await notifyUser(this.bot, this.guild, memberToKick.user, kickMessage, {
         useDM: config.dm_on_kick,
         useChannel: config.message_on_kick,
         channelId: config.message_channel,
@@ -598,13 +671,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     // Kick the user
-    this.serverLogs.ignoreLog(LogType.MEMBER_KICK, args.member.id);
-    this.ignoreEvent(IgnoredEventType.Kick, args.member.id);
-    args.member.kick(reason);
+    this.serverLogs.ignoreLog(LogType.MEMBER_KICK, memberToKick.id);
+    this.ignoreEvent(IgnoredEventType.Kick, memberToKick.id);
+    memberToKick.kick(reason);
 
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.member.id,
+      userId: memberToKick.id,
       modId: mod.id,
       type: CaseTypes.Kick,
       reason,
@@ -613,7 +686,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Kicked **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
 
@@ -623,17 +696,29 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(mod.user),
-      user: stripObjectToScalars(args.member.user),
+      user: stripObjectToScalars(memberToKick.user),
     });
   }
 
-  @d.command("ban", "<member:Member> [reason:string$]", {
+  @d.command("ban", "<userId:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async banCmd(msg, args: { member: Member; reason?: string; mod?: Member }) {
+  async banCmd(msg, args: { userId: string; reason?: string; mod?: Member }) {
+    const { member: memberToBan, isBanned } = await this.resolveMember(args.userId);
+
+    if (!memberToBan) {
+      if (isBanned) {
+        this.sendErrorMessage(msg.channel, `User is already banned`);
+      } else {
+        this.sendErrorMessage(msg.channel, `User not found on the server`);
+      }
+
+      return;
+    }
+
     // Make sure we're allowed to ban this member
-    if (!this.canActOn(msg.member, args.member)) {
+    if (!this.canActOn(msg.member, memberToBan)) {
       msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
       return;
     }
@@ -660,7 +745,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         reason,
       });
 
-      userMessageResult = await notifyUser(this.bot, this.guild, args.member.user, banMessage, {
+      userMessageResult = await notifyUser(this.bot, this.guild, memberToBan.user, banMessage, {
         useDM: config.dm_on_ban,
         useChannel: config.message_on_ban,
         channelId: config.message_channel,
@@ -668,13 +753,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     // Ban the user
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
-    this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
-    args.member.ban(1, reason);
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToBan.id);
+    this.ignoreEvent(IgnoredEventType.Ban, memberToBan.id);
+    memberToBan.ban(1, reason);
 
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.member.id,
+      userId: memberToBan.id,
       modId: mod.id,
       type: CaseTypes.Ban,
       reason,
@@ -683,7 +768,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Banned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${
       createdCase.case_number
     })`;
 
@@ -693,17 +778,29 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(mod.user),
-      user: stripObjectToScalars(args.member.user),
+      user: stripObjectToScalars(memberToBan.user),
     });
   }
 
-  @d.command("softban", "<member:Member> [reason:string$]", {
+  @d.command("softban", "<userId:userId> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async softbanCmd(msg, args) {
+  async softbanCmd(msg, args: { userId: string; reason: string; mod?: Member }) {
+    const { member: memberToSoftban, isBanned } = await this.resolveMember(args.userId);
+
+    if (!memberToSoftban) {
+      if (isBanned) {
+        this.sendErrorMessage(msg.channel, `User is already banned`);
+      } else {
+        this.sendErrorMessage(msg.channel, `User not found on the server`);
+      }
+
+      return;
+    }
+
     // Make sure we're allowed to ban this member
-    if (!this.canActOn(msg.member, args.member)) {
+    if (!this.canActOn(msg.member, memberToSoftban)) {
       msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
       return;
     }
@@ -722,17 +819,17 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Softban the user = ban, and immediately unban
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.member.id);
-    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.member.id);
-    this.ignoreEvent(IgnoredEventType.Ban, args.member.id);
-    this.ignoreEvent(IgnoredEventType.Unban, args.member.id);
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToSoftban.id);
+    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToSoftban.id);
+    this.ignoreEvent(IgnoredEventType.Ban, memberToSoftban.id);
+    this.ignoreEvent(IgnoredEventType.Unban, memberToSoftban.id);
 
-    await args.member.ban(1, reason);
-    await this.guild.unbanMember(args.member.id);
+    await memberToSoftban.ban(1, reason);
+    await this.guild.unbanMember(memberToSoftban.id);
 
     // Create a case for this action
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.member.id,
+      userId: memberToSoftban.id,
       modId: mod.id,
       type: CaseTypes.Softban,
       reason,
@@ -742,7 +839,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Confirm the action to the moderator
     msg.channel.createMessage(
       successMessage(
-        `Softbanned **${args.member.user.username}#${args.member.user.discriminator}** (Case #${
+        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${
           createdCase.case_number
         })`,
       ),
@@ -751,7 +848,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(args.member, ["user"]),
+      member: stripObjectToScalars(memberToSoftban, ["user"]),
     });
   }
 

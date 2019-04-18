@@ -1,8 +1,8 @@
 {
   "MEMBER_WARN": "⚠️ {userMention(member)} was warned by {userMention(mod)}",
-  "MEMBER_MUTE": "🔇 {userMention(member)} was muted indefinitely by {userMention(mod)}",
-  "MEMBER_TIMED_MUTE": "🔇 {userMention(member)} was muted for **{time}** by {userMention(mod)}",
-  "MEMBER_UNMUTE": "🔊 {userMention(member)} was unmuted by {userMention(mod)}",
+  "MEMBER_MUTE": "🔇 {userMention(user)} was muted indefinitely by {userMention(mod)}",
+  "MEMBER_TIMED_MUTE": "🔇 {userMention(user)} was muted for **{time}** by {userMention(mod)}",
+  "MEMBER_UNMUTE": "🔊 {userMention(user)} was unmuted by {userMention(mod)}",
   "MEMBER_TIMED_UNMUTE": "🔊 {userMention(member)} was scheduled to be unmuted in **{time}** by {userMention(mod)}",
   "MEMBER_MUTE_EXPIRED": "🔊 {userMention(member)}'s mute expired",
   "MEMBER_KICK": "👢 {userMention(user)} was kicked by {userMention(mod)}",
@@ -17,7 +17,7 @@
   "MEMBER_ROLE_CHANGES": "🔑 {userMention(member)}: roles changed: added **{addedRoles}**, removed **{removedRoles}** by {userMention(mod)}",
   "MEMBER_NICK_CHANGE": "✏ {userMention(member)}: nickname changed from **{oldNick}** to **{newNick}**",
   "MEMBER_USERNAME_CHANGE": "✏ {userMention(member)}: username changed from **{oldName}** to **{newName}**",
-  "MEMBER_RESTORE": "💿 {userMention(member)} was restored",
+  "MEMBER_RESTORE": "💿 Restored {restoredData} for {userMention(member)} on rejoin",
 
   "CHANNEL_CREATE": "🖊 Channel {channelMention(channel)} was created",
   "CHANNEL_DELETE": "🗑 Channel {channelMention(channel)} was deleted",
@@ -50,5 +50,7 @@
 
   "MEMBER_JOIN_WITH_PRIOR_RECORDS": "⚠ {userMention(member)} joined with prior records. Recent cases:\n{recentCaseSummary}",
 
-  "CASE_UPDATE": "✏ {userMention(mod)} updated case #{caseNumber} ({caseType}) with note:\n```{note}```"
+  "CASE_UPDATE": "✏ {userMention(mod)} updated case #{caseNumber} ({caseType}) with note:\n```{note}```",
+
+  "MEMBER_MUTE_REJOIN": "⚠ Reapplied active mute for {userMention(member)} on rejoin"
 }
