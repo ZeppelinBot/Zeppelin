@@ -12,8 +12,8 @@ type UnknownAction<T extends string> = T extends KnownActions ? never : T;
 
 type ActionFn<T> = (args: T) => any | Promise<any>;
 
-type MuteActionArgs = { member: Member; muteTime?: number; reason?: string; caseDetails?: ICaseDetails };
-type UnmuteActionArgs = { member: Member; unmuteTime?: number; reason?: string; caseDetails?: ICaseDetails };
+type MuteActionArgs = { userId: string; muteTime?: number; reason?: string; caseDetails?: ICaseDetails };
+type UnmuteActionArgs = { userId: string; unmuteTime?: number; reason?: string; caseDetails?: ICaseDetails };
 type CreateCaseActionArgs = ICaseDetails;
 type CreateCaseNoteActionArgs = {
   caseId: number;

@@ -245,7 +245,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
               ? convertDelayStringToMS(spamConfig.mute_time.toString())
               : 120 * 1000;
             muteResult = await this.actions.fire("mute", {
-              member,
+              userId: member.id,
               muteTime,
               reason: "Automatic spam detection",
               caseDetails: {
@@ -366,7 +366,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
         if (spamConfig.mute && member) {
           const muteTime = spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000;
           this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, userId);
-          this.actions.fire("mute", { member, muteTime, reason: "Automatic spam detection" });
+          this.actions.fire("mute", { userId: member.id, muteTime, reason: "Automatic spam detection" });
         }
 
         // Clear recent cases

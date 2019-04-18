@@ -69,35 +69,36 @@ export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
     const persistedData = await this.persistedData.find(member.id);
     if (!persistedData) return;
 
-    let restore = false;
     const toRestore: MemberOptions = {};
     const config = this.getConfig();
+    const restoredData = [];
 
     const persistedRoles = config.persisted_roles;
     if (persistedRoles.length) {
       const rolesToRestore = intersection(persistedRoles, persistedData.roles);
       if (rolesToRestore.length) {
-        restore = true;
+        restoredData.push("roles");
         toRestore.roles = rolesToRestore;
       }
     }
 
     if (config.persist_nicknames && persistedData.nickname) {
-      restore = true;
+      restoredData.push("nickname");
       toRestore.nick = persistedData.nickname;
     }
 
     if (config.persist_voice_mutes && persistedData.is_voice_muted) {
-      restore = true;
+      restoredData.push("voice mute");
       toRestore.mute = true;
     }
 
-    if (restore) {
+    if (restoredData.length) {
       await member.edit(toRestore, "Restored upon rejoin");
       await this.persistedData.clear(member.id);
 
       this.logs.log(LogType.MEMBER_RESTORE, {
         member: stripObjectToScalars(member, ["user"]),
+        restoredData: restoredData.join(", "),
       });
     }
   }
