@@ -7,7 +7,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
-const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60 * 1000; // 6 hours
+const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
@@ -288,7 +288,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
     // Make sure this user is affected by the slowmode
     const member = this.guild.members.get(msg.user_id);
-    const isAffected = this.hasPermission("affected", { channelId: channel.id, userId: msg.user_id, member });
+    const isAffected = this.hasPermission("is_affected", { channelId: channel.id, userId: msg.user_id, member });
     if (!isAffected) return thisMsgLock.unlock();
 
     // Check if this channel even *has* a bot-maintained slowmode
