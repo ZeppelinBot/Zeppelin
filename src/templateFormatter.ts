@@ -219,7 +219,7 @@ export function parseTemplate(str: string): ParsedTemplate {
 }
 
 async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
-  const value = has(values, theVar.identifier) && at(values, theVar.identifier)[0];
+  let value = has(values, theVar.identifier) ? at(values, theVar.identifier)[0] : undefined;
 
   if (typeof value === "function") {
     const args = [];
