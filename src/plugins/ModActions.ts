@@ -187,11 +187,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       userId = userResolvable;
     }
 
-    return (
-      this.bot.users.find(u => u.id === userId) ||
-      (await this.bot.getRESTUser(userId)) ||
-      createUnknownUser({ id: userId })
-    );
+    const cachedUser = this.bot.users.find(u => u.id === userId);
+    if (cachedUser) return cachedUser;
+
+    try {
+      const freshUser = await this.bot.getRESTUser(userId);
+      return freshUser;
+    } catch (e) {} // tslint:disable-line
+
+    return createUnknownUser({ id: userId });
   }
 
   async getMember(userId: string): Promise<Member> {
