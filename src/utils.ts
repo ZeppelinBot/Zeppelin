@@ -496,8 +496,19 @@ export function ucfirst(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-export const unknownUser = {
+export type UnknownUser = {
+  id: string;
+  username: string;
+  discriminator: string;
+  [key: string]: any;
+};
+
+export const unknownUser: UnknownUser = {
   id: "0",
   username: "Unknown",
   discriminator: "0000",
 };
+
+export function createUnknownUser(props = {}): UnknownUser {
+  return { ...unknownUser, ...props };
+}
