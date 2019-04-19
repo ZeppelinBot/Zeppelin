@@ -6,6 +6,7 @@ import {
   getRoleMentions,
   getUrlsInString,
   getUserMentions,
+  noop,
   stripObjectToScalars,
   trimLines,
 } from "../utils";
@@ -270,7 +271,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           // Then, if enabled, remove the spam messages
           if (spamConfig.clean !== false) {
             msgIds.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-            this.bot.deleteMessages(savedMessage.channel_id, msgIds);
+            this.bot.deleteMessages(savedMessage.channel_id, msgIds).catch(noop);
           }
 
           // Store the ID of the last handled message
