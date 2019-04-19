@@ -5,6 +5,7 @@ import { GuildCases } from "../data/GuildCases";
 import {
   asSingleLine,
   createChunkedMessage,
+  createUnknownUser,
   errorMessage,
   findRelevantAuditLogEntry,
   INotifyUserResult,
@@ -14,7 +15,7 @@ import {
   successMessage,
   trimLines,
   ucfirst,
-  unknownUser,
+  UnknownUser,
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
@@ -155,22 +156,61 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     return ((reason || "") + " " + attachmentUrls.join(" ")).trim();
   }
 
-  async resolveMember(userId: string): Promise<{ member: Member; isBanned?: boolean }> {
+  /**
+   * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
+   */
+  async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
+    let userId;
+
+    // A user mention?
+    const mentionMatch = userResolvable.match(/^<@!?(\d+)>$/);
+    if (mentionMatch) {
+      userId = mentionMatch[1];
+    }
+
+    // A non-mention, full username?
+    if (!userId) {
+      const usernameMatch = userResolvable.match(/^@?([^#]+)#(\d{4})$/);
+      if (usernameMatch) {
+        const user = this.bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+        userId = user.id;
+      }
+    }
+
+    // Just a user ID?
+    if (!userId) {
+      const idMatch = userResolvable.match(/^\d+$/);
+      if (!idMatch) {
+        return null;
+      }
+
+      userId = userResolvable;
+    }
+
+    return (
+      this.bot.users.find(u => u.id === userId) ||
+      (await this.bot.getRESTUser(userId)) ||
+      createUnknownUser({ id: userId })
+    );
+  }
+
+  async getMember(userId: string): Promise<Member> {
+    // See if we have the member cached...
     let member = this.guild.members.get(userId);
 
+    // If not, fetch it from the API
     if (!member) {
       try {
         member = await this.bot.getRESTGuildMember(this.guildId, userId);
       } catch (e) {} // tslint:disable-line
     }
 
-    if (!member) {
-      const bans = (await this.guild.getBans()) as any;
-      const isBanned = bans.some(b => b.user.id === userId);
-      return { member, isBanned };
-    }
+    return member;
+  }
 
-    return { member };
+  async isBanned(userId): Promise<boolean> {
+    const bans = (await this.guild.getBans()) as any;
+    return bans.some(b => b.user.id === userId);
   }
 
   /**
@@ -326,7 +366,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     if (!theCase) {
-      msg.channel.createMessage(errorMessage("Case not found"));
+      this.sendErrorMessage(msg.channel, "Case not found");
       return;
     }
 
@@ -346,31 +386,37 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
   }
 
-  @d.command("note", "<userId:userId> <note:string$>")
+  @d.command("note", "<user:string> <note:string$>")
   @d.permission("can_note")
-  async noteCmd(msg: Message, args: any) {
-    const user = await this.bot.users.get(args.userId);
-    const userName = user ? `${user.username}#${user.discriminator}` : "member";
+  async noteCmd(msg: Message, args: { user: string; note: string }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const userName = `${user.username}#${user.discriminator}`;
     const reason = this.formatReasonWithAttachments(args.note, msg.attachments);
 
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.userId,
+      userId: user.id,
       modId: msg.author.id,
       type: CaseTypes.Note,
       reason,
     });
 
-    msg.channel.createMessage(successMessage(`Note added on **${userName}** (Case #${createdCase.case_number})`));
+    this.sendSuccessMessage(msg.channel, `Note added on **${userName}** (Case #${createdCase.case_number})`);
   }
 
-  @d.command("warn", "<userId:string> <reason:string$>", {
+  @d.command("warn", "<user:string> <reason:string$>", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_warn")
-  async warnCmd(msg: Message, args: { userId: string; reason: string; mod?: Member }) {
-    const { member: memberToWarn, isBanned } = await this.resolveMember(args.userId);
+  async warnCmd(msg: Message, args: { user: string; reason: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const memberToWarn = await this.getMember(user.id);
 
     if (!memberToWarn) {
+      const isBanned = await this.isBanned(user.id);
       if (isBanned) {
         this.sendErrorMessage(msg.channel, `User is banned`);
       } else {
@@ -441,33 +487,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("mute", "<userId:userId> <time:delay> <reason:string$>", {
-    overloads: ["<userId:userId> <time:delay>", "<userId:userId> [reason:string$]"],
-    options: [{ name: "mod", type: "member" }],
-  })
-  @d.permission("can_mute")
-  async muteCmd(msg: Message, args: { userId: string; time?: number; reason?: string; mod: Member }) {
-    const user = this.bot.users.get(args.userId) || { ...unknownUser, id: args.userId };
-    const { member: memberToMute, isBanned } = await this.resolveMember(user.id);
-
-    if (!memberToMute) {
-      const notOnServerMsg = isBanned
-        ? await msg.channel.createMessage("User is banned. Apply a mute to them anyway?")
-        : await msg.channel.createMessage("User is not on the server. Apply a mute to them anyway?");
-
-      const reply = await waitForReaction(this.bot, notOnServerMsg, ["✅", "❌"], msg.author.id);
-      notOnServerMsg.delete();
-      if (!reply || reply.name === "❌") {
-        return;
-      }
-    }
-
-    // Make sure we're allowed to mute this member
-    if (memberToMute && !this.canActOn(msg.member, memberToMute)) {
-      msg.channel.createMessage(errorMessage("Cannot mute: insufficient permissions"));
-      return;
-    }
-
+  /**
+   * The actual function run by both !mute and !forcemute.
+   * The only difference between the two commands is in target member validation.
+   */
+  async actualMuteCmd(user: User | UnknownUser, msg: Message, args: { time?: number; reason?: string; mod: Member }) {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     let pp = null;
@@ -532,50 +556,83 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     if (muteResult.notifyResult.text) response += ` (${muteResult.notifyResult.text})`;
-    msg.channel.createMessage(successMessage(response));
+    this.sendSuccessMessage(msg.channel, response);
   }
 
-  @d.command("unmute", "<userId:userId> <time:delay> <reason:string$>", {
-    overloads: ["<userId:userId> <time:delay>", "<userId:userId> [reason:string$]"],
+  @d.command("mute", "<user:string> <time:delay> <reason:string$>", {
+    overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_mute")
-  async unmuteCmd(msg: Message, args: { userId: string; time?: number; reason?: string; mod?: Member }) {
-    // Check if they're muted in the first place
-    if (!(await this.mutes.isMuted(args.userId))) {
-      msg.channel.createMessage(errorMessage("Cannot unmute: member is not muted"));
-      return;
-    }
+  async muteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
-    // Find the server member to unmute
-    const user = this.bot.users.get(args.userId) || { ...unknownUser, id: args.userId };
-    const { member: memberToUnmute, isBanned } = await this.resolveMember(user.id);
+    const memberToMute = await this.getMember(user.id);
 
-    if (!memberToUnmute) {
-      const notOnServerMsg = isBanned
-        ? await msg.channel.createMessage("User is banned. Unmute them anyway?")
-        : await msg.channel.createMessage("User is not on the server. Unmute them anyway?");
-
-      const reply = await waitForReaction(this.bot, notOnServerMsg, ["✅", "❌"], msg.author.id);
-      notOnServerMsg.delete();
-      if (!reply || reply.name === "❌") {
-        return;
+    if (!memberToMute) {
+      const isBanned = await this.isBanned(user.id);
+      const prefix = this.guildConfig.prefix;
+      if (isBanned) {
+        this.sendErrorMessage(
+          msg.channel,
+          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
+        );
+      } else {
+        this.sendErrorMessage(
+          msg.channel,
+          `User is not on the server. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
+        );
       }
-    }
 
-    // Make sure we're allowed to unmute this member
-    if (memberToUnmute && !this.canActOn(msg.member, memberToUnmute)) {
-      msg.channel.createMessage(errorMessage("Cannot unmute: insufficient permissions"));
       return;
     }
 
+    // Make sure we're allowed to mute this member
+    if (memberToMute && !this.canActOn(msg.member, memberToMute)) {
+      this.sendErrorMessage(msg.channel, "Cannot mute: insufficient permissions");
+      return;
+    }
+
+    this.actualMuteCmd(user, msg, args);
+  }
+
+  @d.command("forcemute", "<user:string> <time:delay> <reason:string$>", {
+    overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
+    options: [{ name: "mod", type: "member" }],
+  })
+  @d.permission("can_mute")
+  async forcemuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const memberToMute = await this.getMember(user.id);
+
+    // Make sure we're allowed to mute this user
+    if (memberToMute && !this.canActOn(msg.member, memberToMute)) {
+      this.sendErrorMessage(msg.channel, "Cannot mute: insufficient permissions");
+      return;
+    }
+
+    this.actualMuteCmd(user, msg, args);
+  }
+
+  /**
+   * The actual function run by both !unmute and !forceunmute.
+   * The only difference between the two commands is in target member validation.
+   */
+  async actualUnmuteCmd(
+    user: User | UnknownUser,
+    msg: Message,
+    args: { time?: number; reason?: string; mod?: Member },
+  ) {
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.author;
     let pp = null;
 
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -618,14 +675,87 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
   }
 
-  @d.command("kick", "<userId:userId> [reason:string$]", {
+  @d.command("unmute", "<user:string> <time:delay> <reason:string$>", {
+    overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
+    options: [{ name: "mod", type: "member" }],
+  })
+  @d.permission("can_mute")
+  async unmuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    // Check if they're muted in the first place
+    if (!(await this.mutes.isMuted(args.user))) {
+      this.sendErrorMessage(msg.channel, "Cannot unmute: member is not muted");
+      return;
+    }
+
+    // Find the server member to unmute
+    const memberToUnmute = await this.getMember(user.id);
+
+    if (!memberToUnmute) {
+      const isBanned = await this.isBanned(user.id);
+      const prefix = this.guildConfig.prefix;
+      if (isBanned) {
+        this.sendErrorMessage(msg.channel, `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`);
+      } else {
+        this.sendErrorMessage(
+          msg.channel,
+          `User is not on the server. Use \`${prefix}forceunmute\` to unmute them anyway.`,
+        );
+      }
+
+      return;
+    }
+
+    // Make sure we're allowed to unmute this member
+    if (memberToUnmute && !this.canActOn(msg.member, memberToUnmute)) {
+      this.sendErrorMessage(msg.channel, "Cannot unmute: insufficient permissions");
+      return;
+    }
+
+    this.actualUnmuteCmd(user, msg, args);
+  }
+
+  @d.command("forceunmute", "<user:string> <time:delay> <reason:string$>", {
+    overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
+    options: [{ name: "mod", type: "member" }],
+  })
+  @d.permission("can_mute")
+  async forceunmuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    // Check if they're muted in the first place
+    if (!(await this.mutes.isMuted(user.id))) {
+      this.sendErrorMessage(msg.channel, "Cannot unmute: member is not muted");
+      return;
+    }
+
+    // Find the server member to unmute
+    const memberToUnmute = await this.getMember(user.id);
+
+    // Make sure we're allowed to unmute this member
+    if (memberToUnmute && !this.canActOn(msg.member, memberToUnmute)) {
+      this.sendErrorMessage(msg.channel, "Cannot unmute: insufficient permissions");
+      return;
+    }
+
+    this.actualUnmuteCmd(user, msg, args);
+  }
+
+  @d.command("kick", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_kick")
-  async kickCmd(msg, args: { userId: string; reason: string; mod: Member }) {
-    const { member: memberToKick, isBanned } = await this.resolveMember(args.userId);
+  async kickCmd(msg, args: { user: string; reason: string; mod: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const memberToKick = await this.getMember(user.id);
 
     if (!memberToKick) {
+      const isBanned = await this.isBanned(user.id);
       if (isBanned) {
         this.sendErrorMessage(msg.channel, `User is banned`);
       } else {
@@ -637,7 +767,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Make sure we're allowed to kick this member
     if (!this.canActOn(msg.member, memberToKick)) {
-      msg.channel.createMessage(errorMessage("Cannot kick: insufficient permissions"));
+      this.sendErrorMessage(msg.channel, "Cannot kick: insufficient permissions");
       return;
     }
 
@@ -645,7 +775,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -700,14 +830,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("ban", "<userId:userId> [reason:string$]", {
+  @d.command("ban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async banCmd(msg, args: { userId: string; reason?: string; mod?: Member }) {
-    const { member: memberToBan, isBanned } = await this.resolveMember(args.userId);
+  async banCmd(msg, args: { user: string; reason?: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const memberToBan = await this.getMember(user.id);
 
     if (!memberToBan) {
+      const isBanned = await this.isBanned(user.id);
       if (isBanned) {
         this.sendErrorMessage(msg.channel, `User is already banned`);
       } else {
@@ -719,7 +853,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, memberToBan)) {
-      msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
+      this.sendErrorMessage(msg.channel, "Cannot ban: insufficient permissions");
       return;
     }
 
@@ -727,7 +861,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -782,14 +916,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("softban", "<userId:userId> [reason:string$]", {
+  @d.command("softban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async softbanCmd(msg, args: { userId: string; reason: string; mod?: Member }) {
-    const { member: memberToSoftban, isBanned } = await this.resolveMember(args.userId);
+  async softbanCmd(msg, args: { user: string; reason: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const memberToSoftban = await this.getMember(user.id);
 
     if (!memberToSoftban) {
+      const isBanned = await this.isBanned(user.id);
       if (isBanned) {
         this.sendErrorMessage(msg.channel, `User is already banned`);
       } else {
@@ -801,7 +939,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Make sure we're allowed to ban this member
     if (!this.canActOn(msg.member, memberToSoftban)) {
-      msg.channel.createMessage(errorMessage("Cannot ban: insufficient permissions"));
+      this.sendErrorMessage(msg.channel, "Cannot ban: insufficient permissions");
       return;
     }
 
@@ -809,7 +947,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -852,29 +990,32 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("unban", "<userId:userId> [reason:string$]", {
+  @d.command("unban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async unbanCmd(msg: Message, args: { userId: string; reason: string; mod: Member }) {
+  async unbanCmd(msg: Message, args: { user: string; reason: string; mod: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
       mod = args.mod;
     }
 
-    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userId);
+    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
 
     try {
-      this.ignoreEvent(IgnoredEventType.Unban, args.userId);
-      await this.guild.unbanMember(args.userId);
+      this.ignoreEvent(IgnoredEventType.Unban, user.id);
+      await this.guild.unbanMember(user.id);
     } catch (e) {
-      msg.channel.createMessage(errorMessage("Failed to unban member; are you sure they're banned?"));
+      this.sendErrorMessage(msg.channel, "Failed to unban member; are you sure they're banned?");
       return;
     }
 
@@ -882,7 +1023,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.userId,
+      userId: user.id,
       modId: mod.id,
       type: CaseTypes.Unban,
       reason,
@@ -895,19 +1036,22 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.userId,
+      userId: user.id,
     });
   }
 
-  @d.command("forceban", "<userId:userId> [reason:string$]", {
+  @d.command("forceban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_ban")
-  async forcebanCmd(msg: Message, args: any) {
+  async forcebanCmd(msg: Message, args: { user: string; reason?: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
     // If the user exists as a guild member, make sure we can act on them first
-    const member = this.guild.members.get(args.userId);
+    const member = await this.getMember(user.id);
     if (member && !this.canActOn(msg.member, member)) {
-      msg.channel.createMessage(errorMessage("Cannot forceban this user: insufficient permissions"));
+      this.sendErrorMessage(msg.channel, "Cannot forceban this user: insufficient permissions");
       return;
     }
 
@@ -915,7 +1059,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -924,19 +1068,19 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    this.ignoreEvent(IgnoredEventType.Ban, args.userId);
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.userId);
+    this.ignoreEvent(IgnoredEventType.Ban, user.id);
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
     try {
-      await this.guild.banMember(args.userId, 1, reason);
+      await this.guild.banMember(user.id, 1, reason);
     } catch (e) {
-      msg.channel.createMessage(errorMessage("Failed to forceban member"));
+      this.sendErrorMessage(msg.channel, "Failed to forceban member");
       return;
     }
 
     // Create a case
     const createdCase = await this.actions.fire("createCase", {
-      userId: args.userId,
+      userId: user.id,
       modId: mod.id,
       type: CaseTypes.Ban,
       reason,
@@ -949,7 +1093,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.userId,
+      userId: user.id,
     });
   }
 
@@ -958,7 +1102,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
     // Limit to 100 users at once (arbitrary?)
     if (args.userIds.length > 100) {
-      msg.channel.createMessage(errorMessage(`Can only massban max 100 users at once`));
+      this.sendErrorMessage(msg.channel, `Can only massban max 100 users at once`);
       return;
     }
 
@@ -966,7 +1110,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     msg.channel.createMessage("Ban reason? `cancel` to cancel");
     const banReasonReply = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
     if (!banReasonReply || !banReasonReply.content || banReasonReply.content.toLowerCase().trim() === "cancel") {
-      msg.channel.createMessage("Cancelled");
+      this.sendErrorMessage(msg.channel, "Cancelled");
       return;
     }
 
@@ -976,7 +1120,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     for (const userId of args.userIds) {
       const member = this.guild.members.get(userId);
       if (member && !this.canActOn(msg.member, member)) {
-        msg.channel.createMessage(errorMessage("Cannot massban one or more users: insufficient permissions"));
+        this.sendErrorMessage(msg.channel, "Cannot massban one or more users: insufficient permissions");
         return;
       }
     }
@@ -1016,7 +1160,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const successfulBanCount = args.userIds.length - failedBans.length;
     if (successfulBanCount === 0) {
       // All bans failed - don't create a log entry and notify the user
-      msg.channel.createMessage(errorMessage("All bans failed. Make sure the IDs are valid."));
+      this.sendErrorMessage(msg.channel, "All bans failed. Make sure the IDs are valid.");
     } else {
       // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
       this.serverLogs.log(LogType.MASSBAN, {
@@ -1034,21 +1178,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
   }
 
-  @d.command("addcase", "<type:string> <target:userId> [reason:string$]", {
+  @d.command("addcase", "<type:string> <user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
   })
   @d.permission("can_addcase")
-  async addcaseCmd(msg: Message, args: { type: string; target: string; reason?: string; mod?: Member }) {
-    // Verify the user id is a valid snowflake-ish
-    if (!args.target.match(/^[0-9]{17,20}$/)) {
-      msg.channel.createMessage(errorMessage("Cannot add case: invalid user id"));
-      return;
-    }
+  async addcaseCmd(msg: Message, args: { type: string; user: string; reason?: string; mod?: Member }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
     // If the user exists as a guild member, make sure we can act on them first
-    const member = this.guild.members.get(args.target);
+    const member = await this.getMember(user.id);
     if (member && !this.canActOn(msg.member, member)) {
-      msg.channel.createMessage(errorMessage("Cannot add case on this user: insufficient permissions"));
+      this.sendErrorMessage(msg.channel, "Cannot add case on this user: insufficient permissions");
       return;
     }
 
@@ -1056,7 +1197,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        this.sendErrorMessage(msg.channel, "No permission for --mod");
         return;
       }
 
@@ -1066,7 +1207,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Verify the case type is valid
     const type: string = args.type[0].toUpperCase() + args.type.slice(1).toLowerCase();
     if (!CaseTypes[type]) {
-      msg.channel.createMessage(errorMessage("Cannot add case: invalid case type"));
+      this.sendErrorMessage(msg.channel, "Cannot add case: invalid case type");
       return;
     }
 
@@ -1074,14 +1215,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Create the case
     const theCase: Case = await this.actions.fire("createCase", {
-      userId: args.target,
+      userId: user.id,
       modId: mod.id,
       type: CaseTypes[type],
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : null,
     });
 
-    const user = member ? member.user : this.bot.users.get(args.target);
     if (user) {
       msg.channel.createMessage(
         successMessage(`Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`),
@@ -1093,7 +1233,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.CASE_CREATE, {
       mod: stripObjectToScalars(mod.user),
-      userId: args.target,
+      userId: user.id,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase(),
     });
@@ -1111,7 +1251,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
 
     if (!theCase) {
-      msg.channel.createMessage(errorMessage("Case not found"));
+      this.sendErrorMessage(msg.channel, "Case not found");
       return;
     }
 
@@ -1121,7 +1261,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
   }
 
-  @d.command("cases", "<userId:userId> [opts:string$]", {
+  @d.command("cases", "<user:string> [opts:string$]", {
     options: [
       {
         name: "expand",
@@ -1136,12 +1276,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     ],
   })
   @d.permission("can_view")
-  async userCasesCmd(msg: Message, args: { userId: string; opts?: string; expand?: boolean; hidden?: boolean }) {
-    const cases = await this.cases.with("notes").getByUserId(args.userId);
+  async userCasesCmd(msg: Message, args: { user: string; opts?: string; expand?: boolean; hidden?: boolean }) {
+    const user = await this.resolveUser(args.user);
+    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+
+    const cases = await this.cases.with("notes").getByUserId(user.id);
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
-    const user = this.bot.users.get(args.userId) || unknownUser;
     const userName = `${user.username}#${user.discriminator}`;
 
     if (cases.length === 0) {
@@ -1233,7 +1375,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   async hideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);
     if (!theCase) {
-      msg.channel.createMessage(errorMessage("Case not found!"));
+      this.sendErrorMessage(msg.channel, "Case not found!");
       return;
     }
 
@@ -1248,11 +1390,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   async unhideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);
     if (!theCase) {
-      msg.channel.createMessage(errorMessage("Case not found!"));
+      this.sendErrorMessage(msg.channel, "Case not found!");
       return;
     }
 
     await this.cases.setHidden(theCase.id, false);
-    msg.channel.createMessage(successMessage(`Case #${theCase.case_number} is no longer hidden!`));
+    this.sendSuccessMessage(msg.channel, `Case #${theCase.case_number} is no longer hidden!`);
   }
 }

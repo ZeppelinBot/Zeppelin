@@ -74,7 +74,7 @@ import { AutoReactionsPlugin } from "./plugins/AutoReactionsPlugin";
 import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
 import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
 import { RemindersPlugin } from "./plugins/Reminders";
-import { convertDelayStringToMS } from "./utils";
+import { convertDelayStringToMS, errorMessage, successMessage } from "./utils";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -167,6 +167,14 @@ connect().then(async conn => {
 
           return result;
         },
+      },
+
+      sendSuccessMessageFn(channel, body) {
+        channel.createMessage(successMessage(body));
+      },
+
+      sendErrorMessageFn(channel, body) {
+        channel.createMessage(errorMessage(body));
       },
     },
   });
