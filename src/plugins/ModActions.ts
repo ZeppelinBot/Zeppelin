@@ -305,11 +305,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   /**
    * Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it
    */
-  @d.command("update", "<caseNumber:number> <note:string$>", {
-    overloads: ["<note:string$>"],
+  @d.command("update", "<caseNumber:number> [note:string$]", {
+    overloads: ["[note:string$]"],
   })
   @d.permission("can_note")
-  async updateCmd(msg: Message, args: { caseNumber?: number; note: string }) {
+  async updateCmd(msg: Message, args: { caseNumber?: number; note?: string }) {
     let theCase: Case;
     if (args.caseNumber != null) {
       theCase = await this.cases.findByCaseNumber(args.caseNumber);
@@ -322,18 +322,25 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
+    if (!args.note && msg.attachments.length === 0) {
+      this.sendErrorMessage(msg.channel, "Text or attachment required");
+      return;
+    }
+
+    const note = this.formatReasonWithAttachments(args.note, msg.attachments);
+
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     await casesPlugin.createCaseNote({
       caseId: theCase.id,
       modId: msg.author.id,
-      body: args.note,
+      body: note,
     });
 
     this.serverLogs.log(LogType.CASE_UPDATE, {
       mod: msg.author,
       caseNumber: theCase.case_number,
       caseType: CaseTypes[theCase.type],
-      note: args.note,
+      note,
     });
 
     msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
