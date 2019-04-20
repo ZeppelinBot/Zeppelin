@@ -1,4 +1,11 @@
-import { convertDelayStringToMS, resolveMember, resolveUser, UnknownUser } from "./utils";
+import {
+  convertDelayStringToMS,
+  deactivateMentions,
+  disableCodeBlocks,
+  resolveMember,
+  resolveUser,
+  UnknownUser,
+} from "./utils";
 import { CommandArgumentTypeError } from "knub";
 import { Client, GuildChannel, Message } from "eris";
 
@@ -15,7 +22,7 @@ export const customArgumentTypes = {
   async resolvedUser(value, msg, bot: Client) {
     const result = await resolveUser(bot, value);
     if (result == null || result instanceof UnknownUser) {
-      throw new CommandArgumentTypeError(`User \`${value}\` was not found`);
+      throw new CommandArgumentTypeError(`User \`${disableCodeBlocks(value)}\` was not found`);
     }
     return result;
   },
@@ -23,7 +30,7 @@ export const customArgumentTypes = {
   async resolvedUserLoose(value, msg, bot: Client) {
     const result = await resolveUser(bot, value);
     if (result == null) {
-      throw new CommandArgumentTypeError(`Invalid user: ${value}`);
+      throw new CommandArgumentTypeError(`Invalid user: \`${disableCodeBlocks(value)}\``);
     }
     return result;
   },
@@ -33,7 +40,9 @@ export const customArgumentTypes = {
 
     const result = await resolveMember(bot, msg.channel.guild, value);
     if (result == null) {
-      throw new CommandArgumentTypeError(`Member \`${value}\` was not found or they have left the server`);
+      throw new CommandArgumentTypeError(
+        `Member \`${disableCodeBlocks(value)}\` was not found or they have left the server`,
+      );
     }
     return result;
   },
