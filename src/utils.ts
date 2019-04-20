@@ -1,4 +1,4 @@
-import { Client, Emoji, Guild, GuildAuditLogEntry, TextableChannel, TextChannel, User } from "eris";
+import { Client, Emoji, Guild, GuildAuditLogEntry, Member, TextableChannel, TextChannel, User } from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -234,7 +234,7 @@ export function getRoleMentions(str: string) {
  * Disables link previews in the given string by wrapping links in < >
  */
 export function disableLinkPreviews(str: string): string {
-  return str.replace(/(?<!\<)(https?:\/\/\S+)/gi, "<$1>");
+  return str.replace(/(?<!<)(https?:\/\/\S+)/gi, "<$1>");
 }
 
 export function deactivateMentions(content: string): string {
@@ -496,19 +496,76 @@ export function ucfirst(str) {
   return str[0].toUpperCase() + str.slice(1);
 }
 
-export type UnknownUser = {
-  id: string;
-  username: string;
-  discriminator: string;
-  [key: string]: any;
-};
+export class UnknownUser {
+  public id: string = null;
+  public username = "Unknown";
+  public discriminator = "0000";
 
-export const unknownUser: UnknownUser = {
-  id: null,
-  username: "Unknown",
-  discriminator: "0000",
-};
+  constructor(props = {}) {
+    for (const key in props) {
+      this[key] = props[key];
+    }
+  }
+}
 
-export function createUnknownUser(props = {}): UnknownUser {
-  return { ...unknownUser, ...props };
+export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser> {
+  if (value == null || typeof value !== "string") {
+    return new UnknownUser();
+  }
+
+  let userId;
+
+  // A user mention?
+  const mentionMatch = value.match(/^<@!?(\d+)>$/);
+  if (mentionMatch) {
+    userId = mentionMatch[1];
+  }
+
+  // A non-mention, full username?
+  if (!userId) {
+    const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+    if (usernameMatch) {
+      const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+      userId = user.id;
+    }
+  }
+
+  // Just a user ID?
+  if (!userId) {
+    const idMatch = value.match(/^\d+$/);
+    if (!idMatch) {
+      return null;
+    }
+
+    userId = value;
+  }
+
+  const cachedUser = bot.users.find(u => u.id === userId);
+  if (cachedUser) return cachedUser;
+
+  try {
+    const freshUser = await bot.getRESTUser(userId);
+    bot.users.add(freshUser, bot);
+    return freshUser;
+  } catch (e) {} // tslint:disable-line
+
+  return new UnknownUser({ id: userId });
+}
+
+export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
+  // Start by resolving the user
+  const user = await resolveUser(bot, value);
+  if (!user) return null;
+
+  // See if we have the member cached...
+  let member = guild.members.get(user.id);
+
+  // If not, fetch it from the API
+  if (!member) {
+    try {
+      member = await bot.getRESTGuildMember(guild.id, user.id);
+    } catch (e) {} // tslint:disable-line
+  }
+
+  return member;
 }
