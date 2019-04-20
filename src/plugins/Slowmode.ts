@@ -240,7 +240,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= NATIVE_SLOWMODE_LIMIT;
 
     if (seconds === 0) {
-      return this.disableSlowmodeCmd(msg, { channel: args.channel });
+      return this.disableSlowmodeCmd(msg, { channel });
     }
 
     if (seconds > MAX_SLOWMODE) {
