@@ -1,4 +1,4 @@
-import { decorators as d, getCommandSignature, IPluginOptions } from "knub";
+import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition } from "knub";
 import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
 import {
   channelMentionRegex,
@@ -26,7 +26,6 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { ICommandDefinition } from "knub/dist/CommandManager";
 
 const { performance } = require("perf_hooks");
 
