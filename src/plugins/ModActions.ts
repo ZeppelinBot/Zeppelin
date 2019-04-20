@@ -8,6 +8,7 @@ import {
   errorMessage,
   findRelevantAuditLogEntry,
   INotifyUserResult,
+  multiSorter,
   notifyUser,
   NotifyUserStatus,
   stripObjectToScalars,
@@ -1272,7 +1273,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         // Compact view (= regular message with a preview of each case)
         const lines = [];
         for (const theCase of casesToDisplay) {
-          theCase.notes.sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
+          theCase.notes.sort(multiSorter(["created_at", "id"]));
           const caseSummary = this.cases.getSummaryText(theCase);
           lines.push(caseSummary);
         }
