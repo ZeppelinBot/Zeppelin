@@ -1245,10 +1245,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
-    const userName = `${user.username}#${user.discriminator}`;
+    const userName =
+      user instanceof UnknownUser && cases.length
+        ? cases[cases.length - 1].user_name
+        : `${user.username}#${user.discriminator}`;
 
     if (cases.length === 0) {
-      msg.channel.createMessage(`No cases found for ${user ? `**${userName}**` : "the specified user"}`);
+      msg.channel.createMessage(`No cases found for **${userName}**`);
     } else {
       const showHidden = args.hidden || (args.opts && args.opts.match(/\bhidden\b/));
       const casesToDisplay = showHidden ? cases : normalCases;
