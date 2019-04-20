@@ -165,10 +165,11 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
       });
     }
 
-    const archiveLinkMatch = body && body.match(/\/archives\/([a-zA-Z0-9\-]+)/);
+    const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9\-]+/g);
     if (archiveLinkMatch) {
-      const archiveId = archiveLinkMatch[1];
-      this.archives.makePermanent(archiveId);
+      for (const archiveId of archiveLinkMatch) {
+        this.archives.makePermanent(archiveId);
+      }
     }
 
     if ((!args.automatic || this.getConfig().log_automatic_actions) && args.postInCaseLogOverride !== false) {
