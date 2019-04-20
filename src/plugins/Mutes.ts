@@ -1,8 +1,7 @@
 import { Member, Message, User } from "eris";
-import { GuildCases, ICaseDetails } from "../data/GuildCases";
+import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { GuildActions } from "../data/GuildActions";
 import { GuildMutes } from "../data/GuildMutes";
 import {
   chunkMessageLines,
@@ -14,7 +13,6 @@ import {
   stripObjectToScalars,
   successMessage,
   ucfirst,
-  unknownUser,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -23,6 +21,8 @@ import { decorators as d, IPluginOptions, logger } from "knub";
 import { Mute } from "../data/entities/Mute";
 import { renderTemplate } from "../templateFormatter";
 import { CaseTypes } from "../data/CaseTypes";
+import { CaseArgs, CasesPlugin } from "./Cases";
+import { Case } from "../data/entities/Case";
 
 interface IMuteWithDetails extends Mute {
   member?: Member;
@@ -43,10 +43,19 @@ interface IMutesPluginConfig {
   can_cleanup: boolean;
 }
 
+export type MuteResult = {
+  case: Case;
+  notifyResult: INotifyUserResult;
+  updatedExistingMute: boolean;
+};
+
+export type UnmuteResult = {
+  case: Case;
+};
+
 export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   public static pluginName = "mutes";
 
-  protected actions: GuildActions;
   protected mutes: GuildMutes;
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
@@ -84,62 +93,38 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     };
   }
 
-  onLoad() {
-    this.actions = GuildActions.getInstance(this.guildId);
+  protected onLoad() {
     this.mutes = GuildMutes.getInstance(this.guildId);
     this.cases = GuildCases.getInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
-
-    this.actions.register("mute", args => {
-      return this.muteUser(args.userId, args.muteTime, args.reason, args.caseDetails);
-    });
-    this.actions.register("unmute", args => {
-      return this.unmuteUser(args.userId, args.unmuteTime, args.caseDetails);
-    });
 
     // Check for expired mutes every 5s
     this.clearExpiredMutes();
     this.muteClearIntervalId = setInterval(() => this.clearExpiredMutes(), 5000);
   }
 
-  onUnload() {
-    this.actions.unregister("mute");
-    this.actions.unregister("unmute");
-
+  protected onUnload() {
     clearInterval(this.muteClearIntervalId);
-  }
-
-  async resolveMember(userId: string) {
-    if (this.guild.members.has(userId)) {
-      return this.guild.members.get(userId);
-    }
-
-    try {
-      const member = await this.bot.getRESTGuildMember(this.guildId, userId);
-      return member;
-    } catch (e) {
-      return null;
-    }
   }
 
   public async muteUser(
     userId: string,
     muteTime: number = null,
     reason: string = null,
-    caseDetails: ICaseDetails = {},
-  ) {
+    caseArgs: Partial<CaseArgs> = {},
+  ): Promise<MuteResult> {
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
     const timeUntilUnmute = muteTime && humanizeDuration(muteTime);
 
     // No mod specified -> mark Zeppelin as the mod
-    if (!caseDetails.modId) {
-      caseDetails.modId = this.bot.user.id;
+    if (!caseArgs.modId) {
+      caseArgs.modId = this.bot.user.id;
     }
 
-    const user = this.bot.users.get(userId) || { ...unknownUser, id: userId };
-    const member = await this.resolveMember(userId);
+    const user = await this.resolveUser(userId);
+    const member = await this.getMember(user.id);
 
     if (member) {
       // Apply mute role if it's missing
@@ -193,17 +178,29 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     }
 
     // Create/update a case
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     let theCase;
+
     if (existingMute && existingMute.case_id) {
       // Update old case
+      // Since mutes can often have multiple notes (extraNotes), we won't post each case note individually,
+      // but instead we'll post the entire case afterwards
       theCase = await this.cases.find(existingMute.case_id);
       const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
-      await this.actions.fire("createCaseNote", {
-        caseId: existingMute.case_id,
-        modId: caseDetails.modId,
-        note: reason,
-        noteDetails,
-      });
+      const reasons = [reason, ...(caseArgs.extraNotes || [])];
+      for (const noteReason of reasons) {
+        await casesPlugin.createCaseNote({
+          caseId: existingMute.case_id,
+          modId: caseArgs.modId,
+          body: noteReason,
+          noteDetails,
+          postInCaseLogOverride: false,
+        });
+      }
+
+      if (caseArgs.postInCaseLogOverride !== false) {
+        casesPlugin.postCaseToCaseLogChannel(existingMute.case_id);
+      }
     } else {
       // Create new case
       const noteDetails = [`Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}`];
@@ -211,20 +208,19 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
         noteDetails.push(ucfirst(notifyResult.text));
       }
 
-      theCase = await this.actions.fire("createCase", {
+      theCase = await casesPlugin.createCase({
+        ...caseArgs,
         userId,
-        modId: caseDetails.modId,
+        modId: caseArgs.modId,
         type: CaseTypes.Mute,
         reason,
-        ppId: caseDetails.ppId,
         noteDetails,
-        extraNotes: caseDetails.extraNotes,
       });
       await this.mutes.setCaseId(user.id, theCase.id);
     }
 
     // Log the action
-    const mod = this.bot.users.get(caseDetails.modId) || { ...unknownUser, id: caseDetails.modId };
+    const mod = await this.resolveUser(caseArgs.modId);
     if (muteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
         mod: stripObjectToScalars(mod),
@@ -245,12 +241,16 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     };
   }
 
-  public async unmuteUser(userId: string, unmuteTime: number = null, caseDetails: ICaseDetails = {}) {
+  public async unmuteUser(
+    userId: string,
+    unmuteTime: number = null,
+    caseArgs: Partial<CaseArgs> = {},
+  ): Promise<UnmuteResult> {
     const existingMute = await this.mutes.findExistingMuteForUserId(userId);
     if (!existingMute) return;
 
-    const user = this.bot.users.get(userId) || { ...unknownUser, id: userId };
-    const member = await this.resolveMember(userId);
+    const user = await this.resolveUser(userId);
+    const member = await this.getMember(userId);
 
     if (unmuteTime) {
       // Schedule timed unmute (= just set the mute's duration)
@@ -277,17 +277,17 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       noteDetails.push(`Unmuted immediately`);
     }
 
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
+      ...caseArgs,
       userId,
-      modId: caseDetails.modId,
+      modId: caseArgs.modId,
       type: CaseTypes.Unmute,
-      reason: caseDetails.reason,
-      ppId: caseDetails.ppId,
       noteDetails,
     });
 
     // Log the action
-    const mod = this.bot.users.get(caseDetails.modId);
+    const mod = this.bot.users.get(caseArgs.modId);
     if (unmuteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
         mod: stripObjectToScalars(mod),
@@ -310,7 +310,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     options: [{ name: "age", type: "delay" }, { name: "left", type: "boolean" }],
   })
   @d.permission("can_view_list")
-  public async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
+  protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
     const lines = [];
 
     // Active, logged mutes
@@ -449,7 +449,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
    * Reapply active mutes on join
    */
   @d.event("guildMemberAdd")
-  async onGuildMemberAdd(_, member: Member) {
+  protected async onGuildMemberAdd(_, member: Member) {
     const mute = await this.mutes.findExistingMuteForUserId(member.id);
     if (mute) {
       const muteRole = this.getConfig().mute_role;
@@ -465,7 +465,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
    * Clear active mute from the member if the member is banned
    */
   @d.event("guildBanAdd")
-  async onGuildBanAdd(_, user: User) {
+  protected async onGuildBanAdd(_, user: User) {
     const mute = await this.mutes.findExistingMuteForUserId(user.id);
     if (mute) {
       this.mutes.clear(user.id);
@@ -477,7 +477,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
    */
   @d.command("clear_banned_mutes")
   @d.permission("can_cleanup")
-  async clearBannedMutesCmd(msg: Message) {
+  protected async clearBannedMutesCmd(msg: Message) {
     await msg.channel.createMessage("Clearing mutes from banned users...");
 
     const activeMutes = await this.mutes.getActiveMutes();
@@ -505,7 +505,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
    * Clear active mute from the member if the mute role is removed
    */
   @d.event("guildMemberUpdate")
-  async onGuildMemberUpdate(_, member: Member) {
+  protected async onGuildMemberUpdate(_, member: Member) {
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
@@ -522,7 +522,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
    */
   @d.command("clear_mutes_without_role")
   @d.permission("can_cleanup")
-  async clearMutesWithoutRoleCmd(msg: Message) {
+  protected async clearMutesWithoutRoleCmd(msg: Message) {
     const activeMutes = await this.mutes.getActiveMutes();
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
@@ -545,7 +545,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
   @d.command("clear_mute", "<userId:string>")
   @d.permission("can_cleanup")
-  async clearMuteCmd(msg: Message, args: { userId: string }) {
+  protected async clearMuteCmd(msg: Message, args: { userId: string }) {
     const mute = await this.mutes.findExistingMuteForUserId(args.userId);
     if (!mute) {
       msg.channel.createMessage(errorMessage("No active mutes found for that user id"));

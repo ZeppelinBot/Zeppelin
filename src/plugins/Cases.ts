@@ -1,11 +1,10 @@
-import { Message, MessageContent, MessageFile, TextableChannel, TextChannel } from "eris";
-import { GuildCases, ICaseDetails } from "../data/GuildCases";
+import { Message, MessageContent, MessageFile, TextChannel } from "eris";
+import { GuildCases } from "../data/GuildCases";
 import { CaseTypes } from "../data/CaseTypes";
 import { Case } from "../data/entities/Case";
 import moment from "moment-timezone";
 import { CaseTypeColors } from "../data/CaseTypeColors";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { GuildActions } from "../data/GuildActions";
 import { GuildArchives } from "../data/GuildArchives";
 import { IPluginOptions } from "knub";
 
@@ -14,10 +13,34 @@ interface ICasesPluginConfig {
   case_log_channel: string;
 }
 
+/**
+ * Can also be used as a config object for functions that create cases
+ */
+export type CaseArgs = {
+  userId: string;
+  modId: string;
+  ppId?: string;
+  type: CaseTypes;
+  auditLogId?: string;
+  reason?: string;
+  automatic?: boolean;
+  postInCaseLogOverride?: boolean;
+  noteDetails?: string[];
+  extraNotes?: string[];
+};
+
+export type CaseNoteArgs = {
+  caseId: number;
+  modId: string;
+  body: string;
+  automatic?: boolean;
+  postInCaseLogOverride?: boolean;
+  noteDetails?: string[];
+};
+
 export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   public static pluginName = "cases";
 
-  protected actions: GuildActions;
   protected cases: GuildCases;
   protected archives: GuildArchives;
 
@@ -31,35 +54,13 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   }
 
   onLoad() {
-    this.actions = GuildActions.getInstance(this.guildId);
     this.cases = GuildCases.getInstance(this.guildId);
     this.archives = GuildArchives.getInstance(this.guildId);
 
-    this.actions.register("createCase", args => {
-      return this.createCase(args);
-    });
-
-    this.actions.register("createCaseNote", args => {
-      return this.createCaseNote(
-        args.caseId,
-        args.modId,
-        args.note,
-        args.automatic,
-        args.postInCaseLog,
-        args.noteDetails,
-      );
-    });
-
-    this.actions.register("postCase", async args => {
-      const embed = await this.getCaseEmbed(args.caseId);
-      return (args.channel as TextableChannel).createMessage(embed);
-    });
-  }
-
-  onUnload() {
-    this.actions.unregister("createCase");
-    this.actions.unregister("createCaseNote");
-    this.actions.unregister("postCase");
+    // this.actions.register("postCase", async args => {
+    //   const embed = await this.getCaseEmbed(args.caseId);
+    //   return (args.channel as TextableChannel).createMessage(embed);
+    // });
   }
 
   protected resolveCaseId(caseOrCaseId: Case | number): number {
@@ -68,39 +69,51 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
 
   /**
    * Creates a new case and, depending on config, posts it in the case log channel
-   * @return {Number} The ID of the created case
    */
-  public async createCase(opts: ICaseDetails): Promise<Case> {
-    const user = this.bot.users.get(opts.userId);
-    const userName = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+  public async createCase(args: CaseArgs): Promise<Case> {
+    const user = await this.resolveUser(args.userId);
+    const userName = `${user.username}#${user.discriminator}`;
 
-    const mod = this.bot.users.get(opts.modId);
-    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
+    const mod = await this.resolveUser(args.modId);
+    const modName = `${mod.username}#${mod.discriminator}`;
 
     let ppName = null;
-    if (opts.ppId) {
-      const pp = this.bot.users.get(opts.ppId);
-      ppName = pp ? `${pp.username}#${pp.discriminator}` : "Unknown#0000";
+    if (args.ppId) {
+      const pp = await this.resolveUser(args.ppId);
+      ppName = `${pp.username}#${pp.discriminator}`;
     }
 
     const createdCase = await this.cases.create({
-      type: opts.type,
-      user_id: opts.userId,
+      type: args.type,
+      user_id: args.userId,
       user_name: userName,
-      mod_id: opts.modId,
+      mod_id: args.modId,
       mod_name: modName,
-      audit_log_id: opts.auditLogId,
-      pp_id: opts.ppId,
+      audit_log_id: args.auditLogId,
+      pp_id: args.ppId,
       pp_name: ppName,
     });
 
-    if (opts.reason || (opts.noteDetails && opts.noteDetails.length)) {
-      await this.createCaseNote(createdCase, opts.modId, opts.reason || "", opts.automatic, false, opts.noteDetails);
+    if (args.reason || (args.noteDetails && args.noteDetails.length)) {
+      await this.createCaseNote({
+        caseId: createdCase.id,
+        modId: args.modId,
+        body: args.reason || "",
+        automatic: args.automatic,
+        postInCaseLogOverride: false,
+        noteDetails: args.noteDetails,
+      });
     }
 
-    if (opts.extraNotes) {
-      for (const extraNote of opts.extraNotes) {
-        await this.createCaseNote(createdCase, opts.modId, extraNote, opts.automatic, false);
+    if (args.extraNotes) {
+      for (const extraNote of args.extraNotes) {
+        await this.createCaseNote({
+          caseId: createdCase.id,
+          modId: args.modId,
+          body: extraNote,
+          automatic: args.automatic,
+          postInCaseLogOverride: false,
+        });
       }
     }
 
@@ -108,8 +121,8 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
 
     if (
       config.case_log_channel &&
-      (!opts.automatic || config.log_automatic_actions) &&
-      opts.postInCaseLogOverride !== false
+      (!args.automatic || config.log_automatic_actions) &&
+      args.postInCaseLogOverride !== false
     ) {
       try {
         await this.postCaseToCaseLogChannel(createdCase);
@@ -122,29 +135,24 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   /**
    * Adds a case note to an existing case and, depending on config, posts the updated case in the case log channel
    */
-  public async createCaseNote(
-    caseOrCaseId: Case | number,
-    modId: string,
-    body: string,
-    automatic = false,
-    postInCaseLogOverride = null,
-    noteDetails: string[] = null,
-  ): Promise<void> {
-    const mod = this.bot.users.get(modId);
-    const modName = mod ? `${mod.username}#${mod.discriminator}` : "Unknown#0000";
-
-    const theCase = await this.cases.find(this.resolveCaseId(caseOrCaseId));
+  public async createCaseNote(args: CaseNoteArgs): Promise<void> {
+    const theCase = await this.cases.find(this.resolveCaseId(args.caseId));
     if (!theCase) {
-      this.throwPluginRuntimeError(`Unknown case ID: ${caseOrCaseId}`);
+      this.throwPluginRuntimeError(`Unknown case ID: ${args.caseId}`);
     }
 
+    const mod = await this.resolveUser(args.modId);
+    const modName = `${mod.username}#${mod.discriminator}`;
+
+    let body = args.body;
+
     // Add note details to the beginning of the note
-    if (noteDetails && noteDetails.length) {
-      body = noteDetails.map(d => `__[${d}]__`).join(" ") + " " + body;
+    if (args.noteDetails && args.noteDetails.length) {
+      body = args.noteDetails.map(d => `__[${d}]__`).join(" ") + " " + body;
     }
 
     await this.cases.createNote(theCase.id, {
-      mod_id: modId,
+      mod_id: mod.id,
       mod_name: modName,
       body: body || "",
     });
@@ -152,7 +160,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
     if (theCase.mod_id == null) {
       // If the case has no moderator information, assume the first one to add a note to it did the action
       await this.cases.update(theCase.id, {
-        mod_id: modId,
+        mod_id: mod.id,
         mod_name: modName,
       });
     }
@@ -163,7 +171,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
       this.archives.makePermanent(archiveId);
     }
 
-    if ((!automatic || this.getConfig().log_automatic_actions) && postInCaseLogOverride !== false) {
+    if ((!args.automatic || this.getConfig().log_automatic_actions) && args.postInCaseLogOverride !== false) {
       try {
         await this.postCaseToCaseLogChannel(theCase.id);
       } catch (e) {} // tslint:disable-line

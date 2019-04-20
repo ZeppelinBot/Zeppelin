@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError, CommandArgumentTypeError } from "knub";
+import { Knub, logger, PluginError, CommandArgumentTypeError, Plugin } from "knub";
 import { SimpleError } from "./SimpleError";
 
 require("dotenv").config();
@@ -75,6 +75,7 @@ import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
 import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
 import { RemindersPlugin } from "./plugins/Reminders";
 import { convertDelayStringToMS, errorMessage, successMessage } from "./utils";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -125,11 +126,30 @@ connect().then(async conn => {
 
     options: {
       getEnabledPlugins(guildId, guildConfig): string[] {
-        const plugins = guildConfig.plugins || {};
-        const keys: string[] = Array.from(this.plugins.keys());
-        return keys.filter(pluginName => {
-          return basePlugins.includes(pluginName) || (plugins[pluginName] && plugins[pluginName].enabled !== false);
+        const configuredPlugins = guildConfig.plugins || {};
+        const pluginNames: string[] = Array.from(this.plugins.keys());
+        const plugins: Array<typeof Plugin> = Array.from(this.plugins.values());
+        const zeppelinPlugins: Array<typeof ZeppelinPlugin> = plugins.filter(
+          p => p.prototype instanceof ZeppelinPlugin,
+        ) as Array<typeof ZeppelinPlugin>;
+
+        const enabledBasePlugins = pluginNames.filter(n => basePlugins.includes(n));
+        const explicitlyEnabledPlugins = pluginNames.filter(pluginName => {
+          return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
+        const enabledPlugins = new Set([...enabledBasePlugins, ...explicitlyEnabledPlugins]);
+
+        const pluginsEnabledAsDependencies = zeppelinPlugins.reduce((arr, pluginClass) => {
+          if (!enabledPlugins.has(pluginClass.pluginName)) return arr;
+          return arr.concat(pluginClass.dependencies);
+        }, []);
+
+        const finalEnabledPlugins = new Set([
+          ...basePlugins,
+          ...pluginsEnabledAsDependencies,
+          ...explicitlyEnabledPlugins,
+        ]);
+        return Array.from(finalEnabledPlugins.values());
       },
 
       async getConfig(id) {

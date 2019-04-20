@@ -8,6 +8,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
 const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
+const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
@@ -237,6 +238,15 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
     const seconds = Math.ceil(convertDelayStringToMS(args.time, "s") / 1000);
     const useNativeSlowmode = this.getConfigForChannel(channel).use_native_slowmode && seconds <= NATIVE_SLOWMODE_LIMIT;
+
+    if (seconds === 0) {
+      return this.disableSlowmodeCmd(msg, { channel: args.channel });
+    }
+
+    if (seconds > MAX_SLOWMODE) {
+      this.sendErrorMessage(msg.channel, `Sorry, slowmodes can be at most 100 years long. Maybe 99 would be enough?`);
+      return;
+    }
 
     if (useNativeSlowmode) {
       // Native slowmode
