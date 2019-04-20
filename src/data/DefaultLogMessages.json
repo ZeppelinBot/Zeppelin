@@ -3,7 +3,7 @@
   "MEMBER_MUTE": "🔇 {userMention(user)} was muted indefinitely by {userMention(mod)}",
   "MEMBER_TIMED_MUTE": "🔇 {userMention(user)} was muted for **{time}** by {userMention(mod)}",
   "MEMBER_UNMUTE": "🔊 {userMention(user)} was unmuted by {userMention(mod)}",
-  "MEMBER_TIMED_UNMUTE": "🔊 {userMention(member)} was scheduled to be unmuted in **{time}** by {userMention(mod)}",
+  "MEMBER_TIMED_UNMUTE": "🔊 {userMention(user)} was scheduled to be unmuted in **{time}** by {userMention(mod)}",
   "MEMBER_MUTE_EXPIRED": "🔊 {userMention(member)}'s mute expired",
   "MEMBER_KICK": "👢 {userMention(user)} was kicked by {userMention(mod)}",
   "MEMBER_BAN": "🔨 {userMention(user)} was banned by {userMention(mod)}",
