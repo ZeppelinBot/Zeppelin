@@ -5,9 +5,36 @@ import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
 
-const CLEANUP_INTERVAL = 5 * 60 * 1000;
+const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 min
 
 const RETENTION_PERIOD = 5 * 24 * 60 * 60 * 1000; // 5 days
+
+async function cleanup() {
+  const repository = getRepository(SavedMessage);
+  await repository
+    .createQueryBuilder("messages")
+    .where(
+      // Clear deleted messages
+      new Brackets(qb => {
+        qb.where("deleted_at IS NOT NULL");
+        qb.andWhere(`deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)`);
+      }),
+    )
+    .orWhere(
+      // Clear old messages
+      new Brackets(qb => {
+        qb.where("is_permanent = 0");
+        qb.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
+      }),
+    )
+    .delete()
+    .execute();
+
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
+// Start first cleanup 30 seconds after startup
+setTimeout(cleanup, 30 * 1000);
 
 export class GuildSavedMessages extends BaseRepository {
   private messages: Repository<SavedMessage>;
@@ -21,9 +48,6 @@ export class GuildSavedMessages extends BaseRepository {
     this.events = new QueuedEventEmitter();
 
     this.toBePermanent = new Set();
-
-    this.cleanup();
-    setInterval(() => this.cleanup(), CLEANUP_INTERVAL);
   }
 
   public msgToSavedMessageData(msg: Message): ISavedMessageData {
@@ -40,33 +64,6 @@ export class GuildSavedMessages extends BaseRepository {
     if (msg.embeds.length) data.embeds = msg.embeds;
 
     return data;
-  }
-
-  async cleanup() {
-    await this.messages
-      .createQueryBuilder("messages")
-      .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .andWhere(
-        new Brackets(qb => {
-          // Clear deleted messages
-          qb.orWhere(
-            new Brackets(qb2 => {
-              qb2.where("deleted_at IS NOT NULL");
-              qb2.andWhere(`deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)`);
-            }),
-          );
-
-          // Clear old messages
-          qb.orWhere(
-            new Brackets(qb2 => {
-              qb2.where("is_permanent = 0");
-              qb2.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
-            }),
-          );
-        }),
-      )
-      .delete()
-      .execute();
   }
 
   find(id) {
