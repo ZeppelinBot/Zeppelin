@@ -7,7 +7,7 @@ import moment from "moment-timezone";
 
 const CLEANUP_INTERVAL = 5 * 60 * 1000;
 
-const RETENTION_PERIOD = 7 * 24 * 60 * 60 * 1000; // 1 week
+const RETENTION_PERIOD = 5 * 24 * 60 * 60 * 1000; // 5 days
 
 export class GuildSavedMessages extends BaseRepository {
   private messages: Repository<SavedMessage>;
@@ -30,10 +30,10 @@ export class GuildSavedMessages extends BaseRepository {
     const data: ISavedMessageData = {
       author: {
         username: msg.author.username,
-        discriminator: msg.author.discriminator
+        discriminator: msg.author.discriminator,
       },
       content: msg.content,
-      timestamp: msg.timestamp
+      timestamp: msg.timestamp,
     };
 
     if (msg.attachments.length) data.attachments = msg.attachments;
@@ -53,7 +53,7 @@ export class GuildSavedMessages extends BaseRepository {
             new Brackets(qb2 => {
               qb2.where("deleted_at IS NOT NULL");
               qb2.andWhere(`deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)`);
-            })
+            }),
           );
 
           // Clear old messages
@@ -61,9 +61,9 @@ export class GuildSavedMessages extends BaseRepository {
             new Brackets(qb2 => {
               qb2.where("is_permanent = 0");
               qb2.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
-            })
+            }),
           );
-        })
+        }),
       )
       .delete()
       .execute();
@@ -160,7 +160,7 @@ export class GuildSavedMessages extends BaseRepository {
       user_id: msg.author.id,
       is_bot: msg.author.bot,
       data: savedMessageData,
-      posted_at: postedAt
+      posted_at: postedAt,
     };
 
     return this.create({ ...data, ...overrides });
@@ -171,7 +171,7 @@ export class GuildSavedMessages extends BaseRepository {
       .createQueryBuilder("messages")
       .update()
       .set({
-        deleted_at: () => "NOW(3)"
+        deleted_at: () => "NOW(3)",
       })
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere("id = :id", { id })
@@ -221,8 +221,8 @@ export class GuildSavedMessages extends BaseRepository {
     await this.messages.update(
       { id },
       {
-        data: newData
-      }
+        data: newData,
+      },
     );
 
     this.events.emit("update", [newMessage, oldMessage]);
@@ -240,8 +240,8 @@ export class GuildSavedMessages extends BaseRepository {
       await this.messages.update(
         { id },
         {
-          is_permanent: true
-        }
+          is_permanent: true,
+        },
       );
     } else {
       this.toBePermanent.add(id);
