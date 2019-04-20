@@ -14,6 +14,7 @@ import {
   stripObjectToScalars,
   successMessage,
   trimLines,
+  UnknownUser,
 } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -187,16 +188,10 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }
   }
 
-  @d.command("level", "[userId:string]")
+  @d.command("level", "[member:resolvedMember]")
   @d.permission("can_level")
-  async levelCmd(msg: Message, args) {
-    const member = args.userId ? this.guild.members.get(args.userId) : msg.member;
-
-    if (!member) {
-      msg.channel.createMessage(errorMessage("Member not found"));
-      return;
-    }
-
+  async levelCmd(msg: Message, args: { member?: Member }) {
+    const member = args.member || msg.member;
     const level = this.getMemberLevel(member);
     msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
@@ -413,15 +408,17 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
-  @d.command("info", "<userId:userId>")
+  @d.command("info", "[user:resolvedUserLoose]")
   @d.permission("can_info")
-  async infoCmd(msg: Message, args: { userId: string }) {
+  async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
+    const user = args.user || msg.author;
+    const member = user && (await this.getMember(user.id));
+
     const embed: EmbedOptions = {
       fields: [],
     };
 
-    const user = this.bot.users.get(args.userId);
-    if (user) {
+    if (user && !(user instanceof UnknownUser)) {
       const createdAt = moment(user.createdAt);
       const accountAge = humanizeDuration(moment().valueOf() - user.createdAt, {
         largest: 2,
@@ -444,7 +441,6 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       embed.title = `Unknown user`;
     }
 
-    const member = this.guild.members.get(args.userId);
     if (member) {
       const joinedAt = moment(member.joinedAt);
       const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
@@ -476,7 +472,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       }
     }
 
-    const cases = (await this.cases.getByUserId(args.userId)).filter(c => !c.is_hidden);
+    const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
     if (cases.length > 0) {
       cases.sort((a, b) => {
@@ -501,16 +497,16 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command(/(?:nickname|nick) reset/, "<target:member>")
+  @d.command(/(?:nickname|nick) reset/, "<member:resolvedMember>")
   @d.permission("can_nickname")
-  async nicknameResetCmd(msg: Message, args: { target: Member; nickname: string }) {
-    if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
+  async nicknameResetCmd(msg: Message, args: { member: Member }) {
+    if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot reset nickname: insufficient permissions"));
       return;
     }
 
     try {
-      await args.target.edit({
+      await args.member.edit({
         nick: "",
       });
     } catch (e) {
@@ -518,13 +514,13 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       return;
     }
 
-    msg.channel.createMessage(successMessage(`Nickname of <@!${args.target.id}> is now reset`));
+    msg.channel.createMessage(successMessage(`The nickname of <@!${args.member.id}> has been reset`));
   }
 
-  @d.command(/nickname|nick/, "<target:member> <nickname:string$>")
+  @d.command(/nickname|nick/, "<member:resolvedMember> <nickname:string$>")
   @d.permission("can_nickname")
-  async nicknameCmd(msg: Message, args: { target: Member; nickname: string }) {
-    if (msg.member.id !== args.target.id && !this.canActOn(msg.member, args.target)) {
+  async nicknameCmd(msg: Message, args: { member: Member; nickname: string }) {
+    if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
@@ -535,8 +531,10 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       return;
     }
 
+    const oldNickname = args.member.nick || "<none>";
+
     try {
-      await args.target.edit({
+      await args.member.edit({
         nick: args.nickname,
       });
     } catch (e) {
@@ -544,7 +542,9 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       return;
     }
 
-    msg.channel.createMessage(successMessage(`Changed nickname of <@!${args.target.id}> to ${args.nickname}`));
+    msg.channel.createMessage(
+      successMessage(`Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`),
+    );
   }
 
   @d.command("server")
@@ -673,7 +673,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     msg.channel.createMessage(`Message source: ${url}`);
   }
 
-  @d.command("vcmove", "<member:Member> <channel:string$>")
+  @d.command("vcmove", "<member:resolvedMember> <channel:string$>")
   @d.permission("can_vcmove")
   async vcmoveCmd(msg: Message, args: { member: Member; channel: string }) {
     let channel: VoiceChannel;

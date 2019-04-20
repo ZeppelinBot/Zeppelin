@@ -10,7 +10,7 @@ import {
   findRelevantAuditLogEntry,
   noop,
   stripObjectToScalars,
-  unknownUser,
+  UnknownUser,
   useMediaUrls,
 } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
@@ -256,7 +256,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
 
     this.guildLogs.log(
       LogType.MEMBER_BAN,
@@ -275,7 +275,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
 
     this.guildLogs.log(
       LogType.MEMBER_UNBAN,
@@ -308,7 +308,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
         member.id,
       );
-      const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : unknownUser;
+      const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
 
       if (addedRoles.length && removedRoles.length) {
         // Roles added *and* removed

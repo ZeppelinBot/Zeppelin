@@ -1,7 +1,7 @@
 import { IBasePluginConfig, IPluginOptions, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import Ajv, { ErrorObject } from "ajv";
-import { createUnknownUser, isSnowflake, isUnicodeEmoji, UnknownUser } from "../utils";
+import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, UnknownUser } from "../utils";
 import { Member, User } from "eris";
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
@@ -81,59 +81,10 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
    */
   async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
-    if (userResolvable == null) {
-      return createUnknownUser();
-    }
-
-    let userId;
-
-    // A user mention?
-    const mentionMatch = userResolvable.match(/^<@!?(\d+)>$/);
-    if (mentionMatch) {
-      userId = mentionMatch[1];
-    }
-
-    // A non-mention, full username?
-    if (!userId) {
-      const usernameMatch = userResolvable.match(/^@?([^#]+)#(\d{4})$/);
-      if (usernameMatch) {
-        const user = this.bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-        userId = user.id;
-      }
-    }
-
-    // Just a user ID?
-    if (!userId) {
-      const idMatch = userResolvable.match(/^\d+$/);
-      if (!idMatch) {
-        return null;
-      }
-
-      userId = userResolvable;
-    }
-
-    const cachedUser = this.bot.users.find(u => u.id === userId);
-    if (cachedUser) return cachedUser;
-
-    try {
-      const freshUser = await this.bot.getRESTUser(userId);
-      return freshUser;
-    } catch (e) {} // tslint:disable-line
-
-    return createUnknownUser({ id: userId });
+    return resolveUser(this.bot, userResolvable);
   }
 
-  async getMember(userId: string): Promise<Member> {
-    // See if we have the member cached...
-    let member = this.guild.members.get(userId);
-
-    // If not, fetch it from the API
-    if (!member) {
-      try {
-        member = await this.bot.getRESTGuildMember(this.guildId, userId);
-      } catch (e) {} // tslint:disable-line
-    }
-
-    return member;
+  async getMember(memberResolvable: string): Promise<Member> {
+    return resolveMember(this.bot, this.guild, memberResolvable);
   }
 }
