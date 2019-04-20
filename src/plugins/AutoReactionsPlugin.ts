@@ -46,7 +46,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConf
     this.savedMessages.events.off("create", this.onMessageCreateFn);
   }
 
-  @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
+  @d.command("auto_reactions", "<channelId:channelid> <reactions...>")
   @d.permission("use")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
     const finalReactions = [];
@@ -80,7 +80,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConf
     msg.channel.createMessage(successMessage(`Auto-reactions set for <#${args.channelId}>`));
   }
 
-  @d.command("auto_reactions disable", "<channelId:channelId>")
+  @d.command("auto_reactions disable", "<channelId:channelid>")
   @d.permission("use")
   async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
     const autoReaction = await this.autoReactions.getForChannel(args.channelId);

@@ -35,7 +35,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> 
     this.nameHistory = GuildNameHistory.getInstance(this.guildId);
   }
 
-  @d.command("names", "<userId:userId>")
+  @d.command("names", "<userId:userid>")
   @d.permission("can_view")
   async namesCmd(msg: Message, args: { userId: string }) {
     const names = await this.nameHistory.getByUserId(args.userId);
