@@ -50,7 +50,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IPingableRolesPluginConf
     return this.cache.get(channelId);
   }
 
-  @d.command("pingable_role disable", "<channelId:channelId> <role:role>")
+  @d.command("pingable_role disable", "<channelId:channelid> <role:role>")
   @d.permission("can_manage")
   async disablePingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const pingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
@@ -67,7 +67,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IPingableRolesPluginConf
     );
   }
 
-  @d.command("pingable_role", "<channelId:channelId> <role:role>")
+  @d.command("pingable_role", "<channelId:channelid> <role:role>")
   @d.permission("can_manage")
   async setPingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const existingPingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);

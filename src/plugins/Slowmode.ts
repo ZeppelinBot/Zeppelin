@@ -166,7 +166,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   /**
    * COMMAND: Clear slowmode from a specific user on a specific channel
    */
-  @d.command("slowmode clear", "<channel:channel> <user:user>")
+  @d.command("slowmode clear", "<channel:channel> <user:resolvedUserLoose>")
   @d.permission("can_manage")
   async clearSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel; user: User }) {
     const channelSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);

@@ -174,7 +174,7 @@ export class StarboardPlugin extends ZeppelinPlugin<IStarboardPluginConfig> {
   /**
    * Deletes the starboard from the specified channel. The already-posted starboard messages are retained.
    */
-  @d.command("starboard delete", "<channelId:channelId>")
+  @d.command("starboard delete", "<channelId:channelid>")
   @d.permission("can_manage")
   async deleteCmd(msg: Message, args: { channelId: string }) {
     const starboard = await this.starboards.getStarboardByChannelId(args.channelId);
@@ -333,7 +333,7 @@ export class StarboardPlugin extends ZeppelinPlugin<IStarboardPluginConfig> {
     }
   }
 
-  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>")
+  @d.command("starboard migrate_pins", "<pinChannelId:channelid> <starboardChannelId:channelid>")
   async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
     const starboard = await this.starboards.getStarboardByChannelId(args.starboardChannelId);
     if (!starboard) {
