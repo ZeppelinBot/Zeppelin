@@ -504,7 +504,7 @@ export type UnknownUser = {
 };
 
 export const unknownUser: UnknownUser = {
-  id: "0",
+  id: null,
   username: "Unknown",
   discriminator: "0000",
 };

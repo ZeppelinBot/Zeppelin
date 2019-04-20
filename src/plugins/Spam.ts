@@ -17,10 +17,10 @@ import { GuildArchives } from "../data/GuildArchives";
 import moment from "moment-timezone";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import { GuildActions, MuteActionResult } from "../data/GuildActions";
-import { Case } from "../data/entities/Case";
 import { GuildMutes } from "../data/GuildMutes";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { MuteResult, MutesPlugin } from "./Mutes";
+import { CasesPlugin } from "./Cases";
 
 enum RecentActionType {
   Message = 1,
@@ -71,7 +71,6 @@ interface ISpamPluginConfig {
 export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
   public static pluginName = "spam";
 
-  protected actions: GuildActions;
   protected logs: GuildLogs;
   protected archives: GuildArchives;
   protected savedMessages: GuildSavedMessages;
@@ -128,7 +127,6 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
   }
 
   onLoad() {
-    this.actions = GuildActions.getInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
     this.archives = GuildArchives.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
@@ -240,18 +238,15 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           const recentActions = this.getRecentActions(type, savedMessage.user_id, savedMessage.channel_id, since);
 
           // Start by muting them, if enabled
-          let muteResult: MuteActionResult;
+          let muteResult: MuteResult;
           if (spamConfig.mute && member) {
+            const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
             const muteTime = spamConfig.mute_time
               ? convertDelayStringToMS(spamConfig.mute_time.toString())
               : 120 * 1000;
-            muteResult = await this.actions.fire("mute", {
-              userId: member.id,
-              muteTime,
-              reason: "Automatic spam detection",
-              caseDetails: {
-                modId: this.bot.user.id,
-              },
+            muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
+              modId: this.bot.user.id,
+              postInCaseLogOverride: false,
             });
           }
 
@@ -296,18 +291,20 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           const archiveUrl = await this.saveSpamArchives(uniqueMessages);
 
           // Create a case
+          const casesPlugin = this.getPlugin<CasesPlugin>("cases");
           if (muteResult) {
             // If the user was muted, the mute already generated a case - in that case, just update the case with extra details
+            // This will also post the case in the case log channel, which we didn't do with the mute initially to avoid
+            // posting the case on the channel twice: once with the initial reason, and then again with the note from here
             const updateText = trimLines(`
               Details: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
               ${archiveUrl}
             `);
-            this.actions.fire("createCaseNote", {
+            casesPlugin.createCaseNote({
               caseId: muteResult.case.id,
               modId: muteResult.case.mod_id,
-              note: updateText,
+              body: updateText,
               automatic: true,
-              postInCaseLogOverride: false,
             });
           } else {
             // If the user was not muted, create a note case of the detected spam instead
@@ -316,7 +313,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
               ${archiveUrl}
             `);
 
-            this.actions.fire("createCase", {
+            casesPlugin.createCase({
               userId: savedMessage.user_id,
               modId: this.bot.user.id,
               type: CaseTypes.Note,
@@ -362,22 +359,28 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
 
       if (recentActionsCount > spamConfig.count) {
         const member = this.guild.members.get(userId);
+        const details = `${description} (over ${spamConfig.count} in ${spamConfig.interval}s)`;
 
-        // Start by muting them, if enabled
         if (spamConfig.mute && member) {
-          const muteTime = spamConfig.mute_time ? spamConfig.mute_time * 60 * 1000 : 120 * 1000;
-          this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, userId);
-          this.actions.fire("mute", { userId: member.id, muteTime, reason: "Automatic spam detection" });
+          const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
+          const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
+          await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
+            modId: this.bot.user.id,
+            extraNotes: [`Details: ${details}`],
+          });
+        } else {
+          // If we're not muting the user, just add a note on them
+          const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+          await casesPlugin.createCase({
+            userId,
+            modId: this.bot.user.id,
+            type: CaseTypes.Note,
+            reason: `Automatic spam detection: ${details}`,
+          });
         }
 
         // Clear recent cases
         this.clearRecentUserActions(RecentActionType.VoiceChannelMove, userId, actionGroupId);
-
-        // Create a case and log the actions taken above
-        const caseType = spamConfig.mute ? CaseTypes.Mute : CaseTypes.Note;
-        const caseText = trimLines(`
-          Automatic spam detection: ${description} (over ${spamConfig.count} in ${spamConfig.interval}s)
-        `);
 
         this.logs.log(LogType.OTHER_SPAM_DETECTED, {
           member: stripObjectToScalars(member, ["user"]),
@@ -385,19 +388,6 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
           limit: spamConfig.count,
           interval: spamConfig.interval,
         });
-
-        const theCase: Case = await this.actions.fire("createCase", {
-          userId,
-          modId: this.bot.user.id,
-          type: caseType,
-          reason: caseText,
-          automatic: true,
-        });
-
-        // For mutes, also set the mute's case id (for !mutes)
-        if (spamConfig.mute && member) {
-          await this.mutes.setCaseId(userId, theCase.id);
-        }
       }
     });
   }

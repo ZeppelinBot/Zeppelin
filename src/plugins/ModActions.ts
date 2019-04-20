@@ -5,7 +5,6 @@ import { GuildCases } from "../data/GuildCases";
 import {
   asSingleLine,
   createChunkedMessage,
-  createUnknownUser,
   errorMessage,
   findRelevantAuditLogEntry,
   INotifyUserResult,
@@ -22,9 +21,10 @@ import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
-import { GuildActions, MuteActionResult } from "../data/GuildActions";
 import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
+import { CasesPlugin } from "./Cases";
+import { MuteResult, MutesPlugin } from "./Mutes";
 
 enum IgnoredEventType {
   Ban = 1,
@@ -65,8 +65,8 @@ interface IModActionsPluginConfig {
 
 export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   public static pluginName = "mod_actions";
+  public static dependencies = ["cases", "mutes"];
 
-  protected actions: GuildActions;
   protected mutes: GuildMutes;
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
@@ -74,7 +74,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   protected ignoredEvents: IIgnoredEvent[];
 
   async onLoad() {
-    this.actions = GuildActions.getInstance(this.guildId);
     this.mutes = GuildMutes.getInstance(this.guildId);
     this.cases = GuildCases.getInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
@@ -156,62 +155,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     return ((reason || "") + " " + attachmentUrls.join(" ")).trim();
   }
 
-  /**
-   * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
-   */
-  async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
-    let userId;
-
-    // A user mention?
-    const mentionMatch = userResolvable.match(/^<@!?(\d+)>$/);
-    if (mentionMatch) {
-      userId = mentionMatch[1];
-    }
-
-    // A non-mention, full username?
-    if (!userId) {
-      const usernameMatch = userResolvable.match(/^@?([^#]+)#(\d{4})$/);
-      if (usernameMatch) {
-        const user = this.bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-        userId = user.id;
-      }
-    }
-
-    // Just a user ID?
-    if (!userId) {
-      const idMatch = userResolvable.match(/^\d+$/);
-      if (!idMatch) {
-        return null;
-      }
-
-      userId = userResolvable;
-    }
-
-    const cachedUser = this.bot.users.find(u => u.id === userId);
-    if (cachedUser) return cachedUser;
-
-    try {
-      const freshUser = await this.bot.getRESTUser(userId);
-      return freshUser;
-    } catch (e) {} // tslint:disable-line
-
-    return createUnknownUser({ id: userId });
-  }
-
-  async getMember(userId: string): Promise<Member> {
-    // See if we have the member cached...
-    let member = this.guild.members.get(userId);
-
-    // If not, fetch it from the API
-    if (!member) {
-      try {
-        member = await this.bot.getRESTGuildMember(this.guildId, userId);
-      } catch (e) {} // tslint:disable-line
-    }
-
-    return member;
-  }
-
   async isBanned(userId): Promise<boolean> {
     const bans = (await this.guild.getBans()) as any;
     return bans.some(b => b.user.id === userId);
@@ -234,11 +177,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       user.id,
     );
 
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      this.actions.fire("createCase", {
+      casesPlugin.createCase({
         userId: user.id,
         modId,
         type: CaseTypes.Ban,
@@ -247,8 +191,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         automatic: true,
       });
     } else {
-      this.actions.fire("createCase", {
+      casesPlugin.createCase({
         userId: user.id,
+        modId: null,
         type: CaseTypes.Ban,
       });
     }
@@ -271,11 +216,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       user.id,
     );
 
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      this.actions.fire("createCase", {
+      casesPlugin.createCase({
         userId: user.id,
         modId,
         type: CaseTypes.Unban,
@@ -283,8 +229,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         automatic: true,
       });
     } else {
-      this.actions.fire("createCase", {
+      casesPlugin.createCase({
         userId: user.id,
+        modId: null,
         type: CaseTypes.Unban,
         automatic: true,
       });
@@ -337,7 +284,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
           }`,
         );
       } else {
-        this.actions.fire("createCase", {
+        const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+        casesPlugin.createCase({
           userId: member.id,
           modId: kickAuditLogEntry.user.id,
           type: CaseTypes.Kick,
@@ -374,10 +322,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
-    await this.actions.fire("createCaseNote", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    await casesPlugin.createCaseNote({
       caseId: theCase.id,
       modId: msg.author.id,
-      note: args.note,
+      body: args.note,
     });
 
     this.serverLogs.log(LogType.CASE_UPDATE, {
@@ -399,7 +348,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const userName = `${user.username}#${user.discriminator}`;
     const reason = this.formatReasonWithAttachments(args.note, msg.attachments);
 
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: user.id,
       modId: msg.author.id,
       type: CaseTypes.Note,
@@ -466,7 +416,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       }
     }
 
-    const createdCase: Case = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: memberToWarn.id,
       modId: mod.id,
       type: CaseTypes.Warn,
@@ -513,17 +464,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const timeUntilUnmute = args.time && humanizeDuration(args.time);
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    let muteResult: MuteActionResult;
+    let muteResult: MuteResult;
+    const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
 
     try {
-      muteResult = await this.actions.fire("mute", {
-        userId: user.id,
-        muteTime: args.time,
-        reason,
-        caseDetails: {
-          modId: mod.id,
-          ppId: pp && pp.id,
-        },
+      muteResult = await mutesPlugin.muteUser(user.id, args.time, reason, {
+        modId: mod.id,
+        ppId: pp && pp.id,
       });
     } catch (e) {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
@@ -646,14 +593,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    const result = await this.actions.fire("unmute", {
-      userId: user.id,
-      unmuteTime: args.time,
-      caseDetails: {
-        modId: mod.id,
-        ppId: pp && pp.id,
-        reason,
-      },
+    const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
+    const result = await mutesPlugin.unmuteUser(user.id, args.time, {
+      modId: mod.id,
+      ppId: pp && pp.id,
+      reason,
     });
 
     // Confirm the action to the moderator
@@ -810,7 +754,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     memberToKick.kick(reason);
 
     // Create a case for this action
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: memberToKick.id,
       modId: mod.id,
       type: CaseTypes.Kick,
@@ -896,7 +841,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     memberToBan.ban(1, reason);
 
     // Create a case for this action
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: memberToBan.id,
       modId: mod.id,
       type: CaseTypes.Ban,
@@ -970,7 +916,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     await this.guild.unbanMember(memberToSoftban.id);
 
     // Create a case for this action
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: memberToSoftban.id,
       modId: mod.id,
       type: CaseTypes.Softban,
@@ -1026,7 +973,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Create a case
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: user.id,
       modId: mod.id,
       type: CaseTypes.Unban,
@@ -1083,7 +1031,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     // Create a case
-    const createdCase = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
       userId: user.id,
       modId: mod.id,
       type: CaseTypes.Ban,
@@ -1142,16 +1091,17 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Ban each user and count failed bans (if any)
     const failedBans = [];
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     for (const userId of args.userIds) {
       try {
         await this.guild.banMember(userId);
 
-        await this.actions.fire("createCase", {
+        await casesPlugin.createCase({
           userId,
           modId: msg.author.id,
           type: CaseTypes.Ban,
           reason: `Mass ban: ${banReason}`,
-          postInCaseLog: false,
+          postInCaseLogOverride: false,
         });
       } catch (e) {
         failedBans.push(userId);
@@ -1218,7 +1168,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Create the case
-    const theCase: Case = await this.actions.fire("createCase", {
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const theCase: Case = await casesPlugin.createCase({
       userId: user.id,
       modId: mod.id,
       type: CaseTypes[type],
@@ -1259,10 +1210,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
-    await this.actions.fire("postCase", {
-      caseId: theCase.id,
-      channel: msg.channel,
-    });
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const embed = await casesPlugin.getCaseEmbed(theCase.id);
+    msg.channel.createMessage(embed);
   }
 
   @d.command("cases", "<user:string> [opts:string$]", {
@@ -1303,11 +1253,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         }
 
         // Expanded view (= individual case embeds)
+        const casesPlugin = this.getPlugin<CasesPlugin>("cases");
         for (const theCase of casesToDisplay) {
-          await this.actions.fire("postCase", {
-            caseId: theCase.id,
-            channel: msg.channel,
-          });
+          const embed = await casesPlugin.getCaseEmbed(theCase.id);
+          msg.channel.createMessage(embed);
         }
       } else {
         // Compact view (= regular message with a preview of each case)
