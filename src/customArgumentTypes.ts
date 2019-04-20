@@ -13,7 +13,7 @@ export const customArgumentTypes = {
   },
 
   async resolvedUser(value, msg, bot: Client) {
-    const result = resolveUser(bot, value);
+    const result = await resolveUser(bot, value);
     if (result == null || result instanceof UnknownUser) {
       throw new CommandArgumentTypeError(`User \`${value}\` was not found`);
     }
@@ -21,7 +21,7 @@ export const customArgumentTypes = {
   },
 
   async resolvedUserLoose(value, msg, bot: Client) {
-    const result = resolveUser(bot, value);
+    const result = await resolveUser(bot, value);
     if (result == null) {
       throw new CommandArgumentTypeError(`Invalid user: ${value}`);
     }
