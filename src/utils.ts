@@ -555,7 +555,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
 export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
   // Start by resolving the user
   const user = await resolveUser(bot, value);
-  if (!user) return null;
+  if (!user || user instanceof UnknownUser) return null;
 
   // See if we have the member cached...
   let member = guild.members.get(user.id);
@@ -564,6 +564,8 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   if (!member) {
     try {
       member = await bot.getRESTGuildMember(guild.id, user.id);
+      member.id = user.id;
+      member.guild = guild;
     } catch (e) {} // tslint:disable-line
   }
 
