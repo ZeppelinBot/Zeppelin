@@ -30,22 +30,16 @@ interface ILogChannel {
   exclude?: string[];
   batched?: boolean;
   batch_time?: number;
+  excluded_users?: string[];
 }
 
 interface ILogChannelMap {
   [channelId: string]: ILogChannel;
 }
 
-interface IChannelConfig {
-  include?: string[];
-  exclude?: string[];
-  batched?: boolean;
-  batch_time?: number;
-}
-
 interface ILogsPluginConfig {
   channels: {
-    [key: string]: IChannelConfig;
+    [key: string]: ILogChannel;
   };
   format: {
     [key: string]: string;
@@ -70,6 +64,8 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   private onMessageDeleteFn;
   private onMessageDeleteBulkFn;
   private onMessageUpdateFn;
+
+  private excludedUserProps = ["user", "member", "mod"];
 
   getDefaultOptions(): IPluginOptions<ILogsPluginConfig> {
     return {
@@ -126,11 +122,21 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     const logChannels: ILogChannelMap = this.getConfig().channels;
     const typeStr = LogType[type];
 
-    for (const [channelId, opts] of Object.entries(logChannels)) {
+    logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
       const channel = this.guild.channels.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
 
       if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
+        // If this log entry is about an excluded user, skip it
+        // TODO: Quick and dirty solution, look into changing at some point
+        if (opts.excluded_users) {
+          for (const prop of this.excludedUserProps) {
+            if (data && data[prop] && opts.excluded_users.includes(data[prop].id)) {
+              continue logChannelLoop;
+            }
+          }
+        }
+
         const message = await this.getLogMessage(type, data);
         if (message) {
           if (opts.batched) {
