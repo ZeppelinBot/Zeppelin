@@ -526,7 +526,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
     const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
     if (usernameMatch) {
       const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-      userId = user.id;
+      if (user) userId = user.id;
     }
   }
 
