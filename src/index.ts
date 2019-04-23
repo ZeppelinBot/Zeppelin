@@ -7,31 +7,38 @@ const fsp = fs.promises;
 import { Knub, logger, PluginError, Plugin } from "knub";
 import { SimpleError } from "./SimpleError";
 
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
+
 require("dotenv").config();
 
 let recentPluginErrors = 0;
-const RECENT_ERROR_EXIT_THRESHOLD = 5;
+const RECENT_PLUGIN_ERROR_EXIT_THRESHOLD = 5;
+
+let recentDiscordErrors = 0;
+const RECENT_DISCORD_ERROR_EXIT_THRESHOLD = 5;
+
 setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 2500);
+setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 2500);
 
-process.on("unhandledRejection", (reason, p) => {
-  console.error(reason);
-
-  if (reason instanceof PluginError) {
-    if (++recentPluginErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
-  } else {
-    process.exit(1);
-  }
-});
-
-process.on("uncaughtException", err => {
+function errorHandler(err) {
   console.error(err);
 
   if (err instanceof PluginError) {
-    if (++recentPluginErrors >= RECENT_ERROR_EXIT_THRESHOLD) process.exit(1);
+    // Tolerate a few recent plugin errors before crashing
+    if (++recentPluginErrors >= RECENT_PLUGIN_ERROR_EXIT_THRESHOLD) process.exit(1);
+  } else if (err instanceof DiscordRESTError || err instanceof DiscordHTTPError) {
+    // Discord API errors, usually safe to continue (rate limits etc. are handled elsewhere)
+    // We still bail if we get a ton of them in a short amount of time
+    if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) process.exit(1);
   } else {
+    // On other errors, crash immediately
     process.exit(1);
   }
-});
+}
+
+process.on("unhandledRejection", errorHandler);
+process.on("uncaughtException", errorHandler);
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "10.14.2";
