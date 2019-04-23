@@ -90,6 +90,7 @@ import { RemindersPlugin } from "./plugins/Reminders";
 import { errorMessage, successMessage } from "./utils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
+import { startUptimeCounter } from "./uptime";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -202,6 +203,10 @@ connect().then(async conn => {
         channel.createMessage(errorMessage(body));
       },
     },
+  });
+
+  client.once("ready", () => {
+    startUptimeCounter();
   });
 
   logger.info("Starting the bot");

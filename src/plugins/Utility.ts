@@ -1,5 +1,17 @@
 import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition } from "knub";
-import { CategoryChannel, Channel, EmbedOptions, Member, Message, Role, TextChannel, User, VoiceChannel } from "eris";
+import {
+  CategoryChannel,
+  Channel,
+  EmbedOptions,
+  GuildChannel,
+  Member,
+  Message,
+  MessageContent,
+  Role,
+  TextChannel,
+  User,
+  VoiceChannel,
+} from "eris";
 import {
   channelMentionRegex,
   chunkArray,
@@ -9,7 +21,9 @@ import {
   isSnowflake,
   multiSorter,
   noop,
+  resolveMember,
   simpleClosestStringMatch,
+  sleep,
   sorter,
   stripObjectToScalars,
   successMessage,
@@ -26,6 +40,9 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { getCurrentUptime } from "../uptime";
+
+import LCL from "last-commit-log";
 
 const { performance } = require("perf_hooks");
 
@@ -48,6 +65,7 @@ interface IUtilityPluginConfig {
   can_source: boolean;
   can_vcmove: boolean;
   can_help: boolean;
+  can_about: boolean;
 }
 
 export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
@@ -73,6 +91,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         can_source: false,
         can_vcmove: false,
         can_help: false,
+        can_about: false,
       },
       overrides: [
         {
@@ -95,6 +114,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
             can_reload_guild: true,
             can_ping: true,
             can_source: true,
+            can_about: true,
           },
         },
       ],
@@ -790,6 +810,65 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
     message += `\n\n${signatures.join("\n")}`;
     createChunkedMessage(msg.channel, message);
+  }
+
+  @d.command("about")
+  @d.permission("can_about")
+  async aboutCmd(msg: Message) {
+    const uptime = getCurrentUptime();
+    const prettyUptime = humanizeDuration(uptime, { largest: 2, round: true });
+
+    const lcl = new LCL();
+    const lastCommit = await lcl.getLastCommit();
+
+    const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
+
+    const basicInfoRows = [
+      ["Uptime", prettyUptime],
+      ["Last update", moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]")],
+      ["Version", lastCommit.shortHash],
+      ["API latency", `${shard.latency}ms`],
+    ];
+
+    const loadedPlugins = Object.keys(this.guildConfig.plugins);
+
+    const aboutContent: MessageContent = {
+      embed: {
+        title: `About ${this.bot.user.username}`,
+        fields: [
+          {
+            name: "Basic info",
+            value:
+              basicInfoRows
+                .map(([label, value]) => {
+                  return `${label}: **${value}**`;
+                })
+                .join("\n") + embedPadding,
+          },
+          {
+            name: "Loaded plugins on this server",
+            value: loadedPlugins.join(", "),
+          },
+        ],
+      },
+    };
+
+    // For the embed color, find the highest colored role the bot has - this is their color on the server as well
+    const botMember = await resolveMember(this.bot, this.guild, this.bot.user.id);
+    let botRoles = botMember.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r));
+    botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
+    botRoles = botRoles.filter(r => r.color); // Filter to those with a color
+    botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
+    if (botRoles.length) {
+      aboutContent.embed.color = botRoles[0].color;
+    }
+
+    // Use the bot avatar as the embed image
+    if (this.bot.user.avatarURL) {
+      aboutContent.embed.thumbnail = { url: this.bot.user.avatarURL };
+    }
+
+    msg.channel.createMessage(aboutContent);
   }
 
   @d.command("reload_guild")
