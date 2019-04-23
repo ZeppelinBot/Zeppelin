@@ -139,11 +139,17 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         name: "counts",
         type: "bool",
       },
+      {
+        name: "sort",
+        type: "string",
+      },
     ],
   })
   @d.permission("can_roles")
-  async rolesCmd(msg: Message, args: { search?: string; counts?: boolean }) {
+  async rolesCmd(msg: Message, args: { search?: string; counts?: boolean; sort?: string }) {
     let roles: Array<{ _memberCount?: number } & Role> = Array.from((msg.channel as TextChannel).guild.roles.values());
+    let sort = args.sort;
+
     if (args.search) {
       const searchStr = args.search.toLowerCase();
       roles = roles.filter(r => r.name.toLowerCase().includes(searchStr) || r.id === searchStr);
@@ -167,6 +173,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         role._memberCount = roleCounts.has(role.id) ? roleCounts.get(role.id) : 0;
       }
 
+      if (!sort) sort = "-memberCount";
       roles.sort((a, b) => {
         if (a._memberCount > b._memberCount) return -1;
         if (a._memberCount < b._memberCount) return 1;
@@ -179,6 +186,25 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
         return 0;
       });
+    }
+
+    if (!sort) sort = "name";
+
+    let sortDir: "ASC" | "DESC" = "ASC";
+    if (sort && sort[0] === "-") {
+      sort = sort.slice(1);
+      sortDir = "DESC";
+    }
+
+    if (sort === "position" || sort === "order") {
+      roles.sort(sorter("position", sortDir));
+    } else if (sort === "memberCount" && args.counts) {
+      roles.sort(sorter("_memberCount", sortDir));
+    } else if (sort === "name") {
+      roles.sort(sorter(r => r.name.toLowerCase(), sortDir));
+    } else {
+      this.sendErrorMessage(msg.channel, "Unknown sorting method");
+      return;
     }
 
     const longestId = roles.reduce((longest, role) => Math.max(longest, role.id.length), 0);
