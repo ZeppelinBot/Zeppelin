@@ -26,11 +26,17 @@ function errorHandler(err) {
 
   if (err instanceof PluginError) {
     // Tolerate a few recent plugin errors before crashing
-    if (++recentPluginErrors >= RECENT_PLUGIN_ERROR_EXIT_THRESHOLD) process.exit(1);
+    if (++recentPluginErrors >= RECENT_PLUGIN_ERROR_EXIT_THRESHOLD) {
+      console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
+      process.exit(1);
+    }
   } else if (err instanceof DiscordRESTError || err instanceof DiscordHTTPError) {
     // Discord API errors, usually safe to continue (rate limits etc. are handled elsewhere)
     // We still bail if we get a ton of them in a short amount of time
-    if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) process.exit(1);
+    if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
+      console.error(`Exiting after ${RECENT_DISCORD_ERROR_EXIT_THRESHOLD} API errors`);
+      process.exit(1);
+    }
   } else {
     // On other errors, crash immediately
     process.exit(1);
