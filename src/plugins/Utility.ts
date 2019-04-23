@@ -685,6 +685,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     const lowest = Math.round(Math.min(...times));
     const mean = Math.round(times.reduce((t, v) => t + v, 0) / times.length);
 
+    const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
+
     msg.channel.createMessage(
       trimLines(`
       **Ping:**
@@ -692,6 +694,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       Highest: **${highest}ms**
       Mean: **${mean}ms**
       Time between ping command and first reply: **${msgToMsgDelay}ms**
+      Shard latency: **${shard.latency}ms**
     `),
     );
 
