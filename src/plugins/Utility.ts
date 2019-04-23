@@ -859,7 +859,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       ["API latency", `${shard.latency}ms`],
     ];
 
-    const loadedPlugins = Object.keys(this.guildConfig.plugins);
+    const loadedPlugins = Array.from(this.knub.getGuildData(this.guildId).loadedPlugins.keys());
+    loadedPlugins.sort();
 
     const aboutContent: MessageContent = {
       embed: {
@@ -875,7 +876,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
                 .join("\n") + embedPadding,
           },
           {
-            name: "Loaded plugins on this server",
+            name: `Loaded plugins on this server (${loadedPlugins.length})`,
             value: loadedPlugins.join(", "),
           },
         ],
