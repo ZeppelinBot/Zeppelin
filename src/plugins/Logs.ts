@@ -462,9 +462,6 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
   // Uses events from savesMessages
   onMessageDelete(savedMessage: SavedMessage) {
-    // Don't log deletions from the bot user
-    if (savedMessage.user_id === this.bot.user.id) return;
-
     const member = this.guild.members.get(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
