@@ -25,6 +25,7 @@ import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
+import cloneDeep from "lodash.clonedeep";
 
 interface ILogChannel {
   include?: string[];
@@ -433,14 +434,31 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   async onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
     // To log a message update, either the message content or a rich embed has to change
     let logUpdate = false;
-    const oldRichEmbed = (oldSavedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
-    const newRichEmbed = (savedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
+
+    const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as Embed[])
+      .map(e => cloneDeep(e))
+      .filter(e => (e as Embed).type === "rich");
+
+    const newEmbedsToCompare = ((savedMessage.data.embeds || []) as Embed[])
+      .map(e => cloneDeep(e))
+      .filter(e => (e as Embed).type === "rich");
+
+    for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
+      if (embed.thumbnail) {
+        delete embed.thumbnail.width;
+        delete embed.thumbnail.height;
+      }
+
+      if (embed.image) {
+        delete embed.image.width;
+        delete embed.image.height;
+      }
+    }
 
     if (
       oldSavedMessage.data.content !== savedMessage.data.content ||
-      ((oldRichEmbed && !newRichEmbed) ||
-        (!oldRichEmbed && newRichEmbed) ||
-        JSON.stringify(oldRichEmbed) !== JSON.stringify(newRichEmbed))
+      oldEmbedsToCompare.length !== newEmbedsToCompare.length ||
+      JSON.stringify(oldEmbedsToCompare) !== JSON.stringify(newEmbedsToCompare)
     ) {
       logUpdate = true;
     }
