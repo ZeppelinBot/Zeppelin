@@ -462,6 +462,9 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         ? "\nAttachments:\n" + savedMessage.data.attachments.map((a: any) => a.url).join("\n")
         : "";
 
+      const richEmbed = (savedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
+      const embeds = richEmbed ? "\nEmbeds:\n```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```" : "";
+
       this.guildLogs.log(
         LogType.MESSAGE_DELETE,
         {
@@ -470,6 +473,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
           messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
           messageDate: moment(savedMessage.data.timestamp, "x").format(this.getConfig().format.timestamp),
           attachments: disableLinkPreviews(useMediaUrls(attachments)),
+          embeds,
         },
         savedMessage.id,
       );
