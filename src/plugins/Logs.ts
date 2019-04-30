@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { Channel, Constants as ErisConstants, Member, TextChannel, User } from "eris";
+import { Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
 import {
   createChunkedMessage,
   deactivateMentions,
@@ -410,24 +410,42 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
   // Uses events from savesMessages
   onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
-    // Don't log edits from the bot user
-    if (savedMessage.user_id === this.bot.user.id) return;
+    // To log a message update, either the message content or a rich embed has to change
+    let logUpdate = false;
+    const oldRichEmbed = (oldSavedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
+    const newRichEmbed = (savedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
 
-    if (oldSavedMessage && JSON.stringify(savedMessage.data) === JSON.stringify(oldSavedMessage.data)) return;
+    if (
+      oldSavedMessage.data.content !== savedMessage.data.content ||
+      ((oldRichEmbed && !newRichEmbed) ||
+        (!oldRichEmbed && newRichEmbed) ||
+        JSON.stringify(oldRichEmbed) !== JSON.stringify(newRichEmbed))
+    ) {
+      logUpdate = true;
+    }
+
+    if (!logUpdate) {
+      return;
+    }
 
     const member = this.guild.members.get(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
-    const before = oldSavedMessage
-      ? disableCodeBlocks(deactivateMentions(oldSavedMessage.data.content || ""))
-      : "Unknown pre-edit content";
-    const after = disableCodeBlocks(deactivateMentions(savedMessage.data.content || ""));
+    let oldMessageContent = oldSavedMessage.data.content || "<no text content>";
+    if (oldRichEmbed) {
+      oldMessageContent += "\n\nEmbed:\n\n" + JSON.stringify(oldRichEmbed);
+    }
+
+    let newMessageContent = savedMessage.data.content || "<no text content>";
+    if (newRichEmbed) {
+      newMessageContent += "\n\nEmbed:\n\n" + JSON.stringify(newRichEmbed);
+    }
 
     this.guildLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel),
-      before,
-      after,
+      before: disableCodeBlocks(deactivateMentions(oldMessageContent)),
+      after: disableCodeBlocks(deactivateMentions(newMessageContent)),
     });
   }
 
