@@ -293,13 +293,35 @@ export function chunkLines(str: string, maxChunkLength = 2000): string[] {
 }
 
 /**
- * Chunks a long message to multiple smaller messages, retaining leading and trailing line breaks
+ * Chunks a long message to multiple smaller messages, retaining leading and trailing line breaks, open code blocks, etc.
  */
 export function chunkMessageLines(str: string): string[] {
-  const chunks = chunkLines(str, 1999);
+  const chunks = chunkLines(str, 1990); // We don't split at exactly 2000 to be able to do the stuff below
+  let openCodeBlock = false;
+
   return chunks.map(chunk => {
+    // If the chunk starts with a newline, add an invisible unicode char so Discord doesn't strip it away
     if (chunk[0] === "\n") chunk = "\u200b" + chunk;
+    // If the chunk ends with a newline, add an invisible unicode char so Discord doesn't strip it away
     if (chunk[chunk.length - 1] === "\n") chunk = chunk + "\u200b";
+    // If the previous chunk had an open code block, open it here again
+    if (openCodeBlock) {
+      openCodeBlock = false;
+      if (chunk.startsWith("```")) {
+        // Edge case: chunk starts with a code block delimiter, e.g. the previous chunk and this one were split right before the end of a code block
+        // Fix: just strip the code block delimiter away from here, we don't need it anymore
+        chunk = chunk.slice(3);
+      } else {
+        chunk = "```" + chunk;
+      }
+    }
+    // If the chunk has an open code block, close it and open it again in the next chunk
+    const codeBlockDelimiters = chunk.match(/```/g);
+    if (codeBlockDelimiters && codeBlockDelimiters.length % 2 !== 0) {
+      chunk += "```";
+      openCodeBlock = true;
+    }
+
     return chunk;
   });
 }
