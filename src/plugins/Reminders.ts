@@ -4,7 +4,14 @@ import { GuildReminders } from "../data/GuildReminders";
 import { Message, TextChannel } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { convertDelayStringToMS, createChunkedMessage, errorMessage, sorter, successMessage } from "../utils";
+import {
+  convertDelayStringToMS,
+  createChunkedMessage,
+  disableLinkPreviews,
+  errorMessage,
+  sorter,
+  successMessage,
+} from "../utils";
 
 const REMINDER_LOOP_TIME = 10 * 1000;
 const MAX_TRIES = 3;
@@ -50,7 +57,9 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
       const channel = this.guild.channels.get(reminder.channel_id);
       if (channel && channel instanceof TextChannel) {
         try {
-          await channel.createMessage(`<@!${reminder.user_id}> You asked me to remind you: ${reminder.body}`);
+          await channel.createMessage(
+            disableLinkPreviews(`<@!${reminder.user_id}> You asked me to remind you: ${reminder.body}`),
+          );
         } catch (e) {
           // Probably random Discord internal server error or missing permissions or somesuch
           // Try again next round unless we've already tried to post this a bunch of times
@@ -68,11 +77,11 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
     this.postRemindersTimeout = setTimeout(() => this.postDueRemindersLoop(), REMINDER_LOOP_TIME);
   }
 
-  @d.command("remind", "<time:string> <reminder:string$>", {
+  @d.command("remind", "<time:string> [reminder:string$]", {
     aliases: ["remindme"],
   })
   @d.permission("can_use")
-  async addReminderCmd(msg: Message, args: { time: string; reminder: string }) {
+  async addReminderCmd(msg: Message, args: { time: string; reminder?: string }) {
     const now = moment();
 
     let reminderTime;
@@ -102,7 +111,8 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
       return;
     }
 
-    await this.reminders.add(msg.author.id, msg.channel.id, reminderTime.format("YYYY-MM-DD HH:mm:ss"), args.reminder);
+    const reminderBody = args.reminder || `https://discordapp.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`;
+    await this.reminders.add(msg.author.id, msg.channel.id, reminderTime.format("YYYY-MM-DD HH:mm:ss"), reminderBody);
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
