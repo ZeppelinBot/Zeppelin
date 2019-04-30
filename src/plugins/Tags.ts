@@ -92,7 +92,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
           return `<#${input}>`;
         }
 
-        return input;
+        return "";
       },
     };
   }
