@@ -7,6 +7,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
 import Timeout = NodeJS.Timeout;
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 
 type ReactionRolePair = [string, string, string?];
 
@@ -120,7 +121,18 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
    */
   async applyReactionRoleReactionsToMessage(channelId: string, messageId: string, reactionRoles: ReactionRole[]) {
     const channel = this.guild.channels.get(channelId) as TextChannel;
-    const targetMessage = await channel.getMessage(messageId);
+
+    let targetMessage;
+    try {
+      targetMessage = await channel.getMessage(messageId);
+    } catch (e) {
+      if (e instanceof DiscordRESTError) {
+        logger.warn(`Reaction roles for unknown message ${messageId} in guild ${this.guild.name} (${this.guildId})`);
+        return;
+      } else {
+        throw e;
+      }
+    }
 
     // Remove old reactions, if any
     const removeSleep = sleep(1250);
