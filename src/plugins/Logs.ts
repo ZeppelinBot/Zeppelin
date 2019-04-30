@@ -430,7 +430,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   }
 
   // Uses events from savesMessages
-  onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
+  async onMessageUpdate(savedMessage: SavedMessage, oldSavedMessage: SavedMessage) {
     // To log a message update, either the message content or a rich embed has to change
     let logUpdate = false;
     const oldRichEmbed = (oldSavedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
@@ -449,11 +449,11 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       return;
     }
 
-    const member = this.guild.members.get(savedMessage.user_id);
+    const user = await this.resolveUser(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
     this.guildLogs.log(LogType.MESSAGE_EDIT, {
-      member: stripObjectToScalars(member, ["user"]),
+      user: stripObjectToScalars(user),
       channel: stripObjectToScalars(channel),
       before: oldSavedMessage,
       after: savedMessage,
@@ -461,11 +461,11 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   }
 
   // Uses events from savesMessages
-  onMessageDelete(savedMessage: SavedMessage) {
-    const member = this.guild.members.get(savedMessage.user_id);
+  async onMessageDelete(savedMessage: SavedMessage) {
+    const user = await this.resolveUser(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
-    if (member) {
+    if (user) {
       // Replace attachment URLs with media URLs
       if (savedMessage.data.attachments) {
         for (const attachment of savedMessage.data.attachments as Attachment[]) {
@@ -476,7 +476,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       this.guildLogs.log(
         LogType.MESSAGE_DELETE,
         {
-          member: stripObjectToScalars(member, ["user"]),
+          user: stripObjectToScalars(user),
           channel: stripObjectToScalars(channel),
           messageDate: moment(savedMessage.data.timestamp, "x").format(this.getConfig().format.timestamp),
           message: savedMessage,
