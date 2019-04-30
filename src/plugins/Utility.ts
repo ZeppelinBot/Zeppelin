@@ -711,12 +711,10 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       return;
     }
 
-    if (!savedMessage.data.content) {
-      msg.channel.createMessage(errorMessage("Message content is empty"));
-      return;
-    }
+    const source =
+      (savedMessage.data.content || "<no text content>") + "\n\nSource:\n\n" + JSON.stringify(savedMessage.data);
 
-    const archiveId = await this.archives.create(savedMessage.data.content, moment().add(1, "hour"));
+    const archiveId = await this.archives.create(source, moment().add(1, "hour"));
     const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
     msg.channel.createMessage(`Message source: ${url}`);
   }
