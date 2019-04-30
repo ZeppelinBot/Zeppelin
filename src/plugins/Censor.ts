@@ -118,14 +118,16 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
    * @return {boolean} Indicates whether the message was removed
    */
   async applyFiltersToMsg(savedMessage: SavedMessage): Promise<boolean> {
-    if (!savedMessage.data.content) return false;
-
     const config = this.getConfigForMemberIdAndChannelId(savedMessage.user_id, savedMessage.channel_id);
+
+    let messageContent = savedMessage.data.content || "";
+    if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
+    if (savedMessage.data.embeds) messageContent += " " + JSON.stringify(savedMessage.data.embeds);
 
     // Filter zalgo
     const filterZalgo = config.filter_zalgo;
     if (filterZalgo) {
-      const result = ZalgoRegex.exec(savedMessage.data.content);
+      const result = ZalgoRegex.exec(messageContent);
       if (result) {
         this.censorMessage(savedMessage, "zalgo detected");
         return true;
@@ -141,7 +143,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       const inviteCodeBlacklist = config.invite_code_blacklist;
       const allowGroupDMInvites = config.allow_group_dm_invites;
 
-      const inviteCodes = getInviteCodesInString(savedMessage.data.content);
+      const inviteCodes = getInviteCodesInString(messageContent);
 
       let invites: Invite[] = await Promise.all(inviteCodes.map(code => this.bot.getInvite(code).catch(() => null)));
 
@@ -187,7 +189,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       const domainWhitelist = config.domain_whitelist;
       const domainBlacklist = config.domain_blacklist;
 
-      const urls = getUrlsInString(savedMessage.data.content);
+      const urls = getUrlsInString(messageContent);
       for (const thisUrl of urls) {
         if (domainWhitelist && !domainWhitelist.includes(thisUrl.hostname)) {
           this.censorMessage(savedMessage, `domain (\`${thisUrl.hostname}\`) not found in whitelist`);
@@ -204,7 +206,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
     // Filter tokens
     const blockedTokens = config.blocked_tokens || [];
     for (const token of blockedTokens) {
-      if (savedMessage.data.content.toLowerCase().includes(token.toLowerCase())) {
+      if (messageContent.toLowerCase().includes(token.toLowerCase())) {
         this.censorMessage(savedMessage, `blocked token (\`${token}\`) found`);
         return true;
       }
@@ -214,7 +216,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
     const blockedWords = config.blocked_words || [];
     for (const word of blockedWords) {
       const regex = new RegExp(`\\b${escapeStringRegexp(word)}\\b`, "i");
-      if (regex.test(savedMessage.data.content)) {
+      if (regex.test(messageContent)) {
         this.censorMessage(savedMessage, `blocked word (\`${word}\`) found`);
         return true;
       }
@@ -224,7 +226,8 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
     const blockedRegex = config.blocked_regex || [];
     for (const regexStr of blockedRegex) {
       const regex = new RegExp(regexStr, "i");
-      if (regex.test(savedMessage.data.content)) {
+      // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
+      if (regex.test(savedMessage.data.content) || regex.test(messageContent)) {
         this.censorMessage(savedMessage, `blocked regex (\`${regexStr}\`) found`);
         return true;
       }
