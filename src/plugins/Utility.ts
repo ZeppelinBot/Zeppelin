@@ -49,6 +49,7 @@ const { performance } = require("perf_hooks");
 const MAX_SEARCH_RESULTS = 15;
 const MAX_CLEAN_COUNT = 50;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
+const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
@@ -75,6 +76,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
   protected cases: GuildCases;
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
+
+  protected lastFullMemberRefresh = 0;
 
   getDefaultOptions(): IPluginOptions<IUtilityPluginConfig> {
     return {
@@ -133,6 +136,12 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }
   }
 
+  protected async refreshMembersIfNeeded() {
+    if (Date.now() < this.lastFullMemberRefresh + MEMBER_REFRESH_FREQUENCY) return;
+    await this.guild.fetchAllMembers();
+    this.lastFullMemberRefresh = Date.now();
+  }
+
   @d.command("roles", "[search:string$]", {
     options: [
       {
@@ -156,6 +165,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }
 
     if (args.counts) {
+      this.refreshMembersIfNeeded();
+
       // If the user requested role member counts as well, calculate them and sort the roles by their member count
       const roleCounts: Map<string, number> = Array.from(this.guild.members.values()).reduce((map, member) => {
         for (const roleId of member.roles) {
@@ -272,6 +283,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     msg: Message,
     args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string; "case-sensitive"?: boolean },
   ) {
+    this.refreshMembersIfNeeded();
+
     let matchingMembers = Array.from(this.guild.members.values());
 
     if (args.role) {
