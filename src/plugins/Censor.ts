@@ -102,11 +102,11 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       return;
     }
 
-    const member = this.guild.members.get(savedMessage.user_id);
+    const user = await this.resolveUser(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
     this.serverLogs.log(LogType.CENSOR, {
-      member: stripObjectToScalars(member, ["user"]),
+      user: stripObjectToScalars(user),
       channel: stripObjectToScalars(channel),
       reason,
       messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content)),
