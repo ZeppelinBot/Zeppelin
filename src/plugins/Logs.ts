@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
+import { Attachment, Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
 import {
   createChunkedMessage,
   deactivateMentions,
@@ -10,6 +10,7 @@ import {
   findRelevantAuditLogEntry,
   noop,
   stripObjectToScalars,
+  trimLines,
   UnknownUser,
   useMediaUrls,
 } from "../utils";
@@ -188,6 +189,24 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
           if (!channel) return "";
           return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
         },
+        messageSummary: (msg: SavedMessage) => {
+          // Regular text content
+          let result = "```" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
+
+          // Rich embed
+          const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
+          if (richEmbed) result += "Embed:```" + JSON.stringify(richEmbed) + "```";
+
+          // Attachments
+          if (msg.data.attachments) {
+            result +=
+              "Attachments:\n" +
+              msg.data.attachments.map((a: Attachment) => disableLinkPreviews(a.url)).join("\n") +
+              "\n";
+          }
+
+          return result;
+        },
       });
     } catch (e) {
       if (e instanceof TemplateParseError) {
@@ -197,6 +216,8 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         throw e;
       }
     }
+
+    formatted = formatted.trim();
 
     const timestampFormat = config.format.timestamp;
     if (timestampFormat) {
@@ -431,21 +452,11 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     const member = this.guild.members.get(savedMessage.user_id);
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
-    let oldMessageContent = oldSavedMessage.data.content || "<no text content>";
-    if (oldRichEmbed) {
-      oldMessageContent += "\n\nEmbed:\n\n" + JSON.stringify(oldRichEmbed);
-    }
-
-    let newMessageContent = savedMessage.data.content || "<no text content>";
-    if (newRichEmbed) {
-      newMessageContent += "\n\nEmbed:\n\n" + JSON.stringify(newRichEmbed);
-    }
-
     this.guildLogs.log(LogType.MESSAGE_EDIT, {
       member: stripObjectToScalars(member, ["user"]),
       channel: stripObjectToScalars(channel),
-      before: disableCodeBlocks(deactivateMentions(oldMessageContent)),
-      after: disableCodeBlocks(deactivateMentions(newMessageContent)),
+      before: oldSavedMessage,
+      after: savedMessage,
     });
   }
 
@@ -458,22 +469,20 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     const channel = this.guild.channels.get(savedMessage.channel_id);
 
     if (member) {
-      const attachments = savedMessage.data.attachments
-        ? "\nAttachments:\n" + savedMessage.data.attachments.map((a: any) => a.url).join("\n")
-        : "";
-
-      const richEmbed = (savedMessage.data.embeds || []).find(e => (e as Embed).type === "rich");
-      const embeds = richEmbed ? "\nEmbeds:\n```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```" : "";
+      // Replace attachment URLs with media URLs
+      if (savedMessage.data.attachments) {
+        for (const attachment of savedMessage.data.attachments as Attachment[]) {
+          attachment.url = useMediaUrls(attachment.url);
+        }
+      }
 
       this.guildLogs.log(
         LogType.MESSAGE_DELETE,
         {
           member: stripObjectToScalars(member, ["user"]),
           channel: stripObjectToScalars(channel),
-          messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content || "<no text content>")),
           messageDate: moment(savedMessage.data.timestamp, "x").format(this.getConfig().format.timestamp),
-          attachments: disableLinkPreviews(useMediaUrls(attachments)),
-          embeds,
+          message: savedMessage,
         },
         savedMessage.id,
       );
