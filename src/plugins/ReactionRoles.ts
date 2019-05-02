@@ -162,7 +162,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
         timeout: null,
         changes: [],
         applyFn: async () => {
-          const member = await this.guild.members.get(memberId);
+          const member = await this.getMember(memberId);
           if (member) {
             const newRoleIds = new Set(member.roles);
             for (const change of newPendingRoleChangeObj.changes) {
@@ -336,7 +336,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
     const reactionRoles = await this.reactionRoles.getForMessage(msg.id);
     if (reactionRoles.length === 0) return;
 
-    const member = this.guild.members.get(userId);
+    const member = await this.getMember(userId);
     if (!member) return;
 
     if (emoji.name === CLEAR_ROLES_EMOJI) {

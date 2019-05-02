@@ -341,13 +341,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     for (const [index, mute] of filteredMutes.entries()) {
       const muteWithDetails = { ...mute };
 
-      let member = this.guild.members.get(mute.user_id);
-      if (!member) {
-        try {
-          member = await this.bot.getRESTGuildMember(this.guildId, mute.user_id);
-          this.guild.members.add(member);
-        } catch (e) {} // tslint:disable-line
-      }
+      const member = await this.getMember(mute.user_id);
 
       if (!member) {
         if (!bannedIds) {
@@ -531,7 +525,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
     let cleared = 0;
     for (const mute of activeMutes) {
-      const member = this.guild.members.get(mute.user_id);
+      const member = await this.getMember(mute.user_id);
       if (!member) continue;
 
       if (!member.roles.includes(muteRole)) {
@@ -559,7 +553,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   protected async clearExpiredMutes() {
     const expiredMutes = await this.mutes.getExpiredMutes();
     for (const mute of expiredMutes) {
-      const member = this.guild.members.get(mute.user_id);
+      const member = await this.getMember(mute.user_id);
       if (!member) continue;
 
       try {

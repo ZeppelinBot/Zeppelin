@@ -1079,7 +1079,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
-      const member = this.guild.members.get(userId);
+      const member = this.guild.members.get(userId); // TODO: Get members on demand?
       if (member && !this.canActOn(msg.member, member)) {
         this.sendErrorMessage(msg.channel, "Cannot massban one or more users: insufficient permissions");
         return;

@@ -203,7 +203,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
   }
 
   async onMessageCreate(msg: SavedMessage) {
-    const member = this.guild.members.get(msg.user_id);
+    const member = await this.getMember(msg.user_id);
     if (!this.hasPermission("can_use", { member, channelId: msg.channel_id })) return;
 
     if (!msg.data.content) return;
