@@ -532,6 +532,11 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         `) + embedPadding,
         });
       }
+    } else {
+      embed.fields.push({
+        name: "!!  USER IS NOT ON THE SERVER  !!",
+        value: embedPadding,
+      });
     }
 
     const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
