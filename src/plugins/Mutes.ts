@@ -262,6 +262,10 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
         if (member.roles.includes(muteRole)) {
           await member.removeRole(muteRole);
         }
+      } else {
+        logger.warn(
+          `Member ${userId} not found in guild ${this.guild.name} (${this.guildId}) when attempting to unmute`,
+        );
       }
 
       await this.mutes.clear(userId);
