@@ -1,4 +1,4 @@
-import { decorators as d, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
 import { convertDelayStringToMS, createChunkedMessage, errorMessage, noop, successMessage } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
@@ -6,6 +6,7 @@ import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 
 const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
@@ -74,7 +75,17 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
       (existingOverride ? existingOverride.allow : 0) & ~ErisConstants.Permissions.sendMessages;
     await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
 
-    await this.slowmodes.addSlowmodeUser(channel.id, userId);
+    try {
+      await this.slowmodes.addSlowmodeUser(channel.id, userId);
+    } catch (e) {
+      if (e instanceof DiscordRESTError && e.code === 50013) {
+        logger.warn(
+          `Missing permissions to apply bot slowmode to user ${userId} on channel ${channel.name} (${
+            channel.id
+          }) on server ${this.guild.name} (${this.guildId})`,
+        );
+      }
+    }
   }
 
   /**
