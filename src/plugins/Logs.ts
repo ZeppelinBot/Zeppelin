@@ -171,11 +171,17 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     try {
       formatted = await renderTemplate(format, {
         ...data,
-        userMention: user => {
+        userMention: async user => {
           if (!user) return "";
-          if (user.user) user = user.user;
 
-          const member = this.guild.members.get(user.id);
+          let member: Member;
+          if (user.user) {
+            member = user;
+            user = member.user;
+          } else {
+            member = await this.getMember(user.id);
+          }
+
           const memberConfig = this.getMatchingConfig({ member, userId: user.id });
 
           if (memberConfig.ping_user) {
@@ -389,11 +395,11 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   }
 
   @d.event("userUpdate")
-  onUserUpdate(user: User, oldUser: User) {
+  async onUserUpdate(user: User, oldUser: User) {
     if (!oldUser) return;
 
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
-      const member = this.guild.members.get(user.id) || { id: user.id, user };
+      const member = (await this.getMember(user.id)) || { id: user.id, user };
       this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
         member: stripObjectToScalars(member, ["user"]),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,

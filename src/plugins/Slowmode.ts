@@ -297,7 +297,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     if (thisMsgLock.interrupted) return;
 
     // Make sure this user is affected by the slowmode
-    const member = this.guild.members.get(msg.user_id);
+    const member = await this.getMember(msg.user_id);
     const isAffected = this.hasPermission("is_affected", { channelId: channel.id, userId: msg.user_id, member });
     if (!isAffected) return thisMsgLock.unlock();
 
