@@ -171,12 +171,21 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     try {
       formatted = await renderTemplate(format, {
         ...data,
-        userMention: async user => {
-          if (!user) return "";
+        userMention: async userOrMember => {
+          if (!userOrMember) return "";
+          
+          let user;
+          let member;
+          
+          if (userOrMember.user) {
+            member = userOrMember;
+            user = member.user;
+          } else {
+            user = userOrMember;
+            member = this.guild.members.get(user.id) || { id: user.id, user };
+          }
 
-          const member: Member = user.user ? user : this.guild.members.get(user.id) || { id: user.id, user };
-
-          const memberConfig = (member.guild && this.getMatchingConfig({ member, userId: user.id })) || ({} as any);
+          const memberConfig = member.guild && this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
 
           if (memberConfig.ping_user) {
             // Ping/mention the user
