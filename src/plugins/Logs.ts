@@ -183,6 +183,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
             return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
           } else {
             // No ping/mention
+            if (user.username == null) console.log('?', user);
             return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
           }
         },
