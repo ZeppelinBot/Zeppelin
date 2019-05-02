@@ -310,14 +310,14 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     const thisMsgLock = await this.locks.acquire(`message-${msg.id}`);
     if (thisMsgLock.interrupted) return;
 
+    // Check if this channel even *has* a bot-maintained slowmode
+    const channelSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
+    if (!channelSlowmode) return thisMsgLock.unlock();
+
     // Make sure this user is affected by the slowmode
     const member = await this.getMember(msg.user_id);
     const isAffected = this.hasPermission("is_affected", { channelId: channel.id, userId: msg.user_id, member });
     if (!isAffected) return thisMsgLock.unlock();
-
-    // Check if this channel even *has* a bot-maintained slowmode
-    const channelSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
-    if (!channelSlowmode) return thisMsgLock.unlock();
 
     // Delete any extra messages sent after a slowmode was already applied
     const userHasSlowmode = await this.slowmodes.userHasSlowmode(channel.id, msg.user_id);

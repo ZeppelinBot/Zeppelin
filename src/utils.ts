@@ -566,6 +566,9 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
   if (cachedUser) return cachedUser;
 
   try {
+    logger.info(`Resolving unknown user: ${value} / ${userId}`);
+    console.trace();
+
     const freshUser = await bot.getRESTUser(userId);
     bot.users.add(freshUser, bot);
     return freshUser;
@@ -585,6 +588,9 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   // If not, fetch it from the API
   if (!member) {
     try {
+      logger.info(`Resolving unknown member: ${value}`);
+      console.trace();
+
       member = await bot.getRESTGuildMember(guild.id, user.id);
       member.id = user.id;
       member.guild = guild;

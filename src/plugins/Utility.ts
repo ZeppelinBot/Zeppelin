@@ -470,7 +470,11 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
   @d.permission("can_info")
   async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
     const user = args.user || msg.author;
-    const member = user && (await this.getMember(user.id));
+
+    let member;
+    if (!(user instanceof UnknownUser)) {
+      member = await this.getMember(user.id);
+    }
 
     const embed: EmbedOptions = {
       fields: [],
