@@ -219,7 +219,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
     this.spamDetectionQueue = this.spamDetectionQueue.then(
       async () => {
         const timestamp = moment(savedMessage.posted_at).valueOf();
-        const member = this.guild.members.get(savedMessage.user_id);
+        const member = await this.getMember(savedMessage.user_id);
 
         // Log this action...
         this.addRecentAction(type, savedMessage.user_id, savedMessage.channel_id, savedMessage, timestamp, actionCount);
@@ -358,7 +358,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
       const recentActionsCount = this.getRecentActionCount(type, userId, actionGroupId, since);
 
       if (recentActionsCount > spamConfig.count) {
-        const member = this.guild.members.get(userId);
+        const member = await this.getMember(userId);
         const details = `${description} (over ${spamConfig.count} in ${spamConfig.interval}s)`;
 
         if (spamConfig.mute && member) {
