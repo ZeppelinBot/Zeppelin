@@ -565,14 +565,11 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
   const cachedUser = bot.users.find(u => u.id === userId);
   if (cachedUser) return cachedUser;
 
-  try {
-    logger.info(`Resolving unknown user: ${value} / ${userId}`);
-    console.trace();
-
-    const freshUser = await bot.getRESTUser(userId);
-    bot.users.add(freshUser, bot);
-    return freshUser;
-  } catch (e) {} // tslint:disable-line
+  // try {
+  //   const freshUser = await bot.getRESTUser(userId);
+  //   bot.users.add(freshUser, bot);
+  //   return freshUser;
+  // } catch (e) {} // tslint:disable-line
 
   return new UnknownUser({ id: userId });
 }
@@ -586,16 +583,13 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   let member = guild.members.get(user.id);
 
   // If not, fetch it from the API
-  if (!member) {
-    try {
-      logger.info(`Resolving unknown member: ${value}`);
-      console.trace();
-
-      member = await bot.getRESTGuildMember(guild.id, user.id);
-      member.id = user.id;
-      member.guild = guild;
-    } catch (e) {} // tslint:disable-line
-  }
+  // if (!member) {
+  //   try {
+  //     member = await bot.getRESTGuildMember(guild.id, user.id);
+  //     member.id = user.id;
+  //     member.guild = guild;
+  //   } catch (e) {} // tslint:disable-line
+  // }
 
   return member;
 }
