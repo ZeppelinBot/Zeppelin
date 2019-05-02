@@ -134,12 +134,11 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
       // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
       const moveToVoiceChannelId = this.getConfig().move_to_voice_channel;
-      if (moveToVoiceChannelId && member.voiceState.channelID) {
+      if (moveToVoiceChannelId) {
+        // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
         try {
           await member.edit({ channelID: moveToVoiceChannelId });
-        } catch (e) {
-          logger.warn(`Could not move user ${member.id} to voice channel ${moveToVoiceChannelId} when muting`);
-        }
+        } catch (e) {} // tslint:disable-line
       }
     }
 
