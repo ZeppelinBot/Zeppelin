@@ -13,6 +13,7 @@ import {
   stripObjectToScalars,
   successMessage,
   ucfirst,
+  UnknownUser,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -566,16 +567,19 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     const expiredMutes = await this.mutes.getExpiredMutes();
     for (const mute of expiredMutes) {
       const member = await this.getMember(mute.user_id);
-      if (!member) continue;
 
-      try {
-        await member.removeRole(this.getConfig().mute_role);
-      } catch (e) {} // tslint:disable-line
+      if (member) {
+        try {
+          await member.removeRole(this.getConfig().mute_role);
+        } catch (e) {} // tslint:disable-line
+      }
 
-      await this.mutes.clear(member.id);
+      await this.mutes.clear(mute.user_id);
 
       this.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: member
+          ? stripObjectToScalars(member, ["user"])
+          : { id: mute.user_id, user: new UnknownUser({ id: mute.user_id }) },
       });
     }
   }
