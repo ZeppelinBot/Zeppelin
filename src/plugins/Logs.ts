@@ -182,7 +182,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
             member = await this.getMember(user.id);
           }
 
-          const memberConfig = this.getMatchingConfig({ member, userId: user.id });
+          const memberConfig = (member.guild && this.getMatchingConfig({ member, userId: user.id })) || ({} as any);
 
           if (memberConfig.ping_user) {
             // Ping/mention the user
