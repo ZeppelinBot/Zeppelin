@@ -174,13 +174,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         userMention: async user => {
           if (!user) return "";
 
-          let member: Member;
-          if (user.user) {
-            member = user;
-            user = member.user;
-          } else {
-            member = await this.getMember(user.id);
-          }
+          const member: Member = user.user ? user : this.guild.members.get(user.id) || { id: user.id, user };
 
           const memberConfig = (member.guild && this.getMatchingConfig({ member, userId: user.id })) || ({} as any);
 
