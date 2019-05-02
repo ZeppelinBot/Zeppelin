@@ -98,7 +98,7 @@ connect().then(async conn => {
   await conn.runMigrations();
 
   const client = new Client(`Bot ${process.env.TOKEN}`, {
-    getAllUsers: false,
+    getAllUsers: true,
     restMode: true,
   });
   client.setMaxListeners(100);
