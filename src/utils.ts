@@ -530,6 +530,9 @@ export class UnknownUser {
   }
 }
 
+const unknownUsers = new Set();
+const unknownMembers = new Set();
+
 export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser> {
   if (value == null || typeof value !== "string") {
     return new UnknownUser();
@@ -565,11 +568,18 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
   const cachedUser = bot.users.find(u => u.id === userId);
   if (cachedUser) return cachedUser;
 
-  // try {
-  //   const freshUser = await bot.getRESTUser(userId);
-  //   bot.users.add(freshUser, bot);
-  //   return freshUser;
-  // } catch (e) {} // tslint:disable-line
+  // We only fetch the user from the API if we haven't tried it before:
+  // - If the user was found, the bot has them in its cache
+  // - If the user was not found, they'll be in unknownUsers
+  if (!unknownUsers.has(userId)) {
+    try {
+      const freshUser = await bot.getRESTUser(userId);
+      bot.users.add(freshUser, bot);
+      return freshUser;
+    } catch (e) {} // tslint:disable-line
+
+    unknownUsers.add(userId);
+  }
 
   return new UnknownUser({ id: userId });
 }
@@ -582,14 +592,22 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   // See if we have the member cached...
   let member = guild.members.get(user.id);
 
-  // If not, fetch it from the API
-  // if (!member) {
-  //   try {
-  //     member = await bot.getRESTGuildMember(guild.id, user.id);
-  //     member.id = user.id;
-  //     member.guild = guild;
-  //   } catch (e) {} // tslint:disable-line
-  // }
+  // We only fetch the member from the API if we haven't tried it before:
+  // - If the member was found, the bot has them in the guild's member cache
+  // - If the member was not found, they'll be in unknownMembers
+  const unknownKey = `${guild.id}-${user.id}`;
+  if (!unknownMembers.has(unknownKey)) {
+    // If not, fetch it from the API
+    if (!member) {
+      try {
+        member = await bot.getRESTGuildMember(guild.id, user.id);
+        member.id = user.id;
+        member.guild = guild;
+      } catch (e) {} // tslint:disable-line
+    }
+
+    if (!member) unknownMembers.add(unknownKey);
+  }
 
   return member;
 }
