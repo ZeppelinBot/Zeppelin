@@ -1,5 +1,5 @@
 import { IPluginOptions } from "knub";
-import { Invite } from "eris";
+import { Invite, Embed } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -14,6 +14,7 @@ import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import cloneDeep from "lodash.clonedeep";
 
 interface ICensorPluginConfig {
   filter_zalgo: boolean;
@@ -122,7 +123,17 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
 
     let messageContent = savedMessage.data.content || "";
     if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
-    if (savedMessage.data.embeds) messageContent += " " + JSON.stringify(savedMessage.data.embeds);
+    if (savedMessage.data.embeds) {
+      const embeds = (savedMessage.data.embeds as Embed[]).map(e => cloneDeep(e));
+      for (const embed of embeds) {
+        if (embed.type === "video") {
+          // Ignore video descriptions as they're not actually shown on the embed
+          delete embed.description;
+        }
+      }
+      
+      messageContent += " " + JSON.stringify(embeds);
+    }
 
     // Filter zalgo
     const filterZalgo = config.filter_zalgo;
