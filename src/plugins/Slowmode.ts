@@ -73,10 +73,9 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
       (existingOverride ? existingOverride.deny : 0) | ErisConstants.Permissions.sendMessages;
     const newAllowedPermissions =
       (existingOverride ? existingOverride.allow : 0) & ~ErisConstants.Permissions.sendMessages;
-    await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
 
     try {
-      await this.slowmodes.addSlowmodeUser(channel.id, userId);
+      await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
     } catch (e) {
       if (e instanceof DiscordRESTError && e.code === 50013) {
         logger.warn(
@@ -84,8 +83,12 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
             channel.id
           }) on server ${this.guild.name} (${this.guildId})`,
         );
+      } else {
+        throw e;
       }
     }
+
+    await this.slowmodes.addSlowmodeUser(channel.id, userId);
   }
 
   /**
