@@ -600,6 +600,9 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
     // If not, fetch it from the API
     if (!member) {
       try {
+        logger.info(`Fetching unknown member (${user.id} in ${guild.name} (${guild.id})) from the API`);
+        console.trace();
+
         member = await bot.getRESTGuildMember(guild.id, user.id);
         member.id = user.id;
         member.guild = guild;
