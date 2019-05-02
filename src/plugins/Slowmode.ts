@@ -10,6 +10,7 @@ import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disab
 
 const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
+const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * 1000;
 
 interface ISlowmodePluginConfig {
   use_native_slowmode: boolean;
@@ -51,7 +52,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   onLoad() {
     this.slowmodes = GuildSlowmodes.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.clearInterval = setInterval(() => this.clearExpiredSlowmodes(), 2000);
+    this.clearInterval = setInterval(() => this.clearExpiredSlowmodes(), BOT_SLOWMODE_CLEAR_INTERVAL);
 
     this.onMessageCreateFn = this.onMessageCreate.bind(this);
     this.savedMessages.events.on("create", this.onMessageCreateFn);

@@ -53,6 +53,10 @@ export type UnmuteResult = {
   case: Case;
 };
 
+const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
+let FIRST_CHECK_TIME = Date.now();
+const FIRST_CHECK_INCREMENT = 5 * 1000;
+
 export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   public static pluginName = "mutes";
 
@@ -99,8 +103,13 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     this.serverLogs = new GuildLogs(this.guildId);
 
     // Check for expired mutes every 5s
-    this.clearExpiredMutes();
-    this.muteClearIntervalId = setInterval(() => this.clearExpiredMutes(), 5000);
+    const firstCheckTime = Math.max(Date.now(), FIRST_CHECK_TIME) + FIRST_CHECK_INCREMENT;
+    FIRST_CHECK_TIME = firstCheckTime;
+
+    setTimeout(() => {
+      this.clearExpiredMutes();
+      this.muteClearIntervalId = setInterval(() => this.clearExpiredMutes(), EXPIRED_MUTE_CHECK_INTERVAL);
+    }, firstCheckTime - Date.now());
   }
 
   protected onUnload() {
