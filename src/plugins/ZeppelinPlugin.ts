@@ -1,8 +1,12 @@
-import { IBasePluginConfig, IPluginOptions, Plugin } from "knub";
+import { IBasePluginConfig, IPluginOptions, logger, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import Ajv, { ErrorObject } from "ajv";
 import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, UnknownUser } from "../utils";
 import { Member, User } from "eris";
+
+import { performance } from "perf_hooks";
+
+const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
   protected configSchema: any;
@@ -81,10 +85,24 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
    */
   async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
-    return resolveUser(this.bot, userResolvable);
+    const start = performance.now();
+    const user = await resolveUser(this.bot, userResolvable);
+    const time = performance.now() - start;
+    if (time >= SLOW_RESOLVE_THRESHOLD) {
+      const rounded = Math.round(time);
+      logger.warn(`Slow user resolve (${rounded}ms): ${userResolvable}`);
+    }
+    return user;
   }
 
   async getMember(memberResolvable: string): Promise<Member> {
-    return resolveMember(this.bot, this.guild, memberResolvable);
+    const start = performance.now();
+    const member = await resolveMember(this.bot, this.guild, memberResolvable);
+    const time = performance.now() - start;
+    if (time >= SLOW_RESOLVE_THRESHOLD) {
+      const rounded = Math.round(time);
+      logger.warn(`Slow member resolve (${rounded}ms): ${memberResolvable} in ${this.guild.name} (${this.guild.id})`);
+    }
+    return member;
   }
 }

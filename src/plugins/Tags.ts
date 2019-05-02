@@ -203,6 +203,8 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
   }
 
   async onMessageCreate(msg: SavedMessage) {
+    if (msg.is_bot) return;
+
     const member = await this.getMember(msg.user_id);
     if (!this.hasPermission("can_use", { member, channelId: msg.channel_id })) return;
 
