@@ -1223,7 +1223,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     msg.channel.createMessage(embed);
   }
 
-  @d.command("cases", "<user:string> [opts:string$]", {
+  @d.command("cases", "<user:string>", {
     options: [
       {
         name: "expand",
@@ -1238,7 +1238,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     ],
   })
   @d.permission("can_view")
-  async userCasesCmd(msg: Message, args: { user: string; opts?: string; expand?: boolean; hidden?: boolean }) {
+  async userCasesCmd(msg: Message, args: { user: string; expand?: boolean; hidden?: boolean }) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -1254,10 +1254,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     if (cases.length === 0) {
       msg.channel.createMessage(`No cases found for **${userName}**`);
     } else {
-      const showHidden = args.hidden || (args.opts && args.opts.match(/\bhidden\b/));
-      const casesToDisplay = showHidden ? cases : normalCases;
+      const casesToDisplay = args.hidden ? cases : normalCases;
 
-      if (args.expand || (args.opts && args.opts.match(/\b(expand|e)\b/))) {
+      if (args.expand) {
         if (casesToDisplay.length > 8) {
           msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
           return;
@@ -1278,7 +1277,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
           lines.push(caseSummary);
         }
 
-        if (!showHidden && hiddenCases.length) {
+        if (!args.hidden && hiddenCases.length) {
           if (hiddenCases.length === 1) {
             lines.push(`*+${hiddenCases.length} hidden case, use "--hidden" to show it*`);
           } else {
@@ -1295,14 +1294,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       `);
 
         createChunkedMessage(msg.channel, finalMessage);
-      }
-
-      if ((args.opts && args.opts.match(/\bhidden\b/)) || (args.opts && args.opts.match(/\b(expand|e)\b/))) {
-        msg.channel.createMessage(
-          `<@!${
-            msg.author.id
-          }> **Note:** expand/hidden have been replaced with --expand/--hidden (and -e/-h as shortcuts)`,
-        );
       }
     }
   }
