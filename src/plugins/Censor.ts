@@ -110,6 +110,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
       user: stripObjectToScalars(user),
       channel: stripObjectToScalars(channel),
       reason,
+      message: savedMessage,
       messageText: disableCodeBlocks(deactivateMentions(savedMessage.data.content)),
     });
   }
@@ -131,7 +132,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
           delete embed.description;
         }
       }
-      
+
       messageContent += " " + JSON.stringify(embeds);
     }
 
