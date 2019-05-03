@@ -205,7 +205,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
           // Rich embed
           const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
-          if (richEmbed) result += "Embed:```" + JSON.stringify(richEmbed) + "```";
+          if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
 
           // Attachments
           if (msg.data.attachments) {
