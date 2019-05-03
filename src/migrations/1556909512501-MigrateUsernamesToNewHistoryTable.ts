@@ -36,7 +36,7 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
           toDelete.push(row.id);
         });
         stream.on("end", async () => {
-          if (toInsert.length) {
+          if (toInsert.length || toDelete.length) {
             await queryRunner.query("START TRANSACTION");
             await queryRunner.query(
               "INSERT INTO username_history (user_id, username, timestamp) VALUES " +
