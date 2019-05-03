@@ -55,7 +55,7 @@ export function uclower(str) {
 }
 
 export function stripObjectToScalars(obj, includedNested: string[] = []) {
-  const result = {};
+  const result = Array.isArray(obj) ? [] : {};
 
   for (const key in obj) {
     if (
