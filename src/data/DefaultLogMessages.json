@@ -41,7 +41,7 @@
 
   "MESSAGE_SPAM_DETECTED": "🛑 {userMention(member)} spam detected in {channelMention(channel)}: {description} (more than {limit} in {interval}s)\n{archiveUrl}",
   "OTHER_SPAM_DETECTED": "🛑 {userMention(member)} spam detected: {description} (more than {limit} in {interval}s)",
-  "CENSOR": "🛑 Censored message from {userMention(user)} in {channelMention(channel)}: {reason}:\n```{messageText}```",
+  "CENSOR": "🛑 Censored message (`{message.id}`) from {userMention(user)} in {channelMention(channel)}: {reason}:\n```{messageText}```",
   "CLEAN": "🚿 {userMention(mod)} cleaned **{count}** message(s) in {channelMention(channel)}\n{archiveUrl}",
 
   "CASE_CREATE": "✏ {userMention(mod)} manually created new **{caseType}** case (#{caseNum})",
