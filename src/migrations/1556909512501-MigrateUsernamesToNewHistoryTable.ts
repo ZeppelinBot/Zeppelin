@@ -38,15 +38,22 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
         stream.on("end", async () => {
           if (toInsert.length || toDelete.length) {
             await queryRunner.query("START TRANSACTION");
-            await queryRunner.query(
-              "INSERT INTO username_history (user_id, username, timestamp) VALUES " +
-                Array.from({ length: toInsert.length }, () => "(?, ?, ?)").join(","),
-              toInsert.flat(),
-            );
-            await queryRunner.query(
-              "DELETE FROM name_history WHERE id IN (" + Array.from("?".repeat(toDelete.length)).join(", ") + ")",
-              toDelete,
-            );
+
+            if (toInsert.length) {
+              await queryRunner.query(
+                "INSERT INTO username_history (user_id, username, timestamp) VALUES " +
+                  Array.from({ length: toInsert.length }, () => "(?, ?, ?)").join(","),
+                toInsert.flat(),
+              );
+            }
+
+            if (toDelete.length) {
+              await queryRunner.query(
+                "DELETE FROM name_history WHERE id IN (" + Array.from("?".repeat(toDelete.length)).join(", ") + ")",
+                toDelete,
+              );
+            }
+
             await queryRunner.query("COMMIT");
 
             resolve({ finished: false, migrated: toInsert.length });
