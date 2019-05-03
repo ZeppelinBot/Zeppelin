@@ -92,6 +92,7 @@ import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
 import { startUptimeCounter } from "./uptime";
 import { UsernameSaver } from "./plugins/UsernameSaver";
+import { WelcomeMessagePlugin } from "./plugins/WelcomeMessage";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -136,6 +137,7 @@ connect().then(async conn => {
       PingableRolesPlugin,
       SelfGrantableRolesPlugin,
       RemindersPlugin,
+      WelcomeMessagePlugin,
     ],
 
     globalPlugins: [BotControlPlugin, LogServerPlugin, UsernameSaver],
