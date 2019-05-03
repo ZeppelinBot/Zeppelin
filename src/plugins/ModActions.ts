@@ -446,7 +446,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(memberToWarn, ["user"]),
+      member: stripObjectToScalars(memberToWarn, ["user", "roles"]),
     });
   }
 
@@ -945,7 +945,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Log the action
     this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
       mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(memberToSoftban, ["user"]),
+      member: stripObjectToScalars(memberToSoftban, ["user", "roles"]),
     });
   }
 
