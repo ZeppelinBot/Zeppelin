@@ -61,13 +61,13 @@ export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> 
     createChunkedMessage(msg.channel, message);
   }
 
-  @d.event("userUpdate", null, false)
-  async onUserUpdate(user: User, oldUser: { username: string; discriminator: string; avatar: string }) {
-    if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
-      const newUsername = `${user.username}#${user.discriminator}`;
-      await this.nameHistory.addEntry(user.id, NameHistoryEntryTypes.Username, newUsername);
-    }
-  }
+  // @d.event("userUpdate", null, false)
+  // async onUserUpdate(user: User, oldUser: { username: string; discriminator: string; avatar: string }) {
+  //   if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
+  //     const newUsername = `${user.username}#${user.discriminator}`;
+  //     await this.nameHistory.addEntry(user.id, NameHistoryEntryTypes.Username, newUsername);
+  //   }
+  // }
 
   @d.event("guildMemberUpdate")
   async onGuildMemberUpdate(_, member: Member) {
@@ -77,12 +77,12 @@ export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> 
     }
   }
 
-  @d.event("guildMemberAdd")
-  async onGuildMemberAdd(_, member: Member) {
-    const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
-    const username = `${member.user.username}#${member.user.discriminator}`;
-    if (!latestEntry || latestEntry.value !== username) {
-      await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Username, username);
-    }
-  }
+  // @d.event("guildMemberAdd")
+  // async onGuildMemberAdd(_, member: Member) {
+  //   const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
+  //   const username = `${member.user.username}#${member.user.discriminator}`;
+  //   if (!latestEntry || latestEntry.value !== username) {
+  //     await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Username, username);
+  //   }
+  // }
 }

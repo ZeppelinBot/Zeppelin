@@ -95,7 +95,7 @@ import { startUptimeCounter } from "./uptime";
 // Run latest database migrations
 logger.info("Running database migrations");
 connect().then(async conn => {
-  await conn.runMigrations();
+  // await conn.runMigrations();
 
   const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: true,
