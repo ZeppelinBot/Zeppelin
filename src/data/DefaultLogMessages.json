@@ -16,7 +16,7 @@
   "MEMBER_ROLE_REMOVE": "🔑 {userMention(member)}: role(s) **{roles}** removed by {userMention(mod)}",
   "MEMBER_ROLE_CHANGES": "🔑 {userMention(member)}: roles changed: added **{addedRoles}**, removed **{removedRoles}** by {userMention(mod)}",
   "MEMBER_NICK_CHANGE": "✏ {userMention(member)}: nickname changed from **{oldNick}** to **{newNick}**",
-  "MEMBER_USERNAME_CHANGE": "✏ {userMention(member)}: username changed from **{oldName}** to **{newName}**",
+  "MEMBER_USERNAME_CHANGE": "✏ {userMention(user)}: username changed from **{oldName}** to **{newName}**",
   "MEMBER_RESTORE": "💿 Restored {restoredData} for {userMention(member)} on rejoin",
 
   "CHANNEL_CREATE": "🖊 Channel {channelMention(channel)} was created",

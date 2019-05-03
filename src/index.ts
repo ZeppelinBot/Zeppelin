@@ -91,11 +91,12 @@ import { errorMessage, successMessage } from "./utils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
 import { startUptimeCounter } from "./uptime";
+import { UsernameSaver } from "./plugins/UsernameSaver";
 
 // Run latest database migrations
 logger.info("Running database migrations");
 connect().then(async conn => {
-  // await conn.runMigrations();
+  await conn.runMigrations();
 
   const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: true,
@@ -137,7 +138,7 @@ connect().then(async conn => {
       RemindersPlugin,
     ],
 
-    globalPlugins: [BotControlPlugin, LogServerPlugin],
+    globalPlugins: [BotControlPlugin, LogServerPlugin, UsernameSaver],
 
     options: {
       getEnabledPlugins(guildId, guildConfig): string[] {
