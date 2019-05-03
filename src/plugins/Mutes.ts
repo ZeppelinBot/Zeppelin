@@ -463,7 +463,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       await member.addRole(muteRole);
 
       this.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: stripObjectToScalars(member, ["user", "roles"]),
       });
     }
   }
@@ -578,7 +578,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
       this.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
         member: member
-          ? stripObjectToScalars(member, ["user"])
+          ? stripObjectToScalars(member, ["user", "roles"])
           : { id: mute.user_id, user: new UnknownUser({ id: mute.user_id }) },
       });
     }

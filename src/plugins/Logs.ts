@@ -173,10 +173,10 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
         ...data,
         userMention: async userOrMember => {
           if (!userOrMember) return "";
-          
+
           let user;
           let member;
-          
+
           if (userOrMember.user) {
             member = userOrMember;
             user = member.user;
@@ -185,7 +185,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
             member = this.guild.members.get(user.id) || { id: user.id, user };
           }
 
-          const memberConfig = member.guild && this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
+          const memberConfig = this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
 
           if (memberConfig.ping_user) {
             // Ping/mention the user
@@ -247,7 +247,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     });
 
     this.guildLogs.log(LogType.MEMBER_JOIN, {
-      member: stripObjectToScalars(member, ["user"]),
+      member: stripObjectToScalars(member, ["user", "roles"]),
       new: member.createdAt >= newThreshold ? " :new:" : "",
       account_age: accountAge,
     });
@@ -273,7 +273,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
       }
 
       this.guildLogs.log(LogType.MEMBER_JOIN_WITH_PRIOR_RECORDS, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: stripObjectToScalars(member, ["user", "roles"]),
         recentCaseSummary,
       });
     }
@@ -282,7 +282,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   @d.event("guildMemberRemove")
   onMemberLeave(_, member) {
     this.guildLogs.log(LogType.MEMBER_LEAVE, {
-      member: stripObjectToScalars(member, ["user"]),
+      member: stripObjectToScalars(member, ["user", "roles"]),
     });
   }
 
@@ -404,7 +404,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
       const member = (await this.getMember(user.id)) || { id: user.id, user };
       this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: stripObjectToScalars(member, ["user", "roles"]),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,
         newName: `${user.username}#${user.discriminator}`,
       });
@@ -542,7 +542,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   @d.event("voiceChannelJoin")
   onVoiceChannelJoin(member: Member, channel: Channel) {
     this.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
-      member: stripObjectToScalars(member, ["user"]),
+      member: stripObjectToScalars(member, ["user", "roles"]),
       channel: stripObjectToScalars(channel),
     });
   }
@@ -550,7 +550,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   @d.event("voiceChannelLeave")
   onVoiceChannelLeave(member: Member, channel: Channel) {
     this.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
-      member: stripObjectToScalars(member, ["user"]),
+      member: stripObjectToScalars(member, ["user", "roles"]),
       channel: stripObjectToScalars(channel),
     });
   }
@@ -558,7 +558,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   @d.event("voiceChannelSwitch")
   onVoiceChannelSwitch(member: Member, newChannel: Channel, oldChannel: Channel) {
     this.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
-      member: stripObjectToScalars(member, ["user"]),
+      member: stripObjectToScalars(member, ["user", "roles"]),
       oldChannel: stripObjectToScalars(oldChannel),
       newChannel: stripObjectToScalars(newChannel),
     });

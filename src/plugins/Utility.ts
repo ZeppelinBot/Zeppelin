@@ -802,7 +802,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
     this.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
       mod: stripObjectToScalars(msg.author),
-      member: stripObjectToScalars(args.member, ["user"]),
+      member: stripObjectToScalars(args.member, ["user", "roles"]),
       oldChannel: stripObjectToScalars(oldVoiceChannel),
       newChannel: stripObjectToScalars(channel),
     });

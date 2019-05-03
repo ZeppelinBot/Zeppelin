@@ -324,7 +324,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
 
           // Create a log entry
           this.logs.log(LogType.MESSAGE_SPAM_DETECTED, {
-            member: stripObjectToScalars(member, ["user"]),
+            member: stripObjectToScalars(member, ["user", "roles"]),
             channel: stripObjectToScalars(channel),
             description,
             limit: spamConfig.count,
@@ -383,7 +383,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
         this.clearRecentUserActions(RecentActionType.VoiceChannelMove, userId, actionGroupId);
 
         this.logs.log(LogType.OTHER_SPAM_DETECTED, {
-          member: stripObjectToScalars(member, ["user"]),
+          member: stripObjectToScalars(member, ["user", "roles"]),
           description,
           limit: spamConfig.count,
           interval: spamConfig.interval,

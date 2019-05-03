@@ -97,7 +97,7 @@ export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
       await this.persistedData.clear(member.id);
 
       this.logs.log(LogType.MEMBER_RESTORE, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: stripObjectToScalars(member, ["user", "roles"]),
         restoredData: restoredData.join(", "),
       });
     }
