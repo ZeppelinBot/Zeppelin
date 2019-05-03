@@ -9,6 +9,14 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
 
     const migratedUsernames = new Set();
 
+    await new Promise(async resolve => {
+      const stream = await queryRunner.stream("SELECT CONCAT(user_id, '-', username) AS `key` FROM username_history");
+      stream.on("result", row => {
+        migratedUsernames.add(row.key);
+      });
+      stream.on("end", resolve);
+    });
+
     const migrateNextBatch = (): Promise<{ finished: boolean; migrated?: number }> => {
       return new Promise(async resolve => {
         const toInsert = [];
@@ -19,10 +27,12 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
         );
         stream.on("result", row => {
           const key = `${row.user_id}-${row.value}`;
-          if (migratedUsernames.has(key)) return;
-          migratedUsernames.add(key);
 
-          toInsert.push([row.user_id, row.value, row.timestamp]);
+          if (!migratedUsernames.has(key)) {
+            migratedUsernames.add(key);
+            toInsert.push([row.user_id, row.value, row.timestamp]);
+          }
+
           toDelete.push(row.id);
         });
         stream.on("end", async () => {
