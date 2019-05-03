@@ -1,18 +1,14 @@
 import { Entity, Column, PrimaryColumn } from "typeorm";
 
-@Entity("name_history")
-export class NameHistoryEntry {
+@Entity("username_history")
+export class UsernameHistoryEntry {
   @Column()
   @PrimaryColumn()
   id: string;
 
-  @Column() guild_id: string;
-
   @Column() user_id: string;
 
-  @Column() type: number;
-
-  @Column() value: string;
+  @Column() username: string;
 
   @Column() timestamp: string;
 }

@@ -397,14 +397,13 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
     }
   }
 
-  @d.event("userUpdate")
+  @d.event("userUpdate", null, false)
   async onUserUpdate(user: User, oldUser: User) {
     if (!oldUser) return;
 
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
-      const member = (await this.getMember(user.id)) || { id: user.id, user };
       this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        user: stripObjectToScalars(user),
         oldName: `${oldUser.username}#${oldUser.discriminator}`,
         newName: `${user.username}#${user.discriminator}`,
       });

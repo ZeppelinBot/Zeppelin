@@ -1,9 +1,9 @@
 import { decorators as d, IPluginOptions } from "knub";
-import { GuildNameHistory } from "../data/GuildNameHistory";
-import { Member, Message, User } from "eris";
-import { NameHistoryEntryTypes } from "../data/NameHistoryEntryTypes";
-import { createChunkedMessage, errorMessage, trimLines } from "../utils";
+import { GuildNicknameHistory, MAX_NICKNAME_ENTRIES_PER_USER } from "../data/GuildNicknameHistory";
+import { Member, Message } from "eris";
+import { createChunkedMessage, disableCodeBlocks } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { MAX_USERNAME_ENTRIES_PER_USER, UsernameHistory } from "../data/UsernameHistory";
 
 interface INameHistoryPluginConfig {
   can_view: boolean;
@@ -12,7 +12,8 @@ interface INameHistoryPluginConfig {
 export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> {
   public static pluginName = "name_history";
 
-  protected nameHistory: GuildNameHistory;
+  protected nicknameHistory: GuildNicknameHistory;
+  protected usernameHistory: UsernameHistory;
 
   getDefaultOptions(): IPluginOptions<INameHistoryPluginConfig> {
     return {
@@ -32,57 +33,45 @@ export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> 
   }
 
   onLoad() {
-    this.nameHistory = GuildNameHistory.getInstance(this.guildId);
+    this.nicknameHistory = GuildNicknameHistory.getInstance(this.guildId);
+    this.usernameHistory = UsernameHistory.getInstance(null);
   }
 
   @d.command("names", "<userId:userid>")
   @d.permission("can_view")
   async namesCmd(msg: Message, args: { userId: string }) {
-    const names = await this.nameHistory.getByUserId(args.userId);
-    if (!names) {
-      msg.channel.createMessage(errorMessage("No name history found for that user!"));
-      return;
+    const nicknames = await this.nicknameHistory.getByUserId(args.userId);
+    const usernames = await this.usernameHistory.getByUserId(args.userId);
+
+    if (nicknames.length === 0 && usernames.length === 0) {
+      return this.sendErrorMessage(msg.channel, "No name history found");
     }
 
-    const rows = names.map(entry => {
-      const type = entry.type === NameHistoryEntryTypes.Username ? "Username" : "Nickname";
-      const value = entry.value || "<none>";
-      return `\`[${entry.timestamp}]\` ${type} **${value}**`;
-    });
+    const nicknameRows = nicknames.map(
+      r => `\`[${r.timestamp}]\` ${r.nickname ? `**${disableCodeBlocks(r.nickname)}**` : "*None*"}`,
+    );
+    const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
     const user = this.bot.users.get(args.userId);
     const currentUsername = user ? `${user.username}#${user.discriminator}` : args.userId;
 
-    const message = trimLines(`
-      Name history for **${currentUsername}**:
-      
-      ${rows.join("\n")}
-    `);
+    let message = `Name history for **${currentUsername}**:`;
+    if (nicknameRows.length) {
+      message += `\n\n__Last ${MAX_NICKNAME_ENTRIES_PER_USER} nicknames:__\n${nicknameRows.join("\n")}`;
+    }
+    if (usernameRows.length) {
+      message += `\n\n__Last ${MAX_USERNAME_ENTRIES_PER_USER} usernames:__\n${usernameRows.join("\n")}`;
+    }
+
     createChunkedMessage(msg.channel, message);
   }
 
-  // @d.event("userUpdate", null, false)
-  // async onUserUpdate(user: User, oldUser: { username: string; discriminator: string; avatar: string }) {
-  //   if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
-  //     const newUsername = `${user.username}#${user.discriminator}`;
-  //     await this.nameHistory.addEntry(user.id, NameHistoryEntryTypes.Username, newUsername);
-  //   }
-  // }
-
   @d.event("guildMemberUpdate")
   async onGuildMemberUpdate(_, member: Member) {
-    const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Nickname);
-    if (!latestEntry || latestEntry.value !== member.nick) {
-      await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Nickname, member.nick);
+    const latestEntry = await this.nicknameHistory.getLastEntry(member.id);
+    if (!latestEntry || latestEntry.nickname != member.nick) {
+      // tslint:disable-line
+      await this.nicknameHistory.addEntry(member.id, member.nick);
     }
   }
-
-  // @d.event("guildMemberAdd")
-  // async onGuildMemberAdd(_, member: Member) {
-  //   const latestEntry = await this.nameHistory.getLastEntryByType(member.id, NameHistoryEntryTypes.Username);
-  //   const username = `${member.user.username}#${member.user.discriminator}`;
-  //   if (!latestEntry || latestEntry.value !== username) {
-  //     await this.nameHistory.addEntry(member.id, NameHistoryEntryTypes.Username, username);
-  //   }
-  // }
 }
