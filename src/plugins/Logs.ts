@@ -401,6 +401,8 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   async onUserUpdate(user: User, oldUser: User) {
     if (!oldUser) return;
 
+    if (!this.guild.members.has(user.id)) return;
+
     if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
       this.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
         user: stripObjectToScalars(user),
