@@ -217,6 +217,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<ISelfGrantableRoles
   @d.command("role help", [], {
     aliases: ["role"],
   })
+  @d.permission("can_use")
   @d.cooldown(5000, "can_ignore_cooldown")
   async roleHelpCmd(msg: Message) {
     const channelGrantableRoles = await this.selfGrantableRoles.getForChannel(msg.channel.id);
