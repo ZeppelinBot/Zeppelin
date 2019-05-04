@@ -184,6 +184,12 @@ connect().then(async conn => {
         return yaml.safeLoad(yamlString);
       },
 
+      logFn: (level, msg) => {
+        if (level === "debug") return;
+        // tslint:disable-next-line
+        console.log(`[${level.toUpperCase()}] ${msg}`);
+      },
+
       performanceDebug: {
         enabled: false,
         size: 30,
