@@ -12,6 +12,7 @@ export class UsernameSaver extends GlobalPlugin {
   }
 
   protected async updateUsername(user: User) {
+    if (!user) return;
     const newUsername = `${user.username}#${user.discriminator}`;
     const latestEntry = await this.usernameHistory.getLastEntry(user.id);
     if (!latestEntry || newUsername !== latestEntry.username) {
