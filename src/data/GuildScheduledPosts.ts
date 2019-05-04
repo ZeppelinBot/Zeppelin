@@ -1,0 +1,41 @@
+import { BaseRepository } from "./BaseRepository";
+import { getRepository, Repository } from "typeorm";
+import { ScheduledPost } from "./entities/ScheduledPost";
+
+export class GuildScheduledPosts extends BaseRepository {
+  private scheduledPosts: Repository<ScheduledPost>;
+
+  constructor(guildId) {
+    super(guildId);
+    this.scheduledPosts = getRepository(ScheduledPost);
+  }
+
+  all(): Promise<ScheduledPost[]> {
+    return this.scheduledPosts
+      .createQueryBuilder()
+      .where("guild_id = :guildId", { guildId: this.guildId })
+      .getMany();
+  }
+
+  getDueScheduledPosts(): Promise<ScheduledPost[]> {
+    return this.scheduledPosts
+      .createQueryBuilder()
+      .where("guild_id = :guildId", { guildId: this.guildId })
+      .andWhere("post_at <= NOW()")
+      .getMany();
+  }
+
+  async delete(id) {
+    await this.scheduledPosts.delete({
+      guild_id: this.guildId,
+      id,
+    });
+  }
+
+  async create(data: Partial<ScheduledPost>) {
+    await this.scheduledPosts.insert({
+      ...data,
+      guild_id: this.guildId,
+    });
+  }
+}

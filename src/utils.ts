@@ -1,4 +1,15 @@
-import { Client, Emoji, Guild, GuildAuditLogEntry, Member, TextableChannel, TextChannel, User } from "eris";
+import {
+  Client,
+  EmbedOptions,
+  Emoji,
+  Guild,
+  GuildAuditLogEntry,
+  Member,
+  MessageContent,
+  TextableChannel,
+  TextChannel,
+  User,
+} from "eris";
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -613,3 +624,11 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
 
   return member;
 }
+
+export const MS = 1;
+export const SECONDS = 1000 * MS;
+export const MINUTES = 60 * SECONDS;
+export const HOURS = 60 * MINUTES;
+export const DAYS = 24 * HOURS;
+
+export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
