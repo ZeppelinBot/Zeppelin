@@ -184,12 +184,6 @@ connect().then(async conn => {
         return yaml.safeLoad(yamlString);
       },
 
-      logFn: (level, msg) => {
-        if (level === "debug") return;
-        const ts = moment().format("YYYY-MM-DD HH:mm:ss");
-        console.log(`[${ts}] [${level.toUpperCase()}] ${msg}`);
-      },
-
       performanceDebug: {
         enabled: true,
         size: 30,
