@@ -185,7 +185,7 @@ connect().then(async conn => {
       },
 
       performanceDebug: {
-        enabled: true,
+        enabled: false,
         size: 30,
         threshold: 200,
       },
