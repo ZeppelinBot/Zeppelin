@@ -169,7 +169,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
     let formatted;
     try {
-      formatted = await renderTemplate(format, {
+      const values = {
         ...data,
         userMention: async userOrMember => {
           if (!userOrMember) return "";
@@ -217,7 +217,16 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
           return result;
         },
-      });
+      };
+
+      if (type === LogType.BOT_ALERT) {
+        const valuesWithoutTmplEval = { ...values };
+        values.tmplEval = str => {
+          return renderTemplate(str, valuesWithoutTmplEval);
+        };
+      }
+
+      formatted = await renderTemplate(format, values);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.error(`Error when parsing template:\nError: ${e.message}\nTemplate: ${format}`);

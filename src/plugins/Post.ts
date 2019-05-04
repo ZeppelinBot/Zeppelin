@@ -152,16 +152,26 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
     for (const post of duePosts) {
       const channel = this.guild.channels.get(post.channel_id);
       if (channel instanceof TextChannel) {
+        const [username, discriminator] = post.author_name.split("#");
+        const author: Partial<User> = this.bot.users.get(post.author_id) || {
+          id: post.author_id,
+          username,
+          discriminator,
+        };
+
         try {
           const postedMessage = await this.postMessage(channel, post.content, post.attachments, post.enable_mentions);
-
-          const [username, discriminator] = post.author_name.split("#");
           this.logs.log(LogType.POSTED_SCHEDULED_MESSAGE, {
-            author: ({ id: post.author_id, username, discriminator } as any) as Partial<User>,
+            author: stripObjectToScalars(author),
             channel: stripObjectToScalars(channel),
             messageId: postedMessage.id,
           });
         } catch (e) {
+          this.logs.log(LogType.BOT_ALERT, {
+            body: `Failed to post scheduled message by {userMention(author)} to {channelMention(channel)}`,
+            channel: stripObjectToScalars(channel),
+            author: stripObjectToScalars(author),
+          });
           logger.warn(
             `Failed to post scheduled message to #${channel.name} (${channel.id}) on ${this.guild.name} (${
               this.guildId

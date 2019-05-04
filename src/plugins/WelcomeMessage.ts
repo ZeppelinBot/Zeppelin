@@ -3,6 +3,8 @@ import { decorators as d, IPluginOptions } from "knub";
 import { Member, TextChannel } from "eris";
 import { renderTemplate } from "../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../utils";
+import { LogType } from "../data/LogType";
+import { GuildLogs } from "../data/GuildLogs";
 
 interface IWelcomeMessageConfig {
   send_dm: boolean;
@@ -13,6 +15,8 @@ interface IWelcomeMessageConfig {
 export class WelcomeMessagePlugin extends ZeppelinPlugin<IWelcomeMessageConfig> {
   public static pluginName = "welcome_message";
 
+  protected logs: GuildLogs;
+
   protected getDefaultOptions(): IPluginOptions<IWelcomeMessageConfig> {
     return {
       config: {
@@ -21,6 +25,10 @@ export class WelcomeMessagePlugin extends ZeppelinPlugin<IWelcomeMessageConfig> 
         message: null,
       },
     };
+  }
+
+  protected onLoad() {
+    this.logs = new GuildLogs(this.guildId);
   }
 
   @d.event("guildMemberAdd")
@@ -39,7 +47,12 @@ export class WelcomeMessagePlugin extends ZeppelinPlugin<IWelcomeMessageConfig> 
 
       try {
         createChunkedMessage(dmChannel, formatted);
-      } catch (e) {} // tslint:disable-line
+      } catch (e) {
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Failed send a welcome DM to {userMention(member)}`,
+          member: stripObjectToScalars(member),
+        });
+      }
     }
 
     if (config.send_to_channel) {
@@ -48,7 +61,13 @@ export class WelcomeMessagePlugin extends ZeppelinPlugin<IWelcomeMessageConfig> 
 
       try {
         createChunkedMessage(channel, formatted);
-      } catch (e) {} // tslint:disable-line
+      } catch (e) {
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Failed send a welcome message for {userMention(member)} to {channelMention(channel)}`,
+          member: stripObjectToScalars(member),
+          channel: stripObjectToScalars(channel),
+        });
+      }
     }
   }
 }

@@ -1,12 +1,22 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildChannel, Message, TextChannel, Constants as ErisConstants, User } from "eris";
-import { convertDelayStringToMS, createChunkedMessage, errorMessage, noop, successMessage } from "../utils";
+import {
+  convertDelayStringToMS,
+  createChunkedMessage,
+  errorMessage,
+  noop,
+  stripObjectToScalars,
+  successMessage,
+  UnknownUser,
+} from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import { GuildLogs } from "../data/GuildLogs";
+import { LogType } from "../data/LogType";
 
 const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
@@ -24,6 +34,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
   protected slowmodes: GuildSlowmodes;
   protected savedMessages: GuildSavedMessages;
+  protected logs: GuildLogs;
   protected clearInterval;
 
   private onMessageCreateFn;
@@ -52,6 +63,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   onLoad() {
     this.slowmodes = GuildSlowmodes.getInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.logs = new GuildLogs(this.guildId);
     this.clearInterval = setInterval(() => this.clearExpiredSlowmodes(), BOT_SLOWMODE_CLEAR_INTERVAL);
 
     this.onMessageCreateFn = this.onMessageCreate.bind(this);
@@ -78,13 +90,25 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     try {
       await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
     } catch (e) {
+      const user = this.bot.users.get(userId) || new UnknownUser({ id: userId });
+
       if (e instanceof DiscordRESTError && e.code === 50013) {
         logger.warn(
           `Missing permissions to apply bot slowmode to user ${userId} on channel ${channel.name} (${
             channel.id
           }) on server ${this.guild.name} (${this.guildId})`,
         );
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Missing permissions to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
+          user: stripObjectToScalars(user),
+          channel: stripObjectToScalars(channel),
+        });
       } else {
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Failed to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
+          user: stripObjectToScalars(user),
+          channel: stripObjectToScalars(channel),
+        });
         throw e;
       }
     }
@@ -190,11 +214,18 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
       return;
     }
 
-    await this.clearBotSlowmodeFromUserId(args.channel, args.user.id);
-    msg.channel.createMessage(
-      successMessage(
-        `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
-      ),
+    try {
+      await this.clearBotSlowmodeFromUserId(args.channel, args.user.id);
+    } catch (e) {
+      return this.sendErrorMessage(
+        msg.channel,
+        `Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
+      );
+    }
+
+    this.sendSuccessMessage(
+      msg.channel,
+      `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
     );
   }
 
