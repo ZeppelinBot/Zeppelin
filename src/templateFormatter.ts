@@ -1,7 +1,7 @@
 import has from "lodash.has";
 import at from "lodash.at";
 
-const TEMPLATE_CACHE_SIZE = 100;
+const TEMPLATE_CACHE_SIZE = 200;
 const templateCache: Map<string, ParsedTemplate> = new Map();
 
 export class TemplateParseError extends Error {}
