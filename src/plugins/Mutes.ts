@@ -571,7 +571,12 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       if (member) {
         try {
           await member.removeRole(this.getConfig().mute_role);
-        } catch (e) {} // tslint:disable-line
+        } catch (e) {
+          this.serverLogs.log(LogType.BOT_ALERT, {
+            body: `Failed to remove mute role from {userMention(member)}`,
+            member: stripObjectToScalars(member),
+          });
+        }
       }
 
       await this.mutes.clear(mute.user_id);

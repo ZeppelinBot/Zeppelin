@@ -7,6 +7,8 @@ import { CaseTypeColors } from "../data/CaseTypeColors";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildArchives } from "../data/GuildArchives";
 import { IPluginOptions } from "knub";
+import { GuildLogs } from "../data/GuildLogs";
+import { LogType } from "../data/LogType";
 
 interface ICasesPluginConfig {
   log_automatic_actions: boolean;
@@ -43,6 +45,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
 
   protected cases: GuildCases;
   protected archives: GuildArchives;
+  protected logs: GuildLogs;
 
   getDefaultOptions(): IPluginOptions<ICasesPluginConfig> {
     return {
@@ -56,11 +59,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   onLoad() {
     this.cases = GuildCases.getInstance(this.guildId);
     this.archives = GuildArchives.getInstance(this.guildId);
-
-    // this.actions.register("postCase", async args => {
-    //   const embed = await this.getCaseEmbed(args.caseId);
-    //   return (args.channel as TextableChannel).createMessage(embed);
-    // });
+    this.logs = new GuildLogs(this.guildId);
   }
 
   protected resolveCaseId(caseOrCaseId: Case | number): number {
@@ -124,9 +123,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
       (!args.automatic || config.log_automatic_actions) &&
       args.postInCaseLogOverride !== false
     ) {
-      try {
-        await this.postCaseToCaseLogChannel(createdCase);
-      } catch (e) {} // tslint:disable-line
+      await this.postCaseToCaseLogChannel(createdCase);
     }
 
     return createdCase;
@@ -173,9 +170,7 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
     }
 
     if ((!args.automatic || this.getConfig().log_automatic_actions) && args.postInCaseLogOverride !== false) {
-      try {
-        await this.postCaseToCaseLogChannel(theCase.id);
-      } catch (e) {} // tslint:disable-line
+      await this.postCaseToCaseLogChannel(theCase.id);
     }
   }
 
@@ -256,9 +251,19 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
    * A helper to post a case embed to the case log channel
    */
   public async postCaseToCaseLogChannel(caseOrCaseId: Case | number): Promise<Message> {
+    const theCase = await this.cases.find(this.resolveCaseId(caseOrCaseId));
+    if (!theCase) return;
+
     const caseEmbed = await this.getCaseEmbed(caseOrCaseId);
     if (!caseEmbed) return;
 
-    return this.postToCaseLogChannel(caseEmbed);
+    try {
+      return this.postToCaseLogChannel(caseEmbed);
+    } catch (e) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Failed to post case #${theCase.case_number} to the case log channel`,
+      });
+      return null;
+    }
   }
 }
