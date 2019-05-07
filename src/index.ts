@@ -12,6 +12,7 @@ import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disab
 
 require("dotenv").config();
 
+// Error handling
 let recentPluginErrors = 0;
 const RECENT_PLUGIN_ERROR_EXIT_THRESHOLD = 5;
 
@@ -22,6 +23,7 @@ setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 25
 setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 2500);
 
 function errorHandler(err) {
+  // tslint:disable:no-console
   console.error(err);
 
   if (err instanceof PluginError) {
@@ -31,7 +33,7 @@ function errorHandler(err) {
       process.exit(1);
     }
   } else if (err instanceof DiscordRESTError || err instanceof DiscordHTTPError) {
-    // Discord API errors, usually safe to continue (rate limits etc. are handled elsewhere)
+    // Discord API errors, usually safe to just log instead of crash
     // We still bail if we get a ton of them in a short amount of time
     if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
       console.error(`Exiting after ${RECENT_DISCORD_ERROR_EXIT_THRESHOLD} API errors`);
@@ -41,6 +43,7 @@ function errorHandler(err) {
     // On other errors, crash immediately
     process.exit(1);
   }
+  // tslint:enable:no-console
 }
 
 process.on("unhandledRejection", errorHandler);
@@ -56,7 +59,8 @@ for (const [i, part] of actualVersionParts.entries()) {
   throw new SimpleError(`Unsupported Node.js version! Must be at least ${REQUIRED_NODE_VERSION}`);
 }
 
-// Always use UTC
+// Always use UTC internally
+// This is also enforced for the database in data/db.ts
 import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
@@ -143,6 +147,12 @@ connect().then(async conn => {
     globalPlugins: [BotControlPlugin, LogServerPlugin, UsernameSaver],
 
     options: {
+      /**
+       * Plugins are enabled if they...
+       * - are base plugins, i.e. always enabled, or
+       * - are dependencies of other enabled plugins, or
+       * - are explicitly enabled in the guild config
+       */
       getEnabledPlugins(guildId, guildConfig): string[] {
         const configuredPlugins = guildConfig.plugins || {};
         const pluginNames: string[] = Array.from(this.plugins.keys());
@@ -170,6 +180,10 @@ connect().then(async conn => {
         return Array.from(finalEnabledPlugins.values());
       },
 
+      /**
+       * Loads the requested config file from the config dir
+       * TODO: Move to the database
+       */
       async getConfig(id) {
         const configFile = id ? `${id}.yml` : "global.yml";
         const configPath = path.join("config", configFile);
