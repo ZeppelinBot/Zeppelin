@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Load nvm
+. ~/.nvm/nvm.sh
+
+# Run update
 nvm use
 git pull
 npm ci
