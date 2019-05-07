@@ -1,4 +1,4 @@
-import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition } from "knub";
+import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition, waitForReaction } from "knub";
 import {
   CategoryChannel,
   Channel,
@@ -19,9 +19,11 @@ import {
   embedPadding,
   errorMessage,
   isSnowflake,
+  MINUTES,
   multiSorter,
   noop,
   resolveMember,
+  SECONDS,
   simpleClosestStringMatch,
   sleep,
   sorter,
@@ -46,12 +48,20 @@ import LCL from "last-commit-log";
 
 const { performance } = require("perf_hooks");
 
-const MAX_SEARCH_RESULTS = 15;
+const SEARCH_RESULTS_PER_PAGE = 15;
 const MAX_CLEAN_COUNT = 50;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
 
 const activeReloads: Map<string, TextChannel> = new Map();
+
+type MemberSearchParams = {
+  query?: string;
+  role?: string;
+  voice?: boolean;
+  sort?: string;
+  "case-sensitive"?: boolean;
+};
 
 interface IUtilityPluginConfig {
   can_roles: boolean;
@@ -252,37 +262,11 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
 
-  @d.command("search", "[query:string$]", {
-    aliases: ["s"],
-    options: [
-      {
-        name: "page",
-        type: "number",
-      },
-      {
-        name: "role",
-        type: "string",
-      },
-      {
-        name: "voice",
-        type: "bool",
-      },
-      {
-        name: "sort",
-        type: "string",
-      },
-      {
-        name: "case-sensitive",
-        type: "boolean",
-        shortcut: "cs",
-      },
-    ],
-  })
-  @d.permission("can_search")
-  async searchCmd(
-    msg: Message,
-    args: { query?: string; role?: string; page?: number; voice?: boolean; sort?: string; "case-sensitive"?: boolean },
-  ) {
+  protected async performMemberSearch(
+    args: MemberSearchParams,
+    page = 1,
+    perPage = SEARCH_RESULTS_PER_PAGE,
+  ): Promise<{ results: Member[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
     this.refreshMembersIfNeeded();
 
     let matchingMembers = Array.from(this.guild.members.values());
@@ -319,52 +303,197 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
       });
     }
 
-    if (matchingMembers.length > 0) {
-      let header;
-      const resultText = matchingMembers.length === 1 ? "result" : "results";
+    const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+    const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
-      const paginated = matchingMembers.length > MAX_SEARCH_RESULTS;
+    if (sortBy === "id") {
+      matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
+    } else {
+      matchingMembers.sort(
+        multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
+      );
+    }
 
-      const inputPage = args.page || 1;
-      const lastPage = Math.ceil(matchingMembers.length / MAX_SEARCH_RESULTS);
-      const page = Math.min(lastPage, Math.max(1, inputPage));
+    const lastPage = Math.ceil(matchingMembers.length / SEARCH_RESULTS_PER_PAGE);
+    page = Math.min(lastPage, Math.max(1, page));
 
-      const from = (page - 1) * MAX_SEARCH_RESULTS;
-      const to = Math.min(from + MAX_SEARCH_RESULTS, matchingMembers.length);
+    const from = (page - 1) * SEARCH_RESULTS_PER_PAGE;
+    const to = Math.min(from + SEARCH_RESULTS_PER_PAGE, matchingMembers.length);
 
-      if (paginated) {
-        header = `Found ${matchingMembers.length} ${resultText} (showing ${from + 1}-${to})`;
-      } else {
-        header = `Found ${matchingMembers.length} ${resultText}`;
-      }
+    const pageMembers = matchingMembers.slice(from, to);
 
-      const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
-      const realSortDir = sortDir === "-" ? "DESC" : "ASC";
+    return {
+      results: pageMembers,
+      totalResults: matchingMembers.length,
+      page,
+      lastPage,
+      from: from + 1,
+      to,
+    };
+  }
 
-      if (sortBy === "id") {
-        matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
-      } else {
-        matchingMembers.sort(
-          multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
-        );
-      }
-
-      const pageMembers = matchingMembers.slice(from, to);
-
-      const longestId = pageMembers.reduce((longest, member) => Math.max(longest, member.id.length), 0);
-      const lines = pageMembers.map(member => {
+  @d.command("search", "[query:string$]", {
+    aliases: ["s"],
+    options: [
+      {
+        name: "page",
+        type: "number",
+      },
+      {
+        name: "role",
+        type: "string",
+      },
+      {
+        name: "voice",
+        type: "bool",
+      },
+      {
+        name: "sort",
+        type: "string",
+      },
+      {
+        name: "case-sensitive",
+        type: "boolean",
+        shortcut: "cs",
+      },
+      {
+        name: "export",
+        type: "boolean",
+        shortcut: "e",
+      },
+    ],
+  })
+  @d.permission("can_search")
+  async searchCmd(
+    msg: Message,
+    args: {
+      query?: string;
+      role?: string;
+      page?: number;
+      voice?: boolean;
+      sort?: string;
+      "case-sensitive"?: boolean;
+      export?: boolean;
+    },
+  ) {
+    const formatSearchResultLines = (members: Member[]) => {
+      const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
+      const lines = members.map(member => {
         const paddedId = member.id.padEnd(longestId, " ");
         let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
         if (member.nick) line += ` (${member.nick})`;
         return line;
       });
+      return lines;
+    };
 
-      const footer = paginated ? "Use --page=n to browse results" : "";
+    // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
+    // Just get the results and dump them in an archive.
+    if (args.export) {
+      const results = await this.performMemberSearch(args, 1, Infinity);
+      if (results.totalResults === 0) {
+        return this.sendErrorMessage(msg.channel, "No results found");
+      }
 
-      msg.channel.createMessage(`${header}\n\`\`\`js\n${lines.join("\n")}\`\`\`${footer}`);
-    } else {
-      msg.channel.createMessage(errorMessage("No results found"));
+      const resultLines = formatSearchResultLines(results.results);
+      const archiveId = await this.archives.create(
+        trimLines(`
+        Search results (total ${results.totalResults}):
+
+        ${resultLines.join("\n")}
+      `),
+        moment().add(1, "hour"),
+      );
+      const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+      msg.channel.createMessage(`Exported search results: ${url}`);
+
+      return;
     }
+
+    // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
+    let originalSearchMsg: Message = null;
+    let searching = false;
+    let currentPage = args.page || 1;
+    let hasReactions = false;
+    let clearReactionsFn = null;
+    let clearReactionsTimeout = null;
+
+    const loadSearchPage = async page => {
+      if (searching) return;
+      searching = true;
+
+      // The initial message is created here, as well as edited to say "Searching..." on subsequent requests
+      // We don't "await" this so we can start loading the search results immediately instead of after the message has been created/edited
+      let searchMsgPromise: Promise<Message>;
+      if (originalSearchMsg) {
+        searchMsgPromise = originalSearchMsg.edit("Searching...");
+      } else {
+        searchMsgPromise = msg.channel.createMessage("Searching...");
+        searchMsgPromise.then(m => (originalSearchMsg = m));
+      }
+
+      const searchResult = await this.performMemberSearch(args, page, SEARCH_RESULTS_PER_PAGE);
+      if (searchResult.totalResults === 0) {
+        return this.sendErrorMessage(msg.channel, "No results found");
+      }
+
+      const resultWord = searchResult.totalResults === 1 ? "matching member" : "matching members";
+      const headerText =
+        searchResult.totalResults > SEARCH_RESULTS_PER_PAGE
+          ? trimLines(`
+            **Page ${searchResult.page}** (${searchResult.from}-${searchResult.to}) (total ${searchResult.totalResults})
+          `)
+          : `Found ${searchResult.totalResults} ${resultWord}`;
+      const lines = formatSearchResultLines(searchResult.results);
+      const result = trimLines(`
+        ${headerText}
+        \`\`\`js
+        ${lines.join("\n")}
+        \`\`\`
+      `);
+
+      const searchMsg = await searchMsgPromise;
+      searchMsg.edit(result);
+
+      // Set up pagination reactions if needed. The reactions are cleared after a timeout.
+      if (searchResult.totalResults > SEARCH_RESULTS_PER_PAGE) {
+        if (!hasReactions) {
+          hasReactions = true;
+          searchMsg.addReaction("⬅");
+          searchMsg.addReaction("➡");
+          searchMsg.addReaction("🔄");
+
+          const removeListenerFn = this.on("messageReactionAdd", (rMsg: Message, emoji, userId) => {
+            if (userId !== msg.author.id) return;
+            if (!["⬅", "➡", "🔄"].includes(emoji.name)) return;
+
+            if (emoji.name === "⬅" && currentPage > 1) {
+              loadSearchPage(currentPage - 1);
+            } else if (emoji.name === "➡" && currentPage < searchResult.lastPage) {
+              loadSearchPage(currentPage + 1);
+            } else if (emoji.name === "🔄") {
+              loadSearchPage(currentPage);
+            }
+
+            rMsg.removeReaction(emoji.name, userId);
+          });
+
+          clearReactionsFn = async () => {
+            searchMsg.removeReactions();
+            removeListenerFn();
+          };
+        }
+
+        clearTimeout(clearReactionsTimeout);
+        clearReactionsTimeout = setTimeout(clearReactionsFn, 5 * MINUTES);
+      }
+
+      currentPage = searchResult.page;
+      searching = false;
+    };
+
+    loadSearchPage(currentPage);
   }
 
   async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
