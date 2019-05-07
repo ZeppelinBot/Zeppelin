@@ -267,6 +267,36 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     }
   }
 
+  @d.command("slowmode", "[channel:channel]")
+  @d.permission("can_manage")
+  async showSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
+    const channel = args.channel || msg.channel;
+
+    if (channel == null || !(channel instanceof TextChannel)) {
+      msg.channel.createMessage(errorMessage("Channel must be a text channel"));
+      return;
+    }
+
+    let currentSlowmode = channel.rateLimitPerUser;
+    let isNative = true;
+
+    if (!currentSlowmode) {
+      const botSlowmode = await this.slowmodes.getChannelSlowmode(channel.id);
+      if (botSlowmode) {
+        currentSlowmode = botSlowmode.slowmode_seconds;
+        isNative = false;
+      }
+    }
+
+    if (currentSlowmode) {
+      const humanized = humanizeDuration(channel.rateLimitPerUser * 1000);
+      const slowmodeType = isNative ? "native" : "bot-maintained";
+      msg.channel.createMessage(`The current slowmode of <#${channel.id}> is **${humanized}** (${slowmodeType})`);
+    } else {
+      msg.channel.createMessage("Channel is not on slowmode");
+    }
+  }
+
   /**
    * COMMAND: Set slowmode for the specified channel
    */
@@ -304,9 +334,13 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
       }
 
       // Set slowmode
-      channel.edit({
-        rateLimitPerUser: seconds,
-      });
+      try {
+        await channel.edit({
+          rateLimitPerUser: seconds,
+        });
+      } catch (e) {
+        return this.sendErrorMessage(msg.channel, "Failed to set native slowmode (check permissions)");
+      }
     } else {
       // Bot-maintained slowmode
 
@@ -322,8 +356,9 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
     const humanizedSlowmodeTime = humanizeDuration(seconds * 1000);
     const slowmodeType = useNativeSlowmode ? "native slowmode" : "bot-maintained slowmode";
-    msg.channel.createMessage(
-      successMessage(`Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`),
+    this.sendSuccessMessage(
+      msg.channel,
+      `Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`,
     );
   }
 
