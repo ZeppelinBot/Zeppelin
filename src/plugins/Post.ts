@@ -40,12 +40,18 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
   protected scheduledPosts: GuildScheduledPosts;
   protected logs: GuildLogs;
 
+  private scheduledPostLoopTimeout;
+
   onLoad() {
     this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
     this.scheduledPosts = GuildScheduledPosts.getInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
 
     this.scheduledPostLoop();
+  }
+
+  onUnload() {
+    clearTimeout(this.scheduledPostLoopTimeout);
   }
 
   getDefaultOptions(): IPluginOptions<IPostPluginConfig> {
@@ -183,7 +189,7 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
       await this.scheduledPosts.delete(post.id);
     }
 
-    setTimeout(() => this.scheduledPostLoop(), SCHEDULED_POST_CHECK_INTERVAL);
+    this.scheduledPostLoopTimeout = setTimeout(() => this.scheduledPostLoop(), SCHEDULED_POST_CHECK_INTERVAL);
   }
 
   /**
