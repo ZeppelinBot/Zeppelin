@@ -120,18 +120,16 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
    * Clears bot-maintained slowmode from the specified user id on the specified channel.
    * This reverts the channel permissions changed above and clears the database entry.
    */
-  async clearBotSlowmodeFromUserId(channel: GuildChannel & TextChannel, userId: string) {
-    // We only need to tweak permissions if there is an existing permission override
-    // In most cases there should be, since one is created in applySlowmodeToUserId()
-    const existingOverride = channel.permissionOverwrites.get(userId);
-    if (existingOverride) {
-      if (existingOverride.allow === 0 && existingOverride.deny === ErisConstants.Permissions.sendMessages) {
-        // If the only override for this user is what we applied earlier, remove the entire permission overwrite
-        await channel.deletePermission(userId);
-      } else {
-        // Otherwise simply negate the sendMessages permission from the denied permissions
-        const newDeniedPermissions = existingOverride.deny & ~ErisConstants.Permissions.sendMessages;
-        await channel.editPermission(userId, existingOverride.allow, newDeniedPermissions, "member");
+  async clearBotSlowmodeFromUserId(channel: GuildChannel & TextChannel, userId: string, force = false) {
+    try {
+      // Remove permission overrides from the channel for this user
+      // Previously we diffed the overrides so we could clear the "send messages" override without touching other
+      // overrides. Unfortunately, it seems that was a bit buggy - we didn't always receive the event for the changed
+      // overrides and then we also couldn't diff against them. For consistency's sake, we just delete the override now.
+      await channel.deletePermission(userId);
+    } catch (e) {
+      if (!force) {
+        throw e;
       }
     }
 
@@ -205,9 +203,16 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   /**
    * COMMAND: Clear slowmode from a specific user on a specific channel
    */
-  @d.command("slowmode clear", "<channel:channel> <user:resolvedUserLoose>")
+  @d.command("slowmode clear", "<channel:channel> <user:resolvedUserLoose>", {
+    options: [
+      {
+        name: "force",
+        type: "bool",
+      },
+    ],
+  })
   @d.permission("can_manage")
-  async clearSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel; user: User }) {
+  async clearSlowmodeCmd(msg: Message, args: { channel: GuildChannel & TextChannel; user: User; force?: boolean }) {
     const channelSlowmode = await this.slowmodes.getChannelSlowmode(args.channel.id);
     if (!channelSlowmode) {
       msg.channel.createMessage(errorMessage("Channel doesn't have slowmode!"));
@@ -215,7 +220,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
     }
 
     try {
-      await this.clearBotSlowmodeFromUserId(args.channel, args.user.id);
+      await this.clearBotSlowmodeFromUserId(args.channel, args.user.id, args.force);
     } catch (e) {
       return this.sendErrorMessage(
         msg.channel,
@@ -414,7 +419,18 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
         continue;
       }
 
-      await this.clearBotSlowmodeFromUserId(channel as GuildChannel & TextChannel, user.user_id);
+      try {
+        await this.clearBotSlowmodeFromUserId(channel as GuildChannel & TextChannel, user.user_id);
+      } catch (e) {
+        logger.error(e);
+
+        const realUser = this.bot.users.get(user.user_id) || new UnknownUser({ id: user.user_id });
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Failed to clear slowmode permissions from {userMention(user)} in {channelMention(channel)}`,
+          user: stripObjectToScalars(realUser),
+          channel: stripObjectToScalars(channel),
+        });
+      }
     }
   }
 }
