@@ -1015,6 +1015,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
+    // Make sure the user isn't already banned
+    const isBanned = await this.isBanned(user.id);
+    if (isBanned) {
+      this.sendErrorMessage(msg.channel, `User is already banned`);
+      return;
+    }
+
     // The moderator who did the action is the message author or, if used, the specified --mod
     let mod = msg.member;
     if (args.mod) {
