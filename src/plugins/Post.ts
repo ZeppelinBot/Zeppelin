@@ -113,6 +113,8 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
           }
         }
       }
+
+      content.disableEveryone = false;
     }
 
     const createdMsg = await channel.createMessage(content, file);
