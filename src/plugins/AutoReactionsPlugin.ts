@@ -47,7 +47,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConf
   }
 
   @d.command("auto_reactions", "<channelId:channelid> <reactions...>")
-  @d.permission("use")
+  @d.permission("can_manage")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
     const finalReactions = [];
 
@@ -81,7 +81,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConf
   }
 
   @d.command("auto_reactions disable", "<channelId:channelid>")
-  @d.permission("use")
+  @d.permission("can_manage")
   async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
     const autoReaction = await this.autoReactions.getForChannel(args.channelId);
     if (!autoReaction) {
