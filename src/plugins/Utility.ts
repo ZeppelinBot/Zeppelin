@@ -1,4 +1,4 @@
-import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition, waitForReaction } from "knub";
+import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition } from "knub";
 import {
   CategoryChannel,
   Channel,
@@ -11,6 +11,7 @@ import {
   TextChannel,
   User,
   VoiceChannel,
+  Permission,
 } from "eris";
 import {
   channelMentionRegex,
@@ -23,9 +24,7 @@ import {
   multiSorter,
   noop,
   resolveMember,
-  SECONDS,
   simpleClosestStringMatch,
-  sleep,
   sorter,
   stripObjectToScalars,
   successMessage,
@@ -77,6 +76,7 @@ interface IUtilityPluginConfig {
   can_vcmove: boolean;
   can_help: boolean;
   can_about: boolean;
+  can_lock: boolean;
 }
 
 export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
@@ -105,6 +105,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         can_vcmove: false,
         can_help: false,
         can_about: false,
+        can_lock: false,
       },
       overrides: [
         {
@@ -128,6 +129,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
             can_ping: true,
             can_source: true,
             can_about: true,
+            can_lock: true,
           },
         },
       ],
@@ -1058,5 +1060,37 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
     msg.channel.createMessage("Reloading...");
     this.knub.reloadGuild(this.guildId);
+  }
+
+  @d.command("lock", "[channel:channel]", {
+    aliases: ["unlock"],
+  })
+  @d.permission("can_lock")
+  async lockChannelCmd(msg: Message, args: { channel: GuildChannel & TextChannel }) {
+    const channel = args.channel || <GuildChannel>msg.channel;
+
+    if (channel == null || !(channel instanceof GuildChannel) || !(channel instanceof TextChannel)) {
+      await this.sendErrorMessage(msg.channel, `The channel \`${channel.name}\` cant be locked!`);
+      return;
+    }
+
+    const permission = channel.permissionOverwrites.get(this.guildId);
+
+    const everyonePerms = new Permission(permission.allow, permission.deny);
+    const everyonePermsJson = JSON.stringify(everyonePerms.json);
+
+    if (everyonePerms.has("sendMessages")) {
+      await channel.editPermission(this.guildId, permission.allow - 2048, permission.deny + 2048, "role");
+      this.sendSuccessMessage(msg.channel, `Locked ${channel.mention}`);
+      return;
+    } else if (!everyonePermsJson.includes("sendMessages")) {
+      await channel.editPermission(this.guildId, permission.allow, permission.deny + 2048, "role");
+      this.sendSuccessMessage(msg.channel, `Locked ${channel.mention}`);
+      return;
+    } else {
+      await channel.editPermission(this.guildId, permission.allow + 2048, permission.deny - 2048, "role");
+      this.sendSuccessMessage(msg.channel, `Unlocked ${channel.mention}`);
+      return;
+    }
   }
 }
