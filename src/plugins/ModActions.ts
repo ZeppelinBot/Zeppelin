@@ -51,7 +51,6 @@ interface IModActionsPluginConfig {
   ban_message: string;
   alert_on_rejoin: boolean;
   alert_channel: string;
-  warn_amount_notify_threshhold: number;
 
   can_note: boolean;
   can_warn: boolean;
@@ -98,7 +97,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
-        warn_amount_notify_threshhold: 5,
 
         can_note: false,
         can_warn: false,
@@ -445,14 +443,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         })${messageResultText}`,
       ),
     );
-
-    const priorWarnAmount = (await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn)) - 1;
-    if (priorWarnAmount >= config.warn_amount_notify_threshhold) {
-      this.sendErrorMessage(
-        msg.channel,
-        `The user already has ${(await priorWarnAmount) - 1} prior warnings ${msg.author.mention}!`,
-      );
-    }
 
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod.user),
