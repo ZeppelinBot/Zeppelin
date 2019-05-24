@@ -266,4 +266,19 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
       return null;
     }
   }
+
+  public async getCaseTypeAmountForUserId(userID: string, type: CaseTypes) {
+    const cases = (await this.cases.getByUserId(userID)).filter(c => !c.is_hidden);
+    let typeAmount = 0;
+
+    if (cases.length > 0) {
+      cases.forEach(singleCase => {
+        if (singleCase.type == type.valueOf()) {
+          typeAmount++;
+        }
+      });
+    }
+
+    return typeAmount;
+  }
 }
