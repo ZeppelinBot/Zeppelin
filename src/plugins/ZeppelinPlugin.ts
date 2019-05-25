@@ -9,9 +9,7 @@ import { performance } from "perf_hooks";
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
-  protected configSchema: any;
-  protected permissionsSchema: any;
-
+  protected static configSchema: any;
   public static dependencies = [];
 
   protected throwPluginRuntimeError(message: string) {
@@ -28,7 +26,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return ourLevel > memberLevel;
   }
 
-  public validateOptions(options: IPluginOptions): ErrorObject[] | null {
+  public static validateOptions(options: IPluginOptions): ErrorObject[] | null {
     // Validate config values
     if (this.configSchema) {
       const ajv = new Ajv();
@@ -55,7 +53,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
 
   public async runLoad(): Promise<any> {
     const mergedOptions = this.getMergedOptions();
-    const validationErrors = this.validateOptions(mergedOptions);
+    const validationErrors = ((this.constructor as unknown) as typeof ZeppelinPlugin).validateOptions(mergedOptions);
     if (validationErrors) {
       throw new Error(`Invalid options:\n${validationErrors.join("\n")}`);
     }
@@ -83,6 +81,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
 
   /**
    * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
+   * If the user is not found in the cache, it's fetched from the API.
    */
   async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
     const start = performance.now();
@@ -95,6 +94,10 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return user;
   }
 
+  /**
+   * Resolves a member from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
+   * If the member is not found in the cache, it's fetched from the API.
+   */
   async getMember(memberResolvable: string): Promise<Member> {
     const start = performance.now();
     const member = await resolveMember(this.bot, this.guild, memberResolvable);
