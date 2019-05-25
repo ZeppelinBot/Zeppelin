@@ -41,7 +41,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<ISelfGrantableRoles
   }
 
   onLoad() {
-    this.selfGrantableRoles = GuildSelfGrantableRoles.getInstance(this.guildId);
+    this.selfGrantableRoles = GuildSelfGrantableRoles.getGuildInstance(this.guildId);
   }
 
   @d.command("role remove", "<roleNames:string...>")

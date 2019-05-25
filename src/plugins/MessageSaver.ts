@@ -30,7 +30,7 @@ export class MessageSaverPlugin extends Plugin<IMessageSaverPluginConfig> {
   }
 
   onLoad() {
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
   }
 
   @d.event("messageCreate", "guild", false)

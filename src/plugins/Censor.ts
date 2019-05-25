@@ -81,7 +81,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
 
   onLoad() {
     this.serverLogs = new GuildLogs(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
 
     this.onMessageCreateFn = this.onMessageCreate.bind(this);
     this.onMessageUpdateFn = this.onMessageUpdate.bind(this);

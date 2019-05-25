@@ -1,5 +1,5 @@
 import { PersistedData } from "./entities/PersistedData";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 
 export interface IPartialPersistData {
@@ -8,7 +8,7 @@ export interface IPartialPersistData {
   is_voice_muted?: boolean;
 }
 
-export class GuildPersistedData extends BaseRepository {
+export class GuildPersistedData extends BaseGuildRepository {
   private persistedData: Repository<PersistedData>;
 
   constructor(guildId) {
@@ -20,8 +20,8 @@ export class GuildPersistedData extends BaseRepository {
     return this.persistedData.findOne({
       where: {
         guild_id: this.guildId,
-        user_id: userId
-      }
+        user_id: userId,
+      },
     });
   }
 
@@ -36,15 +36,15 @@ export class GuildPersistedData extends BaseRepository {
       await this.persistedData.update(
         {
           guild_id: this.guildId,
-          user_id: userId
+          user_id: userId,
         },
-        finalData
+        finalData,
       );
     } else {
       await this.persistedData.insert({
         ...finalData,
         guild_id: this.guildId,
-        user_id: userId
+        user_id: userId,
       });
     }
   }
@@ -52,7 +52,7 @@ export class GuildPersistedData extends BaseRepository {
   async clear(userId: string) {
     await this.persistedData.delete({
       guild_id: this.guildId,
-      user_id: userId
+      user_id: userId,
     });
   }
 }

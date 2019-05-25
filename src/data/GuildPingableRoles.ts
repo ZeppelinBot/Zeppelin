@@ -1,8 +1,8 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { PingableRole } from "./entities/PingableRole";
 
-export class GuildPingableRoles extends BaseRepository {
+export class GuildPingableRoles extends BaseGuildRepository {
   private pingableRoles: Repository<PingableRole>;
 
   constructor(guildId) {
@@ -13,8 +13,8 @@ export class GuildPingableRoles extends BaseRepository {
   async all(): Promise<PingableRole[]> {
     return this.pingableRoles.find({
       where: {
-        guild_id: this.guildId
-      }
+        guild_id: this.guildId,
+      },
     });
   }
 
@@ -22,8 +22,8 @@ export class GuildPingableRoles extends BaseRepository {
     return this.pingableRoles.find({
       where: {
         guild_id: this.guildId,
-        channel_id: channelId
-      }
+        channel_id: channelId,
+      },
     });
   }
 
@@ -32,8 +32,8 @@ export class GuildPingableRoles extends BaseRepository {
       where: {
         guild_id: this.guildId,
         channel_id: channelId,
-        role_id: roleId
-      }
+        role_id: roleId,
+      },
     });
   }
 
@@ -41,7 +41,7 @@ export class GuildPingableRoles extends BaseRepository {
     await this.pingableRoles.delete({
       guild_id: this.guildId,
       channel_id: channelId,
-      role_id: roleId
+      role_id: roleId,
     });
   }
 
@@ -49,7 +49,7 @@ export class GuildPingableRoles extends BaseRepository {
     await this.pingableRoles.insert({
       guild_id: this.guildId,
       channel_id: channelId,
-      role_id: roleId
+      role_id: roleId,
     });
   }
 }

@@ -1,6 +1,6 @@
 import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, In, Repository } from "typeorm";
 import { disableLinkPreviews } from "../utils";
 import { CaseTypes } from "./CaseTypes";
@@ -8,7 +8,7 @@ import moment = require("moment-timezone");
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
-export class GuildCases extends BaseRepository {
+export class GuildCases extends BaseGuildRepository {
   private cases: Repository<Case>;
   private caseNotes: Repository<CaseNote>;
 

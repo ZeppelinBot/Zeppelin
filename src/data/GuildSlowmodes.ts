@@ -1,10 +1,10 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { SlowmodeChannel } from "./entities/SlowmodeChannel";
 import { SlowmodeUser } from "./entities/SlowmodeUser";
 import moment from "moment-timezone";
 
-export class GuildSlowmodes extends BaseRepository {
+export class GuildSlowmodes extends BaseGuildRepository {
   private slowmodeChannels: Repository<SlowmodeChannel>;
   private slowmodeUsers: Repository<SlowmodeUser>;
 

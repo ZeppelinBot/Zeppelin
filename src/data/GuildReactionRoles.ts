@@ -1,8 +1,8 @@
 import { ReactionRole } from "./entities/ReactionRole";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 
-export class GuildReactionRoles extends BaseRepository {
+export class GuildReactionRoles extends BaseGuildRepository {
   private reactionRoles: Repository<ReactionRole>;
 
   constructor(guildId) {
@@ -13,8 +13,8 @@ export class GuildReactionRoles extends BaseRepository {
   async all(): Promise<ReactionRole[]> {
     return this.reactionRoles.find({
       where: {
-        guild_id: this.guildId
-      }
+        guild_id: this.guildId,
+      },
     });
   }
 
@@ -22,8 +22,8 @@ export class GuildReactionRoles extends BaseRepository {
     return this.reactionRoles.find({
       where: {
         guild_id: this.guildId,
-        message_id: messageId
-      }
+        message_id: messageId,
+      },
     });
   }
 
@@ -32,15 +32,15 @@ export class GuildReactionRoles extends BaseRepository {
       where: {
         guild_id: this.guildId,
         message_id: messageId,
-        emoji
-      }
+        emoji,
+      },
     });
   }
 
   async removeFromMessage(messageId: string, emoji: string = null) {
     const criteria: any = {
       guild_id: this.guildId,
-      message_id: messageId
+      message_id: messageId,
     };
 
     if (emoji) {
@@ -56,7 +56,7 @@ export class GuildReactionRoles extends BaseRepository {
       channel_id: channelId,
       message_id: messageId,
       emoji,
-      role_id: roleId
+      role_id: roleId,
     });
   }
 }

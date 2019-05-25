@@ -1,8 +1,8 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { SelfGrantableRole } from "./entities/SelfGrantableRole";
 
-export class GuildSelfGrantableRoles extends BaseRepository {
+export class GuildSelfGrantableRoles extends BaseGuildRepository {
   private selfGrantableRoles: Repository<SelfGrantableRole>;
 
   constructor(guildId) {

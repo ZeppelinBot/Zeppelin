@@ -128,9 +128,9 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
-    this.archives = GuildArchives.getInstance(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.mutes = GuildMutes.getInstance(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.mutes = GuildMutes.getGuildInstance(this.guildId);
 
     this.recentActions = [];
     this.expiryInterval = setInterval(() => this.clearOldRecentActions(), 1000 * 60);

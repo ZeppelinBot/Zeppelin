@@ -30,7 +30,7 @@ export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
   }
 
   onLoad() {
-    this.persistedData = GuildPersistedData.getInstance(this.guildId);
+    this.persistedData = GuildPersistedData.getGuildInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
   }
 

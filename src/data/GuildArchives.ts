@@ -2,7 +2,7 @@ import uuid from "uuid/v4"; // tslint:disable-line
 import moment from "moment-timezone";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
 import { getRepository, Repository } from "typeorm";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { trimLines } from "../utils";
 import { SavedMessage } from "./entities/SavedMessage";
 import { Channel, Guild, User } from "eris";
@@ -16,7 +16,7 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
   "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}";
 
-export class GuildArchives extends BaseRepository {
+export class GuildArchives extends BaseGuildRepository {
   protected archives: Repository<ArchiveEntry>;
 
   constructor(guildId) {

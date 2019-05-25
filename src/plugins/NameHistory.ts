@@ -33,8 +33,8 @@ export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> 
   }
 
   onLoad() {
-    this.nicknameHistory = GuildNicknameHistory.getInstance(this.guildId);
-    this.usernameHistory = UsernameHistory.getInstance(null);
+    this.nicknameHistory = GuildNicknameHistory.getGuildInstance(this.guildId);
+    this.usernameHistory = new UsernameHistory();
   }
 
   @d.command("names", "<userId:userid>")

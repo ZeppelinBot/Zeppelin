@@ -47,8 +47,8 @@ export class StarboardPlugin extends ZeppelinPlugin<IStarboardPluginConfig> {
   }
 
   onLoad() {
-    this.starboards = GuildStarboards.getInstance(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.starboards = GuildStarboards.getGuildInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
 
     this.onMessageDeleteFn = this.onMessageDelete.bind(this);
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);

@@ -1,7 +1,7 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 
-export class GuildEvents extends BaseRepository {
+export class GuildEvents extends BaseGuildRepository {
   private queuedEventEmitter: QueuedEventEmitter;
   private pluginListeners: Map<string, Map<string, any[]>>;
 

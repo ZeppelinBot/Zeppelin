@@ -36,7 +36,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<IPingableRolesPluginConf
   }
 
   onLoad() {
-    this.pingableRoles = GuildPingableRoles.getInstance(this.guildId);
+    this.pingableRoles = GuildPingableRoles.getGuildInstance(this.guildId);
 
     this.cache = new Map();
     this.timeouts = new Map();

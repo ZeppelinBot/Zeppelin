@@ -46,7 +46,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
   }
 
   onLoad() {
-    this.reminders = GuildReminders.getInstance(this.guildId);
+    this.reminders = GuildReminders.getGuildInstance(this.guildId);
     this.tries = new Map();
     this.postDueRemindersLoop();
   }

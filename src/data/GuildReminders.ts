@@ -1,8 +1,8 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { Reminder } from "./entities/Reminder";
 
-export class GuildReminders extends BaseRepository {
+export class GuildReminders extends BaseGuildRepository {
   private reminders: Repository<Reminder>;
 
   constructor(guildId) {

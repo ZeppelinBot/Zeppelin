@@ -1,5 +1,5 @@
 import { Brackets, getRepository, Repository } from "typeorm";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
@@ -36,7 +36,7 @@ async function cleanup() {
 // Start first cleanup 30 seconds after startup
 setTimeout(cleanup, 30 * 1000);
 
-export class GuildSavedMessages extends BaseRepository {
+export class GuildSavedMessages extends BaseGuildRepository {
   private messages: Repository<SavedMessage>;
   protected toBePermanent: Set<string>;
 
