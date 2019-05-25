@@ -5,7 +5,6 @@ import {
   Guild,
   GuildAuditLogEntry,
   Member,
-  MessageContent,
   TextableChannel,
   TextChannel,
   User,
@@ -61,8 +60,19 @@ export function errorMessage(str) {
   return `⚠ ${str}`;
 }
 
-export function uclower(str) {
-  return str[0].toLowerCase() + str.slice(1);
+export function get(obj, path, def?): any {
+  let cursor = obj;
+  const pathParts = path.split(".");
+  for (const part of pathParts) {
+    cursor = cursor[part];
+    if (cursor === undefined) return def;
+    if (cursor == null) return null;
+  }
+  return cursor;
+}
+
+export function has(obj, path): boolean {
+  return get(obj, path) !== undefined;
 }
 
 export function stripObjectToScalars(obj, includedNested: string[] = []) {

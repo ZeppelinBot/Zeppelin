@@ -71,7 +71,9 @@ desktop.ini
 
 # Compiled files
 /dist
+/dist-frontend
 
 # Misc
 /convert.js
 /startscript.js
+/.cache
