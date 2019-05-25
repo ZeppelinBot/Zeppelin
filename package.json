@@ -10,7 +10,8 @@
     "format": "prettier --write \"./**/*.ts\"",
     "typeorm": "ts-node ./node_modules/typeorm/cli.js",
     "build": "rimraf dist && tsc",
-    "start-prod": "cross-env NODE_ENV=production node dist/index.js"
+    "start-prod": "cross-env NODE_ENV=production node dist/index.js",
+    "migrate": "npm run typeorm -- migration:run"
   },
   "keywords": [],
   "author": "",
