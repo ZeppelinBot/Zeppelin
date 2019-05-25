@@ -1,0 +1,5 @@
+{
+  "watch": "src/dashboard/api",
+  "ext": "ts",
+  "exec": "ts-node ./src/dashboard/api/index.ts"
+}
