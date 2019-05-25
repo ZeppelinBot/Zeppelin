@@ -99,8 +99,8 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   }
 
   protected onLoad() {
-    this.mutes = GuildMutes.getInstance(this.guildId);
-    this.cases = GuildCases.getInstance(this.guildId);
+    this.mutes = GuildMutes.getGuildInstance(this.guildId);
+    this.cases = GuildCases.getGuildInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
 
     // Check for expired mutes every 5s

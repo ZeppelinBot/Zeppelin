@@ -61,8 +61,8 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
   }
 
   onLoad() {
-    this.slowmodes = GuildSlowmodes.getInstance(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.slowmodes = GuildSlowmodes.getGuildInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
     this.clearInterval = setInterval(() => this.clearExpiredSlowmodes(), BOT_SLOWMODE_CLEAR_INTERVAL);
 

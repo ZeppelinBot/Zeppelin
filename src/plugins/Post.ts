@@ -43,8 +43,8 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
   private scheduledPostLoopTimeout;
 
   onLoad() {
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.scheduledPosts = GuildScheduledPosts.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.scheduledPosts = GuildScheduledPosts.getGuildInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
 
     this.scheduledPostLoop();

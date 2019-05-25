@@ -93,9 +93,9 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
   onLoad() {
     this.guildLogs = new GuildLogs(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.archives = GuildArchives.getInstance(this.guildId);
-    this.cases = GuildCases.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
+    this.cases = GuildCases.getGuildInstance(this.guildId);
 
     this.logListener = ({ type, data }) => this.log(type, data);
     this.guildLogs.on("log", this.logListener);

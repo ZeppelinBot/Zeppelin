@@ -8,7 +8,7 @@ export class UsernameSaver extends GlobalPlugin {
   protected usernameHistory: UsernameHistory;
 
   async onLoad() {
-    this.usernameHistory = UsernameHistory.getInstance(null);
+    this.usernameHistory = new UsernameHistory();
   }
 
   protected async updateUsername(user: User) {

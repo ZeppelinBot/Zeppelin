@@ -1,8 +1,8 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { ScheduledPost } from "./entities/ScheduledPost";
 
-export class GuildScheduledPosts extends BaseRepository {
+export class GuildScheduledPosts extends BaseGuildRepository {
   private scheduledPosts: Repository<ScheduledPost>;
 
   constructor(guildId) {

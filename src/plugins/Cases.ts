@@ -57,8 +57,8 @@ export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
   }
 
   onLoad() {
-    this.cases = GuildCases.getInstance(this.guildId);
-    this.archives = GuildArchives.getInstance(this.guildId);
+    this.cases = GuildCases.getGuildInstance(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
     this.logs = new GuildLogs(this.guildId);
   }
 

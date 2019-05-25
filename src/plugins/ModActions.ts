@@ -75,8 +75,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
   protected ignoredEvents: IIgnoredEvent[];
 
   async onLoad() {
-    this.mutes = GuildMutes.getInstance(this.guildId);
-    this.cases = GuildCases.getInstance(this.guildId);
+    this.mutes = GuildMutes.getGuildInstance(this.guildId);
+    this.cases = GuildCases.getGuildInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
 
     this.ignoredEvents = [];

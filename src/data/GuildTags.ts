@@ -1,9 +1,9 @@
 import { Tag } from "./entities/Tag";
 import { getRepository, Repository } from "typeorm";
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { TagResponse } from "./entities/TagResponse";
 
-export class GuildTags extends BaseRepository {
+export class GuildTags extends BaseGuildRepository {
   private tags: Repository<Tag>;
   private tagResponses: Repository<TagResponse>;
 
@@ -16,8 +16,8 @@ export class GuildTags extends BaseRepository {
   async all(): Promise<Tag[]> {
     return this.tags.find({
       where: {
-        guild_id: this.guildId
-      }
+        guild_id: this.guildId,
+      },
     });
   }
 
@@ -25,8 +25,8 @@ export class GuildTags extends BaseRepository {
     return this.tags.findOne({
       where: {
         guild_id: this.guildId,
-        tag
-      }
+        tag,
+      },
     });
   }
 
@@ -39,7 +39,7 @@ export class GuildTags extends BaseRepository {
         .set({
           body,
           user_id: userId,
-          created_at: () => "NOW()"
+          created_at: () => "NOW()",
         })
         .where("guild_id = :guildId", { guildId: this.guildId })
         .andWhere("tag = :tag", { tag })
@@ -49,7 +49,7 @@ export class GuildTags extends BaseRepository {
         guild_id: this.guildId,
         user_id: userId,
         tag,
-        body
+        body,
       });
     }
   }
@@ -57,7 +57,7 @@ export class GuildTags extends BaseRepository {
   async delete(tag) {
     await this.tags.delete({
       guild_id: this.guildId,
-      tag
+      tag,
     });
   }
 
@@ -65,8 +65,8 @@ export class GuildTags extends BaseRepository {
     return this.tagResponses.findOne({
       where: {
         guild_id: this.guildId,
-        command_message_id: messageId
-      }
+        command_message_id: messageId,
+      },
     });
   }
 
@@ -74,8 +74,8 @@ export class GuildTags extends BaseRepository {
     return this.tagResponses.findOne({
       where: {
         guild_id: this.guildId,
-        response_message_id: messageId
-      }
+        response_message_id: messageId,
+      },
     });
   }
 
@@ -83,7 +83,7 @@ export class GuildTags extends BaseRepository {
     await this.tagResponses.insert({
       guild_id: this.guildId,
       command_message_id: cmdMessageId,
-      response_message_id: responseMessageId
+      response_message_id: responseMessageId,
     });
   }
 }

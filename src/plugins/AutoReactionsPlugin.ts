@@ -36,8 +36,8 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConf
   }
 
   onLoad() {
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.autoReactions = GuildAutoReactions.getInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.autoReactions = GuildAutoReactions.getGuildInstance(this.guildId);
 
     this.onMessageCreateFn = this.savedMessages.events.on("create", this.onMessageCreate.bind(this));
   }

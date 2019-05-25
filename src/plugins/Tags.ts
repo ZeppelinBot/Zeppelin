@@ -55,9 +55,9 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
   }
 
   onLoad() {
-    this.archives = GuildArchives.getInstance(this.guildId);
-    this.tags = GuildTags.getInstance(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
+    this.tags = GuildTags.getGuildInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
 
     this.onMessageCreateFn = this.onMessageCreate.bind(this);
     this.savedMessages.events.on("create", this.onMessageCreateFn);

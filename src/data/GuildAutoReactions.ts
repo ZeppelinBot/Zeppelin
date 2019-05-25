@@ -1,8 +1,8 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { AutoReaction } from "./entities/AutoReaction";
 
-export class GuildAutoReactions extends BaseRepository {
+export class GuildAutoReactions extends BaseGuildRepository {
   private autoReactions: Repository<AutoReaction>;
 
   constructor(guildId) {
@@ -13,8 +13,8 @@ export class GuildAutoReactions extends BaseRepository {
   async all(): Promise<AutoReaction[]> {
     return this.autoReactions.find({
       where: {
-        guild_id: this.guildId
-      }
+        guild_id: this.guildId,
+      },
     });
   }
 
@@ -22,15 +22,15 @@ export class GuildAutoReactions extends BaseRepository {
     return this.autoReactions.findOne({
       where: {
         guild_id: this.guildId,
-        channel_id: channelId
-      }
+        channel_id: channelId,
+      },
     });
   }
 
   async removeFromChannel(channelId: string) {
     await this.autoReactions.delete({
       guild_id: this.guildId,
-      channel_id: channelId
+      channel_id: channelId,
     });
   }
 
@@ -40,17 +40,17 @@ export class GuildAutoReactions extends BaseRepository {
       this.autoReactions.update(
         {
           guild_id: this.guildId,
-          channel_id: channelId
+          channel_id: channelId,
         },
         {
-          reactions
-        }
+          reactions,
+        },
       );
     } else {
       await this.autoReactions.insert({
         guild_id: this.guildId,
         channel_id: channelId,
-        reactions
+        reactions,
       });
     }
   }

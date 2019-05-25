@@ -1,11 +1,11 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
 import { sorter } from "../utils";
 
 export const MAX_NICKNAME_ENTRIES_PER_USER = 10;
 
-export class GuildNicknameHistory extends BaseRepository {
+export class GuildNicknameHistory extends BaseGuildRepository {
   private nicknameHistory: Repository<NicknameHistoryEntry>;
 
   constructor(guildId) {

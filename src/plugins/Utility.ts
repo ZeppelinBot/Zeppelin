@@ -136,9 +136,9 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
   onLoad() {
     this.logs = new GuildLogs(this.guildId);
-    this.cases = GuildCases.getInstance(this.guildId);
-    this.savedMessages = GuildSavedMessages.getInstance(this.guildId);
-    this.archives = GuildArchives.getInstance(this.guildId);
+    this.cases = GuildCases.getGuildInstance(this.guildId);
+    this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
 
     if (activeReloads && activeReloads.has(this.guildId)) {
       activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));

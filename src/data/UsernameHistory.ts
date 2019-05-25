@@ -1,22 +1,21 @@
-import { BaseRepository } from "./BaseRepository";
 import { getRepository, Repository } from "typeorm";
 import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
 import { sorter } from "../utils";
+import { BaseRepository } from "./BaseRepository";
 
 export const MAX_USERNAME_ENTRIES_PER_USER = 10;
 
 export class UsernameHistory extends BaseRepository {
   private usernameHistory: Repository<UsernameHistoryEntry>;
 
-  constructor(guildId) {
-    super(guildId);
+  constructor() {
+    super();
     this.usernameHistory = getRepository(UsernameHistoryEntry);
   }
 
   async getByUserId(userId): Promise<UsernameHistoryEntry[]> {
     return this.usernameHistory.find({
       where: {
-        guild_id: this.guildId,
         user_id: userId,
       },
       order: {
@@ -29,7 +28,6 @@ export class UsernameHistory extends BaseRepository {
   getLastEntry(userId): Promise<UsernameHistoryEntry> {
     return this.usernameHistory.findOne({
       where: {
-        guild_id: this.guildId,
         user_id: userId,
       },
       order: {
