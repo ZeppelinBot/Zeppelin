@@ -66,37 +66,11 @@ moment.tz.setDefault("UTC");
 
 import { Client } from "eris";
 import { connect } from "./data/db";
-
-// Global plugins
-import { BotControlPlugin } from "./plugins/BotControl";
-import { LogServerPlugin } from "./plugins/LogServer";
-
-// Guild plugins
-import { ModActionsPlugin } from "./plugins/ModActions";
-import { UtilityPlugin } from "./plugins/Utility";
-import { LogsPlugin } from "./plugins/Logs";
-import { PostPlugin } from "./plugins/Post";
-import { ReactionRolesPlugin } from "./plugins/ReactionRoles";
-import { CensorPlugin } from "./plugins/Censor";
-import { PersistPlugin } from "./plugins/Persist";
-import { SpamPlugin } from "./plugins/Spam";
-import { TagsPlugin } from "./plugins/Tags";
-import { MessageSaverPlugin } from "./plugins/MessageSaver";
-import { CasesPlugin } from "./plugins/Cases";
-import { MutesPlugin } from "./plugins/Mutes";
-import { SlowmodePlugin } from "./plugins/Slowmode";
-import { StarboardPlugin } from "./plugins/Starboard";
-import { NameHistoryPlugin } from "./plugins/NameHistory";
-import { AutoReactionsPlugin } from "./plugins/AutoReactionsPlugin";
-import { PingableRolesPlugin } from "./plugins/PingableRolesPlugin";
-import { SelfGrantableRolesPlugin } from "./plugins/SelfGrantableRolesPlugin";
-import { RemindersPlugin } from "./plugins/Reminders";
-import { errorMessage, successMessage } from "./utils";
+import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
+import { errorMessage, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
-import { UsernameSaver } from "./plugins/UsernameSaver";
-import { WelcomeMessagePlugin } from "./plugins/WelcomeMessage";
 
 // Run latest database migrations
 logger.info("Running database migrations");
@@ -115,36 +89,9 @@ connect().then(async conn => {
     }
   });
 
-  const basePlugins = ["message_saver", "name_history", "cases", "mutes"];
-
   const bot = new Knub(client, {
-    plugins: [
-      // Base plugins (always enabled)
-      MessageSaverPlugin,
-      NameHistoryPlugin,
-      CasesPlugin,
-      MutesPlugin,
-
-      // Regular plugins
-      UtilityPlugin,
-      ModActionsPlugin,
-      LogsPlugin,
-      PostPlugin,
-      ReactionRolesPlugin,
-      CensorPlugin,
-      PersistPlugin,
-      SpamPlugin,
-      TagsPlugin,
-      SlowmodePlugin,
-      StarboardPlugin,
-      AutoReactionsPlugin,
-      PingableRolesPlugin,
-      SelfGrantableRolesPlugin,
-      RemindersPlugin,
-      WelcomeMessagePlugin,
-    ],
-
-    globalPlugins: [BotControlPlugin, LogServerPlugin, UsernameSaver],
+    plugins: availablePlugins,
+    globalPlugins: availableGlobalPlugins,
 
     options: {
       /**
