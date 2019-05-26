@@ -21,6 +21,7 @@ import { WelcomeMessagePlugin } from "./WelcomeMessage";
 import { BotControlPlugin } from "./BotControl";
 import { LogServerPlugin } from "./LogServer";
 import { UsernameSaver } from "./UsernameSaver";
+import { CompanionChannelPlugin } from "./CompanionChannels";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -46,6 +47,7 @@ export const availablePlugins = [
   SelfGrantableRolesPlugin,
   RemindersPlugin,
   WelcomeMessagePlugin,
+  CompanionChannelPlugin,
 ];
 
 /**
