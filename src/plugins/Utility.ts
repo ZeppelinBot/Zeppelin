@@ -649,7 +649,8 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
         `) + embedPadding,
       });
 
-      const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
+      const upToDateMember = await resolveMember(this.bot, this.guild, user.id);
+      const voiceChannel = <VoiceChannel>this.guild.channels.get(upToDateMember.voiceState.channelID);
       if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
         embed.fields.push({
           name: "Voice information",
