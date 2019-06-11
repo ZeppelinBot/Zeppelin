@@ -121,6 +121,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
    */
   async applyReactionRoleReactionsToMessage(channelId: string, messageId: string, reactionRoles: ReactionRole[]) {
     const channel = this.guild.channels.get(channelId) as TextChannel;
+    if (!channel) return;
 
     let targetMessage;
     try {
