@@ -1066,6 +1066,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
+    // Verify we can act on each of the users specified
+    for (const userId of args.userIds) {
+      const member = this.guild.members.get(userId); // TODO: Get members on demand?
+      if (member && !this.canActOn(msg.member, member)) {
+        this.sendErrorMessage(msg.channel, "Cannot massban one or more users: insufficient permissions");
+        return;
+      }
+    }
+
     // Ask for ban reason (cleaner this way instead of trying to cram it into the args)
     msg.channel.createMessage("Ban reason? `cancel` to cancel");
     const banReasonReply = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
@@ -1075,15 +1084,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     const banReason = this.formatReasonWithAttachments(banReasonReply.content, msg.attachments);
-
-    // Verify we can act on each of the users specified
-    for (const userId of args.userIds) {
-      const member = this.guild.members.get(userId); // TODO: Get members on demand?
-      if (member && !this.canActOn(msg.member, member)) {
-        this.sendErrorMessage(msg.channel, "Cannot massban one or more users: insufficient permissions");
-        return;
-      }
-    }
 
     // Ignore automatic ban cases and logs for these users
     // We'll create our own cases below and post a single "mass banned" log instead
@@ -1148,6 +1148,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       return;
     }
 
+    // Verify we can act upon all users
+    for (const userId of args.userIds) {
+      const member = this.guild.members.get(userId);
+      if (member && !this.canActOn(msg.member, member)) {
+        this.sendErrorMessage(msg.channel, "Cannot massmute one or more users: insufficient permissions");
+        return;
+      }
+    }
+
     // Ask for mute reason
     msg.channel.createMessage("Mute reason? `cancel` to cancel");
     const muteReasonReceived = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
@@ -1161,15 +1170,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     const muteReason = this.formatReasonWithAttachments(muteReasonReceived.content, msg.attachments);
-
-    // Verify we can act upon all users
-    for (const userId of args.userIds) {
-      const member = this.guild.members.get(userId);
-      if (member && !this.canActOn(msg.member, member)) {
-        this.sendErrorMessage(msg.channel, "Cannot massmute one or more users: insufficient permissions");
-        return;
-      }
-    }
 
     // Ignore automatic mute cases and logs for these users
     // We'll create our own cases below and post a single "mass muted" log instead
