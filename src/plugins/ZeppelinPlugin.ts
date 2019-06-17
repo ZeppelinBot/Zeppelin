@@ -17,7 +17,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   }
 
   protected canActOn(member1, member2) {
-    if (member1.id === member2.id) {
+    if (member1.id === member2.id || member2.id === this.bot.user.id) {
       return false;
     }
 
