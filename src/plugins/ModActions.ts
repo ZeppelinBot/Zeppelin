@@ -31,6 +31,7 @@ enum IgnoredEventType {
   Ban = 1,
   Unban,
   Kick,
+  Mute,
 }
 
 interface IIgnoredEvent {
@@ -60,6 +61,7 @@ interface IModActionsPluginConfig {
   can_view: boolean;
   can_addcase: boolean;
   can_massban: boolean;
+  can_massmute: boolean;
   can_hidecase: boolean;
   can_act_as_other: boolean;
 }
@@ -106,6 +108,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         can_view: false,
         can_addcase: false,
         can_massban: false,
+        can_massmute: false,
         can_hidecase: false,
         can_act_as_other: false,
       },
@@ -126,6 +129,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
           level: ">=100",
           config: {
             can_massban: true,
+            can_massmute: true,
             can_hidecase: true,
             can_act_as_other: true,
           },
@@ -256,9 +260,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
       alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${
-          actions.length
-        } prior record(s)`,
+        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
       );
     }
   }
@@ -280,9 +282,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       const existingCaseForThisEntry = await this.cases.findByAuditLogId(kickAuditLogEntry.id);
       if (existingCaseForThisEntry) {
         logger.warn(
-          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${
-            existingCaseForThisEntry.id
-          }`,
+          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${existingCaseForThisEntry.id}`,
         );
       } else {
         const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -438,9 +438,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     msg.channel.createMessage(
       successMessage(
-        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${
-          createdCase.case_number
-        })${messageResultText}`,
+        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${createdCase.case_number})${messageResultText}`,
       ),
     );
 
@@ -773,9 +771,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${
-      createdCase.case_number
-    })`;
+    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${createdCase.case_number})`;
 
     if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
@@ -860,9 +856,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${
-      createdCase.case_number
-    })`;
+    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${createdCase.case_number})`;
 
     if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
@@ -936,9 +930,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Confirm the action to the moderator
     msg.channel.createMessage(
       successMessage(
-        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${
-          createdCase.case_number
-        })`,
+        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
       ),
     );
 
@@ -1143,6 +1135,87 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         );
       } else {
         msg.channel.createMessage(successMessage(`Banned ${successfulBanCount} users successfully`));
+      }
+    }
+  }
+
+  @d.command("massmute", "<userIds:string...>")
+  @d.permission("can_massmute")
+  async massmuteCmd(msg: Message, args: { userIds: string[] }) {
+    // Limit to 100 users at once (arbitrary?)
+    if (args.userIds.length > 100) {
+      this.sendErrorMessage(msg.channel, `Can only massmute max 100 users at once`);
+      return;
+    }
+
+    // Ask for mute reason
+    msg.channel.createMessage("Mute reason? `cancel` to cancel");
+    const muteReasonReceived = await waitForReply(this.bot, msg.channel as TextChannel, msg.author.id);
+    if (
+      !muteReasonReceived ||
+      !muteReasonReceived.content ||
+      muteReasonReceived.content.toLowerCase().trim() === "cancel"
+    ) {
+      this.sendErrorMessage(msg.channel, "Cancelled");
+      return;
+    }
+
+    const muteReason = this.formatReasonWithAttachments(muteReasonReceived.content, msg.attachments);
+
+    // Verify we can act upon all users
+    for (const userId of args.userIds) {
+      const member = this.guild.members.get(userId);
+      if (member && !this.canActOn(msg.member, member)) {
+        this.sendErrorMessage(msg.channel, "Cannot massmute one or more users: insufficient permissions");
+        return;
+      }
+    }
+
+    // Ignore automatic mute cases and logs for these users
+    // We'll create our own cases below and post a single "mass muted" log instead
+    args.userIds.forEach(userId => {
+      // Use longer timeouts since this can take a while
+      this.ignoreEvent(IgnoredEventType.Mute, userId, 120 * 1000);
+      this.serverLogs.ignoreLog(LogType.MEMBER_MUTE, userId, 120 * 1000);
+    });
+
+    // Show loading indicator
+    const loadingMsg = await msg.channel.createMessage("Muting...");
+
+    // Mute everyone and count fails
+    const modId = msg.author.id;
+    const failedMutes = [];
+    const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
+    for (const userId of args.userIds) {
+      try {
+        await mutesPlugin.muteUser(userId, null, `Mass mute: ${muteReason}`, {
+          modId: modId,
+        });
+      } catch (e) {
+        failedMutes.push(userId);
+      }
+    }
+
+    // Clear loading indicator
+    loadingMsg.delete();
+
+    const successfulMuteCount = args.userIds.length - failedMutes.length;
+    if (successfulMuteCount === 0) {
+      // All mutes failed
+      this.sendErrorMessage(msg.channel, "All mutes failed. Make sure the IDs are valid.");
+    } else {
+      // Success on all or some mutes
+      this.serverLogs.log(LogType.MASSMUTE, {
+        mod: stripObjectToScalars(msg.author),
+        count: successfulMuteCount,
+      });
+
+      if (failedMutes.length) {
+        msg.channel.createMessage(
+          successMessage(`Muted ${successfulMuteCount} users, ${failedMutes.length} failed: ${failedMutes.join(" ")}`),
+        );
+      } else {
+        msg.channel.createMessage(successMessage(`Muted ${successfulMuteCount} users successfully`));
       }
     }
   }

@@ -16,6 +16,6 @@ export class PluginRuntimeError {
   }
 
   toString() {
-    return this[util.inspect.custom]();
+    return this[util.inspect.custom];
   }
 }
