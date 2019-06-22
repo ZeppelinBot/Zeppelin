@@ -1,5 +1,4 @@
-import has from "lodash.has";
-import at from "lodash.at";
+import { has, get } from "./utils";
 
 const TEMPLATE_CACHE_SIZE = 200;
 const templateCache: Map<string, ParsedTemplate> = new Map();
@@ -219,7 +218,7 @@ export function parseTemplate(str: string): ParsedTemplate {
 }
 
 async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
-  let value = has(values, theVar.identifier) ? at(values, theVar.identifier)[0] : undefined;
+  const value = has(values, theVar.identifier) ? get(values, theVar.identifier) : undefined;
 
   if (typeof value === "function") {
     const args = [];
