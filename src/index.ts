@@ -10,6 +10,8 @@ import { SimpleError } from "./SimpleError";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
 
+import { Configs } from "./data/Configs";
+
 require("dotenv").config();
 
 // Error handling
@@ -71,8 +73,8 @@ import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
 import { errorMessage, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
+import { AllowedGuilds } from "./data/AllowedGuilds";
 
-// Run latest database migrations
 logger.info("Connecting to database");
 connect().then(async conn => {
   const client = new Client(`Bot ${process.env.TOKEN}`, {
@@ -87,18 +89,25 @@ connect().then(async conn => {
     }
   });
 
+  const allowedGuilds = new AllowedGuilds();
+  const guildConfigs = new Configs();
+
   const bot = new Knub(client, {
     plugins: availablePlugins,
     globalPlugins: availableGlobalPlugins,
 
     options: {
+      canLoadGuild(guildId): Promise<boolean> {
+        return allowedGuilds.isAllowed(guildId);
+      },
+
       /**
        * Plugins are enabled if they...
        * - are base plugins, i.e. always enabled, or
        * - are dependencies of other enabled plugins, or
        * - are explicitly enabled in the guild config
        */
-      getEnabledPlugins(guildId, guildConfig): string[] {
+      async getEnabledPlugins(guildId, guildConfig): Promise<string[]> {
         const configuredPlugins = guildConfig.plugins || {};
         const pluginNames: string[] = Array.from(this.plugins.keys());
         const plugins: Array<typeof Plugin> = Array.from(this.plugins.values());
@@ -125,22 +134,15 @@ connect().then(async conn => {
         return Array.from(finalEnabledPlugins.values());
       },
 
-      /**
-       * Loads the requested config file from the config dir
-       * TODO: Move to the database
-       */
       async getConfig(id) {
-        const configFile = id ? `${id}.yml` : "global.yml";
-        const configPath = path.join("config", configFile);
-
-        try {
-          await fsp.access(configPath);
-        } catch (e) {
-          return {};
+        const key = id === "global" ? "global" : `guild-${id}`;
+        const row = await guildConfigs.getActiveByKey(key);
+        if (row) {
+          return yaml.safeLoad(row.config);
         }
 
-        const yamlString = await fsp.readFile(configPath, { encoding: "utf8" });
-        return yaml.safeLoad(yamlString);
+        logger.warn(`No config with key "${key}"`);
+        return {};
       },
 
       logFn: (level, msg) => {

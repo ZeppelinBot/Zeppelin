@@ -1,0 +1,27 @@
+{
+  "name": "zeppelin-dashboard",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "build": "rimraf dist && parcel build src/index.html --out-dir dist",
+    "watch": "parcel src/index.html"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.0.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "parcel-bundler": "^1.12.3",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.0",
+    "vue": "^2.6.10",
+    "vue-hot-reload-api": "^2.3.3",
+    "vue-router": "^3.0.6"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
+}
