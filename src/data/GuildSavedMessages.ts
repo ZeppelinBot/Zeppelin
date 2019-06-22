@@ -201,7 +201,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     const deleted = await this.messages
       .createQueryBuilder()
       .where("id IN (:ids)", { ids })
-      .where("deleted_at = :deletedAt", { deletedAt })
+      .andWhere("deleted_at = :deletedAt", { deletedAt })
       .getMany();
 
     if (deleted.length) {
