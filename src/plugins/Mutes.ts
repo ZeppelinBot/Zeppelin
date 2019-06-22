@@ -75,8 +75,8 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
         dm_on_mute: false,
         message_on_mute: false,
         message_channel: null,
-        mute_message: "You have been muted on {guildName}. Reason given: {reason}",
-        timed_mute_message: "You have been muted on {guildName} for {time}. Reason given: {reason}",
+        mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
+        timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
 
         can_view_list: false,
         can_cleanup: false,
