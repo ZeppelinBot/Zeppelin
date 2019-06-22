@@ -32,7 +32,7 @@ export class DashboardLogins extends BaseRepository {
     const login = await this.dashboardLogins
       .createQueryBuilder()
       .where("id = :id", { id: loginId })
-      .where("expires_at > NOW()")
+      .andWhere("expires_at > NOW()")
       .getOne();
 
     if (!login) {
@@ -40,7 +40,7 @@ export class DashboardLogins extends BaseRepository {
     }
 
     const hash = crypto.createHash("sha256");
-    hash.update(token);
+    hash.update(loginId + token); // Remember to use loginId as the salt
     const hashedToken = hash.digest("hex");
     if (hashedToken !== login.token) {
       return null;
@@ -65,7 +65,7 @@ export class DashboardLogins extends BaseRepository {
     // Generate token
     const token = uuidv4();
     const hash = crypto.createHash("sha256");
-    hash.update(token);
+    hash.update(loginId + token); // Use loginId as a salt
     const hashedToken = hash.digest("hex");
 
     // Save this to the DB
