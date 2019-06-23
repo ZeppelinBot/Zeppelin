@@ -19,9 +19,9 @@ import { SelfGrantableRolesPlugin } from "./SelfGrantableRolesPlugin";
 import { RemindersPlugin } from "./Reminders";
 import { WelcomeMessagePlugin } from "./WelcomeMessage";
 import { BotControlPlugin } from "./BotControl";
-import { LogServerPlugin } from "./LogServer";
 import { UsernameSaver } from "./UsernameSaver";
 import { CustomEventsPlugin } from "./CustomEvents";
+import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -48,12 +48,14 @@ export const availablePlugins = [
   RemindersPlugin,
   WelcomeMessagePlugin,
   CustomEventsPlugin,
+  GuildInfoSaverPlugin,
 ];
 
 /**
  * Plugins that are always loaded (subset of the names of the plugins in availablePlugins)
  */
 export const basePlugins = [
+  GuildInfoSaverPlugin.pluginName,
   MessageSaverPlugin.pluginName,
   NameHistoryPlugin.pluginName,
   CasesPlugin.pluginName,
@@ -63,4 +65,4 @@ export const basePlugins = [
 /**
  * Available global plugins (can't be loaded per-guild, only globally)
  */
-export const availableGlobalPlugins = [BotControlPlugin, LogServerPlugin, UsernameSaver];
+export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver];

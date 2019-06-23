@@ -2,9 +2,11 @@ import express, { Request, Response } from "express";
 import passport from "passport";
 import OAuth2Strategy from "passport-oauth2";
 import CustomStrategy from "passport-custom";
-import { DashboardLogins, DashboardLoginUserData } from "../data/DashboardLogins";
+import { ApiLogins } from "../data/ApiLogins";
 import pick from "lodash.pick";
 import https from "https";
+import { ApiUserInfo } from "../data/ApiUserInfo";
+import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
 
 const DISCORD_API_URL = "https://discordapp.com/api";
 
@@ -53,7 +55,8 @@ export function initAuth(app: express.Express) {
   passport.serializeUser((user, done) => done(null, user));
   passport.deserializeUser((user, done) => done(null, user));
 
-  const dashboardLogins = new DashboardLogins();
+  const apiLogins = new ApiLogins();
+  const apiUserInfo = new ApiUserInfo();
 
   // Initialize API tokens
   passport.use(
@@ -62,7 +65,7 @@ export function initAuth(app: express.Express) {
       const apiKey = req.header("X-Api-Key");
       if (!apiKey) return cb();
 
-      const userId = await dashboardLogins.getUserIdByApiKey(apiKey);
+      const userId = await apiLogins.getUserIdByApiKey(apiKey);
       if (userId) {
         return cb(null, { userId });
       }
@@ -72,6 +75,7 @@ export function initAuth(app: express.Express) {
   );
 
   // Initialize OAuth2 for Discord login
+  // When the user logs in through OAuth2, we create them a "login" (= api token) and update their user info in the DB
   passport.use(
     new OAuth2Strategy(
       {
@@ -84,10 +88,10 @@ export function initAuth(app: express.Express) {
       },
       async (accessToken, refreshToken, profile, cb) => {
         const user = await simpleDiscordAPIRequest(accessToken, "users/@me");
-        const userData = pick(user, ["username", "discriminator", "avatar"]) as DashboardLoginUserData;
-        const apiKey = await dashboardLogins.addLogin(user.id, userData);
+        const apiKey = await apiLogins.addLogin(user.id);
+        const userData = pick(user, ["username", "discriminator", "avatar"]) as ApiUserInfoData;
+        await apiUserInfo.update(user.id, userData);
         // TODO: Revoke access token, we don't need it anymore
-        console.log("done, calling cb with", apiKey);
         cb(null, { apiKey });
       },
     ),
@@ -108,7 +112,7 @@ export function initAuth(app: express.Express) {
       return res.status(400).json({ error: "No key supplied" });
     }
 
-    const userId = await dashboardLogins.getUserIdByApiKey(key);
+    const userId = await apiLogins.getUserIdByApiKey(key);
     if (!userId) {
       return res.json({ valid: false });
     }

@@ -4,7 +4,7 @@ import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
 export class AllowedGuild {
   @Column()
   @PrimaryColumn()
-  guild_id: string;
+  id: string;
 
   @Column()
   name: string;
