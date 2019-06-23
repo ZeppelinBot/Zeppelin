@@ -9,4 +9,13 @@ export class DashboardUsers extends BaseRepository {
     super();
     this.dashboardUsers = getRepository(DashboardUser);
   }
+
+  getByGuildAndUserId(guildId, userId) {
+    return this.dashboardUsers.findOne({
+      where: {
+        guild_id: guildId,
+        user_id: userId,
+      },
+    });
+  }
 }

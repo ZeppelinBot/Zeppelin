@@ -18,6 +18,7 @@
   "dependencies": {
     "js-cookie": "^2.2.0",
     "vue": "^2.6.10",
+    "vue-codemirror": "^4.0.6",
     "vue-hot-reload-api": "^2.3.3",
     "vue-router": "^3.0.6"
   },

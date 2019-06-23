@@ -6,10 +6,10 @@
 		<h1>Guilds</h1>
 		<table v-for="guild in guilds">
 			<tr>
-				<td>{{ guild.id }}</td>
+				<td>{{ guild.guild_id }}</td>
 				<td>{{ guild.name }}</td>
 				<td>
-					<a v-bind:href="'/dashboard/guilds/' + guild.id + '/config'">Config</a>
+					<a v-bind:href="'/dashboard/guilds/' + guild.guild_id + '/config'">Config</a>
 				</td>
 			</tr>
 		</table>
@@ -17,19 +17,19 @@
 </template>
 
 <script>
-	import {mapGetters, mapState} from "vuex";
-    import {LoadStatus} from "../store/types";
+	import {mapState} from "vuex";
 
 	export default {
-	  mounted() {
-	    this.$store.dispatch("guilds/loadAvailableGuilds");
+	  async mounted() {
+	    await this.$store.dispatch("guilds/loadAvailableGuilds");
+	    this.loading = false;
+	  },
+	  data() {
+	    return { loading: true };
 	  },
 	  computed: {
-	    loading() {
-	      return this.$state.guilds.availableGuildsLoadStatus !== LoadStatus.Done;
-	    },
-	    ...mapState({
-	      guilds: 'guilds/available',
+	    ...mapState('guilds', {
+	      guilds: 'available',
 	    }),
 	  },
 	};

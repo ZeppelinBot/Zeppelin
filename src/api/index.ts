@@ -20,6 +20,11 @@ connect().then(() => {
   initAuth(app);
   initGuildsAPI(app);
 
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500);
+    res.json({ error: err.message });
+  });
+
   app.get("/", (req, res) => {
     res.end({ status: "cookies" });
   });
