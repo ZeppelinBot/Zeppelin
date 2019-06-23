@@ -3,13 +3,22 @@
 		Loading...
 	</div>
 	<div v-else>
-		<h1>Config for {{ guild.name }}</h1>
+		<h2 class="title is-1">Config for {{ guild.name }}</h2>
 		<codemirror v-model="editableConfig" :options="cmConfig"></codemirror>
-		<button v-on:click="save" :disabled="saving">Save</button>
+		<button class="button" v-on:click="save" :disabled="saving">Save</button>
 		<span v-if="saving">Saving...</span>
-		<span v-else-if="saved">Saved!</span>
 	</div>
 </template>
+
+<style scoped>
+  .vue-codemirror {
+    margin-bottom: 16px;
+  }
+
+  >>> .CodeMirror {
+    height: 70vh;
+  }
+</style>
 
 <script>
 	import {mapState} from "vuex";
@@ -37,7 +46,6 @@
 	    return {
 	      loading: true,
 	      saving: false,
-	      saved: false,
 	      editableConfig: null,
 	      cmConfig: {
 	        indentWithTabs: false,
@@ -51,7 +59,7 @@
 	  computed: {
 	    ...mapState('guilds', {
 	      guild() {
-	        return this.$store.state.guilds.available.find(g => g.guild_id === this.$route.params.guildId);
+	        return this.$store.state.guilds.available.find(g => g.id === this.$route.params.guildId);
 	      },
 	      config() {
 	        return this.$store.state.guilds.configs[this.$route.params.guildId];
@@ -65,9 +73,7 @@
 	        guildId: this.$route.params.guildId,
 	        config: this.editableConfig,
 	      });
-	      this.saving = false;
-	      this.saved = true;
-	      setTimeout(() => this.saved = false, 2500);
+	      this.$router.push("/dashboard");
 	    },
 	  },
 	};

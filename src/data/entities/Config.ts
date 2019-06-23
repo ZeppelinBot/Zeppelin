@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, CreateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { ApiUserInfo } from "./ApiUserInfo";
 
 @Entity("configs")
 export class Config {
@@ -20,4 +21,8 @@ export class Config {
 
   @Column()
   edited_at: string;
+
+  @ManyToOne(type => ApiUserInfo)
+  @JoinColumn({ name: "edited_by" })
+  userInfo: ApiUserInfo;
 }

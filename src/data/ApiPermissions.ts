@@ -1,17 +1,17 @@
 import { getRepository, Repository } from "typeorm";
-import { DashboardUser } from "./entities/DashboardUser";
+import { ApiPermission } from "./entities/ApiPermission";
 import { BaseRepository } from "./BaseRepository";
 
-export class DashboardUsers extends BaseRepository {
-  private dashboardUsers: Repository<DashboardUser>;
+export class ApiPermissions extends BaseRepository {
+  private apiPermissions: Repository<ApiPermission>;
 
   constructor() {
     super();
-    this.dashboardUsers = getRepository(DashboardUser);
+    this.apiPermissions = getRepository(ApiPermission);
   }
 
   getByGuildAndUserId(guildId, userId) {
-    return this.dashboardUsers.findOne({
+    return this.apiPermissions.findOne({
       where: {
         guild_id: guildId,
         user_id: userId,

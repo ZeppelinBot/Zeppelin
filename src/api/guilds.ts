@@ -2,35 +2,35 @@ import express from "express";
 import passport from "passport";
 import { AllowedGuilds } from "../data/AllowedGuilds";
 import { requireAPIToken } from "./auth";
-import { DashboardUsers } from "../data/DashboardUsers";
+import { ApiPermissions } from "../data/ApiPermissions";
 import { clientError, ok, unauthorized } from "./responses";
 import { Configs } from "../data/Configs";
-import { DashboardRoles } from "../data/DashboardRoles";
+import { ApiRoles } from "../data/ApiRoles";
 
 export function initGuildsAPI(app: express.Express) {
   const guildAPIRouter = express.Router();
   requireAPIToken(guildAPIRouter);
 
   const allowedGuilds = new AllowedGuilds();
-  const dashboardUsers = new DashboardUsers();
+  const apiPermissions = new ApiPermissions();
   const configs = new Configs();
 
   guildAPIRouter.get("/guilds/available", async (req, res) => {
-    const guilds = await allowedGuilds.getForDashboardUser(req.user.userId);
+    const guilds = await allowedGuilds.getForApiUser(req.user.userId);
     res.json(guilds);
   });
 
   guildAPIRouter.get("/guilds/:guildId/config", async (req, res) => {
-    const dbUser = await dashboardUsers.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!dbUser) return unauthorized(res);
+    const permissions = await apiPermissions.getByGuildAndUserId(req.params.guildId, req.user.userId);
+    if (!permissions) return unauthorized(res);
 
     const config = await configs.getActiveByKey(`guild-${req.params.guildId}`);
     res.json({ config: config ? config.config : "" });
   });
 
   guildAPIRouter.post("/guilds/:guildId/config", async (req, res) => {
-    const dbUser = await dashboardUsers.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!dbUser || DashboardRoles[dbUser.role] < DashboardRoles.Editor) return unauthorized(res);
+    const permissions = await apiPermissions.getByGuildAndUserId(req.params.guildId, req.user.userId);
+    if (!permissions || ApiRoles[permissions.role] < ApiRoles.Editor) return unauthorized(res);
 
     const config = req.body.config;
     if (config == null) return clientError(res, "No config supplied");

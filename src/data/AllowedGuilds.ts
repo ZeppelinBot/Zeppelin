@@ -21,21 +21,25 @@ export class AllowedGuilds extends BaseRepository {
   async isAllowed(guildId) {
     const count = await this.allowedGuilds.count({
       where: {
-        guild_id: guildId,
+        id: guildId,
       },
     });
     return count !== 0;
   }
 
-  getForDashboardUser(userId) {
+  getForApiUser(userId) {
     return this.allowedGuilds
       .createQueryBuilder("allowed_guilds")
       .innerJoin(
-        "dashboard_users",
-        "dashboard_users",
-        "dashboard_users.guild_id = allowed_guilds.guild_id AND dashboard_users.user_id = :userId",
+        "api_permissions",
+        "api_permissions",
+        "api_permissions.guild_id = allowed_guilds.id AND api_permissions.user_id = :userId",
         { userId },
       )
       .getMany();
+  }
+
+  updateInfo(id, name, icon) {
+    return this.allowedGuilds.update({ id }, { name, icon });
   }
 }

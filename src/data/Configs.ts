@@ -32,6 +32,18 @@ export class Configs extends BaseRepository {
     return (await this.getActiveByKey(key)) != null;
   }
 
+  getRevisions(key, num = 10) {
+    return this.configs.find({
+      relations: this.getRelations(),
+      where: { key },
+      select: ["id", "key", "is_active", "edited_by", "edited_at"],
+      order: {
+        edited_at: "DESC",
+      },
+      take: num,
+    });
+  }
+
   async saveNewRevision(key, config, editedBy) {
     return connection.transaction(async entityManager => {
       const repo = entityManager.getRepository(Config);

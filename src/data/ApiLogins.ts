@@ -1,5 +1,5 @@
 import { getRepository, Repository } from "typeorm";
-import { DashboardLogin } from "./entities/DashboardLogin";
+import { ApiLogin } from "./entities/ApiLogin";
 import { BaseRepository } from "./BaseRepository";
 import crypto from "crypto";
 import moment from "moment-timezone";
@@ -9,18 +9,12 @@ import uuidv4 from "uuid/v4";
 import { DBDateFormat } from "../utils";
 import { log } from "util";
 
-export interface DashboardLoginUserData {
-  username: string;
-  discriminator: string;
-  avatar: string;
-}
-
-export class DashboardLogins extends BaseRepository {
-  private dashboardLogins: Repository<DashboardLogin>;
+export class ApiLogins extends BaseRepository {
+  private apiLogins: Repository<ApiLogin>;
 
   constructor() {
     super();
-    this.dashboardLogins = getRepository(DashboardLogin);
+    this.apiLogins = getRepository(ApiLogin);
   }
 
   async getUserIdByApiKey(apiKey: string): Promise<string | null> {
@@ -29,7 +23,7 @@ export class DashboardLogins extends BaseRepository {
       return null;
     }
 
-    const login = await this.dashboardLogins
+    const login = await this.apiLogins
       .createQueryBuilder()
       .where("id = :id", { id: loginId })
       .andWhere("expires_at > NOW()")
@@ -49,12 +43,12 @@ export class DashboardLogins extends BaseRepository {
     return login.user_id;
   }
 
-  async addLogin(userId: string, userData: DashboardLoginUserData): Promise<string> {
+  async addLogin(userId: string): Promise<string> {
     // Generate random login id
     let loginId;
     while (true) {
       loginId = uuidv4();
-      const existing = await this.dashboardLogins.findOne({
+      const existing = await this.apiLogins.findOne({
         where: {
           id: loginId,
         },
@@ -69,11 +63,10 @@ export class DashboardLogins extends BaseRepository {
     const hashedToken = hash.digest("hex");
 
     // Save this to the DB
-    await this.dashboardLogins.insert({
+    await this.apiLogins.insert({
       id: loginId,
       token: hashedToken,
       user_id: userId,
-      user_data: userData,
       logged_in_at: moment().format(DBDateFormat),
       expires_at: moment()
         .add(1, "day")

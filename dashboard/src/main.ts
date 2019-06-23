@@ -1,3 +1,5 @@
+import "./style/base.scss";
+
 import Vue from "vue";
 import { RootStore } from "./store";
 import { router } from "./routes";

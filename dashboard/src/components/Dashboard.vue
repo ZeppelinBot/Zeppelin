@@ -1,36 +1,46 @@
 <template>
-	<div v-if="loading">
-		Loading...
-	</div>
-	<div v-else>
-		<h1>Guilds</h1>
-		<table v-for="guild in guilds">
-			<tr>
-				<td>{{ guild.guild_id }}</td>
-				<td>{{ guild.name }}</td>
-				<td>
-					<a v-bind:href="'/dashboard/guilds/' + guild.guild_id + '/config'">Config</a>
-				</td>
-			</tr>
-		</table>
+	<div class="dashboard">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <div class="navbar-item">
+            <img class="dashboard-logo" src="../img/logo.png" aria-hidden="true">
+            <h1 class="dashboard-title">Zeppelin Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="navbar-menu is-active">
+          <div class="navbar-start">
+            <router-link to="/dashboard" class="navbar-item">Guilds</router-link>
+            <a href="#" class="navbar-item">Docs</a>
+            <a href="#" class="navbar-item">Log out</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="section">
+      <div class="container">
+        <router-view></router-view>
+      </div>
+    </div>
 	</div>
 </template>
 
-<script>
-	import {mapState} from "vuex";
+<style scoped>
+  .dashboard-logo {
+    margin-right: 12px;
+  }
 
-	export default {
-	  async mounted() {
-	    await this.$store.dispatch("guilds/loadAvailableGuilds");
-	    this.loading = false;
-	  },
-	  data() {
-	    return { loading: true };
-	  },
-	  computed: {
-	    ...mapState('guilds', {
-	      guilds: 'available',
-	    }),
-	  },
-	};
+  .dashboard-title {
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  export default {
+    async mounted() {
+      await import("../style/dashboard.scss");
+    }
+  };
 </script>
