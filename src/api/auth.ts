@@ -59,13 +59,12 @@ export function initAuth(app: express.Express) {
   passport.use(
     "api-token",
     new CustomStrategy(async (req, cb) => {
-      console.log("in api-token strategy");
       const apiKey = req.header("X-Api-Key");
       if (!apiKey) return cb();
 
       const userId = await dashboardLogins.getUserIdByApiKey(apiKey);
       if (userId) {
-        cb(null, { userId });
+        return cb(null, { userId });
       }
 
       cb();
@@ -111,9 +110,15 @@ export function initAuth(app: express.Express) {
 
     const userId = await dashboardLogins.getUserIdByApiKey(key);
     if (!userId) {
-      return res.status(403).json({ error: "Invalid key" });
+      return res.json({ valid: false });
     }
 
-    res.json({ status: "ok" });
+    res.json({ valid: true });
+  });
+}
+
+export function requireAPIToken(router: express.Router) {
+  router.use(passport.authenticate("api-token", { failWithError: true }), (err, req, res, next) => {
+    return res.json({ error: err.message });
   });
 }

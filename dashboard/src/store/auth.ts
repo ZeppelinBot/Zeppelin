@@ -16,11 +16,11 @@ export const AuthStore: Module<AuthState, RootState> = {
 
       const storedKey = localStorage.getItem("apiKey");
       if (storedKey) {
-        console.log("key?", storedKey);
         const result = await post("auth/validate-key", { key: storedKey });
-        if (result.isValid) {
+        if (result.valid) {
           await dispatch("setApiKey", storedKey);
         } else {
+          console.log("Unable to validate key, removing from localStorage");
           localStorage.removeItem("apiKey");
         }
       }

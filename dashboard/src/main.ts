@@ -2,8 +2,6 @@ import Vue from "vue";
 import { RootStore } from "./store";
 import { router } from "./routes";
 
-get("/foo", { bar: "baz" });
-
 // Set up a read-only global variable to access specific env vars
 Vue.mixin({
   data() {

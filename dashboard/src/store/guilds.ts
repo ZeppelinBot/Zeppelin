@@ -1,4 +1,4 @@
-import { get } from "../api";
+import { get, post } from "../api";
 import { Module } from "vuex";
 import { GuildState, LoadStatus, RootState } from "./types";
 
@@ -19,6 +19,15 @@ export const GuildStore: Module<GuildState, RootState> = {
       const availableGuilds = await get("guilds/available");
       commit("setAvailableGuilds", availableGuilds);
     },
+
+    async loadConfig({ commit }, guildId) {
+      const result = await get(`guilds/${guildId}/config`);
+      commit("setConfig", { guildId, config: result.config });
+    },
+
+    async saveConfig({ commit }, { guildId, config }) {
+      await post(`guilds/${guildId}/config`, { config });
+    },
   },
 
   mutations: {
@@ -29,6 +38,10 @@ export const GuildStore: Module<GuildState, RootState> = {
     setAvailableGuilds(state: GuildState, guilds) {
       state.available = guilds;
       state.availableGuildsLoadStatus = LoadStatus.Done;
+    },
+
+    setConfig(state: GuildState, { guildId, config }) {
+      state.configs[guildId] = config;
     },
   },
 };
