@@ -11,11 +11,11 @@ export class PluginRuntimeError {
     this.guildId = guildId;
   }
 
-  [util.inspect.custom](depth, options) {
+  [util.inspect.custom]() {
     return `PRE [${this.pluginName}] [${this.guildId}] ${this.message}`;
   }
 
   toString() {
-    return this[util.inspect.custom]();
+    return this[util.inspect.custom];
   }
 }

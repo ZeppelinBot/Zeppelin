@@ -1,0 +1,148 @@
+import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import humanizeDuration from "humanize-duration";
+import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel } from "eris";
+import { GuildVCAlerts } from "../data/GuildVCAlerts";
+import moment = require("moment");
+import { resolveMember } from "../utils";
+
+const ALERT_LOOP_TIME = 30 * 1000;
+
+interface ILocatePluginConfig {
+  can_where: boolean;
+  can_alert: boolean;
+}
+
+export class LocatePlugin extends ZeppelinPlugin<ILocatePluginConfig> {
+  public static pluginName = "locate_user";
+
+  private alerts: GuildVCAlerts;
+  private outdatedAlertsTimeout;
+  private usersWithAlerts: string[] = [];
+
+  getDefaultOptions(): IPluginOptions<ILocatePluginConfig> {
+    return {
+      config: {
+        can_where: false,
+        can_alert: false,
+      },
+      overrides: [
+        {
+          level: ">=50",
+          config: {
+            can_where: true,
+            can_alert: true,
+          },
+        },
+      ],
+    };
+  }
+
+  onLoad() {
+    this.alerts = GuildVCAlerts.getGuildInstance(this.guildId);
+    this.outdatedAlertsLoop();
+    this.fillActiveAlertsList();
+  }
+
+  async outdatedAlertsLoop() {
+    const outdatedAlerts = await this.alerts.getOutdatedAlerts();
+
+    for (const alert of outdatedAlerts) {
+      await this.alerts.delete(alert.id);
+      await this.removeUserIDFromActiveAlerts(alert.user_id);
+    }
+
+    this.outdatedAlertsTimeout = setTimeout(() => this.outdatedAlertsLoop(), ALERT_LOOP_TIME);
+  }
+
+  async fillActiveAlertsList() {
+    const allAlerts = await this.alerts.getAllGuildAlerts();
+
+    allAlerts.forEach(alert => {
+      if (!this.usersWithAlerts.includes(alert.user_id)) {
+        this.usersWithAlerts.push(alert.user_id);
+      }
+    });
+  }
+
+  @d.command("where", "<member:resolvedMember>", {})
+  @d.permission("can_where")
+  async whereCmd(msg: Message, args: { member: Member; time?: number; reminder?: string }) {
+    let member = await resolveMember(this.bot, this.guild, args.member.id);
+    sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
+  }
+
+  @d.command("alert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {})
+  @d.permission("can_alert")
+  async notifyRequest(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
+    let time = args.duration || 600000;
+    let alertTime = moment().add(time, "millisecond");
+    let body = args.reminder || "None";
+
+    this.alerts.add(msg.author.id, args.member.id, msg.channel.id, alertTime.format("YYYY-MM-DD HH:mm:ss"), body);
+    if (!this.usersWithAlerts.includes(args.member.id)) {
+      this.usersWithAlerts.push(args.member.id);
+    }
+
+    msg.channel.createMessage(
+      `If ${args.member.mention} joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
+    );
+  }
+
+  @d.event("voiceChannelJoin")
+  async userJoinedVC(member: Member, channel: Channel) {
+    if (this.usersWithAlerts.includes(member.id)) {
+      this.sendAlerts(member.id);
+      await this.removeUserIDFromActiveAlerts(member.id);
+    }
+  }
+
+  @d.event("voiceChannelSwitch")
+  async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel) {
+    if (this.usersWithAlerts.includes(member.id)) {
+      this.sendAlerts(member.id);
+      await this.removeUserIDFromActiveAlerts(member.id);
+    }
+  }
+
+  async sendAlerts(userid: string) {
+    const triggeredAlerts = await this.alerts.getAlertsByUserId(userid);
+    const member = await resolveMember(this.bot, this.guild, userid);
+
+    triggeredAlerts.forEach(alert => {
+      let prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
+      sendWhere(this.guild, member, <TextableChannel>this.bot.getChannel(alert.channel_id), prepend);
+      this.alerts.delete(alert.id);
+    });
+  }
+
+  async removeUserIDFromActiveAlerts(userid: string) {
+    const index = this.usersWithAlerts.indexOf(userid);
+    if (index > -1) {
+      this.usersWithAlerts.splice(index, 1);
+    }
+  }
+}
+
+export async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend: string) {
+  let voice = await (<VoiceChannel>guild.channels.get(member.voiceState.channelID));
+
+  if (voice == null) {
+    channel.createMessage(prepend + "That user is not in a channel");
+  } else {
+    let invite = await createInvite(voice);
+    channel.createMessage(
+      prepend + ` ${member.mention} is in the following channel: ${voice.name} https://${getInviteLink(invite)}`,
+    );
+  }
+}
+
+export async function createInvite(vc: VoiceChannel) {
+  let existingInvites = await vc.getInvites();
+
+  if (existingInvites.length !== 0) {
+    return existingInvites[0];
+  } else {
+    return vc.createInvite(undefined);
+  }
+}

@@ -22,6 +22,7 @@ import { BotControlPlugin } from "./BotControl";
 import { UsernameSaver } from "./UsernameSaver";
 import { CustomEventsPlugin } from "./CustomEvents";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
+import { LocatePlugin } from "./LocateUser";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -49,6 +50,7 @@ export const availablePlugins = [
   WelcomeMessagePlugin,
   CustomEventsPlugin,
   GuildInfoSaverPlugin,
+  LocatePlugin,
 ];
 
 /**
