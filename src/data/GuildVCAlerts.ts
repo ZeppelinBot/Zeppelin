@@ -34,6 +34,15 @@ export class GuildVCAlerts extends BaseGuildRepository {
     });
   }
 
+  async getAlertsByRequestorId(requestorId: string): Promise<VCAlert[]> {
+    return this.allAlerts.find({
+      where: {
+        guild_id: this.guildId,
+        requestor_id: requestorId,
+      },
+    });
+  }
+
   async delete(id) {
     await this.allAlerts.delete({
       guild_id: this.guildId,

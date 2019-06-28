@@ -4,7 +4,7 @@ import humanizeDuration from "humanize-duration";
 import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
 import moment = require("moment");
-import { resolveMember } from "../utils";
+import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage } from "../utils";
 
 const ALERT_LOOP_TIME = 30 * 1000;
 
@@ -72,9 +72,11 @@ export class LocatePlugin extends ZeppelinPlugin<ILocatePluginConfig> {
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
   }
 
-  @d.command("alert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {})
+  @d.command("vcalert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {
+    aliases: ["vca"],
+  })
   @d.permission("can_alert")
-  async notifyRequest(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
+  async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
     let time = args.duration || 600000;
     let alertTime = moment().add(time, "millisecond");
     let body = args.reminder || "None";
@@ -87,6 +89,45 @@ export class LocatePlugin extends ZeppelinPlugin<ILocatePluginConfig> {
     msg.channel.createMessage(
       `If ${args.member.mention} joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
     );
+  }
+
+  @d.command("vcalerts")
+  @d.permission("can_alert")
+  async listVcalertCmd(msg: Message) {
+    const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
+    if (alerts.length === 0) {
+      this.sendErrorMessage(msg.channel, "You have no active alerts!");
+      return;
+    }
+
+    alerts.sort(sorter("expires_at"));
+    const longestNum = (alerts.length + 1).toString().length;
+    const lines = Array.from(alerts.entries()).map(([i, alert]) => {
+      const num = i + 1;
+      const paddedNum = num.toString().padStart(longestNum, " ");
+      return `\`${paddedNum}.\` \`${alert.expires_at}\` Member: <@!${alert.user_id}> Reminder: \`${alert.body}\``;
+    });
+    createChunkedMessage(msg.channel, lines.join("\n"));
+  }
+
+  @d.command("vcalerts delete", "<num:number>", {
+    aliases: ["vcalerts d"],
+  })
+  @d.permission("can_alert")
+  async deleteVcalertCmd(msg: Message, args: { num: number }) {
+    const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
+    alerts.sort(sorter("expires_at"));
+    const lastNum = alerts.length + 1;
+
+    if (args.num > lastNum || args.num < 0) {
+      msg.channel.createMessage(errorMessage("Unknown alert"));
+      return;
+    }
+
+    const toDelete = alerts[args.num - 1];
+    await this.alerts.delete(toDelete.id);
+
+    msg.channel.createMessage(successMessage("Alert deleted"));
   }
 
   @d.event("voiceChannelJoin")
