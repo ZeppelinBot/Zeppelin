@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import humanizeDuration from "humanize-duration";
-import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel } from "eris";
+import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
 import moment = require("moment");
 import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage } from "../utils";
@@ -144,6 +144,14 @@ export class LocatePlugin extends ZeppelinPlugin<ILocatePluginConfig> {
       this.sendAlerts(member.id);
       await this.removeUserIDFromActiveAlerts(member.id);
     }
+  }
+
+  @d.event("guildBanAdd")
+  async onGuildBanAdd(_, user: User) {
+    const alerts = await this.alerts.getAlertsByUserId(user.id);
+    alerts.forEach(alert => {
+      this.alerts.delete(alert.id);
+    });
   }
 
   async sendAlerts(userid: string) {
