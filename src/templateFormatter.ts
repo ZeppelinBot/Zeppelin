@@ -1,4 +1,5 @@
 import { has, get } from "./utils";
+import seedrandom from "seedrandom";
 
 const TEMPLATE_CACHE_SIZE = 200;
 const templateCache: Map<string, ParsedTemplate> = new Map();
@@ -299,7 +300,7 @@ const baseValues = {
     if (end != null && isNaN(end)) return "";
     return arg1.slice(parseInt(start, 10), end && parseInt(end, 10));
   },
-  rand(from, to) {
+  rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
     if (to == null) {
@@ -313,7 +314,9 @@ const baseValues = {
       [from, to] = [to, from];
     }
 
-    return Math.round(Math.random() * (to - from) + from);
+    let randValue = seed != null ? new seedrandom(seed)() : Math.random();
+
+    return Math.round(randValue * (to - from) + from);
   },
   add(...args) {
     return args.reduce((result, arg) => {
