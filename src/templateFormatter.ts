@@ -275,6 +275,9 @@ const baseValues = {
   concat(...args) {
     return [...args].join("");
   },
+  concatArr(arr, separator = "") {
+    return arr.join(separator);
+  },
   eq(...args) {
     if (args.length < 2) return true;
     for (let i = 1; i < args.length; i++) {
