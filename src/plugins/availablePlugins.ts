@@ -22,6 +22,7 @@ import { BotControlPlugin } from "./BotControl";
 import { UsernameSaver } from "./UsernameSaver";
 import { CustomEventsPlugin } from "./CustomEvents";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
+import { LogServerPlugin } from "./LogServer";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -65,4 +66,4 @@ export const basePlugins = [
 /**
  * Available global plugins (can't be loaded per-guild, only globally)
  */
-export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver];
+export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver, LogServerPlugin];
