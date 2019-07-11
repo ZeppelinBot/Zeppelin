@@ -1,6 +1,6 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { Message, TextChannel } from "eris";
-import { errorMessage, successMessage } from "../utils";
+import { errorMessage, successMessage, stripObjectToScalars } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
@@ -174,13 +174,14 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
     msg.channel.createMessage(`Tag source:\n${url}`);
   }
 
-  async renderTag(body, args = []) {
+  async renderTag(body, args = [], extraData = {}) {
     const dynamicVars = {};
     const maxTagFnCalls = 25;
     let tagFnCalls = 0;
 
     const data = {
       args,
+      ...extraData,
       ...this.tagFunctions,
       set(name, val) {
         if (typeof name !== "string") return;
@@ -206,7 +207,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
     if (msg.is_bot) return;
 
     const member = await this.getMember(msg.user_id);
-    if (!this.hasPermission("can_use", { member, channelId: msg.channel_id })) return;
+    if (!member || !this.hasPermission("can_use", { member, channelId: msg.channel_id })) return;
 
     if (!msg.data.content) return;
     if (msg.is_bot) return;
@@ -229,7 +230,10 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
 
     // Format the string
     try {
-      body = await this.renderTag(body, tagArgs);
+      body = await this.renderTag(body, tagArgs, {
+        member: stripObjectToScalars(member, ["user"]),
+        user: stripObjectToScalars(member.user),
+      });
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tag.body}`);
