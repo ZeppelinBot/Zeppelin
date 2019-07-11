@@ -457,7 +457,9 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
     }
 
     // let the user know we are done
-    msg.channel.createMessage(successMessage("All mutes for the specified filters posted!"));
+    if (chunks.length > 2) {
+      msg.channel.createMessage(successMessage("All mutes for the specified filters posted!"));
+    }
   }
 
   /**
