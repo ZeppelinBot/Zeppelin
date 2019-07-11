@@ -40,7 +40,7 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<ICompanionChannelPlug
   }
 
   onUnload() {
-    this.companionChannels.clear;
+    this.companionChannels.clear();
   }
 
   async handleCompanionPermissions(userID: string, voiceChannelId: string, remove?: boolean) {
