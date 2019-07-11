@@ -24,6 +24,7 @@ import { CustomEventsPlugin } from "./CustomEvents";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
 import { LogServerPlugin } from "./LogServer";
 import { CompanionChannelPlugin } from "./CompanionChannels";
+import { LocatePlugin } from "./LocateUser";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -52,6 +53,7 @@ export const availablePlugins = [
   CustomEventsPlugin,
   GuildInfoSaverPlugin,
   CompanionChannelPlugin,
+  LocatePlugin,
 ];
 
 /**
