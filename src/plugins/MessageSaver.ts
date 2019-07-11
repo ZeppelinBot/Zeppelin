@@ -2,12 +2,13 @@ import { Plugin, decorators as d, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 
 interface IMessageSaverPluginConfig {
   can_manage: boolean;
 }
 
-export class MessageSaverPlugin extends Plugin<IMessageSaverPluginConfig> {
+export class MessageSaverPlugin extends ZeppelinPlugin<IMessageSaverPluginConfig> {
   public static pluginName = "message_saver";
 
   protected savedMessages: GuildSavedMessages;

@@ -5,8 +5,17 @@
 	<div v-else>
 		<h2 class="title is-1">Config for {{ guild.name }}</h2>
 		<codemirror v-model="editableConfig" :options="cmConfig"></codemirror>
-		<button class="button" v-on:click="save" :disabled="saving">Save</button>
-		<span v-if="saving">Saving...</span>
+    <div class="editor-footer">
+      <div class="actions">
+        <button class="button" v-on:click="save" :disabled="saving">Save</button>
+      </div>
+      <div class="status">
+        <div class="status-message" v-if="saving">Saving...</div>
+        <div class="status-message error" v-if="errors.length">
+          <div v-for="error in errors">{{ error }}</div>
+        </div>
+      </div>
+    </div>
 	</div>
 </template>
 
@@ -26,6 +35,7 @@
 	import "codemirror/lib/codemirror.css";
 	import "codemirror/theme/oceanic-next.css";
 	import "codemirror/mode/yaml/yaml.js";
+  import {ApiError} from "../api";
 
 	export default {
 	  components: {
@@ -47,6 +57,7 @@
 	      loading: true,
 	      saving: false,
 	      editableConfig: null,
+        errors: [],
 	      cmConfig: {
 	        indentWithTabs: false,
 	        indentUnit: 2,
@@ -69,10 +80,23 @@
 	  methods: {
 	    async save() {
 	      this.saving = true;
-	      await this.$store.dispatch("guilds/saveConfig", {
-	        guildId: this.$route.params.guildId,
-	        config: this.editableConfig,
-	      });
+	      this.errors = [];
+
+	      try {
+          await this.$store.dispatch("guilds/saveConfig", {
+            guildId: this.$route.params.guildId,
+            config: this.editableConfig,
+          });
+        } catch (e) {
+	        if (e instanceof ApiError && (e.status === 400 || e.status === 422)) {
+            this.errors = e.body.errors || ['Error while saving config'];
+            this.saving = false;
+            return;
+          }
+
+	        throw e;
+        }
+
 	      this.$router.push("/dashboard");
 	    },
 	  },

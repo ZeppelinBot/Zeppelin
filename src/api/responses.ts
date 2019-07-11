@@ -8,7 +8,7 @@ export function error(res: Response, message: string, statusCode: number = 500) 
   res.status(statusCode).json({ error: message });
 }
 
-export function serverError(res: Response, message: string) {
+export function serverError(res: Response, message = "Server error") {
   error(res, message, 500);
 }
 

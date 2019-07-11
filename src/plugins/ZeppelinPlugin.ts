@@ -1,15 +1,18 @@
 import { IBasePluginConfig, IPluginOptions, logger, Plugin } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
-import Ajv, { ErrorObject } from "ajv";
+import * as t from "io-ts";
+import { pipe } from "fp-ts/lib/pipeable";
+import { fold } from "fp-ts/lib/Either";
+import { PathReporter } from "io-ts/lib/PathReporter";
 import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, UnknownUser } from "../utils";
 import { Member, User } from "eris";
-
 import { performance } from "perf_hooks";
+import { validateStrict } from "../validatorUtils";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
-  protected static configSchema: any;
+  protected static configSchema: t.TypeC<any>;
   public static dependencies = [];
 
   protected throwPluginRuntimeError(message: string) {
@@ -26,22 +29,19 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return ourLevel > memberLevel;
   }
 
-  public static validateOptions(options: IPluginOptions): ErrorObject[] | null {
+  public static validateOptions(options: any): string[] | null {
     // Validate config values
     if (this.configSchema) {
-      const ajv = new Ajv();
-      const validate = ajv.compile(this.configSchema);
-
       if (options.config) {
-        const isValid = validate(options.config);
-        if (!isValid) return validate.errors;
+        const errors = validateStrict(this.configSchema, options.config);
+        if (errors) return errors;
       }
 
       if (options.overrides) {
         for (const override of options.overrides) {
           if (override.config) {
-            const isValid = validate(override.config);
-            if (!isValid) return validate.errors;
+            const errors = validateStrict(this.configSchema, override.config);
+            if (errors) return errors;
           }
         }
       }

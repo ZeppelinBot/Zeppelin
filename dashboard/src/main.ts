@@ -19,7 +19,6 @@ Vue.mixin({
 
 import App from "./components/App.vue";
 import Login from "./components/Login.vue";
-import { get } from "./api";
 
 const app = new Vue({
   router,
