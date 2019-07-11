@@ -8,6 +8,7 @@ import {
   DBDateFormat,
   errorMessage,
   INotifyUserResult,
+  noop,
   notifyUser,
   NotifyUserStatus,
   stripObjectToScalars,
@@ -433,7 +434,9 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
       lines.push(
         ...manuallyMutedMembers.map(member => {
-          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${
+            member.id
+          }\`)   🔧 Manual mute`;
         }),
       );
     }
@@ -447,7 +450,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       message = hasFilters ? "No mutes found with the specified filters!" : "No active mutes!";
     }
 
-    await loadingMessage.delete();
+    await loadingMessage.delete().catch(noop);
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
       msg.channel.createMessage(chunk);
