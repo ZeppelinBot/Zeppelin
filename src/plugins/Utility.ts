@@ -287,7 +287,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
     }
 
     if (args.query) {
-      const query = args["case-sensitive"] ? args.query : args.query.toLowerCase();
+      const query = args["case-sensitive"] ? args.query.trimStart() : args.query.toLowerCase().trimStart();
 
       matchingMembers = matchingMembers.filter(member => {
         const nick = args["case-sensitive"] ? member.nick : member.nick && member.nick.toLowerCase();
