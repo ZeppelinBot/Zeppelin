@@ -326,6 +326,9 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
   protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
     const lines = [];
 
+    // Create a loading message as this can potentially take some time
+    const loadingMessage = await msg.channel.createMessage("Loading mutes...");
+
     // Active, logged mutes
     const activeMutes = await this.mutes.getActiveMutes();
     activeMutes.sort((a, b) => {
@@ -430,9 +433,7 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
 
       lines.push(
         ...manuallyMutedMembers.map(member => {
-          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${
-            member.id
-          }\`)   🔧 Manual mute`;
+          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
         }),
       );
     }
@@ -446,10 +447,14 @@ export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
       message = hasFilters ? "No mutes found with the specified filters!" : "No active mutes!";
     }
 
+    await loadingMessage.delete();
     const chunks = chunkMessageLines(message);
     for (const chunk of chunks) {
       msg.channel.createMessage(chunk);
     }
+
+    // let the user know we are done
+    msg.channel.createMessage(successMessage("All mutes for the specified filters posted!"));
   }
 
   /**
