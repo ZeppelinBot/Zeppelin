@@ -23,6 +23,7 @@ import { UsernameSaver } from "./UsernameSaver";
 import { CustomEventsPlugin } from "./CustomEvents";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
 import { LogServerPlugin } from "./LogServer";
+import { CompanionChannelPlugin } from "./CompanionChannels";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -50,6 +51,7 @@ export const availablePlugins = [
   WelcomeMessagePlugin,
   CustomEventsPlugin,
   GuildInfoSaverPlugin,
+  CompanionChannelPlugin,
 ];
 
 /**
