@@ -1,4 +1,4 @@
-import { get, hasApiKey, post, setApiKey } from "../api";
+import { get, post } from "../api";
 import { ActionTree, Module } from "vuex";
 import { AuthState, RootState } from "./types";
 
@@ -16,13 +16,16 @@ export const AuthStore: Module<AuthState, RootState> = {
 
       const storedKey = localStorage.getItem("apiKey");
       if (storedKey) {
-        const result = await post("auth/validate-key", { key: storedKey });
-        if (result.valid) {
-          await dispatch("setApiKey", storedKey);
-        } else {
-          console.log("Unable to validate key, removing from localStorage");
-          localStorage.removeItem("apiKey");
-        }
+        try {
+          const result = await post("auth/validate-key", { key: storedKey });
+          if (result.valid) {
+            await dispatch("setApiKey", storedKey);
+            return;
+          }
+        } catch (e) {}
+
+        console.log("Unable to validate key, removing from localStorage");
+        localStorage.removeItem("apiKey");
       }
 
       commit("markInitialAuthLoaded");

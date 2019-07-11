@@ -5,20 +5,23 @@ import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import * as t from "io-ts";
 
-interface IAutoReactionsPluginConfig {
-  can_manage: boolean;
-}
+const configSchema = t.type({
+  can_manage: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof configSchema>;
 
-export class AutoReactionsPlugin extends ZeppelinPlugin<IAutoReactionsPluginConfig> {
+export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "auto_reactions";
+  protected static configSchema = configSchema;
 
   protected savedMessages: GuildSavedMessages;
   protected autoReactions: GuildAutoReactions;
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<IAutoReactionsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,
