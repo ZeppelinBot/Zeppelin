@@ -11,4 +11,7 @@ export class AllowedGuild {
 
   @Column()
   icon: string;
+
+  @Column()
+  owner_id: string;
 }

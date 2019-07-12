@@ -19,6 +19,6 @@ export class GuildInfoSaverPlugin extends ZeppelinPlugin {
   }
 
   protected updateGuildInfo() {
-    this.allowedGuilds.updateInfo(this.guildId, this.guild.name, this.guild.iconURL);
+    this.allowedGuilds.updateInfo(this.guildId, this.guild.name, this.guild.iconURL, this.guild.ownerID);
   }
 }
