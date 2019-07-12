@@ -39,7 +39,7 @@ export class AllowedGuilds extends BaseRepository {
       .getMany();
   }
 
-  updateInfo(id, name, icon) {
-    return this.allowedGuilds.update({ id }, { name, icon });
+  updateInfo(id, name, icon, ownerId) {
+    return this.allowedGuilds.update({ id }, { name, icon, owner_id: ownerId });
   }
 }
