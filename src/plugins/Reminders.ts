@@ -27,6 +27,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
   protected tries: Map<number, number>;
 
   private postRemindersTimeout;
+  private unloaded = false;
 
   getDefaultOptions(): IPluginOptions<IRemindersPluginConfig> {
     return {
@@ -49,6 +50,11 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
     this.reminders = GuildReminders.getGuildInstance(this.guildId);
     this.tries = new Map();
     this.postDueRemindersLoop();
+  }
+
+  onUnload() {
+    clearTimeout(this.postRemindersTimeout);
+    this.unloaded = true;
   }
 
   async postDueRemindersLoop() {
@@ -74,7 +80,9 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
       await this.reminders.delete(reminder.id);
     }
 
-    this.postRemindersTimeout = setTimeout(() => this.postDueRemindersLoop(), REMINDER_LOOP_TIME);
+    if (!this.unloaded) {
+      this.postRemindersTimeout = setTimeout(() => this.postDueRemindersLoop(), REMINDER_LOOP_TIME);
+    }
   }
 
   @d.command("remind", "<time:string> [reminder:string$]", {
