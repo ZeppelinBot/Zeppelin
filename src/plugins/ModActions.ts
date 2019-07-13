@@ -51,6 +51,8 @@ interface IModActionsPluginConfig {
   ban_message: string;
   alert_on_rejoin: boolean;
   alert_channel: string;
+  warn_notify_threshold: number;
+  warn_threshold_message: string;
 
   can_note: boolean;
   can_warn: boolean;
@@ -97,6 +99,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         ban_message: "You have been banned from {guildName}. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
+        warn_notify_threshold: 5,
+        warn_threshold_message: "The user already has {priorWarnings} warnings. Proceed anyways?",
 
         can_note: false,
         can_warn: false,
@@ -256,9 +260,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
       alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${
-          actions.length
-        } prior record(s)`,
+        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
       );
     }
   }
@@ -280,9 +282,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       const existingCaseForThisEntry = await this.cases.findByAuditLogId(kickAuditLogEntry.id);
       if (existingCaseForThisEntry) {
         logger.warn(
-          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${
-            existingCaseForThisEntry.id
-          }`,
+          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${existingCaseForThisEntry.id}`,
         );
       } else {
         const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -406,6 +406,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     }
 
     const config = this.getConfig();
+
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+
+    const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
+    if (priorWarnAmount >= config.warn_notify_threshold) {
+      const tooManyWarningsMsg = await msg.channel.createMessage(
+        config.warn_threshold_message.replace("{priorWarnings}", `${priorWarnAmount}`),
+      );
+      const reply = await waitForReaction(this.bot, tooManyWarningsMsg, ["✅", "❌"], msg.author.id);
+      tooManyWarningsMsg.delete();
+      if (!reply || reply.name === "❌") {
+        return;
+      }
+    }
+
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
@@ -424,7 +439,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
       }
     }
 
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const createdCase = await casesPlugin.createCase({
       userId: memberToWarn.id,
       modId: mod.id,
@@ -438,9 +452,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
 
     msg.channel.createMessage(
       successMessage(
-        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${
-          createdCase.case_number
-        })${messageResultText}`,
+        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${createdCase.case_number})${messageResultText}`,
       ),
     );
 
@@ -773,9 +785,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${
-      createdCase.case_number
-    })`;
+    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${createdCase.case_number})`;
 
     if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
@@ -860,9 +870,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     });
 
     // Confirm the action to the moderator
-    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${
-      createdCase.case_number
-    })`;
+    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${createdCase.case_number})`;
 
     if (userMessageResult.text) response += ` (${userMessageResult.text})`;
     msg.channel.createMessage(successMessage(response));
@@ -936,9 +944,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     // Confirm the action to the moderator
     msg.channel.createMessage(
       successMessage(
-        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${
-          createdCase.case_number
-        })`,
+        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
       ),
     );
 
