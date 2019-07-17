@@ -100,7 +100,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
         alert_on_rejoin: false,
         alert_channel: null,
         warn_notify_threshold: 5,
-        warn_threshold_message: "The user already has {priorWarnings} warnings. Proceed anyways?",
+        warn_threshold_message: "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
 
         can_note: false,
         can_warn: false,
