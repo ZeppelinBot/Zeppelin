@@ -31,7 +31,8 @@ connect().then(() => {
 
   // Error response
   app.use((err, req, res, next) => {
-    error(res, err.message, err.status || 500);
+    console.error(err);
+    error(res, "Server error", err.status || 500);
   });
 
   // 404 response
