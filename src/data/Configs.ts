@@ -28,6 +28,19 @@ export class Configs extends BaseRepository {
     });
   }
 
+  async getHighestId(): Promise<number> {
+    const rows = await connection.query("SELECT MAX(id) AS highest_id FROM configs");
+    return (rows.length && rows[0].highest_id) || 0;
+  }
+
+  getActiveLargerThanId(id) {
+    return this.configs
+      .createQueryBuilder()
+      .where("id > :id", { id })
+      .andWhere("is_active = 1")
+      .getMany();
+  }
+
   async hasConfig(key) {
     return (await this.getActiveByKey(key)) != null;
   }
