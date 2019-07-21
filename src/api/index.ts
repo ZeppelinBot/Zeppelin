@@ -1,4 +1,4 @@
-import { error, notFound } from "./responses";
+import { clientError, error, notFound } from "./responses";
 import express from "express";
 import cors from "cors";
 import { initAuth } from "./auth";
@@ -6,6 +6,7 @@ import { initGuildsAPI } from "./guilds";
 import { initArchives } from "./archives";
 import { connect } from "../data/db";
 import path from "path";
+import { TokenError } from "passport-oauth2";
 
 require("dotenv").config({ path: path.resolve(__dirname, "..", "..", "api.env") });
 
@@ -31,8 +32,12 @@ connect().then(() => {
 
   // Error response
   app.use((err, req, res, next) => {
-    console.error(err);
-    error(res, "Server error", err.status || 500);
+    if (err instanceof TokenError) {
+      clientError(res, "Invalid code");
+    } else {
+      console.error(err);
+      error(res, "Server error", err.status || 500);
+    }
   });
 
   // 404 response
