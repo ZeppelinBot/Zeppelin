@@ -7,14 +7,14 @@ import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../util
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
 
-const configSchema = t.type({
+const ConfigSchema = t.type({
   can_manage: t.boolean,
 });
-type TConfigSchema = t.TypeOf<typeof configSchema>;
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "auto_reactions";
-  protected static configSchema = configSchema;
+  protected static configSchema = ConfigSchema;
 
   protected savedMessages: GuildSavedMessages;
   protected autoReactions: GuildAutoReactions;

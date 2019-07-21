@@ -8,6 +8,22 @@ import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
 import Timeout = NodeJS.Timeout;
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import * as t from "io-ts";
+
+/**
+ * Either of:
+ * [emojiId, roleId]
+ * [emojiId, roleId, emojiName]
+ * Where emojiId is either the snowflake of a custom emoji, or the actual unicode emoji
+ */
+const ReactionRolePair = t.union([t.tuple([t.string, t.string, t.string]), t.tuple([t.string, t.string])]);
+type TReactionRolePair = t.TypeOf<typeof ReactionRolePair>;
+
+const ConfigSchema = t.type({
+  auto_refresh_interval: t.number,
+  can_manage: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 type ReactionRolePair = [string, string, string?];
 
@@ -26,14 +42,9 @@ type PendingMemberRoleChanges = {
   }>;
 };
 
-interface IReactionRolesPluginConfig {
-  auto_refresh_interval: number;
-
-  can_manage: boolean;
-}
-
-export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConfig> {
+export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "reaction_roles";
+  protected static configSchema = ConfigSchema;
 
   protected reactionRoles: GuildReactionRoles;
   protected savedMessages: GuildSavedMessages;
@@ -44,7 +55,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
 
   private autoRefreshTimeout;
 
-  getDefaultOptions(): IPluginOptions<IReactionRolesPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         auto_refresh_interval: null,
@@ -279,17 +290,17 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<IReactionRolesPluginConf
 
     // Turn "emoji = role" pairs into an array of tuples of the form [emoji, roleId]
     // Emoji is either a unicode emoji or the snowflake of a custom emoji
-    const emojiRolePairs: ReactionRolePair[] = args.reactionRolePairs
+    const emojiRolePairs: TReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
       .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
       .map(
-        (pair): ReactionRolePair => {
+        (pair): TReactionRolePair => {
           const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
           if (customEmojiMatch) {
             return [customEmojiMatch[2], pair[1], customEmojiMatch[1]];
           } else {
-            return pair as ReactionRolePair;
+            return pair as TReactionRolePair;
           }
         },
       );

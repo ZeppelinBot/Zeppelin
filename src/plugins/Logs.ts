@@ -26,33 +26,35 @@ import { GuildCases } from "../data/GuildCases";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
 import cloneDeep from "lodash.clonedeep";
+import * as t from "io-ts";
 
-interface ILogChannel {
-  include?: string[];
-  exclude?: string[];
-  batched?: boolean;
-  batch_time?: number;
-  excluded_users?: string[];
-}
+const LogChannel = t.partial({
+  include: t.array(t.string),
+  exclude: t.array(t.string),
+  batched: t.boolean,
+  batch_time: t.number,
+  excluded_users: t.array(t.string),
+});
+type TLogChannel = t.TypeOf<typeof LogChannel>;
 
-interface ILogChannelMap {
-  [channelId: string]: ILogChannel;
-}
+const LogChannelMap = t.record(t.string, LogChannel);
+type TLogChannelMap = t.TypeOf<typeof LogChannelMap>;
 
-interface ILogsPluginConfig {
-  channels: {
-    [key: string]: ILogChannel;
-  };
-  format: {
-    [key: string]: string;
-    timestamp: string;
-  };
+const ConfigSchema = t.type({
+  channels: LogChannelMap,
+  format: t.intersection([
+    t.record(t.string, t.string),
+    t.type({
+      timestamp: t.string,
+    }),
+  ]),
+  ping_user: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-  ping_user: boolean;
-}
-
-export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
+export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "logs";
+  protected static configSchema = ConfigSchema;
 
   protected guildLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
@@ -69,7 +71,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
 
   private excludedUserProps = ["user", "member", "mod"];
 
-  getDefaultOptions(): IPluginOptions<ILogsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         channels: {},
@@ -121,7 +123,7 @@ export class LogsPlugin extends ZeppelinPlugin<ILogsPluginConfig> {
   }
 
   async log(type, data) {
-    const logChannels: ILogChannelMap = this.getConfig().channels;
+    const logChannels: TLogChannelMap = this.getConfig().channels;
     const typeStr = LogType[type];
 
     logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {

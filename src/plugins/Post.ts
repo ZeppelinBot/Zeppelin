@@ -22,6 +22,13 @@ import { GuildScheduledPosts } from "../data/GuildScheduledPosts";
 import moment, { Moment } from "moment-timezone";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  can_post: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+
 const fsp = fs.promises;
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
@@ -29,12 +36,9 @@ const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 const SCHEDULED_POST_CHECK_INTERVAL = 15 * SECONDS;
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 
-interface IPostPluginConfig {
-  can_post: boolean;
-}
-
-export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
+export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "post";
+  protected static configSchema = ConfigSchema;
 
   protected savedMessages: GuildSavedMessages;
   protected scheduledPosts: GuildScheduledPosts;
@@ -54,7 +58,7 @@ export class PostPlugin extends ZeppelinPlugin<IPostPluginConfig> {
     clearTimeout(this.scheduledPostLoopTimeout);
   }
 
-  getDefaultOptions(): IPluginOptions<IPostPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_post: false,

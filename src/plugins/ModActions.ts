@@ -26,6 +26,33 @@ import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
 import { CasesPlugin } from "./Cases";
 import { MuteResult, MutesPlugin } from "./Mutes";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  dm_on_warn: t.boolean,
+  dm_on_kick: t.boolean,
+  dm_on_ban: t.boolean,
+  message_on_warn: t.boolean,
+  message_on_kick: t.boolean,
+  message_on_ban: t.boolean,
+  message_channel: t.string,
+  warn_message: t.string,
+  kick_message: t.string,
+  ban_message: t.string,
+  alert_on_rejoin: t.boolean,
+  alert_channel: t.string,
+  can_note: t.boolean,
+  can_warn: t.boolean,
+  can_mute: t.boolean,
+  can_kick: t.boolean,
+  can_ban: t.boolean,
+  can_view: t.boolean,
+  can_addcase: t.boolean,
+  can_massban: t.boolean,
+  can_hidecase: t.boolean,
+  can_act_as_other: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 enum IgnoredEventType {
   Ban = 1,
@@ -38,35 +65,10 @@ interface IIgnoredEvent {
   userId: string;
 }
 
-interface IModActionsPluginConfig {
-  dm_on_warn: boolean;
-  dm_on_kick: boolean;
-  dm_on_ban: boolean;
-  message_on_warn: boolean;
-  message_on_kick: boolean;
-  message_on_ban: boolean;
-  message_channel: string;
-  warn_message: string;
-  kick_message: string;
-  ban_message: string;
-  alert_on_rejoin: boolean;
-  alert_channel: string;
-
-  can_note: boolean;
-  can_warn: boolean;
-  can_mute: boolean;
-  can_kick: boolean;
-  can_ban: boolean;
-  can_view: boolean;
-  can_addcase: boolean;
-  can_massban: boolean;
-  can_hidecase: boolean;
-  can_act_as_other: boolean;
-}
-
-export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
+export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mod_actions";
   public static dependencies = ["cases", "mutes"];
+  protected static configSchema = ConfigSchema;
 
   protected mutes: GuildMutes;
   protected cases: GuildCases;
@@ -82,7 +84,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<IModActionsPluginConfig> {
     this.ignoredEvents = [];
   }
 
-  getDefaultOptions(): IPluginOptions<IModActionsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         dm_on_warn: true,

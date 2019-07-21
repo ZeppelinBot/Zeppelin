@@ -3,17 +3,20 @@ import { GuildChannel, Message, TextChannel } from "eris";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import * as t from "io-ts";
 
-interface IMessageSaverPluginConfig {
-  can_manage: boolean;
-}
+const ConfigSchema = t.type({
+  can_manage: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class MessageSaverPlugin extends ZeppelinPlugin<IMessageSaverPluginConfig> {
+export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "message_saver";
+  protected static configSchema = ConfigSchema;
 
   protected savedMessages: GuildSavedMessages;
 
-  getDefaultOptions(): IPluginOptions<IMessageSaverPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

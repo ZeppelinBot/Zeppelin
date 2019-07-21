@@ -3,19 +3,22 @@ import { GuildSelfGrantableRoles } from "../data/GuildSelfGrantableRoles";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
 import { asSingleLine, chunkArray, errorMessage, sorter, successMessage, trimLines } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import * as t from "io-ts";
 
-interface ISelfGrantableRolesPluginConfig {
-  can_manage: boolean;
-  can_use: boolean;
-  can_ignore_cooldown: boolean;
-}
+const ConfigSchema = t.type({
+  can_manage: t.boolean,
+  can_use: t.boolean,
+  can_ignore_cooldown: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class SelfGrantableRolesPlugin extends ZeppelinPlugin<ISelfGrantableRolesPluginConfig> {
+export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "self_grantable_roles";
+  protected static configSchema = ConfigSchema;
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;
 
-  getDefaultOptions(): IPluginOptions<ISelfGrantableRolesPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

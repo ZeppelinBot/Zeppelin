@@ -9,18 +9,21 @@ import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { parseTemplate, renderTemplate, TemplateParseError } from "../templateFormatter";
 import { GuildArchives } from "../data/GuildArchives";
+import * as t from "io-ts";
 
-interface ITagsPluginConfig {
-  prefix: string;
-  delete_with_command: boolean;
+const ConfigSchema = t.type({
+  prefix: t.string,
+  delete_with_command: t.boolean,
 
-  can_create: boolean;
-  can_use: boolean;
-  can_list: boolean;
-}
+  can_create: t.boolean,
+  can_use: t.boolean,
+  can_list: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
+export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "tags";
+  protected static configSchema = ConfigSchema;
 
   protected archives: GuildArchives;
   protected tags: GuildTags;
@@ -31,7 +34,7 @@ export class TagsPlugin extends ZeppelinPlugin<ITagsPluginConfig> {
 
   protected tagFunctions;
 
-  getDefaultOptions(): IPluginOptions<ITagsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         prefix: "!!",

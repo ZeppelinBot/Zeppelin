@@ -15,26 +15,26 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import cloneDeep from "lodash.clonedeep";
+import * as t from "io-ts";
 
-interface ICensorPluginConfig {
-  filter_zalgo: boolean;
-  filter_invites: boolean;
-  invite_guild_whitelist: string[];
-  invite_guild_blacklist: string[];
-  invite_code_whitelist: string[];
-  invite_code_blacklist: string[];
-  allow_group_dm_invites: boolean;
+const ConfigSchema = t.type({
+  filter_zalgo: t.boolean,
+  filter_invites: t.boolean,
+  invite_guild_whitelist: t.array(t.string),
+  invite_guild_blacklist: t.array(t.string),
+  invite_code_whitelist: t.array(t.string),
+  invite_code_blacklist: t.array(t.string),
+  allow_group_dm_invites: t.boolean,
+  filter_domains: t.boolean,
+  domain_whitelist: t.array(t.string),
+  domain_blacklist: t.array(t.string),
+  blocked_tokens: t.array(t.string),
+  blocked_words: t.array(t.string),
+  blocked_regex: t.array(t.string),
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-  filter_domains: boolean;
-  domain_whitelist: string[];
-  domain_blacklist: string[];
-
-  blocked_tokens: string[];
-  blocked_words: string[];
-  blocked_regex: string[];
-}
-
-export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
+export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "censor";
 
   protected serverLogs: GuildLogs;
@@ -43,7 +43,7 @@ export class CensorPlugin extends ZeppelinPlugin<ICensorPluginConfig> {
   private onMessageCreateFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions(): IPluginOptions<ICensorPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         filter_zalgo: false,

@@ -1,29 +1,31 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { Member, Channel, GuildChannel, PermissionOverwrite, Permission, Message } from "eris";
+import * as t from "io-ts";
 
 // Permissions using these numbers: https://abal.moe/Eris/docs/reference (add all allowed/denied ones up)
-interface ICompanionChannel {
-  channelIds: string[];
-  permissions: number;
-}
+const CompanionChannel = t.type({
+  channelIds: t.array(t.string),
+  permissions: t.number,
+});
+type TCompanionChannel = t.TypeOf<typeof CompanionChannel>;
+
+const ConfigSchema = t.type({
+  channels: t.record(t.string, CompanionChannel),
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 interface ICompanionChannelMap {
-  [channelId: string]: ICompanionChannel;
+  [channelId: string]: TCompanionChannel;
 }
 
-interface ICompanionChannelPluginConfig {
-  channels: {
-    [key: string]: ICompanionChannel;
-  };
-}
-
-export class CompanionChannelPlugin extends ZeppelinPlugin<ICompanionChannelPluginConfig> {
+export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "companion_channels";
+  protected static configSchema = ConfigSchema;
 
-  companionChannels: Map<string, ICompanionChannel> = new Map();
+  companionChannels: Map<string, TCompanionChannel> = new Map();
 
-  getDefaultOptions(): IPluginOptions<ICompanionChannelPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         channels: {},

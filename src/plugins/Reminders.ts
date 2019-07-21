@@ -12,16 +12,19 @@ import {
   sorter,
   successMessage,
 } from "../utils";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  can_use: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const REMINDER_LOOP_TIME = 10 * 1000;
 const MAX_TRIES = 3;
 
-interface IRemindersPluginConfig {
-  can_use: boolean;
-}
-
-export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
+export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "reminders";
+  protected static configSchema = ConfigSchema;
 
   protected reminders: GuildReminders;
   protected tries: Map<number, number>;
@@ -29,7 +32,7 @@ export class RemindersPlugin extends ZeppelinPlugin<IRemindersPluginConfig> {
   private postRemindersTimeout;
   private unloaded = false;
 
-  getDefaultOptions(): IPluginOptions<IRemindersPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_use: false,
