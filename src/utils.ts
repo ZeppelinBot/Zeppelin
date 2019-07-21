@@ -11,7 +11,7 @@ import {
 } from "eris";
 import url from "url";
 import tlds from "tlds";
-import emojiRegex from "emoji-regex";
+import emojiRegex from "emoji-regex/es2015/text";
 
 import fs from "fs";
 const fsp = fs.promises;
