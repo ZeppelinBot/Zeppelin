@@ -26,7 +26,7 @@ connect().then(() => {
 
   // Default route
   app.get("/", (req, res) => {
-    res.end({ status: "cookies" });
+    res.json({ status: "cookies", with: "milk" });
   });
 
   // Error response
