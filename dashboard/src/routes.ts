@@ -3,9 +3,6 @@ import VueRouter, { RouteConfig } from "vue-router";
 import Splash from "./components/Splash.vue";
 import Login from "./components/Login.vue";
 import LoginCallback from "./components/LoginCallback.vue";
-import DashboardGuildList from "./components/DashboardGuildList.vue";
-import DashboardGuildConfigEditor from "./components/DashboardGuildConfigEditor.vue";
-import Dashboard from "./components/Dashboard.vue";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
 
 Vue.use(VueRouter);
@@ -20,16 +17,16 @@ export const router = new VueRouter({
     // Dashboard
     {
       path: "/dashboard",
-      component: Dashboard,
+      component: () => import("./components/Dashboard.vue"),
       beforeEnter: authGuard,
       children: [
         {
           path: "",
-          component: DashboardGuildList,
+          component: () => import("./components/DashboardGuildList.vue"),
         },
         {
           path: "guilds/:guildId/config",
-          component: DashboardGuildConfigEditor,
+          component: () => import("./components/DashboardGuildConfigEditor.vue"),
         },
       ],
     },
