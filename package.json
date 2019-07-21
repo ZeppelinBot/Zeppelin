@@ -21,7 +21,7 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "dotenv": "^4.0.0",
-    "emoji-regex": "^7.0.1",
+    "emoji-regex": "^8.0.0",
     "eris": "^0.10.0",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
