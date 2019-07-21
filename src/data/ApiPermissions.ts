@@ -10,6 +10,14 @@ export class ApiPermissions extends BaseRepository {
     this.apiPermissions = getRepository(ApiPermission);
   }
 
+  getByUserId(userId) {
+    return this.apiPermissions.find({
+      where: {
+        user_id: userId,
+      },
+    });
+  }
+
   getByGuildAndUserId(guildId, userId) {
     return this.apiPermissions.findOne({
       where: {

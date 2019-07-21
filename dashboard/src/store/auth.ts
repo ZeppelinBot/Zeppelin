@@ -35,6 +35,16 @@ export const AuthStore: Module<AuthState, RootState> = {
       localStorage.setItem("apiKey", newKey);
       commit("setApiKey", newKey);
     },
+
+    clearApiKey({ commit }) {
+      localStorage.removeItem("apiKey");
+      commit("setApiKey", null);
+    },
+
+    async logout({ dispatch }) {
+      await post("auth/logout");
+      await dispatch("clearApiKey");
+    },
   },
 
   mutations: {
