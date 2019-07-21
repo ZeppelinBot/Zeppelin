@@ -134,21 +134,17 @@ export function initAuth(app: express.Express) {
 
     res.json({ valid: true });
   });
-  app.post("/auth/logout", ...getRequireAPITokenHandlers(), async (req: Request, res: Response) => {
+  app.post("/auth/logout", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
     await apiLogins.expireApiKey(req.user.apiKey);
     return ok(res);
   });
 }
 
-function getRequireAPITokenHandlers() {
+export function apiTokenAuthHandlers() {
   return [
     passport.authenticate("api-token", { failWithError: true }),
     (err, req, res, next) => {
       return res.json({ error: err.message });
     },
   ];
-}
-
-export function requireAPIToken(router: express.Router) {
-  router.use(...getRequireAPITokenHandlers());
 }
