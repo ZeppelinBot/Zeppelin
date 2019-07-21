@@ -11,7 +11,7 @@ import {
 } from "eris";
 import url from "url";
 import tlds from "tlds";
-import emojiRegex from "emoji-regex/text";
+import emojiRegex from "emoji-regex";
 import * as t from "io-ts";
 
 import fs from "fs";
