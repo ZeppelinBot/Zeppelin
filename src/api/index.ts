@@ -1,6 +1,6 @@
 import { error, notFound } from "./responses";
 
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(__dirname, "..", "..", "api.env") });
 
 import express from "express";
 import cors from "cors";
@@ -8,6 +8,7 @@ import { initAuth } from "./auth";
 import { initGuildsAPI } from "./guilds";
 import { initArchives } from "./archives";
 import { connect } from "../data/db";
+import path from "path";
 
 console.log("Connecting to database...");
 connect().then(() => {

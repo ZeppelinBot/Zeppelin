@@ -12,7 +12,7 @@ import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disab
 
 import { Configs } from "./data/Configs";
 
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(__dirname, "..", "bot.env") });
 
 // Error handling
 let recentPluginErrors = 0;
