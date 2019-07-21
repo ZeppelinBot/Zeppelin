@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "zeppelin-api",
+      "script": "npm",
+      "args": "run start-api-prod",
+      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+    }
+  ]
+}
