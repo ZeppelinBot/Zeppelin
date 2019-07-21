@@ -34,8 +34,15 @@ export function initGuildsAPI(app: express.Express) {
     const permissions = await apiPermissions.getByGuildAndUserId(req.params.guildId, req.user.userId);
     if (!permissions || ApiRoles[permissions.role] < ApiRoles.Editor) return unauthorized(res);
 
-    const config = req.body.config;
+    let config = req.body.config;
     if (config == null) return clientError(res, "No config supplied");
+
+    config = config.trim() + "\n"; // Normalize start/end whitespace in the config
+
+    const currentConfig = await configs.getActiveByKey(`guild-${req.params.guildId}`);
+    if (config === currentConfig.config) {
+      return ok(res);
+    }
 
     // Validate config
     let parsedConfig;
