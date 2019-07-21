@@ -6,20 +6,23 @@ import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import * as t from "io-ts";
 
-interface IPersistPluginConfig {
-  persisted_roles: string[];
-  persist_nicknames: boolean;
-  persist_voice_mutes: boolean;
-}
+const ConfigSchema = t.type({
+  persisted_roles: t.array(t.string),
+  persist_nicknames: t.boolean,
+  persist_voice_mutes: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class PersistPlugin extends ZeppelinPlugin<IPersistPluginConfig> {
+export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "persist";
+  protected static configSchema = ConfigSchema;
 
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;
 
-  getDefaultOptions(): IPluginOptions<IPersistPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         persisted_roles: [],

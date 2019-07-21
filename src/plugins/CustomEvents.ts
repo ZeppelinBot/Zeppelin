@@ -5,68 +5,77 @@ import { renderTemplate } from "../templateFormatter";
 import { stripObjectToScalars } from "../utils";
 import { CasesPlugin } from "./Cases";
 import { CaseTypes } from "../data/CaseTypes";
+import * as t from "io-ts";
 
 // Triggers
-type CommandTrigger = {
-  type: "command";
-  name: string;
-  params: string;
-  can_use: boolean;
-};
+const CommandTrigger = t.type({
+  type: t.literal("command"),
+  name: t.string,
+  params: t.string,
+  can_use: t.boolean,
+});
+type TCommandTrigger = t.TypeOf<typeof CommandTrigger>;
 
-type AnyTrigger = CommandTrigger;
+const AnyTrigger = CommandTrigger; // TODO: Make into a union once we have more triggers
+type TAnyTrigger = t.TypeOf<typeof AnyTrigger>;
 
 // Actions
-type AddRoleAction = {
-  type: "add_role";
-  target: string;
-  role: string | string[];
-};
+const AddRoleAction = t.type({
+  type: t.literal("add_role"),
+  target: t.string,
+  role: t.union([t.string, t.array(t.string)]),
+});
+type TAddRoleAction = t.TypeOf<typeof AddRoleAction>;
 
-type CreateCaseAction = {
-  type: "create_case";
-  case_type: string;
-  mod: string;
-  target: string;
-  reason: string;
-};
+const CreateCaseAction = t.type({
+  type: t.literal("create_case"),
+  case_type: t.string,
+  mod: t.string,
+  target: t.string,
+  reason: t.string,
+});
+type TCreateCaseAction = t.TypeOf<typeof CreateCaseAction>;
 
-type MoveToVoiceChannelAction = {
-  type: "move_to_vc";
-  target: string;
-  channel: string;
-};
+const MoveToVoiceChannelAction = t.type({
+  type: t.literal("move_to_vc"),
+  target: t.string,
+  channel: t.string,
+});
+type TMoveToVoiceChannelAction = t.TypeOf<typeof MoveToVoiceChannelAction>;
 
-type MessageAction = {
-  type: "message";
-  channel: string;
-  content: string;
-};
+const MessageAction = t.type({
+  type: t.literal("message"),
+  channel: t.string,
+  content: t.string,
+});
+type TMessageAction = t.TypeOf<typeof MessageAction>;
 
-type AnyAction = AddRoleAction | CreateCaseAction | MoveToVoiceChannelAction | MessageAction;
+const AnyAction = t.union([AddRoleAction, CreateCaseAction, MoveToVoiceChannelAction, MessageAction]);
+type TAnyAction = t.TypeOf<typeof AnyAction>;
 
-// Event
-type CustomEvent = {
-  name: string;
-  trigger: AnyTrigger;
-  actions: AnyAction[];
-};
+// Full config schema
+const CustomEvent = t.type({
+  name: t.string,
+  trigger: AnyTrigger,
+  actions: t.array(AnyAction),
+});
+type TCustomEvent = t.TypeOf<typeof CustomEvent>;
 
-interface ICustomEventsPluginConfig {
-  events: {
-    [key: string]: CustomEvent;
-  };
-}
+const ConfigSchema = t.type({
+  events: t.record(t.string, CustomEvent),
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 class ActionError extends Error {}
 
-export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig> {
+export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "custom_events";
+  public static dependencies = ["cases"];
+  protected static configSchema = ConfigSchema;
+
   private clearTriggers: () => void;
 
-  public static dependencies = ["cases"];
-
-  getDefaultOptions(): IPluginOptions<ICustomEventsPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         events: {},
@@ -97,7 +106,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig
     // TODO: Run this.clearTriggers() once we actually have something there
   }
 
-  async runEvent(event: CustomEvent, eventData: any, values: any) {
+  async runEvent(event: TCustomEvent, eventData: any, values: any) {
     try {
       for (const action of event.actions) {
         if (action.type === "add_role") {
@@ -125,7 +134,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig
     }
   }
 
-  async addRoleAction(action: AddRoleAction, values: any, event: CustomEvent, eventData: any) {
+  async addRoleAction(action: TAddRoleAction, values: any, event: TCustomEvent, eventData: any) {
     const targetId = await renderTemplate(action.target, values, false);
     const target = await this.getMember(targetId);
     if (!target) throw new ActionError(`Unknown target member: ${targetId}`);
@@ -140,7 +149,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig
     });
   }
 
-  async createCaseAction(action: CreateCaseAction, values: any, event: CustomEvent, eventData: any) {
+  async createCaseAction(action: TCreateCaseAction, values: any, event: TCustomEvent, eventData: any) {
     const modId = await renderTemplate(action.mod, values, false);
     const targetId = await renderTemplate(action.target, values, false);
 
@@ -159,7 +168,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig
     });
   }
 
-  async moveToVoiceChannelAction(action: MoveToVoiceChannelAction, values: any, event: CustomEvent, eventData: any) {
+  async moveToVoiceChannelAction(action: TMoveToVoiceChannelAction, values: any, event: TCustomEvent, eventData: any) {
     const targetId = await renderTemplate(action.target, values, false);
     const target = await this.getMember(targetId);
     if (!target) throw new ActionError("Unknown target member");
@@ -179,7 +188,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<ICustomEventsPluginConfig
     });
   }
 
-  async messageAction(action: MessageAction, values: any) {
+  async messageAction(action: TMessageAction, values: any) {
     const targetChannelId = await renderTemplate(action.channel, values, false);
     const targetChannel = this.guild.channels.get(targetChannelId);
     if (!targetChannel) throw new ActionError("Unknown target channel");

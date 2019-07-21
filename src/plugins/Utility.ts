@@ -43,8 +43,25 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { getCurrentUptime } from "../uptime";
-
 import LCL from "last-commit-log";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  can_roles: t.boolean,
+  can_level: t.boolean,
+  can_search: t.boolean,
+  can_clean: t.boolean,
+  can_info: t.boolean,
+  can_server: t.boolean,
+  can_reload_guild: t.boolean,
+  can_nickname: t.boolean,
+  can_ping: t.boolean,
+  can_source: t.boolean,
+  can_vcmove: t.boolean,
+  can_help: t.boolean,
+  can_about: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const { performance } = require("perf_hooks");
 
@@ -63,24 +80,9 @@ type MemberSearchParams = {
   "case-sensitive"?: boolean;
 };
 
-interface IUtilityPluginConfig {
-  can_roles: boolean;
-  can_level: boolean;
-  can_search: boolean;
-  can_clean: boolean;
-  can_info: boolean;
-  can_server: boolean;
-  can_reload_guild: boolean;
-  can_nickname: boolean;
-  can_ping: boolean;
-  can_source: boolean;
-  can_vcmove: boolean;
-  can_help: boolean;
-  can_about: boolean;
-}
-
-export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
+export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "utility";
+  protected static configSchema = ConfigSchema;
 
   protected logs: GuildLogs;
   protected cases: GuildCases;
@@ -89,7 +91,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
   protected lastFullMemberRefresh = 0;
 
-  getDefaultOptions(): IPluginOptions<IUtilityPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_roles: false,
@@ -834,7 +836,7 @@ export class UtilityPlugin extends ZeppelinPlugin<IUtilityPluginConfig> {
 
     const highest = Math.round(Math.max(...times));
     const lowest = Math.round(Math.min(...times));
-    const mean = Math.round(times.reduce((t, v) => t + v, 0) / times.length);
+    const mean = Math.round(times.reduce((total, ms) => total + ms, 0) / times.length);
 
     const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
 

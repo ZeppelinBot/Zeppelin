@@ -5,19 +5,22 @@ import { renderTemplate } from "../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
+import * as t from "io-ts";
 
-interface IWelcomeMessageConfig {
-  send_dm: boolean;
-  send_to_channel: string;
-  message: string;
-}
+const ConfigSchema = t.type({
+  send_dm: t.boolean,
+  send_to_channel: t.string,
+  message: t.string,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class WelcomeMessagePlugin extends ZeppelinPlugin<IWelcomeMessageConfig> {
+export class WelcomeMessagePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "welcome_message";
+  protected static configSchema = ConfigSchema;
 
   protected logs: GuildLogs;
 
-  protected getDefaultOptions(): IPluginOptions<IWelcomeMessageConfig> {
+  protected getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         send_dm: false,

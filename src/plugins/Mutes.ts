@@ -25,24 +25,26 @@ import { renderTemplate } from "../templateFormatter";
 import { CaseTypes } from "../data/CaseTypes";
 import { CaseArgs, CasesPlugin } from "./Cases";
 import { Case } from "../data/entities/Case";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  mute_role: t.string,
+  move_to_voice_channel: t.string,
+
+  dm_on_mute: t.boolean,
+  message_on_mute: t.boolean,
+  message_channel: t.string,
+  mute_message: t.string,
+  timed_mute_message: t.string,
+
+  can_view_list: t.boolean,
+  can_cleanup: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 interface IMuteWithDetails extends Mute {
   member?: Member;
   banned?: boolean;
-}
-
-interface IMutesPluginConfig {
-  mute_role: string;
-  move_to_voice_channel: string;
-
-  dm_on_mute: boolean;
-  message_on_mute: boolean;
-  message_channel: string;
-  mute_message: string;
-  timed_mute_message: string;
-
-  can_view_list: boolean;
-  can_cleanup: boolean;
 }
 
 export type MuteResult = {
@@ -59,15 +61,16 @@ const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
 let FIRST_CHECK_TIME = Date.now();
 const FIRST_CHECK_INCREMENT = 5 * 1000;
 
-export class MutesPlugin extends ZeppelinPlugin<IMutesPluginConfig> {
+export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mutes";
+  protected static configSchema = ConfigSchema;
 
   protected mutes: GuildMutes;
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  getDefaultOptions(): IPluginOptions<IMutesPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         mute_role: null,

@@ -5,22 +5,25 @@ import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } 
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
 import moment = require("moment");
 import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage } from "../utils";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  can_where: t.boolean,
+  can_alert: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const ALERT_LOOP_TIME = 30 * 1000;
 
-interface ILocatePluginConfig {
-  can_where: boolean;
-  can_alert: boolean;
-}
-
-export class LocatePlugin extends ZeppelinPlugin<ILocatePluginConfig> {
+export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "locate_user";
+  protected static configSchema = ConfigSchema;
 
   private alerts: GuildVCAlerts;
   private outdatedAlertsTimeout;
   private usersWithAlerts: string[] = [];
 
-  getDefaultOptions(): IPluginOptions<ILocatePluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_where: false,

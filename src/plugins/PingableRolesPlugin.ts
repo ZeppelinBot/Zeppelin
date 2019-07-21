@@ -4,21 +4,24 @@ import { GuildPingableRoles } from "../data/GuildPingableRoles";
 import { PingableRole } from "../data/entities/PingableRole";
 import { errorMessage, successMessage } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  can_manage: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const TIMEOUT = 10 * 1000;
 
-interface IPingableRolesPluginConfig {
-  can_manage: boolean;
-}
-
-export class PingableRolesPlugin extends ZeppelinPlugin<IPingableRolesPluginConfig> {
+export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "pingable_roles";
+  protected static configSchema = ConfigSchema;
 
   protected pingableRoles: GuildPingableRoles;
   protected cache: Map<string, PingableRole[]>;
   protected timeouts: Map<string, any>;
 
-  getDefaultOptions(): IPluginOptions<IPingableRolesPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

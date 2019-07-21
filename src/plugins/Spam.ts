@@ -21,6 +21,34 @@ import { GuildMutes } from "../data/GuildMutes";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { MuteResult, MutesPlugin } from "./Mutes";
 import { CasesPlugin } from "./Cases";
+import * as t from "io-ts";
+
+const BaseSingleSpamConfig = t.intersection([
+  t.type({
+    interval: t.number,
+    count: t.number,
+  }),
+  t.partial({
+    mute: t.boolean,
+    mute_time: t.number,
+    clean: t.boolean,
+  }),
+]);
+type TBaseSingleSpamConfig = t.TypeOf<typeof BaseSingleSpamConfig>;
+
+const ConfigSchema = t.type({
+  max_censor: BaseSingleSpamConfig,
+  max_messages: BaseSingleSpamConfig,
+  max_mentions: BaseSingleSpamConfig,
+  max_links: BaseSingleSpamConfig,
+  max_attachments: BaseSingleSpamConfig,
+  max_emojis: BaseSingleSpamConfig,
+  max_newlines: BaseSingleSpamConfig,
+  max_duplicates: BaseSingleSpamConfig,
+  max_characters: BaseSingleSpamConfig,
+  max_voice_moves: BaseSingleSpamConfig,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 enum RecentActionType {
   Message = 1,
@@ -47,29 +75,9 @@ const MAX_INTERVAL = 300;
 
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
-interface IBaseSingleSpamConfig {
-  interval: number;
-  count: number;
-  mute?: boolean;
-  mute_time?: number;
-  clean?: boolean;
-}
-
-interface ISpamPluginConfig {
-  max_censor: IBaseSingleSpamConfig;
-  max_messages: IBaseSingleSpamConfig;
-  max_mentions: IBaseSingleSpamConfig;
-  max_links: IBaseSingleSpamConfig;
-  max_attachments: IBaseSingleSpamConfig;
-  max_emojis: IBaseSingleSpamConfig;
-  max_newlines: IBaseSingleSpamConfig;
-  max_duplicates: IBaseSingleSpamConfig;
-  max_characters: IBaseSingleSpamConfig;
-  max_voice_moves: IBaseSingleSpamConfig;
-}
-
-export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
+export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "spam";
+  protected static configSchema = ConfigSchema;
 
   protected logs: GuildLogs;
   protected archives: GuildArchives;
@@ -91,7 +99,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
 
   private expiryInterval;
 
-  getDefaultOptions(): IPluginOptions<ISpamPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         max_censor: null,
@@ -201,7 +209,7 @@ export class SpamPlugin extends ZeppelinPlugin<ISpamPluginConfig> {
   async logAndDetectMessageSpam(
     savedMessage: SavedMessage,
     type: RecentActionType,
-    spamConfig: IBaseSingleSpamConfig,
+    spamConfig: TBaseSingleSpamConfig,
     actionCount: number,
     description: string,
   ) {

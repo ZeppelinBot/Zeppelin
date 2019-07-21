@@ -17,20 +17,23 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
+import * as t from "io-ts";
+
+const ConfigSchema = t.type({
+  use_native_slowmode: t.boolean,
+
+  can_manage: t.boolean,
+  is_affected: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * 1000;
 
-interface ISlowmodePluginConfig {
-  use_native_slowmode: boolean;
-
-  can_manage: boolean;
-  is_affected: boolean;
-}
-
-export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
+export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "slowmode";
+  protected static configSchema = ConfigSchema;
 
   protected slowmodes: GuildSlowmodes;
   protected savedMessages: GuildSavedMessages;
@@ -39,7 +42,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<ISlowmodePluginConfig> {
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<ISlowmodePluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         use_native_slowmode: true,

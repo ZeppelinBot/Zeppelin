@@ -16,20 +16,23 @@ import path from "path";
 import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
+import * as t from "io-ts";
 
-interface IStarboardPluginConfig {
-  can_manage: boolean;
-}
+const ConfigSchema = t.type({
+  can_manage: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class StarboardPlugin extends ZeppelinPlugin<IStarboardPluginConfig> {
+export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "starboard";
+  protected static configSchema = ConfigSchema;
 
   protected starboards: GuildStarboards;
   protected savedMessages: GuildSavedMessages;
 
   private onMessageDeleteFn;
 
-  getDefaultOptions(): IPluginOptions<IStarboardPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

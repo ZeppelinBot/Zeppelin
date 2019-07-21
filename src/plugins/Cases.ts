@@ -9,11 +9,13 @@ import { GuildArchives } from "../data/GuildArchives";
 import { IPluginOptions } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
+import * as t from "io-ts";
 
-interface ICasesPluginConfig {
-  log_automatic_actions: boolean;
-  case_log_channel: string;
-}
+const ConfigSchema = t.type({
+  log_automatic_actions: t.boolean,
+  case_log_channel: t.string,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 /**
  * Can also be used as a config object for functions that create cases
@@ -40,14 +42,15 @@ export type CaseNoteArgs = {
   noteDetails?: string[];
 };
 
-export class CasesPlugin extends ZeppelinPlugin<ICasesPluginConfig> {
+export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "cases";
+  protected static configSchema = ConfigSchema;
 
   protected cases: GuildCases;
   protected archives: GuildArchives;
   protected logs: GuildLogs;
 
-  getDefaultOptions(): IPluginOptions<ICasesPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         log_automatic_actions: true,

@@ -4,18 +4,21 @@ import { Member, Message } from "eris";
 import { createChunkedMessage, disableCodeBlocks } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { MAX_USERNAME_ENTRIES_PER_USER, UsernameHistory } from "../data/UsernameHistory";
+import * as t from "io-ts";
 
-interface INameHistoryPluginConfig {
-  can_view: boolean;
-}
+const ConfigSchema = t.type({
+  can_view: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class NameHistoryPlugin extends ZeppelinPlugin<INameHistoryPluginConfig> {
+export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "name_history";
+  protected static configSchema = ConfigSchema;
 
   protected nicknameHistory: GuildNicknameHistory;
   protected usernameHistory: UsernameHistory;
 
-  getDefaultOptions(): IPluginOptions<INameHistoryPluginConfig> {
+  getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_view: false,
