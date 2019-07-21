@@ -47,7 +47,7 @@ export function initGuildsAPI(app: express.Express) {
       parsedConfig = yaml.safeLoad(config);
     } catch (e) {
       if (e instanceof YAMLException) {
-        return error(res, e.message, 400);
+        return res.status(400).json({ errors: [e.message] });
       }
 
       console.error("Error when loading YAML: " + e.message);
