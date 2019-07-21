@@ -22,7 +22,7 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         persisted_roles: [],

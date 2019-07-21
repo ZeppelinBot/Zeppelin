@@ -21,7 +21,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected cache: Map<string, PingableRole[]>;
   protected timeouts: Map<string, any>;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

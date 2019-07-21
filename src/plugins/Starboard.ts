@@ -32,7 +32,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private onMessageDeleteFn;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

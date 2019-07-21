@@ -13,6 +13,7 @@ import {
   NotifyUserStatus,
   stripObjectToScalars,
   successMessage,
+  tNullable,
   ucfirst,
   UnknownUser,
 } from "../utils";
@@ -28,14 +29,14 @@ import { Case } from "../data/entities/Case";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
-  mute_role: t.string,
-  move_to_voice_channel: t.string,
+  mute_role: tNullable(t.string),
+  move_to_voice_channel: tNullable(t.string),
 
   dm_on_mute: t.boolean,
   message_on_mute: t.boolean,
-  message_channel: t.string,
-  mute_message: t.string,
-  timed_mute_message: t.string,
+  message_channel: tNullable(t.string),
+  mute_message: tNullable(t.string),
+  timed_mute_message: tNullable(t.string),
 
   can_view_list: t.boolean,
   can_cleanup: t.boolean,
@@ -70,7 +71,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         mute_role: null,
@@ -366,7 +367,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (!member) {
         if (!bannedIds) {
           const bans = await this.guild.getBans();
-          bannedIds = bans.map(u => u.id);
+          bannedIds = bans.map(u => u.user.id);
         }
 
         muteWithDetails.banned = bannedIds.includes(mute.user_id);

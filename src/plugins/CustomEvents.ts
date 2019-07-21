@@ -75,7 +75,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private clearTriggers: () => void;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         events: {},

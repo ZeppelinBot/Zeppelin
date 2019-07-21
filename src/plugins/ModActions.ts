@@ -13,6 +13,7 @@ import {
   NotifyUserStatus,
   stripObjectToScalars,
   successMessage,
+  tNullable,
   trimLines,
   ucfirst,
   UnknownUser,
@@ -35,12 +36,12 @@ const ConfigSchema = t.type({
   message_on_warn: t.boolean,
   message_on_kick: t.boolean,
   message_on_ban: t.boolean,
-  message_channel: t.string,
-  warn_message: t.string,
-  kick_message: t.string,
-  ban_message: t.string,
+  message_channel: tNullable(t.string),
+  warn_message: tNullable(t.string),
+  kick_message: tNullable(t.string),
+  ban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
-  alert_channel: t.string,
+  alert_channel: tNullable(t.string),
   can_note: t.boolean,
   can_warn: t.boolean,
   can_mute: t.boolean,
@@ -84,7 +85,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.ignoredEvents = [];
   }
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         dm_on_warn: true,

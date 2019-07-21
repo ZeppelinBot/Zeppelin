@@ -90,8 +90,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
 
   protected lastFullMemberRefresh = 0;
+  protected lastReload;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_roles: false,
@@ -141,6 +142,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.cases = GuildCases.getGuildInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.archives = GuildArchives.getGuildInstance(this.guildId);
+
+    this.lastReload = Date.now();
 
     if (activeReloads && activeReloads.has(this.guildId)) {
       activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));
@@ -1003,8 +1006,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
 
+    const lastReload = humanizeDuration(Date.now() - this.lastReload, {
+      largest: 2,
+      round: true,
+    });
+
     const basicInfoRows = [
       ["Uptime", prettyUptime],
+      ["Last reload", `${lastReload} ago`],
       ["Last update", moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]")],
       ["Version", lastCommit.shortHash],
       ["API latency", `${shard.latency}ms`],

@@ -34,7 +34,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected tagFunctions;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         prefix: "!!",

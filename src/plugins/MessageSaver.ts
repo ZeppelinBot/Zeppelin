@@ -16,7 +16,7 @@ export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected savedMessages: GuildSavedMessages;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

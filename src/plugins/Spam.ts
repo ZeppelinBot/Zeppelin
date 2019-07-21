@@ -8,6 +8,7 @@ import {
   getUserMentions,
   noop,
   stripObjectToScalars,
+  tNullable,
   trimLines,
 } from "../utils";
 import { LogType } from "../data/LogType";
@@ -23,30 +24,26 @@ import { MuteResult, MutesPlugin } from "./Mutes";
 import { CasesPlugin } from "./Cases";
 import * as t from "io-ts";
 
-const BaseSingleSpamConfig = t.intersection([
-  t.type({
-    interval: t.number,
-    count: t.number,
-  }),
-  t.partial({
-    mute: t.boolean,
-    mute_time: t.number,
-    clean: t.boolean,
-  }),
-]);
+const BaseSingleSpamConfig = t.type({
+  interval: t.number,
+  count: t.number,
+  mute: tNullable(t.boolean),
+  mute_time: tNullable(t.number),
+  clean: tNullable(t.boolean),
+});
 type TBaseSingleSpamConfig = t.TypeOf<typeof BaseSingleSpamConfig>;
 
 const ConfigSchema = t.type({
-  max_censor: BaseSingleSpamConfig,
-  max_messages: BaseSingleSpamConfig,
-  max_mentions: BaseSingleSpamConfig,
-  max_links: BaseSingleSpamConfig,
-  max_attachments: BaseSingleSpamConfig,
-  max_emojis: BaseSingleSpamConfig,
-  max_newlines: BaseSingleSpamConfig,
-  max_duplicates: BaseSingleSpamConfig,
-  max_characters: BaseSingleSpamConfig,
-  max_voice_moves: BaseSingleSpamConfig,
+  max_censor: tNullable(BaseSingleSpamConfig),
+  max_messages: tNullable(BaseSingleSpamConfig),
+  max_mentions: tNullable(BaseSingleSpamConfig),
+  max_links: tNullable(BaseSingleSpamConfig),
+  max_attachments: tNullable(BaseSingleSpamConfig),
+  max_emojis: tNullable(BaseSingleSpamConfig),
+  max_newlines: tNullable(BaseSingleSpamConfig),
+  max_duplicates: tNullable(BaseSingleSpamConfig),
+  max_characters: tNullable(BaseSingleSpamConfig),
+  max_voice_moves: tNullable(BaseSingleSpamConfig),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -99,7 +96,7 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private expiryInterval;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         max_censor: null,

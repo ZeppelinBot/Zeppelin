@@ -11,7 +11,8 @@ import {
 } from "eris";
 import url from "url";
 import tlds from "tlds";
-import emojiRegex from "emoji-regex/es2015/text";
+import emojiRegex from "emoji-regex/text";
+import * as t from "io-ts";
 
 import fs from "fs";
 const fsp = fs.promises;
@@ -27,6 +28,10 @@ const delayStringMultipliers = {
   m: 1000 * 60,
   s: 1000,
 };
+
+export function tNullable(type: t.Mixed) {
+  return t.union([type, t.undefined, t.null]);
+}
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds

@@ -25,7 +25,7 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   companionChannels: Map<string, TCompanionChannel> = new Map();
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         channels: {},

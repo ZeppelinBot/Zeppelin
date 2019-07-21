@@ -9,6 +9,7 @@ import {
   getInviteCodesInString,
   getUrlsInString,
   stripObjectToScalars,
+  tNullable,
 } from "../utils";
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
@@ -20,17 +21,17 @@ import * as t from "io-ts";
 const ConfigSchema = t.type({
   filter_zalgo: t.boolean,
   filter_invites: t.boolean,
-  invite_guild_whitelist: t.array(t.string),
-  invite_guild_blacklist: t.array(t.string),
-  invite_code_whitelist: t.array(t.string),
-  invite_code_blacklist: t.array(t.string),
+  invite_guild_whitelist: tNullable(t.array(t.string)),
+  invite_guild_blacklist: tNullable(t.array(t.string)),
+  invite_code_whitelist: tNullable(t.array(t.string)),
+  invite_code_blacklist: tNullable(t.array(t.string)),
   allow_group_dm_invites: t.boolean,
   filter_domains: t.boolean,
-  domain_whitelist: t.array(t.string),
-  domain_blacklist: t.array(t.string),
-  blocked_tokens: t.array(t.string),
-  blocked_words: t.array(t.string),
-  blocked_regex: t.array(t.string),
+  domain_whitelist: tNullable(t.array(t.string)),
+  domain_blacklist: tNullable(t.array(t.string)),
+  blocked_tokens: tNullable(t.array(t.string)),
+  blocked_words: tNullable(t.array(t.string)),
+  blocked_regex: tNullable(t.array(t.string)),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -43,7 +44,7 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   private onMessageCreateFn;
   private onMessageUpdateFn;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         filter_zalgo: false,

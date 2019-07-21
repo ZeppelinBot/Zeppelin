@@ -32,7 +32,7 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
   private postRemindersTimeout;
   private unloaded = false;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_use: false,

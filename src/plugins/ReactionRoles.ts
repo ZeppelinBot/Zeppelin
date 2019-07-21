@@ -55,7 +55,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private autoRefreshTimeout;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         auto_refresh_interval: MIN_AUTO_REFRESH,
