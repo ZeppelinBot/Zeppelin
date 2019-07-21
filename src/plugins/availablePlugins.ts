@@ -22,7 +22,6 @@ import { BotControlPlugin } from "./BotControl";
 import { UsernameSaver } from "./UsernameSaver";
 import { CustomEventsPlugin } from "./CustomEvents";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
-import { LogServerPlugin } from "./LogServer";
 import { CompanionChannelPlugin } from "./CompanionChannels";
 import { LocatePlugin } from "./LocateUser";
 import { GuildConfigReloader } from "./GuildConfigReloader";
@@ -71,4 +70,4 @@ export const basePlugins = [
 /**
  * Available global plugins (can't be loaded per-guild, only globally)
  */
-export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver, LogServerPlugin, GuildConfigReloader];
+export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver, GuildConfigReloader];
