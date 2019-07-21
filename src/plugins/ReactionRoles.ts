@@ -58,7 +58,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   getDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
-        auto_refresh_interval: null,
+        auto_refresh_interval: MIN_AUTO_REFRESH,
 
         can_manage: false,
       },
