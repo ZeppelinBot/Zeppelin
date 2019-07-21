@@ -71,7 +71,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private excludedUserProps = ["user", "member", "mod"];
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         channels: {},

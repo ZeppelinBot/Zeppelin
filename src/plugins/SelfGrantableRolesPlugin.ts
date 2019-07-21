@@ -18,7 +18,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

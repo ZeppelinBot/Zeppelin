@@ -1,4 +1,4 @@
-import { IBasePluginConfig, IPluginOptions, logger, Plugin } from "knub";
+import { IBasePluginConfig, IPluginOptions, logger, Plugin, configUtils } from "knub";
 import { PluginRuntimeError } from "../PluginRuntimeError";
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
@@ -29,19 +29,47 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return ourLevel > memberLevel;
   }
 
+  protected static getStaticDefaultOptions() {
+    // Implemented by plugin
+    return {};
+  }
+
+  protected getDefaultOptions(): IPluginOptions<TConfig> {
+    return (this.constructor as typeof ZeppelinPlugin).getStaticDefaultOptions() as IPluginOptions<TConfig>;
+  }
+
   public static validateOptions(options: any): string[] | null {
     // Validate config values
     if (this.configSchema) {
       if (options.config) {
-        const errors = validateStrict(this.configSchema, options.config);
-        if (errors) return errors;
+        const merged = configUtils.mergeConfig(
+          {},
+          (this.getStaticDefaultOptions() as any).config || {},
+          options.config,
+        );
+        const errors = validateStrict(this.configSchema, merged);
+        if (errors) {
+          return errors;
+        }
       }
 
       if (options.overrides) {
-        for (const override of options.overrides) {
+        for (const [i, override] of options.overrides.entries()) {
           if (override.config) {
-            const errors = validateStrict(this.configSchema, override.config);
-            if (errors) return errors;
+            // For type checking overrides, apply default config + supplied config + any overrides preceding this override + finally this override
+            // Exhaustive type checking would require checking against all combinations of preceding overrides but that's... costy. This will do for now.
+            // TODO: Override default config retrieval functions and do some sort of memoized checking there?
+            const merged = configUtils.mergeConfig(
+              {},
+              (this.getStaticDefaultOptions() as any).config || {},
+              options.config || {},
+              ...options.overrides.slice(0, i),
+              override.config,
+            );
+            const errors = validateStrict(this.configSchema, merged);
+            if (errors) {
+              return errors;
+            }
           }
         }
       }
@@ -55,7 +83,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     const mergedOptions = this.getMergedOptions();
     const validationErrors = ((this.constructor as unknown) as typeof ZeppelinPlugin).validateOptions(mergedOptions);
     if (validationErrors) {
-      throw new Error(`Invalid options:\n${validationErrors.join("\n")}`);
+      throw new Error(validationErrors.join("\n"));
     }
 
     return super.runLoad();

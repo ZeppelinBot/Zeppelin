@@ -18,7 +18,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected nicknameHistory: GuildNicknameHistory;
   protected usernameHistory: UsernameHistory;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_view: false,

@@ -10,10 +10,11 @@ import { IPluginOptions } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
+import { tNullable } from "../utils";
 
 const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
-  case_log_channel: t.string,
+  case_log_channel: tNullable(t.string),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -50,7 +51,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
   protected logs: GuildLogs;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         log_automatic_actions: true,

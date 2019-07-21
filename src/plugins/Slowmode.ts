@@ -42,7 +42,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         use_native_slowmode: true,

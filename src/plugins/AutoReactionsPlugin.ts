@@ -21,7 +21,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private onMessageCreateFn;
 
-  getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,
