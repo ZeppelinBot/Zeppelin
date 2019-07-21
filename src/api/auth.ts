@@ -7,6 +7,8 @@ import pick from "lodash.pick";
 import https from "https";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
+import { ApiPermissions } from "../data/ApiPermissions";
+import { ok } from "./responses";
 
 const DISCORD_API_URL = "https://discordapp.com/api";
 
@@ -57,6 +59,7 @@ export function initAuth(app: express.Express) {
 
   const apiLogins = new ApiLogins();
   const apiUserInfo = new ApiUserInfo();
+  const apiPermissions = new ApiPermissions();
 
   // Initialize API tokens
   passport.use(
@@ -67,7 +70,7 @@ export function initAuth(app: express.Express) {
 
       const userId = await apiLogins.getUserIdByApiKey(apiKey);
       if (userId) {
-        return cb(null, { userId });
+        return cb(null, { apiKey, userId });
       }
 
       cb();
@@ -88,6 +91,15 @@ export function initAuth(app: express.Express) {
       },
       async (accessToken, refreshToken, profile, cb) => {
         const user = await simpleDiscordAPIRequest(accessToken, "users/@me");
+
+        // Make sure the user is able to access at least 1 guild
+        const permissions = await apiPermissions.getByUserId(user.id);
+        if (permissions.length === 0) {
+          cb(null, {});
+          return;
+        }
+
+        // Generate API key
         const apiKey = await apiLogins.addLogin(user.id);
         const userData = pick(user, ["username", "discriminator", "avatar"]) as ApiUserInfoData;
         await apiUserInfo.update(user.id, userData);
@@ -102,12 +114,15 @@ export function initAuth(app: express.Express) {
     "/auth/oauth-callback",
     passport.authenticate("oauth2", { failureRedirect: "/", session: false }),
     (req, res) => {
-      console.log("redirecting to a non-existent page haHAA");
-      res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
+      if (req.user && req.user.apiKey) {
+        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
+      } else {
+        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?error=noaccess`);
+      }
     },
   );
   app.post("/auth/validate-key", async (req: Request, res: Response) => {
-    const key = req.params.key || req.query.key;
+    const key = req.body.key;
     if (!key) {
       return res.status(400).json({ error: "No key supplied" });
     }
@@ -119,10 +134,21 @@ export function initAuth(app: express.Express) {
 
     res.json({ valid: true });
   });
+  app.post("/auth/logout", ...getRequireAPITokenHandlers(), async (req: Request, res: Response) => {
+    await apiLogins.expireApiKey(req.user.apiKey);
+    return ok(res);
+  });
+}
+
+function getRequireAPITokenHandlers() {
+  return [
+    passport.authenticate("api-token", { failWithError: true }),
+    (err, req, res, next) => {
+      return res.json({ error: err.message });
+    },
+  ];
 }
 
 export function requireAPIToken(router: express.Router) {
-  router.use(passport.authenticate("api-token", { failWithError: true }), (err, req, res, next) => {
-    return res.json({ error: err.message });
-  });
+  router.use(...getRequireAPITokenHandlers());
 }
