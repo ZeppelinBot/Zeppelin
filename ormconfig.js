@@ -1,6 +1,17 @@
-require('dotenv').config();
-
+const fs = require('fs');
 const path = require('path');
+
+try {
+  fs.accessSync(path.resolve(__dirname, 'bot.env'));
+  require('dotenv').config({ path: path.resolve(__dirname, 'bot.env') });
+} catch (e) {
+  try {
+    fs.accessSync(path.resolve(__dirname, 'api.env'));
+    require('dotenv').config({ path: path.resolve(__dirname, 'api.env') });
+  } catch (e) {
+    throw new Error("bot.env or api.env required");
+  }
+}
 
 const moment = require('moment-timezone');
 moment.tz.setDefault('UTC');
