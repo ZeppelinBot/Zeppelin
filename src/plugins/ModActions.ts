@@ -1,5 +1,6 @@
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
@@ -164,6 +165,20 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     return bans.some(b => b.user.id === userId);
   }
 
+  async findRelevantAuditLogEntry(actionType: number, userId: string, attempts?: number, attemptDelay?: number) {
+    try {
+      return await findRelevantAuditLogEntry(this.guild, actionType, userId, attempts, attemptDelay);
+    } catch (e) {
+      if (e instanceof DiscordRESTError && e.code === 50013) {
+        this.serverLogs.log(LogType.BOT_ALERT, {
+          body: "Missing permissions to read audit log",
+        });
+      } else {
+        throw e;
+      }
+    }
+  }
+
   /**
    * Add a BAN action automatically when a user is banned.
    * Attempts to find the ban's details in the audit log.
@@ -175,8 +190,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.guild,
+    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id,
     );
@@ -214,8 +228,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.guild,
+    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id,
     );
@@ -273,8 +286,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    const kickAuditLogEntry = await findRelevantAuditLogEntry(
-      this.guild,
+    const kickAuditLogEntry = await this.findRelevantAuditLogEntry(
       ErisConstants.AuditLogActions.MEMBER_KICK,
       member.id,
     );

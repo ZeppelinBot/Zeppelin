@@ -1,16 +1,15 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { Attachment, Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
+import { Attachment, Channel, Constants as ErisConstants, Embed, Guild, Member, TextChannel, User } from "eris";
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import {
   createChunkedMessage,
-  deactivateMentions,
   disableCodeBlocks,
   disableLinkPreviews,
   findRelevantAuditLogEntry,
   noop,
   stripObjectToScalars,
-  trimLines,
   UnknownUser,
   useMediaUrls,
 } from "../utils";
@@ -249,6 +248,20 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
+  async findRelevantAuditLogEntry(actionType: number, userId: string, attempts?: number, attemptDelay?: number) {
+    try {
+      return await findRelevantAuditLogEntry(this.guild, actionType, userId, attempts, attemptDelay);
+    } catch (e) {
+      if (e instanceof DiscordRESTError && e.code === 50013) {
+        this.guildLogs.log(LogType.BOT_ALERT, {
+          body: "Missing permissions to read audit log",
+        });
+      } else {
+        throw e;
+      }
+    }
+  }
+
   @d.event("guildMemberAdd")
   async onMemberJoin(_, member) {
     const newThreshold = moment().valueOf() - 1000 * 60 * 60;
@@ -299,8 +312,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.event("guildBanAdd")
   async onMemberBan(_, user) {
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.guild,
+    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id,
     );
@@ -318,8 +330,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.event("guildBanRemove")
   async onMemberUnban(_, user) {
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      this.guild,
+    const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id,
     );
@@ -351,8 +362,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
       const addedRoles = diff(member.roles, oldMember.roles);
       const removedRoles = diff(oldMember.roles, member.roles);
 
-      const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-        this.guild,
+      const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
         ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
         member.id,
       );
