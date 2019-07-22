@@ -18,7 +18,7 @@ const guildConfigRootSchema = t.type({
   levels: t.record(t.string, t.number),
   plugins: t.record(t.string, t.unknown),
 });
-const partialGuildConfigRootSchema = t.exact(t.partial(guildConfigRootSchema.props));
+const partialGuildConfigRootSchema = t.partial(guildConfigRootSchema.props);
 
 const globalConfigRootSchema = t.type({
   url: t.string,

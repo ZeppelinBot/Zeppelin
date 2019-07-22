@@ -63,7 +63,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
               {},
               (this.getStaticDefaultOptions() as any).config || {},
               options.config || {},
-              ...options.overrides.slice(0, i),
+              ...options.overrides.slice(0, i).map(o => o.config || {}),
               override.config,
             );
             const errors = validateStrict(this.configSchema, merged);
