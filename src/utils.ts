@@ -3,12 +3,14 @@ import {
   EmbedOptions,
   Emoji,
   Guild,
+  GuildAuditLog,
   GuildAuditLogEntry,
   Member,
   TextableChannel,
   TextChannel,
   User,
 } from "eris";
+import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -129,9 +131,19 @@ export async function findRelevantAuditLogEntry(
   attempts: number = 3,
   attemptDelay: number = 3000,
 ): Promise<GuildAuditLogEntry> {
-  const auditLogEntries = await guild.getAuditLogs(5, null, actionType);
+  let auditLogs: GuildAuditLog;
+  try {
+    auditLogs = await guild.getAuditLogs(5, null, actionType);
+  } catch (e) {
+    // Ignore internal server errors which seem to be pretty common with audit log requests
+    if (!(e instanceof DiscordHTTPError) || e.code !== 500) {
+      throw e;
+    }
+  }
 
-  auditLogEntries.entries.sort((a, b) => {
+  const entries = auditLogs ? auditLogs.entries : [];
+
+  entries.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
     if (a.createdAt > b.createdAt) return 1;
     return 0;
@@ -139,7 +151,7 @@ export async function findRelevantAuditLogEntry(
 
   const cutoffTS = Date.now() - 1000 * 60 * 2;
 
-  const relevantEntry = auditLogEntries.entries.find(entry => {
+  const relevantEntry = entries.find(entry => {
     return entry.targetID === userId && entry.createdAt >= cutoffTS;
   });
 
