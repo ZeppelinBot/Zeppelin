@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { noop } from "./utils";
+import deepDiff from "deep-diff";
 
 // From io-ts/lib/PathReporter
 function stringify(v) {
@@ -42,8 +43,8 @@ const report = fold((errors: any) => {
  * Validates the given value against the given schema while also disallowing extra properties
  * See: https://github.com/gcanti/io-ts/issues/322
  */
-export function validateStrict(schema: t.Type<any, any, any>, value: any): string[] | null {
-  const validationResult = schema.decode(value);
+export function validateStrict(schema: t.HasProps, value: any): string[] | null {
+  const validationResult = t.exact(schema).decode(value);
   return pipe(
     validationResult,
     fold(
@@ -51,8 +52,9 @@ export function validateStrict(schema: t.Type<any, any, any>, value: any): strin
       result => {
         // Make sure there are no extra properties
         if (JSON.stringify(value) !== JSON.stringify(result)) {
-          // TODO: Actually mention what the unknown property is
-          return ["Found unknown properties"];
+          const diff = deepDiff(result, value);
+          const errors = diff.filter(d => d.kind === "N").map(d => `Unknown property <${d.path.join(".")}>`);
+          return errors.length ? errors : ["Found unknown properties"];
         }
 
         return null;

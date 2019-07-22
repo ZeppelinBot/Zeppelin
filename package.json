@@ -20,6 +20,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
+    "deep-diff": "^1.0.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "eris": "^0.10.1",
