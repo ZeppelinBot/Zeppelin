@@ -35,7 +35,10 @@ const report = fold((errors: any) => {
   return errors.map(err => {
     if (err.message) return err.message;
     const context = err.context.map(c => c.key).filter(k => k && !k.startsWith("{"));
-    return `Invalid value <${stringify(err.value)}> supplied to <${context.join("/")}>`;
+    const value = stringify(err.value);
+    return value === undefined
+      ? `<${context.join("/")}> is required`
+      : `Invalid value <${stringify(err.value)}> supplied to <${context.join("/")}>`;
   });
 }, noop);
 
