@@ -6,15 +6,15 @@ import { tNullable } from "../utils";
 
 // Permissions using these numbers: https://abal.moe/Eris/docs/reference (add all allowed/denied ones up)
 const CompanionChannelOpts = t.type({
-  voiceChannelIds: t.array(t.string),
-  textChannelIds: t.array(t.string),
+  voice_channel_ids: t.array(t.string),
+  text_channel_ids: t.array(t.string),
   permissions: t.number,
   enabled: tNullable(t.boolean),
 });
 type TCompanionChannelOpts = t.TypeOf<typeof CompanionChannelOpts>;
 
 const ConfigSchema = t.type({
-  companions: t.record(t.string, CompanionChannelOpts),
+  entries: t.record(t.string, CompanionChannelOpts),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -33,7 +33,7 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
-        companions: {},
+        entries: {},
       },
     };
   }
@@ -44,8 +44,8 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
    */
   protected getCompanionChannelOptsForVoiceChannelId(userId, voiceChannelId): TCompanionChannelOpts[] {
     const config = this.getConfigForMemberIdAndChannelId(userId, voiceChannelId);
-    return Object.values(config.companions)
-      .filter(opts => opts.voiceChannelIds.includes(voiceChannelId))
+    return Object.values(config.entries)
+      .filter(opts => opts.voice_channel_ids.includes(voiceChannelId))
       .map(opts => Object.assign({}, defaultCompanionChannelOpts, opts));
   }
 
@@ -62,14 +62,14 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
       : [];
 
     for (const oldChannelOpts of oldChannelOptsArr) {
-      for (const channelId of oldChannelOpts.textChannelIds) {
+      for (const channelId of oldChannelOpts.text_channel_ids) {
         oldPerms.set(channelId, oldChannelOpts.permissions);
         permsToDelete.add(channelId);
       }
     }
 
     for (const newChannelOpts of newChannelOptsArr) {
-      for (const channelId of newChannelOpts.textChannelIds) {
+      for (const channelId of newChannelOpts.text_channel_ids) {
         if (oldPerms.get(channelId) !== newChannelOpts.permissions) {
           // Update text channel perms if the channel we transitioned from didn't already have the same text channel perms
           permsToSet.set(channelId, newChannelOpts.permissions);
