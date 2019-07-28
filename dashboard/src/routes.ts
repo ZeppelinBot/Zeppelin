@@ -35,6 +35,16 @@ export const router = new VueRouter({
           path: "plugin-configuration",
           component: () => import("./components/docs/PluginConfiguration.vue"),
         },
+        {
+          path: "plugins",
+          component: () => import("./components/docs/plugins/Layout.vue"),
+          children: [
+            {
+              path: "mod-actions",
+              component: () => import("./components/docs/plugins/ModActions.vue"),
+            },
+          ],
+        },
       ],
     },
 

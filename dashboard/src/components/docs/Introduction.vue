@@ -16,5 +16,15 @@
       All Zeppelin configuration is done through the dashboard by editing a YAML config file. By default, only the server
       owner has access to this, but they can give other users access as they see fit. See <router-link to="/docs/configuration-format">Configuration format</router-link> for more details.
     </p>
+
+    <h2>Plugins</h2>
+    <p>
+      Zeppelin is divided into plugins: grouped functionality that can be enabled/disabled as needed, and that have their own configurations.
+    </p>
+
+    <h2>Commands</h2>
+    <p>
+      The commands for each plugin are listed on the plugin's page (see "Plugins" on the menu). On these pages, the command prefix is assumed to be <code>!</code> but this can be changed on a per-server basis.
+    </p>
   </div>
 </template>

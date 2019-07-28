@@ -31,8 +31,7 @@
 
             <p class="menu-label">Plugins</p>
             <ul class="menu-list">
-              <li><a>Blah</a></li>
-              <li><a>Bloh</a></li>
+              <li><router-link to="/docs/plugins/mod-actions">Mod actions</router-link></li>
             </ul>
           </aside>
         </div>
