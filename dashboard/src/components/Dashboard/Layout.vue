@@ -1,10 +1,10 @@
 <template>
-	<div class="dashboard">
+	<div class="dashboard dashboard-cloak">
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="container">
         <div class="navbar-brand">
           <div class="navbar-item">
-            <img class="dashboard-logo" src="../img/logo.png" aria-hidden="true">
+            <img class="dashboard-logo" src="../../img/logo.png" alt="" aria-hidden="true">
             <h1 class="dashboard-title">Zeppelin Dashboard</h1>
           </div>
         </div>
@@ -28,6 +28,11 @@
 </template>
 
 <style scoped>
+  .dashboard-cloak {
+    /* Replaced by "visible" in dashboard.scss */
+    visibility: hidden;
+  }
+
   .dashboard-logo {
     margin-right: 12px;
   }
@@ -40,7 +45,7 @@
 <script>
   export default {
     async mounted() {
-      await import("../style/dashboard.scss");
+      await import("../../style/dashboard.scss");
     },
     methods: {
       async logout() {
