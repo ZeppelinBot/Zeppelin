@@ -35,7 +35,7 @@
   import "codemirror/lib/codemirror.css";
   import "codemirror/theme/oceanic-next.css";
   import "codemirror/mode/yaml/yaml.js";
-  import {ApiError} from "../api";
+  import {ApiError} from "../../api";
 
   export default {
     components: {

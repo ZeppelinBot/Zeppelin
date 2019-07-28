@@ -18,7 +18,6 @@ Vue.mixin({
 });
 
 import App from "./components/App.vue";
-import Login from "./components/Login.vue";
 
 const app = new Vue({
   router,

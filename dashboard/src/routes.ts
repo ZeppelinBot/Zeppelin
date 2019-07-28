@@ -14,19 +14,43 @@ export const router = new VueRouter({
     { path: "/login", beforeEnter: authRedirectGuard },
     { path: "/login-callback", beforeEnter: loginCallbackGuard },
 
+    // Docs
+    {
+      path: "/docs",
+      component: () => import("./components/Docs/Layout.vue"),
+      children: [
+        {
+          path: "",
+          component: () => import("./components/Docs/Introduction.vue"),
+        },
+        {
+          path: "configuration-format",
+          component: () => import("./components/Docs/ConfigurationFormat.vue"),
+        },
+        {
+          path: "permissions",
+          component: () => import("./components/Docs/Permissions.vue"),
+        },
+        {
+          path: "plugin-configuration",
+          component: () => import("./components/Docs/PluginConfiguration.vue"),
+        },
+      ],
+    },
+
     // Dashboard
     {
       path: "/dashboard",
-      component: () => import("./components/Dashboard.vue"),
+      component: () => import("./components/Dashboard/Layout.vue"),
       beforeEnter: authGuard,
       children: [
         {
           path: "",
-          component: () => import("./components/DashboardGuildList.vue"),
+          component: () => import("./components/Dashboard/GuildList.vue"),
         },
         {
           path: "guilds/:guildId/config",
-          component: () => import("./components/DashboardGuildConfigEditor.vue"),
+          component: () => import("./components/Dashboard/GuildConfigEditor.vue"),
         },
       ],
     },
