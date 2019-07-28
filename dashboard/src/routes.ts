@@ -17,23 +17,23 @@ export const router = new VueRouter({
     // Docs
     {
       path: "/docs",
-      component: () => import("./components/Docs/Layout.vue"),
+      component: () => import("./components/docs/Layout.vue"),
       children: [
         {
           path: "",
-          component: () => import("./components/Docs/Introduction.vue"),
+          component: () => import("./components/docs/Introduction.vue"),
         },
         {
           path: "configuration-format",
-          component: () => import("./components/Docs/ConfigurationFormat.vue"),
+          component: () => import("./components/docs/ConfigurationFormat.vue"),
         },
         {
           path: "permissions",
-          component: () => import("./components/Docs/Permissions.vue"),
+          component: () => import("./components/docs/Permissions.vue"),
         },
         {
           path: "plugin-configuration",
-          component: () => import("./components/Docs/PluginConfiguration.vue"),
+          component: () => import("./components/docs/PluginConfiguration.vue"),
         },
       ],
     },
@@ -41,16 +41,16 @@ export const router = new VueRouter({
     // Dashboard
     {
       path: "/dashboard",
-      component: () => import("./components/Dashboard/Layout.vue"),
+      component: () => import("./components/dashboard/Layout.vue"),
       beforeEnter: authGuard,
       children: [
         {
           path: "",
-          component: () => import("./components/Dashboard/GuildList.vue"),
+          component: () => import("./components/dashboard/GuildList.vue"),
         },
         {
           path: "guilds/:guildId/config",
-          component: () => import("./components/Dashboard/GuildConfigEditor.vue"),
+          component: () => import("./components/dashboard/GuildConfigEditor.vue"),
         },
       ],
     },
