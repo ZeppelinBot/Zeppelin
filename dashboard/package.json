@@ -17,6 +17,7 @@
     "vue-template-compiler": "^2.6.10"
   },
   "dependencies": {
+    "buefy": "^0.7.10",
     "bulma": "^0.7.5",
     "bulmaswatch": "^0.7.2",
     "js-cookie": "^2.2.0",
