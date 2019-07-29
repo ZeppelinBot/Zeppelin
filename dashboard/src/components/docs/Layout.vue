@@ -31,7 +31,7 @@
 
             <p class="menu-label">Descriptions</p>
             <ul class="menu-list">
-              <li><router-link to="/docs/descriptions/argument-types">Argument Types</router-link></li>
+              <li><router-link to="/docs/descriptions/argument-types">Argument types</router-link></li>
             </ul>
 
             <p class="menu-label">Plugins</p>
