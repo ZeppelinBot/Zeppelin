@@ -40,6 +40,14 @@ This page details the different argument types available for commands.
     <h2 id="string">String</h2>
 
     <h2 id="user">User</h2>
+    <p>
+      Anything that uniquelly identifies a user. This includes:
+    </p>
+    <ul>
+      <li>User ID <code>108552944961454080</code></li>
+      <li>User Mention <code>@Dark#1010</code></li>
+      <li>Loose user mention <code>Dark#1010</code></li>
+    </ul>
   </div>
 </template>
 
