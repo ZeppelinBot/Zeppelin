@@ -17,6 +17,11 @@
       </div>
     </nav>
 
+    <div class="wip-bar">
+      <i class="mdi mdi-alert"></i>
+      <strong>Note!</strong> This documentation is a work in progress.
+    </div>
+
     <div class="wrapper">
       <div class="docs-sidebar">
         <div class="docs-sidebar-content">
@@ -74,6 +79,20 @@
 
   .docs-title {
     font-weight: 600;
+  }
+
+  .wip-bar {
+    padding: 4px 10px;
+    margin-bottom: 24px;
+    background-color: #2B3E50;
+    border-radius: 4px;
+  }
+
+  .wip-bar i {
+    color: #fdd7a5;
+    font-size: 24px;
+    vertical-align: -3px;
+    margin-right: 6px;
   }
 
   .wrapper {
