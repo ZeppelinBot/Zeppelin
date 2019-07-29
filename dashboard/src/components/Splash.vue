@@ -11,7 +11,7 @@
         </div>
         <div class="actions">
           <router-link class="btn" to="/login">Dashboard</router-link>
-          <router-link class="btn" to="/docs">Docs</router-link>
+          <router-link class="btn" to="/docs">Documentation</router-link>
         </div>
         <div class="error" v-if="error">
           <strong>Error</strong>
