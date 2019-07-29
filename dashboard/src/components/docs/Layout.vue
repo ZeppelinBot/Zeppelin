@@ -134,12 +134,7 @@
   import VueHighlightJS from "vue-highlightjs";
   import "../../directives/trim-code";
   import "highlight.js/styles/ocean.css";
+  import "../../style/docs.scss";
 
   Vue.use(VueHighlightJS);
-
-  export default {
-    async mounted() {
-      await import("../../style/docs.scss");
-    },
-  };
 </script>

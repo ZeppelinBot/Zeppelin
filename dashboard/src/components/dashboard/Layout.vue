@@ -45,10 +45,9 @@
 </style>
 
 <script>
+  import "../../style/dashboard.scss";
+
   export default {
-    async mounted() {
-      await import("../../style/dashboard.scss");
-    },
     methods: {
       async logout() {
         await this.$store.dispatch("auth/logout");
