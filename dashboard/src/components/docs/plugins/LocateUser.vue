@@ -8,11 +8,11 @@
     <h2>Description</h2>
     <p>
       This plugin allows users with access to the commands the following:
-      <ul>
-          <li>Instantly receive an invite to the voice channel of a user</li>
-          <li>Be notified as soon as a user switches or joins a voice channel</li>
-      </ul>
     </p>
+    <ul>
+      <li>Instantly receive an invite to the voice channel of a user</li>
+      <li>Be notified as soon as a user switches or joins a voice channel</li>
+    </ul>
 
     <h2>Default configuration</h2>
     <CodeBlock lang="yaml" trim="4">
@@ -30,11 +30,12 @@
     <h3>!where</h3>
     <p>
       Permission: <code>can_where</code><br>
-      Arguments: 
-      <ul>
-          <li><code>&lt;User&gt;</code> The user we want to find</li>
-      </ul>
-
+      Arguments:
+    </p>
+    <ul>
+      <li><code>&lt;User&gt;</code> The user we want to find</li>
+    </ul>
+    <p>
       Sends an instant invite to the voice channel the user from the <code>&lt;User&gt;</code> argument is in.
     </p>
     <h3>!vcalert</h3>
@@ -46,43 +47,41 @@
       
       Shortcut: <code>!vca</code><br><br>
 
-      Sends an instant invite along with a specified reminder once the user switches or joins a voice channel.<br><br>
-
-      <b-collapse :open="false" class="card">
-            <div
-                slot="trigger" 
-                slot-scope="props"
-                class="card-header"
-                role="button">
-                <p class="card-header-title">
-                    Additional Information
-                </p>
-                <a class="card-header-icon">
-                    <b-icon
-                        :icon="props.open ? 'menu-down' : 'menu-up'">
-                    </b-icon>
-                </a>
-            </div>
-            <div class="card-content">
-                <div class="content">
-                  
-                  Signatures:
-                    <ul>
-                     <li><code>!vcalert &lt;user&gt;</code></li>
-                     <li><code>!vcalert &lt;user&gt; [delay] [reminderString]</code></li>
-                    </ul>
-
-                  Arguments:
-                    <ul>
-                     <li><code>&lt;user&gt;</code> The user we want to find</li>
-                     <li><code>[delay]</code> How long the alert should be active, following the default <router-link to="/docs/descriptions/argument-types#Delay">Delay format</router-link>. Default: <code>10 minutes</code></li>
-                     <li><code>[reminderString]</code> Any text we want to receive once the alert triggers. Default: <code>None</code></li>
-                    </ul>
-                </div>
-            </div>
-        </b-collapse>
-
+      Sends an instant invite along with a specified reminder once the user switches or joins a voice channel.
     </p>
+    <b-collapse :open="false" class="card">
+      <div
+        slot="trigger"
+        slot-scope="props"
+        class="card-header"
+        role="button">
+        <div class="card-header-title">
+          Additional Information
+        </div>
+        <a class="card-header-icon">
+          <b-icon
+            :icon="props.open ? 'menu-down' : 'menu-up'">
+          </b-icon>
+        </a>
+      </div>
+      <div class="card-content">
+        <div class="content">
+
+          Signatures:
+          <ul>
+            <li><code>!vcalert &lt;user&gt;</code></li>
+            <li><code>!vcalert &lt;user&gt; [delay] [reminderString]</code></li>
+          </ul>
+
+          Arguments:
+          <ul>
+            <li><code>&lt;user&gt;</code> The user we want to find</li>
+            <li><code>[delay]</code> How long the alert should be active, following the default <router-link to="/docs/descriptions/argument-types#Delay">Delay format</router-link>. Default: <code>10 minutes</code></li>
+            <li><code>[reminderString]</code> Any text we want to receive once the alert triggers. Default: <code>None</code></li>
+          </ul>
+        </div>
+      </div>
+    </b-collapse>
   </div>
 </template>
 
