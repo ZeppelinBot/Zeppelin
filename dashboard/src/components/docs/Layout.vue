@@ -29,8 +29,14 @@
               <li><router-link to="/docs/permissions">Permissions</router-link></li>
             </ul>
 
+            <p class="menu-label">Descriptions</p>
+            <ul class="menu-list">
+              <li><router-link to="/docs/descriptions/argument-types">Argument Types</router-link></li>
+            </ul>
+
             <p class="menu-label">Plugins</p>
             <ul class="menu-list">
+              <li><router-link to="/docs/plugins/locate-user">Locate user</router-link></li>
               <li><router-link to="/docs/plugins/mod-actions">Mod actions</router-link></li>
             </ul>
           </aside>
