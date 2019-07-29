@@ -36,12 +36,26 @@ export const router = new VueRouter({
           component: () => import("./components/docs/PluginConfiguration.vue"),
         },
         {
+          path: "descriptions",
+          component: () => import("./components/docs/descriptions/Layout.vue"),
+          children: [
+            {
+              path: "argument-types",
+              component: () => import("./components/docs/descriptions/ArgumentTypes.vue"),
+            },
+          ],
+        },
+        {
           path: "plugins",
           component: () => import("./components/docs/plugins/Layout.vue"),
           children: [
             {
               path: "mod-actions",
               component: () => import("./components/docs/plugins/ModActions.vue"),
+            },
+            {
+              path: "locate-user",
+              component: () => import("./components/docs/plugins/LocateUser.vue"),
             },
           ],
         },
@@ -65,4 +79,12 @@ export const router = new VueRouter({
       ],
     },
   ],
+
+  scrollBehavior: function(to) {
+    if (to.hash) {
+      return {
+        selector: to.hash,
+      };
+    }
+  },
 });
