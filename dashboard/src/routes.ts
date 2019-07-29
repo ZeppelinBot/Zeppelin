@@ -80,7 +80,7 @@ export const router = new VueRouter({
     },
   ],
 
-  scrollBehavior: function(to) {
+  scrollBehavior(to) {
     if (to.hash) {
       return {
         selector: to.hash,
