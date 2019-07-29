@@ -12,7 +12,9 @@
         <div class="navbar-menu is-active">
           <div class="navbar-start">
             <router-link to="/dashboard" class="navbar-item">Guilds</router-link>
-            <a href="#" class="navbar-item">Docs</a>
+            <a href="/docs" class="navbar-item">Documentation</a>
+          </div>
+          <div class="navbar-end">
             <a href="javascript:void(0)" class="navbar-item" v-on:click="logout()">Log out</a>
           </div>
         </div>
