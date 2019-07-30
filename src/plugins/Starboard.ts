@@ -17,7 +17,6 @@ const StarboardOpts = t.type({
   positive_required: tNullable(t.number),
   allow_multistar: tNullable(t.boolean),
   negative_emojis: tNullable(t.array(t.string)),
-  bot_reacts: tNullable(t.boolean),
   enabled: tNullable(t.boolean),
 });
 type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
