@@ -1,6 +1,7 @@
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
@@ -161,8 +162,16 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   async isBanned(userId): Promise<boolean> {
-    const bans = (await this.guild.getBans()) as any;
-    return bans.some(b => b.user.id === userId);
+    try {
+      const bans = (await this.guild.getBans()) as any;
+      return bans.some(b => b.user.id === userId);
+    } catch (e) {
+      if (e instanceof DiscordHTTPError && e.code === 500) {
+        return false;
+      }
+
+      throw e;
+    }
   }
 
   async findRelevantAuditLogEntry(actionType: number, userId: string, attempts?: number, attemptDelay?: number) {
