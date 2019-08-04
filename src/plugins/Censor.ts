@@ -241,8 +241,8 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
     const blockedRegex: RegExp[] = config.blocked_regex || [];
     for (const [i, regex] of blockedRegex.entries()) {
       if (typeof regex.test !== "function") {
-        logger.debug(
-          `Regex <${regex}> was not a regex; index ${i} of censor.blocked_regex for guild ${this.guild.name} (${
+        logger.info(
+          `[DEBUG] Regex <${regex}> was not a regex; index ${i} of censor.blocked_regex for guild ${this.guild.name} (${
             this.guild.id
           })`,
         );
