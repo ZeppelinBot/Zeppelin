@@ -17,7 +17,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
-import { TSafeRegexString } from "../validatorUtils";
+import { TSafeRegex } from "../validatorUtils";
 
 const ConfigSchema = t.type({
   filter_zalgo: t.boolean,
@@ -32,7 +32,7 @@ const ConfigSchema = t.type({
   domain_blacklist: tNullable(t.array(t.string)),
   blocked_tokens: tNullable(t.array(t.string)),
   blocked_words: tNullable(t.array(t.string)),
-  blocked_regex: tNullable(t.array(TSafeRegexString)),
+  blocked_regex: tNullable(t.array(TSafeRegex)),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -238,12 +238,12 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Filter regex
-    const blockedRegex = config.blocked_regex || [];
-    for (const regexStr of blockedRegex) {
-      const regex = new RegExp(regexStr, "i");
+    const blockedRegex: RegExp[] = config.blocked_regex || [];
+    for (const regex of blockedRegex) {
+      // Support supplying your own regex flags with the /<regex>/<flags> syntax
       // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
       if (regex.test(savedMessage.data.content) || regex.test(messageContent)) {
-        this.censorMessage(savedMessage, `blocked regex (\`${regexStr}\`) found`);
+        this.censorMessage(savedMessage, `blocked regex (\`${regex.source}\`) found`);
         return true;
       }
     }
