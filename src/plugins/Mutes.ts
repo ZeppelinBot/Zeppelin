@@ -139,7 +139,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const user = await this.resolveUser(userId);
-    const member = await this.getMember(user.id);
+    const member = await this.getMember(user.id, true); // Grab the fresh member so we don't have stale role info
 
     if (member) {
       // Apply mute role if it's missing
@@ -264,7 +264,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!existingMute) return;
 
     const user = await this.resolveUser(userId);
-    const member = await this.getMember(userId);
+    const member = await this.getMember(userId, true); // Grab the fresh member so we don't have stale role info
 
     if (unmuteTime) {
       // Schedule timed unmute (= just set the mute's duration)
