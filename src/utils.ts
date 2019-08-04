@@ -31,6 +31,12 @@ const delayStringMultipliers = {
   s: 1000,
 };
 
+export const MS = 1;
+export const SECONDS = 1000 * MS;
+export const MINUTES = 60 * SECONDS;
+export const HOURS = 60 * MINUTES;
+export const DAYS = 24 * HOURS;
+
 export function tNullable(type: t.Mixed) {
   return t.union([type, t.undefined, t.null]);
 }
@@ -571,91 +577,86 @@ export class UnknownUser {
 const unknownUsers = new Set();
 const unknownMembers = new Set();
 
+export function resolveUserId(bot: Client, value: string) {
+  // A user mention?
+  const mentionMatch = value.match(/^<@!?(\d+)>$/);
+  if (mentionMatch) {
+    return mentionMatch[1];
+  }
+
+  // A non-mention, full username?
+  const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+  if (usernameMatch) {
+    const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    if (user) return user.id;
+  }
+
+  // Just a user ID?
+  const idMatch = value.match(/^\d+$/);
+  if (idMatch) {
+    return value;
+  }
+
+  return null;
+}
+
 export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser> {
   if (value == null || typeof value !== "string") {
     return new UnknownUser();
   }
 
-  let userId;
-
-  // A user mention?
-  const mentionMatch = value.match(/^<@!?(\d+)>$/);
-  if (mentionMatch) {
-    userId = mentionMatch[1];
+  // If we have the user cached, return that directly
+  const userId = resolveUserId(bot, value);
+  if (bot.users.has(userId)) {
+    return bot.users.get(userId);
   }
 
-  // A non-mention, full username?
-  if (!userId) {
-    const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
-    if (usernameMatch) {
-      const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-      if (user) userId = user.id;
-    }
+  // We don't want to spam the API by trying to fetch unknown users again and again,
+  // so we cache the fact that they're "unknown" for a while
+  if (unknownUsers.has(userId)) {
+    return new UnknownUser({ id: userId });
   }
 
-  // Just a user ID?
-  if (!userId) {
-    const idMatch = value.match(/^\d+$/);
-    if (!idMatch) {
-      return null;
-    }
-
-    userId = value;
+  const freshUser = await bot.getRESTUser(userId);
+  if (freshUser) {
+    bot.users.add(freshUser, bot);
+    return freshUser;
   }
 
-  const cachedUser = bot.users.find(u => u.id === userId);
-  if (cachedUser) return cachedUser;
-
-  // We only fetch the user from the API if we haven't tried it before:
-  // - If the user was found, the bot has them in its cache
-  // - If the user was not found, they'll be in unknownUsers
-  if (!unknownUsers.has(userId)) {
-    try {
-      const freshUser = await bot.getRESTUser(userId);
-      bot.users.add(freshUser, bot);
-      return freshUser;
-    } catch (e) {} // tslint:disable-line
-
-    unknownUsers.add(userId);
-  }
+  unknownUsers.add(userId);
+  setTimeout(() => unknownUsers.delete(userId), 15 * MINUTES);
 
   return new UnknownUser({ id: userId });
 }
 
 export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
-  // Start by resolving the user
-  const user = await resolveUser(bot, value);
-  if (!user || user instanceof UnknownUser) return null;
+  const userId = resolveUserId(bot, value);
+  if (!userId) return null;
 
-  // See if we have the member cached...
-  let member = guild.members.get(user.id);
-
-  // We only fetch the member from the API if we haven't tried it before:
-  // - If the member was found, the bot has them in the guild's member cache
-  // - If the member was not found, they'll be in unknownMembers
-  const unknownKey = `${guild.id}-${user.id}`;
-  if (!unknownMembers.has(unknownKey)) {
-    // If not, fetch it from the API
-    if (!member) {
-      try {
-        logger.debug(`Fetching unknown member (${user.id} in ${guild.name} (${guild.id})) from the API`);
-
-        member = await bot.getRESTGuildMember(guild.id, user.id);
-        member.id = user.id;
-        member.guild = guild;
-      } catch (e) {} // tslint:disable-line
-    }
-
-    if (!member) unknownMembers.add(unknownKey);
+  // If we have the member cached, return that directly
+  if (guild.members.has(userId)) {
+    return guild.members.get(userId);
   }
 
-  return member;
-}
+  // We don't want to spam the API by trying to fetch unknown members again and again,
+  // so we cache the fact that they're "unknown" for a while
+  const unknownKey = `${guild.id}-${userId}`;
+  if (unknownMembers.has(unknownKey)) {
+    return null;
+  }
 
-export const MS = 1;
-export const SECONDS = 1000 * MS;
-export const MINUTES = 60 * SECONDS;
-export const HOURS = 60 * MINUTES;
-export const DAYS = 24 * HOURS;
+  logger.debug(`Fetching unknown member (${userId} in ${guild.name} (${guild.id})) from the API`);
+
+  const freshMember = await bot.getRESTGuildMember(guild.id, userId).catch(noop);
+  if (freshMember) {
+    freshMember.id = userId;
+    return freshMember;
+  }
+
+  unknownMembers.add(unknownKey);
+  setTimeout(() => unknownMembers.delete(unknownKey), 15 * MINUTES);
+
+  return null;
+}
 
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };

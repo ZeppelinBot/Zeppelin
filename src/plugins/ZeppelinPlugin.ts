@@ -4,7 +4,7 @@ import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, UnknownUser } from "../utils";
+import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, resolveUserId, UnknownUser } from "../utils";
 import { Member, User } from "eris";
 import { performance } from "perf_hooks";
 import { validateStrict } from "../validatorUtils";
@@ -126,14 +126,24 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    * Resolves a member from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
    * If the member is not found in the cache, it's fetched from the API.
    */
-  async getMember(memberResolvable: string): Promise<Member> {
+  async getMember(memberResolvable: string, forceFresh = false): Promise<Member> {
     const start = performance.now();
-    const member = await resolveMember(this.bot, this.guild, memberResolvable);
+
+    let member;
+    if (forceFresh) {
+      const userId = await resolveUserId(this.bot, memberResolvable);
+      member = userId && (await this.bot.getRESTGuildMember(this.guild.id, userId));
+      if (member) member.id = member.user.id;
+    } else {
+      member = await resolveMember(this.bot, this.guild, memberResolvable);
+    }
+
     const time = performance.now() - start;
     if (time >= SLOW_RESOLVE_THRESHOLD) {
       const rounded = Math.round(time);
       logger.warn(`Slow member resolve (${rounded}ms): ${memberResolvable} in ${this.guild.name} (${this.guild.id})`);
     }
+
     return member;
   }
 }
