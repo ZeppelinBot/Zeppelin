@@ -582,11 +582,33 @@ export function isObjectLiteral(obj) {
   return Object.getPrototypeOf(obj) === deepestPrototype;
 }
 
+const keyMods = ["+", "-", "="];
 export function deepKeyIntersect(obj, keyReference) {
   const result = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (!keyReference.hasOwnProperty(key)) continue;
-    if (value != null && typeof value === "object" && typeof keyReference[key] === "object" && isObjectLiteral(value)) {
+  for (let [key, value] of Object.entries(obj)) {
+    if (!keyReference.hasOwnProperty(key)) {
+      // Temporary solution so we don't erase keys with modifiers
+      // Modifiers will be removed soon(tm) so we can remove this when that happens as well
+      let found = false;
+      for (const mod of keyMods) {
+        if (keyReference.hasOwnProperty(mod + key)) {
+          key = mod + key;
+          found = true;
+          break;
+        }
+      }
+      if (!found) continue;
+    }
+
+    if (Array.isArray(value)) {
+      // Also temp (because modifier shenanigans)
+      result[key] = keyReference[key];
+    } else if (
+      value != null &&
+      typeof value === "object" &&
+      typeof keyReference[key] === "object" &&
+      isObjectLiteral(value)
+    ) {
       result[key] = deepKeyIntersect(value, keyReference[key]);
     } else {
       result[key] = value;
