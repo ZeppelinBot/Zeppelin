@@ -37,7 +37,7 @@ export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
 
-export function tNullable(type: t.Mixed) {
+export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
   return t.union([type, t.undefined, t.null]);
 }
 
@@ -572,6 +572,19 @@ export class UnknownUser {
       this[key] = props[key];
     }
   }
+}
+
+export function deepKeyIntersect(obj, keyReference) {
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (!keyReference.hasOwnProperty(key)) continue;
+    if (value != null && typeof value === "object" && typeof keyReference[key] === "object") {
+      result[key] = deepKeyIntersect(value, keyReference[key]);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
 }
 
 const unknownUsers = new Set();

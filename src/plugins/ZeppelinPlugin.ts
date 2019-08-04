@@ -4,10 +4,19 @@ import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, resolveUserId, UnknownUser } from "../utils";
+import {
+  deepKeyIntersect,
+  isSnowflake,
+  isUnicodeEmoji,
+  resolveMember,
+  resolveUser,
+  resolveUserId,
+  UnknownUser,
+} from "../utils";
 import { Member, User } from "eris";
 import { performance } from "perf_hooks";
-import { validateStrict } from "../validatorUtils";
+import { decodeAndValidateStrict, StrictValidationErrors } from "../validatorUtils";
+import { mergeConfig } from "knub/dist/configUtils";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
@@ -29,50 +38,83 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return ourLevel > memberLevel;
   }
 
+  /**
+   * Since we want to do type checking without creating instances of every plugin,
+   * we need a static version of getDefaultOptions(). This static version is then,
+   * by turn, called from getDefaultOptions() so everything still works as expected.
+   */
   protected static getStaticDefaultOptions() {
     // Implemented by plugin
     return {};
   }
 
+  /**
+   * Wrapper to fetch the real default options from getStaticDefaultOptions()
+   */
   protected getDefaultOptions(): IPluginOptions<TConfig> {
     return (this.constructor as typeof ZeppelinPlugin).getStaticDefaultOptions() as IPluginOptions<TConfig>;
   }
 
+  /**
+   * Merges the given options and default options and decodes them according to the config schema of the plugin (if any).
+   * Throws on any decoding/validation errors.
+   *
+   * Intended as an augmented, static replacement for Plugin.getMergedConfig() which is why this is also called from
+   * getMergedConfig().
+   *
+   * Like getStaticDefaultOptions(), we also want to use this function for type checking without creating an instance of
+   * the plugin, which is why this has to be a static function.
+   */
+  protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
+    const defaultOptions: any = this.getStaticDefaultOptions();
+    const mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
+    const mergedOverrides = options["=overrides"]
+      ? options["=overrides"]
+      : (options.overrides || []).concat(defaultOptions.overrides || []);
+
+    const decodedConfig = this.configSchema ? decodeAndValidateStrict(this.configSchema, mergedConfig) : mergedConfig;
+    if (decodedConfig instanceof StrictValidationErrors) {
+      throw new Error(decodedConfig.getErrors().join("\n"));
+    }
+
+    const decodedOverrides = [];
+    for (const override of mergedOverrides) {
+      const overrideConfigMergedWithBaseConfig = mergeConfig({}, mergedConfig, override.config || {});
+      const decodedOverrideConfig = this.configSchema
+        ? decodeAndValidateStrict(this.configSchema, overrideConfigMergedWithBaseConfig)
+        : overrideConfigMergedWithBaseConfig;
+      if (decodedOverrideConfig instanceof StrictValidationErrors) {
+        throw new Error(decodedConfig.getErrors().join("\n"));
+      }
+      decodedOverrides.push({ ...override, config: deepKeyIntersect(decodedOverrideConfig, override.config || {}) });
+    }
+
+    return {
+      config: decodedConfig,
+      overrides: decodedOverrides,
+    };
+  }
+
+  /**
+   * Wrapper that calls mergeAndValidateStaticOptions()
+   */
+  protected getMergedOptions(): IPluginOptions<TConfig> {
+    if (!this.mergedPluginOptions) {
+      this.mergedPluginOptions = ((this.constructor as unknown) as typeof ZeppelinPlugin).mergeAndDecodeStaticOptions(
+        this.pluginOptions,
+      );
+    }
+
+    return this.mergedPluginOptions as IPluginOptions<TConfig>;
+  }
+
+  /**
+   * Run static type checks and other validations on the given options
+   */
   public static validateOptions(options: any): string[] | null {
     // Validate config values
     if (this.configSchema) {
-      if (options.config) {
-        const merged = configUtils.mergeConfig(
-          {},
-          (this.getStaticDefaultOptions() as any).config || {},
-          options.config,
-        );
-        const errors = validateStrict(this.configSchema, merged);
-        if (errors) {
-          return errors;
-        }
-      }
-
-      if (options.overrides) {
-        for (const [i, override] of options.overrides.entries()) {
-          if (override.config) {
-            // For type checking overrides, apply default config + supplied config + any overrides preceding this override + finally this override
-            // Exhaustive type checking would require checking against all combinations of preceding overrides but that's... costy. This will do for now.
-            // TODO: Override default config retrieval functions and do some sort of memoized checking there?
-            const merged = configUtils.mergeConfig(
-              {},
-              (this.getStaticDefaultOptions() as any).config || {},
-              options.config || {},
-              ...options.overrides.slice(0, i).map(o => o.config || {}),
-              override.config,
-            );
-            const errors = validateStrict(this.configSchema, merged);
-            if (errors) {
-              return errors;
-            }
-          }
-        }
-      }
+      this.mergeAndDecodeStaticOptions(options);
     }
 
     // No errors, return null
@@ -80,12 +122,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   }
 
   public async runLoad(): Promise<any> {
-    const mergedOptions = this.getMergedOptions();
-    const validationErrors = ((this.constructor as unknown) as typeof ZeppelinPlugin).validateOptions(mergedOptions);
-    if (validationErrors) {
-      throw new Error(validationErrors.join("\n"));
-    }
-
+    const mergedOptions = this.getMergedOptions(); // This implicitly also validates the config
     return super.runLoad();
   }
 
@@ -103,8 +140,18 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     }
   }
 
+  /**
+   * Intended for cross-plugin functionality
+   */
   public getRegisteredCommands() {
     return this.commands.commands;
+  }
+
+  /**
+   * Intended for cross-plugin functionality
+   */
+  public getRuntimeOptions() {
+    return this.getMergedOptions();
   }
 
   /**

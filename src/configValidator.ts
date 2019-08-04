@@ -5,7 +5,7 @@ import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { availablePlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
-import { validateStrict } from "./validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const pluginNameToClass = new Map<string, typeof ZeppelinPlugin>();
 for (const pluginClass of availablePlugins) {
@@ -29,8 +29,8 @@ const globalConfigRootSchema = t.type({
 const partialMegaTest = t.partial({ name: t.string });
 
 export function validateGuildConfig(config: any): string[] | null {
-  const rootErrors = validateStrict(partialGuildConfigRootSchema, config);
-  if (rootErrors) return rootErrors;
+  const validationResult = decodeAndValidateStrict(partialGuildConfigRootSchema, config);
+  if (validationResult instanceof StrictValidationError) return validationResult.getErrors();
 
   if (config.plugins) {
     for (const [pluginName, pluginOptions] of Object.entries(config.plugins)) {
