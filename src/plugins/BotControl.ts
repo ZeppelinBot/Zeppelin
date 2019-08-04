@@ -1,32 +1,61 @@
-import { decorators as d, GlobalPlugin, IPluginOptions } from "knub";
+import { decorators as d, IPluginOptions } from "knub";
 import child_process from "child_process";
 import { GuildChannel, Message, TextChannel } from "eris";
-import { createChunkedMessage, errorMessage, noop, sorter, successMessage } from "../utils";
+import moment from "moment-timezone";
+import { createChunkedMessage, errorMessage, noop, sorter, successMessage, tNullable } from "../utils";
 import { ReactionRolesPlugin } from "./ReactionRoles";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { GuildArchives } from "../data/GuildArchives";
+import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
+import * as t from "io-ts";
 
 let activeReload: [string, string] = null;
 
-interface IBotControlPluginConfig {
-  owners: string[];
-  update_cmd: string;
-}
+const ConfigSchema = t.type({
+  can_use: t.boolean,
+  owners: t.array(t.string),
+  update_cmd: tNullable(t.string),
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 /**
  * A global plugin that allows bot owners to control the bot
  */
-export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
+export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
   public static pluginName = "bot_control";
+  protected static configSchema = ConfigSchema;
 
-  getDefaultOptions(): IPluginOptions<IBotControlPluginConfig> {
+  protected archives: GuildArchives;
+
+  protected static getStaticDefaultOptions() {
     return {
       config: {
+        can_use: false,
         owners: [],
         update_cmd: null,
       },
+      overrides: [
+        {
+          level: ">=100",
+          config: {
+            can_use: true,
+          },
+        },
+      ],
     };
   }
 
+  protected getMemberLevel(member) {
+    if (this.getConfig().owners.includes(member.id)) {
+      return 100;
+    }
+
+    return 0;
+  }
+
   async onLoad() {
+    this.archives = new GuildArchives(0);
+
     if (activeReload) {
       const [guildId, channelId] = activeReload;
       activeReload = null;
@@ -46,9 +75,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("bot_full_update")
+  @d.permission("can_use")
   async fullUpdateCmd(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
-
     const updateCmd = this.getConfig().update_cmd;
     if (!updateCmd) {
       msg.channel.createMessage(errorMessage("Update command not specified!"));
@@ -64,8 +92,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("bot_reload_global_plugins")
+  @d.permission("can_use")
   async reloadGlobalPluginsCmd(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
     if (activeReload) return;
 
     if (msg.channel) {
@@ -77,8 +105,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("perf")
+  @d.permission("can_use")
   async perfCmd(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
     const perfItems = this.knub.getPerformanceDebugItems();
 
     if (perfItems.length) {
@@ -90,9 +118,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("refresh_reaction_roles_globally")
+  @d.permission("can_use")
   async refreshAllReactionRolesCmd(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
-
     const guilds = this.knub.getLoadedGuilds();
     for (const guild of guilds) {
       if (guild.loadedPlugins.has("reaction_roles")) {
@@ -103,9 +130,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("guilds")
+  @d.permission("can_use")
   async serversCmd(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
-
     const joinedGuilds = Array.from(this.bot.guilds.values());
     const loadedGuilds = this.knub.getLoadedGuilds();
     const loadedGuildsMap = loadedGuilds.reduce((map, guildData) => map.set(guildData.id, guildData), new Map());
@@ -122,9 +148,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("leave_guild", "<guildId:string>")
+  @d.permission("can_use")
   async leaveGuildCmd(msg: Message, args: { guildId: string }) {
-    if (!this.isOwner(msg.author.id)) return;
-
     if (!this.bot.guilds.has(args.guildId)) {
       msg.channel.createMessage(errorMessage("I am not in that guild"));
       return;
@@ -144,9 +169,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("reload_guild", "<guildId:string>")
+  @d.permission("can_use")
   async reloadGuildCmd(msg: Message, args: { guildId: string }) {
-    if (!this.isOwner(msg.author.id)) return;
-
     if (!this.bot.guilds.has(args.guildId)) {
       msg.channel.createMessage(errorMessage("I am not in that guild"));
       return;
@@ -164,9 +188,8 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
   }
 
   @d.command("reload_all_guilds")
+  @d.permission("can_use")
   async reloadAllGuilds(msg: Message) {
-    if (!this.isOwner(msg.author.id)) return;
-
     const failedReloads: Map<string, string> = new Map();
     let reloadCount = 0;
 
@@ -190,5 +213,30 @@ export class BotControlPlugin extends GlobalPlugin<IBotControlPluginConfig> {
     } else {
       msg.channel.createMessage(successMessage(`Reloaded ${reloadCount} guild(s)`));
     }
+  }
+
+  @d.command("show_plugin_config", "<guildId:string> <pluginName:string>")
+  @d.permission("can_use")
+  async showPluginConfig(msg: Message, args: { guildId: string; pluginName: string }) {
+    const guildData = this.knub.getGuildData(args.guildId);
+    if (!guildData) {
+      msg.channel.createMessage(errorMessage(`Guild not loaded`));
+      return;
+    }
+
+    const pluginInstance = guildData.loadedPlugins.get(args.pluginName);
+    if (!pluginInstance) {
+      msg.channel.createMessage(errorMessage(`Plugin not loaded`));
+      return;
+    }
+
+    if (!(pluginInstance instanceof ZeppelinPlugin)) {
+      msg.channel.createMessage(errorMessage(`Plugin is not a Zeppelin plugin`));
+      return;
+    }
+
+    const opts = pluginInstance.getRuntimeOptions();
+    const archiveId = await this.archives.create(JSON.stringify(opts, null, 2), moment().add(15, "minutes"));
+    msg.channel.createMessage(this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId));
   }
 }
