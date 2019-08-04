@@ -17,6 +17,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
+import { TSafeRegexString } from "../validatorUtils";
 
 const ConfigSchema = t.type({
   filter_zalgo: t.boolean,
@@ -31,12 +32,13 @@ const ConfigSchema = t.type({
   domain_blacklist: tNullable(t.array(t.string)),
   blocked_tokens: tNullable(t.array(t.string)),
   blocked_words: tNullable(t.array(t.string)),
-  blocked_regex: tNullable(t.array(t.string)),
+  blocked_regex: tNullable(t.array(TSafeRegexString)),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "censor";
+  protected static configSchema = ConfigSchema;
 
   protected serverLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
