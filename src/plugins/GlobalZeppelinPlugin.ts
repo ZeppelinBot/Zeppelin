@@ -7,7 +7,7 @@ import { PathReporter } from "io-ts/lib/PathReporter";
 import { deepKeyIntersect, isSnowflake, isUnicodeEmoji, resolveMember, resolveUser, UnknownUser } from "../utils";
 import { Member, User } from "eris";
 import { performance } from "perf_hooks";
-import { decodeAndValidateStrict, StrictValidationErrors } from "../validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
 import { mergeConfig } from "knub/dist/configUtils";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
@@ -51,8 +51,8 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
       : (options.overrides || []).concat(defaultOptions.overrides || []);
 
     const decodedConfig = this.configSchema ? decodeAndValidateStrict(this.configSchema, mergedConfig) : mergedConfig;
-    if (decodedConfig instanceof StrictValidationErrors) {
-      throw new Error(decodedConfig.getErrors().join("\n"));
+    if (decodedConfig instanceof StrictValidationError) {
+      throw decodedConfig;
     }
 
     const decodedOverrides = [];
@@ -61,8 +61,8 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
       const decodedOverrideConfig = this.configSchema
         ? decodeAndValidateStrict(this.configSchema, overrideConfigMergedWithBaseConfig)
         : overrideConfigMergedWithBaseConfig;
-      if (decodedOverrideConfig instanceof StrictValidationErrors) {
-        throw new Error(decodedConfig.getErrors().join("\n"));
+      if (decodedOverrideConfig instanceof StrictValidationError) {
+        throw decodedOverrideConfig;
       }
       decodedOverrides.push({ ...override, config: deepKeyIntersect(decodedOverrideConfig, override.config) });
     }
@@ -91,7 +91,15 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
   public static validateOptions(options: any): string[] | null {
     // Validate config values
     if (this.configSchema) {
-      this.mergeAndDecodeStaticOptions(options);
+      try {
+        this.mergeAndDecodeStaticOptions(options);
+      } catch (e) {
+        if (e instanceof StrictValidationError) {
+          return e.getErrors();
+        }
+
+        throw e;
+      }
     }
 
     // No errors, return null
