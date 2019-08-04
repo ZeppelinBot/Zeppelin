@@ -607,7 +607,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let member;
     if (!(user instanceof UnknownUser)) {
-      member = await this.getMember(user.id);
+      member = await this.getMember(user.id, true);
     }
 
     const embed: EmbedOptions = {
