@@ -13,6 +13,7 @@ const CHECK_INTERVAL = 1000;
  */
 export class GuildConfigReloader extends GlobalZeppelinPlugin {
   public static pluginName = "guild_config_reloader";
+
   protected guildConfigs: Configs;
   private unloaded = false;
   private highestConfigId;
