@@ -1,8 +1,19 @@
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
-import { fold } from "fp-ts/lib/Either";
+import { fold, either } from "fp-ts/lib/Either";
 import { noop } from "./utils";
 import deepDiff from "deep-diff";
+import safeRegex from "safe-regex";
+
+export const TSafeRegexString = new t.Type(
+  "TSafeRegexString",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      return safeRegex(s) ? t.success(s) : t.failure(from, to, "Unsafe regex");
+    }),
+  s => s,
+);
 
 // From io-ts/lib/PathReporter
 function stringify(v) {
@@ -35,10 +46,12 @@ const report = fold((errors: any) => {
   return errors.map(err => {
     if (err.message) return err.message;
     const context = err.context.map(c => c.key).filter(k => k && !k.startsWith("{"));
+    if (context.length > 0 && !isNaN(context[context.length - 1])) context.splice(-1);
+
     const value = stringify(err.value);
     return value === undefined
       ? `<${context.join("/")}> is required`
-      : `Invalid value <${stringify(err.value)}> supplied to <${context.join("/")}>`;
+      : `Invalid value supplied to <${context.join("/")}>`;
   });
 }, noop);
 
