@@ -261,7 +261,9 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
     } else {
       // Post the message immediately
       await this.postMessage(args.channel, args.content, msg.attachments, args["enable-mentions"]);
-      this.sendSuccessMessage(msg.channel, `Message posted in <#${args.channel.id}>`);
+      if (args.channel.id !== msg.channel.id) {
+        this.sendSuccessMessage(msg.channel, `Message posted in <#${args.channel.id}>`);
+      }
     }
   }
 
@@ -349,7 +351,9 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       const createdMsg = await args.channel.createMessage({ embed });
       this.savedMessages.setPermanent(createdMsg.id);
 
-      await this.sendSuccessMessage(msg.channel, `Embed posted in <#${args.channel.id}>`);
+      if (msg.channel.id !== args.channel.id) {
+        await this.sendSuccessMessage(msg.channel, `Embed posted in <#${args.channel.id}>`);
+      }
     }
 
     if (args.content) {
