@@ -404,7 +404,7 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
           if (retries === 0) {
             throw httpsErr;
           } else {
-            console.warn("File download failed, retrying. Error given:", httpsErr.message);
+            console.warn("File download failed, retrying. Error given:", httpsErr.message); // tslint:disable-line
             resolve(downloadFile(attachmentUrl, retries - 1));
           }
         });
@@ -650,6 +650,10 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
 
   // If we have the user cached, return that directly
   const userId = resolveUserId(bot, value);
+  if (!userId) {
+    return new UnknownUser({ id: userId });
+  }
+
   if (bot.users.has(userId)) {
     return bot.users.get(userId);
   }
@@ -660,7 +664,7 @@ export async function resolveUser(bot: Client, value: string): Promise<User | Un
     return new UnknownUser({ id: userId });
   }
 
-  const freshUser = await bot.getRESTUser(userId);
+  const freshUser = await bot.getRESTUser(userId).catch(noop);
   if (freshUser) {
     bot.users.add(freshUser, bot);
     return freshUser;
