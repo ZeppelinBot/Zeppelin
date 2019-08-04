@@ -7,8 +7,18 @@ import { initArchives } from "./archives";
 import { connect } from "../data/db";
 import path from "path";
 import { TokenError } from "passport-oauth2";
+import { PluginError } from "knub";
 
 require("dotenv").config({ path: path.resolve(__dirname, "..", "..", "api.env") });
+
+function errorHandler(err) {
+  // tslint:disable:no-console
+  console.error(err.stack || err);
+  process.exit(1);
+  // tslint:enable:no-console
+}
+
+process.on("unhandledRejection", errorHandler);
 
 console.log("Connecting to database...");
 connect().then(() => {
