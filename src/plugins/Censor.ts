@@ -1,4 +1,4 @@
-import { IPluginOptions } from "knub";
+import { IPluginOptions, logger } from "knub";
 import { Invite, Embed } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
@@ -239,8 +239,16 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // Filter regex
     const blockedRegex: RegExp[] = config.blocked_regex || [];
-    for (const regex of blockedRegex) {
-      // Support supplying your own regex flags with the /<regex>/<flags> syntax
+    for (const [i, regex] of blockedRegex.entries()) {
+      if (typeof regex.test !== "function") {
+        logger.debug(
+          `Regex <${regex}> was not a regex; index ${i} of censor.blocked_regex for guild ${this.guild.name} (${
+            this.guild.id
+          })`,
+        );
+        continue;
+      }
+
       // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
       if (regex.test(savedMessage.data.content) || regex.test(messageContent)) {
         this.censorMessage(savedMessage, `blocked regex (\`${regex.source}\`) found`);
