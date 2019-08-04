@@ -3,8 +3,8 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import humanizeDuration from "humanize-duration";
 import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
-import moment = require("moment");
-import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage } from "../utils";
+import moment from "moment-timezone";
+import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage, MINUTES } from "../utils";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -71,7 +71,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("where", "<member:resolvedMember>", {})
   @d.permission("can_where")
   async whereCmd(msg: Message, args: { member: Member; time?: number; reminder?: string }) {
-    let member = await resolveMember(this.bot, this.guild, args.member.id);
+    const member = await resolveMember(this.bot, this.guild, args.member.id);
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
   }
 
@@ -80,9 +80,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   })
   @d.permission("can_alert")
   async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
-    let time = args.duration || 600000;
-    let alertTime = moment().add(time, "millisecond");
-    let body = args.reminder || "None";
+    const time = args.duration || 10 * MINUTES;
+    const alertTime = moment().add(time, "millisecond");
+    const body = args.reminder || "None";
 
     this.alerts.add(msg.author.id, args.member.id, msg.channel.id, alertTime.format("YYYY-MM-DD HH:mm:ss"), body);
     if (!this.usersWithAlerts.includes(args.member.id)) {
@@ -162,10 +162,10 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const member = await resolveMember(this.bot, this.guild, userid);
 
     triggeredAlerts.forEach(alert => {
-      let prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${
+      const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${
         alert.body
       }\`\n`;
-      sendWhere(this.guild, member, <TextableChannel>this.bot.getChannel(alert.channel_id), prepend);
+      sendWhere(this.guild, member, this.bot.getChannel(alert.channel_id) as TextableChannel, prepend);
       this.alerts.delete(alert.id);
     });
   }
@@ -179,12 +179,12 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
 }
 
 export async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend: string) {
-  let voice = await (<VoiceChannel>guild.channels.get(member.voiceState.channelID));
+  const voice = guild.channels.get(member.voiceState.channelID) as VoiceChannel;
 
   if (voice == null) {
     channel.createMessage(prepend + "That user is not in a channel");
   } else {
-    let invite = await createInvite(voice);
+    const invite = await createInvite(voice);
     channel.createMessage(
       prepend + ` ${member.mention} is in the following channel: ${voice.name} https://${getInviteLink(invite)}`,
     );
@@ -192,7 +192,7 @@ export async function sendWhere(guild: Guild, member: Member, channel: TextableC
 }
 
 export async function createInvite(vc: VoiceChannel) {
-  let existingInvites = await vc.getInvites();
+  const existingInvites = await vc.getInvites();
 
   if (existingInvites.length !== 0) {
     return existingInvites[0];
