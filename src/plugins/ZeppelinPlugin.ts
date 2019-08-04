@@ -14,6 +14,7 @@ import {
   UnknownUser,
 } from "../utils";
 import { Member, User } from "eris";
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
 import { mergeConfig } from "knub/dist/configUtils";
@@ -190,7 +191,14 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     let member;
     if (forceFresh) {
       const userId = await resolveUserId(this.bot, memberResolvable);
-      member = userId && (await this.bot.getRESTGuildMember(this.guild.id, userId));
+      try {
+        member = userId && (await this.bot.getRESTGuildMember(this.guild.id, userId));
+      } catch (e) {
+        if (!(e instanceof DiscordRESTError)) {
+          throw e;
+        }
+      }
+
       if (member) member.id = member.user.id;
     } else {
       member = await resolveMember(this.bot, this.guild, memberResolvable);
