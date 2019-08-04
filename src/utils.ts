@@ -574,11 +574,19 @@ export class UnknownUser {
   }
 }
 
+export function isObjectLiteral(obj) {
+  let deepestPrototype = obj;
+  while (Object.getPrototypeOf(deepestPrototype) != null) {
+    deepestPrototype = Object.getPrototypeOf(deepestPrototype);
+  }
+  return Object.getPrototypeOf(obj) === deepestPrototype;
+}
+
 export function deepKeyIntersect(obj, keyReference) {
   const result = {};
   for (const [key, value] of Object.entries(obj)) {
     if (!keyReference.hasOwnProperty(key)) continue;
-    if (value != null && typeof value === "object" && typeof keyReference[key] === "object") {
+    if (value != null && typeof value === "object" && typeof keyReference[key] === "object" && isObjectLiteral(value)) {
       result[key] = deepKeyIntersect(value, keyReference[key]);
     } else {
       result[key] = value;

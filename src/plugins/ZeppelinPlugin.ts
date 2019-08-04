@@ -86,7 +86,10 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
       if (decodedOverrideConfig instanceof StrictValidationError) {
         throw decodedOverrideConfig;
       }
-      decodedOverrides.push({ ...override, config: deepKeyIntersect(decodedOverrideConfig, override.config || {}) });
+      decodedOverrides.push({
+        ...override,
+        config: deepKeyIntersect(decodedOverrideConfig, override.config || {}),
+      });
     }
 
     return {
