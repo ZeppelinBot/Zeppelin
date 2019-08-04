@@ -496,8 +496,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         ppId: pp && pp.id,
       });
     } catch (e) {
-      logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
-      msg.channel.createMessage(errorMessage("Could not mute the user"));
+      if (e instanceof DiscordRESTError && e.code === 10007) {
+        msg.channel.createMessage(errorMessage("Could not mute the user: unknown member"));
+      } else {
+        logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
+        msg.channel.createMessage(errorMessage("Could not mute the user"));
+      }
+
       return;
     }
 
