@@ -46,11 +46,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
   }
 
   protected getMemberLevel(member) {
-    if (this.getConfig().owners.includes(member.id)) {
-      return 100;
-    }
-
-    return 0;
+    return this.isOwner(member.id) ? 100 : 0;
   }
 
   async onLoad() {
@@ -68,10 +64,6 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
         }
       }
     }
-  }
-
-  isOwner(userId) {
-    return this.getConfig().owners.includes(userId);
   }
 
   @d.command("bot_full_update")
