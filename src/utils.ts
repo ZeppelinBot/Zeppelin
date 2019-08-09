@@ -6,6 +6,7 @@ import {
   GuildAuditLog,
   GuildAuditLogEntry,
   Member,
+  MessageContent,
   TextableChannel,
   TextChannel,
   User,
@@ -21,7 +22,7 @@ const fsp = fs.promises;
 
 import https from "https";
 import tmp from "tmp";
-import { logger } from "knub";
+import { logger, waitForReaction } from "knub";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -707,3 +708,10 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
 }
 
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
+
+export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
+  const msg = await channel.createMessage(content);
+  const reply = await waitForReaction(bot, msg, ["✅", "❌"], userId);
+  msg.delete().catch(noop);
+  return reply && reply.name === "✅";
+}
