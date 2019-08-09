@@ -554,7 +554,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
-  @d.command("clean user", "<userId:userid> <count:number>")
+  @d.command("clean user", "<userId:userId> <count:number>")
   @d.permission("can_clean")
   async cleanUserCmd(msg: Message, args: { userId: string; count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
