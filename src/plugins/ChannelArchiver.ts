@@ -98,7 +98,7 @@ export class ChannelArchiverPlugin extends ZeppelinPlugin {
 
     while (archivedMessages < maxMessagesToArchive) {
       const messagesToFetch = Math.min(MAX_MESSAGES_PER_FETCH, maxMessagesToArchive - archivedMessages);
-      const messages = await msg.channel.getMessages(messagesToFetch, previousId);
+      const messages = await args.channel.getMessages(messagesToFetch, previousId);
 
       for (const message of messages) {
         const ts = moment.utc(message.timestamp).format("YYYY-MM-DD HH:mm:ss");
