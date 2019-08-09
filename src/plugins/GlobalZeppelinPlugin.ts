@@ -110,4 +110,9 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
     const mergedOptions = this.getMergedOptions(); // This implicitly also validates the config
     return super.runLoad();
   }
+
+  protected isOwner(userId) {
+    const owners = this.knub.getGlobalConfig().owners || [];
+    return owners.includes(userId);
+  }
 }
