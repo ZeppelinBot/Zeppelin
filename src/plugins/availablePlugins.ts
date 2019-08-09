@@ -25,6 +25,7 @@ import { GuildInfoSaverPlugin } from "./GuildInfoSaver";
 import { CompanionChannelPlugin } from "./CompanionChannels";
 import { LocatePlugin } from "./LocateUser";
 import { GuildConfigReloader } from "./GuildConfigReloader";
+import { ChannelArchiverPlugin } from "./ChannelArchiver";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -54,6 +55,7 @@ export const availablePlugins = [
   GuildInfoSaverPlugin,
   CompanionChannelPlugin,
   LocatePlugin,
+  ChannelArchiverPlugin,
 ];
 
 /**
