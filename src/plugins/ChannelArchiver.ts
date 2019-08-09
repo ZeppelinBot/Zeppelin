@@ -106,6 +106,7 @@ export class ChannelArchiverPlugin extends ZeppelinPlugin {
         let content = `[${ts}] [${message.author.id}] [${message.author.username}#${
           message.author.discriminator
         }]: ${message.content || "<no text content>"}`;
+
         if (message.attachments.length) {
           if (args["attachment-channel"]) {
             const rehostedAttachmentUrl = await this.rehostAttachment(
@@ -116,6 +117,14 @@ export class ChannelArchiverPlugin extends ZeppelinPlugin {
           } else {
             content += `\n-- Attachment: ${message.attachments[0].url}`;
           }
+        }
+
+        if (message.reactions && Object.keys(message.reactions).length > 0) {
+          const reactionCounts = [];
+          for (const [emoji, info] of Object.entries(message.reactions)) {
+            reactionCounts.push(`${info.count}x ${emoji}`);
+          }
+          content += `\n-- Reactions: ${reactionCounts.join(", ")}`;
         }
 
         archiveLines.push(content);
