@@ -52,7 +52,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
 
     for (const alert of outdatedAlerts) {
       await this.alerts.delete(alert.id);
-      await this.removeUserIDFromActiveAlerts(alert.user_id);
+      await this.removeUserIdFromActiveAlerts(alert.user_id);
     }
 
     this.outdatedAlertsTimeout = setTimeout(() => this.outdatedAlertsLoop(), ALERT_LOOP_TIME);
@@ -137,7 +137,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   async userJoinedVC(member: Member, channel: Channel) {
     if (this.usersWithAlerts.includes(member.id)) {
       this.sendAlerts(member.id);
-      await this.removeUserIDFromActiveAlerts(member.id);
+      await this.removeUserIdFromActiveAlerts(member.id);
     }
   }
 
@@ -145,7 +145,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel) {
     if (this.usersWithAlerts.includes(member.id)) {
       this.sendAlerts(member.id);
-      await this.removeUserIDFromActiveAlerts(member.id);
+      await this.removeUserIdFromActiveAlerts(member.id);
     }
   }
 
@@ -157,9 +157,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
-  async sendAlerts(userid: string) {
-    const triggeredAlerts = await this.alerts.getAlertsByUserId(userid);
-    const member = await resolveMember(this.bot, this.guild, userid);
+  async sendAlerts(userId: string) {
+    const triggeredAlerts = await this.alerts.getAlertsByUserId(userId);
+    const member = await resolveMember(this.bot, this.guild, userId);
 
     triggeredAlerts.forEach(alert => {
       const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${
@@ -170,8 +170,8 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
-  async removeUserIDFromActiveAlerts(userid: string) {
-    const index = this.usersWithAlerts.indexOf(userid);
+  async removeUserIdFromActiveAlerts(userId: string) {
+    const index = this.usersWithAlerts.indexOf(userId);
     if (index > -1) {
       this.usersWithAlerts.splice(index, 1);
     }

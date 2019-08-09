@@ -40,7 +40,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.usernameHistory = new UsernameHistory();
   }
 
-  @d.command("names", "<userId:userid>")
+  @d.command("names", "<userId:userId>")
   @d.permission("can_view")
   async namesCmd(msg: Message, args: { userId: string }) {
     const nicknames = await this.nicknameHistory.getByUserId(args.userId);
@@ -72,7 +72,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.event("guildMemberUpdate")
   async onGuildMemberUpdate(_, member: Member) {
     const latestEntry = await this.nicknameHistory.getLastEntry(member.id);
-    if (!latestEntry || latestEntry.nickname != member.nick) {
+    if (!latestEntry || latestEntry.nickname !== member.nick) {
       // tslint:disable-line
       await this.nicknameHistory.addEntry(member.id, member.nick);
     }
