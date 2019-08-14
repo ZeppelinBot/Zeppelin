@@ -788,7 +788,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Kick the user
     this.serverLogs.ignoreLog(LogType.MEMBER_KICK, memberToKick.id);
     this.ignoreEvent(IgnoredEventType.Kick, memberToKick.id);
-    memberToKick.kick(reason);
+    try {
+      await memberToKick.kick();
+    } catch (e) {
+      msg.channel.create(errorMessage("Failed to kick the user"));
+      return;
+    }
 
     // Create a case for this action
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -872,10 +877,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
     }
 
-    // Ban the user
+    // (Try to) ban the user
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToBan.id);
     this.ignoreEvent(IgnoredEventType.Ban, memberToBan.id);
-    memberToBan.ban(1, reason);
+    try {
+      await memberToBan.ban(1);
+    } catch (e) {
+      msg.channel.create(errorMessage("Failed to ban the user"));
+      return;
+    }
 
     // Create a case for this action
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -949,8 +959,19 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.ignoreEvent(IgnoredEventType.Ban, memberToSoftban.id);
     this.ignoreEvent(IgnoredEventType.Unban, memberToSoftban.id);
 
-    await memberToSoftban.ban(1, reason);
-    await this.guild.unbanMember(memberToSoftban.id);
+    try {
+      await memberToSoftban.ban(1);
+    } catch (e) {
+      msg.channel.create(errorMessage("Failed to softban the user"));
+      return;
+    }
+
+    try {
+      await this.guild.unbanMember(memberToSoftban.id);
+    } catch (e) {
+      msg.channel.create(errorMessage("Failed to unban the user after softbanning them"));
+      return;
+    }
 
     // Create a case for this action
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -1068,7 +1089,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
     try {
-      await this.guild.banMember(user.id, 1, reason);
+      await this.guild.banMember(user.id, 1);
     } catch (e) {
       this.sendErrorMessage(msg.channel, "Failed to forceban member");
       return;
