@@ -622,6 +622,10 @@ const unknownUsers = new Set();
 const unknownMembers = new Set();
 
 export function resolveUserId(bot: Client, value: string) {
+  if (value == null) {
+    return null;
+  }
+
   // A user mention?
   const mentionMatch = value.match(/^<@!?(\d+)>$/);
   if (mentionMatch) {
