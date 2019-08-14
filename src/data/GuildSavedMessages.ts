@@ -147,6 +147,9 @@ export class GuildSavedMessages extends BaseGuildRepository {
   }
 
   async createFromMsg(msg: Message, overrides = {}) {
+    const existingSavedMsg = await this.find(msg.id);
+    if (existingSavedMsg) return;
+
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
 
