@@ -57,6 +57,14 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   }
 
   /**
+   * Allows the plugin to preprocess the config before it's validated.
+   * Useful for e.g. adding default properties to dynamic objects.
+   */
+  protected static preprocessStaticConfig(config: any) {
+    return config;
+  }
+
+  /**
    * Merges the given options and default options and decodes them according to the config schema of the plugin (if any).
    * Throws on any decoding/validation errors.
    *
@@ -68,10 +76,12 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    */
   protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
     const defaultOptions: any = this.getStaticDefaultOptions();
-    const mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
+    let mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
     const mergedOverrides = options["=overrides"]
       ? options["=overrides"]
       : (options.overrides || []).concat(defaultOptions.overrides || []);
+
+    mergedConfig = this.preprocessStaticConfig(mergedConfig);
 
     const decodedConfig = this.configSchema ? decodeAndValidateStrict(this.configSchema, mergedConfig) : mergedConfig;
     if (decodedConfig instanceof StrictValidationError) {
