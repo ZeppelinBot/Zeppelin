@@ -27,7 +27,7 @@ import { LogType } from "../data/LogType";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
-import { CasesPlugin } from "./Cases";
+import { CaseArgs, CasesPlugin } from "./Cases";
 import { MuteResult, MutesPlugin } from "./Mutes";
 import * as t from "io-ts";
 
@@ -328,8 +328,115 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   /**
-   * Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it
+   * Kick the specified server member. Generates a case.
    */
+  async kickMember(member: Member, reason: string = null, caseArgs: Partial<CaseArgs> = {}): Promise<KickResult> {
+    const config = this.getConfig();
+
+    // Attempt to message the user *before* kicking them, as doing it after may not be possible
+    let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
+    if (reason) {
+      const kickMessage = await renderTemplate(config.kick_message, {
+        guildName: this.guild.name,
+        reason,
+      });
+
+      notifyResult = await notifyUser(this.bot, this.guild, member.user, kickMessage, {
+        useDM: config.dm_on_kick,
+        useChannel: config.message_on_kick,
+        channelId: config.message_channel,
+      });
+    }
+
+    // Kick the user
+    this.serverLogs.ignoreLog(LogType.MEMBER_KICK, member.id);
+    this.ignoreEvent(IgnoredEventType.Kick, member.id);
+    try {
+      await member.kick();
+    } catch (e) {
+      return {
+        status: "failed",
+        error: e.getMessage(),
+      };
+    }
+
+    // Create a case for this action
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
+      ...caseArgs,
+      userId: member.id,
+      modId: caseArgs.modId,
+      type: CaseTypes.Kick,
+      reason,
+      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+    });
+
+    // Log the action
+    const mod = await this.resolveUser(caseArgs.modId);
+    this.serverLogs.log(LogType.MEMBER_KICK, {
+      mod: stripObjectToScalars(mod),
+      user: stripObjectToScalars(member.user),
+    });
+
+    return {
+      status: "success",
+      case: createdCase,
+      notifyResult,
+    };
+  }
+
+  /**
+   * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
+   */
+  async banUserId(userId: string, reason: string = null, caseArgs: Partial<CaseArgs> = {}): Promise<BanResult> {
+    const config = this.getConfig();
+    const user = await this.resolveUser(userId);
+
+    // Attempt to message the user *before* banning them, as doing it after may not be possible
+    let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
+    if (reason && user instanceof User) {
+      const banMessage = await renderTemplate(config.ban_message, {
+        guildName: this.guild.name,
+        reason,
+      });
+      notifyResult = await notifyUser(this.bot, this.guild, user, banMessage, {
+        useDM: config.dm_on_ban,
+        useChannel: config.message_on_ban,
+        channelId: config.message_channel,
+      });
+    }
+
+    // (Try to) ban the user
+    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId);
+    this.ignoreEvent(IgnoredEventType.Ban, userId);
+    try {
+      await this.guild.banMember(userId, 1);
+    } catch (e) {
+      return {
+        status: "failed",
+        error: e.getMessage(),
+      };
+    }
+
+    // Create a case for this action
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
+      ...caseArgs,
+      userId,
+      modId: caseArgs.modId,
+      type: CaseTypes.Ban,
+      reason,
+      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+    });
+
+    // Log the action
+    const mod = await this.resolveUser(caseArgs.modId);
+    this.serverLogs.log(LogType.MEMBER_BAN, {
+      mod: stripObjectToScalars(mod),
+      user: stripObjectToScalars(user),
+    });
+  }
+
   @d.command("update", "<caseNumber:number> [note:string$]", {
     overloads: ["[note:string$]"],
   })
@@ -433,37 +540,27 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
+    const warnResult = await this.warnMember(
+      memberToWarn,
+      warnMessage,
+      {
+        modId: mod.id,
+        ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      },
+      msg.channel as TextChannel,
+    );
 
-    const userMessageResult = await notifyUser(this.bot, this.guild, memberToWarn.user, warnMessage, {
-      useDM: config.dm_on_warn,
-      useChannel: config.message_on_warn,
-    });
-
-    if (userMessageResult.status === NotifyUserStatus.Failed) {
-      const failedMsg = await msg.channel.createMessage("Failed to message the user. Log the warning anyway?");
-      const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"], msg.author.id);
-      failedMsg.delete();
-      if (!reply || reply.name === "❌") {
-        return;
-      }
+    if (warnResult.status === "failed") {
+      msg.channel.createMessage(errorMessage("Failed to warn user"));
+      return;
     }
 
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    const createdCase = await casesPlugin.createCase({
-      userId: memberToWarn.id,
-      modId: mod.id,
-      type: CaseTypes.Warn,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
-      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
-    });
-
-    const messageResultText = userMessageResult.text ? ` (${userMessageResult.text})` : "";
+    const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
     msg.channel.createMessage(
       successMessage(
         `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${
-          createdCase.case_number
+          warnResult.case.case_number
         })${messageResultText}`,
       ),
     );
@@ -472,6 +569,61 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod: stripObjectToScalars(mod.user),
       member: stripObjectToScalars(memberToWarn, ["user", "roles"]),
     });
+  }
+
+  async warnMember(
+    member: Member,
+    warnMessage: string,
+    caseArgs: Partial<CaseArgs> = {},
+    retryPromptChannel: TextChannel = null,
+  ): Promise<WarnResult | null> {
+    const config = this.getConfig();
+
+    const notifyResult = await notifyUser(this.bot, this.guild, member.user, warnMessage, {
+      useDM: config.dm_on_warn,
+      useChannel: config.message_on_warn,
+    });
+
+    if (notifyResult.status === NotifyUserStatus.Failed) {
+      if (retryPromptChannel && this.guild.channels.has(retryPromptChannel.id)) {
+        const failedMsg = await retryPromptChannel.createMessage("Failed to message the user. Log the warning anyway?");
+        const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"]);
+        failedMsg.delete();
+        if (!reply || reply.name === "❌") {
+          return {
+            status: "failed",
+            error: "Failed to message user",
+          };
+        }
+      } else {
+        return {
+          status: "failed",
+          error: "Failed to message user",
+        };
+      }
+    }
+
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const createdCase = await casesPlugin.createCase({
+      ...caseArgs,
+      userId: member.id,
+      modId: caseArgs.modId,
+      type: CaseTypes.Warn,
+      reason: warnMessage,
+      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+    });
+
+    const mod = await this.resolveUser(caseArgs.modId);
+    this.serverLogs.log(LogType.MEMBER_WARN, {
+      mod: stripObjectToScalars(mod),
+      member: stripObjectToScalars(member, ["user", "roles"]),
+    });
+
+    return {
+      status: "success",
+      case: createdCase,
+      notifyResult,
+    };
   }
 
   /**
@@ -767,58 +919,24 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod = args.mod;
     }
 
-    const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+    const kickResult = await this.kickMember(memberToKick, reason, {
+      modId: mod.id,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+    });
 
-    // Attempt to message the user *before* kicking them, as doing it after may not be possible
-    let userMessageResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
-    if (args.reason) {
-      const kickMessage = await renderTemplate(config.kick_message, {
-        guildName: this.guild.name,
-        reason,
-      });
-
-      userMessageResult = await notifyUser(this.bot, this.guild, memberToKick.user, kickMessage, {
-        useDM: config.dm_on_kick,
-        useChannel: config.message_on_kick,
-        channelId: config.message_channel,
-      });
-    }
-
-    // Kick the user
-    this.serverLogs.ignoreLog(LogType.MEMBER_KICK, memberToKick.id);
-    this.ignoreEvent(IgnoredEventType.Kick, memberToKick.id);
-    try {
-      await memberToKick.kick();
-    } catch (e) {
-      msg.channel.create(errorMessage("Failed to kick the user"));
+    if (kickResult.status === "failed") {
+      msg.channel.createMessage(errorMessage(`Failed to kick user`));
       return;
     }
 
-    // Create a case for this action
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    const createdCase = await casesPlugin.createCase({
-      userId: memberToKick.id,
-      modId: mod.id,
-      type: CaseTypes.Kick,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
-      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
-    });
-
     // Confirm the action to the moderator
     let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${
-      createdCase.case_number
+      kickResult.case.case_number
     })`;
 
-    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
+    if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
     msg.channel.createMessage(successMessage(response));
-
-    // Log the action
-    this.serverLogs.log(LogType.MEMBER_KICK, {
-      mod: stripObjectToScalars(mod.user),
-      user: stripObjectToScalars(memberToKick.user),
-    });
   }
 
   @d.command("ban", "<user:string> [reason:string$]", {
