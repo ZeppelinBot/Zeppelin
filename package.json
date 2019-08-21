@@ -51,8 +51,7 @@
     "ts-node": "^3.3.0",
     "typeorm": "^0.2.14",
     "typescript": "^3.5.3",
-    "uuid": "^3.3.2",
-    "vuex": "^3.1.1"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
