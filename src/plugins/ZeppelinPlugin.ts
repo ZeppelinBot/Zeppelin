@@ -22,12 +22,21 @@ import { mergeConfig } from "knub/dist/configUtils";
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export interface PluginInfo {
-  name: string;
+  prettyName: string;
   description?: string;
+}
+
+export interface CommandInfo {
+  description?: string;
+  basicUsage?: string;
+  parameterDescriptions?: {
+    [key: string]: string;
+  };
 }
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
   public static pluginInfo: PluginInfo;
+  public static showInDocs: boolean = true;
 
   protected static configSchema: t.TypeC<any>;
   public static dependencies = [];
@@ -51,7 +60,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    * we need a static version of getDefaultOptions(). This static version is then,
    * by turn, called from getDefaultOptions() so everything still works as expected.
    */
-  protected static getStaticDefaultOptions() {
+  public static getStaticDefaultOptions() {
     // Implemented by plugin
     return {};
   }

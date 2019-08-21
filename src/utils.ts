@@ -244,6 +244,37 @@ export function asSingleLine(str: string) {
   return trimLines(str).replace(/\n/g, " ");
 }
 
+export function trimEmptyStartEndLines(str: string) {
+  const lines = str.split("\n");
+  let emptyLinesAtStart = 0;
+  let emptyLinesAtEnd = 0;
+
+  for (const line of lines) {
+    if (line.match(/^\s*$/)) {
+      emptyLinesAtStart++;
+    } else {
+      break;
+    }
+  }
+
+  for (let i = lines.length - 1; i > 0; i--) {
+    if (lines[i].match(/^\s*$/)) {
+      emptyLinesAtEnd++;
+    } else {
+      break;
+    }
+  }
+
+  return lines.slice(emptyLinesAtStart, emptyLinesAtEnd ? -1 * emptyLinesAtEnd : null).join("\n");
+}
+
+export function trimIndents(str: string, indentLength: number) {
+  return str
+    .split("\n")
+    .map(line => line.slice(indentLength))
+    .join("\n");
+}
+
 export const emptyEmbedValue = "\u200b";
 export const embedPadding = "\n" + emptyEmbedValue;
 

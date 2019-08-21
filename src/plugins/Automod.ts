@@ -358,7 +358,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     return config;
   }
 
-  protected static getStaticDefaultOptions() {
+  public static getStaticDefaultOptions() {
     return {
       rules: [],
     };

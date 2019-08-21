@@ -16,6 +16,8 @@ import {
   stripObjectToScalars,
   successMessage,
   tNullable,
+  trimEmptyStartEndLines,
+  trimIndents,
   trimLines,
   ucfirst,
   UnknownUser,
@@ -68,10 +70,57 @@ interface IIgnoredEvent {
   userId: string;
 }
 
+export type WarnResult =
+  | {
+      status: "failed";
+      error: string;
+    }
+  | {
+      status: "success";
+      case: Case;
+      notifyResult: INotifyUserResult;
+    };
+
+export type KickResult =
+  | {
+      status: "failed";
+      error: string;
+    }
+  | {
+      status: "success";
+      case: Case;
+      notifyResult: INotifyUserResult;
+    };
+
+export type BanResult =
+  | {
+      status: "failed";
+      error: string;
+    }
+  | {
+      status: "success";
+      case: Case;
+      notifyResult: INotifyUserResult;
+    };
+
+type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
+
 export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mod_actions";
   public static dependencies = ["cases", "mutes"];
   protected static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Mod actions",
+    description: trimIndents(
+      trimEmptyStartEndLines(`
+      Testing **things**
+      
+      Multiline haHAA
+    `),
+      6,
+    ),
+  };
 
   protected mutes: GuildMutes;
   protected cases: GuildCases;
@@ -87,7 +136,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.ignoredEvents = [];
   }
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         dm_on_warn: true,
@@ -439,6 +488,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("update", "<caseNumber:number> [note:string$]", {
     overloads: ["[note:string$]"],
+    info: {
+      description:
+        "Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it",
+    },
   })
   @d.permission("can_note")
   async updateCmd(msg: Message, args: { caseNumber?: number; note?: string }) {
@@ -478,7 +531,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
   }
 
-  @d.command("note", "<user:string> <note:string$>")
+  @d.command("note", "<user:string> <note:string$>", {
+    info: {
+      description: "Add a note to the specified user",
+    },
+  })
   @d.permission("can_note")
   async noteCmd(msg: Message, args: { user: string; note: string }) {
     const user = await this.resolveUser(args.user);
@@ -500,6 +557,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("warn", "<user:string> <reason:string$>", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Send a warning to the specified user",
+    },
   })
   @d.permission("can_warn")
   async warnCmd(msg: Message, args: { user: string; reason: string; mod?: Member }) {
@@ -702,6 +762,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("mute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Mute the specified member",
+    },
   })
   @d.permission("can_mute")
   async muteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
@@ -740,6 +803,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("forcemute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Force-mute the specified user, even if they're not on the server",
+    },
   })
   @d.permission("can_mute")
   async forcemuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
@@ -815,6 +881,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("unmute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Unmute the specified member",
+    },
   })
   @d.permission("can_mute")
   async unmuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod?: Member }) {
@@ -857,6 +926,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("forceunmute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Force-unmute the specified user, even if they're not on the server",
+    },
   })
   @d.permission("can_mute")
   async forceunmuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod?: Member }) {
@@ -883,6 +955,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("kick", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Kick the specified member",
+    },
   })
   @d.permission("can_kick")
   async kickCmd(msg, args: { user: string; reason: string; mod: Member }) {
@@ -941,6 +1016,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("ban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Ban the specified member",
+    },
   })
   @d.permission("can_ban")
   async banCmd(msg, args: { user: string; reason?: string; mod?: Member }) {
@@ -977,62 +1055,32 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod = args.mod;
     }
 
-    const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+    const banResult = await this.banUserId(memberToBan.id, reason, {
+      modId: mod.id,
+      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+    });
 
-    // Attempt to message the user *before* banning them, as doing it after may not be possible
-    let userMessageResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
-    if (reason) {
-      const banMessage = await renderTemplate(config.ban_message, {
-        guildName: this.guild.name,
-        reason,
-      });
-
-      userMessageResult = await notifyUser(this.bot, this.guild, memberToBan.user, banMessage, {
-        useDM: config.dm_on_ban,
-        useChannel: config.message_on_ban,
-        channelId: config.message_channel,
-      });
-    }
-
-    // (Try to) ban the user
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToBan.id);
-    this.ignoreEvent(IgnoredEventType.Ban, memberToBan.id);
-    try {
-      await memberToBan.ban(1);
-    } catch (e) {
-      msg.channel.create(errorMessage("Failed to ban the user"));
+    if (banResult.status === "failed") {
+      msg.channel.createMessage(errorMessage(`Failed to ban member`));
       return;
     }
 
-    // Create a case for this action
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    const createdCase = await casesPlugin.createCase({
-      userId: memberToBan.id,
-      modId: mod.id,
-      type: CaseTypes.Ban,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
-      noteDetails: userMessageResult.status !== NotifyUserStatus.Ignored ? [ucfirst(userMessageResult.text)] : [],
-    });
-
     // Confirm the action to the moderator
     let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${
-      createdCase.case_number
+      banResult.case.case_number
     })`;
 
-    if (userMessageResult.text) response += ` (${userMessageResult.text})`;
+    if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
     msg.channel.createMessage(successMessage(response));
-
-    // Log the action
-    this.serverLogs.log(LogType.MEMBER_BAN, {
-      mod: stripObjectToScalars(mod.user),
-      user: stripObjectToScalars(memberToBan.user),
-    });
   }
 
   @d.command("softban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description:
+        '"Softban" the specified user by banning and immediately unbanning them. Effectively a kick with message deletions.',
+    },
   })
   @d.permission("can_ban")
   async softbanCmd(msg, args: { user: string; reason: string; mod?: Member }) {
@@ -1119,6 +1167,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("unban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Unban the specified member",
+    },
   })
   @d.permission("can_ban")
   async unbanCmd(msg: Message, args: { user: string; reason: string; mod: Member }) {
@@ -1170,6 +1221,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("forceban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Force-ban the specified user, even if they aren't on the server",
+    },
   })
   @d.permission("can_ban")
   async forcebanCmd(msg: Message, args: { user: string; reason?: string; mod?: Member }) {
@@ -1233,7 +1287,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
-  @d.command("massban", "<userIds:string...>")
+  @d.command("massban", "<userIds:string...>", {
+    info: {
+      description: "Mass-ban a list of user IDs",
+    },
+  })
   @d.permission("can_massban")
   async massbanCmd(msg: Message, args: { userIds: string[] }) {
     // Limit to 100 users at once (arbitrary?)
@@ -1317,6 +1375,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("addcase", "<type:string> <user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
+    info: {
+      description: "Add an arbitrary case to the specified user without taking any action",
+    },
   })
   @d.permission("can_addcase")
   async addcaseCmd(msg: Message, args: { type: string; user: string; reason?: string; mod?: Member }) {
@@ -1377,15 +1438,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
-  /**
-   * Display a case or list of cases
-   * If the argument passed is a case id, display that case
-   * If the argument passed is a user id, show all cases on that user
-   */
-  @d.command("case", "<caseNumber:number>")
+  @d.command("case", "<caseNumber:number>", {
+    info: {
+      description: "Show information about a specific case",
+    },
+  })
   @d.permission("can_view")
   async showCaseCmd(msg: Message, args: { caseNumber: number }) {
-    // Assume case id
     const theCase = await this.cases.findByCaseNumber(args.caseNumber);
 
     if (!theCase) {
@@ -1411,6 +1470,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "h",
       },
     ],
+    info: {
+      description: "Show a list of cases the specified user has",
+    },
   })
   @d.permission("can_view")
   async userCasesCmd(msg: Message, args: { user: string; expand?: boolean; hidden?: boolean }) {
@@ -1475,6 +1537,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("cases", null, {
     options: [{ name: "mod", type: "Member" }],
+    info: {
+      description: "Show the most recent 5 cases by the specified --mod",
+    },
   })
   @d.permission("can_view")
   async recentCasesCmd(msg: Message, args: { mod?: Member }) {
@@ -1500,7 +1565,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("hidecase", "<caseNum:number>")
+  @d.command("hidecase", "<caseNum:number>", {
+    info: {
+      description: "Hide the specified case so it doesn't appear in !cases or !info",
+    },
+  })
   @d.permission("can_hidecase")
   async hideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);
@@ -1515,7 +1584,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  @d.command("unhidecase", "<caseNum:number>")
+  @d.command("unhidecase", "<caseNum:number>", {
+    info: {
+      description: "Un-hide the specified case, making it appear in !cases and !info again",
+    },
+  })
   @d.permission("can_hidecase")
   async unhideCaseCmd(msg: Message, args: { caseNum: number }) {
     const theCase = await this.cases.findByCaseNumber(args.caseNum);

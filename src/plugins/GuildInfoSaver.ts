@@ -4,6 +4,7 @@ import { MINUTES } from "../utils";
 
 export class GuildInfoSaverPlugin extends ZeppelinPlugin {
   public static pluginName = "guild_info_saver";
+  public static showInDocs = false;
   protected allowedGuilds: AllowedGuilds;
   private updateInterval;
 

@@ -21,7 +21,7 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
    * we need a static version of getDefaultOptions(). This static version is then,
    * by turn, called from getDefaultOptions() so everything still works as expected.
    */
-  protected static getStaticDefaultOptions() {
+  public static getStaticDefaultOptions() {
     // Implemented by plugin
     return {};
   }

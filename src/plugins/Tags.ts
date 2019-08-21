@@ -34,7 +34,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected tagFunctions;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         prefix: "!!",
@@ -117,7 +117,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const prefix = this.getConfigForMsg(msg).prefix;
-    const tagNames = tags.map(t => t.tag).sort();
+    const tagNames = tags.map(tag => tag.tag).sort();
     msg.channel.createMessage(`
       Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\`
     `);

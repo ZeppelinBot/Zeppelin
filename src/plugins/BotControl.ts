@@ -27,7 +27,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
 
   protected archives: GuildArchives;
 
-  protected static getStaticDefaultOptions() {
+  public static getStaticDefaultOptions() {
     return {
       config: {
         can_use: false,

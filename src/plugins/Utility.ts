@@ -92,7 +92,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected lastFullMemberRefresh = 0;
   protected lastReload;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_roles: false,
