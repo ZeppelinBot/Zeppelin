@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import humanizeDuration from "humanize-duration";
 import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
@@ -17,7 +17,16 @@ const ALERT_LOOP_TIME = 30 * 1000;
 
 export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "locate_user";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Locate user",
+    description: trimPluginDescription(`
+      This plugin allows users with access to the commands the following:
+      * Instantly receive an invite to the voice channel of a user
+      * Be notified as soon as a user switches or joins a voice channel
+    `),
+  };
 
   private alerts: GuildVCAlerts;
   private outdatedAlertsTimeout;
@@ -68,7 +77,11 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
-  @d.command("where", "<member:resolvedMember>", {})
+  @d.command("where", "<member:resolvedMember>", {
+    info: {
+      description: "Posts an instant invite to the voice channel that `<member>` is in",
+    },
+  })
   @d.permission("can_where")
   async whereCmd(msg: Message, args: { member: Member; time?: number; reminder?: string }) {
     const member = await resolveMember(this.bot, this.guild, args.member.id);
@@ -77,6 +90,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("vcalert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {
     aliases: ["vca"],
+    info: {
+      description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
+    },
   })
   @d.permission("can_alert")
   async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {

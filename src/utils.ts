@@ -39,7 +39,16 @@ export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
 
 export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
-  return t.union([type, t.undefined, t.null]);
+  return t.union([type, t.undefined, t.null], type.name);
+}
+
+export function dropPropertiesByName(obj, propName) {
+  if (obj.hasOwnProperty(propName)) delete obj[propName];
+  for (const value of Object.values(obj)) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      dropPropertiesByName(value, propName);
+    }
+  }
 }
 
 /**
@@ -272,6 +281,17 @@ export function trimIndents(str: string, indentLength: number) {
   return str
     .split("\n")
     .map(line => line.slice(indentLength))
+    .join("\n");
+}
+
+export function indentLine(str: string, indentLength: number) {
+  return " ".repeat(indentLength) + str;
+}
+
+export function indentLines(str: string, indentLength: number) {
+  return str
+    .split("\n")
+    .map(line => indentLine(line, indentLength))
     .join("\n");
 }
 

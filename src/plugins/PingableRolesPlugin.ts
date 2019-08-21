@@ -15,7 +15,11 @@ const TIMEOUT = 10 * 1000;
 
 export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "pingable_roles";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Pingable roles",
+  };
 
   protected pingableRoles: GuildPingableRoles;
   protected cache: Map<string, PingableRole[]>;

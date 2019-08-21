@@ -74,7 +74,11 @@ const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
 export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "spam";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Spam protection",
+  };
 
   protected logs: GuildLogs;
   protected archives: GuildArchives;

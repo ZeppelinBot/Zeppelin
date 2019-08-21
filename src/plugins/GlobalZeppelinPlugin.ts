@@ -13,7 +13,7 @@ import { mergeConfig } from "knub/dist/configUtils";
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends GlobalPlugin<TConfig> {
-  protected static configSchema: t.TypeC<any>;
+  public static configSchema: t.TypeC<any>;
   public static dependencies = [];
 
   /**

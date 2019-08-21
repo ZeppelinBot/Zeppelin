@@ -24,7 +24,11 @@ const MAX_TRIES = 3;
 
 export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "reminders";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Reminders",
+  };
 
   protected reminders: GuildReminders;
   protected tries: Map<number, number>;

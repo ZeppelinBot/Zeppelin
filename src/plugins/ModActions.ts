@@ -26,7 +26,7 @@ import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
 import { CaseArgs, CasesPlugin } from "./Cases";
@@ -108,18 +108,13 @@ type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mod_actions";
   public static dependencies = ["cases", "mutes"];
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
   public static pluginInfo = {
     prettyName: "Mod actions",
-    description: trimIndents(
-      trimEmptyStartEndLines(`
-      Testing **things**
-      
-      Multiline haHAA
+    description: trimPluginDescription(`
+      This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
     `),
-      6,
-    ),
   };
 
   protected mutes: GuildMutes;

@@ -82,7 +82,11 @@ type MemberSearchParams = {
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "utility";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Utility",
+  };
 
   protected logs: GuildLogs;
   protected cases: GuildCases;
@@ -698,7 +702,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command(/(?:nickname|nick) reset/, "<member:resolvedMember>")
+  @d.command("nickname reset", "<member:resolvedMember>", {
+    aliases: ["nick reset"],
+  })
   @d.permission("can_nickname")
   async nicknameResetCmd(msg: Message, args: { member: Member }) {
     if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {
@@ -718,7 +724,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`The nickname of <@!${args.member.id}> has been reset`));
   }
 
-  @d.command(/nickname|nick/, "<member:resolvedMember> <nickname:string$>")
+  @d.command("nickname", "<member:resolvedMember> <nickname:string$>", {
+    aliases: ["nick"],
+  })
   @d.permission("can_nickname")
   async nicknameCmd(msg: Message, args: { member: Member; nickname: string }) {
     if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {

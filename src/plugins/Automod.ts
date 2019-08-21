@@ -309,7 +309,7 @@ const inviteCache = new SimpleCache(10 * MINUTES);
 
 export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "automod";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
   public static dependencies = ["mod_actions", "mutes"];
 
   protected unloaded = false;

@@ -64,7 +64,11 @@ const FIRST_CHECK_INCREMENT = 5 * 1000;
 
 export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mutes";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Mutes",
+  };
 
   protected mutes: GuildMutes;
   protected cases: GuildCases;
