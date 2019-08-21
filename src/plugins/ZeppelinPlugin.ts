@@ -21,7 +21,14 @@ import { mergeConfig } from "knub/dist/configUtils";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
+export interface PluginInfo {
+  name: string;
+  description?: string;
+}
+
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
+  public static pluginInfo: PluginInfo;
+
   protected static configSchema: t.TypeC<any>;
   public static dependencies = [];
 
