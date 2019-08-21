@@ -96,7 +96,7 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private expiryInterval;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         max_censor: null,

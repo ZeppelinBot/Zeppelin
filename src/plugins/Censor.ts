@@ -46,7 +46,7 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   private onMessageCreateFn;
   private onMessageUpdateFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         filter_zalgo: false,

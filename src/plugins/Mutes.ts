@@ -71,7 +71,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         mute_role: null,

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h1>Configuration format</h1>
-    <p>
+    <h1 class="z-title is-1 mb-1">Configuration format</h1>
+    <p class="mb-1">
       This is the basic format of the bot configuration for a guild. The basic breakdown is:
     </p>
-    <ol>
+    <ol class="z-list mb-1">
       <li>Prefix (i.e. what character is preceding each command)</li>
       <li>Permission levels (see <router-link to="/docs/permissions">Permissions</router-link> for more info)</li>
       <li>Plugin-specific configuration (see <router-link to="/docs/plugin-configuration">Plugin configuration</router-link> for more info)</li>

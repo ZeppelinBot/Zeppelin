@@ -25,6 +25,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "starboard";
+  public static showInDocs = false;
   protected static configSchema = ConfigSchema;
 
   protected starboards: GuildStarboards;
@@ -32,7 +33,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private onMessageDeleteFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

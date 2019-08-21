@@ -23,7 +23,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   private outdatedAlertsTimeout;
   private usersWithAlerts: string[] = [];
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_where: false,

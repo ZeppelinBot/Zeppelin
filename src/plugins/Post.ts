@@ -58,7 +58,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
     clearTimeout(this.scheduledPostLoopTimeout);
   }
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_post: false,

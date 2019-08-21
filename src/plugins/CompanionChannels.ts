@@ -30,7 +30,7 @@ export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "companion_channels";
   protected static configSchema = ConfigSchema;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         entries: {},

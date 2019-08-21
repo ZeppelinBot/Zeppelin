@@ -51,7 +51,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
   protected logs: GuildLogs;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         log_automatic_actions: true,

@@ -41,14 +41,15 @@
 
             <p class="menu-label">Plugins</p>
             <ul class="menu-list">
-              <li><router-link to="/docs/plugins/locate-user">Locate user</router-link></li>
-              <li><router-link to="/docs/plugins/mod-actions">Mod actions</router-link></li>
+              <li v-for="plugin in plugins">
+                <router-link :to="'/docs/plugins/' + plugin.name">{{ plugin.info.prettyName || plugin.name }}</router-link>
+              </li>
             </ul>
           </aside>
         </div>
       </div>
-      <div class="docs-main content">
-        <router-view></router-view>
+      <div class="docs-main">
+        <router-view :key="$route.fullPath"></router-view>
       </div>
     </div>
   </div>
@@ -132,9 +133,22 @@
 <script>
   import Vue from "vue";
   import VueHighlightJS from "vue-highlightjs";
+  import {mapState} from "vuex";
+
   import "../../directives/trim-code";
   import "highlight.js/styles/ocean.css";
   import "../../style/docs.scss";
 
   Vue.use(VueHighlightJS);
+
+  export default {
+    async mounted() {
+      await this.$store.dispatch("docs/loadAllPlugins");
+    },
+    computed: {
+      ...mapState('docs', {
+        plugins: 'allPlugins',
+      }),
+    },
+  };
 </script>
