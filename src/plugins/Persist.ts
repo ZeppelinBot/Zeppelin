@@ -17,7 +17,11 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "persist";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Persist",
+  };
 
   protected persistedData: GuildPersistedData;
   protected logs: GuildLogs;

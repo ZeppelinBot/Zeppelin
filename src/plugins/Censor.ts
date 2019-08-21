@@ -14,7 +14,7 @@ import {
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
 import { TSafeRegex } from "../validatorUtils";
@@ -38,7 +38,14 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "censor";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Censor",
+    description: trimPluginDescription(`
+      Censor words, tokens, links, regex, etc.
+    `),
+  };
 
   protected serverLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;

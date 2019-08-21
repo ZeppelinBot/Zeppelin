@@ -44,7 +44,11 @@ type PendingMemberRoleChanges = {
 
 export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "reaction_roles";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Reaction roles",
+  };
 
   protected reactionRoles: GuildReactionRoles;
   protected savedMessages: GuildSavedMessages;

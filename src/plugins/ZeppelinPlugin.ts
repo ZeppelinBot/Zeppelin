@@ -11,6 +11,8 @@ import {
   resolveMember,
   resolveUser,
   resolveUserId,
+  trimEmptyStartEndLines,
+  trimIndents,
   UnknownUser,
 } from "../utils";
 import { Member, User } from "eris";
@@ -34,11 +36,15 @@ export interface CommandInfo {
   };
 }
 
+export function trimPluginDescription(str) {
+  return trimIndents(trimEmptyStartEndLines(str), 6);
+}
+
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
   public static pluginInfo: PluginInfo;
   public static showInDocs: boolean = true;
 
-  protected static configSchema: t.TypeC<any>;
+  public static configSchema: t.TypeC<any>;
   public static dependencies = [];
 
   protected throwPluginRuntimeError(message: string) {

@@ -72,7 +72,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "custom_events";
   public static showInDocs = false;
   public static dependencies = ["cases"];
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
   private clearTriggers: () => void;
 

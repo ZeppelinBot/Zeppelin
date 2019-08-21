@@ -15,6 +15,7 @@ const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;
 
 export class ChannelArchiverPlugin extends ZeppelinPlugin {
   public static pluginName = "channel_archiver";
+  public static showInDocs = false;
 
   protected isOwner(userId) {
     const owners = this.knub.getGlobalConfig().owners || [];

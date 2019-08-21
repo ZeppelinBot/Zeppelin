@@ -16,11 +16,15 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class WelcomeMessagePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "welcome_message";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Welcome message",
+  };
 
   protected logs: GuildLogs;
 
-  protected getDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         send_dm: false,

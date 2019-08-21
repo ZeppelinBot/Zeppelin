@@ -105,8 +105,9 @@
   }
 
   .docs-sidebar-content {
-    position: sticky;
-    top: 20px;
+    /* can't scroll with a long list before reaching the end of the page, figure out */
+    /*position: sticky;*/
+    /*top: 20px;*/
   }
 
   .docs-sidebar .menu {

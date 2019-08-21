@@ -23,7 +23,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
  */
 export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
   public static pluginName = "bot_control";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
   protected archives: GuildArchives;
 

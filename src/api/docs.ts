@@ -3,8 +3,57 @@ import { availablePlugins } from "../plugins/availablePlugins";
 import { ZeppelinPlugin } from "../plugins/ZeppelinPlugin";
 import { notFound } from "./responses";
 import { CommandManager, ICommandConfig } from "knub/dist/CommandManager";
+import { dropPropertiesByName, indentLines } from "../utils";
 
 const commandManager = new CommandManager();
+
+function formatConfigSchema(schema) {
+  if (schema._tag === "InterfaceType" || schema._tag === "PartialType") {
+    return (
+      `{\n` +
+      Object.entries(schema.props)
+        .map(([k, value]) => indentLines(`${k}: ${formatConfigSchema(value)}`, 2))
+        .join("\n") +
+      "\n}"
+    );
+  } else if (schema._tag === "DictionaryType") {
+    return "{\n" + indentLines(`[string]: ${formatConfigSchema(schema.codomain)}`, 2) + "\n}";
+  } else {
+    return schema.name;
+  }
+}
+
+function formatTypeName(typeName) {
+  let result = "";
+  let indent = 0;
+  let skip = false;
+  for (const char of [...typeName]) {
+    if (skip) {
+      skip = false;
+      continue;
+    }
+
+    if (char === "}") {
+      result += "\n";
+      indent--;
+      skip = true;
+    }
+
+    result += char;
+
+    if (char === "{") {
+      result += "\n";
+      indent++;
+      skip = true;
+    }
+
+    if (char === ",") {
+      result += "\n";
+      skip = true;
+    }
+  }
+  return result;
+}
 
 export function initDocs(app: express.Express) {
   const docsPlugins = availablePlugins.filter(pluginClass => pluginClass.showInDocs);
@@ -60,9 +109,12 @@ export function initDocs(app: express.Express) {
 
     const options = (pluginClass as typeof ZeppelinPlugin).getStaticDefaultOptions();
 
+    const configSchema = pluginClass.configSchema && formatConfigSchema(pluginClass.configSchema);
+
     res.json({
       name: pluginClass.pluginName,
       info: pluginClass.pluginInfo || {},
+      configSchema,
       options,
       commands,
     });

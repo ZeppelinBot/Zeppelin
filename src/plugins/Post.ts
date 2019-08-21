@@ -38,7 +38,11 @@ const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 
 export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "post";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Post",
+  };
 
   protected savedMessages: GuildSavedMessages;
   protected scheduledPosts: GuildScheduledPosts;

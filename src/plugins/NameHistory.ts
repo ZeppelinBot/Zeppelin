@@ -14,7 +14,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "name_history";
   public static showInDocs = false;
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
   protected nicknameHistory: GuildNicknameHistory;
   protected usernameHistory: UsernameHistory;

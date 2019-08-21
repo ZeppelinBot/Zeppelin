@@ -8,16 +8,28 @@
       Name in config: <code>{{ data.name }}</code>
     </p>
 
-    <div v-if="data.info.description">
-      <h2 class="z-title is-2 mt-2 mb-1">Description</h2>
-      <div class="content" v-html="renderMarkdown(data.info.description)"></div>
-    </div>
+    <div v-if="data.info.description" class="content" v-html="renderMarkdown(data.info.description)"></div>
 
-    <h2 class="z-title is-2 mt-2 mb-1">Default configuration</h2>
+    <p class="mt-1 mb-1">
+      To enable this plugin with default configuration, add <code>{{ data.name }}: {}</code> to the <code>plugins</code> list in config
+    </p>
+
+    <h2 id="default-configuration" class="z-title is-2 mt-2 mb-1">Default configuration</h2>
     <CodeBlock lang="yaml">{{ renderConfiguration(data.options) }}</CodeBlock>
+    <b-collapse :open="false" class="card mt-1 mb-1">
+      <div slot="trigger" slot-scope="props" class="card-header" role="button">
+        <p class="card-header-title">Config schema</p>
+        <a class="card-header-icon">
+          <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+        </a>
+      </div>
+      <div class="card-content">
+        <CodeBlock lang="plain">{{ data.configSchema }}</CodeBlock>
+      </div>
+    </b-collapse>
 
     <div v-if="data.commands.length">
-      <h2 class="z-title is-2 mt-2 mb-1">Commands</h2>
+      <h2 id="commands" class="z-title is-2 mt-2 mb-1">Commands</h2>
       <div v-for="command in data.commands">
         <h3 class="z-title is-3 mt-2 mb-1">!{{ command.trigger }}</h3>
         <div v-if="command.config.requiredPermission">
@@ -30,6 +42,40 @@
           Shortcut:
           <code style="margin-right: 4px" v-for="alias in command.config.aliases">!{{ alias }}</code>
         </div>
+        <div v-if="command.config.info && command.config.info.description" class="content mt-1 mb-1" v-html="renderMarkdown(command.config.info.description)"></div>
+
+        <b-collapse :open="false" class="card mt-1 mb-1">
+          <div slot="trigger" slot-scope="props" class="card-header" role="button">
+            <p class="card-header-title">Additional information</p>
+            <a class="card-header-icon">
+              <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
+            </a>
+          </div>
+          <div class="card-content">
+            Signatures:
+            <ul class="z-list z-ul">
+              <li>
+                <code>
+                  !{{ command.trigger }}
+                  <span v-for="param in command.parameters">{{ renderParameter(param) }} </span>
+                </code>
+              </li>
+            </ul>
+
+            <div class="mt-2" v-if="command.parameters.length">
+              Command arguments:
+              <ul class="z-list z-ul">
+                <li v-for="param in command.parameters">
+                  <code>{{ renderParameter(param) }}</code>
+                  <router-link :to="'/docs/descriptions/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
+                  <div v-if="command.config.info && command.config.info.parameterDescriptions && command.config.info.parameterDescriptions[param.name]" class="content">
+                    {{ renderMarkdown(command.config.info.parameterDescriptions[param.name]) }}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </b-collapse>
       </div>
     </div>
   </div>
@@ -58,6 +104,15 @@
         return yaml.safeDump({
           [this.pluginName]: options,
         });
+      },
+      renderParameter(param) {
+        let str = `${param.name}`;
+        if (param.rest) str += '...';
+        if (param.required) {
+          return `<${str}>`;
+        } else {
+          return `[${str}]`;
+        }
       },
     },
     data() {

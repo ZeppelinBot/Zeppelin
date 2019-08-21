@@ -23,7 +23,11 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "tags";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Tags",
+  };
 
   protected archives: GuildArchives;
   protected tags: GuildTags;
