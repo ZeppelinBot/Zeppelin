@@ -211,6 +211,10 @@ const BanAction = t.type({
   reason: tNullable(t.string),
 });
 
+const AlertAction = t.type({
+  text: t.string,
+});
+
 /**
  * FULL CONFIG SCHEMA
  */
@@ -242,7 +246,7 @@ const Rule = t.type({
     mute: tNullable(MuteAction),
     kick: tNullable(KickAction),
     ban: tNullable(BanAction),
-    // TODO: Alert action
+    alert: tNullable(AlertAction),
   }),
 });
 type TRule = t.TypeOf<typeof Rule>;
@@ -769,6 +773,28 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
+    if (rule.actions.warn) {
+      const reason = rule.actions.mute.reason || "Warned automatically";
+      const caseArgs = {
+        modId: this.bot.user.id,
+        extraNotes: [`Matched automod rule "${rule.name}"`],
+      };
+
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
+        const member = await this.getMember(matchResult.userId);
+        if (member) {
+          await this.modActions.warnMember(member, reason, caseArgs);
+        }
+      } else if (matchResult.type === "raidspam") {
+        for (const userId of matchResult.userIds) {
+          const member = await this.getMember(userId);
+          if (member) {
+            await this.modActions.warnMember(member, reason, caseArgs);
+          }
+        }
+      }
+    }
+
     if (rule.actions.mute) {
       const duration = rule.actions.mute.duration ? convertDelayStringToMS(rule.actions.mute.duration) : null;
       const reason = rule.actions.mute.reason || "Muted automatically";
@@ -786,7 +812,45 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    // TODO: Other actions
+    if (rule.actions.kick) {
+      const reason = rule.actions.kick.reason || "Kicked automatically";
+      const caseArgs = {
+        modId: this.bot.user.id,
+        extraNotes: [`Matched automod rule "${rule.name}"`],
+      };
+
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
+        const member = await this.getMember(matchResult.userId);
+        if (member) {
+          await this.modActions.kickMember(member, reason, caseArgs);
+        }
+      } else if (matchResult.type === "raidspam") {
+        for (const userId of matchResult.userIds) {
+          const member = await this.getMember(userId);
+          if (member) {
+            await this.modActions.kickMember(member, reason, caseArgs);
+          }
+        }
+      }
+    }
+
+    if (rule.actions.ban) {
+      const reason = rule.actions.ban.reason || "Banned automatically";
+      const caseArgs = {
+        modId: this.bot.user.id,
+        extraNotes: [`Matched automod rule "${rule.name}"`],
+      };
+
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
+        await this.modActions.banUserId(matchResult.userId, reason, caseArgs);
+      } else if (matchResult.type === "raidspam") {
+        for (const userId of matchResult.userIds) {
+          await this.modActions.banUserId(userId, reason, caseArgs);
+        }
+      }
+    }
+
+    // TODO: Alert action (and AUTOMOD_ALERT log type)
   }
 
   @d.event("messageCreate")
