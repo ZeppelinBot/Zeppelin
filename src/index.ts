@@ -78,7 +78,7 @@ import { AllowedGuilds } from "./data/AllowedGuilds";
 logger.info("Connecting to database");
 connect().then(async conn => {
   const client = new Client(`Bot ${process.env.TOKEN}`, {
-    getAllUsers: true,
+    getAllUsers: false,
     restMode: true,
   });
   client.setMaxListeners(100);

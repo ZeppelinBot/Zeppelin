@@ -1,8 +1,9 @@
 import { decorators as d, GlobalPlugin } from "knub";
 import { UsernameHistory } from "../data/UsernameHistory";
 import { Member, User } from "eris";
+import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
 
-export class UsernameSaver extends GlobalPlugin {
+export class UsernameSaver extends GlobalZeppelinPlugin {
   public static pluginName = "username_saver";
 
   protected usernameHistory: UsernameHistory;

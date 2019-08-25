@@ -4,13 +4,22 @@ import cors from "cors";
 import { initAuth } from "./auth";
 import { initGuildsAPI } from "./guilds";
 import { initArchives } from "./archives";
+import { initDocs } from "./docs";
 import { connect } from "../data/db";
 import path from "path";
 import { TokenError } from "passport-oauth2";
+import { PluginError } from "knub";
 
 require("dotenv").config({ path: path.resolve(__dirname, "..", "..", "api.env") });
 
-console.log("Connecting to database...");
+function errorHandler(err) {
+  console.error(err.stack || err); // tslint:disable-line:no-console
+  process.exit(1);
+}
+
+process.on("unhandledRejection", errorHandler);
+
+console.log("Connecting to database..."); // tslint:disable-line
 connect().then(() => {
   const app = express();
 
@@ -24,6 +33,7 @@ connect().then(() => {
   initAuth(app);
   initGuildsAPI(app);
   initArchives(app);
+  initDocs(app);
 
   // Default route
   app.get("/", (req, res) => {
@@ -35,7 +45,7 @@ connect().then(() => {
     if (err instanceof TokenError) {
       clientError(res, "Invalid code");
     } else {
-      console.error(err);
+      console.error(err); // tslint:disable-line
       error(res, "Server error", err.status || 500);
     }
   });
@@ -46,5 +56,6 @@ connect().then(() => {
   });
 
   const port = process.env.PORT || 3000;
+  // tslint:disable-next-line
   app.listen(port, () => console.log(`API server listening on port ${port}`));
 });

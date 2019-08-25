@@ -64,14 +64,18 @@ const FIRST_CHECK_INCREMENT = 5 * 1000;
 
 export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mutes";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Mutes",
+  };
 
   protected mutes: GuildMutes;
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         mute_role: null,
@@ -139,7 +143,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const user = await this.resolveUser(userId);
-    const member = await this.getMember(user.id);
+    const member = await this.getMember(user.id, true); // Grab the fresh member so we don't have stale role info
 
     if (member) {
       // Apply mute role if it's missing
@@ -264,7 +268,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!existingMute) return;
 
     const user = await this.resolveUser(userId);
-    const member = await this.getMember(userId);
+    const member = await this.getMember(userId, true); // Grab the fresh member so we don't have stale role info
 
     if (unmuteTime) {
       // Schedule timed unmute (= just set the mute's duration)

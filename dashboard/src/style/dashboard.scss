@@ -3,3 +3,7 @@ $family-primary: 'Open Sans', sans-serif;
 @import "~bulmaswatch/superhero/_variables";
 @import "~bulma/bulma";
 @import "~bulmaswatch/superhero/_overrides";
+
+.dashboard-cloak {
+  visibility: visible !important;
+}

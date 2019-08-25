@@ -6,6 +6,7 @@ import {
   GuildAuditLog,
   GuildAuditLogEntry,
   Member,
+  MessageContent,
   TextableChannel,
   TextChannel,
   User,
@@ -21,7 +22,7 @@ const fsp = fs.promises;
 
 import https from "https";
 import tmp from "tmp";
-import { logger } from "knub";
+import { logger, waitForReaction } from "knub";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -31,8 +32,23 @@ const delayStringMultipliers = {
   s: 1000,
 };
 
-export function tNullable(type: t.Mixed) {
-  return t.union([type, t.undefined, t.null]);
+export const MS = 1;
+export const SECONDS = 1000 * MS;
+export const MINUTES = 60 * SECONDS;
+export const HOURS = 60 * MINUTES;
+export const DAYS = 24 * HOURS;
+
+export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
+  return t.union([type, t.undefined, t.null], type.name);
+}
+
+export function dropPropertiesByName(obj, propName) {
+  if (obj.hasOwnProperty(propName)) delete obj[propName];
+  for (const value of Object.values(obj)) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+      dropPropertiesByName(value, propName);
+    }
+  }
 }
 
 /**
@@ -168,8 +184,10 @@ export async function findRelevantAuditLogEntry(
 const urlRegex = /(\S+\.\S+)/g;
 const protocolRegex = /^[a-z]+:\/\//;
 
-export function getUrlsInString(str: string): url.URL[] {
-  const matches = str.match(urlRegex) || [];
+export function getUrlsInString(str: string, unique = false): url.URL[] {
+  let matches = str.match(urlRegex).map(m => m[0]) || [];
+  if (unique) matches = Array.from(new Set(matches));
+
   return matches.reduce((urls, match) => {
     if (!protocolRegex.test(match)) {
       match = `https://${match}`;
@@ -233,6 +251,48 @@ export function trimLines(str: string) {
 
 export function asSingleLine(str: string) {
   return trimLines(str).replace(/\n/g, " ");
+}
+
+export function trimEmptyStartEndLines(str: string) {
+  const lines = str.split("\n");
+  let emptyLinesAtStart = 0;
+  let emptyLinesAtEnd = 0;
+
+  for (const line of lines) {
+    if (line.match(/^\s*$/)) {
+      emptyLinesAtStart++;
+    } else {
+      break;
+    }
+  }
+
+  for (let i = lines.length - 1; i > 0; i--) {
+    if (lines[i].match(/^\s*$/)) {
+      emptyLinesAtEnd++;
+    } else {
+      break;
+    }
+  }
+
+  return lines.slice(emptyLinesAtStart, emptyLinesAtEnd ? -1 * emptyLinesAtEnd : null).join("\n");
+}
+
+export function trimIndents(str: string, indentLength: number) {
+  return str
+    .split("\n")
+    .map(line => line.slice(indentLength))
+    .join("\n");
+}
+
+export function indentLine(str: string, indentLength: number) {
+  return " ".repeat(indentLength) + str;
+}
+
+export function indentLines(str: string, indentLength: number) {
+  return str
+    .split("\n")
+    .map(line => indentLine(line, indentLength))
+    .join("\n");
 }
 
 export const emptyEmbedValue = "\u200b";
@@ -398,7 +458,7 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
           if (retries === 0) {
             throw httpsErr;
           } else {
-            console.warn("File download failed, retrying. Error given:", httpsErr.message);
+            console.warn("File download failed, retrying. Error given:", httpsErr.message); // tslint:disable-line
             resolve(downloadFile(attachmentUrl, retries - 1));
           }
         });
@@ -568,94 +628,147 @@ export class UnknownUser {
   }
 }
 
+export function isObjectLiteral(obj) {
+  let deepestPrototype = obj;
+  while (Object.getPrototypeOf(deepestPrototype) != null) {
+    deepestPrototype = Object.getPrototypeOf(deepestPrototype);
+  }
+  return Object.getPrototypeOf(obj) === deepestPrototype;
+}
+
+const keyMods = ["+", "-", "="];
+export function deepKeyIntersect(obj, keyReference) {
+  const result = {};
+  for (let [key, value] of Object.entries(obj)) {
+    if (!keyReference.hasOwnProperty(key)) {
+      // Temporary solution so we don't erase keys with modifiers
+      // Modifiers will be removed soon(tm) so we can remove this when that happens as well
+      let found = false;
+      for (const mod of keyMods) {
+        if (keyReference.hasOwnProperty(mod + key)) {
+          key = mod + key;
+          found = true;
+          break;
+        }
+      }
+      if (!found) continue;
+    }
+
+    if (Array.isArray(value)) {
+      // Also temp (because modifier shenanigans)
+      result[key] = keyReference[key];
+    } else if (
+      value != null &&
+      typeof value === "object" &&
+      typeof keyReference[key] === "object" &&
+      isObjectLiteral(value)
+    ) {
+      result[key] = deepKeyIntersect(value, keyReference[key]);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 const unknownUsers = new Set();
 const unknownMembers = new Set();
+
+export function resolveUserId(bot: Client, value: string) {
+  if (value == null) {
+    return null;
+  }
+
+  // A user mention?
+  const mentionMatch = value.match(/^<@!?(\d+)>$/);
+  if (mentionMatch) {
+    return mentionMatch[1];
+  }
+
+  // A non-mention, full username?
+  const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+  if (usernameMatch) {
+    const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    if (user) return user.id;
+  }
+
+  // Just a user ID?
+  const idMatch = value.match(/^\d+$/);
+  if (idMatch) {
+    return value;
+  }
+
+  return null;
+}
 
 export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser> {
   if (value == null || typeof value !== "string") {
     return new UnknownUser();
   }
 
-  let userId;
-
-  // A user mention?
-  const mentionMatch = value.match(/^<@!?(\d+)>$/);
-  if (mentionMatch) {
-    userId = mentionMatch[1];
-  }
-
-  // A non-mention, full username?
+  // If we have the user cached, return that directly
+  const userId = resolveUserId(bot, value);
   if (!userId) {
-    const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
-    if (usernameMatch) {
-      const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-      if (user) userId = user.id;
-    }
+    return new UnknownUser({ id: userId });
   }
 
-  // Just a user ID?
-  if (!userId) {
-    const idMatch = value.match(/^\d+$/);
-    if (!idMatch) {
-      return null;
-    }
-
-    userId = value;
+  if (bot.users.has(userId)) {
+    return bot.users.get(userId);
   }
 
-  const cachedUser = bot.users.find(u => u.id === userId);
-  if (cachedUser) return cachedUser;
-
-  // We only fetch the user from the API if we haven't tried it before:
-  // - If the user was found, the bot has them in its cache
-  // - If the user was not found, they'll be in unknownUsers
-  if (!unknownUsers.has(userId)) {
-    try {
-      const freshUser = await bot.getRESTUser(userId);
-      bot.users.add(freshUser, bot);
-      return freshUser;
-    } catch (e) {} // tslint:disable-line
-
-    unknownUsers.add(userId);
+  // We don't want to spam the API by trying to fetch unknown users again and again,
+  // so we cache the fact that they're "unknown" for a while
+  if (unknownUsers.has(userId)) {
+    return new UnknownUser({ id: userId });
   }
+
+  const freshUser = await bot.getRESTUser(userId).catch(noop);
+  if (freshUser) {
+    bot.users.add(freshUser, bot);
+    return freshUser;
+  }
+
+  unknownUsers.add(userId);
+  setTimeout(() => unknownUsers.delete(userId), 15 * MINUTES);
 
   return new UnknownUser({ id: userId });
 }
 
 export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
-  // Start by resolving the user
-  const user = await resolveUser(bot, value);
-  if (!user || user instanceof UnknownUser) return null;
+  const userId = resolveUserId(bot, value);
+  if (!userId) return null;
 
-  // See if we have the member cached...
-  let member = guild.members.get(user.id);
-
-  // We only fetch the member from the API if we haven't tried it before:
-  // - If the member was found, the bot has them in the guild's member cache
-  // - If the member was not found, they'll be in unknownMembers
-  const unknownKey = `${guild.id}-${user.id}`;
-  if (!unknownMembers.has(unknownKey)) {
-    // If not, fetch it from the API
-    if (!member) {
-      try {
-        logger.debug(`Fetching unknown member (${user.id} in ${guild.name} (${guild.id})) from the API`);
-
-        member = await bot.getRESTGuildMember(guild.id, user.id);
-        member.id = user.id;
-        member.guild = guild;
-      } catch (e) {} // tslint:disable-line
-    }
-
-    if (!member) unknownMembers.add(unknownKey);
+  // If we have the member cached, return that directly
+  if (guild.members.has(userId)) {
+    return guild.members.get(userId);
   }
 
-  return member;
+  // We don't want to spam the API by trying to fetch unknown members again and again,
+  // so we cache the fact that they're "unknown" for a while
+  const unknownKey = `${guild.id}-${userId}`;
+  if (unknownMembers.has(unknownKey)) {
+    return null;
+  }
+
+  logger.debug(`Fetching unknown member (${userId} in ${guild.name} (${guild.id})) from the API`);
+
+  const freshMember = await bot.getRESTGuildMember(guild.id, userId).catch(noop);
+  if (freshMember) {
+    freshMember.id = userId;
+    return freshMember;
+  }
+
+  unknownMembers.add(unknownKey);
+  setTimeout(() => unknownMembers.delete(unknownKey), 15 * MINUTES);
+
+  return null;
 }
 
-export const MS = 1;
-export const SECONDS = 1000 * MS;
-export const MINUTES = 60 * SECONDS;
-export const HOURS = 60 * MINUTES;
-export const DAYS = 24 * HOURS;
-
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
+
+export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
+  const msg = await channel.createMessage(content);
+  const reply = await waitForReaction(bot, msg, ["✅", "❌"], userId);
+  msg.delete().catch(noop);
+  return reply && reply.name === "✅";
+}

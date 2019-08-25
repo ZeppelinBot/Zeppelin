@@ -33,7 +33,11 @@ const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * 1000;
 
 export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "slowmode";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Slowmode",
+  };
 
   protected slowmodes: GuildSlowmodes;
   protected savedMessages: GuildSavedMessages;
@@ -42,7 +46,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private onMessageCreateFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         use_native_slowmode: true,

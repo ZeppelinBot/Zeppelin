@@ -44,7 +44,11 @@ type PendingMemberRoleChanges = {
 
 export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "reaction_roles";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Reaction roles",
+  };
 
   protected reactionRoles: GuildReactionRoles;
   protected savedMessages: GuildSavedMessages;
@@ -55,7 +59,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private autoRefreshTimeout;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         auto_refresh_interval: MIN_AUTO_REFRESH,

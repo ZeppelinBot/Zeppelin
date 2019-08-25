@@ -15,13 +15,17 @@ const TIMEOUT = 10 * 1000;
 
 export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "pingable_roles";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Pingable roles",
+  };
 
   protected pingableRoles: GuildPingableRoles;
   protected cache: Map<string, PingableRole[]>;
   protected timeouts: Map<string, any>;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,
@@ -53,7 +57,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     return this.cache.get(channelId);
   }
 
-  @d.command("pingable_role disable", "<channelId:channelid> <role:role>")
+  @d.command("pingable_role disable", "<channelId:channelId> <role:role>")
   @d.permission("can_manage")
   async disablePingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const pingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
@@ -70,7 +74,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  @d.command("pingable_role", "<channelId:channelid> <role:role>")
+  @d.command("pingable_role", "<channelId:channelId> <role:role>")
   @d.permission("can_manage")
   async setPingableRoleCmd(msg: Message, args: { channelId: string; role: Role }) {
     const existingPingableRole = await this.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);

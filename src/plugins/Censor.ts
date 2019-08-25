@@ -1,4 +1,4 @@
-import { IPluginOptions } from "knub";
+import { IPluginOptions, logger } from "knub";
 import { Invite, Embed } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildLogs } from "../data/GuildLogs";
@@ -14,9 +14,10 @@ import {
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
+import { TSafeRegex } from "../validatorUtils";
 
 const ConfigSchema = t.type({
   filter_zalgo: t.boolean,
@@ -31,12 +32,20 @@ const ConfigSchema = t.type({
   domain_blacklist: tNullable(t.array(t.string)),
   blocked_tokens: tNullable(t.array(t.string)),
   blocked_words: tNullable(t.array(t.string)),
-  blocked_regex: tNullable(t.array(t.string)),
+  blocked_regex: tNullable(t.array(TSafeRegex)),
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "censor";
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Censor",
+    description: trimPluginDescription(`
+      Censor words, tokens, links, regex, etc.
+    `),
+  };
 
   protected serverLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
@@ -44,7 +53,7 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
   private onMessageCreateFn;
   private onMessageUpdateFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         filter_zalgo: false,
@@ -236,12 +245,20 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Filter regex
-    const blockedRegex = config.blocked_regex || [];
-    for (const regexStr of blockedRegex) {
-      const regex = new RegExp(regexStr, "i");
+    const blockedRegex: RegExp[] = config.blocked_regex || [];
+    for (const [i, regex] of blockedRegex.entries()) {
+      if (typeof regex.test !== "function") {
+        logger.info(
+          `[DEBUG] Regex <${regex}> was not a regex; index ${i} of censor.blocked_regex for guild ${this.guild.name} (${
+            this.guild.id
+          })`,
+        );
+        continue;
+      }
+
       // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
       if (regex.test(savedMessage.data.content) || regex.test(messageContent)) {
-        this.censorMessage(savedMessage, `blocked regex (\`${regexStr}\`) found`);
+        this.censorMessage(savedMessage, `blocked regex (\`${regex.source}\`) found`);
         return true;
       }
     }

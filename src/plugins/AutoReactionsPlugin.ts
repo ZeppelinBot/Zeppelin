@@ -4,7 +4,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -14,14 +14,21 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "auto_reactions";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Auto-reactions",
+    description: trimPluginDescription(`
+      Allows setting up automatic reactions to all new messages on a channel
+    `),
+  };
 
   protected savedMessages: GuildSavedMessages;
   protected autoReactions: GuildAutoReactions;
 
   private onMessageCreateFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,
@@ -49,7 +56,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages.events.off("create", this.onMessageCreateFn);
   }
 
-  @d.command("auto_reactions", "<channelId:channelid> <reactions...>")
+  @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
   @d.permission("can_manage")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
     const finalReactions = [];
@@ -83,7 +90,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`Auto-reactions set for <#${args.channelId}>`));
   }
 
-  @d.command("auto_reactions disable", "<channelId:channelid>")
+  @d.command("auto_reactions disable", "<channelId:channelId>")
   @d.permission("can_manage")
   async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
     const autoReaction = await this.autoReactions.getForChannel(args.channelId);

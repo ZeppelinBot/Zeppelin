@@ -82,7 +82,11 @@ type MemberSearchParams = {
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "utility";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Utility",
+  };
 
   protected logs: GuildLogs;
   protected cases: GuildCases;
@@ -92,7 +96,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected lastFullMemberRefresh = 0;
   protected lastReload;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_roles: false,
@@ -554,7 +558,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }, CLEAN_COMMAND_DELETE_DELAY);
   }
 
-  @d.command("clean user", "<userId:userid> <count:number>")
+  @d.command("clean user", "<userId:userId> <count:number>")
   @d.permission("can_clean")
   async cleanUserCmd(msg: Message, args: { userId: string; count: number }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
@@ -607,7 +611,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let member;
     if (!(user instanceof UnknownUser)) {
-      member = await this.getMember(user.id);
+      member = await this.getMember(user.id, true);
     }
 
     const embed: EmbedOptions = {
@@ -698,7 +702,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command(/(?:nickname|nick) reset/, "<member:resolvedMember>")
+  @d.command("nickname reset", "<member:resolvedMember>", {
+    aliases: ["nick reset"],
+  })
   @d.permission("can_nickname")
   async nicknameResetCmd(msg: Message, args: { member: Member }) {
     if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {
@@ -718,7 +724,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`The nickname of <@!${args.member.id}> has been reset`));
   }
 
-  @d.command(/nickname|nick/, "<member:resolvedMember> <nickname:string$>")
+  @d.command("nickname", "<member:resolvedMember> <nickname:string$>", {
+    aliases: ["nick"],
+  })
   @d.permission("can_nickname")
   async nicknameCmd(msg: Message, args: { member: Member; nickname: string }) {
     if (msg.member.id !== args.member.id && !this.canActOn(msg.member, args.member)) {

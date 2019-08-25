@@ -70,12 +70,13 @@ class ActionError extends Error {}
 
 export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "custom_events";
+  public static showInDocs = false;
   public static dependencies = ["cases"];
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
   private clearTriggers: () => void;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         events: {},
@@ -162,7 +163,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     await casesPlugin.createCase({
       userId: targetId,
-      modId: modId,
+      modId,
       type: CaseTypes[action.case_type],
       reason: `__[${event.name}]__ ${reason}`,
     });

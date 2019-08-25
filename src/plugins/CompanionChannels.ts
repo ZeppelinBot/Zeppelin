@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { Member, Channel, GuildChannel, PermissionOverwrite, Permission, Message, TextChannel } from "eris";
 import * as t from "io-ts";
 import { tNullable } from "../utils";
@@ -28,9 +28,18 @@ const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
 
 export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "companion_channels";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static pluginInfo = {
+    prettyName: "Companion channels",
+    description: trimPluginDescription(`
+      Set up 'companion channels' between text and voice channels.
+      Once set up, any time a user joins one of the specified voice channels,
+      they'll get channel permissions applied to them for the text channels.
+    `),
+  };
+
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         entries: {},

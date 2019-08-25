@@ -14,11 +14,12 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "self_grantable_roles";
-  protected static configSchema = ConfigSchema;
+  public static showInDocs = false;
+  public static configSchema = ConfigSchema;
 
   protected selfGrantableRoles: GuildSelfGrantableRoles;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

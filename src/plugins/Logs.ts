@@ -22,7 +22,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
@@ -53,7 +53,11 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "logs";
-  protected static configSchema = ConfigSchema;
+  public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Logs",
+  };
 
   protected guildLogs: GuildLogs;
   protected savedMessages: GuildSavedMessages;
@@ -70,7 +74,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   private excludedUserProps = ["user", "member", "mod"];
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         channels: {},

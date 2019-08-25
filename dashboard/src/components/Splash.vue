@@ -10,8 +10,8 @@
           Zeppelin is a private moderation bot for Discord, designed with large servers and reliability in mind.
         </div>
         <div class="actions">
-          <a class="btn" href="/login">Dashboard</a>
-          <a class="btn disabled" href="#">Docs</a>
+          <router-link class="btn" to="/login">Dashboard</router-link>
+          <router-link class="btn" to="/docs">Documentation</router-link>
         </div>
         <div class="error" v-if="error">
           <strong>Error</strong>

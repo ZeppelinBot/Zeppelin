@@ -8,7 +8,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import * as t from "io-ts";
 import { GuildStarboardMessages } from "../data/GuildStarboardMessages";
-import { StarboardMessage } from "src/data/entities/StarboardMessage";
+import { StarboardMessage } from "../data/entities/StarboardMessage";
 
 const StarboardOpts = t.type({
   source_channel_ids: t.array(t.string),
@@ -38,14 +38,15 @@ const defaultStarboardOpts: Partial<TStarboardOpts> = {
 
 export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "starboard";
-  protected static configSchema = ConfigSchema;
+  public static showInDocs = false;
+  public static configSchema = ConfigSchema;
 
   protected savedMessages: GuildSavedMessages;
   protected starboardMessages: GuildStarboardMessages;
 
   private onMessageDeleteFn;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,
@@ -258,7 +259,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("starboard migrate_pins", "<pinChannelId:channelid> <starboardChannelId:channelid>")
+  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>")
   async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
     try {
       const starboards = await this.getStarboardOptsForStarboardChannelId(this.bot.getChannel(args.starboardChannelId));

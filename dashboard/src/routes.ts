@@ -14,21 +14,65 @@ export const router = new VueRouter({
     { path: "/login", beforeEnter: authRedirectGuard },
     { path: "/login-callback", beforeEnter: loginCallbackGuard },
 
+    // Docs
+    {
+      path: "/docs",
+      component: () => import("./components/docs/Layout.vue"),
+      children: [
+        {
+          path: "",
+          component: () => import("./components/docs/Introduction.vue"),
+        },
+        {
+          path: "configuration-format",
+          component: () => import("./components/docs/ConfigurationFormat.vue"),
+        },
+        {
+          path: "permissions",
+          component: () => import("./components/docs/Permissions.vue"),
+        },
+        {
+          path: "plugin-configuration",
+          component: () => import("./components/docs/PluginConfiguration.vue"),
+        },
+        {
+          path: "descriptions/argument-types",
+          component: () => import("./components/docs/ArgumentTypes.vue"),
+        },
+        {
+          path: "plugins/:pluginName",
+          component: () => import("./components/docs/Plugin.vue"),
+        },
+      ],
+    },
+
     // Dashboard
     {
       path: "/dashboard",
-      component: () => import("./components/Dashboard.vue"),
+      component: () => import("./components/dashboard/Layout.vue"),
       beforeEnter: authGuard,
       children: [
         {
           path: "",
-          component: () => import("./components/DashboardGuildList.vue"),
+          component: () => import("./components/dashboard/GuildList.vue"),
         },
         {
           path: "guilds/:guildId/config",
-          component: () => import("./components/DashboardGuildConfigEditor.vue"),
+          component: () => import("./components/dashboard/GuildConfigEditor.vue"),
         },
       ],
     },
   ],
+
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        selector: to.hash,
+      };
+    } else if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { x: 0, y: 0 };
+    }
+  },
 });

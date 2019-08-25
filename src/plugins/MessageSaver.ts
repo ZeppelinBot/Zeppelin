@@ -12,11 +12,12 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "message_saver";
-  protected static configSchema = ConfigSchema;
+  public static showInDocs = false;
+  public static configSchema = ConfigSchema;
 
   protected savedMessages: GuildSavedMessages;
 
-  protected static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
       config: {
         can_manage: false,

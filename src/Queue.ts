@@ -1,6 +1,8 @@
+import { SECONDS } from "./utils";
+
 type QueueFn = (...args: any[]) => Promise<any>;
 
-const DEFAULT_TIMEOUT = 10 * 1000;
+const DEFAULT_TIMEOUT = 10 * SECONDS;
 
 export class Queue {
   protected running: boolean = false;
