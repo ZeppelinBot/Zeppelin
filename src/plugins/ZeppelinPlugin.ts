@@ -187,13 +187,6 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   /**
    * Intended for cross-plugin functionality
    */
-  public getRegisteredCommands() {
-    return this.commands.commands;
-  }
-
-  /**
-   * Intended for cross-plugin functionality
-   */
   public getRuntimeOptions() {
     return this.getMergedOptions();
   }

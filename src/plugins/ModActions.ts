@@ -483,9 +483,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("update", "<caseNumber:number> [note:string$]", {
     overloads: ["[note:string$]"],
-    info: {
-      description:
-        "Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it",
+    extra: {
+      info: {
+        description:
+          "Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it",
+      },
     },
   })
   @d.permission("can_note")
@@ -527,8 +529,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("note", "<user:string> <note:string$>", {
-    info: {
-      description: "Add a note to the specified user",
+    extra: {
+      info: {
+        description: "Add a note to the specified user",
+      },
     },
   })
   @d.permission("can_note")
@@ -552,8 +556,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("warn", "<user:string> <reason:string$>", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Send a warning to the specified user",
+    extra: {
+      info: {
+        description: "Send a warning to the specified user",
+      },
     },
   })
   @d.permission("can_warn")
@@ -757,8 +763,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("mute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Mute the specified member",
+    extra: {
+      info: {
+        description: "Mute the specified member",
+      },
     },
   })
   @d.permission("can_mute")
@@ -798,8 +806,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("forcemute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Force-mute the specified user, even if they're not on the server",
+    extra: {
+      info: {
+        description: "Force-mute the specified user, even if they're not on the server",
+      },
     },
   })
   @d.permission("can_mute")
@@ -876,8 +886,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("unmute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Unmute the specified member",
+    extra: {
+      info: {
+        description: "Unmute the specified member",
+      },
     },
   })
   @d.permission("can_mute")
@@ -921,8 +933,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("forceunmute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Force-unmute the specified user, even if they're not on the server",
+    extra: {
+      info: {
+        description: "Force-unmute the specified user, even if they're not on the server",
+      },
     },
   })
   @d.permission("can_mute")
@@ -950,8 +964,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("kick", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Kick the specified member",
+    extra: {
+      info: {
+        description: "Kick the specified member",
+      },
     },
   })
   @d.permission("can_kick")
@@ -1011,8 +1027,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("ban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Ban the specified member",
+    extra: {
+      info: {
+        description: "Ban the specified member",
+      },
     },
   })
   @d.permission("can_ban")
@@ -1072,9 +1090,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("softban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description:
-        '"Softban" the specified user by banning and immediately unbanning them. Effectively a kick with message deletions.',
+    extra: {
+      info: {
+        description:
+          '"Softban" the specified user by banning and immediately unbanning them. Effectively a kick with message deletions.',
+      },
     },
   })
   @d.permission("can_ban")
@@ -1162,8 +1182,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("unban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Unban the specified member",
+    extra: {
+      info: {
+        description: "Unban the specified member",
+      },
     },
   })
   @d.permission("can_ban")
@@ -1216,8 +1238,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("forceban", "<user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Force-ban the specified user, even if they aren't on the server",
+    extra: {
+      info: {
+        description: "Force-ban the specified user, even if they aren't on the server",
+      },
     },
   })
   @d.permission("can_ban")
@@ -1283,8 +1307,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("massban", "<userIds:string...>", {
-    info: {
-      description: "Mass-ban a list of user IDs",
+    extra: {
+      info: {
+        description: "Mass-ban a list of user IDs",
+      },
     },
   })
   @d.permission("can_massban")
@@ -1370,8 +1396,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("addcase", "<type:string> <user:string> [reason:string$]", {
     options: [{ name: "mod", type: "member" }],
-    info: {
-      description: "Add an arbitrary case to the specified user without taking any action",
+    extra: {
+      info: {
+        description: "Add an arbitrary case to the specified user without taking any action",
+      },
     },
   })
   @d.permission("can_addcase")
@@ -1434,8 +1462,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("case", "<caseNumber:number>", {
-    info: {
-      description: "Show information about a specific case",
+    extra: {
+      info: {
+        description: "Show information about a specific case",
+      },
     },
   })
   @d.permission("can_view")
@@ -1465,8 +1495,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "h",
       },
     ],
-    info: {
-      description: "Show a list of cases the specified user has",
+    extra: {
+      info: {
+        description: "Show a list of cases the specified user has",
+      },
     },
   })
   @d.permission("can_view")
@@ -1532,8 +1564,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("cases", null, {
     options: [{ name: "mod", type: "Member" }],
-    info: {
-      description: "Show the most recent 5 cases by the specified --mod",
+    extra: {
+      info: {
+        description: "Show the most recent 5 cases by the specified --mod",
+      },
     },
   })
   @d.permission("can_view")
@@ -1561,8 +1595,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("hidecase", "<caseNum:number>", {
-    info: {
-      description: "Hide the specified case so it doesn't appear in !cases or !info",
+    extra: {
+      info: {
+        description: "Hide the specified case so it doesn't appear in !cases or !info",
+      },
     },
   })
   @d.permission("can_hidecase")
@@ -1580,8 +1616,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("unhidecase", "<caseNum:number>", {
-    info: {
-      description: "Un-hide the specified case, making it appear in !cases and !info again",
+    extra: {
+      info: {
+        description: "Un-hide the specified case, making it appear in !cases and !info again",
+      },
     },
   })
   @d.permission("can_hidecase")

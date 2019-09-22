@@ -1,4 +1,4 @@
-import { decorators as d, logger } from "knub";
+import { decorators as d, ICommandContext, logger } from "knub";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
 import { Attachment, GuildChannel, Message, TextChannel } from "eris";
 import { confirm, downloadFile, errorMessage, noop, SECONDS, trimLines } from "../utils";
@@ -57,8 +57,8 @@ export class ChannelArchiverPlugin extends ZeppelinPlugin {
       },
     ],
     preFilters: [
-      (msg, command, plugin: ChannelArchiverPlugin) => {
-        return plugin.isOwner(msg.author.id);
+      (command, context: ICommandContext) => {
+        return (context.plugin as ChannelArchiverPlugin).isOwner(context.message.author.id);
       },
     ],
   })

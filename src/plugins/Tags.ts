@@ -10,6 +10,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { parseTemplate, renderTemplate, TemplateParseError } from "../templateFormatter";
 import { GuildArchives } from "../data/GuildArchives";
 import * as t from "io-ts";
+import { parseArguments } from "knub-command-manager";
 
 const ConfigSchema = t.type({
   prefix: t.string,
@@ -233,7 +234,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // Substitute variables (matched with Knub's argument parser -> supports quotes etc.)
     const variableStr = msg.data.content.slice(prefix.length + tagName.length).trim();
-    const tagArgs = this.commands.parseArguments(variableStr).map(v => v.value);
+    const tagArgs = parseArguments(variableStr).map(v => v.value);
 
     // Format the string
     try {
