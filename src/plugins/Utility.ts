@@ -1,4 +1,11 @@
-import { decorators as d, getCommandSignature, IPluginOptions, ICommandDefinition, waitForReaction } from "knub";
+import {
+  decorators as d,
+  getCommandSignature,
+  ICommandContext,
+  ICommandExtraData,
+  IPluginOptions,
+  waitForReaction,
+} from "knub";
 import {
   CategoryChannel,
   Channel,
@@ -45,6 +52,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { getCurrentUptime } from "../uptime";
 import LCL from "last-commit-log";
 import * as t from "io-ts";
+import { ICommandDefinition } from "knub-command-manager";
 
 const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -959,17 +967,18 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   helpCmd(msg: Message, args: { command: string }) {
     const searchStr = args.command.toLowerCase();
 
-    const matchingCommands: ICommandDefinition[] = [];
+    const matchingCommands: Array<ICommandDefinition<ICommandContext, ICommandExtraData>> = [];
 
     const guildData = this.knub.getGuildData(this.guildId);
     for (const plugin of guildData.loadedPlugins.values()) {
       if (!(plugin instanceof ZeppelinPlugin)) continue;
 
-      const commands = plugin.getRegisteredCommands();
-      for (const command of commands) {
-        const trigger = command.trigger.source.toLowerCase();
-        if (trigger.startsWith(searchStr)) {
-          matchingCommands.push(command);
+      const registeredCommands = plugin.getRegisteredCommands();
+      for (const registeredCommand of registeredCommands) {
+        for (const trigger of registeredCommand.command.triggers) {
+          if (trigger.source.startsWith(searchStr)) {
+            matchingCommands.push(registeredCommand.command);
+          }
         }
       }
     }
@@ -977,16 +986,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const totalResults = matchingCommands.length;
     const limitedResults = matchingCommands.slice(0, 15);
     const signatures = limitedResults.map(command => {
-      return (
-        "`" +
-        getCommandSignature(
-          guildData.config.prefix,
-          command.trigger.source,
-          command.parameters,
-          command.config.options,
-        ) +
-        "`"
-      );
+      return "`" + getCommandSignature(command) + "`";
     });
 
     if (totalResults === 0) {

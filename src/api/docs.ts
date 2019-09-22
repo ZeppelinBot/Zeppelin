@@ -2,10 +2,9 @@ import express from "express";
 import { availablePlugins } from "../plugins/availablePlugins";
 import { ZeppelinPlugin } from "../plugins/ZeppelinPlugin";
 import { notFound } from "./responses";
-import { CommandManager, ICommandConfig } from "knub/dist/CommandManager";
 import { dropPropertiesByName, indentLines } from "../utils";
-
-const commandManager = new CommandManager();
+import { IPluginCommandConfig, Plugin, pluginUtils } from "knub";
+import { parseParameters } from "knub-command-manager";
 
 function formatConfigSchema(schema) {
   if (schema._tag === "InterfaceType" || schema._tag === "PartialType") {
@@ -79,20 +78,20 @@ export function initDocs(app: express.Express) {
     const props = Reflect.ownKeys(pluginClass.prototype);
     const commands = props.reduce((arr, prop) => {
       if (typeof prop !== "string") return arr;
-      const propCommands = Reflect.getMetadata("commands", pluginClass.prototype, prop);
-      if (propCommands) {
+      const decoratorCommands = pluginUtils.getPluginDecoratorCommands(pluginClass as typeof Plugin);
+      if (decoratorCommands) {
         arr.push(
-          ...propCommands.map(cmd => {
-            const trigger = typeof cmd.command === "string" ? cmd.command : cmd.command.source;
+          ...decoratorCommands.map(cmd => {
+            const trigger = typeof cmd.trigger === "string" ? cmd.trigger : cmd.trigger.source;
             const parameters = cmd.parameters
               ? typeof cmd.parameters === "string"
-                ? commandManager.parseParameterString(cmd.parameters)
+                ? parseParameters(cmd.parameters)
                 : cmd.parameters
               : [];
-            const config: ICommandConfig = cmd.options || {};
+            const config: IPluginCommandConfig = cmd.config || {};
             if (config.overloads) {
               config.overloads = config.overloads.map(overload => {
-                return typeof overload === "string" ? commandManager.parseParameterString(overload) : overload;
+                return typeof overload === "string" ? parseParameters(overload) : overload;
               });
             }
 

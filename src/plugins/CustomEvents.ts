@@ -87,7 +87,7 @@ export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
   onLoad() {
     for (const [key, event] of Object.entries(this.getConfig().events)) {
       if (event.trigger.type === "command") {
-        this.commands.add(
+        this.addCommand(
           event.trigger.name,
           event.trigger.params,
           (msg, args) => {
@@ -95,8 +95,9 @@ export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
             this.runEvent(event, { msg, args }, { args, msg: strippedMsg });
           },
           {
-            requiredPermission: `events.${key}.trigger.can_use`,
-            locks: [],
+            extra: {
+              requiredPermission: `events.${key}.trigger.can_use`,
+            },
           },
         );
       }

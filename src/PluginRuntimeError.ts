@@ -11,7 +11,7 @@ export class PluginRuntimeError {
     this.guildId = guildId;
   }
 
-  [util.inspect.custom](depth, options) {
+  [util.inspect.custom](depth?, options?) {
     return `PRE [${this.pluginName}] [${this.guildId}] ${this.message}`;
   }
 

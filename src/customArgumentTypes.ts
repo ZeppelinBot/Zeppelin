@@ -6,41 +6,42 @@ import {
   resolveUser,
   UnknownUser,
 } from "./utils";
-import { CommandArgumentTypeError } from "knub";
 import { Client, GuildChannel, Message } from "eris";
+import { TypeConversionError } from "knub-command-manager";
+import { ICommandContext } from "knub";
 
 export const customArgumentTypes = {
   delay(value) {
     const result = convertDelayStringToMS(value);
     if (result == null) {
-      throw new CommandArgumentTypeError(`Could not convert ${value} to a delay`);
+      throw new TypeConversionError(`Could not convert ${value} to a delay`);
     }
 
     return result;
   },
 
-  async resolvedUser(value, msg, bot: Client) {
-    const result = await resolveUser(bot, value);
+  async resolvedUser(value, context: ICommandContext) {
+    const result = await resolveUser(context.bot, value);
     if (result == null || result instanceof UnknownUser) {
-      throw new CommandArgumentTypeError(`User \`${disableCodeBlocks(value)}\` was not found`);
+      throw new TypeConversionError(`User \`${disableCodeBlocks(value)}\` was not found`);
     }
     return result;
   },
 
-  async resolvedUserLoose(value, msg, bot: Client) {
-    const result = await resolveUser(bot, value);
+  async resolvedUserLoose(value, context: ICommandContext) {
+    const result = await resolveUser(context.bot, value);
     if (result == null) {
-      throw new CommandArgumentTypeError(`Invalid user: \`${disableCodeBlocks(value)}\``);
+      throw new TypeConversionError(`Invalid user: \`${disableCodeBlocks(value)}\``);
     }
     return result;
   },
 
-  async resolvedMember(value, msg: Message, bot: Client) {
-    if (!(msg.channel instanceof GuildChannel)) return null;
+  async resolvedMember(value, context: ICommandContext) {
+    if (!(context.message.channel instanceof GuildChannel)) return null;
 
-    const result = await resolveMember(bot, msg.channel.guild, value);
+    const result = await resolveMember(context.bot, context.message.channel.guild, value);
     if (result == null) {
-      throw new CommandArgumentTypeError(
+      throw new TypeConversionError(
         `Member \`${disableCodeBlocks(value)}\` was not found or they have left the server`,
       );
     }

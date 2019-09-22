@@ -78,8 +78,10 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("where", "<member:resolvedMember>", {
-    info: {
-      description: "Posts an instant invite to the voice channel that `<member>` is in",
+    extra: {
+      info: {
+        description: "Posts an instant invite to the voice channel that `<member>` is in",
+      },
     },
   })
   @d.permission("can_where")
@@ -90,8 +92,10 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("vcalert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {
     aliases: ["vca"],
-    info: {
-      description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
+    extra: {
+      info: {
+        description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
+      },
     },
   })
   @d.permission("can_alert")
