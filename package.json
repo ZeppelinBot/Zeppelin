@@ -4,15 +4,15 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start-bot-dev": "ts-node src/index.ts",
+    "start-bot-dev": "node -r ts-node/register src/index.ts",
     "start-bot-prod": "cross-env NODE_ENV=production node dist/index.js",
     "watch-bot": "nodemon --config nodemon-bot.json",
     "build": "rimraf dist && tsc",
-    "start-api-dev": "ts-node src/api/index.ts",
+    "start-api-dev": "node -r ts-node/register src/api/index.ts",
     "start-api-prod": "cross-env NODE_ENV=production node dist/api/index.js",
     "watch-api": "nodemon --config nodemon-api.json",
     "format": "prettier --write \"./src/**/*.ts\"",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run",
     "migrate-rollback": "npm run typeorm -- migration:revert",
     "test": "jest src"

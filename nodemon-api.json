@@ -1,5 +1,5 @@
 {
   "watch": "src",
   "ext": "ts",
-  "exec": "ts-node ./src/api/index.ts"
+  "exec": "node -r ts-node/register ./src/api/index.ts"
 }
