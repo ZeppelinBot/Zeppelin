@@ -57,5 +57,6 @@
   "SCHEDULED_MESSAGE": "⏰ {userMention(author)} scheduled a message to be posted to {channelMention(channel)} on {date} at {time} (UTC)",
   "POSTED_SCHEDULED_MESSAGE": "\uD83D\uDCE8 Posted scheduled message (`{messageId}`) to {channelMention(channel)} as scheduled by {userMention(author)}",
 
-  "BOT_ALERT": "⚠ {tmplEval(body)}"
+  "BOT_ALERT": "⚠ {tmplEval(body)}",
+  "AUTOMOD_ALERT": "{text}"
 }
