@@ -125,13 +125,12 @@
   import yaml from "js-yaml";
   import CodeBlock from "./CodeBlock";
   import MarkdownBlock from "./MarkdownBlock";
-  import Tabs from "../shared/Tabs";
 
   const validTabs = ['usage', 'configuration'];
   const defaultTab = 'usage';
 
   export default {
-    components: { CodeBlock, MarkdownBlock, Tabs },
+    components: { CodeBlock, MarkdownBlock },
 
     async mounted() {
       this.loading = true;
