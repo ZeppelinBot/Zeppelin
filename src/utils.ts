@@ -185,7 +185,7 @@ const urlRegex = /(\S+\.\S+)/g;
 const protocolRegex = /^[a-z]+:\/\//;
 
 export function getUrlsInString(str: string, unique = false): url.URL[] {
-  let matches = str.match(urlRegex).map(m => m[0]) || [];
+  let matches = (str.match(urlRegex) || []).map(m => m[0]);
   if (unique) matches = Array.from(new Set(matches));
 
   return matches.reduce((urls, match) => {
