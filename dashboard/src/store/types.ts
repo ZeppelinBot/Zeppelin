@@ -31,6 +31,14 @@ export interface ThinDocsPlugin {
 
 export interface DocsPlugin extends ThinDocsPlugin {
   commands: any[];
+  defaultOptions: any;
+  configSchema?: string;
+  info: {
+    name: string;
+    description?: string;
+    usageGuide?: string;
+    configurationGuide?: string;
+  };
 }
 
 export interface DocsState {

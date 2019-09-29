@@ -133,14 +133,21 @@
 
 <script>
   import Vue from "vue";
+  import hljs from "highlight.js/lib/highlight.js";
+  import hljsYaml from "highlight.js/lib/languages/yaml.js";
   import VueHighlightJS from "vue-highlightjs";
+  import Buefy from "buefy";
   import {mapState} from "vuex";
 
-  import "../../directives/trim-code";
+  import "../../style/icons.scss";
+  import "buefy/dist/buefy.css";
   import "highlight.js/styles/ocean.css";
+  import "../../directives/trim-code";
   import "../../style/docs.scss";
 
-  Vue.use(VueHighlightJS);
+  hljs.registerLanguage("yaml", hljsYaml);
+  Vue.use(VueHighlightJS, { hljs });
+  Vue.use(Buefy);
 
   export default {
     async mounted() {

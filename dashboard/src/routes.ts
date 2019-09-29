@@ -1,8 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Splash from "./components/Splash.vue";
-import Login from "./components/Login.vue";
-import LoginCallback from "./components/LoginCallback.vue";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
 
 Vue.use(VueRouter);
@@ -17,7 +15,7 @@ export const router = new VueRouter({
     // Docs
     {
       path: "/docs",
-      component: () => import("./components/docs/Layout.vue"),
+      component: () => import("./components/docs/DocsLayout.vue"),
       children: [
         {
           path: "",
@@ -40,7 +38,7 @@ export const router = new VueRouter({
           component: () => import("./components/docs/ArgumentTypes.vue"),
         },
         {
-          path: "plugins/:pluginName",
+          path: "plugins/:pluginName/:tab?",
           component: () => import("./components/docs/Plugin.vue"),
         },
       ],
