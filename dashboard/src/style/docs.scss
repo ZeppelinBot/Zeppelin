@@ -1,5 +1,6 @@
 @import url('https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css');
 
+$bulmaswatch-import-font: false;
 $family-primary: 'Open Sans', sans-serif;
 $list-background-color: transparent;
 
@@ -9,8 +10,14 @@ $size-3: 1.5rem;
 $size-4: 1.25rem;
 
 @import "~bulmaswatch/superhero/_variables";
+
+$tabs-link-color: $grey-light;
+$tabs-link-active-color: $grey-lighter;
+$tabs-link-active-border-bottom-color: $grey-lighter;
+
 @import "~bulma/bulma";
 @import "~bulmaswatch/superhero/_overrides";
+
 
 .docs-cloak {
   visibility: visible !important;
@@ -42,3 +49,15 @@ $size-4: 1.25rem;
 .mb-1 { margin-bottom: 1rem; }
 .mb-2 { margin-bottom: 1.5rem; }
 .mb-3 { margin-bottom: 2rem; }
+
+.codeblock,
+.content .codeblock {
+  border-radius: 3px;
+  padding: 16px;
+  max-width: 970px; /* FIXME: temp fix for overflowing code blocks, look into properly later */
+}
+
+.codeblock .hljs {
+  background: transparent;
+  padding: 0;
+}

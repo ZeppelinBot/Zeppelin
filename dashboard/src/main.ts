@@ -1,8 +1,6 @@
 import "./style/base.scss";
-import "buefy/dist/buefy.css";
 
 import Vue from "vue";
-import Buefy from "buefy";
 import { RootStore } from "./store";
 import { router } from "./routes";
 
@@ -21,7 +19,6 @@ Vue.mixin({
 
 import App from "./components/App.vue";
 
-Vue.use(Buefy);
 const app = new Vue({
   router,
   store: RootStore,
