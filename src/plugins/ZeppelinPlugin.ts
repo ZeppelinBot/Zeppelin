@@ -23,21 +23,31 @@ import { mergeConfig } from "knub/dist/configUtils";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
+/**
+ * Wrapper for the string type that indicates the text will be parsed as Markdown later
+ */
+type TMarkdown = string;
+
 export interface PluginInfo {
   prettyName: string;
-  description?: string;
+  description?: TMarkdown;
+  usageGuide?: TMarkdown;
+  configurationGuide?: TMarkdown;
 }
 
 export interface CommandInfo {
-  description?: string;
-  basicUsage?: string;
+  description?: TMarkdown;
+  basicUsage?: TMarkdown;
   parameterDescriptions?: {
-    [key: string]: string;
+    [key: string]: TMarkdown;
   };
 }
 
 export function trimPluginDescription(str) {
-  return trimIndents(trimEmptyStartEndLines(str), 6);
+  const emptyLinesTrimmed = trimEmptyStartEndLines(str);
+  const lines = emptyLinesTrimmed.split("\n");
+  const lastLineIndentation = (lines[lines.length - 1].match(/^ +/g) || [""])[0].length;
+  return trimIndents(emptyLinesTrimmed, lastLineIndentation);
 }
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
