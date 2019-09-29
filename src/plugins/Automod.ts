@@ -20,6 +20,8 @@ import { Queue } from "../Queue";
 import Timeout = NodeJS.Timeout;
 import { ModActionsPlugin } from "./ModActions";
 import { MutesPlugin } from "./Mutes";
+import { LogsPlugin } from "./Logs";
+import { LogType } from "../data/LogType";
 
 type MessageInfo = { channelId: string; messageId: string };
 
@@ -310,7 +312,7 @@ const inviteCache = new SimpleCache(10 * MINUTES);
 export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "automod";
   public static configSchema = ConfigSchema;
-  public static dependencies = ["mod_actions", "mutes"];
+  public static dependencies = ["mod_actions", "mutes", "logs"];
 
   protected unloaded = false;
 
@@ -330,6 +332,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected modActions: ModActionsPlugin;
   protected mutes: MutesPlugin;
+  protected logs: LogsPlugin;
 
   protected static preprocessStaticConfig(config) {
     if (config.rules && typeof config.rules === "object") {
@@ -371,6 +374,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected onLoad() {
     this.automodQueue = new Queue();
     this.modActions = this.getPlugin("mod_actions");
+    this.logs = this.getPlugin("logs");
   }
 
   protected onUnload() {
@@ -850,7 +854,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    // TODO: Alert action (and AUTOMOD_ALERT log type)
+    if (rule.actions.alert) {
+      const text = rule.actions.alert.text;
+      this.logs.log(LogType.AUTOMOD_ALERT, { text });
+    }
   }
 
   @d.event("messageCreate")

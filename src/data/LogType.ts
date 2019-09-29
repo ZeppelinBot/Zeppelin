@@ -58,4 +58,5 @@ export enum LogType {
   POSTED_SCHEDULED_MESSAGE,
 
   BOT_ALERT,
+  AUTOMOD_ALERT,
 }
