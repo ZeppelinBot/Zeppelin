@@ -39,7 +39,7 @@ export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
 
 export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
-  return t.union([type, t.undefined, t.null], type.name);
+  return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }
 
 export function dropPropertiesByName(obj, propName) {
