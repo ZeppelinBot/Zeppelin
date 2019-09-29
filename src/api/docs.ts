@@ -17,41 +17,19 @@ function formatConfigSchema(schema) {
     );
   } else if (schema._tag === "DictionaryType") {
     return "{\n" + indentLines(`[string]: ${formatConfigSchema(schema.codomain)}`, 2) + "\n}";
+  } else if (schema._tag === "ArrayType") {
+    return `Array<${formatConfigSchema(schema.type)}>`;
+  } else if (schema._tag === "UnionType") {
+    if (schema.name.startsWith("Nullable<")) {
+      return `Nullable<${formatConfigSchema(schema.types[0])}>`;
+    } else {
+      return schema.types.map(t => formatConfigSchema(t)).join(" | ");
+    }
+  } else if (schema._tag === "IntersectionType") {
+    return schema.types.map(t => formatConfigSchema(t)).join(" & ");
   } else {
     return schema.name;
   }
-}
-
-function formatTypeName(typeName) {
-  let result = "";
-  let indent = 0;
-  let skip = false;
-  for (const char of [...typeName]) {
-    if (skip) {
-      skip = false;
-      continue;
-    }
-
-    if (char === "}") {
-      result += "\n";
-      indent--;
-      skip = true;
-    }
-
-    result += char;
-
-    if (char === "{") {
-      result += "\n";
-      indent++;
-      skip = true;
-    }
-
-    if (char === ",") {
-      result += "\n";
-      skip = true;
-    }
-  }
-  return result;
 }
 
 export function initDocs(app: express.Express) {
@@ -106,7 +84,7 @@ export function initDocs(app: express.Express) {
       return arr;
     }, []);
 
-    const options = (pluginClass as typeof ZeppelinPlugin).getStaticDefaultOptions();
+    const defaultOptions = (pluginClass as typeof ZeppelinPlugin).getStaticDefaultOptions();
 
     const configSchema = pluginClass.configSchema && formatConfigSchema(pluginClass.configSchema);
 
@@ -114,7 +92,7 @@ export function initDocs(app: express.Express) {
       name: pluginClass.pluginName,
       info: pluginClass.pluginInfo || {},
       configSchema,
-      options,
+      defaultOptions,
       commands,
     });
   });
