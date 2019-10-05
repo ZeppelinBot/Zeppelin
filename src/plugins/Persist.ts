@@ -5,7 +5,7 @@ import { Member, MemberOptions } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -21,6 +21,9 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   public static pluginInfo = {
     prettyName: "Persist",
+    description: trimPluginDescription(`
+      Blah
+    `),
   };
 
   protected persistedData: GuildPersistedData;

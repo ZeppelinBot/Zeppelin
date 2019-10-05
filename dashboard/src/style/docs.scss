@@ -61,3 +61,17 @@ $tabs-link-active-border-bottom-color: $grey-lighter;
   background: transparent;
   padding: 0;
 }
+
+.menu-label {
+  &:not(:first-child) {
+    margin-top: 1.4em;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 0.4em;
+  }
+}
+
+.menu-list .router-link-active {
+  text-decoration: underline;
+}

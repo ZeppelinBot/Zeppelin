@@ -4,7 +4,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { Case } from "../data/entities/Case";
 import moment from "moment-timezone";
 import { CaseTypeColors } from "../data/CaseTypeColors";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildArchives } from "../data/GuildArchives";
 import { IPluginOptions } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
@@ -47,7 +47,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "cases";
   public static configSchema = ConfigSchema;
 
-  public static pluginInfo = {
+  public static pluginInfo: PluginInfo = {
     prettyName: "Cases",
     description: trimPluginDescription(`
       This plugin contains basic configuration for cases created by other plugins

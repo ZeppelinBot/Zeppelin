@@ -41,6 +41,9 @@ export interface CommandInfo {
   parameterDescriptions?: {
     [key: string]: TMarkdown;
   };
+  optionDescriptions?: {
+    [key: string]: TMarkdown;
+  };
 }
 
 export function trimPluginDescription(str) {

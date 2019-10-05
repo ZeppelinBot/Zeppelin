@@ -53,36 +53,27 @@ export function initDocs(app: express.Express) {
       return notFound(res);
     }
 
-    const props = Reflect.ownKeys(pluginClass.prototype);
-    const commands = props.reduce((arr, prop) => {
-      if (typeof prop !== "string") return arr;
-      const decoratorCommands = pluginUtils.getPluginDecoratorCommands(pluginClass as typeof Plugin);
-      if (decoratorCommands) {
-        arr.push(
-          ...decoratorCommands.map(cmd => {
-            const trigger = typeof cmd.trigger === "string" ? cmd.trigger : cmd.trigger.source;
-            const parameters = cmd.parameters
-              ? typeof cmd.parameters === "string"
-                ? parseParameters(cmd.parameters)
-                : cmd.parameters
-              : [];
-            const config: IPluginCommandConfig = cmd.config || {};
-            if (config.overloads) {
-              config.overloads = config.overloads.map(overload => {
-                return typeof overload === "string" ? parseParameters(overload) : overload;
-              });
-            }
-
-            return {
-              trigger,
-              parameters,
-              config,
-            };
-          }),
-        );
+    const decoratorCommands = pluginUtils.getPluginDecoratorCommands(pluginClass as typeof Plugin) || [];
+    const commands = decoratorCommands.map(cmd => {
+      const trigger = typeof cmd.trigger === "string" ? cmd.trigger : cmd.trigger.source;
+      const parameters = cmd.parameters
+        ? typeof cmd.parameters === "string"
+          ? parseParameters(cmd.parameters)
+          : cmd.parameters
+        : [];
+      const config: IPluginCommandConfig = cmd.config || {};
+      if (config.overloads) {
+        config.overloads = config.overloads.map(overload => {
+          return typeof overload === "string" ? parseParameters(overload) : overload;
+        });
       }
-      return arr;
-    }, []);
+
+      return {
+        trigger,
+        parameters,
+        config,
+      };
+    });
 
     const defaultOptions = (pluginClass as typeof ZeppelinPlugin).getStaticDefaultOptions();
 

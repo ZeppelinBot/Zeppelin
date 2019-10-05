@@ -24,6 +24,8 @@
     "interface-name": false,
     "no-submodule-imports": false,
     "no-floating-promises": true,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "no-object-literal-type-assertion": false,
+    "no-angle-bracket-type-assertion": false
   }
 }
