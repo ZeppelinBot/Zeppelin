@@ -4,7 +4,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji, successMessage } from "../utils";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -56,7 +56,13 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages.events.off("create", this.onMessageCreateFn);
   }
 
-  @d.command("auto_reactions", "<channelId:channelId> <reactions...>")
+  @d.command("auto_reactions", "<channelId:channelId> <reactions...>", {
+    extra: {
+      info: <CommandInfo>{
+        basicUsage: "!auto_reactions 629990160477585428 👍 👎",
+      },
+    },
+  })
   @d.permission("can_manage")
   async setAutoReactionsCmd(msg: Message, args: { channelId: string; reactions: string[] }) {
     const finalReactions = [];
@@ -90,7 +96,13 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`Auto-reactions set for <#${args.channelId}>`));
   }
 
-  @d.command("auto_reactions disable", "<channelId:channelId>")
+  @d.command("auto_reactions disable", "<channelId:channelId>", {
+    extra: {
+      info: <CommandInfo>{
+        basicUsage: "!auto_reactions disable 629990160477585428",
+      },
+    },
+  })
   @d.permission("can_manage")
   async disableAutoReactionsCmd(msg: Message, args: { channelId: string }) {
     const autoReaction = await this.autoReactions.getForChannel(args.channelId);

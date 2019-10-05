@@ -5,6 +5,9 @@
   <div v-else>
     <h1 class="z-title is-1 mb-1">{{ data.info.prettyName || data.name }}</h1>
 
+    <!-- Description -->
+    <MarkdownBlock :content="data.info.description" class="content"></MarkdownBlock>
+
     <div class="tabs">
       <ul>
         <li v-bind:class="{'is-active': tab === 'usage'}">
@@ -18,8 +21,10 @@
 
     <!-- Usage tab -->
     <div class="usage" v-if="tab === 'usage'">
-      <!-- Description -->
-      <MarkdownBlock :content="data.info.description" class="content"></MarkdownBlock>
+      <div v-if="!hasUsageInfo">
+        This plugin has no usage information.
+        See <router-link v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>.
+      </div>
 
       <!-- Usage guide -->
       <div v-if="data.info.usageGuide">
@@ -32,11 +37,11 @@
         <h2 id="commands" class="z-title is-2 mt-2 mb-1">Commands</h2>
         <div v-for="command in data.commands">
           <h3 class="z-title is-3 mt-2 mb-1">!{{ command.trigger }}</h3>
-          <div v-if="command.config.requiredPermission">
-            Permission: <code>{{ command.config.requiredPermission }}</code>
+          <div v-if="command.config.extra.requiredPermission">
+            Permission: <code>{{ command.config.extra.requiredPermission }}</code>
           </div>
-          <div v-if="command.config.info && command.config.info.basicUsage">
-            Basic usage: <code>{{ command.config.info.basicUsage }}</code>
+          <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
+            Basic usage: <code>{{ command.config.extra.info.basicUsage }}</code>
           </div>
           <div v-if="command.config.aliases && command.config.aliases.length">
             Shortcut:
@@ -68,9 +73,23 @@
                 <ul class="z-list z-ul">
                   <li v-for="param in command.parameters">
                     <code>{{ renderParameter(param) }}</code>
-                    <router-link :to="'/docs/descriptions/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
+                    <router-link :to="'/docs/reference/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
                     <MarkdownBlock v-if="command.config.info && command.config.info.parameterDescriptions && command.config.info.parameterDescriptions[param.name]"
                                    :content="command.config.info.parameterDescriptions[param.name]"
+                                   class="content">
+                    </MarkdownBlock>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="mt-2" v-if="command.config.options && command.config.options.length">
+                Options:
+                <ul class="z-list z-ul">
+                  <li v-for="opt in command.config.options">
+                    <code>{{ renderOption(opt) }}</code>
+                    <router-link :to="'/docs/reference/argument-types#' + (opt.type || 'string')">{{ opt.type || 'string' }}</router-link>
+                    <MarkdownBlock v-if="command.config.info && command.config.info.optionDescriptions && command.config.info.optionDescriptions[opt.name]"
+                                   :content="command.config.info.optionDescriptions[opt.name]"
                                    class="content">
                     </MarkdownBlock>
                   </li>
@@ -134,7 +153,14 @@
 
     async mounted() {
       this.loading = true;
+
       await this.$store.dispatch("docs/loadPluginData", this.pluginName);
+
+      // If there's no usage info, use Configuration as the default tab
+      if (!this.hasUsageInfo && ! this.$route.params.tab) {
+        this.tab = 'configuration';
+      }
+
       this.loading = false;
     },
     methods: {
@@ -147,6 +173,17 @@
         let str = `${param.name}`;
         if (param.rest) str += '...';
         if (param.required) {
+          return `<${str}>`;
+        } else {
+          return `[${str}]`;
+        }
+      },
+      renderOption(opt) {
+        let str = `--${opt.name}`;
+        if (opt.shortcut) {
+          str += `|-${opt.shortcut}`;
+        }
+        if (opt.required) {
           return `<${str}>`;
         } else {
           return `[${str}]`;
@@ -166,6 +203,12 @@
       ...mapState("docs", {
         data(state) {
           return state.plugins[this.pluginName];
+        },
+        hasUsageInfo() {
+          if (!this.data) return true;
+          if (this.data.commands.length) return true;
+          if (this.data.info.usageGuide) return true;
+          return false;
         },
       }),
     },

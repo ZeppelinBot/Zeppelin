@@ -19,6 +19,10 @@ export const router = new VueRouter({
       children: [
         {
           path: "",
+          redirect: "/docs/introduction",
+        },
+        {
+          path: "introduction",
           component: () => import("./components/docs/Introduction.vue"),
         },
         {
@@ -34,8 +38,16 @@ export const router = new VueRouter({
           component: () => import("./components/docs/PluginConfiguration.vue"),
         },
         {
-          path: "descriptions/argument-types",
+          path: "reference/argument-types",
           component: () => import("./components/docs/ArgumentTypes.vue"),
+        },
+        {
+          path: "setup-guides/logs",
+          component: () => import("./components/docs/WorkInProgress.vue"),
+        },
+        {
+          path: "setup-guides/moderation",
+          component: () => import("./components/docs/WorkInProgress.vue"),
         },
         {
           path: "plugins/:pluginName/:tab?",

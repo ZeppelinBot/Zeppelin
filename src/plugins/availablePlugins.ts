@@ -26,11 +26,13 @@ import { CompanionChannelPlugin } from "./CompanionChannels";
 import { LocatePlugin } from "./LocateUser";
 import { GuildConfigReloader } from "./GuildConfigReloader";
 import { ChannelArchiverPlugin } from "./ChannelArchiver";
+import { AutomodPlugin } from "./Automod";
 
 /**
  * Plugins available to be loaded for individual guilds
  */
 export const availablePlugins = [
+  AutomodPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
   CasesPlugin,

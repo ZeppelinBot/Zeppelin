@@ -28,15 +28,21 @@
           <aside class="menu">
             <p class="menu-label">General</p>
             <ul class="menu-list">
-              <li><router-link to="/docs">Introduction</router-link></li>
+              <li><router-link to="/docs/introduction">Introduction</router-link></li>
               <li><router-link to="/docs/configuration-format">Configuration format</router-link></li>
               <li><router-link to="/docs/plugin-configuration">Plugin configuration</router-link></li>
               <li><router-link to="/docs/permissions">Permissions</router-link></li>
             </ul>
 
-            <p class="menu-label">Descriptions</p>
+            <p class="menu-label">Reference</p>
             <ul class="menu-list">
-              <li><router-link to="/docs/descriptions/argument-types">Argument types</router-link></li>
+              <li><router-link to="/docs/reference/argument-types">Argument types</router-link></li>
+            </ul>
+
+            <p class="menu-label">Setup guides</p>
+            <ul class="menu-list">
+              <li><router-link to="/docs/setup-guides/logs">Logs</router-link></li>
+              <li><router-link to="/docs/setup-guides/moderation">Moderation</router-link></li>
             </ul>
 
             <p class="menu-label">Plugins</p>
