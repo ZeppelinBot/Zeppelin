@@ -4,7 +4,8 @@
   </div>
   <div v-else>
     <h2 class="title is-1">Config for {{ guild.name }}</h2>
-    <codemirror v-model="editableConfig" :options="cmConfig"></codemirror>
+    <AceEditor v-model="editableConfig" @init="editorInit" lang="yaml" theme="twilight" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
+
     <div class="editor-footer">
       <div class="actions">
         <button class="button" v-on:click="save" :disabled="saving">Save</button>
@@ -19,27 +20,15 @@
   </div>
 </template>
 
-<style scoped>
-  .vue-codemirror {
-    margin-bottom: 16px;
-  }
-
-  >>> .CodeMirror {
-    height: 70vh;
-  }
-</style>
-
 <script>
   import {mapState} from "vuex";
-  import { codemirror } from "vue-codemirror";
-  import "codemirror/lib/codemirror.css";
-  import "codemirror/theme/oceanic-next.css";
-  import "codemirror/mode/yaml/yaml.js";
   import {ApiError} from "../../api";
+
+  import AceEditor from "vue2-ace-editor";
 
   export default {
     components: {
-      codemirror,
+      AceEditor,
     },
     async mounted() {
         await this.$store.dispatch("guilds/loadAvailableGuilds");
@@ -58,18 +47,8 @@
         saving: false,
         editableConfig: null,
         errors: [],
-        cmConfig: {
-          indentWithTabs: false,
-          indentUnit: 2,
-          smartIndent: false,
-          lineNumbers: true,
-          mode: "text/x-yaml",
-          theme: "oceanic-next",
-          extraKeys: {
-            Tab: cm => cm.execCommand("indentMore"),
-            "Shift-Tab": cm => cm.execCommand("indentLess"),
-          },
-        },
+        editorWidth: 900,
+        editorHeight: 600
       };
     },
     computed: {
@@ -83,6 +62,33 @@
       }),
     },
     methods: {
+      editorInit() {
+        require("brace/ext/language_tools");
+        require("brace/mode/yaml");
+        require("brace/theme/twilight");
+
+        this.$refs.aceEditor.editor.setOptions({
+          useSoftTabs: true,
+          tabSize: 2
+        });
+
+        this.fitEditorToWindow();
+      },
+      fitEditorToWindow() {
+        const editorElem = this.$refs.aceEditor.$el;
+        const newWidth = editorElem.parentNode.clientWidth;
+        const rect = editorElem.getBoundingClientRect();
+        const newHeight = window.innerHeight - rect.top - 100;
+        this.resizeEditor(newWidth, newHeight);
+      },
+      resizeEditor(newWidth, newHeight) {
+        this.editorWidth = newWidth;
+        this.editorHeight = newHeight;
+
+        this.$nextTick(() => {
+          this.$refs.aceEditor.editor.resize();
+        });
+      },
       async save() {
         this.saving = true;
         this.errors = [];
