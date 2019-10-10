@@ -110,7 +110,12 @@ let config = {
       // Images/files
       {
         test: /\.(png|jpg)$/i,
-        use: ["file-loader"],
+        use: {
+          loader: "file-loader",
+          options: {
+            name: "[name]-[hash].[ext]",
+          },
+        },
       },
 
       // HTML
