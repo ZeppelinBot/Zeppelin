@@ -45,7 +45,7 @@
 </style>
 
 <script>
-  import "../../style/dashboard.scss";
+  // import "../../style/dashboard.scss";
 
   export default {
     methods: {

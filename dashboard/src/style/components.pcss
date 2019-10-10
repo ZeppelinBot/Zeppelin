@@ -1,0 +1,21 @@
+.inline-code {
+  @apply inline-block;
+  @apply bg-gray-800;
+  @apply px-1;
+  @apply rounded;
+  @apply text-sm;
+}
+
+.codeblock {
+  @apply bg-gray-800;
+  @apply p-3;
+  @apply mb-4;
+  @apply rounded;
+  @apply text-sm;
+  @apply shadow-md;
+
+  & .hljs {
+    @apply bg-transparent;
+    @apply p-0;
+  }
+}

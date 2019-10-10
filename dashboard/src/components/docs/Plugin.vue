@@ -3,21 +3,19 @@
     Loading...
   </div>
   <div v-else>
-    <h1 class="z-title is-1 mb-1">{{ data.info.prettyName || data.name }}</h1>
+    <h1>{{ data.info.prettyName || data.name }}</h1>
 
     <!-- Description -->
     <MarkdownBlock :content="data.info.description" class="content"></MarkdownBlock>
 
-    <div class="tabs">
-      <ul>
-        <li v-bind:class="{'is-active': tab === 'usage'}">
-          <router-link v-bind:to="'/docs/plugins/' + pluginName + '/usage'">Usage</router-link>
-        </li>
-        <li v-bind:class="{'is-active': tab === 'configuration'}">
-          <router-link v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>
-        </li>
-      </ul>
-    </div>
+    <Tabs>
+      <Tab :active="tab === 'usage'">
+        <router-link v-bind:to="'/docs/plugins/' + pluginName + '/usage'">Usage</router-link>
+      </Tab>
+      <Tab :active="tab === 'configuration'">
+        <router-link v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>
+      </Tab>
+    </Tabs>
 
     <!-- Usage tab -->
     <div class="usage" v-if="tab === 'usage'">
@@ -28,38 +26,33 @@
 
       <!-- Usage guide -->
       <div v-if="data.info.usageGuide">
-        <h2 id="usage-guide" class="z-title is-2 mt-2 mb-1">Usage guide</h2>
+        <h2 id="usage-guide">Usage guide</h2>
         <MarkdownBlock :content="data.info.usageGuide" class="content"></MarkdownBlock>
       </div>
 
       <!-- Command list -->
       <div v-if="data.commands.length">
-        <h2 id="commands" class="z-title is-2 mt-2 mb-1">Commands</h2>
-        <div v-for="command in data.commands">
-          <h3 class="z-title is-3 mt-2 mb-1">!{{ command.trigger }}</h3>
+        <h2 id="commands">Commands</h2>
+        <div v-for="command in data.commands" class="mb-4">
+          <h3 class="text-xl">!{{ command.trigger }}</h3>
           <div v-if="command.config.extra.requiredPermission">
-            Permission: <code>{{ command.config.extra.requiredPermission }}</code>
+            Permission: <code class="inline-code">{{ command.config.extra.requiredPermission }}</code>
           </div>
           <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
-            Basic usage: <code>{{ command.config.extra.info.basicUsage }}</code>
+            Basic usage: <code class="inline-code">{{ command.config.extra.info.basicUsage }}</code>
           </div>
           <div v-if="command.config.aliases && command.config.aliases.length">
             Shortcut:
-            <code style="margin-right: 4px" v-for="alias in command.config.aliases">!{{ alias }}</code>
+            <code class="inline-code" style="margin-right: 4px" v-for="alias in command.config.aliases">!{{ alias }}</code>
           </div>
 
-          <MarkdownBlock v-if="command.config.info && command.config.info.description" :content="command.config.info.description" class="content mt-1 mb-1"></MarkdownBlock>
+          <MarkdownBlock v-if="command.config.info && command.config.info.description" :content="command.config.info.description" class="content mb-4"></MarkdownBlock>
 
-          <b-collapse :open="false" class="card mt-1 mb-1">
-            <div slot="trigger" slot-scope="props" class="card-header" role="button">
-              <p class="card-header-title">Additional information</p>
-              <a class="card-header-icon">
-                <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
-              </a>
-            </div>
-            <div class="card-content">
+          <Expandable class="mt-4">
+            <template v-slot:title>Additional information</template>
+            <template v-slot:content>
               Signatures:
-              <ul class="z-list z-ul">
+              <ul>
                 <li>
                   <code>
                     !{{ command.trigger }}
@@ -70,7 +63,7 @@
 
               <div class="mt-2" v-if="command.parameters.length">
                 Command arguments:
-                <ul class="z-list z-ul">
+                <ul>
                   <li v-for="param in command.parameters">
                     <code>{{ renderParameter(param) }}</code>
                     <router-link :to="'/docs/reference/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
@@ -95,8 +88,8 @@
                   </li>
                 </ul>
               </div>
-            </div>
-          </b-collapse>
+            </template>
+          </Expandable>
         </div>
       </div>
     </div>
@@ -104,26 +97,26 @@
     <!-- Configuration tab -->
     <div class="configuration" v-if="tab === 'configuration'">
       <!-- Basic config info -->
-      <p class="mb-1">
+      <p>
         Name in config: <code>{{ data.name }}</code>
       </p>
-      <p class="mt-1 mb-1">
+      <p>
         To enable this plugin with default configuration, add <code>{{ data.name }}: {}</code> to the <code>plugins</code> list in config
       </p>
 
       <!-- Configuration guide -->
       <div v-if="data.info.configurationGuide">
-        <h2 id="configuration-guide" class="z-title is-2 mt-2 mb-1">Configuration guide</h2>
+        <h2 id="configuration-guide">Configuration guide</h2>
         <MarkdownBlock :content="data.info.configurationGuide" class="content"></MarkdownBlock>
       </div>
 
       <!-- Default configuration -->
-      <h2 id="default-configuration" class="z-title is-2 mt-2 mb-1">Default configuration</h2>
+      <h2 id="default-configuration">Default configuration</h2>
       <CodeBlock lang="yaml">{{ renderConfiguration(data.defaultOptions) }}</CodeBlock>
 
       <!-- Config schema -->
-      <h2 id="config-schema" class="z-title is-2 mt-2 mb-1">Config schema</h2>
-      <b-collapse :open="false" class="card mt-1 mb-1">
+      <h2 id="config-schema">Config schema</h2>
+      <div :open="false" class="card mt-1 mb-1"> <!-- b-collapse -->
         <div slot="trigger" slot-scope="props" class="card-header" role="button">
           <p class="card-header-title">Click to expand</p>
           <a class="card-header-icon">
@@ -133,23 +126,27 @@
         <div class="card-content">
           <CodeBlock lang="plain">{{ data.configSchema }}</CodeBlock>
         </div>
-      </b-collapse>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
   import Vue from "vue";
   import {mapState} from "vuex";
   import yaml from "js-yaml";
-  import CodeBlock from "./CodeBlock";
-  import MarkdownBlock from "./MarkdownBlock";
+  import CodeBlock from "./CodeBlock.vue";
+  import MarkdownBlock from "./MarkdownBlock.vue";
+  import Tabs from "../Tabs.vue";
+  import Tab from "../Tab.vue";
+  import Expandable from "../Expandable.vue";
+  import { DocsState } from "../../store/types";
 
   const validTabs = ['usage', 'configuration'];
   const defaultTab = 'usage';
 
   export default {
-    components: { CodeBlock, MarkdownBlock },
+    components: { CodeBlock, MarkdownBlock, Tabs, Tab, Expandable },
 
     async mounted() {
       this.loading = true;
@@ -201,7 +198,7 @@
     },
     computed: {
       ...mapState("docs", {
-        data(state) {
+        data(state: DocsState) {
           return state.plugins[this.pluginName];
         },
         hasUsageInfo() {

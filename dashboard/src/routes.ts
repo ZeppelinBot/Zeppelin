@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Splash from "./components/Splash.vue";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
 
 Vue.use(VueRouter);
@@ -8,7 +7,6 @@ Vue.use(VueRouter);
 export const router = new VueRouter({
   mode: "history",
   routes: [
-    { path: "/", component: Splash },
     { path: "/login", beforeEnter: authRedirectGuard },
     { path: "/login-callback", beforeEnter: loginCallbackGuard },
 

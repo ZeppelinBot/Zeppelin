@@ -2,28 +2,20 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "esnext",
+    "target": "esnext",
     "sourceMap": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "esnext",
-    "strict": true,
+    "strict": false,
     "lib": [
-      "es2017",
       "esnext",
       "dom"
     ],
-    "baseUrl": "./",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "outDir": "./dist"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue"
-  ],
-  "files": [
-    "ts-vue-shim.d.ts"
-  ]
+    "allowJs": true
+  }
 }
