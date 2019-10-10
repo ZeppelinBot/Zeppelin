@@ -116,17 +116,12 @@
 
       <!-- Config schema -->
       <h2 id="config-schema">Config schema</h2>
-      <div :open="false" class="card mt-1 mb-1"> <!-- b-collapse -->
-        <div slot="trigger" slot-scope="props" class="card-header" role="button">
-          <p class="card-header-title">Click to expand</p>
-          <a class="card-header-icon">
-            <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
-          </a>
-        </div>
-        <div class="card-content">
+      <Expandable class="wide">
+        <template v-slot:title>Click to expand</template>
+        <template v-slot:content>
           <CodeBlock lang="plain">{{ data.configSchema }}</CodeBlock>
-        </div>
-      </div>
+        </template>
+      </Expandable>
     </div>
   </div>
 </template>

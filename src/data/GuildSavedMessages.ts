@@ -127,6 +127,14 @@ export class GuildSavedMessages extends BaseGuildRepository {
     return query.getMany();
   }
 
+  getMultiple(messageIds: string[]): Promise<SavedMessage[]> {
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("id IN (:messageIds)", { messageIds })
+      .getMany();
+  }
+
   async create(data) {
     const isPermanent = this.toBePermanent.has(data.id);
     if (isPermanent) {

@@ -77,40 +77,37 @@
       Note that the delay should always be written as 1 word, without spaces!
     </p>
 
-    <div :open="false" class="card mb-1"> <!-- b-collapse -->
-      <div slot="trigger" slot-scope="props" class="card-header" role="button">
-        <p class="card-header-title">Additional Information</p>
-        <a class="card-header-icon">
-          <b-icon :icon="props.open ? 'menu-down' : 'menu-up'"></b-icon>
-        </a>
-      </div>
-      <div class="card-content">
-        <div class="content">
-          Durations:
-          <ul>
-            <li>
-              <code>d</code> Day
-            </li>
-            <li>
-              <code>h</code> Hour
-            </li>
-            <li>
-              <code>m</code> Minute
-            </li>
-            <li>
-              <code>s</code> Seconds
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <Expandable>
+      <template v-slot:title>Additional information</template>
+      <template v-slot:content>
+        Durations:
+        <ul>
+          <li>
+            <code>d</code> Day
+          </li>
+          <li>
+            <code>h</code> Hour
+          </li>
+          <li>
+            <code>m</code> Minute
+          </li>
+          <li>
+            <code>s</code> Seconds
+          </li>
+        </ul>
+      </template>
+    </Expandable>
   </div>
 </template>
 
 <script>
-import CodeBlock from "./CodeBlock";
+  import CodeBlock from "./CodeBlock";
+  import Expandable from "../Expandable";
 
-export default {
-  components: { CodeBlock },
-};
+  export default {
+    components: {
+      CodeBlock,
+      Expandable,
+    },
+  };
 </script>
