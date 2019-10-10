@@ -59,4 +59,5 @@ export enum LogType {
 
   BOT_ALERT,
   AUTOMOD_ALERT,
+  AUTOMOD_ACTION,
 }

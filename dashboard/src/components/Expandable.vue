@@ -68,6 +68,10 @@
   code:not([class]) {
     @apply bg-gray-900;
   }
+
+  .codeblock {
+    box-shadow: none;
+  }
 </style>
 
 <script type="ts">

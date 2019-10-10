@@ -1,5 +1,7 @@
 import {
+  Attachment,
   Client,
+  Embed,
   EmbedOptions,
   Emoji,
   Guild,
@@ -23,6 +25,7 @@ const fsp = fs.promises;
 import https from "https";
 import tmp from "tmp";
 import { logger, waitForReaction } from "knub";
+import { SavedMessage } from "./data/entities/SavedMessage";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -771,4 +774,21 @@ export async function confirm(bot: Client, channel: TextableChannel, userId: str
   const reply = await waitForReaction(bot, msg, ["✅", "❌"], userId);
   msg.delete().catch(noop);
   return reply && reply.name === "✅";
+}
+
+export function messageSummary(msg: SavedMessage) {
+  // Regular text content
+  let result = "```" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
+
+  // Rich embed
+  const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
+  if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
+
+  // Attachments
+  if (msg.data.attachments) {
+    result +=
+      "Attachments:\n" + msg.data.attachments.map((a: Attachment) => disableLinkPreviews(a.url)).join("\n") + "\n";
+  }
+
+  return result;
 }

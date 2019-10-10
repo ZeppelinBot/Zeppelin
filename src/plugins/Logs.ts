@@ -8,6 +8,7 @@ import {
   disableCodeBlocks,
   disableLinkPreviews,
   findRelevantAuditLogEntry,
+  messageSummary,
   noop,
   stripObjectToScalars,
   UnknownUser,
@@ -205,22 +206,8 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
           return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
         },
         messageSummary: (msg: SavedMessage) => {
-          // Regular text content
-          let result = "```" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
-
-          // Rich embed
-          const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
-          if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
-
-          // Attachments
-          if (msg.data.attachments) {
-            result +=
-              "Attachments:\n" +
-              msg.data.attachments.map((a: Attachment) => disableLinkPreviews(a.url)).join("\n") +
-              "\n";
-          }
-
-          return result;
+          if (!msg) return "";
+          return messageSummary(msg);
         },
       };
 

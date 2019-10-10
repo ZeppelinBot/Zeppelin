@@ -58,5 +58,6 @@
   "POSTED_SCHEDULED_MESSAGE": "\uD83D\uDCE8 Posted scheduled message (`{messageId}`) to {channelMention(channel)} as scheduled by {userMention(author)}",
 
   "BOT_ALERT": "⚠ {tmplEval(body)}",
-  "AUTOMOD_ALERT": "{text}"
+  "AUTOMOD_ALERT": "{text}",
+  "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(user)}, actions taken: {actionsTaken}\n{matchSummary}"
 }
