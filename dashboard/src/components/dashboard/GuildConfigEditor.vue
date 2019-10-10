@@ -3,8 +3,6 @@
     Loading...
   </div>
   <div v-else>
-    <div v-if="saving" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">Saving...</div>
-    <div v-if="saved" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">Saved!</div>
     <div v-if="errors.length" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">
       <div class="font-semibold">Errors:</div>
       <div v-for="error in errors">{{ error }}</div>
@@ -12,10 +10,16 @@
 
     <div class="flex items-center">
       <h1 class="flex-auto">Config for {{ guild.name }}</h1>
-      <button class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700" v-on:click="save" :disabled="saving">Save</button>
+      <button v-if="!saving" class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700" v-on:click="save">
+        <span v-if="saved">Saved!</span>
+        <span v-else>Save</span>
+      </button>
+      <div v-if="saving" class="flex-none bg-gray-700 px-5 py-2 rounded">
+        Saving...
+      </div>
     </div>
 
-    <AceEditor class="rounded shadow-lg mt-4" v-model="editableConfig" @init="editorInit" lang="yaml" theme="tomorrow_night" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
+    <AceEditor class="rounded shadow-lg border border-gray-700 mt-4" v-model="editableConfig" @init="editorInit" lang="yaml" theme="tomorrow_night" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
   </div>
 </template>
 
@@ -73,6 +77,17 @@
           tabSize: 2
         });
 
+        this.$refs.aceEditor.editor.commands.addCommand({
+          name: 'save',
+          bindKey: {
+            win: "Ctrl-S",
+            mac: "Cmd-S"
+          },
+          exec: editor => {
+            this.save();
+          },
+        });
+
         this.fitEditorToWindow();
       },
       fitEditorToWindow() {
@@ -91,6 +106,8 @@
         });
       },
       async save() {
+        if (this.saving) return;
+
         this.saved = false;
         this.saving = true;
         this.errors = [];
@@ -99,11 +116,14 @@
           clearTimeout(this.savedTimeout);
         }
 
+        const minWaitTime = new Promise(resolve => setTimeout(resolve, 300));
+
         try {
           await this.$store.dispatch("guilds/saveConfig", {
             guildId: this.$route.params.guildId,
             config: this.editableConfig,
           });
+          await minWaitTime;
 
           this.saving = false;
           this.saved = true;
