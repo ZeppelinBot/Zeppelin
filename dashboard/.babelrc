@@ -1,8 +1,0 @@
-{
-  "plugins": [
-    ["transform-runtime", {
-      "regenerator": true
-    }],
-    "transform-object-rest-spread"
-  ]
-}

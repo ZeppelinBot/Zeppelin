@@ -117,7 +117,7 @@ export function initAuth(app: express.Express) {
       if (req.user && req.user.apiKey) {
         res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
       } else {
-        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?error=noaccess`);
+        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?error=noAccess`);
       }
     },
   );

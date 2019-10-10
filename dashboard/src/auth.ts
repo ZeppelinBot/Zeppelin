@@ -11,7 +11,7 @@ const isAuthenticated = async () => {
 
 export const authGuard: NavigationGuard = async (to, from, next) => {
   if (await isAuthenticated()) return next();
-  next("/");
+  window.location.href = `${process.env.API_URL}/auth/login`;
 };
 
 export const loginCallbackGuard: NavigationGuard = async (to, from, next) => {
@@ -19,12 +19,7 @@ export const loginCallbackGuard: NavigationGuard = async (to, from, next) => {
     await RootStore.dispatch("auth/setApiKey", to.query.apiKey);
     next("/dashboard");
   } else {
-    next({
-      path: "/",
-      query: {
-        error: "noaccess",
-      },
-    });
+    window.location.href = `/?error=noAccess`;
   }
 };
 

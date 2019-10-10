@@ -1,9 +1,78 @@
+@import "~buefy/dist/buefy.css";
+@import "~highlight.js/styles/ocean.css";
+
+$bulmaswatch-import-font: false;
 $family-primary: 'Open Sans', sans-serif;
+$list-background-color: transparent;
+
+$size-1: 2.5rem;
+$size-2: 2rem;
+$size-3: 1.5rem;
+$size-4: 1.25rem;
 
 @import "~bulmaswatch/superhero/_variables";
+
+$tabs-link-color: $grey-light;
+$tabs-link-active-color: $grey-lighter;
+$tabs-link-active-border-bottom-color: $grey-lighter;
+
 @import "~bulma/bulma";
 @import "~bulmaswatch/superhero/_overrides";
 
-.dashboard-cloak {
+
+.init-cloak {
   visibility: visible !important;
+}
+
+.z-title {
+  line-height: 1.125;
+
+  &.is-1 { font-size: $size-1; }
+  &.is-2 { font-size: $size-2; }
+  &.is-3 { font-size: $size-3; }
+  &.is-4 { font-size: $size-4; }
+  &.is-5 { font-size: $size-5; }
+  &.is-6 { font-size: $size-6; }
+}
+
+.z-list {
+  margin-left: 1.5rem;
+}
+
+.z-ul {
+  list-style: disc;
+}
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 1.5rem; }
+.mt-3 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 1.5rem; }
+.mb-3 { margin-bottom: 2rem; }
+
+.codeblock,
+.content .codeblock {
+  border-radius: 3px;
+  padding: 16px;
+  max-width: 970px; /* FIXME: temp fix for overflowing code blocks, look into properly later */
+}
+
+.codeblock .hljs {
+  background: transparent;
+  padding: 0;
+}
+
+.menu-label {
+  &:not(:first-child) {
+    margin-top: 1.4em;
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 0.4em;
+  }
+}
+
+.menu-list .router-link-active {
+  text-decoration: underline;
 }

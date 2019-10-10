@@ -20,6 +20,15 @@
   </div>
 </template>
 
+<style scoped>
+  .ace_editor {
+    box-shadow: 0 2px 16px -4px #0000009e;
+    border-radius: 8px;
+    border: 1px solid #181818;
+    margin: 16px 0;
+  }
+</style>
+
 <script>
   import {mapState} from "vuex";
   import {ApiError} from "../../api";

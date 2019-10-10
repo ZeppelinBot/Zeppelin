@@ -1,15 +1,17 @@
 <template>
   <div>
-    <h1 class="z-title is-1 mb-1">Configuration format</h1>
-    <p class="mb-1">
+    <h1>Configuration format</h1>
+    <p>
       This is the basic format of the bot configuration for a guild. The basic breakdown is:
     </p>
-    <ol class="z-list mb-1">
+
+    <ul>
       <li>Prefix (i.e. what character is preceding each command)</li>
       <li>Permission levels (see <router-link to="/docs/permissions">Permissions</router-link> for more info)</li>
       <li>Plugin-specific configuration (see <router-link to="/docs/plugin-configuration">Plugin configuration</router-link> for more info)</li>
-    </ol>
-    <CodeBlock lang="yaml" trim="4">
+    </ul>
+
+    <CodeBlock lang="yaml" trim="start">
       prefix: "!"
 
       # role id: level
@@ -33,8 +35,8 @@
   </div>
 </template>
 
-<script>
-  import CodeBlock from "./CodeBlock";
+<script lang="ts">
+  import CodeBlock from "./CodeBlock.vue";
 
   export default {
     components: { CodeBlock },
