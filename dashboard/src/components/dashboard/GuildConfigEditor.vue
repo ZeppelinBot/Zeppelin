@@ -3,31 +3,21 @@
     Loading...
   </div>
   <div v-else>
-    <h2 class="title is-1">Config for {{ guild.name }}</h2>
-    <AceEditor v-model="editableConfig" @init="editorInit" lang="yaml" theme="twilight" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
-
-    <div class="editor-footer">
-      <div class="actions">
-        <button class="button" v-on:click="save" :disabled="saving">Save</button>
-      </div>
-      <div class="status">
-        <div class="status-message" v-if="saving">Saving...</div>
-        <div class="status-message error" v-if="errors.length">
-          <div v-for="error in errors">{{ error }}</div>
-        </div>
-      </div>
+    <div v-if="saving" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">Saving...</div>
+    <div v-if="saved" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">Saved!</div>
+    <div v-if="errors.length" class="bg-gray-800 py-2 px-3 rounded shadow-md mb-4">
+      <div class="font-semibold">Errors:</div>
+      <div v-for="error in errors">{{ error }}</div>
     </div>
+
+    <div class="flex items-center">
+      <h1 class="flex-auto">Config for {{ guild.name }}</h1>
+      <button class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700" v-on:click="save" :disabled="saving">Save</button>
+    </div>
+
+    <AceEditor class="rounded shadow-lg mt-4" v-model="editableConfig" @init="editorInit" lang="yaml" theme="tomorrow_night" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
   </div>
 </template>
-
-<style scoped>
-  .ace_editor {
-    box-shadow: 0 2px 16px -4px #0000009e;
-    border-radius: 8px;
-    border: 1px solid #181818;
-    margin: 16px 0;
-  }
-</style>
 
 <script>
   import {mapState} from "vuex";
@@ -54,10 +44,12 @@
       return {
         loading: true,
         saving: false,
+        saved: false,
         editableConfig: null,
         errors: [],
         editorWidth: 900,
-        editorHeight: 600
+        editorHeight: 600,
+        savedTimeout: null
       };
     },
     computed: {
@@ -74,7 +66,7 @@
       editorInit() {
         require("brace/ext/language_tools");
         require("brace/mode/yaml");
-        require("brace/theme/twilight");
+        require("brace/theme/tomorrow_night");
 
         this.$refs.aceEditor.editor.setOptions({
           useSoftTabs: true,
@@ -87,7 +79,7 @@
         const editorElem = this.$refs.aceEditor.$el;
         const newWidth = editorElem.parentNode.clientWidth;
         const rect = editorElem.getBoundingClientRect();
-        const newHeight = window.innerHeight - rect.top - 100;
+        const newHeight = window.innerHeight - rect.top - 48;
         this.resizeEditor(newWidth, newHeight);
       },
       resizeEditor(newWidth, newHeight) {
@@ -99,14 +91,23 @@
         });
       },
       async save() {
+        this.saved = false;
         this.saving = true;
         this.errors = [];
+
+        if (this.savedTimeout) {
+          clearTimeout(this.savedTimeout);
+        }
 
         try {
           await this.$store.dispatch("guilds/saveConfig", {
             guildId: this.$route.params.guildId,
             config: this.editableConfig,
           });
+
+          this.saving = false;
+          this.saved = true;
+          this.savedTimeout = setTimeout(() => this.saved = false, 3000);
         } catch (e) {
           if (e instanceof ApiError && (e.status === 400 || e.status === 422)) {
             this.errors = e.body.errors || ['Error while saving config'];
@@ -116,8 +117,6 @@
 
           throw e;
         }
-
-        this.$router.push("/dashboard");
       },
     },
   };

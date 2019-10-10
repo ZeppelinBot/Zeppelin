@@ -1,46 +1,44 @@
 <template>
-	<div class="dashboard dashboard-cloak">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="container">
-        <div class="navbar-brand">
-          <div class="navbar-item">
-            <img class="dashboard-logo" src="../../img/logo.png" alt="" aria-hidden="true">
-            <h1 class="dashboard-title">Zeppelin Dashboard</h1>
-          </div>
-        </div>
+	<div class="dashboard container mx-auto px-4 py-2">
+    <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl mb-8">
+      <div class="flex-initial flex items-center">
+        <img class="flex-auto w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
 
-        <div class="navbar-menu is-active">
-          <div class="navbar-start">
-            <router-link to="/dashboard" class="navbar-item">Guilds</router-link>
-            <a href="/docs" class="navbar-item">Documentation</a>
-          </div>
-          <div class="navbar-end">
-            <a href="javascript:void(0)" class="navbar-item" v-on:click="logout()">Log out</a>
-          </div>
-        </div>
+        <router-link to="/dashboard">
+          <h1 class="flex-auto font-semibold">Zeppelin Dashboard</h1>
+        </router-link>
+
+        <ul class="dashboard-nav list-none flex ml-8">
+          <router-link class="flex-auto mr-4" to="/dashboard">Guilds</router-link>
+          <a href="javascript:void(0)" class="navbar-item" v-on:click="logout()">Log out</a>
+        </ul>
+      </div>
+
+      <div class="flex-1 flex items-center justify-end">
+        <router-link
+          to="/docs"
+          role="menuitem"
+          class="py-1 px-2 rounded hover:bg-gray-700">
+          Go to documentation
+        </router-link>
       </div>
     </nav>
 
-    <div class="section">
-      <div class="container">
-        <router-view></router-view>
-      </div>
+    <div class="main-content">
+      <router-view></router-view>
     </div>
 	</div>
 </template>
 
 <style scoped>
-  .dashboard-cloak {
-    /* Replaced by "visible" in dashboard.scss */
-    visibility: hidden;
+  .dashboard-nav a {
+    &:hover {
+      @apply underline;
+    }
   }
 
-  .dashboard-logo {
-    margin-right: 12px;
-  }
-
-  .dashboard-title {
-    font-weight: 600;
+  .dashboard-nav .router-link-exact-active {
+    @apply underline;
   }
 </style>
 
@@ -51,7 +49,7 @@
     methods: {
       async logout() {
         await this.$store.dispatch("auth/logout");
-        this.$router.push('/');
+        window.location.pathname = '/';
       }
     },
   };

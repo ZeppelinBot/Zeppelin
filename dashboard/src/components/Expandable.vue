@@ -13,6 +13,8 @@
 </template>
 
 <style scoped>
+  @import "../style/components.pcss";
+
   :root {
     --animation-time: 400ms;
     --target-height: auto;
@@ -60,6 +62,11 @@
 
   .closing {
     animation: close var(--animation-time) ease-in-out;
+  }
+
+  .inline-code,
+  code:not([class]) {
+    @apply bg-gray-900;
   }
 </style>
 

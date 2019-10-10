@@ -46,7 +46,7 @@
             <code class="inline-code" style="margin-right: 4px" v-for="alias in command.config.aliases">!{{ alias }}</code>
           </div>
 
-          <MarkdownBlock v-if="command.config.info && command.config.info.description" :content="command.config.info.description" class="content mb-4"></MarkdownBlock>
+          <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description" :content="command.config.extra.info.description" class="content"></MarkdownBlock>
 
           <Expandable class="mt-4">
             <template v-slot:title>Additional information</template>
@@ -54,7 +54,7 @@
               Signatures:
               <ul>
                 <li>
-                  <code>
+                  <code class="inline-code bg-gray-900">
                     !{{ command.trigger }}
                     <span v-for="param in command.parameters">{{ renderParameter(param) }} </span>
                   </code>
@@ -77,7 +77,7 @@
 
               <div class="mt-2" v-if="command.config.options && command.config.options.length">
                 Options:
-                <ul class="z-list z-ul">
+                <ul>
                   <li v-for="opt in command.config.options">
                     <code>{{ renderOption(opt) }}</code>
                     <router-link :to="'/docs/reference/argument-types#' + (opt.type || 'string')">{{ opt.type || 'string' }}</router-link>

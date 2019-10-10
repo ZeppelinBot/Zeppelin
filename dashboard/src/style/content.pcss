@@ -1,0 +1,45 @@
+.main-content {
+  & h1 {
+    @apply text-5xl;
+    @apply font-semibold;
+    @apply leading-none;
+    @apply mb-4;
+  }
+
+  & h2 {
+    @apply text-2xl;
+    @apply font-semibold;
+    @apply mt-2;
+    @apply mb-1;
+  }
+
+  & h3 {
+    @apply font-semibold;
+    @apply mb-1;
+  }
+
+  & p {
+    @apply mb-4;
+  }
+
+  & a:not([class]) {
+    @apply link;
+  }
+
+  & ul:not([class]) {
+    @apply list-disc;
+    @apply mb-4;
+
+    & li {
+      @apply ml-6;
+    }
+  }
+
+  & code:not([class]) {
+    @apply inline-code;
+  }
+
+  & .expandable {
+    max-width: 600px;
+  }
+}
