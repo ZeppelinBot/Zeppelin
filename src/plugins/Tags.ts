@@ -1,6 +1,6 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
-import { Message, TextChannel } from "eris";
-import { errorMessage, successMessage, stripObjectToScalars } from "../utils";
+import { Member, Message, TextChannel } from "eris";
+import { errorMessage, successMessage, stripObjectToScalars, tNullable } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
@@ -11,10 +11,22 @@ import { parseTemplate, renderTemplate, TemplateParseError } from "../templateFo
 import { GuildArchives } from "../data/GuildArchives";
 import * as t from "io-ts";
 import { parseArguments } from "knub-command-manager";
+import escapeStringRegexp from "escape-string-regexp";
+
+const TagCategory = t.type({
+  prefix: tNullable(t.string),
+  delete_with_command: tNullable(t.boolean),
+
+  tags: t.record(t.string, t.string),
+
+  can_use: tNullable(t.boolean),
+});
 
 const ConfigSchema = t.type({
   prefix: t.string,
   delete_with_command: t.boolean,
+
+  categories: t.record(t.string, TagCategory),
 
   can_create: t.boolean,
   can_use: t.boolean,
@@ -45,8 +57,10 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         prefix: "!!",
         delete_with_command: true,
 
+        categories: {},
+
         can_create: false,
-        can_use: true,
+        can_use: false,
         can_list: false,
       },
 
@@ -54,6 +68,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         {
           level: ">=50",
           config: {
+            can_use: true,
             can_create: true,
             can_list: true,
           },
@@ -211,54 +226,107 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     return renderTemplate(body, data);
   }
 
-  async onMessageCreate(msg: SavedMessage) {
-    if (msg.is_bot) return;
-
-    const member = await this.getMember(msg.user_id);
-    if (!member || !this.hasPermission("can_use", { member, channelId: msg.channel_id })) return;
-
-    if (!msg.data.content) return;
-    if (msg.is_bot) return;
-
-    const prefix = this.getConfigForMemberIdAndChannelId(msg.user_id, msg.channel_id).prefix;
-    if (!msg.data.content.startsWith(prefix)) return;
-
-    const tagNameMatch = msg.data.content.slice(prefix.length).match(/^\S+/);
-    if (tagNameMatch === null) return;
-
-    const tagName = tagNameMatch[0];
-    const tag = await this.tags.find(tagName);
-    if (!tag) return;
-
-    let body = tag.body;
-
-    // Substitute variables (matched with Knub's argument parser -> supports quotes etc.)
-    const variableStr = msg.data.content.slice(prefix.length + tagName.length).trim();
+  async renderSafeTagFromMessage(
+    str: string,
+    prefix: string,
+    tagName: string,
+    tagBody: string,
+    member: Member,
+  ): Promise<string | null> {
+    const variableStr = str.slice(prefix.length + tagName.length).trim();
     const tagArgs = parseArguments(variableStr).map(v => v.value);
 
     // Format the string
     try {
-      body = await this.renderTag(body, tagArgs, {
+      let rendered = await this.renderTag(tagBody, tagArgs, {
         member: stripObjectToScalars(member, ["user"]),
         user: stripObjectToScalars(member.user),
       });
+      rendered = rendered.trim();
+
+      if (rendered === "") return;
+      if (rendered.length > 2000) return;
+
+      return rendered;
     } catch (e) {
       if (e instanceof TemplateParseError) {
-        logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tag.body}`);
-        return;
+        logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tagBody}`);
+        return null;
       } else {
         throw e;
       }
     }
+  }
 
-    if (body.trim() === "") return;
-    if (body.length > 2000) return;
+  async onMessageCreate(msg: SavedMessage) {
+    if (msg.is_bot) return;
+    if (!msg.data.content) return;
+
+    const member = await this.getMember(msg.user_id);
+    if (!member) return;
+
+    const config = this.getConfigForMemberIdAndChannelId(msg.user_id, msg.channel_id);
+    let deleteWithCommand = false;
+
+    // Find potential matching tag, looping through categories first and checking dynamic tags last
+    let renderedTag = null;
+
+    for (const [name, category] of Object.entries(config.categories)) {
+      const canUse = category.can_use != null ? category.can_use : config.can_use;
+      if (canUse !== true) continue;
+
+      const prefix = category.prefix != null ? category.prefix : config.prefix;
+      if (prefix !== "" && !msg.data.content.startsWith(prefix)) continue;
+
+      const withoutPrefix = msg.data.content.slice(prefix.length);
+      for (const [tagName, tagBody] of Object.entries(category.tags)) {
+        const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\s|$)`);
+        if (regex.test(withoutPrefix)) {
+          renderedTag = await this.renderSafeTagFromMessage(
+            msg.data.content,
+            prefix,
+            tagName,
+            category.tags[tagName],
+            member,
+          );
+          if (renderedTag) break;
+        }
+      }
+
+      if (renderedTag) {
+        deleteWithCommand =
+          category.delete_with_command != null ? category.delete_with_command : config.delete_with_command;
+
+        break;
+      }
+    }
+
+    // Matching tag was not found from the config, try a dynamic tag
+    if (!renderedTag) {
+      if (config.can_use !== true) return;
+
+      const prefix = config.prefix;
+      if (!msg.data.content.startsWith(prefix)) return;
+
+      const tagNameMatch = msg.data.content.slice(prefix.length).match(/^\S+/);
+      if (tagNameMatch === null) return;
+
+      const tagName = tagNameMatch[0];
+      const tag = await this.tags.find(tagName);
+      if (!tag) return;
+
+      renderedTag = await this.renderSafeTagFromMessage(msg.data.content, prefix, tagName, tag.body, member);
+    }
+
+    if (!renderedTag) return;
+
+    deleteWithCommand = config.delete_with_command;
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
-    const responseMsg = await channel.createMessage(body);
+    const responseMsg = await channel.createMessage(renderedTag);
 
     // Save the command-response message pair once the message is in our database
-    if (this.getConfigForMemberIdAndChannelId(msg.user_id, msg.channel_id).delete_with_command) {
+    if (deleteWithCommand) {
       this.savedMessages.onceMessageAvailable(responseMsg.id, async () => {
         await this.tags.addResponse(msg.id, responseMsg.id);
       });
