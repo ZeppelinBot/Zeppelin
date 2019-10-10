@@ -8,7 +8,7 @@
       <li v-for="guild in guilds" class="flex-none m-4 w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
         <div class="flex items-center">
           <div class="flex-none">
-            <img v-if="guild.icon" class="guild-logo" :src="guild.icon" :alt="'Logo for guild ' + guild.name">
+            <img v-if="guild.icon" class="rounded-full w-12" :src="guild.icon" :alt="'Logo for guild ' + guild.name">
           </div>
           <div class="flex-auto ml-3">
             <div>
@@ -26,26 +26,6 @@
     </ul>
 	</div>
 </template>
-
-<style scoped>
-  .table td {
-    vertical-align: middle;
-  }
-
-  .guild-logo {
-    display: block;
-    width: 42px;
-    border-radius: 50%;
-  }
-
-  .guild-name {
-    font-weight: 600;
-  }
-
-  .guild-id {
-    color: hsla(220, 100%, 95%, 0.6);
-  }
-</style>
 
 <script>
   import {mapState} from "vuex";

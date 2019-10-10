@@ -10,7 +10,7 @@
 
         <ul class="dashboard-nav list-none flex ml-8">
           <router-link class="flex-auto mr-4" to="/dashboard">Guilds</router-link>
-          <a href="javascript:void(0)" class="navbar-item" v-on:click="logout()">Log out</a>
+          <a href="javascript:void(0)" class="navbar-item hover:text-red-400" v-on:click="logout()">Log out</a>
         </ul>
       </div>
 

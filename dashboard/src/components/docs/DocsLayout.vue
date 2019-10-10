@@ -21,7 +21,7 @@
 
     <!-- WIP bar -->
     <div class="mt-6 px-3 py-2 rounded bg-gray-800 shadow-md">
-      <i class="mdi mdi-alert mr-1" title="Note"></i>
+      <alert class="mr-1 text-yellow-300" />
       This documentation is a work in progress.
     </div>
 
@@ -50,6 +50,7 @@
 <script lang="ts">
   import Vue from "vue";
   import {mapState} from "vuex";
+  import Alert from 'vue-material-design-icons/Alert.vue';
 
   type TMenuItem = {
     to: string;
@@ -110,6 +111,7 @@
   ];
 
   export default {
+    components: { Alert },
     async mounted() {
       await this.$store.dispatch("docs/loadAllPlugins");
     },
