@@ -2,14 +2,14 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { decorators as d, IPluginOptions } from "knub";
 import { Member, TextChannel } from "eris";
 import { renderTemplate } from "../templateFormatter";
-import { createChunkedMessage, stripObjectToScalars } from "../utils";
+import { createChunkedMessage, stripObjectToScalars, tNullable } from "../utils";
 import { LogType } from "../data/LogType";
 import { GuildLogs } from "../data/GuildLogs";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
   send_dm: t.boolean,
-  send_to_channel: t.string,
+  send_to_channel: tNullable(t.string),
   message: t.string,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

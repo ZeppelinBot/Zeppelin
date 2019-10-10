@@ -98,9 +98,7 @@
     <div class="configuration" v-if="tab === 'configuration'">
       <!-- Basic config info -->
       <p>
-        Name in config: <code>{{ data.name }}</code>
-      </p>
-      <p>
+        <strong>Name in config:</strong> <code>{{ data.name }}</code><br>
         To enable this plugin with default configuration, add <code>{{ data.name }}: {}</code> to the <code>plugins</code> list in config
       </p>
 
