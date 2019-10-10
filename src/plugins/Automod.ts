@@ -353,7 +353,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginInfo: PluginInfo = {
     prettyName: "Automod",
     description: trimPluginDescription(`
-      This plugin allows you to specify automated actions in response to triggers. Example use cases include word filtering and spam prevention.
+      Allows specifying automated actions in response to triggers. Example use cases include word filtering and spam prevention.
     `),
     configurationGuide: trimPluginDescription(`
       The automod plugin is very customizable. For a full list of available triggers, actions, and their options, see Config schema at the bottom of this page.    
