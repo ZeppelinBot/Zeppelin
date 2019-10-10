@@ -1,5 +1,5 @@
 <template>
-  <div ref="rendered"></div>
+  <div class="markdown-block" ref="rendered"></div>
 </template>
 
 <script>
