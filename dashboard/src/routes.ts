@@ -65,8 +65,16 @@ export const router = new VueRouter({
           component: () => import("./components/dashboard/GuildList.vue"),
         },
         {
+          path: "guilds/:guildId/info",
+          component: () => import("./components/dashboard/GuildInfo.vue"),
+        },
+        {
           path: "guilds/:guildId/config",
           component: () => import("./components/dashboard/GuildConfigEditor.vue"),
+        },
+        {
+          path: "guilds/:guildId/access",
+          component: () => import("./components/dashboard/GuildAccess.vue"),
         },
       ],
     },
