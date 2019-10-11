@@ -329,7 +329,16 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("mutes", [], {
-    options: [{ name: "age", type: "delay" }, { name: "left", type: "boolean" }],
+    options: [
+      {
+        name: "age",
+        type: "delay",
+      },
+      {
+        name: "left",
+        flag: true,
+      },
+    ],
   })
   @d.permission("can_view_list")
   protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
