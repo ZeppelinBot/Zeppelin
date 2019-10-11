@@ -13,6 +13,7 @@ import {
   SECONDS,
   stripObjectToScalars,
   tNullable,
+  verboseChannelMention,
 } from "../utils";
 import { decorators as d } from "knub";
 import { mergeConfig } from "knub/dist/configUtils";
@@ -1025,10 +1026,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
       const baseUrl = this.knub.getGlobalConfig().url;
       const archiveUrl = this.archives.getUrl(baseUrl, archiveId);
-      matchSummary = `Deleted messages: <${archiveUrl}>`;
+      matchSummary = `Matched messages: <${archiveUrl}>`;
     } else if (matchedMessageIds.length === 1) {
       const message = await this.savedMessages.find(matchedMessageIds[0]);
-      matchSummary = `Deleted message:\n${messageSummary(message)}`;
+      const channel = this.guild.channels.get(message.channel_id);
+      const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
+      matchSummary = `Matched message in ${channelMention} (originally posted at **${
+        message.posted_at
+      }**):\n${messageSummary(message)}`;
     }
 
     if (matchResult.type === "username") {

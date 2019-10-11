@@ -13,6 +13,9 @@ import {
   stripObjectToScalars,
   UnknownUser,
   useMediaUrls,
+  verboseChannelMention,
+  verboseUserMention,
+  verboseUserName,
 } from "../utils";
 import DefaultLogMessages from "../data/DefaultLogMessages.json";
 import moment from "moment-timezone";
@@ -193,17 +196,11 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
           const memberConfig = this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
 
-          if (memberConfig.ping_user) {
-            // Ping/mention the user
-            return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
-          } else {
-            // No ping/mention
-            return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
-          }
+          return memberConfig.ping_user ? verboseUserMention(user) : verboseUserName(user);
         },
         channelMention: channel => {
           if (!channel) return "";
-          return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+          return verboseChannelMention(channel);
         },
         messageSummary: (msg: SavedMessage) => {
           if (!msg) return "";
