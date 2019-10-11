@@ -607,6 +607,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       {
         modId: mod.id,
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
+        reason,
       },
       msg.channel as TextChannel,
     );
@@ -670,7 +671,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       userId: member.id,
       modId: caseArgs.modId,
       type: CaseTypes.Warn,
-      reason: warnMessage,
+      reason: caseArgs.reason || warnMessage,
       noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
     });
 
