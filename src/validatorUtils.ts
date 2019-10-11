@@ -12,6 +12,7 @@ const regexWithFlags = /^\/(.*?)\/([i]*)$/;
  * The value is then checked for "catastrophic exponential-time regular expressions" by
  * https://www.npmjs.com/package/safe-regex
  */
+const safeRegexAllowedFlags = ["i"];
 export const TSafeRegex = new t.Type<RegExp, string>(
   "TSafeRegex",
   (s): s is RegExp => s instanceof RegExp,
@@ -19,7 +20,11 @@ export const TSafeRegex = new t.Type<RegExp, string>(
     either.chain(t.string.validate(from, to), s => {
       const advancedSyntaxMatch = s.match(regexWithFlags);
       const [regexStr, flags] = advancedSyntaxMatch ? [advancedSyntaxMatch[1], advancedSyntaxMatch[2]] : [s, ""];
-      return safeRegex(regexStr) ? t.success(new RegExp(regexStr, flags)) : t.failure(from, to, "Unsafe regex");
+      const finalFlags = flags
+        .split("")
+        .filter(flag => safeRegexAllowedFlags.includes(flag))
+        .join("");
+      return safeRegex(regexStr) ? t.success(new RegExp(regexStr, finalFlags)) : t.failure(from, to, "Unsafe regex");
     }),
   s => `/${s.source}/${s.flags}`,
 );
