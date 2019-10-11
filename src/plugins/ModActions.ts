@@ -141,9 +141,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         message_on_kick: false,
         message_on_ban: false,
         message_channel: null,
-        warn_message: "You have received a warning on {guildName}: {reason}",
-        kick_message: "You have been kicked from {guildName}. Reason given: {reason}",
-        ban_message: "You have been banned from {guildName}. Reason given: {reason}",
+        warn_message: "You have received a warning on the {guildName} server: {reason}",
+        kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",
+        ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
 
