@@ -38,7 +38,7 @@ const LogChannel = t.partial({
   batched: t.boolean,
   batch_time: t.number,
   excluded_users: t.array(t.string),
-  excluded_message_regex: t.array(TSafeRegex),
+  excluded_message_regexes: t.array(TSafeRegex),
 });
 type TLogChannel = t.TypeOf<typeof LogChannel>;
 
@@ -150,16 +150,16 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
           }
         }
 
-        if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regex && data.message.data.content) {
-          for (const regex of opts.excluded_message_regex) {
+        if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regexes && data.message.data.content) {
+          for (const regex of opts.excluded_message_regexes) {
             if (regex.test(data.message.data.content)) {
               return;
             }
           }
         }
 
-        if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regex && data.before.data.content) {
-          for (const regex of opts.excluded_message_regex) {
+        if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regexes && data.before.data.content) {
+          for (const regex of opts.excluded_message_regexes) {
             if (regex.test(data.before.data.content)) {
               return;
             }
