@@ -479,6 +479,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
     });
+
+    return {
+      status: "success",
+      case: createdCase,
+      notifyResult,
+    };
   }
 
   @d.command("update", "<caseNumber:number> [note:string$]", {
