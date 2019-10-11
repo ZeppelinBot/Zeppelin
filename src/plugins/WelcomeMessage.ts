@@ -53,7 +53,7 @@ export class WelcomeMessagePlugin extends ZeppelinPlugin<TConfigSchema> {
       if (!dmChannel) return;
 
       try {
-        createChunkedMessage(dmChannel, formatted);
+        await createChunkedMessage(dmChannel, formatted);
       } catch (e) {
         this.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome DM to {userMention(member)}`,
@@ -67,7 +67,7 @@ export class WelcomeMessagePlugin extends ZeppelinPlugin<TConfigSchema> {
       if (!channel || !(channel instanceof TextChannel)) return;
 
       try {
-        createChunkedMessage(channel, formatted);
+        await createChunkedMessage(channel, formatted);
       } catch (e) {
         this.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome message for {userMention(member)} to {channelMention(channel)}`,
