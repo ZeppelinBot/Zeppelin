@@ -217,6 +217,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (tagFnCalls++ > maxTagFnCalls) return "\\_recursion\\_";
         if (typeof name !== "string") return "";
         if (name === "") return "";
+        // TODO: Incorporate tag categories here
         const subTag = await this.tags.find(name);
         if (!subTag) return "";
         return renderTemplate(subTag.body, { ...data, args: subTagArgs });
