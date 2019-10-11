@@ -7,6 +7,7 @@ import {
   Guild,
   GuildAuditLog,
   GuildAuditLogEntry,
+  GuildChannel,
   Member,
   MessageContent,
   TextableChannel,
@@ -791,4 +792,16 @@ export function messageSummary(msg: SavedMessage) {
   }
 
   return result;
+}
+
+export function verboseUserMention(user: User | UnknownUser): string {
+  return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
+}
+
+export function verboseUserName(user: User | UnknownUser): string {
+  return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
+}
+
+export function verboseChannelMention(channel: GuildChannel): string {
+  return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
 }
