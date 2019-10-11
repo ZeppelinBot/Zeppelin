@@ -30,6 +30,7 @@ import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
+import { TSafeRegex } from "../validatorUtils";
 
 const LogChannel = t.partial({
   include: t.array(t.string),
@@ -37,6 +38,7 @@ const LogChannel = t.partial({
   batched: t.boolean,
   batch_time: t.number,
   excluded_users: t.array(t.string),
+  excluded_message_regex: t.array(TSafeRegex),
 });
 type TLogChannel = t.TypeOf<typeof LogChannel>;
 
@@ -144,6 +146,22 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
           for (const prop of this.excludedUserProps) {
             if (data && data[prop] && opts.excluded_users.includes(data[prop].id)) {
               continue logChannelLoop;
+            }
+          }
+        }
+
+        if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regex && data.message.data.content) {
+          for (const regex of opts.excluded_message_regex) {
+            if (regex.test(data.message.data.content)) {
+              return;
+            }
+          }
+        }
+
+        if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regex && data.before.data.content) {
+          for (const regex of opts.excluded_message_regex) {
+            if (regex.test(data.before.data.content)) {
+              return;
             }
           }
         }
