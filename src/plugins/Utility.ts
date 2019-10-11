@@ -370,13 +370,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
       {
         name: "case-sensitive",
-        type: "boolean",
         shortcut: "cs",
+        flag: true,
       },
       {
         name: "export",
-        type: "boolean",
         shortcut: "e",
+        flag: true,
       },
     ],
   })
