@@ -78,3 +78,5 @@ desktop.ini
 /convert.js
 /startscript.js
 /.cache
+/npm-ls.txt
+/npm-audit.txt
