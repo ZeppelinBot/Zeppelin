@@ -13,11 +13,12 @@ import {
   SECONDS,
   stripObjectToScalars,
   tNullable,
+  UnknownUser,
   verboseChannelMention,
 } from "../utils";
 import { decorators as d } from "knub";
 import { mergeConfig } from "knub/dist/configUtils";
-import { Invite, Member, Message } from "eris";
+import { Invite, Member, Message, TextChannel } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { SimpleCache } from "../SimpleCache";
 import { Queue } from "../Queue";
@@ -32,6 +33,7 @@ import { GuildArchives } from "../data/GuildArchives";
 import { GuildLogs } from "../data/GuildLogs";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
+import { renderTemplate } from "../templateFormatter";
 
 type MessageInfo = { channelId: string; messageId: string };
 
@@ -81,7 +83,7 @@ interface RaidSpamTriggerMatchResult extends TriggerMatchResult {
 interface OtherSpamTriggerMatchResult extends TriggerMatchResult {
   type: "otherspam";
   actionType: RecentActionType;
-  userIds: string[];
+  userId: string;
 }
 
 type AnyTriggerMatchResult =
@@ -233,12 +235,15 @@ const BanAction = t.type({
 });
 
 const AlertAction = t.type({
+  channel: t.string,
   text: t.string,
 });
 
 const ChangeNicknameAction = t.type({
   name: t.string,
 });
+
+const LogAction = t.boolean;
 
 /**
  * FULL CONFIG SCHEMA
@@ -273,6 +278,7 @@ const Rule = t.type({
     ban: tNullable(BanAction),
     alert: tNullable(AlertAction),
     change_nickname: tNullable(ChangeNicknameAction),
+    log: tNullable(LogAction),
   }),
 });
 type TRule = t.TypeOf<typeof Rule>;
@@ -485,6 +491,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
                 trigger[defaultTriggerName] = mergeConfig({}, defaultTrigger, trigger[defaultTriggerName]);
               }
             }
+          }
+        }
+
+        // Enable logging of automod actions by default
+        if (rule["actions"] && typeof rule["actions"] === "object") {
+          if (rule["actions"]["log"] == null) {
+            rule["actions"]["log"] = true;
           }
         }
       }
@@ -1153,10 +1166,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     if (rule.actions.change_nickname) {
-      const userIdsToChange =
-        matchResult.type === "raidspam" || matchResult.type === "otherspam"
-          ? matchResult.userIds
-          : [matchResult.userId];
+      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
 
       for (const userId of userIdsToChange) {
         if (this.recentNicknameChanges.has(userId)) continue;
@@ -1175,30 +1185,45 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       actionsTaken.push("nickname");
     }
 
-    if (rule.actions.alert || matchResult.type !== "raidspam") {
-      const user = await this.resolveUser((matchResult as any).userId || "0");
+    // Don't wait for the rest before continuing to other automod items in the queue
+    (async () => {
+      const user = matchResult.type !== "raidspam" ? this.getUser(matchResult.userId) : new UnknownUser();
+      const users = matchResult.type === "raidspam" ? matchResult.userIds.map(id => this.getUser(id)) : [];
+      const safeUser = stripObjectToScalars(user);
+      const safeUsers = users.map(u => stripObjectToScalars(u));
 
       if (rule.actions.alert) {
-        const text = rule.actions.alert.text;
-        this.getLogs().log(LogType.AUTOMOD_ALERT, {
-          rule: rule.name,
-          user: stripObjectToScalars(user),
-          text,
-          matchSummary,
-        });
-
-        actionsTaken.push("alert");
+        const channel = this.guild.channels.get(rule.actions.alert.channel);
+        if (channel && channel instanceof TextChannel) {
+          const text = rule.actions.alert.text;
+          const rendered = await renderTemplate(rule.actions.alert.text, {
+            rule: rule.name,
+            user: safeUser,
+            users: safeUsers,
+            text,
+            matchSummary,
+          });
+          channel.createMessage(rendered);
+          actionsTaken.push("alert");
+        } else {
+          this.getLogs().log(LogType.BOT_ALERT, {
+            body: `Invalid channel id \`${rule.actions.alert.channel}\` for alert action in automod rule **${
+              rule.name
+            }**`,
+          });
+        }
       }
 
-      if (matchResult.type !== "raidspam") {
+      if (rule.actions.log) {
         this.getLogs().log(LogType.AUTOMOD_ACTION, {
           rule: rule.name,
-          user: stripObjectToScalars(user),
+          user: safeUser,
+          users: safeUsers,
           actionsTaken: actionsTaken.length ? actionsTaken.join(", ") : "<none>",
           matchSummary,
         });
       }
-    }
+    })();
   }
 
   protected onMessageCreate(msg: SavedMessage) {

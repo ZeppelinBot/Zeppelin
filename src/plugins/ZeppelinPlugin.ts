@@ -204,6 +204,11 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     return this.getMergedOptions();
   }
 
+  getUser(userResolvable: string): User | UnknownUser {
+    const id = resolveUserId(this.bot, userResolvable);
+    return id ? this.bot.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+  }
+
   /**
    * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
    * If the user is not found in the cache, it's fetched from the API.
