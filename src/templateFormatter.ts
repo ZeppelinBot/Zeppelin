@@ -123,7 +123,7 @@ export function parseTemplate(str: string): ParsedTemplate {
             // We're parsing a number argument
             // The actual validation of whether this is a number is in dumpArg()
             currentVar._state.currentArg += char;
-          } else if (char === " ") {
+          } else if (/\s/.test(char)) {
             // Whitespace, ignore
             continue;
           } else if (char === '"') {
@@ -317,7 +317,7 @@ const baseValues = {
       [from, to] = [to, from];
     }
 
-    let randValue = seed != null ? new seedrandom(seed)() : Math.random();
+    const randValue = seed != null ? new seedrandom(seed)() : Math.random();
 
     return Math.round(randValue * (to - from) + from);
   },
