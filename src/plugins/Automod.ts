@@ -418,9 +418,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
                   within: 10s
               actions:
                 clean: true
-                mute:
-                  duration: 5m
-                  reason: 'Auto-muted for spam'
         overrides:
         - level: '>=50'
           config:
