@@ -545,7 +545,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("clean", "<count:number>", {
-    aliases: ["clean"],
     options: [
       {
         name: "user",
