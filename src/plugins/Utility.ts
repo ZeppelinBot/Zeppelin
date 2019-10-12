@@ -23,8 +23,10 @@ import {
   channelMentionRegex,
   chunkArray,
   createChunkedMessage,
+  DAYS,
   embedPadding,
   errorMessage,
+  getInviteCodesInString,
   isSnowflake,
   MINUTES,
   multiSorter,
@@ -74,7 +76,8 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 const { performance } = require("perf_hooks");
 
 const SEARCH_RESULTS_PER_PAGE = 15;
-const MAX_CLEAN_COUNT = 50;
+const MAX_CLEAN_COUNT = 150;
+const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
 
@@ -542,69 +545,72 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("clean", "<count:number>", {
-    aliases: ["clean all"],
+    aliases: ["clean"],
+    options: [
+      {
+        name: "user",
+        type: "userId",
+        shortcut: "u",
+      },
+      {
+        name: "bots",
+        flag: true,
+        shortcut: "b",
+      },
+      {
+        name: "has-invite",
+        flag: true,
+        shortcut: "i",
+      },
+    ],
   })
   @d.permission("can_clean")
-  async cleanAllCmd(msg: Message, args: { count: number }) {
+  async cleanAllCmd(
+    msg: Message,
+    args: { count: number; user?: string; bots?: boolean; "has-invite"?: boolean; fresh?: boolean },
+  ) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
       msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
       return;
     }
 
-    const messagesToClean = await this.savedMessages.getLatestByChannelBeforeId(msg.channel.id, msg.id, args.count);
+    const messagesToClean = [];
+    let beforeId = msg.id;
+    const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
+
+    while (messagesToClean.length < args.count) {
+      const potentialMessagesToClean = await this.savedMessages.getLatestByChannelBeforeId(
+        msg.channel.id,
+        beforeId,
+        args.count,
+      );
+      if (potentialMessagesToClean.length === 0) break;
+
+      const filtered = potentialMessagesToClean.filter(message => {
+        if (args.user && message.user_id !== args.user) return false;
+        if (args.bots && !message.is_bot) return false;
+        if (args["has-invite"] && getInviteCodesInString(message.data.content || "").length === 0) return false;
+        if (moment.utc(message.posted_at).valueOf() < timeCutoff) return false;
+        return true;
+      });
+
+      messagesToClean.push(...filtered);
+      beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
+
+      if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff)
+        break;
+    }
+
+    let responseMsg: Message;
     if (messagesToClean.length > 0) {
       await this.cleanMessages(msg.channel, messagesToClean, msg.author);
+
+      responseMsg = await msg.channel.createMessage(
+        successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
+      );
+    } else {
+      responseMsg = await msg.channel.createMessage(errorMessage(`Found no messages to clean!`));
     }
-
-    const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
-    );
-
-    setTimeout(() => {
-      msg.delete().catch(noop);
-      responseMsg.delete().catch(noop);
-    }, CLEAN_COMMAND_DELETE_DELAY);
-  }
-
-  @d.command("clean user", "<userId:userId> <count:number>")
-  @d.permission("can_clean")
-  async cleanUserCmd(msg: Message, args: { userId: string; count: number }) {
-    if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-      msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
-      return;
-    }
-
-    const messagesToClean = await this.savedMessages.getLatestByChannelAndUser(msg.channel.id, args.userId, args.count);
-    if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
-    }
-
-    const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
-    );
-
-    setTimeout(() => {
-      msg.delete().catch(noop);
-      responseMsg.delete().catch(noop);
-    }, CLEAN_COMMAND_DELETE_DELAY);
-  }
-
-  @d.command("clean bot", "<count:number>")
-  @d.permission("can_clean")
-  async cleanBotCmd(msg: Message, args: { count: number }) {
-    if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-      msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
-      return;
-    }
-
-    const messagesToClean = await this.savedMessages.getLatestBotMessagesByChannel(msg.channel.id, args.count);
-    if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
-    }
-
-    const responseMsg = await msg.channel.createMessage(
-      successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
-    );
 
     setTimeout(() => {
       msg.delete().catch(noop);
