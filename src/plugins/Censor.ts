@@ -167,7 +167,7 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       const inviteCodes = getInviteCodesInString(messageContent);
 
-      let invites: Invite[] = await Promise.all(inviteCodes.map(code => this.bot.getInvite(code).catch(() => null)));
+      let invites: Invite[] = await Promise.all(inviteCodes.map(code => this.resolveInvite(code)));
 
       invites = invites.filter(v => !!v);
 

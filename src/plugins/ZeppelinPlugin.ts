@@ -8,6 +8,7 @@ import {
   deepKeyIntersect,
   isSnowflake,
   isUnicodeEmoji,
+  MINUTES,
   resolveMember,
   resolveUser,
   resolveUserId,
@@ -15,11 +16,12 @@ import {
   trimIndents,
   UnknownUser,
 } from "../utils";
-import { Member, User } from "eris";
+import { Invite, Member, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
 import { mergeConfig } from "knub/dist/configUtils";
+import { SimpleCache } from "../SimpleCache";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
@@ -52,6 +54,8 @@ export function trimPluginDescription(str) {
   const lastLineIndentation = (lines[lines.length - 1].match(/^ +/g) || [""])[0].length;
   return trimIndents(emptyLinesTrimmed, lastLineIndentation);
 }
+
+const inviteCache = new SimpleCache<Promise<Invite>>(10 * MINUTES, 200);
 
 export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
   public static pluginInfo: PluginInfo;
@@ -254,5 +258,16 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     }
 
     return member;
+  }
+
+  async resolveInvite(code: string): Promise<Invite | null> {
+    if (inviteCache.has(code)) {
+      return inviteCache.get(code);
+    }
+
+    const promise = this.bot.getInvite(code).catch(() => null);
+    inviteCache.set(code, promise);
+
+    return promise;
   }
 }
