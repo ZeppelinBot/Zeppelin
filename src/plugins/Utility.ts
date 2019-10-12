@@ -553,12 +553,17 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "u",
       },
       {
+        name: "channel",
+        type: "channelId",
+        shortcut: "c",
+      },
+      {
         name: "bots",
         flag: true,
         shortcut: "b",
       },
       {
-        name: "has-invite",
+        name: "has-invites",
         flag: true,
         shortcut: "i",
       },
@@ -567,11 +572,32 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_clean")
   async cleanAllCmd(
     msg: Message,
-    args: { count: number; user?: string; bots?: boolean; "has-invite"?: boolean; fresh?: boolean },
+    args: {
+      count: number;
+      user?: string;
+      channel?: string;
+      bots?: boolean;
+      "has-invites"?: boolean;
+      fresh?: boolean;
+    },
   ) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
       msg.channel.createMessage(errorMessage(`Clean count must be between 1 and ${MAX_CLEAN_COUNT}`));
       return;
+    }
+
+    const targetChannel = args.channel ? this.guild.channels.get(args.channel) : msg.channel;
+    if (!targetChannel || !(targetChannel instanceof TextChannel)) {
+      msg.channel.createMessage(errorMessage(`Invalid channel specified`));
+      return;
+    }
+
+    if (targetChannel.id !== msg.channel.id) {
+      const configForTargetChannel = this.getConfigForMemberIdAndChannelId(msg.member.id, targetChannel.id);
+      if (configForTargetChannel.can_clean !== true) {
+        msg.channel.createMessage(errorMessage(`Missing permissions to use clean on that channel`));
+        return;
+      }
     }
 
     const messagesToClean = [];
@@ -580,7 +606,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     while (messagesToClean.length < args.count) {
       const potentialMessagesToClean = await this.savedMessages.getLatestByChannelBeforeId(
-        msg.channel.id,
+        targetChannel.id,
         beforeId,
         args.count,
       );
@@ -589,7 +615,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       const filtered = potentialMessagesToClean.filter(message => {
         if (args.user && message.user_id !== args.user) return false;
         if (args.bots && !message.is_bot) return false;
-        if (args["has-invite"] && getInviteCodesInString(message.data.content || "").length === 0) return false;
+        if (args["has-invites"] && getInviteCodesInString(message.data.content || "").length === 0) return false;
         if (moment.utc(message.posted_at).valueOf() < timeCutoff) return false;
         return true;
       });
@@ -597,25 +623,31 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       messagesToClean.push(...filtered);
       beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
 
-      if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff)
+      if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff) {
         break;
+      }
     }
 
     let responseMsg: Message;
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(msg.channel, messagesToClean, msg.author);
+      await this.cleanMessages(targetChannel, messagesToClean, msg.author);
 
-      responseMsg = await msg.channel.createMessage(
-        successMessage(`Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`),
-      );
+      let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
+      if (targetChannel.id !== msg.channel.id) responseText += ` in <#${targetChannel.id}>`;
+
+      responseMsg = await msg.channel.createMessage(successMessage(responseText));
     } else {
       responseMsg = await msg.channel.createMessage(errorMessage(`Found no messages to clean!`));
     }
 
-    setTimeout(() => {
-      msg.delete().catch(noop);
-      responseMsg.delete().catch(noop);
-    }, CLEAN_COMMAND_DELETE_DELAY);
+    if (targetChannel.id !== msg.channel.id) {
+      // Delete the !clean command and the bot response if a different channel wasn't specified
+      // (so as not to spam the cleaned channel with the command itself)
+      setTimeout(() => {
+        msg.delete().catch(noop);
+        responseMsg.delete().catch(noop);
+      }, CLEAN_COMMAND_DELETE_DELAY);
+    }
   }
 
   @d.command("info", "[user:resolvedUserLoose]")
