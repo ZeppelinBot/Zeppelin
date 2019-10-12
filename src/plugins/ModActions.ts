@@ -1358,7 +1358,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     for (const userId of args.userIds) {
       try {
-        await this.guild.banMember(userId);
+        await this.guild.banMember(userId, 1);
 
         await casesPlugin.createCase({
           userId,
