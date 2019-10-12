@@ -16,13 +16,11 @@ import {
   UnknownUser,
   verboseChannelMention,
 } from "../utils";
-import { decorators as d } from "knub";
 import { mergeConfig } from "knub/dist/configUtils";
-import { Invite, Member, Message, TextChannel } from "eris";
+import { Invite, Member, TextChannel } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { SimpleCache } from "../SimpleCache";
 import { Queue } from "../Queue";
-import Timeout = NodeJS.Timeout;
 import { ModActionsPlugin } from "./ModActions";
 import { MutesPlugin } from "./Mutes";
 import { LogsPlugin } from "./Logs";
@@ -34,6 +32,7 @@ import { GuildLogs } from "../data/GuildLogs";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import { renderTemplate } from "../templateFormatter";
+import Timeout = NodeJS.Timeout;
 
 type MessageInfo = { channelId: string; messageId: string };
 
@@ -585,17 +584,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    const invites: Array<Invite | void> = await Promise.all(
-      uniqueInviteCodes.map(async code => {
-        if (inviteCache.has(code)) {
-          return inviteCache.get(code);
-        } else {
-          const invite = await this.bot.getInvite(code).catch(noop);
-          inviteCache.set(code, invite);
-          return invite;
-        }
-      }),
-    );
+    const invites: Array<Invite | null> = await Promise.all(uniqueInviteCodes.map(code => this.resolveInvite(code)));
 
     for (const invite of invites) {
       if (!invite) return true;
