@@ -632,11 +632,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         })${messageResultText}`,
       ),
     );
-
-    this.serverLogs.log(LogType.MEMBER_WARN, {
-      mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(memberToWarn, ["user", "roles"]),
-    });
   }
 
   async warnMember(
