@@ -618,8 +618,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (moment.utc(message.posted_at).valueOf() < timeCutoff) return false;
         return true;
       });
+      const remaining = args.count - messagesToClean.length;
+      const withoutOverflow = filtered.slice(0, remaining);
+      messagesToClean.push(...withoutOverflow);
 
-      messagesToClean.push(...filtered);
       beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
 
       if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff) {
