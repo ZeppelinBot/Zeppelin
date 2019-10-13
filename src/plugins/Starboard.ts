@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions } from "knub";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPlugin, trimPluginDescription } from "./ZeppelinPlugin";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { errorMessage, getUrlsInString, noop, successMessage, tNullable } from "../utils";
 import path from "path";
@@ -8,7 +8,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import * as t from "io-ts";
 import { GuildStarboardMessages } from "../data/GuildStarboardMessages";
-import { StarboardMessage } from "src/data/entities/StarboardMessage";
+import { StarboardMessage } from "../data/entities/StarboardMessage";
 
 const StarboardOpts = t.type({
   source_channel_ids: t.array(t.string),
@@ -16,7 +16,6 @@ const StarboardOpts = t.type({
   positive_emojis: tNullable(t.array(t.string)),
   positive_required: tNullable(t.number),
   allow_multistar: tNullable(t.boolean),
-  negative_emojis: tNullable(t.array(t.string)),
   enabled: tNullable(t.boolean),
 });
 type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
@@ -32,7 +31,6 @@ const defaultStarboardOpts: Partial<TStarboardOpts> = {
   positive_emojis: ["⭐"],
   positive_required: 5,
   allow_multistar: false,
-  negative_emojis: [],
   enabled: true,
 };
 
@@ -40,6 +38,57 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "starboard";
   public static showInDocs = false;
   public static configSchema = ConfigSchema;
+
+  public static pluginInfo = {
+    prettyName: "Starboards",
+    description: trimPluginDescription(`
+      This plugin contains all functionality needed to use discord channels as starboards.
+    `),
+    configurationGuide: trimPluginDescription(`
+      You can customize multiple settings for starboards.
+      Any emoji that you want available needs to be put into the config in its raw form.
+      To obtain a raw form of an emoji, please write out the emoji and put a backslash in front of it.
+      Example with default emoji: "\:star:" => "⭐"
+      Example with custom emoji: "\:mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
+      Now, past the result into the config, but make sure to exclude all less-than and greater-than signs like in the second example.
+
+
+      ### Simple starboard with one source channel
+      All messages in the source channel that get enough positive reactions will be posted into the starboard channel.
+      The only positive reaction counted here is the default emoji "⭐".
+      Multistars are not allowed, meaning only one reaction is counted from the same user.
+      
+      ~~~yml
+      starboard:
+        config:
+          entries:
+            exampleOne:
+              source_channel_ids: ["604342623569707010"]
+              starboard_channel_id: "604342689038729226"
+              positive_emojis: ["⭐"]
+              positive_required: 5
+              enabled: true
+      ~~~
+      
+      ### Starboard with two sources and two emoji
+      All messages in any of the source channels that get enough positive reactions will be posted into the starboard channel.
+      Both the default emoji "⭐" and the custom emoji ":mrvnSmile:543000534102310933" are counted.
+      Multistars are allowed, so a user can react with both emoji and be counted twice.
+      
+      ~~~yml
+      starboard:
+        config:
+          entries:
+            exampleTwo:
+              source_channel_ids: ["604342623569707010", "604342649251561487"]
+              starboard_channel_id: "604342689038729226"
+              positive_emojis: ["⭐", ":mrvnSmile:543000534102310933"]
+              positive_required: 10
+              allow_multistar: true
+              enabled: true
+      ~~~
+    `),
+  };
 
   protected savedMessages: GuildSavedMessages;
   protected starboardMessages: GuildStarboardMessages;
@@ -64,18 +113,32 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
-  protected getStarboardOptsForSourceChannelId(sourceChannel): TStarboardOpts[] {
+  protected getStarboardOptsForSourceChannel(sourceChannel): TStarboardOpts[] {
     const config = this.getConfigForChannel(sourceChannel);
-    return Object.values(config.entries)
-      .filter(opts => opts.source_channel_ids.includes(sourceChannel.id))
-      .map(opts => Object.assign({}, defaultStarboardOpts, opts));
+
+    const configs = Object.values(config.entries).filter(opts => opts.source_channel_ids.includes(sourceChannel.id));
+    configs.forEach(cfg => {
+      if (cfg.allow_multistar == null) cfg.allow_multistar = defaultStarboardOpts.allow_multistar;
+      if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
+      if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
+      if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
+    });
+
+    return configs;
   }
 
-  protected getStarboardOptsForStarboardChannelId(starboardChannel): TStarboardOpts[] {
+  protected getStarboardOptsForStarboardChannel(starboardChannel): TStarboardOpts[] {
     const config = this.getConfigForChannel(starboardChannel);
-    return Object.values(config.entries)
-      .filter(opts => opts.starboard_channel_id === starboardChannel.id)
-      .map(opts => Object.assign({}, defaultStarboardOpts, opts));
+
+    const configs = Object.values(config.entries).filter(opts => opts.starboard_channel_id === starboardChannel.id);
+    configs.forEach(cfg => {
+      if (cfg.allow_multistar == null) cfg.allow_multistar = defaultStarboardOpts.allow_multistar;
+      if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
+      if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
+      if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
+    });
+
+    return configs;
   }
 
   onLoad() {
@@ -107,7 +170,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    const applicableStarboards = await this.getStarboardOptsForSourceChannelId(msg.channel);
+    const applicableStarboards = await this.getStarboardOptsForSourceChannel(msg.channel);
 
     for (const starboard of applicableStarboards) {
       // Instantly continue if the starboard is disabled
@@ -133,7 +196,6 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
    */
   async countReactions(msg: Message, counted: string[], countDouble: boolean) {
     let totalCount = [];
-    countDouble = countDouble || false;
 
     for (const emoji of counted) {
       totalCount = await this.countReactionsForEmoji(msg, emoji, totalCount, countDouble);
@@ -243,7 +305,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (messages.length > 0) {
       for (const starboardMessage of messages) {
         if (!starboardMessage.starboard_message_id) continue;
-        this.removeMessageFromStarboard(starboardMessage);
+        this.removeMessageFromStarboard(starboardMessage).catch(noop);
       }
     } else {
       messages = await this.starboardMessages.getStarboardMessagesForStarboardMessageId(msg.id);
@@ -254,27 +316,36 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
         this.removeMessageFromStarboardMessages(
           starboardMessage.starboard_message_id,
           starboardMessage.starboard_channel_id,
-        );
+        ).catch(noop);
       }
     }
   }
 
-  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>")
+  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>", {
+    extra: {
+      info: {
+        description:
+          "Migrates all of a channels pins to starboard messages, posting them in the starboard channel. The old pins are not unpinned.",
+      },
+    },
+  })
   async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
     try {
-      const starboards = await this.getStarboardOptsForStarboardChannelId(this.bot.getChannel(args.starboardChannelId));
+      const starboards = await this.getStarboardOptsForStarboardChannel(this.bot.getChannel(args.starboardChannelId));
       if (!starboards) {
-        msg.channel.createMessage(errorMessage("The specified channel doesn't have a starboard!"));
+        msg.channel.createMessage(errorMessage("The specified channel doesn't have a starboard!")).catch(noop);
         return;
       }
 
       const channel = (await this.guild.channels.get(args.pinChannelId)) as GuildChannel & TextChannel;
       if (!channel) {
-        msg.channel.createMessage(errorMessage("Could not find the specified channel to migrate pins from!"));
+        msg.channel
+          .createMessage(errorMessage("Could not find the specified channel to migrate pins from!"))
+          .catch(noop);
         return;
       }
 
-      msg.channel.createMessage(`Migrating pins from <#${channel.id}> to <#${args.starboardChannelId}>...`);
+      msg.channel.createMessage(`Migrating pins from <#${channel.id}> to <#${args.starboardChannelId}>...`).catch(noop);
 
       const pins = await channel.getPins();
       pins.reverse(); // Migrate pins starting from the oldest message
@@ -288,7 +359,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
         await this.saveMessageToStarboard(pin, args.starboardChannelId);
       }
 
-      msg.channel.createMessage(successMessage("Pins migrated!"));
+      msg.channel.createMessage(successMessage("Pins migrated!")).catch(noop);
     } catch (error) {
       this.sendErrorMessage(
         msg.channel,
