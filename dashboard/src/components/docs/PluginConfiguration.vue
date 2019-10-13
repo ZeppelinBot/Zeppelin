@@ -65,9 +65,20 @@
               config:
                 can_kick: false
             # Match on ANY of multiple conditions
-            - channel: "109672661671505920"
-              role: "172950000412655616"
-              type: "any"
+            - any:
+              - channel: "109672661671505920"
+              - role: "172950000412655616"
+              config:
+                can_kick: false
+            # Match on either of two complex conditions
+            - any:
+              - all:
+                - channel: "109672661671505920"
+                  role: "172950000412655616"
+                - not:
+                    role: "473085927053590538"
+              - channel: "534727637017559040"
+                role: "473086848831455234"
               config:
                 can_kick: false
     </CodeBlock>
