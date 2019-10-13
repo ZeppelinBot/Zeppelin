@@ -515,6 +515,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.automodQueue = new Queue();
 
     this.recentActions = [];
+    this.recentActionClearInterval = setInterval(() => this.clearOldRecentActions(), 1 * MINUTES);
+
     this.spamGracePeriods = new Map();
     this.spamGracePriodClearInterval = setInterval(() => this.clearExpiredGracePeriods(), 1 * SECONDS);
 
@@ -544,6 +546,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages.events.off("create", this.onMessageCreateFn);
     clearInterval(this.recentActionClearInterval);
     clearInterval(this.spamGracePriodClearInterval);
+    clearInterval(this.recentNicknameChangesClearInterval);
   }
 
   protected evaluateMatchWordsTrigger(trigger: TMatchWordsTrigger, str: string): boolean {
