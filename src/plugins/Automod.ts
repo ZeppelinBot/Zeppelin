@@ -590,7 +590,9 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     const invites: Array<Invite | null> = await Promise.all(uniqueInviteCodes.map(code => this.resolveInvite(code)));
 
     for (const invite of invites) {
+      // Always match on unknown invites
       if (!invite) return true;
+
       if (trigger.include_guilds && trigger.include_guilds.includes(invite.guild.id)) {
         return true;
       }

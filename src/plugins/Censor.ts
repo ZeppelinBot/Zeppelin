@@ -167,11 +167,15 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       const inviteCodes = getInviteCodesInString(messageContent);
 
-      let invites: Invite[] = await Promise.all(inviteCodes.map(code => this.resolveInvite(code)));
-
-      invites = invites.filter(v => !!v);
+      const invites: Array<Invite | null> = await Promise.all(inviteCodes.map(code => this.resolveInvite(code)));
 
       for (const invite of invites) {
+        // Always filter unknown invites if invite filtering is enabled
+        if (invite == null) {
+          this.censorMessage(savedMessage, `unknown invite not found in whitelist`);
+          return true;
+        }
+
         if (!invite.guild && !allowGroupDMInvites) {
           this.censorMessage(savedMessage, `group dm invites are not allowed`);
           return true;
