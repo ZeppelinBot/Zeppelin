@@ -569,7 +569,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     ],
   })
   @d.permission("can_clean")
-  async cleanAllCmd(
+  async cleanCmd(
     msg: Message,
     args: {
       count: number;
