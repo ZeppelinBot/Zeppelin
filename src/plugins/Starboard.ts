@@ -16,6 +16,7 @@ const StarboardOpts = t.type({
   positive_emojis: tNullable(t.array(t.string)),
   positive_required: tNullable(t.number),
   allow_multistar: tNullable(t.boolean),
+  allowed_roles: tNullable(t.array(t.string)),
   enabled: tNullable(t.boolean),
 });
 type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
@@ -31,6 +32,7 @@ const defaultStarboardOpts: Partial<TStarboardOpts> = {
   positive_emojis: ["⭐"],
   positive_required: 5,
   allow_multistar: false,
+  allowed_roles: [],
   enabled: true,
 };
 
@@ -122,6 +124,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
       if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
       if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
+      if (cfg.allowed_roles == null) cfg.allowed_roles = defaultStarboardOpts.allowed_roles;
     });
 
     return configs;
@@ -136,6 +139,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
       if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
       if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
+      if (cfg.allowed_roles == null) cfg.allowed_roles = defaultStarboardOpts.allowed_roles;
     });
 
     return configs;
@@ -184,7 +188,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       );
       if (starboardMessages.length > 0) continue;
 
-      const reactionsCount = await this.countReactions(msg, starboard.positive_emojis, starboard.allow_multistar);
+      const reactionsCount = await this.countReactions(msg, starboard);
       if (reactionsCount >= starboard.positive_required) {
         await this.saveMessageToStarboard(msg, starboard.starboard_channel_id);
       }
@@ -194,11 +198,12 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   /**
    * Tallys the reaction count of ALL reactions in the array
    */
-  async countReactions(msg: Message, counted: string[], countDouble: boolean) {
+  async countReactions(msg: Message, starboard: any) {
     let totalCount = [];
 
-    for (const emoji of counted) {
-      totalCount = await this.countReactionsForEmoji(msg, emoji, totalCount, countDouble);
+    for (const emoji of starboard.positive_emojis) {
+      totalCount = await this.countReactionsForEmoji(msg, emoji, totalCount, starboard);
+      if (totalCount >= starboard.positive_required) return totalCount; // Exit if we already have enough reactions
     }
 
     return totalCount.length;
@@ -207,8 +212,8 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   /**
    * Counts the emoji specific reactions in the message, ignoring the message author and the bot
    */
-  async countReactionsForEmoji(msg: Message, reaction, usersAlreadyCounted: string[], countDouble: boolean) {
-    countDouble = countDouble || false;
+  async countReactionsForEmoji(msg: Message, reaction, usersAlreadyCounted: string[], starboard: any) {
+    const countDouble = starboard.allow_multistar || false;
 
     // Ignore self-stars, bot-stars and multi-stars
     const reactors = await msg.getReaction(reaction);
@@ -216,6 +221,11 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (user.id === msg.author.id) continue;
       if (user.id === this.bot.user.id) continue;
       if (!countDouble && usersAlreadyCounted.includes(user.id)) continue;
+
+      const mem = await this.getMember(user.id);
+      const foundRole = mem.roles.some(role => starboard.allowed_roles.includes(role));
+      if (!foundRole && starboard.allowed_roles.length > 0) continue;
+
       usersAlreadyCounted.push(user.id);
     }
 
