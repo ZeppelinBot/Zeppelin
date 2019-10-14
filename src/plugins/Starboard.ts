@@ -9,13 +9,13 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import * as t from "io-ts";
 import { GuildStarboardMessages } from "../data/GuildStarboardMessages";
 import { StarboardMessage } from "../data/entities/StarboardMessage";
+import { GuildStarboardReactions } from "../data/GuildStarboardReactions";
 
 const StarboardOpts = t.type({
   source_channel_ids: t.array(t.string),
   starboard_channel_id: t.string,
   positive_emojis: tNullable(t.array(t.string)),
   positive_required: tNullable(t.number),
-  allow_multistar: tNullable(t.boolean),
   allowed_roles: tNullable(t.array(t.string)),
   enabled: tNullable(t.boolean),
 });
@@ -31,7 +31,6 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 const defaultStarboardOpts: Partial<TStarboardOpts> = {
   positive_emojis: ["⭐"],
   positive_required: 5,
-  allow_multistar: false,
   allowed_roles: [],
   enabled: true,
 };
@@ -55,10 +54,10 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       Now, past the result into the config, but make sure to exclude all less-than and greater-than signs like in the second example.
 
 
-      ### Simple starboard with one source channel
+      ### Starboard with one source channel
       All messages in the source channel that get enough positive reactions will be posted into the starboard channel.
       The only positive reaction counted here is the default emoji "⭐".
-      Multistars are not allowed, meaning only one reaction is counted from the same user.
+      Only users with a role matching the allowed_roles role-id will be counted.
       
       ~~~yml
       starboard:
@@ -69,13 +68,13 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
               starboard_channel_id: "604342689038729226"
               positive_emojis: ["⭐"]
               positive_required: 5
+              allowed_roles: ["556110793058287637"]
               enabled: true
       ~~~
       
       ### Starboard with two sources and two emoji
       All messages in any of the source channels that get enough positive reactions will be posted into the starboard channel.
       Both the default emoji "⭐" and the custom emoji ":mrvnSmile:543000534102310933" are counted.
-      Multistars are allowed, so a user can react with both emoji and be counted twice.
       
       ~~~yml
       starboard:
@@ -86,7 +85,6 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
               starboard_channel_id: "604342689038729226"
               positive_emojis: ["⭐", ":mrvnSmile:543000534102310933"]
               positive_required: 10
-              allow_multistar: true
               enabled: true
       ~~~
     `),
@@ -94,6 +92,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected savedMessages: GuildSavedMessages;
   protected starboardMessages: GuildStarboardMessages;
+  protected starboardReactions: GuildStarboardReactions;
 
   private onMessageDeleteFn;
 
@@ -120,7 +119,6 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const configs = Object.values(config.entries).filter(opts => opts.source_channel_ids.includes(sourceChannel.id));
     configs.forEach(cfg => {
-      if (cfg.allow_multistar == null) cfg.allow_multistar = defaultStarboardOpts.allow_multistar;
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
       if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
       if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
@@ -135,7 +133,6 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const configs = Object.values(config.entries).filter(opts => opts.starboard_channel_id === starboardChannel.id);
     configs.forEach(cfg => {
-      if (cfg.allow_multistar == null) cfg.allow_multistar = defaultStarboardOpts.allow_multistar;
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
       if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
       if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
@@ -148,6 +145,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   onLoad() {
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.starboardMessages = GuildStarboardMessages.getGuildInstance(this.guildId);
+    this.starboardReactions = GuildStarboardReactions.getGuildInstance(this.guildId);
 
     this.onMessageDeleteFn = this.onMessageDelete.bind(this);
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);
@@ -163,7 +161,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
    */
   @d.event("messageReactionAdd")
   @d.lock("starboardReaction")
-  async onMessageReactionAdd(msg: Message, emoji: { id: string; name: string }) {
+  async onMessageReactionAdd(msg: Message, emoji: { id: string; name: string }, userId: string) {
     if (!msg.author) {
       // Message is not cached, fetch it
       try {
@@ -187,49 +185,25 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
         msg.id,
       );
       if (starboardMessages.length > 0) continue;
+      // console.log(emoji);
 
-      const reactionsCount = await this.countReactions(msg, starboard);
-      if (reactionsCount >= starboard.positive_required) {
-        await this.saveMessageToStarboard(msg, starboard.starboard_channel_id);
-      }
+      // await this.starboardReactions.createStarboardReaction(msg.id, userId);
+      // const reactions = await this.starboardReactions.getAllReactionsForMessageId(msg.id);
+      // const reactionsCount = reactions.length;
+      // if (reactionsCount >= starboard.positive_required) {
+      //   await this.saveMessageToStarboard(msg, starboard.starboard_channel_id);
+      // }
     }
   }
 
-  /**
-   * Tallys the reaction count of ALL reactions in the array
-   */
-  async countReactions(msg: Message, starboard: any) {
-    let totalCount = [];
-
-    for (const emoji of starboard.positive_emojis) {
-      totalCount = await this.countReactionsForEmoji(msg, emoji, totalCount, starboard);
-      if (totalCount >= starboard.positive_required) return totalCount; // Exit if we already have enough reactions
-    }
-
-    return totalCount.length;
+  @d.event("messageReactionRemove")
+  async onStarboardReactionRemove(msg: Message, emoji: { id: string; name: string }, userId: string) {
+    await this.starboardReactions.deleteStarboardMessage(msg.id, userId);
   }
 
-  /**
-   * Counts the emoji specific reactions in the message, ignoring the message author and the bot
-   */
-  async countReactionsForEmoji(msg: Message, reaction, usersAlreadyCounted: string[], starboard: any) {
-    const countDouble = starboard.allow_multistar || false;
-
-    // Ignore self-stars, bot-stars and multi-stars
-    const reactors = await msg.getReaction(reaction);
-    for (const user of reactors) {
-      if (user.id === msg.author.id) continue;
-      if (user.id === this.bot.user.id) continue;
-      if (!countDouble && usersAlreadyCounted.includes(user.id)) continue;
-
-      const mem = await this.getMember(user.id);
-      const foundRole = mem.roles.some(role => starboard.allowed_roles.includes(role));
-      if (!foundRole && starboard.allowed_roles.length > 0) continue;
-
-      usersAlreadyCounted.push(user.id);
-    }
-
-    return usersAlreadyCounted;
+  @d.event("messageReactionRemoveAll")
+  async onMessageReactionRemoveAll(msg: Message) {
+    await this.starboardReactions.deleteAllStarboardReactionsForMessageId(msg.id);
   }
 
   /**
