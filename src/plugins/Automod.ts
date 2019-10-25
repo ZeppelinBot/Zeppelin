@@ -33,6 +33,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import { renderTemplate } from "../templateFormatter";
 import Timeout = NodeJS.Timeout;
+import { CooldownManager } from "knub";
 
 type MessageInfo = { channelId: string; messageId: string };
 
@@ -42,6 +43,7 @@ type TextTriggerWithMultipleMatchTypes = {
   match_visible_names: boolean;
   match_usernames: boolean;
   match_nicknames: boolean;
+  match_custom_status: boolean;
 };
 
 interface TriggerMatchResult {
@@ -56,7 +58,7 @@ interface MessageTextTriggerMatchResult extends TriggerMatchResult {
 }
 
 interface OtherTextTriggerMatchResult extends TriggerMatchResult {
-  type: "username" | "nickname" | "visiblename";
+  type: "username" | "nickname" | "visiblename" | "customstatus";
   str: string;
   userId: string;
 }
@@ -104,6 +106,7 @@ const MatchWordsTrigger = t.type({
   match_visible_names: t.boolean,
   match_usernames: t.boolean,
   match_nicknames: t.boolean,
+  match_custom_status: t.boolean,
 });
 type TMatchWordsTrigger = t.TypeOf<typeof MatchWordsTrigger>;
 const defaultMatchWordsTrigger: TMatchWordsTrigger = {
@@ -115,6 +118,7 @@ const defaultMatchWordsTrigger: TMatchWordsTrigger = {
   match_visible_names: false,
   match_usernames: false,
   match_nicknames: false,
+  match_custom_status: false,
 };
 
 const MatchRegexTrigger = t.type({
@@ -125,6 +129,7 @@ const MatchRegexTrigger = t.type({
   match_visible_names: t.boolean,
   match_usernames: t.boolean,
   match_nicknames: t.boolean,
+  match_custom_status: t.boolean,
 });
 type TMatchRegexTrigger = t.TypeOf<typeof MatchRegexTrigger>;
 const defaultMatchRegexTrigger: Partial<TMatchRegexTrigger> = {
@@ -134,6 +139,7 @@ const defaultMatchRegexTrigger: Partial<TMatchRegexTrigger> = {
   match_visible_names: false,
   match_usernames: false,
   match_nicknames: false,
+  match_custom_status: false,
 };
 
 const MatchInvitesTrigger = t.type({
@@ -147,6 +153,7 @@ const MatchInvitesTrigger = t.type({
   match_visible_names: t.boolean,
   match_usernames: t.boolean,
   match_nicknames: t.boolean,
+  match_custom_status: t.boolean,
 });
 type TMatchInvitesTrigger = t.TypeOf<typeof MatchInvitesTrigger>;
 const defaultMatchInvitesTrigger: Partial<TMatchInvitesTrigger> = {
@@ -156,6 +163,7 @@ const defaultMatchInvitesTrigger: Partial<TMatchInvitesTrigger> = {
   match_visible_names: false,
   match_usernames: false,
   match_nicknames: false,
+  match_custom_status: false,
 };
 
 const MatchLinksTrigger = t.type({
@@ -167,6 +175,7 @@ const MatchLinksTrigger = t.type({
   match_visible_names: t.boolean,
   match_usernames: t.boolean,
   match_nicknames: t.boolean,
+  match_custom_status: t.boolean,
 });
 type TMatchLinksTrigger = t.TypeOf<typeof MatchLinksTrigger>;
 const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
@@ -176,6 +185,7 @@ const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
   match_visible_names: false,
   match_usernames: false,
   match_nicknames: false,
+  match_custom_status: false,
 };
 
 const BaseSpamTrigger = t.type({
@@ -279,6 +289,7 @@ const Rule = t.type({
     change_nickname: tNullable(ChangeNicknameAction),
     log: tNullable(LogAction),
   }),
+  cooldown: tNullable(t.string),
 });
 type TRule = t.TypeOf<typeof Rule>;
 
@@ -433,6 +444,26 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
               my_second_filter:
                 enabled: false
       ~~~
+      
+      ### Custom status alerts
+      This example sends an alert any time a user with a matching custom status sends a message.
+      
+      ~~~yml
+      automod:
+        config:
+          rules:
+            bad_custom_statuses:
+              triggers:
+              - match_words:
+                  words: ['banana']
+                  match_custom_status: true
+              actions:
+                alert:
+                  channel: "473087035574321152"
+                  text: |-
+                    Bad custom status on user <@!{user.id}>:
+                    {matchSummary}
+      ~~~
     `),
   };
 
@@ -456,6 +487,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected recentNicknameChanges: Map<string, { expiresAt: number }>;
   protected recentNicknameChangesClearInterval: Timeout;
+
+  protected cooldownManager: CooldownManager;
 
   protected onMessageCreateFn;
 
@@ -524,6 +557,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     this.recentNicknameChanges = new Map();
     this.recentNicknameChangesClearInterval = setInterval(() => this.clearExpiredRecentNicknameChanges(), 30 * SECONDS);
+
+    this.cooldownManager = new CooldownManager();
 
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.archives = GuildArchives.getGuildInstance(this.guildId);
@@ -701,6 +736,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       const str = member.nick;
       const match = await cb(str);
       if (match) return { type: "nickname", str, userId: msg.user_id };
+    }
+
+    // type 4 = custom status
+    if (trigger.match_custom_status && member.game && member.game.type === 4) {
+      const str = member.game.state;
+      const match = await cb(str);
+      if (match) return { type: "customstatus", str, userId: msg.user_id };
     }
 
     return null;
@@ -1012,6 +1054,38 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     let matchSummary = null;
     let caseExtraNote = null;
 
+    if (rule.cooldown) {
+      let cooldownKey = rule.name + "-";
+
+      if (matchResult.type === "textspam") {
+        cooldownKey += matchResult.channelId ? `${matchResult.channelId}-${matchResult.userId}` : matchResult.userId;
+      } else if (matchResult.type === "message" || matchResult.type === "embed") {
+        cooldownKey += matchResult.userId;
+      } else if (
+        matchResult.type === "username" ||
+        matchResult.type === "nickname" ||
+        matchResult.type === "visiblename" ||
+        matchResult.type === "customstatus"
+      ) {
+        cooldownKey += matchResult.userId;
+      } else if (matchResult.type === "otherspam") {
+        cooldownKey += matchResult.userId;
+      } else {
+        cooldownKey = null;
+      }
+
+      if (cooldownKey) {
+        if (this.cooldownManager.isOnCooldown(cooldownKey)) {
+          return;
+        }
+
+        const cooldownTime = convertDelayStringToMS(rule.cooldown, "s");
+        if (cooldownTime) {
+          this.cooldownManager.setCooldown(cooldownKey, cooldownTime);
+        }
+      }
+    }
+
     if (matchResult.type === "textspam") {
       this.activateGracePeriod(matchResult);
       this.clearSpecificRecentActions(
@@ -1049,6 +1123,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchSummary = `Matched nickname: ${matchResult.str}`;
     } else if (matchResult.type === "visiblename") {
       matchSummary = `Matched visible name: ${matchResult.str}`;
+    } else if (matchResult.type === "customstatus") {
+      matchSummary = `Matched custom status: ${matchResult.str}`;
     }
 
     caseExtraNote = `Matched automod rule "${rule.name}"`;
