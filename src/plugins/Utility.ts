@@ -26,6 +26,7 @@ import {
   DAYS,
   embedPadding,
   errorMessage,
+  get,
   getInviteCodesInString,
   isSnowflake,
   MINUTES,
@@ -1110,7 +1111,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   helpCmd(msg: Message, args: { command: string }) {
     const searchStr = args.command.toLowerCase();
 
-    const matchingCommands: Array<ICommandDefinition<ICommandContext, ICommandExtraData>> = [];
+    const matchingCommands: Array<{
+      plugin: ZeppelinPlugin;
+      command: ICommandDefinition<ICommandContext, ICommandExtraData>;
+    }> = [];
 
     const guildData = this.knub.getGuildData(this.guildId);
     for (const plugin of guildData.loadedPlugins.values()) {
@@ -1118,18 +1122,48 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       const registeredCommands = plugin.getRegisteredCommands();
       for (const registeredCommand of registeredCommands) {
-        for (const trigger of registeredCommand.command.triggers) {
-          if (trigger.source.startsWith(searchStr)) {
-            matchingCommands.push(registeredCommand.command);
+        for (const trigger of registeredCommand.command.originalTriggers) {
+          const strTrigger = typeof trigger === "string" ? trigger : trigger.source;
+
+          if (strTrigger.startsWith(searchStr)) {
+            matchingCommands.push({
+              plugin,
+              command: registeredCommand.command,
+            });
           }
         }
       }
     }
 
     const totalResults = matchingCommands.length;
-    const limitedResults = matchingCommands.slice(0, 15);
-    const signatures = limitedResults.map(command => {
-      return "`" + getCommandSignature(command) + "`";
+    const limitedResults = matchingCommands.slice(0, 3);
+    const commandSnippets = limitedResults.map(({ plugin, command }) => {
+      const prefix: string = command.originalPrefix
+        ? typeof command.originalPrefix === "string"
+          ? command.originalPrefix
+          : command.originalPrefix.source
+        : "";
+
+      const originalTrigger = command.originalTriggers[0];
+      const trigger: string = originalTrigger
+        ? typeof originalTrigger === "string"
+          ? originalTrigger
+          : originalTrigger.source
+        : "";
+
+      const description = get(command, "config.extra.info.description");
+      const basicUsage = get(command, "config.extra.info.basicUsage");
+      const commandSlug = trigger
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, "-");
+
+      let snippet = `**${prefix}${trigger}**`;
+      if (description) snippet += `\n${description}`;
+      if (basicUsage) snippet += `\nBasic usage: \`${basicUsage}\``;
+      snippet += `\n<https://zeppelin.gg/docs/plugins/${plugin.runtimePluginName}/usage#command-${commandSlug}>`;
+
+      return snippet;
     });
 
     if (totalResults === 0) {
@@ -1139,10 +1173,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let message =
       totalResults !== limitedResults.length
-        ? `Results (${totalResults} total, showing first ${limitedResults.length}):`
-        : `Results:`;
+        ? `Results (${totalResults} total, showing first ${limitedResults.length}):\n\n`
+        : "";
 
-    message += `\n\n${signatures.join("\n")}`;
+    message += `${commandSnippets.join("\n\n")}`;
     createChunkedMessage(msg.channel, message);
   }
 
