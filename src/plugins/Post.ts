@@ -365,8 +365,8 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       msg.channel.createMessage(
         trimLines(`
         <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
-        \`${prefix}post_embed --title="Some title" content goes here\`
-        The \`--content\` option will soon be removed in favor of this.
+        \`${prefix}post_embed -title "Some title" content goes here\`
+        The \`-content\` option will soon be removed in favor of this.
       `),
       );
     }
@@ -440,8 +440,8 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       msg.channel.createMessage(
         trimLines(`
         <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
-        \`${prefix}edit_embed --title="Some title" content goes here\`
-        The \`--content\` option will soon be removed in favor of this.
+        \`${prefix}edit_embed -title "Some title" content goes here\`
+        The \`-content\` option will soon be removed in favor of this.
       `),
       );
     }

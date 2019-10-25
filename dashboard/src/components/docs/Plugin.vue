@@ -169,7 +169,7 @@
         }
       },
       renderOption(opt) {
-        let str = `--${opt.name}`;
+        let str = `-${opt.name}`;
         if (opt.shortcut) {
           str += `|-${opt.shortcut}`;
         }

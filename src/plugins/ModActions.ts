@@ -592,11 +592,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        msg.channel.createMessage(errorMessage("No permission for -mod"));
         return;
       }
 
@@ -694,13 +694,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
    * The only difference between the two commands is in target member validation.
    */
   async actualMuteCmd(user: User | UnknownUser, msg: Message, args: { time?: number; reason?: string; mod: Member }) {
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     let pp = null;
 
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for --mod"));
+        msg.channel.createMessage(errorMessage("No permission for -mod"));
         return;
       }
 
@@ -839,13 +839,13 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg: Message,
     args: { time?: number; reason?: string; mod?: Member },
   ) {
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.author;
     let pp = null;
 
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -996,11 +996,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1059,11 +1059,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1123,11 +1123,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1195,11 +1195,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1265,11 +1265,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1416,11 +1416,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // The moderator who did the action is the message author or, if used, the specified --mod
+    // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
       if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for --mod");
+        this.sendErrorMessage(msg.channel, "No permission for -mod");
         return;
       }
 
@@ -1545,9 +1545,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
         if (!args.hidden && hiddenCases.length) {
           if (hiddenCases.length === 1) {
-            lines.push(`*+${hiddenCases.length} hidden case, use "--hidden" to show it*`);
+            lines.push(`*+${hiddenCases.length} hidden case, use "-hidden" to show it*`);
           } else {
-            lines.push(`*+${hiddenCases.length} hidden cases, use "--hidden" to show them*`);
+            lines.push(`*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`);
           }
         }
 
@@ -1568,7 +1568,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [{ name: "mod", type: "Member" }],
     extra: {
       info: {
-        description: "Show the most recent 5 cases by the specified --mod",
+        description: "Show the most recent 5 cases by the specified -mod",
       },
     },
   })
