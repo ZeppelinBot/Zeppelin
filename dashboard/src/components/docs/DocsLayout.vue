@@ -70,16 +70,22 @@
           to: '/docs/introduction',
           label: 'Introduction',
         },
+      ],
+    },
+
+    {
+      label: 'Configuration',
+      items: [
         {
-          to: '/docs/configuration-format',
+          to: '/docs/configuration/configuration-format',
           label: 'Configuration format',
         },
         {
-          to: '/docs/plugin-configuration',
+          to: '/docs/configuration/plugin-configuration',
           label: 'Plugin configuration',
         },
         {
-          to: '/docs/permissions',
+          to: '/docs/configuration/permissions',
           label: 'Permissions',
         },
       ],

@@ -7,11 +7,11 @@
 
     <ul>
       <li>Prefix (i.e. what character is preceding each command)</li>
-      <li>Permission levels (see <router-link to="/docs/permissions">Permissions</router-link> for more info)</li>
-      <li>Plugin-specific configuration (see <router-link to="/docs/plugin-configuration">Plugin configuration</router-link> for more info)</li>
+      <li>Permission levels (see <router-link to="/docs/configuration/permissions">Permissions</router-link> for more info)</li>
+      <li>Plugin-specific configuration (see <router-link to="/docs/configuration/plugin-configuration">Plugin configuration</router-link> for more info)</li>
     </ul>
 
-    <CodeBlock lang="yaml" trim="start">
+    <CodeBlock code-lang="yaml" trim="start">
       prefix: "!"
 
       # role id: level

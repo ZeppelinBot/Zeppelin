@@ -23,12 +23,22 @@
     @apply mb-4;
   }
 
-  & a:not([class]) {
+  & a:not([class]),
+  & a[class=""] {
     @apply link;
   }
 
   & ul:not([class]) {
     @apply list-disc;
+    @apply mb-4;
+
+    & li {
+      @apply ml-6;
+    }
+  }
+
+  & ol:not([class]) {
+    @apply list-decimal;
     @apply mb-4;
 
     & li {
@@ -42,5 +52,14 @@
 
   & .expandable:not(.wide) {
     max-width: 600px;
+  }
+}
+
+@screen xl {
+  .main-content {
+    & a:not([class]),
+    & a[class=""] {
+      white-space: nowrap;
+    }
   }
 }
