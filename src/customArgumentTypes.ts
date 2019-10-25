@@ -7,8 +7,7 @@ import {
   UnknownUser,
 } from "./utils";
 import { Client, GuildChannel, Message } from "eris";
-import { TypeConversionError } from "knub-command-manager";
-import { ICommandContext } from "knub";
+import { ICommandContext, TypeConversionError } from "knub";
 
 export const customArgumentTypes = {
   delay(value) {
