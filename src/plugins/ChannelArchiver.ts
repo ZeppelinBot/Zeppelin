@@ -73,7 +73,7 @@ export class ChannelArchiverPlugin extends ZeppelinPlugin {
         this.bot,
         msg.channel,
         msg.author.id,
-        "No `--attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
+        "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
       );
       if (!confirmed) {
         msg.channel.createMessage(errorMessage("Canceled"));
