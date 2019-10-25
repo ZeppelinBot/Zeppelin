@@ -46,8 +46,8 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
   protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
     const defaultOptions: any = this.getStaticDefaultOptions();
     const mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
-    const mergedOverrides = options["=overrides"]
-      ? options["=overrides"]
+    const mergedOverrides = options.replaceDefaultOverrides
+      ? options.overrides
       : (options.overrides || []).concat(defaultOptions.overrides || []);
 
     const decodedConfig = this.configSchema ? decodeAndValidateStrict(this.configSchema, mergedConfig) : mergedConfig;

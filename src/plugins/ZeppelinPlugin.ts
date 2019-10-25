@@ -116,8 +116,8 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
     const defaultOptions: any = this.getStaticDefaultOptions();
     let mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
-    const mergedOverrides = options["=overrides"]
-      ? options["=overrides"]
+    const mergedOverrides = options.replaceDefaultOverrides
+      ? options.overrides
       : (options.overrides || []).concat(defaultOptions.overrides || []);
 
     mergedConfig = this.preprocessStaticConfig(mergedConfig);
