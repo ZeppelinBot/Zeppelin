@@ -1489,12 +1489,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       {
         name: "expand",
         shortcut: "e",
-        flag: true,
+        isSwitch: true,
       },
       {
         name: "hidden",
         shortcut: "h",
-        flag: true,
+        isSwitch: true,
       },
     ],
     extra: {
