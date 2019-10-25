@@ -27,21 +27,22 @@
       <!-- Usage guide -->
       <div v-if="data.info.usageGuide">
         <h2 id="usage-guide">Usage guide</h2>
-        <MarkdownBlock :content="data.info.usageGuide" class="content"></MarkdownBlock>
+        <MarkdownBlock :content="data.info.usageGuide" class="content" />
       </div>
 
       <!-- Command list -->
       <div v-if="data.commands.length">
         <h2 id="commands">Commands</h2>
-        <div v-for="command in data.commands" class="mb-4">
+        <div v-for="command in data.commands"
+             class="command mb-4"
+             v-bind:ref="getCommandSlug(command.trigger)" v-bind:class="{target: targetCommandId === getCommandSlug(command.trigger)}">
           <h3 class="text-xl mb-0">
             !{{ command.trigger }}
             <span v-for="alias in command.config.aliases"> <span class="text-gray-600">/</span> !{{ alias }}</span>
           </h3>
           <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description"
                          :content="command.config.extra.info.description"
-                         class="content">
-          </MarkdownBlock>
+                         class="content" />
 
           <div v-bind:class="{'-mt-2': command.config.extra.info && command.config.extra.info.description}">
             <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
@@ -144,6 +145,17 @@
   </div>
 </template>
 
+<style scoped>
+  .command.target {
+    @apply mt-5 mb-3;
+    @apply pt-2 pb-2 pl-4 pr-4;
+    @apply border;
+    @apply border-gray-400;
+    @apply border-dashed;
+    @apply rounded;
+  }
+</style>
+
 <script lang="ts">
   import Vue from "vue";
   import {mapState} from "vuex";
@@ -172,6 +184,18 @@
       }
 
       this.loading = false;
+
+      this.$nextTick(() => {
+        if (this.tab === "usage" && window.location.hash) {
+          this.scrollToCommand(window.location.hash.slice(1));
+        }
+      });
+
+      this.hashChangeListener = () => this.scrollToCommand(window.location.hash.slice(1));
+      window.addEventListener('hashchange', this.hashChangeListener);
+    },
+    beforeDestroy() {
+      window.removeEventListener('hashchange', this.hashChangeListener);
     },
     methods: {
       renderConfiguration(options) {
@@ -199,6 +223,20 @@
           return `[${str}]`;
         }
       },
+      getCommandSlug(str) {
+        return 'command-' + str.trim().toLowerCase().replace(/\s/g, '-');
+      },
+      scrollToCommand(hash) {
+        if (this.$refs[hash]) {
+          this.targetCommandId = hash;
+          (this.$refs[hash][0] as Element).scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        } else {
+          this.targetCommandId = null;
+        }
+      },
     },
     data() {
       return {
@@ -207,6 +245,8 @@
         tab: validTabs.includes(this.$route.params.tab)
           ? this.$route.params.tab
           : defaultTab,
+        targetCommandId: null,
+        hashChangeListener: null
       };
     },
     computed: {
