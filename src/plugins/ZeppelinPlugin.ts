@@ -118,7 +118,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     let mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
     const mergedOverrides = options.replaceDefaultOverrides
       ? options.overrides
-      : (options.overrides || []).concat(defaultOptions.overrides || []);
+      : (defaultOptions.overrides || []).concat(options.overrides || []);
 
     mergedConfig = this.preprocessStaticConfig(mergedConfig);
 
