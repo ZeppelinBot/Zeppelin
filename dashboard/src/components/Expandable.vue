@@ -22,35 +22,32 @@
 <style scoped>
   @import "../style/components.pcss";
 
-  :root {
+  .expandable {
     --animation-time: 400ms;
     --target-height: auto;
-  }
+    transition: box-shadow var(--animation-time); /* hi */
 
-  .expandable {
-    transition: box-shadow var(--animation-time);
-  }
+    & > .title {
+      &:hover {
+        & .title-text {
+          @apply underline;
+        }
+      }
 
-  .title {
-    &:hover {
-      & .title-text {
-        @apply underline;
+      .icon {
+        transition: transform var(--animation-time);
+        transform-origin: 50% 60%;
+      }
+
+      .icon-open {
+        transform: rotate(179deg);
       }
     }
-  }
 
-  .icon {
-    transition: transform var(--animation-time);
-    transform-origin: 50% 60%;
-  }
-
-  .icon-open {
-    transform: rotate(179deg);
-  }
-
-  .content {
-    overflow: hidden;
-    display: none;
+    & > .content {
+      overflow: hidden;
+      display: none;
+    }
   }
 
   @keyframes open {
@@ -72,7 +69,8 @@
   }
 
   .inline-code,
-  code:not([class]) {
+  code:not([class]),
+  >>> code:not([class]) {
     @apply bg-gray-900;
   }
 

@@ -34,24 +34,44 @@
       <div v-if="data.commands.length">
         <h2 id="commands">Commands</h2>
         <div v-for="command in data.commands" class="mb-4">
-          <h3 class="text-xl">!{{ command.trigger }}</h3>
-          <div v-if="command.config.extra.requiredPermission">
-            Permission: <code class="inline-code">{{ command.config.extra.requiredPermission }}</code>
-          </div>
-          <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
-            Basic usage: <code class="inline-code">{{ command.config.extra.info.basicUsage }}</code>
-          </div>
-          <div v-if="command.config.aliases && command.config.aliases.length">
-            Shortcut:
-            <code class="inline-code" style="margin-right: 4px" v-for="alias in command.config.aliases">!{{ alias }}</code>
-          </div>
+          <h3 class="text-xl mb-0">
+            !{{ command.trigger }}
+            <span v-for="alias in command.config.aliases"> <span class="text-gray-600">/</span> !{{ alias }}</span>
+          </h3>
+          <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description"
+                         :content="command.config.extra.info.description"
+                         class="content">
+          </MarkdownBlock>
 
-          <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description" :content="command.config.extra.info.description" class="content"></MarkdownBlock>
+          <div v-bind:class="{'-mt-2': command.config.extra.info && command.config.extra.info.description}">
+            <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
+              <span class="font-semibold">Basic usage:</span> <code class="inline-code">{{ command.config.extra.info.basicUsage }}</code>
+            </div>
+          </div>
 
           <Expandable class="mt-4">
             <template v-slot:title>Additional information</template>
             <template v-slot:content>
-              Signatures:
+              <div v-if="command.config.extra.info && command.config.extra.info.usageGuide">
+                <div class="font-semibold">Usage guide:</div>
+                <MarkdownBlock :content="command.config.extra.info.usageGuide"
+                               class="content">
+                </MarkdownBlock>
+              </div>
+
+              <div v-if="command.config.extra.info && command.config.extra.info.examples">
+                <div class="font-semibold">Examples:</div>
+                <MarkdownBlock :content="command.config.extra.info.examples"
+                               class="content">
+                </MarkdownBlock>
+              </div>
+
+              <p v-if="command.config.extra.requiredPermission">
+                <span class="font-semibold">Permission:</span>
+                <code class="inline-code">{{ command.config.extra.requiredPermission }}</code>
+              </p>
+
+              <span class="font-semibold">Signatures:</span>
               <ul>
                 <li>
                   <code class="inline-code bg-gray-900">
@@ -62,13 +82,13 @@
               </ul>
 
               <div class="mt-2" v-if="command.parameters.length">
-                Command arguments:
+                <span class="font-semibold">Command arguments:</span>
                 <ul>
                   <li v-for="param in command.parameters">
                     <code>{{ renderParameter(param) }}</code>
                     <router-link :to="'/docs/reference/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
-                    <MarkdownBlock v-if="command.config.info && command.config.info.parameterDescriptions && command.config.info.parameterDescriptions[param.name]"
-                                   :content="command.config.info.parameterDescriptions[param.name]"
+                    <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.parameterDescriptions && command.config.extra.info.parameterDescriptions[param.name]"
+                                   :content="command.config.extra.info.parameterDescriptions[param.name]"
                                    class="content">
                     </MarkdownBlock>
                   </li>
@@ -76,13 +96,13 @@
               </div>
 
               <div class="mt-2" v-if="command.config.options && command.config.options.length">
-                Options:
+                <span class="font-semibold">Options:</span>
                 <ul>
                   <li v-for="opt in command.config.options">
                     <code>{{ renderOption(opt) }}</code>
                     <router-link :to="'/docs/reference/argument-types#' + (opt.type || 'string')">{{ opt.type || 'string' }}</router-link>
-                    <MarkdownBlock v-if="command.config.info && command.config.info.optionDescriptions && command.config.info.optionDescriptions[opt.name]"
-                                   :content="command.config.info.optionDescriptions[opt.name]"
+                    <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.optionDescriptions && command.config.extra.info.optionDescriptions[opt.name]"
+                                   :content="command.config.extra.info.optionDescriptions[opt.name]"
                                    class="content">
                     </MarkdownBlock>
                   </li>

@@ -40,6 +40,8 @@ export interface PluginInfo {
 export interface CommandInfo {
   description?: TMarkdown;
   basicUsage?: TMarkdown;
+  examples?: TMarkdown;
+  usageGuide?: TMarkdown;
   parameterDescriptions?: {
     [key: string]: TMarkdown;
   };

@@ -34,6 +34,15 @@ export const DocsStore: Module<DocsState, RootState> = {
       if (state.plugins[name]) return;
 
       const data = await get(`docs/plugins/${name}`);
+      if (data && data.commands) {
+        data.commands.sort((a, b) => {
+          const aName = a.trigger.toLowerCase();
+          const bName = b.trigger.toLowerCase();
+          if (aName > bName) return 1;
+          if (aName < bName) return -1;
+          return 0;
+        });
+      }
       commit("setPluginData", { name, data });
     },
   },
