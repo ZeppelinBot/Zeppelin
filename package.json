@@ -31,7 +31,7 @@
     "io-ts": "^2.0.0",
     "js-yaml": "^3.13.1",
     "knub": "^26.0.2",
-    "knub-command-manager": "^5.2.0",
+    "knub-command-manager": "^6.1.0",
     "last-commit-log": "^2.1.0",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
