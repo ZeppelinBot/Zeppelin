@@ -48,7 +48,7 @@ export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extend
     const mergedConfig = mergeConfig({}, defaultOptions.config || {}, options.config || {});
     const mergedOverrides = options.replaceDefaultOverrides
       ? options.overrides
-      : (options.overrides || []).concat(defaultOptions.overrides || []);
+      : (defaultOptions.overrides || []).concat(options.overrides || []);
 
     const decodedConfig = this.configSchema ? decodeAndValidateStrict(this.configSchema, mergedConfig) : mergedConfig;
     if (decodedConfig instanceof StrictValidationError) {
