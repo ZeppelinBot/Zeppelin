@@ -50,7 +50,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { getCurrentUptime } from "../uptime";
 import LCL from "last-commit-log";
 import * as t from "io-ts";
@@ -183,6 +183,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         type: "string",
       },
     ],
+    extra: {
+      info: <CommandInfo>{
+        description: "List all roles or roles matching a search",
+        basicUsage: "!roles mod",
+      },
+    },
   })
   @d.permission("can_roles")
   async rolesCmd(msg: Message, args: { search?: string; counts?: boolean; sort?: string }) {
@@ -274,7 +280,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("level", "[member:resolvedMember]")
+  @d.command("level", "[member:resolvedMember]", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Show the permission level of a user",
+        basicUsage: "!level 106391128718245888",
+      },
+    },
+  })
   @d.permission("can_level")
   async levelCmd(msg: Message, args: { member?: Member }) {
     const member = args.member || msg.member;
@@ -382,6 +395,21 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         isSwitch: true,
       },
     ],
+    extra: {
+      info: <CommandInfo>{
+        description: "Search server members",
+        basicUsage: "!search dragory",
+        optionDescriptions: {
+          role:
+            "Only include members with a specific role. Multiple roles can be specified by separating them with a comma.",
+          voice: "Only include members currently in a voice channel",
+          sort:
+            "Change how the results are sorted. Possible values are 'id' and 'name'. Prefix with a dash, e.g. '-id', to reverse sorting.",
+          "case-sensitive": "By default, the search is case-insensitive. Use this to make it case-sensitive instead.",
+          export: "If set, the full search results are exported as an archive",
+        },
+      },
+    },
   })
   @d.permission("can_search")
   async searchCmd(
@@ -567,6 +595,29 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "i",
       },
     ],
+    extra: {
+      info: <CommandInfo>{
+        description: "Remove a number of recent messages",
+        basicUsage: "!clean 20",
+        examples: trimPluginDescription(`
+          To clean 20 messages from a specific user:  
+          \`!clean -user 106391128718245888 20\`
+          
+          To clean messages from another channel:
+          \`!clean -channel #other-channel 20\`
+        `),
+        parameterDescriptions: {
+          count: "Number of messages to remove",
+        },
+        optionDescriptions: {
+          user: "Only remove messages from the specified user",
+          channel:
+            "By default, messages are removed from the channel where the command is used. You can clean a different channel by specifying it with this option.",
+          bots: "Only remove messages sent by bots",
+          "has-invites": "Only remove messages that contain invites",
+        },
+      },
+    },
   })
   @d.permission("can_clean")
   async cleanCmd(
@@ -651,7 +702,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("info", "[user:resolvedUserLoose]")
+  @d.command("info", "[user:resolvedUserLoose]", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Show basic information about a user",
+        basicUsage: "!info 106391128718245888",
+      },
+    },
+  })
   @d.permission("can_info")
   async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
     const user = args.user || msg.author;
@@ -751,6 +809,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("nickname reset", "<member:resolvedMember>", {
     aliases: ["nick reset"],
+    extra: {
+      info: <CommandInfo>{
+        description: "Reset a member's nickname to their username",
+        basicUsage: "!nickname reset 106391128718245888",
+      },
+    },
   })
   @d.permission("can_nickname")
   async nicknameResetCmd(msg: Message, args: { member: Member }) {
@@ -773,6 +837,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("nickname", "<member:resolvedMember> <nickname:string$>", {
     aliases: ["nick"],
+    extra: {
+      info: <CommandInfo>{
+        description: "Set a member's nickname",
+        basicUsage: "!nickname 106391128718245888 Drag",
+      },
+    },
   })
   @d.permission("can_nickname")
   async nicknameCmd(msg: Message, args: { member: Member; nickname: string }) {
@@ -803,7 +873,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  @d.command("server")
+  @d.command("server", "", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Show information about the server",
+        basicUsage: "!server",
+      },
+    },
+  })
   @d.permission("can_server")
   async serverCmd(msg: Message) {
     await this.guild.fetchAllMembers();
@@ -874,7 +951,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage({ embed });
   }
 
-  @d.command("ping")
+  @d.command("ping", "", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Test the bot's ping to the Discord API",
+      },
+    },
+  })
   @d.permission("can_ping")
   async pingCmd(msg: Message) {
     const times = [];
@@ -913,7 +996,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.bot.deleteMessages(messages[0].channel.id, messages.map(m => m.id)).catch(noop);
   }
 
-  @d.command("source", "<messageId:string>")
+  @d.command("source", "<messageId:string>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "View the message source of the specified message id",
+        basicUsage: "!source 534722219696455701",
+      },
+    },
+  })
   @d.permission("can_source")
   async sourceCmd(msg: Message, args: { messageId: string }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
@@ -930,7 +1020,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(`Message source: ${url}`);
   }
 
-  @d.command("vcmove", "<member:resolvedMember> <channel:string$>")
+  @d.command("vcmove", "<member:resolvedMember> <channel:string$>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Move a member to another voice channel",
+        basicUsage: "!vcmove @Dragory 473223047822704651",
+      },
+    },
+  })
   @d.permission("can_vcmove")
   async vcmoveCmd(msg: Message, args: { member: Member; channel: string }) {
     let channel: VoiceChannel;
@@ -1001,7 +1098,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  @d.command("help", "<command:string$>")
+  @d.command("help", "<command:string$>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Show a quick reference for the specified command's usage",
+        basicUsage: "!help clean",
+      },
+    },
+  })
   @d.permission("can_help")
   helpCmd(msg: Message, args: { command: string }) {
     const searchStr = args.command.toLowerCase();
@@ -1042,7 +1146,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     createChunkedMessage(msg.channel, message);
   }
 
-  @d.command("about")
+  @d.command("about", "", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Show information about Zeppelin's status on the server",
+      },
+    },
+  })
   @d.permission("can_about")
   async aboutCmd(msg: Message) {
     const uptime = getCurrentUptime();
@@ -1108,7 +1218,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(aboutContent);
   }
 
-  @d.command("reload_guild")
+  @d.command("reload_guild", "", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Reload the Zeppelin configuration and all plugins for the server. This can sometimes fix issues.",
+      },
+    },
+  })
   @d.permission("can_reload_guild")
   reloadGuildCmd(msg: Message) {
     if (activeReloads.has(this.guildId)) return;
