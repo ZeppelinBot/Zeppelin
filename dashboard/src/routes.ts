@@ -24,15 +24,15 @@ export const router = new VueRouter({
           component: () => import("./components/docs/Introduction.vue"),
         },
         {
-          path: "configuration-format",
+          path: "configuration/configuration-format",
           component: () => import("./components/docs/ConfigurationFormat.vue"),
         },
         {
-          path: "permissions",
+          path: "configuration/permissions",
           component: () => import("./components/docs/Permissions.vue"),
         },
         {
-          path: "plugin-configuration",
+          path: "configuration/plugin-configuration",
           component: () => import("./components/docs/PluginConfiguration.vue"),
         },
         {

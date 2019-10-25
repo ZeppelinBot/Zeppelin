@@ -3,7 +3,7 @@
     <h1>Permissions</h1>
     <p>
       Permissions in Zeppelin are simply values in plugin configuration that are checked when the command is used.
-      These values can be changed with overrides (see <router-link to="/docs/plugin-configuration">Plugin configuration</router-link> for more info)
+      These values can be changed with overrides (see <router-link to="/docs/configuration/plugin-configuration">Plugin configuration</router-link> for more info)
       and can depend on e.g. user id, role id, channel id, category id, or <strong>permission level</strong>.
     </p>
 
@@ -21,7 +21,7 @@
       Permission levels are defined in the config in the <strong>levels</strong> section. For example:
     </p>
 
-    <CodeBlock lang="yaml" trim="4">
+    <CodeBlock code-lang="yaml">
       # "role/user id": level
       levels:
         "172949857164722176": 100 # Example admin
@@ -39,7 +39,7 @@
       Here's what the configuration for this would look like:
     </p>
 
-    <CodeBlock lang="yaml" trim="4">
+    <CodeBlock code-lang="yaml">
       plugins:
         cats:
           config:
@@ -63,7 +63,7 @@
       Here's what the configuration for this would look like:
     </p>
 
-    <CodeBlock lang="yaml" trim="4">
+    <CodeBlock code-lang="yaml">
       plugins:
         mod_actions:
           =overrides: # The "=" here means "replace any defaults"

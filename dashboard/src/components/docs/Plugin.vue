@@ -10,10 +10,10 @@
 
     <Tabs>
       <Tab :active="tab === 'usage'">
-        <router-link v-bind:to="'/docs/plugins/' + pluginName + '/usage'">Usage</router-link>
+        <router-link class="unstyled" v-bind:to="'/docs/plugins/' + pluginName + '/usage'">Usage</router-link>
       </Tab>
       <Tab :active="tab === 'configuration'">
-        <router-link v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>
+        <router-link class="unstyled" v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>
       </Tab>
     </Tabs>
 
@@ -110,14 +110,14 @@
 
       <!-- Default configuration -->
       <h2 id="default-configuration">Default configuration</h2>
-      <CodeBlock lang="yaml">{{ renderConfiguration(data.defaultOptions) }}</CodeBlock>
+      <CodeBlock code-lang="yaml">{{ renderConfiguration(data.defaultOptions) }}</CodeBlock>
 
       <!-- Config schema -->
       <h2 id="config-schema">Config schema</h2>
       <Expandable class="wide">
         <template v-slot:title>Click to expand</template>
         <template v-slot:content>
-          <CodeBlock lang="plain">{{ data.configSchema }}</CodeBlock>
+          <CodeBlock code-lang="plain">{{ data.configSchema }}</CodeBlock>
         </template>
       </Expandable>
     </div>

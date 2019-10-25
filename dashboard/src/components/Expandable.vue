@@ -1,6 +1,13 @@
 <template>
-  <div class="expandable mb-4 bg-gray-800 border border-gray-600 rounded overflow-hidden" ref="root" v-bind:class="{'shadow-xl': isOpen}">
-    <div role="button" class="title p-2" v-on:click="toggle">
+  <div class="expandable mb-4 bg-gray-800 border border-gray-600 rounded overflow-hidden"
+       ref="root"
+       v-bind:class="{ 'shadow-xl': isOpen}">
+    <div role="button"
+         class="title p-2 focus:bg-gray-700"
+         v-on:click="toggle"
+         v-on:keydown.space="$event.preventDefault()"
+         v-on:keyup.space="toggle"
+         tabindex="0">
       <chevron-down class="icon" v-bind:class="{'icon-open': isOpen}" />
       <span class="title-text"><slot name="title"></slot></span>
     </div>
