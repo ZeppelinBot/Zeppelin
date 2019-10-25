@@ -336,7 +336,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
       {
         name: "left",
-        flag: true,
+        isSwitch: true,
       },
     ],
   })

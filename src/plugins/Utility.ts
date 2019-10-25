@@ -374,12 +374,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       {
         name: "case-sensitive",
         shortcut: "cs",
-        flag: true,
+        isSwitch: true,
       },
       {
         name: "export",
         shortcut: "e",
-        flag: true,
+        isSwitch: true,
       },
     ],
   })
@@ -558,12 +558,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
       {
         name: "bots",
-        flag: true,
+        isSwitch: true,
         shortcut: "b",
       },
       {
         name: "has-invites",
-        flag: true,
+        isSwitch: true,
         shortcut: "i",
       },
     ],
