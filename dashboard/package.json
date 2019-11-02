@@ -1,5 +1,5 @@
 {
-  "name": "zeppelin-dashboard",
+  "name": "@zeppelin/dashboard",
   "version": "1.0.0",
   "description": "",
   "private": true,

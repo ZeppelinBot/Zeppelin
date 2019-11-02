@@ -2,6 +2,7 @@
   "apps": [
     {
       "name": "zeppelin",
+      "cwd": "./backend",
       "script": "npm",
       "args": "run start-bot-prod",
       "log_date_format": "YYYY-MM-DD HH:mm:ss"

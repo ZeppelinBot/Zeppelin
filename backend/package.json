@@ -1,0 +1,83 @@
+{
+  "name": "@zeppelin/backend",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start-bot-dev": "node -r ts-node/register src/index.ts",
+    "start-bot-prod": "cross-env NODE_ENV=production node dist/index.js",
+    "watch-bot": "nodemon --config nodemon-bot.json",
+    "build": "rimraf dist && tsc",
+    "start-api-dev": "node -r ts-node/register src/api/index.ts",
+    "start-api-prod": "cross-env NODE_ENV=production node dist/api/index.js",
+    "watch-api": "nodemon --config nodemon-api.json",
+    "format": "prettier --write \"./src/**/*.ts\"",
+    "typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
+    "migrate": "npm run typeorm -- migration:run",
+    "migrate-rollback": "npm run typeorm -- migration:revert",
+    "test": "ava"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "cross-env": "^5.2.0",
+    "deep-diff": "^1.0.2",
+    "dotenv": "^4.0.0",
+    "emoji-regex": "^8.0.0",
+    "eris": "^0.11.0",
+    "escape-string-regexp": "^1.0.5",
+    "express": "^4.17.0",
+    "fp-ts": "^2.0.1",
+    "humanize-duration": "^3.15.0",
+    "io-ts": "^2.0.0",
+    "js-yaml": "^3.13.1",
+    "knub": "^26.0.2",
+    "knub-command-manager": "^6.1.0",
+    "last-commit-log": "^2.1.0",
+    "lodash.chunk": "^4.2.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.difference": "^4.5.0",
+    "lodash.intersection": "^4.4.0",
+    "lodash.isequal": "^4.5.0",
+    "lodash.pick": "^4.4.0",
+    "moment-timezone": "^0.5.21",
+    "mysql": "^2.16.0",
+    "passport": "^0.4.0",
+    "passport-custom": "^1.0.5",
+    "passport-oauth2": "^1.5.0",
+    "reflect-metadata": "^0.1.12",
+    "safe-regex": "^2.0.2",
+    "seedrandom": "^3.0.1",
+    "tlds": "^1.203.1",
+    "tmp": "0.0.33",
+    "typeorm": "^0.2.14",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.5",
+    "@types/express": "^4.16.1",
+    "@types/jest": "^24.0.15",
+    "@types/js-yaml": "^3.12.1",
+    "@types/lodash.at": "^4.6.3",
+    "@types/moment-timezone": "^0.5.6",
+    "@types/node": "^12.7.5",
+    "@types/passport": "^1.0.0",
+    "@types/passport-oauth2": "^1.4.8",
+    "@types/passport-strategy": "^0.2.35",
+    "@types/tmp": "0.0.33",
+    "ava": "^2.4.0",
+    "nodemon": "^1.19.4",
+    "rimraf": "^2.6.2",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "files": [
+      "src/**/*.test.ts"
+    ],
+    "extensions": ["ts"],
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}
