@@ -26,6 +26,7 @@
     "no-floating-promises": true,
     "no-string-literal": false,
     "no-object-literal-type-assertion": false,
-    "no-angle-bracket-type-assertion": false
+    "no-angle-bracket-type-assertion": false,
+    "no-implicit-dependencies": false
   }
 }

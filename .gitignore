@@ -63,20 +63,12 @@ typings/
 # windows folder options
 desktop.ini
 
-# Knub data
-/data
-/config
-
 # PHPStorm
 .idea/
-
-# Compiled files
-/dist
-/dist-frontend
 
 # Misc
 /convert.js
 /startscript.js
 /.cache
-/npm-ls.txt
-/npm-audit.txt
+npm-ls.txt
+npm-audit.txt

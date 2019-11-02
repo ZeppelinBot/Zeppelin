@@ -1,26 +1,21 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "esnext",
-    "target": "esnext",
-    "sourceMap": true,
+    "module": "commonjs",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strict": false,
+    "target": "esnext",
     "lib": [
-      "esnext",
-      "dom"
+      "esnext"
     ],
     "baseUrl": "src",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "paths": {
-      "@shared/*": [
-        "../shared/src/*"
-      ]
-    }
-  }
+    "outDir": "./dist"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

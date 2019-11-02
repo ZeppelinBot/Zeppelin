@@ -1,26 +1,27 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "esnext",
-    "target": "esnext",
-    "sourceMap": true,
+    "module": "commonjs",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "strict": false,
+    "target": "esnext",
     "lib": [
-      "esnext",
-      "dom"
+      "es2017",
+      "esnext"
     ],
     "baseUrl": "src",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowJs": true,
+    "outDir": "./dist",
     "paths": {
       "@shared/*": [
         "../shared/src/*"
       ]
     }
-  }
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }
