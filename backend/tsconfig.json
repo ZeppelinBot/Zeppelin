@@ -11,7 +11,7 @@
       "es2017",
       "esnext"
     ],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "./dist",
