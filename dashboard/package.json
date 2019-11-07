@@ -9,9 +9,9 @@
     "watch": "cross-env NODE_ENV=development webpack-dev-server"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.3",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/preset-typescript": "^7.6.0",
+    "@babel/core": "^7.7.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-typescript": "^7.7.2",
     "babel-loader": "^8.0.6",
     "cross-env": "^5.2.0",
     "css-loader": "^3.2.0",
