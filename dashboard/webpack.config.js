@@ -19,6 +19,18 @@ const babelOpts = {
   ],
 };
 
+const tsconfig = require('./tsconfig.json');
+const pathAliases = Object.entries(tsconfig.compilerOptions.paths || []).reduce((aliases, pair) => {
+  let alias = pair[0];
+  if (alias.endsWith('/*')) alias = alias.slice(0, -2);
+
+  let aliasPath = pair[1][0];
+  if (aliasPath.endsWith('/*')) aliasPath = aliasPath.slice(0, -2);
+
+  aliases[alias] = path.resolve(__dirname, aliasPath);
+  return aliases;
+}, {});
+
 let config = {
   entry: './src/main.ts',
   output: {
@@ -153,6 +165,7 @@ let config = {
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.mjs', '.vue'],
+    alias: pathAliases,
   },
 };
 
