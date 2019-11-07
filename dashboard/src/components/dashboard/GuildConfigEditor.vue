@@ -36,7 +36,7 @@
     async mounted() {
         await this.$store.dispatch("guilds/loadAvailableGuilds");
         if (this.guild == null) {
-          this.$router.push('/dashboard/guilds');
+          this.$router.push('/dashboard');
           return;
         }
 
