@@ -68,14 +68,16 @@
     "nodemon": "^1.19.4",
     "rimraf": "^2.6.2",
     "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "ava": {
     "compileEnhancements": false,
     "files": [
       "src/**/*.test.ts"
     ],
-    "extensions": ["ts"],
+    "extensions": [
+      "ts"
+    ],
     "require": [
       "ts-node/register"
     ]

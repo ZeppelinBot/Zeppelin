@@ -10,14 +10,16 @@
   "devDependencies": {
     "ava": "^2.4.0",
     "ts-node": "^8.4.1",
-    "typescript": "^3.6"
+    "typescript": "^3.7.2"
   },
   "ava": {
     "compileEnhancements": false,
     "files": [
       "src/**/*.test.ts"
     ],
-    "extensions": ["ts"],
+    "extensions": [
+      "ts"
+    ],
     "require": [
       "ts-node/register"
     ]

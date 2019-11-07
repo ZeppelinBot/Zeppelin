@@ -13,7 +13,7 @@
     "prettier": "^1.16.4",
     "tslint": "^5.13.1",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.6"
+    "typescript": "^3.7.2"
   },
   "husky": {
     "hooks": {
