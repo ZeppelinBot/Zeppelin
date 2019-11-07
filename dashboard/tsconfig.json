@@ -13,14 +13,12 @@
       "esnext",
       "dom"
     ],
-    "baseUrl": "src",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowJs": true,
     "paths": {
-      "@shared/*": [
-        "../shared/src/*"
-      ]
+      "@shared/*": ["../shared/src/*"]
     }
   }
 }
