@@ -4,15 +4,15 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start-bot-dev": "node -r ts-node/register src/index.ts",
-    "start-bot-prod": "cross-env NODE_ENV=production node dist/index.js",
+    "start-bot-dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/index.js",
     "watch-bot": "nodemon --config nodemon-bot.json",
     "build": "rimraf dist && tsc",
-    "start-api-dev": "node -r ts-node/register src/api/index.ts",
-    "start-api-prod": "cross-env NODE_ENV=production node dist/api/index.js",
+    "start-api-dev": "node -r ts-node/register -r tsconfig-paths/register src/api/index.ts",
+    "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/api/index.js",
     "watch-api": "nodemon --config nodemon-api.json",
     "format": "prettier --write \"./src/**/*.ts\"",
-    "typeorm": "node -r ts-node/register ./node_modules/typeorm/cli.js",
+    "typeorm": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run",
     "migrate-rollback": "npm run typeorm -- migration:revert",
     "test": "ava"
@@ -49,6 +49,7 @@
     "seedrandom": "^3.0.1",
     "tlds": "^1.203.1",
     "tmp": "0.0.33",
+    "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.14",
     "uuid": "^3.3.2"
   },
@@ -79,7 +80,8 @@
       "ts"
     ],
     "require": [
-      "ts-node/register"
+      "ts-node/register",
+      "tsconfig-paths/register"
     ]
   }
 }

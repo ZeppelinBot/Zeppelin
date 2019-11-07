@@ -10,7 +10,7 @@ import path from "path";
 import { TokenError } from "passport-oauth2";
 import { PluginError } from "knub";
 
-require("dotenv").config({ path: path.resolve(__dirname, "..", "..", "api.env") });
+require("dotenv").config({ path: path.resolve(process.cwd(), "api.env") });
 
 function errorHandler(err) {
   console.error(err.stack || err); // tslint:disable-line:no-console
