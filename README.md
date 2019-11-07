@@ -27,8 +27,8 @@ These instructions are intended for bot development only.
 2. `npm ci`
 3. Make a copy of `.env.example` called `.env`, fill in the values
 4. Run the desired start script:
-    * `npm run build` compiled the dashboard's static files in `dist/` which can then be served with any web server
-    * `npm run watch` runs Parcel.js's dev server that automatically reloads on changes
+    * `npm run build` compiles the dashboard's static files to `dist/` which can then be served with any web server
+    * `npm run watch` runs webpack's dev server that automatically reloads on changes
 
 ## Notes
 * Since we now use shared paths in `tsconfig.json`, the compiled files in `backend/dist/` have longer paths, e.g.
