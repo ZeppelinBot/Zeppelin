@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { ApiLogin } from "./ApiLogin";
-import { ApiPermission } from "./ApiPermission";
+import { ApiPermissionAssignment } from "./ApiPermissionAssignment";
 
 export interface ApiUserInfoData {
   username: string;
@@ -23,6 +23,6 @@ export class ApiUserInfo {
   @OneToMany(type => ApiLogin, login => login.userInfo)
   logins: ApiLogin[];
 
-  @OneToMany(type => ApiPermission, perm => perm.userInfo)
-  permissions: ApiPermission[];
+  @OneToMany(type => ApiPermissionAssignment, p => p.userInfo)
+  permissionAssignments: ApiPermissionAssignment[];
 }

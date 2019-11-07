@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { BaseRepository } from "./BaseRepository";
+import { ApiPermissionTypes } from "./ApiPermissionAssignments";
 
 export class AllowedGuilds extends BaseRepository {
   private allowedGuilds: Repository<AllowedGuild>;
@@ -33,8 +34,8 @@ export class AllowedGuilds extends BaseRepository {
       .innerJoin(
         "api_permissions",
         "api_permissions",
-        "api_permissions.guild_id = allowed_guilds.id AND api_permissions.user_id = :userId",
-        { userId },
+        "api_permissions.guild_id = allowed_guilds.id AND api_permissions.type = :type AND api_permissions.target_id = :userId",
+        { type: ApiPermissionTypes.User, userId },
       )
       .getMany();
   }

@@ -1,35 +1,38 @@
-import express from "express";
-import passport from "passport";
+import express, { Request, Response } from "express";
 import { AllowedGuilds } from "../data/AllowedGuilds";
-import { ApiPermissions } from "../data/ApiPermissions";
-import { clientError, error, ok, serverError, unauthorized } from "./responses";
+import { clientError, ok, serverError, unauthorized } from "./responses";
 import { Configs } from "../data/Configs";
-import { ApiRoles } from "../data/ApiRoles";
 import { validateGuildConfig } from "../configValidator";
 import yaml, { YAMLException } from "js-yaml";
 import { apiTokenAuthHandlers } from "./auth";
+import { ApiPermissions, hasPermission, permissionArrToSet } from "@shared/apiPermissions";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 
 export function initGuildsAPI(app: express.Express) {
   const allowedGuilds = new AllowedGuilds();
-  const apiPermissions = new ApiPermissions();
+  const apiPermissionAssignments = new ApiPermissionAssignments();
   const configs = new Configs();
 
-  app.get("/guilds/available", ...apiTokenAuthHandlers(), async (req, res) => {
+  app.get("/guilds/available", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
     const guilds = await allowedGuilds.getForApiUser(req.user.userId);
     res.json(guilds);
   });
 
-  app.get("/guilds/:guildId/config", ...apiTokenAuthHandlers(), async (req, res) => {
-    const permissions = await apiPermissions.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!permissions) return unauthorized(res);
+  app.get("/guilds/:guildId/config", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
+    const permAssignment = await apiPermissionAssignments.getByGuildAndUserId(req.params.guildId, req.user.userId);
+    if (!permAssignment || !hasPermission(permissionArrToSet(permAssignment.permissions), ApiPermissions.ReadConfig)) {
+      return unauthorized(res);
+    }
 
     const config = await configs.getActiveByKey(`guild-${req.params.guildId}`);
     res.json({ config: config ? config.config : "" });
   });
 
   app.post("/guilds/:guildId/config", ...apiTokenAuthHandlers(), async (req, res) => {
-    const permissions = await apiPermissions.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!permissions || ApiRoles[permissions.role] < ApiRoles.Editor) return unauthorized(res);
+    const permAssignment = await apiPermissionAssignments.getByGuildAndUserId(req.params.guildId, req.user.userId);
+    if (!permAssignment || !hasPermission(permissionArrToSet(permAssignment.permissions), ApiPermissions.EditConfig)) {
+      return unauthorized(res);
+    }
 
     let config = req.body.config;
     if (config == null) return clientError(res, "No config supplied");

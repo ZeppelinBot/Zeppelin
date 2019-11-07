@@ -2,19 +2,23 @@ import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
 import { ApiUserInfo } from "./ApiUserInfo";
 
 @Entity("api_permissions")
-export class ApiPermission {
+export class ApiPermissionAssignment {
   @Column()
   @PrimaryColumn()
   guild_id: string;
 
   @Column()
   @PrimaryColumn()
-  user_id: string;
+  type: string;
 
   @Column()
-  role: string;
+  @PrimaryColumn()
+  target_id: string;
 
-  @ManyToOne(type => ApiUserInfo, userInfo => userInfo.permissions)
-  @JoinColumn({ name: "user_id" })
+  @Column("simple-array")
+  permissions: string[];
+
+  @ManyToOne(type => ApiUserInfo, userInfo => userInfo.permissionAssignments)
+  @JoinColumn({ name: "target_id" })
   userInfo: ApiUserInfo;
 }

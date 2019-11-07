@@ -5,26 +5,36 @@ export enum ApiPermissions {
   ReadConfig = "READ_CONFIG",
 }
 
-interface IPermissionHierarchy extends Partial<Record<ApiPermissions, IPermissionHierarchy>> {}
+const reverseApiPermissions = Object.entries(ApiPermissions).reduce((map, [key, value]) => {
+  map[value] = key;
+  return map;
+}, {});
 
-export const permissionHierarchy: IPermissionHierarchy = {
-  [ApiPermissions.Owner]: {
-    [ApiPermissions.ManageAccess]: {
-      [ApiPermissions.EditConfig]: {
-        [ApiPermissions.ReadConfig]: {},
-      },
-    },
-  },
+export const permissionNames = {
+  [ApiPermissions.Owner]: "Server owner",
+  [ApiPermissions.ManageAccess]: "Manage dashboard access",
+  [ApiPermissions.EditConfig]: "Edit config",
+  [ApiPermissions.ReadConfig]: "Read config",
 };
+
+export type TPermissionHierarchy = Array<ApiPermissions | [ApiPermissions, TPermissionHierarchy]>;
+
+export const permissionHierarchy: TPermissionHierarchy = [
+  [ApiPermissions.Owner, [[ApiPermissions.ManageAccess, [[ApiPermissions.EditConfig, [ApiPermissions.ReadConfig]]]]]],
+];
+
+export function permissionArrToSet(permissions: string[]): Set<ApiPermissions> {
+  return new Set(permissions.filter(p => reverseApiPermissions[p])) as Set<ApiPermissions>;
+}
 
 /**
  * Checks whether granted permissions include the specified permission, taking into account permission hierarchy i.e.
  * that in the case of nested permissions, having a top level permission implicitly grants you any permissions nested
  * under it as well
  */
-export function hasPermission(grantedPermissions: ApiPermissions[], permissionToCheck: ApiPermissions): boolean {
+export function hasPermission(grantedPermissions: Set<ApiPermissions>, permissionToCheck: ApiPermissions): boolean {
   // Directly granted
-  if (grantedPermissions.includes(permissionToCheck)) {
+  if (grantedPermissions.has(permissionToCheck)) {
     return true;
   }
 
@@ -37,15 +47,17 @@ export function hasPermission(grantedPermissions: ApiPermissions[], permissionTo
 }
 
 function checkTreeForPermission(
-  tree: IPermissionHierarchy,
-  grantedPermissions: ApiPermissions[],
+  tree: TPermissionHierarchy,
+  grantedPermissions: Set<ApiPermissions>,
   permission: ApiPermissions,
 ): boolean {
-  for (const [perm, nested] of Object.entries(tree)) {
+  for (const item of tree) {
+    const [perm, nested] = Array.isArray(item) ? item : [item];
+
     // Top-level permission granted, implicitly grant all nested permissions as well
-    if (grantedPermissions.includes(perm as ApiPermissions)) {
+    if (grantedPermissions.has(perm)) {
       // Permission we were looking for was found nested under this permission -> granted
-      if (treeIncludesPermission(nested, permission)) {
+      if (nested && treeIncludesPermission(nested, permission)) {
         return true;
       }
 
@@ -55,7 +67,7 @@ function checkTreeForPermission(
     }
 
     // Top-level permission not granted, check further nested permissions
-    if (checkTreeForPermission(nested, grantedPermissions, permission)) {
+    if (nested && checkTreeForPermission(nested, grantedPermissions, permission)) {
       return true;
     }
   }
@@ -63,13 +75,15 @@ function checkTreeForPermission(
   return false;
 }
 
-function treeIncludesPermission(tree: IPermissionHierarchy, permission: ApiPermissions): boolean {
-  for (const [perm, nested] of Object.entries(tree)) {
+function treeIncludesPermission(tree: TPermissionHierarchy, permission: ApiPermissions): boolean {
+  for (const item of tree) {
+    const [perm, nested] = Array.isArray(item) ? item : [item];
+
     if (perm === permission) {
       return true;
     }
 
-    const nestedResult = treeIncludesPermission(nested, permission);
+    const nestedResult = nested && treeIncludesPermission(nested, permission);
     if (nestedResult) {
       return true;
     }
