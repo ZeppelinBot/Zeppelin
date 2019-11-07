@@ -7,7 +7,7 @@ import pick from "lodash.pick";
 import https from "https";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
-import { ApiPermissions } from "../data/ApiPermissions";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ok } from "./responses";
 
 interface IPassportApiUser {
@@ -71,7 +71,7 @@ export function initAuth(app: express.Express) {
 
   const apiLogins = new ApiLogins();
   const apiUserInfo = new ApiUserInfo();
-  const apiPermissions = new ApiPermissions();
+  const apiPermissionAssignments = new ApiPermissionAssignments();
 
   // Initialize API tokens
   passport.use(
@@ -105,7 +105,7 @@ export function initAuth(app: express.Express) {
         const user = await simpleDiscordAPIRequest(accessToken, "users/@me");
 
         // Make sure the user is able to access at least 1 guild
-        const permissions = await apiPermissions.getByUserId(user.id);
+        const permissions = await apiPermissionAssignments.getByUserId(user.id);
         if (permissions.length === 0) {
           cb(null, {});
           return;
