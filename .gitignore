@@ -69,6 +69,6 @@ desktop.ini
 # Misc
 /convert.js
 /startscript.js
-/.cache
+.cache
 npm-ls.txt
 npm-audit.txt
