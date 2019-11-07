@@ -19,7 +19,14 @@
       </div>
     </div>
 
-    <AceEditor class="rounded shadow-lg border border-gray-700 mt-4" v-model="editableConfig" @init="editorInit" lang="yaml" theme="tomorrow_night" :width="editorWidth" :height="editorHeight" ref="aceEditor"></AceEditor>
+    <AceEditor class="rounded shadow-lg border border-gray-700 mt-4"
+               v-model="editableConfig"
+               @init="editorInit"
+               lang="yaml"
+               theme="tomorrow_night"
+               :width="editorWidth"
+               :height="editorHeight"
+               ref="aceEditor" />
   </div>
 </template>
 
