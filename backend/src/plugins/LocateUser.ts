@@ -78,6 +78,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("where", "<member:resolvedMember>", {
+    aliases: ["w"],
     extra: {
       info: {
         description: "Posts an instant invite to the voice channel that `<member>` is in",
@@ -85,12 +86,12 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_where")
-  async whereCmd(msg: Message, args: { member: Member; time?: number; reminder?: string }) {
+  async whereCmd(msg: Message, args: { member: Member }) {
     const member = await resolveMember(this.bot, this.guild, args.member.id);
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
   }
 
-  @d.command("vcalert", "<member:resolvedMember> [duration:delay] [reminder:string$]", {
+  @d.command("vcalert", "<member:resolvedMember> <duration:delay> [reminder:string$]", {
     aliases: ["vca"],
     extra: {
       info: {
@@ -99,7 +100,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_alert")
-  async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
+  async vcalertCmd(msg: Message, args: { member: Member; duration: number; reminder?: string }) {
     const time = args.duration || 10 * MINUTES;
     const alertTime = moment().add(time, "millisecond");
     const body = args.reminder || "None";
@@ -182,7 +183,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const member = await resolveMember(this.bot, this.guild, userId);
 
     triggeredAlerts.forEach(alert => {
-      const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
+      const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${
+        alert.body
+      }\`\n`;
       sendWhere(this.guild, member, this.bot.getChannel(alert.channel_id) as TextableChannel, prepend);
       this.alerts.delete(alert.id);
     });
@@ -202,9 +205,15 @@ export async function sendWhere(guild: Guild, member: Member, channel: TextableC
   if (voice == null) {
     channel.createMessage(prepend + "That user is not in a channel");
   } else {
-    const invite = await createInvite(voice);
+    let invite = null;
+    try {
+      invite = await createInvite(voice);
+    } catch (e) {
+      this.sendErrorMessage(channel, "Cannot create an invite to that channel!");
+      return;
+    }
     channel.createMessage(
-      prepend + ` ${member.mention} is in the following channel: ${voice.name} https://${getInviteLink(invite)}`,
+      prepend + ` ${member.mention} is in the following channel: ${voice.name} ${getInviteLink(invite)}`,
     );
   }
 }
