@@ -1,23 +1,20 @@
 import { Entity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm";
-import { Starboard } from "./Starboard";
-import { Case } from "./Case";
 import { SavedMessage } from "./SavedMessage";
 
 @Entity("starboard_messages")
 export class StarboardMessage {
   @Column()
-  @PrimaryColumn()
-  starboard_id: number;
+  message_id: string;
 
   @Column()
   @PrimaryColumn()
-  message_id: string;
+  starboard_message_id: string;
 
-  @Column() starboard_message_id: string;
+  @Column()
+  starboard_channel_id: string;
 
-  @ManyToOne(type => Starboard, sb => sb.starboardMessages)
-  @JoinColumn({ name: "starboard_id" })
-  starboard: Starboard;
+  @Column()
+  guild_id: string;
 
   @OneToOne(type => SavedMessage)
   @JoinColumn({ name: "message_id" })
