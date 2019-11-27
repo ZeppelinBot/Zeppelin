@@ -1311,6 +1311,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         const matchResult = await this.matchRuleToMessage(rule, msg);
         if (matchResult) {
           await this.applyActionsOnMatch(rule, matchResult);
+          break; // Don't apply multiple rules to the same message
         }
       }
     });
