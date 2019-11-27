@@ -640,6 +640,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected evaluateMatchLinksTrigger(trigger: TMatchLinksTrigger, str: string): boolean {
     const links = getUrlsInString(str, true);
+
     for (const link of links) {
       const normalizedHostname = link.hostname.toLowerCase();
 
