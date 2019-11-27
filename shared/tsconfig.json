@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "esnext",
+    "target": "es2018",
     "lib": [
       "esnext"
     ],
