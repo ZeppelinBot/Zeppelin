@@ -9,6 +9,7 @@ import {
   GuildAuditLogEntry,
   GuildChannel,
   Member,
+  Message,
   MessageContent,
   TextableChannel,
   TextChannel,
@@ -27,6 +28,7 @@ import https from "https";
 import tmp from "tmp";
 import { logger, waitForReaction } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -42,9 +44,73 @@ export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
 
-export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
+export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }
+
+/**
+ * Mirrors EmbedOptions from Eris
+ */
+export const tEmbed = t.type({
+  title: tNullable(t.string),
+  description: tNullable(t.string),
+  url: tNullable(t.string),
+  timestamp: tNullable(t.string),
+  color: tNullable(t.number),
+  footer: tNullable(
+    t.type({
+      text: t.string,
+      icon_url: tNullable(t.string),
+      proxy_icon_url: tNullable(t.string),
+    }),
+  ),
+  image: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      proxy_url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  thumbnail: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      proxy_url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  video: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  provider: tNullable(
+    t.type({
+      name: t.string,
+      url: tNullable(t.string),
+    }),
+  ),
+  fields: tNullable(
+    t.array(
+      t.type({
+        name: tNullable(t.string),
+        value: tNullable(t.string),
+        inline: tNullable(t.boolean),
+      }),
+    ),
+  ),
+  author: tNullable(
+    t.type({
+      name: t.string,
+      url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+});
 
 export function dropPropertiesByName(obj, propName) {
   if (obj.hasOwnProperty(propName)) delete obj[propName];
@@ -804,4 +870,28 @@ export function verboseUserName(user: User | UnknownUser): string {
 
 export function verboseChannelMention(channel: GuildChannel): string {
   return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+}
+
+export function messageLink(message: Message): string;
+export function messageLink(guildIdOrMessage: string | Message | null, channelId?: string, messageId?: string): string {
+  let guildId;
+  if (guildIdOrMessage == null) {
+    // Full arguments without a guild id -> DM/Group chat
+    guildId = "@me";
+  } else if (guildIdOrMessage instanceof Message) {
+    // Message object as the only argument
+    guildId = (guildIdOrMessage.channel as GuildChannel).guild?.id ?? "@me";
+    channelId = guildIdOrMessage.channel.id;
+    messageId = guildIdOrMessage.id;
+  } else {
+    // Full arguments with all IDs
+    guildId = guildIdOrMessage;
+  }
+
+  return `https://discordapp.com/channels/${guildId}/${channelId}/${messageId}`;
+}
+
+export function isValidEmbed(embed: any): boolean {
+  const result = decodeAndValidateStrict(tEmbed, embed);
+  return !(result instanceof StrictValidationError);
 }
