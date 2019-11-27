@@ -13,6 +13,7 @@ import {
   deactivateMentions,
   createChunkedMessage,
   stripObjectToScalars,
+  isValidEmbed,
 } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -278,6 +279,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       { name: "content", type: "string" },
       { name: "color", type: "string" },
       { name: "schedule", type: "string" },
+      { name: "raw", isSwitch: true, shortcut: "r" },
     ],
   })
   @d.permission("can_post")
@@ -290,6 +292,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       content?: string;
       color?: string;
       schedule?: string;
+      raw?: boolean;
     },
   ) {
     if (!(args.channel instanceof TextChannel)) {
@@ -315,10 +318,30 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       color = parseInt(colorMatch[1], 16);
     }
 
-    const embed: EmbedBase = {};
+    let embed: EmbedBase = {};
     if (args.title) embed.title = args.title;
-    if (content) embed.description = this.formatContent(content);
     if (color) embed.color = color;
+
+    if (content) {
+      if (args.raw) {
+        let parsed;
+        try {
+          parsed = JSON.parse(content);
+        } catch (e) {
+          this.sendErrorMessage(msg.channel, "Syntax error in embed JSON");
+          return;
+        }
+
+        if (!isValidEmbed(parsed)) {
+          this.sendErrorMessage(msg.channel, "Embed is not valid");
+          return;
+        }
+
+        embed = Object.assign({}, embed, parsed);
+      } else {
+        embed.description = this.formatContent(content);
+      }
+    }
 
     if (args.schedule) {
       // Schedule the post to be posted later
