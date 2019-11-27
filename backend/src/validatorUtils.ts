@@ -57,7 +57,7 @@ function getContextPath(context) {
 // tslint:enable
 
 export class StrictValidationError extends Error {
-  private errors;
+  private readonly errors;
 
   constructor(errors: string[]) {
     errors = Array.from(new Set(errors));
