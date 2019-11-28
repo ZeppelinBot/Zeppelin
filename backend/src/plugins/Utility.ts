@@ -56,6 +56,7 @@ import { getCurrentUptime } from "../uptime";
 import LCL from "last-commit-log";
 import * as t from "io-ts";
 import { ICommandDefinition } from "knub-command-manager";
+import path from "path";
 
 const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -344,7 +345,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
     } else {
       matchingMembers.sort(
-        multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
+        multiSorter([
+          [m => m.username.toLowerCase(), realSortDir],
+          [m => m.discriminator, realSortDir],
+        ]),
       );
     }
 
@@ -994,7 +998,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
 
     // Clean up test messages
-    this.bot.deleteMessages(messages[0].channel.id, messages.map(m => m.id)).catch(noop);
+    this.bot
+      .deleteMessages(
+        messages[0].channel.id,
+        messages.map(m => m.id),
+      )
+      .catch(noop);
   }
 
   @d.command("source", "<messageId:string>", {
@@ -1192,8 +1201,25 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const uptime = getCurrentUptime();
     const prettyUptime = humanizeDuration(uptime, { largest: 2, round: true });
 
-    const lcl = new LCL();
-    const lastCommit = await lcl.getLastCommit();
+    let lastCommit;
+
+    try {
+      // From project root
+      // FIXME: Store these paths properly somewhere
+      const lcl = new LCL(path.resolve(__dirname, "..", "..", ".."));
+      lastCommit = await lcl.getLastCommit();
+    } catch (e) {} // tslint:disable-line:no-empty
+
+    let lastUpdate;
+    let version;
+
+    if (lastCommit) {
+      lastUpdate = moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]");
+      version = lastCommit.shortHash;
+    } else {
+      lastUpdate = "?";
+      version = "?";
+    }
 
     const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
 
@@ -1205,8 +1231,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const basicInfoRows = [
       ["Uptime", prettyUptime],
       ["Last reload", `${lastReload} ago`],
-      ["Last update", moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]")],
-      ["Version", lastCommit.shortHash],
+      ["Last update", lastUpdate],
+      ["Version", version],
       ["API latency", `${shard.latency}ms`],
     ];
 
