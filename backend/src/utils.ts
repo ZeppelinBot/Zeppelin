@@ -48,6 +48,69 @@ export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }
 
+function typeHasProps(type: any): type is t.TypeC<any> {
+  return type.props != null;
+}
+
+function typeIsArray(type: any): type is t.ArrayC<any> {
+  return type._tag === "ArrayType";
+}
+
+export type TDeepPartial<T> = T extends t.InterfaceType<any>
+  ? TDeepPartialProps<T["props"]>
+  : T extends t.DictionaryType<any, any>
+  ? t.DictionaryType<T["domain"], TDeepPartial<T["codomain"]>>
+  : T extends t.UnionType<any[]>
+  ? t.UnionType<Array<TDeepPartial<T["types"][number]>>>
+  : T extends t.IntersectionType<any>
+  ? t.IntersectionType<Array<TDeepPartial<T["types"][number]>>>
+  : T extends t.ArrayType<any>
+  ? t.ArrayType<TDeepPartial<T["type"]>>
+  : T;
+
+// Based on t.PartialC
+export interface TDeepPartialProps<P extends t.Props>
+  extends t.PartialType<
+    P,
+    {
+      [K in keyof P]?: TDeepPartial<t.TypeOf<P[K]>>;
+    },
+    {
+      [K in keyof P]?: TDeepPartial<t.OutputOf<P[K]>>;
+    }
+  > {}
+
+export function tDeepPartial<T>(type: T): TDeepPartial<T> {
+  if (type instanceof t.InterfaceType) {
+    const newProps = {};
+    for (const [key, prop] of Object.entries(type.props)) {
+      newProps[key] = tDeepPartial(prop);
+    }
+    return t.partial(newProps) as TDeepPartial<T>;
+  } else if (type instanceof t.DictionaryType) {
+    return t.record(type.domain, tDeepPartial(type.codomain)) as TDeepPartial<T>;
+  } else if (type instanceof t.UnionType) {
+    return t.union(type.types.map(unionType => tDeepPartial(unionType))) as TDeepPartial<T>;
+  } else if (type instanceof t.IntersectionType) {
+    const types = type.types.map(intersectionType => tDeepPartial(intersectionType));
+    return (t.intersection(types as [t.Mixed, t.Mixed]) as unknown) as TDeepPartial<T>;
+  } else if (type instanceof t.ArrayType) {
+    return t.array(tDeepPartial(type.type)) as TDeepPartial<T>;
+  } else {
+    return type as TDeepPartial<T>;
+  }
+}
+
+function tDeepPartialProp(prop: any) {
+  if (typeHasProps(prop)) {
+    return tDeepPartial(prop);
+  } else if (typeIsArray(prop)) {
+    return t.array(tDeepPartialProp(prop.type));
+  } else {
+    return prop;
+  }
+}
+
 /**
  * Mirrors EmbedOptions from Eris
  */

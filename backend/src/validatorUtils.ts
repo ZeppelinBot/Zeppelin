@@ -83,6 +83,17 @@ const report = fold((errors: any): StrictValidationError | void => {
   return new StrictValidationError(errorStrings);
 }, noop);
 
+export function validate(schema: t.Type<any>, value: any): StrictValidationError | null {
+  const validationResult = schema.decode(value);
+  return pipe(
+    validationResult,
+    fold(
+      err => report(validationResult),
+      result => null,
+    ),
+  );
+}
+
 /**
  * Decodes and validates the given value against the given schema while also disallowing extra properties
  * See: https://github.com/gcanti/io-ts/issues/322

@@ -12,6 +12,7 @@ import {
   resolveMember,
   resolveUser,
   resolveUserId,
+  tDeepPartial,
   trimEmptyStartEndLines,
   trimIndents,
   UnknownUser,
@@ -19,7 +20,7 @@ import {
 import { Invite, Member, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { performance } from "perf_hooks";
-import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
@@ -120,6 +121,13 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     const mergedOverrides = options.replaceDefaultOverrides
       ? options.overrides
       : (defaultOptions.overrides || []).concat(options.overrides || []);
+
+    // Before preprocessing the static config, do a loose check by checking the schema as deeply partial.
+    // This way the preprocessing function can trust that if a property exists, its value will be the correct (partial) type.
+    const initialLooseCheck = this.configSchema ? validate(tDeepPartial(this.configSchema), mergedConfig) : null;
+    if (initialLooseCheck) {
+      throw initialLooseCheck;
+    }
 
     mergedConfig = this.preprocessStaticConfig(mergedConfig);
 
