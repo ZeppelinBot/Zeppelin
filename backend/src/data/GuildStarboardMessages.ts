@@ -26,12 +26,12 @@ export class GuildStarboardMessages extends BaseGuildRepository {
       .getMany();
   }
 
-  async getMessagesForStarboardIdAndSourceMessageId(starboardId: string, sourceMessageId: string) {
+  async getMatchingStarboardMessages(starboardChannelId: string, sourceMessageId: string) {
     return this.allStarboardMessages
       .createQueryBuilder()
-      .where("guild_id = :gid", { gid: this.guildId })
+      .where("guild_id = :guildId", { guildId: this.guildId })
       .andWhere("message_id = :msgId", { msgId: sourceMessageId })
-      .andWhere("starboard_channel_id = :sbId", { sbId: starboardId })
+      .andWhere("starboard_channel_id = :channelId", { channelId: starboardChannelId })
       .getMany();
   }
 

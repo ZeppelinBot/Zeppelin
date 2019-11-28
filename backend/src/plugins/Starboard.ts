@@ -1,7 +1,16 @@
 import { decorators as d, IPluginOptions } from "knub";
 import { ZeppelinPlugin, trimPluginDescription } from "./ZeppelinPlugin";
-import { GuildChannel, Message, TextChannel } from "eris";
-import { errorMessage, getUrlsInString, noop, successMessage, tNullable } from "../utils";
+import { Embed, EmbedBase, GuildChannel, Message, TextChannel } from "eris";
+import {
+  errorMessage,
+  getUrlsInString,
+  messageLink,
+  noop,
+  successMessage,
+  TDeepPartialProps,
+  tNullable,
+  tDeepPartial,
+} from "../utils";
 import path from "path";
 import moment from "moment-timezone";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
@@ -12,78 +21,85 @@ import { StarboardMessage } from "../data/entities/StarboardMessage";
 import { GuildStarboardReactions } from "../data/GuildStarboardReactions";
 
 const StarboardOpts = t.type({
-  source_channel_ids: t.array(t.string),
-  starboard_channel_id: t.string,
-  positive_emojis: tNullable(t.array(t.string)),
-  positive_required: tNullable(t.number),
+  channel_id: t.string,
+  stars_required: t.number,
+  star_emoji: tNullable(t.array(t.string)),
   enabled: tNullable(t.boolean),
 });
 type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
 
 const ConfigSchema = t.type({
-  entries: t.record(t.string, StarboardOpts),
-
+  boards: t.record(t.string, StarboardOpts),
   can_migrate: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
+const PartialConfigSchema = tDeepPartial(ConfigSchema);
+
 const defaultStarboardOpts: Partial<TStarboardOpts> = {
-  positive_emojis: ["⭐"],
-  positive_required: 5,
+  star_emoji: ["⭐"],
   enabled: true,
 };
 
 export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "starboard";
-  public static showInDocs = false;
   public static configSchema = ConfigSchema;
 
   public static pluginInfo = {
-    prettyName: "Starboards",
+    prettyName: "Starboard",
     description: trimPluginDescription(`
-      This plugin contains all functionality needed to use discord channels as starboards.
+      This plugin allows you to set up starboards on your server. Starboards are like user voted pins where messages with enough reactions get immortalized on a "starboard" channel.
     `),
     configurationGuide: trimPluginDescription(`
-      You can customize multiple settings for starboards.
-      Any emoji that you want available needs to be put into the config in its raw form.
-      To obtain a raw form of an emoji, please write out the emoji and put a backslash in front of it.
-      Example with default emoji: "\:star:" => "⭐"
-      Example with custom emoji: "\:mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
-      Now, past the result into the config, but make sure to exclude all less-than and greater-than signs like in the second example.
+      ### Note on emojis
+      To specify emoji in the config, you need to use the emoji's "raw form".
+      To obtain this, post the emoji with a backslash in front of it.
+      
+      - Example with a default emoji: "\:star:" => "⭐"
+      - Example with a custom emoji: "\:mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
 
-
-      ### Starboard with one source channel
-      All messages in the source channel that get enough positive reactions will be posted into the starboard channel.
-      The only positive reaction counted here is the default emoji "⭐".
-      Only users with a role matching the allowed_roles role-id will be counted.
+      ### Basic starboard
+      Any message on the server that gets 5 star reactions will be posted into the starboard channel (604342689038729226).
       
       ~~~yml
       starboard:
         config:
-          entries:
-            exampleOne:
-              source_channel_ids: ["604342623569707010"]
-              starboard_channel_id: "604342689038729226"
-              positive_emojis: ["⭐"]
-              positive_required: 5
-              allowed_roles: ["556110793058287637"]
-              enabled: true
+          boards:
+            basic:
+              channel_id: "604342689038729226"
+              stars_required: 5
       ~~~
       
-      ### Starboard with two sources and two emoji
-      All messages in any of the source channels that get enough positive reactions will be posted into the starboard channel.
-      Both the default emoji "⭐" and the custom emoji ":mrvnSmile:543000534102310933" are counted.
+      ### Custom star emoji
+      This is identical to the basic starboard above, but accepts two emoji: the regular star and a custom :mrvnSmile: emoji
       
       ~~~yml
       starboard:
         config:
-          entries:
-            exampleTwo:
-              source_channel_ids: ["604342623569707010", "604342649251561487"]
-              starboard_channel_id: "604342689038729226"
-              positive_emojis: ["⭐", ":mrvnSmile:543000534102310933"]
-              positive_required: 10
-              enabled: true
+          boards:
+            basic:
+              channel_id: "604342689038729226"
+              star_emoji: ["⭐", "<:mrvnSmile:543000534102310933>"]
+              stars_required: 5
+      ~~~
+      
+      ### Limit starboard to a specific channel
+      This is identical to the basic starboard above, but only works from a specific channel (473087035574321152).
+      
+      ~~~yml
+      starboard:
+        config:
+          boards:
+            basic:
+              enabled: false # The starboard starts disabled and is then enabled in a channel override below
+              channel_id: "604342689038729226"
+              stars_required: 5
+        overrides:
+          - channel: "473087035574321152"
+            config:
+              boards:
+                basic:
+                  enabled: true
       ~~~
     `),
   };
@@ -98,7 +114,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     return {
       config: {
         can_migrate: false,
-        entries: {},
+        boards: {},
       },
 
       overrides: [
@@ -112,27 +128,24 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
-  protected getStarboardOptsForSourceChannel(sourceChannel): TStarboardOpts[] {
-    const config = this.getConfigForChannel(sourceChannel);
+  protected static preprocessStaticConfig(config: t.TypeOf<typeof PartialConfigSchema>) {
+    if (config.boards) {
+      for (const [name, opts] of Object.entries(config.boards)) {
+        config.boards[name] = Object.assign({}, defaultStarboardOpts, config.boards[name]);
+      }
+    }
 
-    const configs = Object.values(config.entries).filter(opts => opts.source_channel_ids.includes(sourceChannel.id));
-    configs.forEach(cfg => {
-      if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
-      if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
-      if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
-    });
-
-    return configs;
+    return config;
   }
 
   protected getStarboardOptsForStarboardChannel(starboardChannel): TStarboardOpts[] {
     const config = this.getConfigForChannel(starboardChannel);
 
-    const configs = Object.values(config.entries).filter(opts => opts.starboard_channel_id === starboardChannel.id);
+    const configs = Object.values(config.boards).filter(opts => opts.channel_id === starboardChannel.id);
     configs.forEach(cfg => {
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
-      if (cfg.positive_emojis == null) cfg.positive_emojis = defaultStarboardOpts.positive_emojis;
-      if (cfg.positive_required == null) cfg.positive_required = defaultStarboardOpts.positive_required;
+      if (cfg.star_emoji == null) cfg.star_emoji = defaultStarboardOpts.star_emoji;
+      if (cfg.stars_required == null) cfg.stars_required = defaultStarboardOpts.stars_required;
     });
 
     return configs;
@@ -168,26 +181,24 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    const applicableStarboards = await this.getStarboardOptsForSourceChannel(msg.channel);
+    const config = this.getConfigForMemberIdAndChannelId(userId, msg.channel.id);
+    const applicableStarboards = Object.values(config.boards).filter(board => board.enabled);
 
     for (const starboard of applicableStarboards) {
-      // Instantly continue if the starboard is disabled
-      if (!starboard.enabled) continue;
       // Can't star messages in the starboard channel itself
-      if (msg.channel.id === starboard.starboard_channel_id) continue;
-      // Move reaction into DB at this point
+      if (msg.channel.id === starboard.channel_id) continue;
+
+      // Save reaction into the database
       await this.starboardReactions.createStarboardReaction(msg.id, userId).catch();
-      // If the message has already been posted to this starboard, we don't need to do anything else here
-      const starboardMessages = await this.starboardMessages.getMessagesForStarboardIdAndSourceMessageId(
-        starboard.starboard_channel_id,
-        msg.id,
-      );
+
+      // If the message has already been posted to this starboard, we don't need to do anything else
+      const starboardMessages = await this.starboardMessages.getMatchingStarboardMessages(starboard.channel_id, msg.id);
       if (starboardMessages.length > 0) continue;
 
       const reactions = await this.starboardReactions.getAllReactionsForMessageId(msg.id);
       const reactionsCount = reactions.length;
-      if (reactionsCount >= starboard.positive_required) {
-        await this.saveMessageToStarboard(msg, starboard.starboard_channel_id);
+      if (reactionsCount >= starboard.stars_required) {
+        await this.saveMessageToStarboard(msg, starboard.channel_id);
       }
     }
   }
@@ -203,8 +214,8 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   /**
-   * Saves/posts a message to the specified starboard. The message is posted as an embed and image attachments are
-   * included as the embed image.
+   * Saves/posts a message to the specified starboard.
+   * The message is posted as an embed and image attachments are included as the embed image.
    */
   async saveMessageToStarboard(msg: Message, starboardChannelId: string) {
     const channel = this.guild.channels.get(starboardChannelId);
@@ -212,13 +223,14 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const time = moment(msg.timestamp, "x").format("YYYY-MM-DD [at] HH:mm:ss [UTC]");
 
-    const embed: any = {
+    const embed: EmbedBase = {
       footer: {
         text: `#${(msg.channel as GuildChannel).name} - ${time}`,
       },
       author: {
         name: `${msg.author.username}#${msg.author.discriminator}`,
       },
+      url: messageLink(msg),
     };
 
     if (msg.author.avatarURL) {
@@ -229,6 +241,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       embed.description = msg.content;
     }
 
+    // Include attachments
     if (msg.attachments.length) {
       const attachment = msg.attachments[0];
       const ext = path
@@ -238,29 +251,14 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (["jpeg", "jpg", "png", "gif", "webp"].includes(ext)) {
         embed.image = { url: attachment.url };
       }
-    } else if (msg.content) {
-      const links = getUrlsInString(msg.content);
-      for (const link of links) {
-        const parts = link
-          .toString()
-          .replace(/\/$/, "")
-          .split(".");
-        const ext = parts[parts.length - 1].toLowerCase();
-
-        if (
-          (link.hostname === "i.imgur.com" || link.hostname === "cdn.discordapp.com") &&
-          ["jpeg", "jpg", "png", "gif", "webp"].includes(ext)
-        ) {
-          embed.image = { url: link.toString() };
-          break;
-        }
-      }
     }
 
-    const starboardMessage = await (channel as TextChannel).createMessage({
-      content: `https://discordapp.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`,
-      embed,
-    });
+    // Include any embed images in the original message
+    if (msg.embeds.length && msg.embeds[0].image) {
+      embed.image = msg.embeds[0].image;
+    }
+
+    const starboardMessage = await (channel as TextChannel).createMessage({ embed });
     await this.starboardMessages.createStarboardMessage(channel.id, msg.id, starboardMessage.id);
   }
 
@@ -271,81 +269,76 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     await this.bot.deleteMessage(msg.starboard_channel_id, msg.starboard_message_id).catch(noop);
   }
 
-  async removeMessageFromStarboardMessages(starboard_message_id: string, starboard_channel_id: string) {
-    await this.starboardMessages.deleteStarboardMessage(starboard_message_id, starboard_channel_id);
+  async removeMessageFromStarboardMessages(starboard_message_id: string, channel_id: string) {
+    await this.starboardMessages.deleteStarboardMessage(starboard_message_id, channel_id);
   }
 
   /**
    * When a message is deleted, also delete it from any starboards it's been posted in.
+   * Likewise, if a starboard message (i.e. the bot message in the starboard) is deleted, remove it from the database.
    * This function is called in response to GuildSavedMessages events.
-   * TODO: When a message is removed from the starboard itself, i.e. the bot's embed is removed, also remove that message from the starboard_messages database table
    */
   async onMessageDelete(msg: SavedMessage) {
-    let messages = await this.starboardMessages.getStarboardMessagesForMessageId(msg.id);
-    if (messages.length > 0) {
-      for (const starboardMessage of messages) {
-        if (!starboardMessage.starboard_message_id) continue;
-        this.removeMessageFromStarboard(starboardMessage).catch(noop);
-      }
-    } else {
-      messages = await this.starboardMessages.getStarboardMessagesForStarboardMessageId(msg.id);
-      if (messages.length === 0) return;
+    // Deleted source message
+    const starboardMessages = await this.starboardMessages.getStarboardMessagesForMessageId(msg.id);
+    for (const starboardMessage of starboardMessages) {
+      this.removeMessageFromStarboard(starboardMessage);
+    }
 
-      for (const starboardMessage of messages) {
-        if (!starboardMessage.starboard_channel_id) continue;
-        this.removeMessageFromStarboardMessages(
-          starboardMessage.starboard_message_id,
-          starboardMessage.starboard_channel_id,
-        ).catch(noop);
-      }
+    // Deleted message from the starboard
+    const deletedStarboardMessages = await this.starboardMessages.getStarboardMessagesForStarboardMessageId(msg.id);
+    if (deletedStarboardMessages.length === 0) return;
+
+    for (const starboardMessage of deletedStarboardMessages) {
+      this.removeMessageFromStarboardMessages(
+        starboardMessage.starboard_message_id,
+        starboardMessage.starboard_channel_id,
+      );
     }
   }
 
-  @d.command("starboard migrate_pins", "<pinChannelId:channelId> <starboardChannelId:channelId>", {
+  @d.command("starboard migrate_pins", "<pinChannel:channel> <starboardName:string>", {
     extra: {
       info: {
         description:
-          "Migrates all of a channels pins to starboard messages, posting them in the starboard channel. The old pins are not unpinned.",
+          "Posts all pins from a channel to the specified starboard. The pins are NOT unpinned automatically.",
       },
     },
   })
   @d.permission("can_migrate")
-  async migratePinsCmd(msg: Message, args: { pinChannelId: string; starboardChannelId }) {
-    try {
-      const starboards = await this.getStarboardOptsForStarboardChannel(this.bot.getChannel(args.starboardChannelId));
-      if (!starboards) {
-        msg.channel.createMessage(errorMessage("The specified channel doesn't have a starboard!")).catch(noop);
-        return;
-      }
-
-      const channel = (await this.guild.channels.get(args.pinChannelId)) as GuildChannel & TextChannel;
-      if (!channel) {
-        msg.channel
-          .createMessage(errorMessage("Could not find the specified channel to migrate pins from!"))
-          .catch(noop);
-        return;
-      }
-
-      msg.channel.createMessage(`Migrating pins from <#${channel.id}> to <#${args.starboardChannelId}>...`).catch(noop);
-
-      const pins = await channel.getPins();
-      pins.reverse(); // Migrate pins starting from the oldest message
-
-      for (const pin of pins) {
-        const existingStarboardMessage = await this.starboardMessages.getMessagesForStarboardIdAndSourceMessageId(
-          args.starboardChannelId,
-          pin.id,
-        );
-        if (existingStarboardMessage.length > 0) continue;
-        await this.saveMessageToStarboard(pin, args.starboardChannelId);
-      }
-
-      msg.channel.createMessage(successMessage("Pins migrated!")).catch(noop);
-    } catch (error) {
-      this.sendErrorMessage(
-        msg.channel,
-        "Sorry, but something went wrong!\nSyntax: `starboard migrate_pins <sourceChannelId> <starboardChannelid>`",
-      );
+  async migratePinsCmd(msg: Message, args: { pinChannel: GuildChannel; starboardName: string }) {
+    const config = await this.getConfig();
+    const starboard = config.boards[args.starboardName];
+    if (!starboard) {
+      this.sendErrorMessage(msg.channel, "Unknown starboard specified");
+      return;
     }
+
+    if (!(args.pinChannel instanceof TextChannel)) {
+      this.sendErrorMessage(msg.channel, "Unknown/invalid pin channel id");
+      return;
+    }
+
+    const starboardChannel = this.guild.channels.get(starboard.channel_id);
+    if (!starboardChannel || !(starboardChannel instanceof TextChannel)) {
+      this.sendErrorMessage(msg.channel, "Starboard has an unknown/invalid channel id");
+      return;
+    }
+
+    msg.channel.createMessage(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
+
+    const pins = await args.pinChannel.getPins();
+    pins.reverse(); // Migrate pins starting from the oldest message
+
+    for (const pin of pins) {
+      const existingStarboardMessage = await this.starboardMessages.getMatchingStarboardMessages(
+        starboardChannel.id,
+        pin.id,
+      );
+      if (existingStarboardMessage.length > 0) continue;
+      await this.saveMessageToStarboard(pin, starboardChannel.id);
+    }
+
+    this.sendSuccessMessage(msg.channel, `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`);
   }
 }
