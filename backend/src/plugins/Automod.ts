@@ -12,6 +12,7 @@ import {
   noop,
   SECONDS,
   stripObjectToScalars,
+  tDeepPartial,
   tNullable,
   UnknownUser,
   verboseChannelMention,
@@ -297,6 +298,8 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
+const PartialConfigSchema = tDeepPartial(ConfigSchema);
+
 /**
  * DEFAULTS
  */
@@ -499,12 +502,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
   protected guildLogs: GuildLogs;
 
-  protected static preprocessStaticConfig(config) {
-    if (config.rules && typeof config.rules === "object") {
+  protected static preprocessStaticConfig(config: t.TypeOf<typeof PartialConfigSchema>) {
+    if (config.rules) {
       // Loop through each rule
       for (const [name, rule] of Object.entries(config.rules)) {
-        if (rule == null || typeof rule !== "object") continue;
-
         rule["name"] = name;
 
         // If the rule doesn't have an explicitly set "enabled" property, set it to true
@@ -513,12 +514,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         }
 
         // Loop through the rule's triggers
-        if (rule["triggers"] != null && Array.isArray(rule["triggers"])) {
+        if (rule["triggers"]) {
           for (const trigger of rule["triggers"]) {
-            if (trigger == null || typeof trigger !== "object") continue;
             // Apply default config to the triggers used in this rule
             for (const [defaultTriggerName, defaultTrigger] of Object.entries(defaultTriggers)) {
-              if (trigger[defaultTriggerName] && typeof trigger[defaultTriggerName] === "object") {
+              if (trigger[defaultTriggerName]) {
                 trigger[defaultTriggerName] = configUtils.mergeConfig({}, defaultTrigger, trigger[defaultTriggerName]);
               }
             }
@@ -526,7 +526,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         }
 
         // Enable logging of automod actions by default
-        if (rule["actions"] && typeof rule["actions"] === "object") {
+        if (rule["actions"]) {
           if (rule["actions"]["log"] == null) {
             rule["actions"]["log"] = true;
           }
