@@ -80,6 +80,8 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 const { performance } = require("perf_hooks");
 
 const SEARCH_RESULTS_PER_PAGE = 15;
+const SEARCH_ID_RESULTS_PER_PAGE = 50;
+
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
@@ -417,6 +419,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "e",
         isSwitch: true,
       },
+      {
+        name: "ids",
+        isSwitch: true,
+      },
     ],
     extra: {
       info: <CommandInfo>{
@@ -446,9 +452,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       sort?: string;
       "case-sensitive"?: boolean;
       export?: boolean;
+      ids?: boolean;
     },
   ) {
-    const formatSearchResultLines = (members: Member[]) => {
+    const formatSearchResultList = (members: Member[]): string => {
       const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
       const lines = members.map(member => {
         const paddedId = member.id.padEnd(longestId, " ");
@@ -456,7 +463,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (member.nick) line += ` (${member.nick})`;
         return line;
       });
-      return lines;
+      return lines.join("\n");
+    };
+
+    const formatSearchResultIdList = (members: Member[]): string => {
+      return members.map(m => m.id).join(" ");
     };
 
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
@@ -467,12 +478,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
 
-      const resultLines = formatSearchResultLines(results.results);
+      const resultList = args.ids ? formatSearchResultIdList(results.results) : formatSearchResultList(results.results);
+
       const archiveId = await this.archives.create(
         trimLines(`
         Search results (total ${results.totalResults}):
 
-        ${resultLines.join("\n")}
+        ${resultList}
       `),
         moment().add(1, "hour"),
       );
@@ -491,6 +503,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     let clearReactionsFn = null;
     let clearReactionsTimeout = null;
 
+    const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
+
     const loadSearchPage = async page => {
       if (searching) return;
       searching = true;
@@ -505,23 +519,27 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         searchMsgPromise.then(m => (originalSearchMsg = m));
       }
 
-      const searchResult = await this.performMemberSearch(args, page, SEARCH_RESULTS_PER_PAGE);
+      const searchResult = await this.performMemberSearch(args, page, perPage);
       if (searchResult.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
 
       const resultWord = searchResult.totalResults === 1 ? "matching member" : "matching members";
       const headerText =
-        searchResult.totalResults > SEARCH_RESULTS_PER_PAGE
+        searchResult.totalResults > perPage
           ? trimLines(`
             **Page ${searchResult.page}** (${searchResult.from}-${searchResult.to}) (total ${searchResult.totalResults})
           `)
           : `Found ${searchResult.totalResults} ${resultWord}`;
-      const lines = formatSearchResultLines(searchResult.results);
+
+      const resultList = args.ids
+        ? formatSearchResultIdList(searchResult.results)
+        : formatSearchResultList(searchResult.results);
+
       const result = trimLines(`
         ${headerText}
         \`\`\`js
-        ${lines.join("\n")}
+        ${resultList}
         \`\`\`
       `);
 
@@ -529,7 +547,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       searchMsg.edit(result);
 
       // Set up pagination reactions if needed. The reactions are cleared after a timeout.
-      if (searchResult.totalResults > SEARCH_RESULTS_PER_PAGE) {
+      if (searchResult.totalResults > perPage) {
         if (!hasReactions) {
           hasReactions = true;
           searchMsg.addReaction("⬅");
@@ -537,6 +555,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           searchMsg.addReaction("🔄");
 
           const removeListenerFn = this.on("messageReactionAdd", (rMsg: Message, emoji, userId) => {
+            if (rMsg.id !== searchMsg.id) return;
             if (userId !== msg.author.id) return;
             if (!["⬅", "➡", "🔄"].includes(emoji.name)) return;
 
