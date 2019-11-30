@@ -84,6 +84,7 @@ const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
+const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
@@ -356,11 +357,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       );
     }
 
-    const lastPage = Math.ceil(matchingMembers.length / SEARCH_RESULTS_PER_PAGE);
+    const lastPage = Math.max(1, Math.ceil(matchingMembers.length / perPage));
     page = Math.min(lastPage, Math.max(1, page));
 
-    const from = (page - 1) * SEARCH_RESULTS_PER_PAGE;
-    const to = Math.min(from + SEARCH_RESULTS_PER_PAGE, matchingMembers.length);
+    const from = (page - 1) * perPage;
+    const to = Math.min(from + perPage, matchingMembers.length);
 
     const pageMembers = matchingMembers.slice(from, to);
 
@@ -447,7 +448,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
-      const results = await this.performMemberSearch(args, 1, Infinity);
+      const results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
       if (results.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
