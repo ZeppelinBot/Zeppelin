@@ -18,6 +18,7 @@ moment.tz.setDefault('UTC');
 
 const entities = path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/data/entities/*.js'));
 const migrations = path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/migrations/*.js'));
+const migrationsDir = path.relative(process.cwd(), path.resolve(__dirname, 'src/migrations'));
 
 module.exports = {
   type: "mysql",
@@ -50,6 +51,6 @@ module.exports = {
   // Migrations
   migrations: [migrations],
   cli: {
-    migrationsDir: path.dirname(migrations)
+    migrationsDir,
   },
 };
