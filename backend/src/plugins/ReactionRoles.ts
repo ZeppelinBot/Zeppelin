@@ -268,9 +268,17 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
    * :zep_twitch: = 473086848831455234
    * :zep_ps4: = 543184300250759188
    */
-  @d.command("reaction_roles", "<messageId:string> <reactionRolePairs:string$>")
+  @d.command("reaction_roles", "<messageId:string> <reactionRolePairs:string$>", {
+    options: [
+      {
+        name: "exclusive",
+        shortcut: "e",
+        isSwitch: true,
+      },
+    ],
+  })
   @d.permission("can_manage")
-  async reactionRolesCmd(msg: Message, args: { messageId: string; reactionRolePairs: string }) {
+  async reactionRolesCmd(msg: Message, args: { messageId: string; reactionRolePairs: string; exclusive?: boolean }) {
     const savedMessage = await this.savedMessages.find(args.messageId);
     if (!savedMessage) {
       msg.channel.createMessage(errorMessage("Unknown message"));
@@ -331,7 +339,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // Save the new reaction roles to the database
     for (const pair of emojiRolePairs) {
-      await this.reactionRoles.add(channel.id, targetMessage.id, pair[0], pair[1]);
+      await this.reactionRoles.add(channel.id, targetMessage.id, pair[0], pair[1], args.exclusive);
     }
 
     // Apply the reactions themselves
@@ -369,6 +377,14 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       // User reacted with a reaction role emoji -> add the role
       const matchingReactionRole = await this.reactionRoles.getByMessageAndEmoji(msg.id, emoji.id || emoji.name);
       if (!matchingReactionRole) return;
+
+      // If the reaction role is exclusive, remove any other roles in the message first
+      if (matchingReactionRole.is_exclusive) {
+        const messageReactionRoles = await this.reactionRoles.getForMessage(msg.id);
+        for (const reactionRole of messageReactionRoles) {
+          this.addMemberPendingRoleChange(userId, "-", reactionRole.role_id);
+        }
+      }
 
       this.addMemberPendingRoleChange(userId, "+", matchingReactionRole.role_id);
     }
