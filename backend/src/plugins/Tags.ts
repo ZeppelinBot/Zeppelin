@@ -183,8 +183,20 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
   }
 
-  @d.command("tag", "<tag:string>")
-  async tagSourceCmd(msg: Message, args: { tag: string }) {
+  @d.command("tag", "<tag:string>", {
+    options: [
+      {
+        name: "delete",
+        shortcut: "d",
+        isSwitch: true,
+      },
+    ],
+  })
+  async tagSourceCmd(msg: Message, args: { tag: string; delete?: boolean }) {
+    if (args.delete) {
+      return this.deleteTagCmd(msg, { tag: args.tag });
+    }
+
     const tag = await this.tags.find(args.tag);
     if (!tag) {
       msg.channel.createMessage(errorMessage("No tag with that name"));
