@@ -345,15 +345,7 @@ export function getUrlsInString(str: string, unique = false): url.URL[] {
 
 export function getInviteCodesInString(str: string): string[] {
   const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite)\/([a-z0-9]+)/gi;
-  const inviteCodes = [];
-  let match;
-
-  // tslint:disable-next-line
-  while ((match = inviteCodeRegex.exec(str)) !== null) {
-    inviteCodes.push(match[1]);
-  }
-
-  return inviteCodes;
+  return Array.from(str.matchAll(inviteCodeRegex)).map(m => m[1]);
 }
 
 export const unicodeEmojiRegex = emojiRegex();
