@@ -8,9 +8,10 @@ These instructions are intended for bot development only.
 2. `npm ci`
 3. Make a copy of `bot.env.example` called `bot.env`, fill in the values
 4. Run the desired start script:
-    * `npm run start-bot-dev` to run the bot with `ts-node`
-    * `npm run build` followed by `npm run start-bot-prod` to run the bot compiled
-    * `npm run watch-bot` to run the bot with `ts-node` and restart on changes
+    * `npm run build` followed by `npm run start-bot-dev` to run the bot in a **development** environment
+    * `npm run build` followed by `npm run start-bot-prod` to run the bot in a **production** environment
+    * `npm run watch` to watch files and run the **bot and api both** in a **development** environment
+      with automatic restart on file changes
 5. When testing, make sure you have your test server in the `allowed_guilds` table or the guild's config won't be loaded at all
 
 ## Running the API server
@@ -18,9 +19,10 @@ These instructions are intended for bot development only.
 2. `npm ci`
 3. Make a copy of `api.env.example` called `api.env`, fill in the values
 4. Run the desired start script:
-    * `npm run start-api-dev` to run the API server with `ts-node`
-    * `npm run build` followed by `npm run start-api-prod` to run the API server compiled
-    * `npm run watch-api` to run the API server with `ts-node` and restart on changes
+    * `npm run build` followed by `npm run start-api-dev` to run the api in a **development** environment
+    * `npm run build` followed by `npm run start-api-prod` to run the api in a **production** environment
+    * `npm run watch` to watch files and run the **bot and api both** in a **development** environment
+      with automatic restart on file changes
 
 ## Running the dashboard
 1. `cd dashboard`
@@ -34,8 +36,8 @@ These instructions are intended for bot development only.
 * Since we now use shared paths in `tsconfig.json`, the compiled files in `backend/dist/` have longer paths, e.g.
   `backend/dist/backend/src/index.js` instead of `backend/dist/index.js`. This is because the compiled shared files
   are placed in `backend/dist/shared`.
-* The `backend/register-tsconfig-prod-paths.js` module takes care of registering shared paths from `tsconfig.json` for
-  `ts-node`, `ava`, and compiled `.js` files
+* The `backend/register-tsconfig-paths.js` module takes care of registering shared paths from `tsconfig.json` for
+  `ava` and compiled `.js` files
 * To run the tests for the files in the `shared/` directory, you also need to run `npm ci` there
 
 ## Config format example
