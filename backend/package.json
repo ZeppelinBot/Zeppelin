@@ -67,6 +67,7 @@
     "@types/passport": "^1.0.0",
     "@types/passport-oauth2": "^1.4.8",
     "@types/passport-strategy": "^0.2.35",
+    "@types/safe-regex": "^1.1.2",
     "@types/tmp": "0.0.33",
     "ava": "^2.4.0",
     "rimraf": "^2.6.2",
