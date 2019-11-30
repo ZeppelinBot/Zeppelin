@@ -58,6 +58,8 @@ import LCL from "last-commit-log";
 import * as t from "io-ts";
 import { ICommandDefinition } from "knub-command-manager";
 import path from "path";
+import escapeStringRegexp from "escape-string-regexp";
+import safeRegex from "safe-regex";
 
 const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -97,7 +99,10 @@ type MemberSearchParams = {
   bot?: boolean;
   sort?: string;
   "case-sensitive"?: boolean;
+  regex?: boolean;
 };
+
+class SearchError extends Error {}
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "utility";
@@ -334,17 +339,22 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     if (args.query) {
-      const query = args["case-sensitive"] ? args.query.trimStart() : args.query.toLowerCase().trimStart();
+      let queryRegex: RegExp;
+      if (args.regex) {
+        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "i" : "");
+      } else {
+        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "i" : "");
+      }
+
+      if (!safeRegex(queryRegex)) {
+        throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
+      }
 
       matchingMembers = matchingMembers.filter(member => {
-        const nick = args["case-sensitive"] ? member.nick : member.nick && member.nick.toLowerCase();
+        if (member.nick && member.nick.match(queryRegex)) return true;
 
-        const fullUsername = args["case-sensitive"]
-          ? `${member.user.username}#${member.user.discriminator}`
-          : `${member.user.username}#${member.user.discriminator}`.toLowerCase();
-
-        if (nick && nick.indexOf(query) !== -1) return true;
-        if (fullUsername.indexOf(query) !== -1) return true;
+        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+        if (fullUsername.match(queryRegex)) return true;
 
         return false;
       });
@@ -423,6 +433,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         name: "ids",
         isSwitch: true,
       },
+      {
+        name: "regex",
+        shortcut: "re",
+        isSwitch: true,
+      },
     ],
     extra: {
       info: <CommandInfo>{
@@ -453,6 +468,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       "case-sensitive"?: boolean;
       export?: boolean;
       ids?: boolean;
+      regex?: boolean;
     },
   ) {
     const formatSearchResultList = (members: Member[]): string => {
@@ -473,7 +489,17 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
-      const results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
+      let results;
+      try {
+        results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
+      } catch (e) {
+        if (e instanceof SearchError) {
+          return this.sendErrorMessage(msg.channel, e.message);
+        }
+
+        throw e;
+      }
+
       if (results.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
@@ -519,7 +545,17 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         searchMsgPromise.then(m => (originalSearchMsg = m));
       }
 
-      const searchResult = await this.performMemberSearch(args, page, perPage);
+      let searchResult;
+      try {
+        searchResult = await this.performMemberSearch(args, page, perPage);
+      } catch (e) {
+        if (e instanceof SearchError) {
+          return this.sendErrorMessage(msg.channel, e.message);
+        }
+
+        throw e;
+      }
+
       if (searchResult.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
