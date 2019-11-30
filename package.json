@@ -4,7 +4,7 @@
   "description": "",
   "private": true,
   "scripts": {
-    "test": "cd backend && npm run test && cd ../shared && npm run test"
+    "format": "prettier --write \"./{backend,dashboard}/**/*.ts\""
   },
   "dependencies": {},
   "devDependencies": {

@@ -16,13 +16,8 @@ try {
 const moment = require('moment-timezone');
 moment.tz.setDefault('UTC');
 
-const entities = process.env.NODE_ENV === 'production'
-  ? path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/data/entities/*.js'))
-  : path.relative(process.cwd(), path.resolve(__dirname, 'src/data/entities/*.ts'));
-
-const migrations = process.env.NODE_ENV === 'production'
-  ? path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/migrations/*.js'))
-  : path.relative(process.cwd(), path.resolve(__dirname, 'src/migrations/*.ts'));
+const entities = path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/data/entities/*.js'));
+const migrations = path.relative(process.cwd(), path.resolve(__dirname, 'dist/backend/src/migrations/*.js'));
 
 module.exports = {
   type: "mysql",
