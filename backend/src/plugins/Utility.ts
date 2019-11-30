@@ -92,6 +92,7 @@ type MemberSearchParams = {
   query?: string;
   role?: string;
   voice?: boolean;
+  bot?: boolean;
   sort?: string;
   "case-sensitive"?: boolean;
 };
@@ -326,6 +327,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchingMembers = matchingMembers.filter(m => m.voiceState.channelID != null);
     }
 
+    if (args.bot) {
+      matchingMembers = matchingMembers.filter(m => m.bot);
+    }
+
     if (args.query) {
       const query = args["case-sensitive"] ? args.query.trimStart() : args.query.toLowerCase().trimStart();
 
@@ -380,15 +385,23 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "page",
+        shortcut: "p",
         type: "number",
       },
       {
         name: "role",
+        shortcut: "r",
         type: "string",
       },
       {
         name: "voice",
-        type: "bool",
+        shortcut: "v",
+        isSwitch: true,
+      },
+      {
+        name: "bot",
+        shortcut: "b",
+        isSwitch: true,
       },
       {
         name: "sort",
@@ -426,9 +439,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg: Message,
     args: {
       query?: string;
-      role?: string;
       page?: number;
+      role?: string;
       voice?: boolean;
+      bot?: boolean;
       sort?: string;
       "case-sensitive"?: boolean;
       export?: boolean;
