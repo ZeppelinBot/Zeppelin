@@ -10,6 +10,7 @@ import {
   TDeepPartialProps,
   tNullable,
   tDeepPartial,
+  UnknownUser,
 } from "../utils";
 import path from "path";
 import moment from "moment-timezone";
@@ -181,13 +182,34 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
+    const user = await this.resolveUser(userId);
+    if (user instanceof UnknownUser) return;
+    if (user.bot) return;
+
     const config = this.getConfigForMemberIdAndChannelId(userId, msg.channel.id);
-    const applicableStarboards = Object.values(config.boards).filter(board => board.enabled);
+    const applicableStarboards = Object.values(config.boards)
+      .filter(board => board.enabled)
+      // Can't star messages in the starboard channel itself
+      .filter(board => board.channel_id !== msg.channel.id)
+      // Matching emoji
+      .filter(board => {
+        return board.star_emoji.some((boardEmoji: string) => {
+          if (emoji.id) {
+            // Custom emoji
+            const customEmojiMatch = boardEmoji.match(/^<?:.+?:(\d+)>?$/);
+            if (customEmojiMatch) {
+              return customEmojiMatch[1] === emoji.id;
+            }
+
+            return boardEmoji === emoji.id;
+          } else {
+            // Unicode emoji
+            return emoji.name === boardEmoji;
+          }
+        });
+      });
 
     for (const starboard of applicableStarboards) {
-      // Can't star messages in the starboard channel itself
-      if (msg.channel.id === starboard.channel_id) continue;
-
       // Save reaction into the database
       await this.starboardReactions.createStarboardReaction(msg.id, userId).catch();
 
