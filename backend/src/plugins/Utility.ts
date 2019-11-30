@@ -29,6 +29,7 @@ import {
   get,
   getInviteCodesInString,
   isSnowflake,
+  messageLink,
   MINUTES,
   multiSorter,
   noop,
@@ -72,6 +73,7 @@ const ConfigSchema = t.type({
   can_vcmove: t.boolean,
   can_help: t.boolean,
   can_about: t.boolean,
+  can_context: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -125,6 +127,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_vcmove: false,
         can_help: false,
         can_about: false,
+        can_context: false,
       },
       overrides: [
         {
@@ -139,6 +142,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             can_nickname: true,
             can_vcmove: true,
             can_help: true,
+            can_context: true,
           },
         },
         {
@@ -1028,6 +1032,30 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const archiveId = await this.archives.create(source, moment().add(1, "hour"));
     const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
     msg.channel.createMessage(`Message source: ${url}`);
+  }
+
+  @d.command("context", "<channel:channel> <messageId:string>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Get a link to the context of the specified message",
+        basicUsage: "!context 94882524378968064 650391267720822785",
+      },
+    },
+  })
+  @d.permission("can_context")
+  async contextCmd(msg: Message, args: { channel: Channel; messageId: string }) {
+    if (!(args.channel instanceof TextChannel)) {
+      this.sendErrorMessage(msg.channel, "Channel must be a text channel");
+      return;
+    }
+
+    const previousMessage = (await this.bot.getMessages(args.channel.id, 1, args.messageId))[0];
+    if (!previousMessage) {
+      this.sendErrorMessage(msg.channel, "Message context not found");
+      return;
+    }
+
+    msg.channel.createMessage(messageLink(this.guildId, previousMessage.channel.id, previousMessage.id));
   }
 
   @d.command("vcmove", "<member:resolvedMember> <channel:string$>", {

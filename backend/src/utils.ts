@@ -947,6 +947,7 @@ export function verboseChannelMention(channel: GuildChannel): string {
 }
 
 export function messageLink(message: Message): string;
+export function messageLink(guildId: string, channelId: string, messageId: string): string;
 export function messageLink(guildIdOrMessage: string | Message | null, channelId?: string, messageId?: string): string {
   let guildId;
   if (guildIdOrMessage == null) {
