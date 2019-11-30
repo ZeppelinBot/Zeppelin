@@ -2,7 +2,6 @@ import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlu
 import * as t from "io-ts";
 import {
   convertDelayStringToMS,
-  disableCodeBlocks,
   disableInlineCode,
   disableLinkPreviews,
   getEmojiInString,
@@ -21,7 +20,7 @@ import {
   verboseChannelMention,
 } from "../utils";
 import { configUtils, CooldownManager } from "knub";
-import { Invite, Member, TextChannel } from "eris";
+import { Member, TextChannel } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { SimpleCache } from "../SimpleCache";
 import { Queue } from "../Queue";
@@ -51,25 +50,26 @@ type TextTriggerWithMultipleMatchTypes = {
 };
 
 interface TriggerMatchResult {
+  trigger: string;
   type: string;
 }
 
-interface MessageTextTriggerMatchResult extends TriggerMatchResult {
+interface MessageTextTriggerMatchResult<T = any> extends TriggerMatchResult {
   type: "message" | "embed";
   str: string;
   userId: string;
   messageInfo: MessageInfo;
-  matchedContent?: string;
+  matchedValue: T;
 }
 
-interface OtherTextTriggerMatchResult extends TriggerMatchResult {
+interface OtherTextTriggerMatchResult<T = any> extends TriggerMatchResult {
   type: "username" | "nickname" | "visiblename" | "customstatus";
   str: string;
   userId: string;
-  matchedContent?: string;
+  matchedValue: T;
 }
 
-type TextTriggerMatchResult = MessageTextTriggerMatchResult | OtherTextTriggerMatchResult;
+type TextTriggerMatchResult<T = any> = MessageTextTriggerMatchResult<T> | OtherTextTriggerMatchResult<T>;
 
 interface TextSpamTriggerMatchResult extends TriggerMatchResult {
   type: "textspam";
@@ -118,8 +118,7 @@ const MatchWordsTrigger = t.type({
   match_custom_status: t.boolean,
 });
 type TMatchWordsTrigger = t.TypeOf<typeof MatchWordsTrigger>;
-const defaultMatchWordsTrigger: TMatchWordsTrigger = {
-  words: [],
+const defaultMatchWordsTrigger: Partial<TMatchWordsTrigger> = {
   case_sensitive: false,
   only_full_words: true,
   normalize: false,
@@ -732,7 +731,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     recentActionType: RecentActionType,
     trigger: TBaseTextSpamTrigger,
     msg: SavedMessage,
-  ): TextSpamTriggerMatchResult {
+  ): Partial<TextSpamTriggerMatchResult> {
     const since = moment.utc(msg.posted_at).valueOf() - convertDelayStringToMS(trigger.within);
     const recentActions = trigger.per_channel
       ? this.getMatchingRecentActions(recentActionType, `${msg.channel_id}-${msg.user_id}`, since)
@@ -754,69 +753,85 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     return null;
   }
 
-  protected async matchMultipleTextTypesOnMessage(
+  protected async matchMultipleTextTypesOnMessage<T>(
     trigger: TextTriggerWithMultipleMatchTypes,
     msg: SavedMessage,
-    cb,
-  ): Promise<TextTriggerMatchResult> {
+    matchFn: (str: string) => T | Promise<T> | null,
+  ): Promise<Partial<TextTriggerMatchResult<T>>> {
     const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id };
     const member = this.guild.members.get(msg.user_id);
 
     if (trigger.match_messages) {
       const str = msg.data.content;
-      const match = await cb(str);
-      if (match) return { type: "message", str, userId: msg.user_id, messageInfo, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "message", str, userId: msg.user_id, messageInfo, matchedValue: matchResult };
+      }
     }
 
     if (trigger.match_embeds && msg.data.embeds && msg.data.embeds.length) {
       const str = JSON.stringify(msg.data.embeds[0]);
-      const match = await cb(str);
-      if (match) return { type: "embed", str, userId: msg.user_id, messageInfo, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "embed", str, userId: msg.user_id, messageInfo, matchedValue: matchResult };
+      }
     }
 
     if (trigger.match_visible_names) {
       const str = member.nick || msg.data.author.username;
-      const match = await cb(str);
-      if (match) return { type: "visiblename", str, userId: msg.user_id, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "visiblename", str, userId: msg.user_id, matchedValue: matchResult };
+      }
     }
 
     if (trigger.match_usernames) {
       const str = `${msg.data.author.username}#${msg.data.author.discriminator}`;
-      const match = await cb(str);
-      if (match) return { type: "username", str, userId: msg.user_id, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "username", str, userId: msg.user_id, matchedValue: matchResult };
+      }
     }
 
     if (trigger.match_nicknames && member.nick) {
       const str = member.nick;
-      const match = await cb(str);
-      if (match) return { type: "nickname", str, userId: msg.user_id, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "nickname", str, userId: msg.user_id, matchedValue: matchResult };
+      }
     }
 
     // type 4 = custom status
     if (trigger.match_custom_status && member.game && member.game.type === 4) {
       const str = member.game.state;
-      const match = await cb(str);
-      if (match) return { type: "customstatus", str, userId: msg.user_id, matchedContent: match };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "customstatus", str, userId: msg.user_id, matchedValue: matchResult };
+      }
     }
 
     return null;
   }
 
-  protected async matchMultipleTextTypesOnMember(
+  protected async matchMultipleTextTypesOnMember<T>(
     trigger: TextTriggerWithMultipleMatchTypes,
     member: Member,
-    cb,
-  ): Promise<TextTriggerMatchResult> {
+    matchFn: (str: string) => T | Promise<T> | null,
+  ): Promise<Partial<TextTriggerMatchResult<T>>> {
     if (trigger.match_usernames) {
       const str = `${member.user.username}#${member.user.discriminator}`;
-      const match = await cb(str);
-      if (match) return { type: "username", str, userId: member.id };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "username", str, userId: member.id, matchedValue: matchResult };
+      }
     }
 
     if (trigger.match_nicknames && member.nick) {
       const str = member.nick;
-      const match = await cb(str);
-      if (match) return { type: "nickname", str, userId: member.id };
+      const matchResult = await matchFn(str);
+      if (matchResult) {
+        return { type: "nickname", str, userId: member.id, matchedValue: matchResult };
+      }
     }
 
     return null;
@@ -836,63 +851,63 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         const match = await this.matchMultipleTextTypesOnMessage(trigger.match_words, msg, str => {
           return this.evaluateMatchWordsTrigger(trigger.match_words, str);
         });
-        if (match) return match;
+        if (match) return { ...match, trigger: "match_words" } as TextTriggerMatchResult;
       }
 
       if (trigger.match_regex) {
         const match = await this.matchMultipleTextTypesOnMessage(trigger.match_regex, msg, str => {
           return this.evaluateMatchRegexTrigger(trigger.match_regex, str);
         });
-        if (match) return match;
+        if (match) return { ...match, trigger: "match_regex" } as TextTriggerMatchResult;
       }
 
       if (trigger.match_invites) {
         const match = await this.matchMultipleTextTypesOnMessage(trigger.match_invites, msg, str => {
           return this.evaluateMatchInvitesTrigger(trigger.match_invites, str);
         });
-        if (match) return match;
+        if (match) return { ...match, trigger: "match_invites" } as TextTriggerMatchResult;
       }
 
       if (trigger.match_links) {
         const match = await this.matchMultipleTextTypesOnMessage(trigger.match_links, msg, str => {
           return this.evaluateMatchLinksTrigger(trigger.match_links, str);
         });
-        if (match) return match;
+        if (match) return { ...match, trigger: "match_links" } as TextTriggerMatchResult;
       }
 
       if (trigger.message_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Message, trigger.message_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "message_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.mention_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Mention, trigger.mention_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "mention_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.link_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Link, trigger.link_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "link_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.attachment_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Attachment, trigger.attachment_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "attachment_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.emoji_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Emoji, trigger.emoji_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "emoji_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.line_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Line, trigger.line_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "line_spam" } as TextSpamTriggerMatchResult;
       }
 
       if (trigger.character_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Character, trigger.character_spam, msg);
-        if (match) return match;
+        if (match) return { ...match, trigger: "character_spam" } as TextSpamTriggerMatchResult;
       }
     }
 
@@ -1102,6 +1117,9 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
   }
 
+  /**
+   * Apply the actions of the specified rule on the matched message/member
+   */
   protected async applyActionsOnMatch(rule: TRule, matchResult: AnyTriggerMatchResult) {
     if (rule.cooldown && this.checkAndUpdateCooldown(rule, matchResult)) {
       return;
@@ -1335,6 +1353,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   /**
+   * Check if the rule's on cooldown and bump its usage count towards the cooldown up
    * @return Whether the rule's on cooldown
    */
   protected checkAndUpdateCooldown(rule: TRule, matchResult: AnyTriggerMatchResult): boolean {
@@ -1371,15 +1390,17 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     return false;
   }
 
+  /**
+   * Returns a text summary for the match result for use in logs/alerts
+   */
   protected async getMatchSummary(matchResult: AnyTriggerMatchResult): Promise<string> {
     if (matchResult.type === "message" || matchResult.type === "embed") {
       const message = await this.savedMessages.find(matchResult.messageInfo.messageId);
       const channel = this.guild.channels.get(matchResult.messageInfo.channelId);
       const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
-      const matchedContent = disableInlineCode(matchResult.matchedContent);
 
       return trimPluginDescription(`
-        Matched \`${matchedContent}\` in message in ${channelMention}:
+        Matched ${this.getMatchedValueText(matchResult)} in message in ${channelMention}:
         ${messageSummary(message)}
       `);
     } else if (matchResult.type === "textspam" || matchResult.type === "raidspam") {
@@ -1392,20 +1413,36 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         Matched spam: ${disableLinkPreviews(archiveUrl)}
       `);
     } else if (matchResult.type === "username") {
-      const matchedContent = disableInlineCode(matchResult.matchedContent);
-      return `Matched \`${matchedContent}\` in username: ${matchResult.str}`;
+      return `Matched ${this.getMatchedValueText(matchResult)} in username: ${matchResult.str}`;
     } else if (matchResult.type === "nickname") {
-      const matchedContent = disableInlineCode(matchResult.matchedContent);
-      return `Matched \`${matchedContent}\` in nickname: ${matchResult.str}`;
+      return `Matched ${this.getMatchedValueText(matchResult)} in nickname: ${matchResult.str}`;
     } else if (matchResult.type === "visiblename") {
-      const matchedContent = disableInlineCode(matchResult.matchedContent);
-      return `Matched \`${matchedContent}\` in visible name: ${matchResult.str}`;
+      return `Matched ${this.getMatchedValueText(matchResult)} in visible name: ${matchResult.str}`;
     } else if (matchResult.type === "customstatus") {
-      const matchedContent = disableInlineCode(matchResult.matchedContent);
-      return `Matched \`${matchedContent}\` in custom status: ${matchResult.str}`;
+      return `Matched ${this.getMatchedValueText(matchResult)} in custom status: ${matchResult.str}`;
     }
   }
 
+  /**
+   * Returns a formatted version of the matched value (word, regex pattern, link, etc.) for use in the match summary
+   */
+  protected getMatchedValueText(matchResult: TextTriggerMatchResult): string | null {
+    if (matchResult.trigger === "match_words") {
+      return `word \`${disableInlineCode(matchResult.matchedValue)}\``;
+    } else if (matchResult.trigger === "match_regex") {
+      return `regex \`${disableInlineCode(matchResult.matchedValue)}\``;
+    } else if (matchResult.trigger === "match_invites") {
+      return `invite code \`${disableInlineCode(matchResult.matchedValue)}\``;
+    } else if (matchResult.trigger === "match_links") {
+      return `link \`${disableInlineCode(matchResult.matchedValue)}\``;
+    }
+
+    return typeof matchResult.matchedValue === "string" ? `\`${disableInlineCode(matchResult.matchedValue)}\`` : null;
+  }
+
+  /**
+   * Run automod actions on new messages
+   */
   protected onMessageCreate(msg: SavedMessage) {
     if (msg.is_bot) return;
 
