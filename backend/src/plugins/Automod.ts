@@ -2,6 +2,9 @@ import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlu
 import * as t from "io-ts";
 import {
   convertDelayStringToMS,
+  disableCodeBlocks,
+  disableInlineCode,
+  disableLinkPreviews,
   getEmojiInString,
   getInviteCodesInString,
   getRoleMentions,
@@ -55,12 +58,14 @@ interface MessageTextTriggerMatchResult extends TriggerMatchResult {
   str: string;
   userId: string;
   messageInfo: MessageInfo;
+  matchedContent?: string;
 }
 
 interface OtherTextTriggerMatchResult extends TriggerMatchResult {
   type: "username" | "nickname" | "visiblename" | "customstatus";
   str: string;
   userId: string;
+  matchedContent?: string;
 }
 
 type TextTriggerMatchResult = MessageTextTriggerMatchResult | OtherTextTriggerMatchResult;
@@ -94,7 +99,7 @@ type AnyTriggerMatchResult =
   | OtherSpamTriggerMatchResult;
 
 /**
- * TRIGGERS
+ * CONFIG SCHEMA FOR TRIGGERS
  */
 
 const MatchWordsTrigger = t.type({
@@ -221,7 +226,7 @@ const VoiceMoveSpamTrigger = BaseSpamTrigger;
 type TVoiceMoveSpamTrigger = t.TypeOf<typeof VoiceMoveSpamTrigger>;
 
 /**
- * ACTIONS
+ * CONFIG SCHEMA FOR ACTIONS
  */
 
 const CleanAction = t.boolean;
@@ -254,13 +259,8 @@ const ChangeNicknameAction = t.type({
 
 const LogAction = t.boolean;
 
-const AddRolesAction = t.type({
-  roles: t.array(t.string),
-});
-
-const RemoveRolesAction = t.type({
-  roles: t.array(t.string),
-});
+const AddRolesAction = t.array(t.string);
+const RemoveRolesAction = t.array(t.string);
 
 /**
  * FULL CONFIG SCHEMA
@@ -374,6 +374,13 @@ const RECENT_NICKNAME_CHANGE_EXPIRY_TIME = 5 * MINUTES;
 
 const inviteCache = new SimpleCache(10 * MINUTES);
 
+/**
+ * General plugin flow:
+ * - When a message is posted:
+ *   1. Run logRecentActionsForMessage() -- used for detecting spam
+ *   2. Run matchRuleToMessage() for each automod rule. This checks if any triggers in the rule match the message.
+ *   3. If a rule matched, run applyActionsOnMatch() for that rule/match
+ */
 export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "automod";
   public static configSchema = ConfigSchema;
@@ -593,62 +600,72 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     clearInterval(this.recentNicknameChangesClearInterval);
   }
 
-  protected evaluateMatchWordsTrigger(trigger: TMatchWordsTrigger, str: string): boolean {
+  /**
+   * @return Matched word
+   */
+  protected evaluateMatchWordsTrigger(trigger: TMatchWordsTrigger, str: string): null | string {
     for (const word of trigger.words) {
       const pattern = trigger.only_full_words ? `\\b${escapeStringRegexp(word)}\\b` : escapeStringRegexp(word);
 
       const regex = new RegExp(pattern, trigger.case_sensitive ? "" : "i");
       const test = regex.test(str);
-      if (test) return true;
+      if (test) return word;
     }
 
-    return false;
+    return null;
   }
 
-  protected evaluateMatchRegexTrigger(trigger: TMatchRegexTrigger, str: string): boolean {
+  /**
+   * @return Matched regex pattern
+   */
+  protected evaluateMatchRegexTrigger(trigger: TMatchRegexTrigger, str: string): null | string {
     // TODO: Time limit regexes
     for (const pattern of trigger.patterns) {
       const regex = new RegExp(pattern, trigger.case_sensitive ? "" : "i");
       const test = regex.test(str);
-      if (test) return true;
+      if (test) return regex.source;
     }
 
-    return false;
+    return null;
   }
 
-  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<boolean> {
+  /**
+   * @return Matched invite code
+   */
+  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<null | string> {
     const inviteCodes = getInviteCodesInString(str);
-    if (inviteCodes.length === 0) return false;
+    if (inviteCodes.length === 0) return null;
 
     const uniqueInviteCodes = Array.from(new Set(inviteCodes));
 
     for (const code of uniqueInviteCodes) {
       if (trigger.include_invite_codes && trigger.include_invite_codes.includes(code)) {
-        return true;
+        return code;
       }
       if (trigger.exclude_invite_codes && !trigger.exclude_invite_codes.includes(code)) {
-        return true;
+        return code;
       }
     }
 
-    const invites: Array<Invite | null> = await Promise.all(uniqueInviteCodes.map(code => this.resolveInvite(code)));
-
-    for (const invite of invites) {
-      // Always match on unknown invites
-      if (!invite) return true;
+    for (const inviteCode of uniqueInviteCodes) {
+      const invite = await this.resolveInvite(inviteCode);
+      if (!invite) return inviteCode;
 
       if (trigger.include_guilds && trigger.include_guilds.includes(invite.guild.id)) {
-        return true;
+        return inviteCode;
       }
       if (trigger.exclude_guilds && !trigger.exclude_guilds.includes(invite.guild.id)) {
-        return true;
+        return inviteCode;
       }
     }
 
-    return false;
+    return null;
   }
 
-  protected evaluateMatchLinksTrigger(trigger: TMatchLinksTrigger, str: string): boolean {
+  /**
+   * @return Matched link
+   */
+  protected evaluateMatchLinksTrigger(trigger: TMatchLinksTrigger, str: string): null | string {
     const links = getUrlsInString(str, true);
 
     for (const link of links) {
@@ -658,10 +675,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         for (const domain of trigger.include_domains) {
           const normalizedDomain = domain.toLowerCase();
           if (normalizedDomain === normalizedHostname) {
-            return true;
+            return domain;
           }
           if (trigger.include_subdomains && normalizedHostname.endsWith(`.${domain}`)) {
-            return true;
+            return domain;
           }
         }
       }
@@ -670,18 +687,18 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         for (const domain of trigger.exclude_domains) {
           const normalizedDomain = domain.toLowerCase();
           if (normalizedDomain === normalizedHostname) {
-            return false;
+            return null;
           }
           if (trigger.include_subdomains && normalizedHostname.endsWith(`.${domain}`)) {
-            return false;
+            return null;
           }
         }
 
-        return true;
+        return link.toString();
       }
     }
 
-    return false;
+    return null;
   }
 
   protected matchTextSpamTrigger(
@@ -721,38 +738,38 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (trigger.match_messages) {
       const str = msg.data.content;
       const match = await cb(str);
-      if (match) return { type: "message", str, userId: msg.user_id, messageInfo };
+      if (match) return { type: "message", str, userId: msg.user_id, messageInfo, matchedContent: match };
     }
 
     if (trigger.match_embeds && msg.data.embeds && msg.data.embeds.length) {
       const str = JSON.stringify(msg.data.embeds[0]);
       const match = await cb(str);
-      if (match) return { type: "embed", str, userId: msg.user_id, messageInfo };
+      if (match) return { type: "embed", str, userId: msg.user_id, messageInfo, matchedContent: match };
     }
 
     if (trigger.match_visible_names) {
       const str = member.nick || msg.data.author.username;
       const match = await cb(str);
-      if (match) return { type: "visiblename", str, userId: msg.user_id };
+      if (match) return { type: "visiblename", str, userId: msg.user_id, matchedContent: match };
     }
 
     if (trigger.match_usernames) {
       const str = `${msg.data.author.username}#${msg.data.author.discriminator}`;
       const match = await cb(str);
-      if (match) return { type: "username", str, userId: msg.user_id };
+      if (match) return { type: "username", str, userId: msg.user_id, matchedContent: match };
     }
 
     if (trigger.match_nicknames && member.nick) {
       const str = member.nick;
       const match = await cb(str);
-      if (match) return { type: "nickname", str, userId: msg.user_id };
+      if (match) return { type: "nickname", str, userId: msg.user_id, matchedContent: match };
     }
 
     // type 4 = custom status
     if (trigger.match_custom_status && member.game && member.game.type === 4) {
       const str = member.game.state;
       const match = await cb(str);
-      if (match) return { type: "customstatus", str, userId: msg.user_id };
+      if (match) return { type: "customstatus", str, userId: msg.user_id, matchedContent: match };
     }
 
     return null;
@@ -1059,88 +1076,18 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   protected async applyActionsOnMatch(rule: TRule, matchResult: AnyTriggerMatchResult) {
-    const actionsTaken = [];
-
-    let matchSummary = null;
-    let caseExtraNote = null;
-
-    if (rule.cooldown) {
-      let cooldownKey = rule.name + "-";
-
-      if (matchResult.type === "textspam") {
-        cooldownKey += matchResult.channelId ? `${matchResult.channelId}-${matchResult.userId}` : matchResult.userId;
-      } else if (matchResult.type === "message" || matchResult.type === "embed") {
-        cooldownKey += matchResult.userId;
-      } else if (
-        matchResult.type === "username" ||
-        matchResult.type === "nickname" ||
-        matchResult.type === "visiblename" ||
-        matchResult.type === "customstatus"
-      ) {
-        cooldownKey += matchResult.userId;
-      } else if (matchResult.type === "otherspam") {
-        cooldownKey += matchResult.userId;
-      } else {
-        cooldownKey = null;
-      }
-
-      if (cooldownKey) {
-        if (this.cooldownManager.isOnCooldown(cooldownKey)) {
-          return;
-        }
-
-        const cooldownTime = convertDelayStringToMS(rule.cooldown, "s");
-        if (cooldownTime) {
-          this.cooldownManager.setCooldown(cooldownKey, cooldownTime);
-        }
-      }
+    if (rule.cooldown && this.checkAndUpdateCooldown(rule, matchResult)) {
+      return;
     }
 
-    if (matchResult.type === "textspam") {
-      this.activateGracePeriod(matchResult);
-      this.clearSpecificRecentActions(
-        matchResult.actionType,
-        matchResult.channelId ? `${matchResult.channelId}-${matchResult.userId}` : matchResult.userId,
-      );
-    }
+    const matchSummary = this.getMatchSummary(matchResult);
 
-    // Match summary
-    let matchedMessageIds = [];
-    if (matchResult.type === "message" || matchResult.type === "embed") {
-      matchedMessageIds = [matchResult.messageInfo.messageId];
-    } else if (matchResult.type === "textspam" || matchResult.type === "raidspam") {
-      matchedMessageIds = matchResult.messageInfos.map(m => m.messageId);
-    }
-
-    if (matchedMessageIds.length > 1) {
-      const savedMessages = await this.savedMessages.getMultiple(matchedMessageIds);
-      const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
-      const baseUrl = this.knub.getGlobalConfig().url;
-      const archiveUrl = this.archives.getUrl(baseUrl, archiveId);
-      matchSummary = `Matched messages: <${archiveUrl}>`;
-    } else if (matchedMessageIds.length === 1) {
-      const message = await this.savedMessages.find(matchedMessageIds[0]);
-      const channel = this.guild.channels.get(message.channel_id);
-      const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
-      matchSummary = `Matched message in ${channelMention} (originally posted at **${
-        message.posted_at
-      }**):\n${messageSummary(message)}`;
-    }
-
-    if (matchResult.type === "username") {
-      matchSummary = `Matched username: ${matchResult.str}`;
-    } else if (matchResult.type === "nickname") {
-      matchSummary = `Matched nickname: ${matchResult.str}`;
-    } else if (matchResult.type === "visiblename") {
-      matchSummary = `Matched visible name: ${matchResult.str}`;
-    } else if (matchResult.type === "customstatus") {
-      matchSummary = `Matched custom status: ${matchResult.str}`;
-    }
-
-    caseExtraNote = `Matched automod rule "${rule.name}"`;
+    let caseExtraNote = `Matched automod rule "${rule.name}"`;
     if (matchSummary) {
       caseExtraNote += `\n${matchSummary}`;
     }
+
+    const actionsTaken = [];
 
     // Actions
     if (rule.actions.clean) {
@@ -1272,8 +1219,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (!member) continue;
 
         const memberRoles = new Set(member.roles);
-        for (const roleId of rule.actions.add_roles.roles) {
+        for (const roleId of rule.actions.add_roles) {
           memberRoles.add(roleId);
+        }
+
+        if (memberRoles.size === member.roles.length) {
+          // No role changes
+          continue;
         }
 
         const rolesArr = Array.from(memberRoles.values());
@@ -1282,6 +1234,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         });
         member.roles = rolesArr; // Make sure we know of the new roles internally as well
       }
+
+      actionsTaken.push("add roles");
     }
 
     if (rule.actions.remove_roles) {
@@ -1291,8 +1245,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (!member) continue;
 
         const memberRoles = new Set(member.roles);
-        for (const roleId of rule.actions.remove_roles.roles) {
+        for (const roleId of rule.actions.remove_roles) {
           memberRoles.delete(roleId);
+        }
+
+        if (memberRoles.size === member.roles.length) {
+          // No role changes
+          continue;
         }
 
         const rolesArr = Array.from(memberRoles.values());
@@ -1301,6 +1260,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         });
         member.roles = rolesArr; // Make sure we know of the new roles internally as well
       }
+
+      actionsTaken.push("remove roles");
     }
 
     // Don't wait for the rest before continuing to other automod items in the queue
@@ -1309,6 +1270,15 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       const users = matchResult.type === "raidspam" ? matchResult.userIds.map(id => this.getUser(id)) : [];
       const safeUser = stripObjectToScalars(user);
       const safeUsers = users.map(u => stripObjectToScalars(u));
+
+      const logData = {
+        rule: rule.name,
+        user: safeUser,
+        users: safeUsers,
+        actionsTaken: actionsTaken.length ? actionsTaken.join(", ") : "<none>",
+        matchSummary,
+      };
+      const logMessage = this.getLogs().getLogMessage(LogType.AUTOMOD_ACTION, logData);
 
       if (rule.actions.alert) {
         const channel = this.guild.channels.get(rule.actions.alert.channel);
@@ -1320,6 +1290,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
             users: safeUsers,
             text,
             matchSummary,
+            logMessage,
           });
           channel.createMessage(rendered);
           actionsTaken.push("alert");
@@ -1331,15 +1302,81 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
 
       if (rule.actions.log) {
-        this.getLogs().log(LogType.AUTOMOD_ACTION, {
-          rule: rule.name,
-          user: safeUser,
-          users: safeUsers,
-          actionsTaken: actionsTaken.length ? actionsTaken.join(", ") : "<none>",
-          matchSummary,
-        });
+        this.getLogs().log(LogType.AUTOMOD_ACTION, logData);
       }
     })();
+  }
+
+  /**
+   * @return Whether the rule's on cooldown
+   */
+  protected checkAndUpdateCooldown(rule: TRule, matchResult: AnyTriggerMatchResult): boolean {
+    let cooldownKey = rule.name + "-";
+
+    if (matchResult.type === "textspam") {
+      cooldownKey += matchResult.channelId ? `${matchResult.channelId}-${matchResult.userId}` : matchResult.userId;
+    } else if (matchResult.type === "message" || matchResult.type === "embed") {
+      cooldownKey += matchResult.userId;
+    } else if (
+      matchResult.type === "username" ||
+      matchResult.type === "nickname" ||
+      matchResult.type === "visiblename" ||
+      matchResult.type === "customstatus"
+    ) {
+      cooldownKey += matchResult.userId;
+    } else if (matchResult.type === "otherspam") {
+      cooldownKey += matchResult.userId;
+    } else {
+      cooldownKey = null;
+    }
+
+    if (cooldownKey) {
+      if (this.cooldownManager.isOnCooldown(cooldownKey)) {
+        return true;
+      }
+
+      const cooldownTime = convertDelayStringToMS(rule.cooldown, "s");
+      if (cooldownTime) {
+        this.cooldownManager.setCooldown(cooldownKey, cooldownTime);
+      }
+    }
+
+    return false;
+  }
+
+  protected async getMatchSummary(matchResult: AnyTriggerMatchResult): Promise<string> {
+    if (matchResult.type === "message" || matchResult.type === "embed") {
+      const message = await this.savedMessages.find(matchResult.messageInfo.messageId);
+      const channel = this.guild.channels.get(matchResult.messageInfo.channelId);
+      const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
+      const matchedContent = disableInlineCode(matchResult.matchedContent);
+
+      return trimPluginDescription(`
+        Matched \`${matchedContent}\` in message in ${channelMention}:
+        ${messageSummary(message)}
+      `);
+    } else if (matchResult.type === "textspam" || matchResult.type === "raidspam") {
+      const savedMessages = await this.savedMessages.getMultiple(matchResult.messageInfos.map(i => i.messageId));
+      const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
+      const baseUrl = this.knub.getGlobalConfig().url;
+      const archiveUrl = this.archives.getUrl(baseUrl, archiveId);
+
+      return trimPluginDescription(`
+        Matched spam: ${disableLinkPreviews(archiveUrl)}
+      `);
+    } else if (matchResult.type === "username") {
+      const matchedContent = disableInlineCode(matchResult.matchedContent);
+      return `Matched \`${matchedContent}\` in username: ${matchResult.str}`;
+    } else if (matchResult.type === "nickname") {
+      const matchedContent = disableInlineCode(matchResult.matchedContent);
+      return `Matched \`${matchedContent}\` in nickname: ${matchResult.str}`;
+    } else if (matchResult.type === "visiblename") {
+      const matchedContent = disableInlineCode(matchResult.matchedContent);
+      return `Matched \`${matchedContent}\` in visible name: ${matchResult.str}`;
+    } else if (matchResult.type === "customstatus") {
+      const matchedContent = disableInlineCode(matchResult.matchedContent);
+      return `Matched \`${matchedContent}\` in custom status: ${matchResult.str}`;
+    }
   }
 
   protected onMessageCreate(msg: SavedMessage) {
