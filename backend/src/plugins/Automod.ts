@@ -36,6 +36,7 @@ import { GuildLogs } from "../data/GuildLogs";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import { renderTemplate } from "../templateFormatter";
+import { transliterate } from "transliteration";
 import Timeout = NodeJS.Timeout;
 
 type MessageInfo = { channelId: string; messageId: string };
@@ -106,6 +107,9 @@ const MatchWordsTrigger = t.type({
   words: t.array(t.string),
   case_sensitive: t.boolean,
   only_full_words: t.boolean,
+  normalize: t.boolean,
+  loose_matching: t.boolean,
+  loose_matching_threshold: t.number,
   match_messages: t.boolean,
   match_embeds: t.boolean,
   match_visible_names: t.boolean,
@@ -118,6 +122,9 @@ const defaultMatchWordsTrigger: TMatchWordsTrigger = {
   words: [],
   case_sensitive: false,
   only_full_words: true,
+  normalize: false,
+  loose_matching: false,
+  loose_matching_threshold: 4,
   match_messages: true,
   match_embeds: true,
   match_visible_names: false,
@@ -129,6 +136,7 @@ const defaultMatchWordsTrigger: TMatchWordsTrigger = {
 const MatchRegexTrigger = t.type({
   patterns: t.array(TSafeRegex),
   case_sensitive: t.boolean,
+  normalize: t.boolean,
   match_messages: t.boolean,
   match_embeds: t.boolean,
   match_visible_names: t.boolean,
@@ -139,6 +147,7 @@ const MatchRegexTrigger = t.type({
 type TMatchRegexTrigger = t.TypeOf<typeof MatchRegexTrigger>;
 const defaultMatchRegexTrigger: Partial<TMatchRegexTrigger> = {
   case_sensitive: false,
+  normalize: false,
   match_messages: true,
   match_embeds: true,
   match_visible_names: false,
@@ -604,8 +613,22 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
    * @return Matched word
    */
   protected evaluateMatchWordsTrigger(trigger: TMatchWordsTrigger, str: string): null | string {
+    if (trigger.normalize) {
+      str = transliterate(str);
+    }
+
+    const looseMatchingThreshold = Math.min(Math.max(trigger.loose_matching_threshold, 1), 64);
+
     for (const word of trigger.words) {
-      const pattern = trigger.only_full_words ? `\\b${escapeStringRegexp(word)}\\b` : escapeStringRegexp(word);
+      // When performing loose matching, allow any amount of whitespace or up to looseMatchingThreshold number of other
+      // characters between the matched characters. E.g. if we're matching banana, a loose match could also match b a n a n a
+      let pattern = trigger.loose_matching
+        ? [...word].map(c => escapeStringRegexp(c)).join(`(?:\\s*|.{0,${looseMatchingThreshold})`)
+        : escapeStringRegexp(word);
+
+      if (trigger.only_full_words) {
+        pattern = `\\b${pattern}\\b`;
+      }
 
       const regex = new RegExp(pattern, trigger.case_sensitive ? "" : "i");
       const test = regex.test(str);
@@ -619,6 +642,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
    * @return Matched regex pattern
    */
   protected evaluateMatchRegexTrigger(trigger: TMatchRegexTrigger, str: string): null | string {
+    if (trigger.normalize) {
+      str = transliterate(str);
+    }
+
     // TODO: Time limit regexes
     for (const pattern of trigger.patterns) {
       const regex = new RegExp(pattern, trigger.case_sensitive ? "" : "i");

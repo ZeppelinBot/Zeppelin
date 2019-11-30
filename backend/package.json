@@ -51,6 +51,7 @@
     "seedrandom": "^3.0.1",
     "tlds": "^1.203.1",
     "tmp": "0.0.33",
+    "transliteration": "^2.1.7",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.14",
     "uuid": "^3.3.2"
