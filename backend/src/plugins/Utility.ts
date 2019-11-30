@@ -594,6 +594,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       count: savedMessages.length,
       archiveUrl,
     });
+
+    return { archiveUrl };
   }
 
   @d.command("clean", "<count:number>", {
@@ -706,10 +708,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let responseMsg: Message;
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(targetChannel, messagesToClean, msg.author);
+      const cleanResult = await this.cleanMessages(targetChannel, messagesToClean, msg.author);
 
       let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
-      if (targetChannel.id !== msg.channel.id) responseText += ` in <#${targetChannel.id}>`;
+      if (targetChannel.id !== msg.channel.id) {
+        responseText += ` in <#${targetChannel.id}>\n${cleanResult.archiveUrl}`;
+      }
 
       responseMsg = await msg.channel.createMessage(successMessage(responseText));
     } else {
