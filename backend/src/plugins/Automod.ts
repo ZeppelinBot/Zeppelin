@@ -254,6 +254,14 @@ const ChangeNicknameAction = t.type({
 
 const LogAction = t.boolean;
 
+const AddRolesAction = t.type({
+  roles: t.array(t.string),
+});
+
+const RemoveRolesAction = t.type({
+  roles: t.array(t.string),
+});
+
 /**
  * FULL CONFIG SCHEMA
  */
@@ -288,6 +296,8 @@ const Rule = t.type({
     alert: tNullable(AlertAction),
     change_nickname: tNullable(ChangeNicknameAction),
     log: tNullable(LogAction),
+    add_roles: tNullable(AddRolesAction),
+    remove_roles: tNullable(RemoveRolesAction),
   }),
   cooldown: tNullable(t.string),
 });
@@ -1253,6 +1263,44 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
 
       actionsTaken.push("nickname");
+    }
+
+    if (rule.actions.add_roles) {
+      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
+      for (const userId of userIdsToChange) {
+        const member = await this.getMember(userId);
+        if (!member) continue;
+
+        const memberRoles = new Set(member.roles);
+        for (const roleId of rule.actions.add_roles.roles) {
+          memberRoles.add(roleId);
+        }
+
+        const rolesArr = Array.from(memberRoles.values());
+        await member.edit({
+          roles: rolesArr,
+        });
+        member.roles = rolesArr; // Make sure we know of the new roles internally as well
+      }
+    }
+
+    if (rule.actions.remove_roles) {
+      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
+      for (const userId of userIdsToChange) {
+        const member = await this.getMember(userId);
+        if (!member) continue;
+
+        const memberRoles = new Set(member.roles);
+        for (const roleId of rule.actions.remove_roles.roles) {
+          memberRoles.delete(roleId);
+        }
+
+        const rolesArr = Array.from(memberRoles.values());
+        await member.edit({
+          roles: rolesArr,
+        });
+        member.roles = rolesArr; // Make sure we know of the new roles internally as well
+      }
     }
 
     // Don't wait for the rest before continuing to other automod items in the queue
