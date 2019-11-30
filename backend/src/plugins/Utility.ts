@@ -720,7 +720,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       responseMsg = await msg.channel.createMessage(errorMessage(`Found no messages to clean!`));
     }
 
-    if (targetChannel.id !== msg.channel.id) {
+    if (targetChannel.id === msg.channel.id) {
       // Delete the !clean command and the bot response if a different channel wasn't specified
       // (so as not to spam the cleaned channel with the command itself)
       setTimeout(() => {
