@@ -209,7 +209,7 @@ export function convertDelayStringToMS(str, defaultUnit = "m"): number {
 }
 
 export function successMessage(str) {
-  return `👌 ${str}`;
+  return `<:zep_check:650361014180904971> ${str}`;
 }
 
 export function errorMessage(str) {
@@ -462,7 +462,7 @@ export function getRoleMentions(str: string) {
 }
 
 /**
- * Disables link previews in the given string by wrapping links in < >
+ * Disable link previews in the given string by wrapping links in < >
  */
 export function disableLinkPreviews(str: string): string {
   return str.replace(/(?<!<)(https?:\/\/\S+)/gi, "<$1>");
@@ -472,6 +472,17 @@ export function deactivateMentions(content: string): string {
   return content.replace(/@/g, "@\u200b");
 }
 
+/**
+ * Disable inline code in the given string by replacing backticks/grave accents with acute accents
+ * FIXME: Find a better way that keeps the grave accents? Can't use the code block approach here since it's just 1 character.
+ */
+export function disableInlineCode(content: string): string {
+  return content.replace(/`/g, "\u00b4");
+}
+
+/**
+ * Disable code blocks in the given string by adding invisible unicode characters between backticks
+ */
 export function disableCodeBlocks(content: string): string {
   return content.replace(/`/g, "`\u200b");
 }
