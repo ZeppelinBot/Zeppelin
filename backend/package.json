@@ -4,18 +4,20 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start-bot-dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/index.js",
-    "watch-bot": "nodemon --config nodemon-bot.json",
+    "watch": "cross-env NODE_ENV=development tsc-watch --onSuccess \"node start-dev.js\"",
     "build": "rimraf dist && tsc",
-    "start-api-dev": "node -r ts-node/register -r tsconfig-paths/register src/api/index.ts",
-    "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/api/index.js",
-    "watch-api": "nodemon --config nodemon-api.json",
-    "format": "prettier --write \"./src/**/*.ts\"",
-    "typeorm": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migrate": "npm run typeorm -- migration:run",
-    "migrate-rollback": "npm run typeorm -- migration:revert",
-    "test": "ava"
+    "start-bot-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js dist/backend/src/index.js",
+    "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js dist/backend/src/index.js",
+    "start-api-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js dist/backend/src/api/index.js",
+    "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js dist/backend/src/api/index.js",
+    "typeorm": "node -r ./register-tsconfig-paths.js ./node_modules/typeorm/cli.js",
+    "migrate-prod": "npm run typeorm -- migration:run",
+    "migrate-dev": "npm run build && npm run typeorm -- migration:run",
+    "migrate-rollback-prod": "npm run typeorm -- migration:revert",
+    "migrate-rollback-dev": "npm run build && npm run typeorm -- migration:revert",
+    "test": "npm run build && npm run run-tests",
+    "run-tests": "ava",
+    "test-watch": "tsc-watch --onSuccess \"npx ava\""
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -68,20 +70,16 @@
     "ava": "^2.4.0",
     "nodemon": "^1.19.4",
     "rimraf": "^2.6.2",
-    "ts-node": "^8.4.1",
+    "tsc-watch": "^4.0.0",
     "typescript": "^3.7.2"
   },
   "ava": {
     "compileEnhancements": false,
     "files": [
-      "src/**/*.test.ts"
-    ],
-    "extensions": [
-      "ts"
+      "dist/backend/src/**/*.test.js"
     ],
     "require": [
-      "ts-node/register",
-      "tsconfig-paths/register"
+      "./register-tsconfig-paths.js"
     ]
   }
 }
