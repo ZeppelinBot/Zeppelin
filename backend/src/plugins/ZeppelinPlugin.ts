@@ -53,8 +53,8 @@ export interface CommandInfo {
 export function trimPluginDescription(str) {
   const emptyLinesTrimmed = trimEmptyStartEndLines(str);
   const lines = emptyLinesTrimmed.split("\n");
-  const lastLineIndentation = (lines[lines.length - 1].match(/^ +/g) || [""])[0].length;
-  return trimIndents(emptyLinesTrimmed, lastLineIndentation);
+  const firstLineIndentation = (lines[0].match(/^ +/g) || [""])[0].length;
+  return trimIndents(emptyLinesTrimmed, firstLineIndentation);
 }
 
 const inviteCache = new SimpleCache<Promise<Invite>>(10 * MINUTES, 200);
