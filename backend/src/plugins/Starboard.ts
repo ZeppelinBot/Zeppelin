@@ -183,6 +183,9 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
+    // No self-votes!
+    if (msg.author.id === userId) return;
+
     const user = await this.resolveUser(userId);
     if (user instanceof UnknownUser) return;
     if (user.bot) return;
@@ -212,7 +215,7 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     for (const starboard of applicableStarboards) {
       // Save reaction into the database
-      await this.starboardReactions.createStarboardReaction(msg.id, userId).catch();
+      await this.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
       // If the message has already been posted to this starboard, we don't need to do anything else
       const starboardMessages = await this.starboardMessages.getMatchingStarboardMessages(starboard.channel_id, msg.id);
