@@ -29,6 +29,9 @@ import tmp from "tmp";
 import { logger, waitForReaction } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { either } from "fp-ts/lib/Either";
+import safeRegex from "safe-regex";
+import moment from "moment-timezone";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -36,6 +39,7 @@ const delayStringMultipliers = {
   h: 1000 * 60 * 60,
   m: 1000 * 60,
   s: 1000,
+  x: 1,
 };
 
 export const MS = 1;
@@ -184,6 +188,40 @@ export function dropPropertiesByName(obj, propName) {
   }
 }
 
+export const tAlphanumeric = new t.Type<string, string>(
+  "tAlphanumeric",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      return s.match(/\W/) ? t.failure(from, to, "String must be alphanumeric") : t.success(s);
+    }),
+  s => s,
+);
+
+export const tDateTime = new t.Type<string, string>(
+  "tDateTime",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      const parsed =
+        s.length === 10 ? moment(s, "YYYY-MM-DD") : s.length === 19 ? moment(s, "YYYY-MM-DD HH:mm:ss") : null;
+
+      return parsed && parsed.isValid() ? t.success(s) : t.failure(from, to, "Invalid datetime");
+    }),
+  s => s,
+);
+
+export const tDelayString = new t.Type<string, string>(
+  "tDelayString",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      const ms = convertDelayStringToMS(s);
+      return ms === null ? t.failure(from, to, "Invalid delay string") : t.success(s);
+    }),
+  s => s,
+);
+
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
  */
@@ -206,6 +244,21 @@ export function convertDelayStringToMS(str, defaultUnit = "m"): number {
   }
 
   return ms;
+}
+
+export function convertMSToDelayString(ms: number): string {
+  let result = "";
+  let remaining = ms;
+  for (const [abbr, multiplier] of Object.entries(delayStringMultipliers)) {
+    if (multiplier <= remaining) {
+      const amount = Math.floor(remaining / multiplier);
+      result += `${amount}${abbr}`;
+      remaining -= amount * multiplier;
+    }
+
+    if (remaining === 0) break;
+  }
+  return result;
 }
 
 export function successMessage(str) {
