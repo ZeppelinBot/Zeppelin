@@ -14,6 +14,9 @@ import {
   createChunkedMessage,
   stripObjectToScalars,
   isValidEmbed,
+  MINUTES,
+  StrictMessageContent,
+  DAYS,
 } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -24,6 +27,7 @@ import moment, { Moment } from "moment-timezone";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
+import humanizeDuration from "humanize-duration";
 
 const ConfigSchema = t.type({
   can_post: t.boolean,
@@ -34,8 +38,12 @@ const fsp = fs.promises;
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 
-const SCHEDULED_POST_CHECK_INTERVAL = 15 * SECONDS;
+const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
+
+const MIN_REPEAT_TIME = 5 * MINUTES;
+const MAX_REPEAT_TIME = 100 * 365 * DAYS;
+const MAX_REPEAT_UNTIL = moment().add(100, "years");
 
 export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "post";
@@ -143,17 +151,25 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   protected parseScheduleTime(str): Moment {
-    const dtMatch = str.match(/^\d{4}-\d{2}-\d{2} \d{1,2}:\d{1,2}(:\d{1,2})?$/);
-    if (dtMatch) {
-      const dt = moment(str, dtMatch[1] ? "YYYY-MM-DD H:m:s" : "YYYY-MM-DD H:m");
-      return dt;
+    const dt1 = moment(str, "YYYY-MM-DD HH:mm:ss");
+    if (dt1 && dt1.isValid()) return dt1;
+
+    const dt2 = moment(str, "YYYY-MM-DD HH:mm");
+    if (dt2 && dt2.isValid()) return dt2;
+
+    const date = moment(str, "YYYY-MM-DD");
+    if (date && date.isValid()) return date;
+
+    const t1 = moment(str, "HH:mm:ss");
+    if (t1 && t1.isValid()) {
+      if (t1.isBefore(moment())) t1.add(1, "day");
+      return t1;
     }
 
-    const tMatch = str.match(/^\d{1,2}:\d{1,2}(:\d{1,2})?$/);
-    if (tMatch) {
-      const dt = moment(str, tMatch[1] ? "H:m:s" : "H:m");
-      if (dt.isBefore(moment())) dt.add(1, "day");
-      return dt;
+    const t2 = moment(str, "HH:mm");
+    if (t2 && t2.isValid()) {
+      if (t2.isBefore(moment())) t2.add(1, "day");
+      return t2;
     }
 
     const delayStringMS = convertDelayStringToMS(str, "m");
@@ -195,10 +211,206 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
         }
       }
 
-      await this.scheduledPosts.delete(post.id);
+      let shouldClear = true;
+
+      if (post.repeat_interval) {
+        const nextPostAt = moment().add(post.repeat_interval, "ms");
+
+        if (post.repeat_until) {
+          const repeatUntil = moment(post.repeat_until, DBDateFormat);
+          if (nextPostAt.isSameOrBefore(repeatUntil)) {
+            await this.scheduledPosts.update(post.id, {
+              post_at: nextPostAt.format(DBDateFormat),
+            });
+            shouldClear = false;
+          }
+        } else if (post.repeat_times) {
+          if (post.repeat_times > 1) {
+            await this.scheduledPosts.update(post.id, {
+              post_at: nextPostAt.format(DBDateFormat),
+              repeat_times: post.repeat_times - 1,
+            });
+            shouldClear = false;
+          }
+        }
+      }
+
+      if (shouldClear) {
+        await this.scheduledPosts.delete(post.id);
+      }
     }
 
     this.scheduledPostLoopTimeout = setTimeout(() => this.scheduledPostLoop(), SCHEDULED_POST_CHECK_INTERVAL);
+  }
+
+  /**
+   * Since !post and !post_embed have a lot of overlap for post scheduling, repeating, etc., that functionality is abstracted out to here
+   */
+  async actualPostCmd(
+    msg: Message,
+    targetChannel: Channel,
+    content: StrictMessageContent,
+    opts?: {
+      "enable-mentions"?: boolean;
+      schedule?: string;
+      repeat?: number;
+      "repeat-until"?: string;
+      "repeat-times"?: number;
+    },
+  ) {
+    if (!(targetChannel instanceof TextChannel)) {
+      msg.channel.createMessage(errorMessage("Channel is not a text channel"));
+      return;
+    }
+
+    if (content == null && msg.attachments.length === 0) {
+      msg.channel.createMessage(errorMessage("Message content or attachment required"));
+      return;
+    }
+
+    if (opts.repeat) {
+      if (opts.repeat < MIN_REPEAT_TIME) {
+        return this.sendErrorMessage(msg.channel, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
+      }
+      if (opts.repeat > MAX_REPEAT_TIME) {
+        return this.sendErrorMessage(
+          msg.channel,
+          "I'm sure you don't need the repetition interval to be over 100 years long 👀",
+        );
+      }
+    }
+
+    // If this is a scheduled or repeated post, figure out the next post date
+    let postAt;
+    if (opts.schedule) {
+      // Schedule the post to be posted later
+      postAt = this.parseScheduleTime(opts.schedule);
+      if (!postAt) {
+        return this.sendErrorMessage(msg.channel, "Invalid schedule time");
+      }
+    } else if (opts.repeat) {
+      postAt = moment().add(opts.repeat, "ms");
+    }
+
+    // For repeated posts, make sure repeat-until or repeat-times is specified
+    let repeatUntil: moment.Moment = null;
+    let repeatTimes: number = null;
+    let repeatDetailsStr: string = null;
+
+    if (opts["repeat-until"]) {
+      repeatUntil = this.parseScheduleTime(opts["repeat-until"]);
+
+      // Invalid time
+      if (!repeatUntil) {
+        return this.sendErrorMessage(msg.channel, "Invalid time specified for -repeat-until");
+      }
+      if (repeatUntil.isBefore(moment())) {
+        return this.sendErrorMessage(msg.channel, "You can't set -repeat-until in the past");
+      }
+      if (repeatUntil.isAfter(MAX_REPEAT_UNTIL)) {
+        return this.sendErrorMessage(
+          msg.channel,
+          "Unfortunately, -repeat-until can only be at most 100 years into the future. Maybe 99 years would be enough?",
+        );
+      }
+    } else if (opts["repeat-times"]) {
+      repeatTimes = opts["repeat-times"];
+      if (repeatTimes <= 0) {
+        return this.sendErrorMessage(msg.channel, "-repeat-times must be 1 or more");
+      }
+    }
+
+    if (repeatUntil && repeatTimes) {
+      return this.sendErrorMessage(msg.channel, "You can only use one of -repeat-until or -repeat-times at once");
+    }
+
+    if (opts.repeat && !repeatUntil && !repeatTimes) {
+      return this.sendErrorMessage(
+        msg.channel,
+        "You must specify -repeat-until or -repeat-times for repeated messages",
+      );
+    }
+
+    if (opts.repeat) {
+      repeatDetailsStr = repeatUntil
+        ? `every ${humanizeDuration(opts.repeat)} until ${repeatUntil.format(DBDateFormat)}`
+        : `every ${humanizeDuration(opts.repeat)}, ${repeatTimes} times in total`;
+    }
+
+    // Save schedule/repeat information in DB
+    if (postAt) {
+      if (postAt < moment()) {
+        return this.sendErrorMessage(msg.channel, "Post can't be scheduled to be posted in the past");
+      }
+
+      await this.scheduledPosts.create({
+        author_id: msg.author.id,
+        author_name: `${msg.author.username}#${msg.author.discriminator}`,
+        channel_id: targetChannel.id,
+        content,
+        attachments: msg.attachments,
+        post_at: postAt.format(DBDateFormat),
+        enable_mentions: opts["enable-mentions"],
+        repeat_interval: opts.repeat,
+        repeat_until: repeatUntil ? repeatUntil.format(DBDateFormat) : null,
+        repeat_times: repeatTimes ?? null,
+      });
+
+      if (opts.repeat) {
+        this.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
+          author: stripObjectToScalars(msg.author),
+          channel: stripObjectToScalars(targetChannel),
+          date: postAt.format("YYYY-MM-DD"),
+          time: postAt.format("HH:mm:ss"),
+          repeatInterval: humanizeDuration(opts.repeat),
+          repeatDetails: repeatDetailsStr,
+        });
+      } else {
+        this.logs.log(LogType.SCHEDULED_MESSAGE, {
+          author: stripObjectToScalars(msg.author),
+          channel: stripObjectToScalars(targetChannel),
+          date: postAt.format("YYYY-MM-DD"),
+          time: postAt.format("HH:mm:ss"),
+        });
+      }
+    }
+
+    // When the message isn't scheduled for later, post it immediately
+    if (!opts.schedule) {
+      await this.postMessage(targetChannel, content, msg.attachments, opts["enable-mentions"]);
+    }
+
+    if (opts.repeat) {
+      this.logs.log(LogType.REPEATED_MESSAGE, {
+        author: stripObjectToScalars(msg.author),
+        channel: stripObjectToScalars(targetChannel),
+        date: postAt.format("YYYY-MM-DD"),
+        time: postAt.format("HH:mm:ss"),
+        repeatInterval: humanizeDuration(opts.repeat),
+        repeatDetails: repeatDetailsStr,
+      });
+    }
+
+    // Bot reply schenanigans
+    let successMessage = opts.schedule
+      ? `Message scheduled to be posted in <#${targetChannel.id}> on ${postAt.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`
+      : `Message posted in <#${targetChannel.id}>`;
+
+    if (opts.repeat) {
+      successMessage += `. Message will be automatically reposted every ${humanizeDuration(opts.repeat)}`;
+
+      if (repeatUntil) {
+        successMessage += ` until ${repeatUntil.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`;
+      } else if (repeatTimes) {
+        successMessage += `, ${repeatTimes} times in total`;
+      }
+
+      successMessage += ".";
+    }
+
+    if (targetChannel.id !== msg.channel.id || opts.schedule || opts.repeat) {
+      this.sendSuccessMessage(msg.channel, successMessage);
+    }
   }
 
   /**
@@ -214,60 +426,34 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
         name: "schedule",
         type: "string",
       },
+      {
+        name: "repeat",
+        type: "delay",
+      },
+      {
+        name: "repeat-until",
+        type: "string",
+      },
+      {
+        name: "repeat-times",
+        type: "number",
+      },
     ],
   })
   @d.permission("can_post")
   async postCmd(
     msg: Message,
-    args: { channel: Channel; content?: string; "enable-mentions": boolean; schedule?: string },
+    args: {
+      channel: Channel;
+      content?: string;
+      "enable-mentions": boolean;
+      schedule?: string;
+      repeat?: number;
+      "repeat-until"?: string;
+      "repeat-times"?: number;
+    },
   ) {
-    if (!(args.channel instanceof TextChannel)) {
-      msg.channel.createMessage(errorMessage("Channel is not a text channel"));
-      return;
-    }
-
-    if (args.content == null && msg.attachments.length === 0) {
-      msg.channel.createMessage(errorMessage("Text content or attachment required"));
-      return;
-    }
-
-    if (args.schedule) {
-      // Schedule the post to be posted later
-      const postAt = this.parseScheduleTime(args.schedule);
-      if (!postAt) {
-        return this.sendErrorMessage(msg.channel, "Invalid schedule time");
-      }
-
-      if (postAt < moment()) {
-        return this.sendErrorMessage(msg.channel, "Post can't be scheduled to be posted in the past");
-      }
-
-      await this.scheduledPosts.create({
-        author_id: msg.author.id,
-        author_name: `${msg.author.username}#${msg.author.discriminator}`,
-        channel_id: args.channel.id,
-        content: { content: args.content },
-        attachments: msg.attachments,
-        post_at: postAt.format(DBDateFormat),
-        enable_mentions: args["enable-mentions"],
-      });
-      this.sendSuccessMessage(
-        msg.channel,
-        `Message scheduled to be posted in <#${args.channel.id}> on ${postAt.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`,
-      );
-      this.logs.log(LogType.SCHEDULED_MESSAGE, {
-        author: stripObjectToScalars(msg.author),
-        channel: stripObjectToScalars(args.channel),
-        date: postAt.format("YYYY-MM-DD"),
-        time: postAt.format("HH:mm:ss"),
-      });
-    } else {
-      // Post the message immediately
-      await this.postMessage(args.channel, args.content, msg.attachments, args["enable-mentions"]);
-      if (args.channel.id !== msg.channel.id) {
-        this.sendSuccessMessage(msg.channel, `Message posted in <#${args.channel.id}>`);
-      }
-    }
+    this.actualPostCmd(msg, args.channel, { content: args.content }, args);
   }
 
   /**
@@ -280,6 +466,18 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       { name: "color", type: "string" },
       { name: "schedule", type: "string" },
       { name: "raw", isSwitch: true, shortcut: "r" },
+      {
+        name: "repeat",
+        type: "delay",
+      },
+      {
+        name: "repeat-until",
+        type: "string",
+      },
+      {
+        name: "repeat-times",
+        type: "number",
+      },
     ],
   })
   @d.permission("can_post")
@@ -293,13 +491,11 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       color?: string;
       schedule?: string;
       raw?: boolean;
+      repeat?: number;
+      "repeat-until"?: string;
+      "repeat-times"?: number;
     },
   ) {
-    if (!(args.channel instanceof TextChannel)) {
-      msg.channel.createMessage(errorMessage("Channel is not a text channel"));
-      return;
-    }
-
     const content = args.content || args.maincontent;
 
     if (!args.title && !content) {
@@ -343,54 +539,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    if (args.schedule) {
-      // Schedule the post to be posted later
-      const postAt = this.parseScheduleTime(args.schedule);
-      if (!postAt) {
-        return this.sendErrorMessage(msg.channel, "Invalid schedule time");
-      }
-
-      if (postAt < moment()) {
-        return this.sendErrorMessage(msg.channel, "Post can't be scheduled to be posted in the past");
-      }
-
-      await this.scheduledPosts.create({
-        author_id: msg.author.id,
-        author_name: `${msg.author.username}#${msg.author.discriminator}`,
-        channel_id: args.channel.id,
-        content: { embed },
-        attachments: msg.attachments,
-        post_at: postAt.format(DBDateFormat),
-      });
-      await this.sendSuccessMessage(
-        msg.channel,
-        `Embed scheduled to be posted in <#${args.channel.id}> on ${postAt.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`,
-      );
-      this.logs.log(LogType.SCHEDULED_MESSAGE, {
-        author: stripObjectToScalars(msg.author),
-        channel: stripObjectToScalars(args.channel),
-        date: postAt.format("YYYY-MM-DD"),
-        time: postAt.format("HH:mm:ss"),
-      });
-    } else {
-      const createdMsg = await args.channel.createMessage({ embed });
-      this.savedMessages.setPermanent(createdMsg.id);
-
-      if (msg.channel.id !== args.channel.id) {
-        await this.sendSuccessMessage(msg.channel, `Embed posted in <#${args.channel.id}>`);
-      }
-    }
-
-    if (args.content) {
-      const prefix = this.guildConfig.prefix || "!";
-      msg.channel.createMessage(
-        trimLines(`
-        <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
-        \`${prefix}post_embed -title "Some title" content goes here\`
-        The \`-content\` option will soon be removed in favor of this.
-      `),
-      );
-    }
+    this.actualPostCmd(msg, args.channel, { embed }, args);
   }
 
   /**
@@ -495,6 +644,14 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       const parts = [`\`#${i++}\` \`[${p.post_at}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");
       if (p.content.embed) parts.push("*(embed)*");
+      if (p.repeat_until)
+        parts.push(`*(repeated every ${humanizeDuration(p.repeat_interval)} until ${p.repeat_until})*`);
+      if (p.repeat_times)
+        parts.push(
+          `*(repeated every ${humanizeDuration(p.repeat_interval)}, ${p.repeat_times} more ${
+            p.repeat_times === 1 ? "time" : "times"
+          })*`,
+        );
       parts.push(`*(${p.author_name})*`);
 
       return parts.join(" ");
@@ -503,7 +660,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
     const finalMessage = trimLines(`
       ${postLines.join("\n")}
       
-      Use \`scheduled_posts show <num>\` to view a scheduled post in full
+      Use \`scheduled_posts <num>\` to view a scheduled post in full
       Use \`scheduled_posts delete <num>\` to delete a scheduled post
     `);
     createChunkedMessage(msg.channel, finalMessage);
