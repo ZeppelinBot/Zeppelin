@@ -47,6 +47,7 @@ export const SECONDS = 1000 * MS;
 export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
+export const WEEKS = 7 * 24 * HOURS;
 
 export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
