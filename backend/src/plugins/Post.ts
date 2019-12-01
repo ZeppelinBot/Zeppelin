@@ -42,7 +42,7 @@ const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
-const MAX_REPEAT_TIME = 100 * 365 * DAYS;
+const MAX_REPEAT_TIME = Math.pow(2, 32);
 const MAX_REPEAT_UNTIL = moment().add(100, "years");
 
 export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
@@ -273,10 +273,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
         return this.sendErrorMessage(msg.channel, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
       }
       if (opts.repeat > MAX_REPEAT_TIME) {
-        return this.sendErrorMessage(
-          msg.channel,
-          "I'm sure you don't need the repetition interval to be over 100 years long 👀",
-        );
+        return this.sendErrorMessage(msg.channel, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
       }
     }
 
@@ -644,14 +641,16 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
       const parts = [`\`#${i++}\` \`[${p.post_at}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");
       if (p.content.embed) parts.push("*(embed)*");
-      if (p.repeat_until)
+      if (p.repeat_until) {
         parts.push(`*(repeated every ${humanizeDuration(p.repeat_interval)} until ${p.repeat_until})*`);
-      if (p.repeat_times)
+      }
+      if (p.repeat_times) {
         parts.push(
           `*(repeated every ${humanizeDuration(p.repeat_interval)}, ${p.repeat_times} more ${
             p.repeat_times === 1 ? "time" : "times"
           })*`,
         );
+      }
       parts.push(`*(${p.author_name})*`);
 
       return parts.join(" ");
