@@ -2,10 +2,6 @@ import { MigrationInterface, QueryRunner, TableColumn, TableIndex } from "typeor
 
 export class AddTypeAndPermissionsToApiPermissions1573158035867 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    try {
-      await queryRunner.dropPrimaryKey("api_permissions");
-    } catch (e) {} // tslint:disable-line
-
     await queryRunner.dropIndex("api_permissions", new TableIndex({ columnNames: ["user_id"] }));
 
     await queryRunner.addColumn(
