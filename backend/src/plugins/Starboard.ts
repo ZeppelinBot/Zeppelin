@@ -11,6 +11,7 @@ import {
   tNullable,
   tDeepPartial,
   UnknownUser,
+  EMPTY_CHAR,
 } from "../utils";
 import path from "path";
 import moment from "moment-timezone";
@@ -247,12 +248,12 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const embed: EmbedBase = {
       footer: {
-        text: `#${(msg.channel as GuildChannel).name} - ${time}`,
+        text: `#${(msg.channel as GuildChannel).name}`,
       },
       author: {
         name: `${msg.author.username}#${msg.author.discriminator}`,
       },
-      url: messageLink(msg),
+      timestamp: new Date(msg.timestamp).toISOString(),
     };
 
     if (msg.author.avatarURL) {
@@ -279,6 +280,8 @@ export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (msg.embeds.length && msg.embeds[0].image) {
       embed.image = msg.embeds[0].image;
     }
+
+    embed.fields = [{ name: EMPTY_CHAR, value: `[Jump to message](${messageLink(msg)})` }];
 
     const starboardMessage = await (channel as TextChannel).createMessage({ embed });
     await this.starboardMessages.createStarboardMessage(channel.id, msg.id, starboardMessage.id);
