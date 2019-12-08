@@ -18,7 +18,8 @@
       "@shared/*": [
         "../shared/src/*"
       ]
-    }
+    },
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts"
