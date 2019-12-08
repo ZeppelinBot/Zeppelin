@@ -6,9 +6,9 @@
   "scripts": {
     "watch": "cross-env NODE_ENV=development tsc-watch --onSuccess \"node start-dev.js\"",
     "build": "rimraf dist && tsc",
-    "start-bot-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js dist/backend/src/index.js",
+    "start-bot-dev": "cross-env NODE_ENV=development node -r source-map-support/register -r ./register-tsconfig-paths.js dist/backend/src/index.js",
     "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js dist/backend/src/index.js",
-    "start-api-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js dist/backend/src/api/index.js",
+    "start-api-dev": "cross-env NODE_ENV=development node -r source-map-support/register -r ./register-tsconfig-paths.js dist/backend/src/api/index.js",
     "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js dist/backend/src/api/index.js",
     "typeorm": "node -r ./register-tsconfig-paths.js ./node_modules/typeorm/cli.js",
     "migrate-prod": "npm run typeorm -- migration:run",
@@ -71,6 +71,7 @@
     "@types/tmp": "0.0.33",
     "ava": "^2.4.0",
     "rimraf": "^2.6.2",
+    "source-map-support": "^0.5.16",
     "tsc-watch": "^4.0.0",
     "typescript": "^3.7.2"
   },
