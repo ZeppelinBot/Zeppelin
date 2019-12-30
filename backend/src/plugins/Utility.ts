@@ -341,9 +341,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (args.query) {
       let queryRegex: RegExp;
       if (args.regex) {
-        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "i" : "");
+        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
       } else {
-        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "i" : "");
+        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
       }
 
       if (!safeRegex(queryRegex)) {
