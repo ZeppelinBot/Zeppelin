@@ -13,7 +13,6 @@ import {
   successMessage,
 } from "../utils";
 import * as t from "io-ts";
-import { EventListenerTypes } from "typeorm/metadata/types/EventListenerTypes";
 
 const ConfigSchema = t.type({
   can_use: t.boolean,
