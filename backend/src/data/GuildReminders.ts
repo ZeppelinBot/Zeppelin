@@ -34,13 +34,14 @@ export class GuildReminders extends BaseGuildRepository {
     });
   }
 
-  async add(userId: string, channelId: string, remindAt: string, body: string) {
+  async add(userId: string, channelId: string, remindAt: string, body: string, created_at: string) {
     await this.reminders.insert({
       guild_id: this.guildId,
       user_id: userId,
       channel_id: channelId,
       remind_at: remindAt,
       body,
+      created_at
     });
   }
 }
