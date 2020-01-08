@@ -1,9 +1,9 @@
 import { ZeppelinPlugin, trimPluginDescription } from "./ZeppelinPlugin";
 import * as t from "io-ts";
-import { tNullable } from "src/utils";
+import { tNullable } from "../utils";
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildLogs } from "../data/GuildLogs";
 
 const ConfigSchema = t.type({
     can_assign: t.boolean,
@@ -12,7 +12,7 @@ const ConfigSchema = t.type({
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 enum RoleActions{
-    Add,
+    Add = 1,
     Remove
 };
   
@@ -58,10 +58,10 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
     })
   @d.permission("can_assign")
-  async assignRole(msg, args: {action: string; user: string; role: string}){
+  async assignRole(msg: Message, args: {action: string; user: string; role: string}){
     const user = await this.resolveUser(args.user);
     console.log(user);
-    if (!user) {
+    if (user.discriminator == "0000") {
       return this.sendErrorMessage(msg.channel, `User not found`);
     }
 
@@ -81,10 +81,17 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const action: string = args.action[0].toUpperCase() + args.action.slice(1).toLowerCase();
     if(!RoleActions[action]){
       this.sendErrorMessage(msg.channel, "Cannot add or remove roles on this user: invalid action");
+      return;
     }
 
     //check if the role is allowed to be applied
-    
+    let config = this.getConfigForMsg(msg)
+    if(!config.assignable_roles || !config.assignable_roles.includes(args.role)){
+      this.sendErrorMessage(msg.channel, "You do not have access to the specified role");
+      return;
+    }
+    //at this point, everything has been verified, so apply the role
+    await this.bot.addGuildMemberRole(this.guildId, user.id, args.role);
 
     console.log("exited at the end"); 
   }
