@@ -72,3 +72,4 @@ desktop.ini
 .cache
 npm-ls.txt
 npm-audit.txt
+.vscode/launch.json
