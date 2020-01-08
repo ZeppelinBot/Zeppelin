@@ -68,7 +68,6 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
     const pendingReminders = await this.reminders.getDueReminders();
     for (const reminder of pendingReminders) {
       const channel = this.guild.channels.get(reminder.channel_id);
-
       if (channel && channel instanceof TextChannel) {
         try {
           //Only show created at date if one exists
