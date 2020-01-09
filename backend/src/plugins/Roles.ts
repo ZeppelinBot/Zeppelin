@@ -50,7 +50,7 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
 
-  @d.command("role", "<action:string> <user:string> <role:string>",{
+  @d.command("role", "<action:string> <user:string> [role:string$]",{
       extra: {
         info: {
           description: "Assign a permitted role to a user",
@@ -60,20 +60,20 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_assign")
   async assignRole(msg: Message, args: {action: string; user: string; role: string}){
     const user = await this.resolveUser(args.user);
-    console.log(user);
+    const roleId = await this.resolveRoleId(args.role);
     if (user.discriminator == "0000") {
       return this.sendErrorMessage(msg.channel, `User not found`);
     }
 
     //if the role doesnt exist, we can exit
     let roleIds = (msg.channel as TextChannel).guild.roles.map(x => x.id)
-    if(!(roleIds.includes(args.role))){
+    if(!(roleIds.includes(roleId))){
       return this.sendErrorMessage(msg.channel, `Role not found`);
     } 
 
     // If the user exists as a guild member, make sure we can act on them first
-    const member = await this.getMember(user.id);
-    if (member && !this.canActOn(msg.member, member)) {
+    const targetMember = await this.getMember(user.id);
+    if (targetMember && !this.canActOn(msg.member, targetMember)) {
       this.sendErrorMessage(msg.channel, "Cannot add or remove roles on this user: insufficient permissions");
       return;
     }
@@ -86,14 +86,31 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     //check if the role is allowed to be applied
     let config = this.getConfigForMsg(msg)
-    if(!config.assignable_roles || !config.assignable_roles.includes(args.role)){
+    if(!config.assignable_roles || !config.assignable_roles.includes(roleId)){
       this.sendErrorMessage(msg.channel, "You do not have access to the specified role");
       return;
     }
-    //at this point, everything has been verified, so apply the role
-    await this.bot.addGuildMemberRole(this.guildId, user.id, args.role);
-
-    console.log("exited at the end"); 
+    //at this point, everything has been verified, so it's ACTION TIME
+    switch(RoleActions[action]){
+      case RoleActions.Add:
+        if(targetMember.roles.includes(roleId)){
+          this.sendErrorMessage(msg.channel, "Role already applied to user");
+          return;
+        }
+        await this.bot.addGuildMemberRole(this.guildId, user.id, roleId);
+        this.sendSuccessMessage(msg.channel, `Role added to user!`);
+        break;
+      case RoleActions.Remove:
+        if(!targetMember.roles.includes(roleId)){
+          this.sendErrorMessage(msg.channel, "User does not have role");
+          return;
+        }
+        await this.bot.removeGuildMemberRole(this.guildId, user.id, roleId);
+        this.sendSuccessMessage(msg.channel, `Role removed from user!`);
+        break;
+      default:
+        break;
+    }
   }
     
 }
