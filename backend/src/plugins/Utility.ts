@@ -879,6 +879,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
         `) + embedPadding,
       });
+
       const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
       if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
         embed.fields.push({
@@ -896,6 +897,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         name: "!!  USER IS NOT ON THE SERVER  !!",
         value: embedPadding,
       });
+
     }
     const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
@@ -918,6 +920,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         `),
       });
     }
+    
     msg.channel.createMessage({ embed });
   }
 
