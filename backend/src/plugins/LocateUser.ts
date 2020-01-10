@@ -152,7 +152,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const toDelete = alerts[args.num - 1];
     await this.alerts.delete(toDelete.id);
 
-    msg.channel.createMessage(successMessage("Alert deleted"));
+    this.sendSuccessMessage(msg.channel, "Alert deleted");
   }
 
   @d.event("voiceChannelJoin")

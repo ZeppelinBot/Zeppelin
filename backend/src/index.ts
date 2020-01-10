@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError, Plugin } from "knub";
+import { Knub, logger, PluginError, Plugin, IGuildConfig } from "knub";
 import { SimpleError } from "./SimpleError";
 
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
@@ -67,7 +67,7 @@ for (const [i, part] of actualVersionParts.entries()) {
 import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
-import { Client } from "eris";
+import { Client, TextableChannel, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
@@ -160,8 +160,9 @@ connect().then(async conn => {
 
       customArgumentTypes,
 
-      sendSuccessMessageFn(channel, body) {
-        channel.createMessage(successMessage(body));
+      sendSuccessMessageFn(channel: TextChannel, body) {
+        let config: IGuildConfig = this.getConfig(channel.guild.id);
+        channel.createMessage(successMessage(config., body));
       },
 
       sendErrorMessageFn(channel, body) {

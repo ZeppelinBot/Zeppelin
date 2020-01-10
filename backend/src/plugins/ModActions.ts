@@ -530,7 +530,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       note,
     });
 
-    msg.channel.createMessage(successMessage(`Case \`#${theCase.case_number}\` updated`));
+    this.sendSuccessMessage(msg.channel, `Case \`#${theCase.case_number}\` updated`);
   }
 
   @d.command("note", "<user:string> <note:string$>", {
@@ -624,11 +624,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
-    msg.channel.createMessage(
-      successMessage(
-        `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
-      ),
-    );
+    this.sendSuccessMessage(msg.channel, `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`);
   }
 
   async warnMember(
@@ -862,22 +858,18 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Confirm the action to the moderator
     if (args.time) {
       const timeUntilUnmute = args.time && humanizeDuration(args.time);
-      msg.channel.createMessage(
-        successMessage(
-          asSingleLine(`
-          Unmuting **${user.username}#${user.discriminator}**
-          in ${timeUntilUnmute} (Case #${result.case.case_number})
-        `),
-        ),
+      this.sendSuccessMessage(msg.channel, 
+        asSingleLine(`
+        Unmuting **${user.username}#${user.discriminator}**
+        in ${timeUntilUnmute} (Case #${result.case.case_number})
+      `),
       );
     } else {
-      msg.channel.createMessage(
-        successMessage(
-          asSingleLine(`
-          Unmuted **${user.username}#${user.discriminator}**
-          (Case #${result.case.case_number})
-        `),
-        ),
+      this.sendSuccessMessage(msg.channel,
+        asSingleLine(`
+        Unmuted **${user.username}#${user.discriminator}**
+        (Case #${result.case.case_number})
+      `),
       );
     }
   }
@@ -1019,7 +1011,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${kickResult.case.case_number})`;
 
     if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
-    msg.channel.createMessage(successMessage(response));
+    this.sendSuccessMessage(msg.channel, response);
   }
 
   @d.command("ban", "<user:string> [reason:string$]", {
@@ -1080,7 +1072,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${banResult.case.case_number})`;
 
     if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
-    msg.channel.createMessage(successMessage(response));
+    this.sendSuccessMessage(msg.channel, response);
   }
 
   @d.command("softban", "<user:string> [reason:string$]", {
@@ -1160,10 +1152,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     // Confirm the action to the moderator
-    msg.channel.createMessage(
-      successMessage(
-        `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
-      ),
+    this.sendSuccessMessage(msg.channel,
+      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
     );
 
     // Log the action
@@ -1220,7 +1210,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     // Confirm the action
-    msg.channel.createMessage(successMessage(`Member unbanned (Case #${createdCase.case_number})`));
+    this.sendSuccessMessage(msg.channel, `Member unbanned (Case #${createdCase.case_number})`);
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
@@ -1290,7 +1280,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     // Confirm the action
-    msg.channel.createMessage(successMessage(`Member forcebanned (Case #${createdCase.case_number})`));
+    this.sendSuccessMessage(msg.channel, `Member forcebanned (Case #${createdCase.case_number})`);
 
     // Log the action
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
@@ -1378,11 +1368,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
 
       if (failedBans.length) {
-        msg.channel.createMessage(
-          successMessage(`Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`),
+        this.sendSuccessMessage(msg.channel,
+          `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`,
         );
       } else {
-        msg.channel.createMessage(successMessage(`Banned ${successfulBanCount} users successfully`));
+        this.sendSuccessMessage(msg.channel, `Banned ${successfulBanCount} users successfully`);
       }
     }
   }
@@ -1438,11 +1428,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     if (user) {
-      msg.channel.createMessage(
-        successMessage(`Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`),
+      this.sendSuccessMessage(msg.channel,
+        `Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`,
       );
     } else {
-      msg.channel.createMessage(successMessage(`Case #${theCase.case_number} created`));
+      this.sendSuccessMessage(msg.channel, `Case #${theCase.case_number} created`);
     }
 
     // Log the action
@@ -1603,8 +1593,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.cases.setHidden(theCase.id, true);
-    msg.channel.createMessage(
-      successMessage(`Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`),
+    this.sendSuccessMessage(msg.channel,
+      `Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`,
     );
   }
 

@@ -60,7 +60,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
       if (guild) {
         const channel = guild.channels.get(channelId);
         if (channel instanceof TextChannel) {
-          channel.createMessage(successMessage("Global plugins reloaded!"));
+          this.sendSuccessMessage(channel, "Global plugins reloaded!");
         }
       }
     }
@@ -157,7 +157,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    msg.channel.createMessage(successMessage(`Left guild **${guildName}**`));
+    this.sendSuccessMessage(msg.channel, `Left guild **${guildName}**`);
   }
 
   @d.command("reload_guild", "<guildId:string>")
@@ -176,7 +176,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
     }
 
     const guild = this.bot.guilds.get(args.guildId);
-    msg.channel.createMessage(successMessage(`Reloaded guild **${guild.name}**`));
+    this.sendSuccessMessage(msg.channel, `Reloaded guild **${guild.name}**`);
   }
 
   @d.command("reload_all_guilds")
@@ -203,7 +203,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
       });
       createChunkedMessage(msg.channel, `Reloaded ${reloadCount} guild(s). Errors:\n${errorLines.join("\n")}`);
     } else {
-      msg.channel.createMessage(successMessage(`Reloaded ${reloadCount} guild(s)`));
+      this.sendSuccessMessage(msg.channel, `Reloaded ${reloadCount} guild(s)`);
     }
   }
 
