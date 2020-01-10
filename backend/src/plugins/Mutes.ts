@@ -473,7 +473,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // let the user know we are done
     if (chunks.length > 2) {
-      msg.channel.createMessage(successMessage("All mutes for the specified filters posted!"));
+      this.sendSuccessMessage(msg.channel, "All mutes for the specified filters posted!");
     }
   }
 
@@ -530,7 +530,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    msg.channel.createMessage(successMessage(`Cleared ${cleared} mutes from banned users!`));
+    this.sendSuccessMessage(msg.channel, `Cleared ${cleared} mutes from banned users!`);
   }
 
   /**
@@ -572,7 +572,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    msg.channel.createMessage(successMessage(`Cleared ${cleared} mutes from members that don't have the mute role`));
+    this.sendSuccessMessage(msg.channel, `Cleared ${cleared} mutes from members that don't have the mute role`);
   }
 
   @d.command("clear_mute", "<userId:string>")
@@ -585,7 +585,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.mutes.clear(args.userId);
-    msg.channel.createMessage(successMessage(`Active mute cleared`));
+    this.sendSuccessMessage(msg.channel, `Active mute cleared`);
   }
 
   protected async clearExpiredMutes() {

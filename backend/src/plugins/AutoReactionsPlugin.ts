@@ -93,7 +93,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.autoReactions.set(args.channelId, finalReactions);
-    msg.channel.createMessage(successMessage(`Auto-reactions set for <#${args.channelId}>`));
+    this.sendSuccessMessage(msg.channel, `Auto-reactions set for <#${args.channelId}>`);
   }
 
   @d.command("auto_reactions disable", "<channelId:channelId>", {
@@ -112,7 +112,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.autoReactions.removeFromChannel(args.channelId);
-    msg.channel.createMessage(successMessage(`Auto-reactions disabled in <#${args.channelId}>`));
+    this.sendSuccessMessage(msg.channel, `Auto-reactions disabled in <#${args.channelId}>`);
   }
 
   async onMessageCreate(msg: SavedMessage) {

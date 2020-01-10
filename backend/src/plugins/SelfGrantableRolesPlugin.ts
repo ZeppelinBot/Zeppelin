@@ -109,19 +109,15 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         const removedRolesWord = rolesToRemoveArr.length === 1 ? "role" : "roles";
 
         if (nonMatchingRoleNames.length) {
-          msg.channel.createMessage(
-            successMessage(
-              `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord};` +
-                ` couldn't recognize the other roles you mentioned`,
-            ),
+          this.sendSuccessMessage(msg.channel,
+            `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord};` +
+              ` couldn't recognize the other roles you mentioned`,
           );
         } else {
-          msg.channel.createMessage(
-            successMessage(`<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`),
-          );
+          this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`);
         }
       } catch (e) {
-        msg.channel.createMessage(errorMessage(`<@!${msg.author.id}> Got an error while trying to remove the roles`));
+        this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Got an error while trying to remove the roles`);
       }
     } else {
       msg.channel.createMessage(
@@ -193,16 +189,12 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         const grantedRolesWord = rolesToGrantArr.length === 1 ? "role" : "roles";
 
         if (nonMatchingRoleNames.length) {
-          msg.channel.createMessage(
-            successMessage(
-              `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord};` +
-                ` couldn't recognize the other roles you mentioned`,
-            ),
+          this.sendSuccessMessage(msg.channel,
+            `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord};` +
+              ` couldn't recognize the other roles you mentioned`,
           );
         } else {
-          msg.channel.createMessage(
-            successMessage(`<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord}`),
-          );
+          this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord}`);
         }
       } catch (e) {
         msg.channel.createMessage(
@@ -283,9 +275,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Add new one
     await this.selfGrantableRoles.add(args.channel.id, role.id, uniqueAliases);
 
-    msg.channel.createMessage(
-      successMessage(`Self-grantable role **${role.name}** added to **#${args.channel.name}**`),
-    );
+    this.sendSuccessMessage(msg.channel, `Self-grantable role **${role.name}** added to **#${args.channel.name}**`);
   }
 
   @d.command("self_grantable_roles delete", "<channel:channel> <roleId:string>")
@@ -295,9 +285,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const roleName = this.guild.roles.has(args.roleId) ? this.guild.roles.get(args.roleId).name : args.roleId;
 
-    msg.channel.createMessage(
-      successMessage(`Self-grantable role **${roleName}** removed from **#${args.channel.name}**`),
-    );
+    this.sendSuccessMessage(msg.channel, `Self-grantable role **${roleName}** removed from **#${args.channel.name}**`);
   }
 
   @d.command("self_grantable_roles", "<channel:channel>")

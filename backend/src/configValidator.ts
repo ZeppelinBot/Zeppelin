@@ -16,6 +16,7 @@ for (const pluginClass of availablePlugins) {
 const guildConfigRootSchema = t.type({
   prefix: t.string,
   levels: t.record(t.string, t.number),
+  success_emoji: t.string,
   plugins: t.record(t.string, t.unknown),
 });
 const partialGuildConfigRootSchema = t.partial(guildConfigRootSchema.props);
