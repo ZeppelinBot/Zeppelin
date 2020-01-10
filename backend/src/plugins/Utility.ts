@@ -832,6 +832,21 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
             `),
           });
+        if (member) {
+          const joinedAt = moment(member.joinedAt);
+          const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+            largest: 2,
+            round: true,
+          });
+          embed.fields[0].value += `\nJoined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`
+        } else {
+          embed.fields.push({
+            name: "!!  USER IS NOT ON THE SERVER  !!",
+            value: embedPadding,
+          });
+        }
+        msg.channel.createMessage({ embed });
+        return;
       }
       else{
         embed.fields.push({
@@ -856,32 +871,25 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
       const roles = member.roles.map(id => this.guild.roles.get(id)).filter(r => !!r);
 
-      if(args.compact){
-        embed.fields[0].value += `\n` + trimLines(`Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`);
-      }
-      else{
+      embed.fields.push({
+        name: "Member information",
+        value:
+          trimLines(`
+          Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
+        `) + embedPadding,
+      });
+      const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
+      if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
         embed.fields.push({
-          name: "Member information",
+          name: "Voice information",
           value:
             trimLines(`
-            Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-            ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
-          `) + embedPadding,
+          ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
+          ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
+          ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
+        `) + embedPadding,
         });
-      }
-      if(!args.compact){
-        const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
-        if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
-          embed.fields.push({
-            name: "Voice information",
-            value:
-              trimLines(`
-            ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
-            ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
-            ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
-          `) + embedPadding,
-          });
-        }
       }
     } else {
       embed.fields.push({
@@ -889,28 +897,26 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         value: embedPadding,
       });
     }
-    if(!args.compact){
-      const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
+    const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
-      if (cases.length > 0) {
-        cases.sort((a, b) => {
-          return a.created_at < b.created_at ? 1 : -1;
-        });
+    if (cases.length > 0) {
+      cases.sort((a, b) => {
+        return a.created_at < b.created_at ? 1 : -1;
+      });
 
-        const caseSummary = cases.slice(0, 3).map(c => {
-          return `${CaseTypes[c.type]} (#${c.case_number})`;
-        });
+      const caseSummary = cases.slice(0, 3).map(c => {
+        return `${CaseTypes[c.type]} (#${c.case_number})`;
+      });
 
-        const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
+      const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 
-        embed.fields.push({
-          name: "Cases",
-          value: trimLines(`
-            Total cases: **${cases.length}**
-            ${summaryText}: ${caseSummary.join(", ")}
-          `),
-        });
-      }
+      embed.fields.push({
+        name: "Cases",
+        value: trimLines(`
+          Total cases: **${cases.length}**
+          ${summaryText}: ${caseSummary.join(", ")}
+        `),
+      });
     }
     msg.channel.createMessage({ embed });
   }
