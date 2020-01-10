@@ -792,9 +792,16 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         basicUsage: "!info 106391128718245888",
       },
     },
+    options: [
+      {
+        name: "compact",
+        shortcut: "c",
+        isSwitch: true,
+      }
+    ]
   })
   @d.permission("can_info")
-  async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
+  async infoCmd(msg: Message, args: { user?: User | UnknownUser, compact?: boolean }) {
     const user = args.user || msg.author;
 
     let member;
@@ -816,15 +823,27 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       embed.title = `${user.username}#${user.discriminator}`;
       embed.thumbnail = { url: user.avatarURL };
 
-      embed.fields.push({
-        name: "User information",
-        value:
-          trimLines(`
-          ID: **${user.id}**
-          Profile: <@!${user.id}>
-          Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-        `) + embedPadding,
-      });
+      if(args.compact){
+        embed.fields.push({
+          name: "User information",
+          value:
+            trimLines(`
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `),
+          });
+      }
+      else{
+        embed.fields.push({
+          name: "User information",
+          value:
+            trimLines(`
+            ID: **${user.id}**
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `) + embedPadding,
+          });
+      }
     } else {
       embed.title = `Unknown user`;
     }
@@ -837,26 +856,32 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
       const roles = member.roles.map(id => this.guild.roles.get(id)).filter(r => !!r);
 
-      embed.fields.push({
-        name: "Member information",
-        value:
-          trimLines(`
-          Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
-        `) + embedPadding,
-      });
-
-      const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
-      if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
+      if(args.compact){
+        embed.fields[0].value += `\n` + trimLines(`Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`);
+      }
+      else{
         embed.fields.push({
-          name: "Voice information",
+          name: "Member information",
           value:
             trimLines(`
-          ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
-          ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
-          ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
-        `) + embedPadding,
+            Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
+          `) + embedPadding,
         });
+      }
+      if(!args.compact){
+        const voiceChannel = member.voiceState.channelID ? this.guild.channels.get(member.voiceState.channelID) : null;
+        if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
+          embed.fields.push({
+            name: "Voice information",
+            value:
+              trimLines(`
+            ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
+            ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
+            ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
+          `) + embedPadding,
+          });
+        }
       }
     } else {
       embed.fields.push({
@@ -864,29 +889,29 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         value: embedPadding,
       });
     }
+    if(!args.compact){
+      const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
-    const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
+      if (cases.length > 0) {
+        cases.sort((a, b) => {
+          return a.created_at < b.created_at ? 1 : -1;
+        });
 
-    if (cases.length > 0) {
-      cases.sort((a, b) => {
-        return a.created_at < b.created_at ? 1 : -1;
-      });
+        const caseSummary = cases.slice(0, 3).map(c => {
+          return `${CaseTypes[c.type]} (#${c.case_number})`;
+        });
 
-      const caseSummary = cases.slice(0, 3).map(c => {
-        return `${CaseTypes[c.type]} (#${c.case_number})`;
-      });
+        const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 
-      const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
-
-      embed.fields.push({
-        name: "Cases",
-        value: trimLines(`
-          Total cases: **${cases.length}**
-          ${summaryText}: ${caseSummary.join(", ")}
-        `),
-      });
+        embed.fields.push({
+          name: "Cases",
+          value: trimLines(`
+            Total cases: **${cases.length}**
+            ${summaryText}: ${caseSummary.join(", ")}
+          `),
+        });
+      }
     }
-
     msg.channel.createMessage({ embed });
   }
 
