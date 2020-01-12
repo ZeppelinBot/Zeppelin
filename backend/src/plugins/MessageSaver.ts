@@ -108,14 +108,12 @@ export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
     const { savedCount, failed } = await this.saveMessagesToDB(args.channel, args.ids);
 
     if (failed.length) {
-      msg.channel.createMessage(
-        successMessage(
-          `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}
-        `,
-        ),
+      this.sendSuccessMessage(
+        msg.channel,
+        `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}`,
       );
     } else {
-      msg.channel.createMessage(successMessage(`Saved ${savedCount} messages!`));
+      this.sendSuccessMessage(msg.channel, `Saved ${savedCount} messages!`);
     }
   }
 
@@ -131,14 +129,12 @@ export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
 
     if (failed.length) {
-      msg.channel.createMessage(
-        successMessage(
-          `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}
-        `,
-        ),
+      this.sendSuccessMessage(
+        msg.channel,
+        `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}`,
       );
     } else {
-      msg.channel.createMessage(successMessage(`Saved ${savedCount} messages!`));
+      this.sendSuccessMessage(msg.channel, `Saved ${savedCount} messages!`);
     }
   }
 }

@@ -237,7 +237,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const targetMessage = await channel.getMessage(savedMessage.id);
     await targetMessage.removeReactions();
 
-    msg.channel.createMessage(successMessage("Reaction roles cleared"));
+    this.sendSuccessMessage(msg.channel, "Reaction roles cleared");
   }
 
   /**
@@ -259,7 +259,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     await this.refreshReactionRoles(savedMessage.channel_id, savedMessage.id);
 
-    msg.channel.createMessage(successMessage("Reaction roles refreshed"));
+    this.sendSuccessMessage(msg.channel, "Reaction roles refreshed");
   }
 
   /**
@@ -346,7 +346,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const reactionRoles = await this.reactionRoles.getForMessage(targetMessage.id);
     await this.applyReactionRoleReactionsToMessage(targetMessage.channel.id, targetMessage.id, reactionRoles);
 
-    msg.channel.createMessage(successMessage("Reaction roles added"));
+    this.sendSuccessMessage(msg.channel, "Reaction roles added");
   }
 
   /**

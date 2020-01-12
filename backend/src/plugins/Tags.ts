@@ -153,7 +153,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.tags.delete(args.tag);
-    msg.channel.createMessage(successMessage("Tag deleted!"));
+    this.sendSuccessMessage(msg.channel, "Tag deleted!");
   }
 
   @d.command("tag eval", "<body:string$>")
@@ -180,7 +180,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     await this.tags.createOrUpdate(args.tag, args.body, msg.author.id);
 
     const prefix = this.getConfig().prefix;
-    msg.channel.createMessage(successMessage(`Tag set! Use it with: \`${prefix}${args.tag}\``));
+    this.sendSuccessMessage(msg.channel, `Tag set! Use it with: \`${prefix}${args.tag}\``);
   }
 
   @d.command("tag", "<tag:string>", {

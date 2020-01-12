@@ -147,10 +147,9 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
-    msg.channel.createMessage(
-      successMessage(
-        `I will remind you in **${timeUntilReminder}** at **${reminderTime.format("YYYY-MM-DD, HH:mm")}**`,
-      ),
+    this.sendSuccessMessage(
+      msg.channel,
+      `I will remind you in **${timeUntilReminder}** at **${reminderTime.format("YYYY-MM-DD, HH:mm")}**`,
     );
   }
 
@@ -194,6 +193,6 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
     const toDelete = reminders[args.num - 1];
     await this.reminders.delete(toDelete.id);
 
-    msg.channel.createMessage(successMessage("Reminder deleted"));
+    this.sendSuccessMessage(msg.channel, "Reminder deleted");
   }
 }
