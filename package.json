@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "format": "prettier --write \"./{backend,dashboard}/**/*.ts\"",
-    "lint": "tslint"
+    "lint": "tslint",
+    "codestyle-check": "prettier --check \"./{backend,dashboard}/**/*.ts\""
   },
   "dependencies": {},
   "devDependencies": {
