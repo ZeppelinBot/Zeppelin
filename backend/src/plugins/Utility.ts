@@ -176,7 +176,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.lastReload = Date.now();
 
     if (activeReloads && activeReloads.has(this.guildId)) {
-      activeReloads.get(this.guildId).createMessage(successMessage("Reloaded!"));
+      this.sendSuccessMessage(activeReloads.get(this.guildId), "Reloaded!");
       activeReloads.delete(this.guildId);
     }
   }
@@ -770,7 +770,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         responseText += ` in <#${targetChannel.id}>\n${cleanResult.archiveUrl}`;
       }
 
-      responseMsg = await msg.channel.createMessage(successMessage(responseText));
+      responseMsg = await msg.channel.createMessage(successMessage(`<:zep_check:650361014180904971>`, responseText));
     } else {
       responseMsg = await msg.channel.createMessage(errorMessage(`Found no messages to clean!`));
     }
@@ -946,7 +946,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    msg.channel.createMessage(successMessage(`The nickname of <@!${args.member.id}> has been reset`));
+    this.sendSuccessMessage(msg.channel, `The nickname of <@!${args.member.id}> has been reset`);
   }
 
   @d.command("nickname", "<member:resolvedMember> <nickname:string$>", {
@@ -982,8 +982,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    msg.channel.createMessage(
-      successMessage(`Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`),
+    this.sendSuccessMessage(
+      msg.channel,
+      `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
     );
   }
 
@@ -1236,8 +1237,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       newChannel: stripObjectToScalars(channel),
     });
 
-    msg.channel.createMessage(
-      successMessage(`**${args.member.user.username}#${args.member.user.discriminator}** moved to **${channel.name}**`),
+    this.sendSuccessMessage(
+      msg.channel,
+      `**${args.member.user.username}#${args.member.user.discriminator}** moved to **${channel.name}**`,
     );
   }
 

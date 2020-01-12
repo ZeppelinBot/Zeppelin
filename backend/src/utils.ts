@@ -264,8 +264,8 @@ export function convertMSToDelayString(ms: number): string {
   return result;
 }
 
-export function successMessage(str) {
-  return `<:zep_check:650361014180904971> ${str}`;
+export function successMessage(str, emoji) {
+  return `${emoji} ${str}`;
 }
 
 export function errorMessage(str) {
