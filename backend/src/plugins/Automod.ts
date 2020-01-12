@@ -519,10 +519,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected onMessageCreateFn;
 
-  protected modActions: ModActionsPlugin;
-  protected mutes: MutesPlugin;
-  protected logs: LogsPlugin;
-
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
   protected guildLogs: GuildLogs;
@@ -598,6 +594,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected getLogs(): LogsPlugin {
     return this.getPlugin("logs");
+  }
+
+  protected getMutes(): MutesPlugin {
+    return this.getPlugin("mutes");
   }
 
   protected onUnload() {
@@ -1185,10 +1185,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       };
 
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
-        await this.mutes.muteUser(matchResult.userId, duration, reason, caseArgs);
+        await this.getMutes().muteUser(matchResult.userId, duration, reason, caseArgs);
       } else if (matchResult.type === "raidspam") {
         for (const userId of matchResult.userIds) {
-          await this.mutes.muteUser(userId, duration, reason, caseArgs);
+          await this.getMutes().muteUser(userId, duration, reason, caseArgs);
         }
       }
 
