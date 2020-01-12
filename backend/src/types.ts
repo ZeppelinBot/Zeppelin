@@ -1,9 +1,8 @@
 import { IGlobalConfig, IGuildConfig, Knub } from "knub";
 
-// Remove this tslint exception once there are properties in the interface
-// tslint:disable-next-line
 export interface IZeppelinGuildConfig extends IGuildConfig {
-  // To fill
+  success_emoji?: string;
+  error_emoji?: string;
 }
 
 export interface IZeppelinGlobalConfig extends IGlobalConfig {
