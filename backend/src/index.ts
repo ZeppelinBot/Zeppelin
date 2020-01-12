@@ -75,6 +75,7 @@ import { customArgumentTypes } from "./customArgumentTypes";
 import { errorMessage, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
+import { IGuildData } from "knub/dist/Knub";
 
 logger.info("Connecting to database");
 connect().then(async conn => {
@@ -160,9 +161,10 @@ connect().then(async conn => {
 
       customArgumentTypes,
 
-      sendSuccessMessageFn(channel: TextChannel, body) {
-        let config: IGuildConfig = this.getConfig(channel.guild.id);
-        channel.createMessage(successMessage(config., body));
+      sendSuccessMessageFn(channel, body) {
+        const guildId = channel instanceof TextChannel ? channel.guild.id : null;
+        const emoji = (guildId ? bot.getGuildData(guildId).config.success_emoji : null) ?? 'default emoji here';
+        channel.createMessage(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
