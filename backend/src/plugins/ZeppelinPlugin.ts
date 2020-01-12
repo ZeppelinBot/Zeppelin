@@ -243,7 +243,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
    * In the event of duplicate role names, this function will return the first one it comes across.
    * @param roleResolvable
    */
-  async resolveRoleId(roleResolvable: string): Promise<string> {
+  async resolveRoleId(roleResolvable: string): Promise<string | null> {
     const roleId = await resolveRoleId(this.bot, this.guildId, roleResolvable);
     return roleId;
   }
