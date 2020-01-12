@@ -4,7 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "format": "prettier --write \"./{backend,dashboard}/**/*.ts\""
+    "format": "prettier --write \"./{backend,dashboard}/**/*.ts\"",
+    "lint": "tslint"
   },
   "dependencies": {},
   "devDependencies": {
