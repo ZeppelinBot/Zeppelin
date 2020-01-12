@@ -145,7 +145,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     try {
       await this.messages.insert(data);
     } catch (e) {
-      console.warn(e);
+      console.warn(e); // tslint:disable-line
       return;
     }
 
