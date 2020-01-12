@@ -4,9 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "format": "prettier --write \"./{backend,dashboard}/**/*.ts\"",
-    "lint": "tslint",
-    "codestyle-check": "prettier --check \"./{backend,dashboard}/**/*.ts\""
+    "format": "prettier --write \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
+    "lint": "tslint \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
+    "codestyle-check": "prettier --check \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\""
   },
   "dependencies": {},
   "devDependencies": {
