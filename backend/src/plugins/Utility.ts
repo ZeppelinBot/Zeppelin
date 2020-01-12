@@ -792,9 +792,16 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         basicUsage: "!info 106391128718245888",
       },
     },
+    options: [
+      {
+        name: "compact",
+        shortcut: "c",
+        isSwitch: true,
+      }
+    ]
   })
   @d.permission("can_info")
-  async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
+  async infoCmd(msg: Message, args: { user?: User | UnknownUser, compact?: boolean }) {
     const user = args.user || msg.author;
 
     let member;
@@ -816,15 +823,42 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       embed.title = `${user.username}#${user.discriminator}`;
       embed.thumbnail = { url: user.avatarURL };
 
-      embed.fields.push({
-        name: "User information",
-        value:
-          trimLines(`
-          ID: **${user.id}**
-          Profile: <@!${user.id}>
-          Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-        `) + embedPadding,
-      });
+      if(args.compact){
+        embed.fields.push({
+          name: "User information",
+          value:
+            trimLines(`
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `),
+          });
+        if (member) {
+          const joinedAt = moment(member.joinedAt);
+          const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+            largest: 2,
+            round: true,
+          });
+          embed.fields[0].value += `\nJoined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`
+        } else {
+          embed.fields.push({
+            name: "!!  USER IS NOT ON THE SERVER  !!",
+            value: embedPadding,
+          });
+        }
+        msg.channel.createMessage({ embed });
+        return;
+      }
+      else{
+        embed.fields.push({
+          name: "User information",
+          value:
+            trimLines(`
+            ID: **${user.id}**
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `) + embedPadding,
+          });
+      }
     } else {
       embed.title = `Unknown user`;
     }
@@ -863,8 +897,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         name: "!!  USER IS NOT ON THE SERVER  !!",
         value: embedPadding,
       });
-    }
 
+    }
     const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
     if (cases.length > 0) {
@@ -886,7 +920,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         `),
       });
     }
-
+    
     msg.channel.createMessage({ embed });
   }
 
