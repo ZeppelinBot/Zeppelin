@@ -109,12 +109,16 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         const removedRolesWord = rolesToRemoveArr.length === 1 ? "role" : "roles";
 
         if (nonMatchingRoleNames.length) {
-          this.sendSuccessMessage(msg.channel,
+          this.sendSuccessMessage(
+            msg.channel,
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord};` +
               ` couldn't recognize the other roles you mentioned`,
           );
         } else {
-          this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`);
+          this.sendSuccessMessage(
+            msg.channel,
+            `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`,
+          );
         }
       } catch (e) {
         this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Got an error while trying to remove the roles`);
@@ -189,12 +193,16 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         const grantedRolesWord = rolesToGrantArr.length === 1 ? "role" : "roles";
 
         if (nonMatchingRoleNames.length) {
-          this.sendSuccessMessage(msg.channel,
+          this.sendSuccessMessage(
+            msg.channel,
             `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord};` +
               ` couldn't recognize the other roles you mentioned`,
           );
         } else {
-          this.sendSuccessMessage(msg.channel, `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord}`);
+          this.sendSuccessMessage(
+            msg.channel,
+            `<@!${msg.author.id}> Granted you the ${grantedRolesStr.join(", ")} ${grantedRolesWord}`,
+          );
         }
       } catch (e) {
         msg.channel.createMessage(

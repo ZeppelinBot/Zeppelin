@@ -69,9 +69,7 @@ export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     await this.pingableRoles.delete(args.channelId, args.role.id);
     this.cache.delete(args.channelId);
 
-    this.sendSuccessMessage(msg.channel,
-      `**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`,
-    );
+    this.sendSuccessMessage(msg.channel, `**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`);
   }
 
   @d.command("pingable_role", "<channelId:channelId> <role:role>")
