@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError, Plugin } from "knub";
+import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig } from "knub";
 import { SimpleError } from "./SimpleError";
 
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
@@ -75,6 +75,7 @@ import { customArgumentTypes } from "./customArgumentTypes";
 import { errorMessage, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
+import { IZeppelinGuildConfig, IZeppelinGlobalConfig } from "./types";
 
 logger.info("Connecting to database");
 connect().then(async conn => {
@@ -93,7 +94,7 @@ connect().then(async conn => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub(client, {
+  const bot = new Knub<IZeppelinGuildConfig, IZeppelinGlobalConfig>(client, {
     plugins: availablePlugins,
     globalPlugins: availableGlobalPlugins,
 
