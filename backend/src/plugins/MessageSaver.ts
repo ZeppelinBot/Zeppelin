@@ -125,7 +125,10 @@ export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
     await msg.channel.createMessage(`Saving pins from <#${args.channel.id}>...`);
 
     const pins = await args.channel.getPins();
-    const { savedCount, failed } = await this.saveMessagesToDB(args.channel, pins.map(m => m.id));
+    const { savedCount, failed } = await this.saveMessagesToDB(
+      args.channel,
+      pins.map(m => m.id),
+    );
 
     if (failed.length) {
       msg.channel.createMessage(

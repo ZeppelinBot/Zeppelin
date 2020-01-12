@@ -956,25 +956,25 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   return null;
 }
 
-export async function resolveRoleId(bot: Client, guildId: string, value: string){
-  if(value == null){
+export async function resolveRoleId(bot: Client, guildId: string, value: string) {
+  if (value == null) {
     return null;
   }
 
-  //role mention
+  // Role mention
   const mentionMatch = value.match(/^<@&?(\d+)>$/);
-  if(mentionMatch){
+  if (mentionMatch) {
     return mentionMatch[1];
   }
 
-  //role name
-  let roleList = await bot.getRESTGuildRoles(guildId);
-  let role = roleList.filter(x => x.name.toLocaleLowerCase() == value.toLocaleLowerCase());
-  if(role[0]){
+  // Role name
+  const roleList = await bot.getRESTGuildRoles(guildId);
+  const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
+  if (role[0]) {
     return role[0].id;
   }
 
-  //role ID
+  // Role ID
   const idMatch = value.match(/^\d+$/);
   if (idMatch) {
     return value;

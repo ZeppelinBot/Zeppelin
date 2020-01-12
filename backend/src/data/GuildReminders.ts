@@ -41,7 +41,7 @@ export class GuildReminders extends BaseGuildRepository {
       channel_id: channelId,
       remind_at: remindAt,
       body,
-      created_at
+      created_at,
     });
   }
 }
