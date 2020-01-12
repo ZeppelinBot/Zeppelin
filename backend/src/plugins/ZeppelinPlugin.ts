@@ -71,14 +71,14 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     throw new PluginRuntimeError(message, this.runtimePluginName, this.guildId);
   }
 
-  protected canActOn(member1, member2) {
-    if (member1.id === member2.id || member2.id === this.bot.user.id) {
+  protected canActOn(member1: Member, member2: Member, allowSameLevel = false) {
+    if (member2.id === this.bot.user.id) {
       return false;
     }
 
     const ourLevel = this.getMemberLevel(member1);
     const memberLevel = this.getMemberLevel(member2);
-    return ourLevel > memberLevel;
+    return allowSameLevel ? ourLevel >= memberLevel : ourLevel > memberLevel;
   }
 
   /**
@@ -241,7 +241,7 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   /**
    * Resolves a role from the passed string. The passed string can be a role ID, a role mention or a role name.
    * In the event of duplicate role names, this function will return the first one it comes across.
-   * @param roleResolvable 
+   * @param roleResolvable
    */
   async resolveRoleId(roleResolvable: string): Promise<string> {
     const roleId = await resolveRoleId(this.bot, this.guildId, roleResolvable);
