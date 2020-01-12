@@ -27,6 +27,7 @@ import { LocatePlugin } from "./LocateUser";
 import { GuildConfigReloader } from "./GuildConfigReloader";
 import { ChannelArchiverPlugin } from "./ChannelArchiver";
 import { AutomodPlugin } from "./Automod";
+import { RolesPlugin} from "./Roles";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -58,6 +59,7 @@ export const availablePlugins = [
   CompanionChannelPlugin,
   LocatePlugin,
   ChannelArchiverPlugin,
+  RolesPlugin,
 ];
 
 /**
