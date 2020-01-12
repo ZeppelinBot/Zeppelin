@@ -8,12 +8,15 @@ import { deepKeyIntersect, isSnowflake, isUnicodeEmoji, resolveMember, resolveUs
 import { Member, User } from "eris";
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
+import { TZeppelinKnub } from "../types";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
 export class GlobalZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends GlobalPlugin<TConfig> {
   public static configSchema: t.TypeC<any>;
   public static dependencies = [];
+
+  protected readonly knub: TZeppelinKnub;
 
   /**
    * Since we want to do type checking without creating instances of every plugin,
