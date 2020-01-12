@@ -43,6 +43,7 @@ import {
   successMessage,
   trimLines,
   UnknownUser,
+  downloadFile,
 } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -61,7 +62,9 @@ import { ICommandDefinition } from "knub-command-manager";
 import path from "path";
 import escapeStringRegexp from "escape-string-regexp";
 import safeRegex from "safe-regex";
+import fs from "fs";
 
+import { Url, URL, URLSearchParams } from "url";
 const ConfigSchema = t.type({
   can_roles: t.boolean,
   can_level: t.boolean,
@@ -77,6 +80,8 @@ const ConfigSchema = t.type({
   can_help: t.boolean,
   can_about: t.boolean,
   can_context: t.boolean,
+  can_jumbo: t.boolean,
+  jumbo_size: t.Integer,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -92,6 +97,7 @@ const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full membe
 const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
+const fsp = fs.promises;
 
 type MemberSearchParams = {
   query?: string;
@@ -138,6 +144,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_help: false,
         can_about: false,
         can_context: false,
+        can_jumbo: false,
+        jumbo_size: 128,
       },
       overrides: [
         {
@@ -153,6 +161,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             can_vcmove: true,
             can_help: true,
             can_context: true,
+            can_jumbo: true,
           },
         },
         {
@@ -1459,5 +1468,45 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     msg.channel.createMessage("Reloading...");
     this.knub.reloadGuild(this.guildId);
+  }
+
+  @d.command("jumbo", "<emoji:string>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Makes an emoji jumbo",
+      },
+    },
+  })
+  @d.permission("can_jumbo")
+  async jumboCmd(msg: Message, args: {emoji: string}){
+    let config = this.getConfig();
+        
+    //get emoji url
+    let emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
+    let results = emojiRegex.exec(args.emoji);
+    let url = "https://cdn.discordapp.com/emojis/";
+    let name;
+    switch(results[1]){
+      case "<:":
+        url += `${results[2]}.png`;
+        name = "emoji.png"
+        break;
+      case "<a:":
+        url += `${results[2]}.gif`;
+        name = "emoji.gif"
+        break;
+      default:
+        return;
+    }
+    let downloadedEmoji = await downloadFile(url);
+    let buf = await fsp.readFile(downloadedEmoji.path);
+    //resize image here
+
+    let file = {
+      name: name,
+      file: buf,
+    };
+    msg.channel.createMessage("", file);
+    return;
   }
 }
