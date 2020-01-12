@@ -608,7 +608,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           });
 
           clearReactionsFn = async () => {
-            searchMsg.removeReactions();
+            searchMsg.removeReactions().catch(noop);
             removeListenerFn();
           };
         }
