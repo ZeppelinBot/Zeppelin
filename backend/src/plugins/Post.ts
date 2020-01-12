@@ -417,7 +417,7 @@ export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "enable-mentions",
-        type: "bool",
+        isSwitch: true,
       },
       {
         name: "schedule",

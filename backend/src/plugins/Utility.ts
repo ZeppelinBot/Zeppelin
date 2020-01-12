@@ -191,7 +191,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "counts",
-        type: "bool",
+        isSwitch: true,
       },
       {
         name: "sort",
