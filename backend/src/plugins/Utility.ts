@@ -26,6 +26,7 @@ import {
   DAYS,
   embedPadding,
   errorMessage,
+  formatNumber,
   get,
   getInviteCodesInString,
   isSnowflake,
@@ -1033,33 +1034,64 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const offlineMembers = this.guild.members.filter(m => m.status === "offline");
     const notOfflineMembers = this.guild.members.filter(m => m.status !== "offline");
 
+    const restGuild = await this.bot.getRESTGuild(this.guildId);
+
+    let memberCountTotalLines = `Total: **${formatNumber(this.guild.memberCount)}**`;
+    if (restGuild.maxMembers) {
+      memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
+    }
+
+    let memberCountOnlineLines = `Online: **${formatNumber(notOfflineMembers.length)}**`;
+    if (restGuild.maxPresences) {
+      memberCountOnlineLines += `\nMax online: ${formatNumber(restGuild.maxPresences)}`;
+    }
+
     embed.fields.push({
       name: "Members",
       inline: true,
       value: trimLines(`
-        Total: **${this.guild.memberCount}**
-        Online: **${onlineMembers.length}**
-        Idle: **${idleMembers.length}**
-        DND: **${dndMembers.length}**
-        Offline: **${offlineMembers.length}**
-        Not offline: **${notOfflineMembers.length}**
+        ${memberCountTotalLines}
+        ${memberCountOnlineLines}
+        Offline: **${formatNumber(offlineMembers.length)}**
+        <:zep_online:665907874450636810> Online: **${formatNumber(onlineMembers.length)}**
+        <:zep_idle:665908128331726848> Idle: **${formatNumber(idleMembers.length)}**
+        <:zep_dnd:665908138741858365> DND: **${formatNumber(dndMembers.length)}**
       `),
     });
 
+    const totalChannels = this.guild.channels.size;
     const categories = this.guild.channels.filter(channel => channel instanceof CategoryChannel);
     const textChannels = this.guild.channels.filter(channel => channel instanceof TextChannel);
     const voiceChannels = this.guild.channels.filter(channel => channel instanceof VoiceChannel);
+
+    embed.fields.push({
+      name: "Channels",
+      inline: true,
+      value:
+        trimLines(`
+        Total: **${totalChannels}** / 500
+        Categories: **${categories.length}**
+        Text: **${textChannels.length}**
+        Voice: **${voiceChannels.length}**
+      `) + embedPadding,
+    });
+
+    const maxEmojis =
+      {
+        0: 50,
+        1: 100,
+        2: 150,
+        3: 250,
+      }[this.guild.premiumTier] || 50;
 
     embed.fields.push({
       name: "Other stats",
       inline: true,
       value:
         trimLines(`
-        Roles: **${this.guild.roles.size}**
-        Categories: **${categories.length}**
-        Text channels: **${textChannels.length}**
-        Voice channels: **${voiceChannels.length}**
-        Emojis: **${this.guild.emojis.length}**
+        Roles: **${this.guild.roles.size}** / 250
+        Emojis: **${this.guild.emojis.length}** / ${maxEmojis}
+        Boosts: **${this.guild.premiumSubscriptionCount}** (level ${this.guild.premiumTier})
       `) + embedPadding,
     });
 
