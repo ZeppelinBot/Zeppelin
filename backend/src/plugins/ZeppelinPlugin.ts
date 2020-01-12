@@ -23,6 +23,8 @@ import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disab
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";
+import { Knub } from "knub/dist/Knub";
+import { TZeppelinKnub } from "../types";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
@@ -66,6 +68,8 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
 
   public static configSchema: t.TypeC<any>;
   public static dependencies = [];
+
+  protected readonly knub: TZeppelinKnub;
 
   protected throwPluginRuntimeError(message: string) {
     throw new PluginRuntimeError(message, this.runtimePluginName, this.guildId);
