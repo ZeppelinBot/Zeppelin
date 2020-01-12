@@ -163,7 +163,7 @@ connect().then(async conn => {
 
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : null;
-        const emoji = (guildId ? bot.getGuildData(guildId).config.success_emoji : null) ?? 'default emoji here';
+        const emoji = (guildId ? bot.getGuildData(guildId).config.success_emoji : null) ?? "default emoji here";
         channel.createMessage(successMessage(body, emoji));
       },
 

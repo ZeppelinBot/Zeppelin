@@ -194,7 +194,10 @@ export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     if (failedUsers.length) {
-      this.sendSuccessMessage(msg.channel, `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`);
+      this.sendSuccessMessage(
+        msg.channel,
+        `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
+      );
     } else {
       this.sendSuccessMessage(msg.channel, "Slowmode disabled!");
       initMsg.delete().catch(noop);

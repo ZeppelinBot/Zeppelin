@@ -624,7 +624,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
-    this.sendSuccessMessage(msg.channel, `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`);
+    this.sendSuccessMessage(
+      msg.channel,
+      `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
+    );
   }
 
   async warnMember(
@@ -858,14 +861,16 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Confirm the action to the moderator
     if (args.time) {
       const timeUntilUnmute = args.time && humanizeDuration(args.time);
-      this.sendSuccessMessage(msg.channel, 
+      this.sendSuccessMessage(
+        msg.channel,
         asSingleLine(`
         Unmuting **${user.username}#${user.discriminator}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
       `),
       );
     } else {
-      this.sendSuccessMessage(msg.channel,
+      this.sendSuccessMessage(
+        msg.channel,
         asSingleLine(`
         Unmuted **${user.username}#${user.discriminator}**
         (Case #${result.case.case_number})
@@ -1152,7 +1157,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     // Confirm the action to the moderator
-    this.sendSuccessMessage(msg.channel,
+    this.sendSuccessMessage(
+      msg.channel,
       `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
     );
 
@@ -1368,7 +1374,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
 
       if (failedBans.length) {
-        this.sendSuccessMessage(msg.channel,
+        this.sendSuccessMessage(
+          msg.channel,
           `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`,
         );
       } else {
@@ -1428,7 +1435,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     });
 
     if (user) {
-      this.sendSuccessMessage(msg.channel,
+      this.sendSuccessMessage(
+        msg.channel,
         `Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`,
       );
     } else {
@@ -1593,7 +1601,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     await this.cases.setHidden(theCase.id, true);
-    this.sendSuccessMessage(msg.channel,
+    this.sendSuccessMessage(
+      msg.channel,
       `Case #${theCase.case_number} is now hidden! Use \`unhidecase\` to unhide it.`,
     );
   }

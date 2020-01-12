@@ -147,7 +147,10 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
-    this.sendSuccessMessage(msg.channel, `I will remind you in **${timeUntilReminder}** at **${reminderTime.format("YYYY-MM-DD, HH:mm")}**`);
+    this.sendSuccessMessage(
+      msg.channel,
+      `I will remind you in **${timeUntilReminder}** at **${reminderTime.format("YYYY-MM-DD, HH:mm")}**`,
+    );
   }
 
   @d.command("reminders")
