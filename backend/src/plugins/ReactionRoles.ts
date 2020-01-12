@@ -144,7 +144,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     } catch (e) {
       if (e instanceof DiscordRESTError) {
         logger.warn(
-          `Reaction roles for unknown message ${channelId}/${messageId} in guild ${this.guild.name} (${this.guildId})`,
+          `Reaction roles for unknown message ${channelId}/${messageId} in guild ${this.guild.name} (${this.guildId}) (error code ${e.code})`,
         );
         return;
       } else {
