@@ -1,21 +1,17 @@
 import { ZeppelinPlugin, trimPluginDescription } from "./ZeppelinPlugin";
 import * as t from "io-ts";
-import { tNullable } from "../utils";
+import { stripObjectToScalars, tNullable } from "../utils";
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
-import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
+import { Attachment, Constants as ErisConstants, Guild, GuildChannel, Member, Message, TextChannel, User } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
+import { LogType } from "../data/LogType";
 
 const ConfigSchema = t.type({
-    can_assign: t.boolean,
-    assignable_roles: tNullable(t.array(t.string))
-  });  
+  can_assign: t.boolean,
+  assignable_roles: t.array(t.string),
+});
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-enum RoleActions{
-    Add = 1,
-    Remove
-};
-  
 export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "roles";
   public static configSchema = ConfigSchema;
@@ -26,9 +22,10 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       Enables authorised users to add and remove whitelisted roles with a command.
     `),
   };
+
   protected logs: GuildLogs;
 
-  onLoad(){
+  onLoad() {
     this.logs = new GuildLogs(this.guildId);
   }
 
@@ -36,7 +33,7 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     return {
       config: {
         can_assign: false,
-        assignable_roles: null
+        assignable_roles: [],
       },
       overrides: [
         {
@@ -49,68 +46,101 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
-
-  @d.command("role", "<action:string> <user:string> [role:string$]",{
-      extra: {
-        info: {
-          description: "Assign a permitted role to a user",
-        },
+  @d.command("addrole", "<member:member> [role:string$]", {
+    extra: {
+      info: {
+        description: "Add a role to the specified member",
       },
-    })
+    },
+  })
   @d.permission("can_assign")
-  async assignRole(msg: Message, args: {action: string; user: string; role: string}){
-    const user = await this.resolveUser(args.user);
+  async addRoleCmd(msg: Message, args: { member: Member; role: string }) {
+    if (!this.canActOn(msg.member, args.member, true)) {
+      return this.sendErrorMessage(msg.channel, "Cannot add roles to this user: insufficient permissions");
+    }
+
     const roleId = await this.resolveRoleId(args.role);
-    if (user.discriminator == "0000") {
-      return this.sendErrorMessage(msg.channel, `User not found`);
+    if (!roleId) {
+      return this.sendErrorMessage(msg.channel, "Invalid role id");
     }
 
-    //if the role doesnt exist, we can exit
-    let roleIds = (msg.channel as TextChannel).guild.roles.map(x => x.id)
-    if(!(roleIds.includes(roleId))){
-      return this.sendErrorMessage(msg.channel, `Role not found`);
-    } 
-
-    // If the user exists as a guild member, make sure we can act on them first
-    const targetMember = await this.getMember(user.id);
-    if (targetMember && !this.canActOn(msg.member, targetMember)) {
-      this.sendErrorMessage(msg.channel, "Cannot add or remove roles on this user: insufficient permissions");
-      return;
+    const config = this.getConfigForMsg(msg);
+    if (!config.assignable_roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "You cannot assign that role");
     }
 
-    const action: string = args.action[0].toUpperCase() + args.action.slice(1).toLowerCase();
-    if(!RoleActions[action]){
-      this.sendErrorMessage(msg.channel, "Cannot add or remove roles on this user: invalid action");
-      return;
+    // Sanity check: make sure the role is configured properly
+    const role = (msg.channel as GuildChannel).guild.roles.get(roleId);
+    if (!role) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Unknown role configured for 'roles' plugin: ${roleId}`,
+      });
+      return this.sendErrorMessage(msg.channel, "You cannot assign that role");
     }
 
-    //check if the role is allowed to be applied
-    let config = this.getConfigForMsg(msg)
-    if(!config.assignable_roles || !config.assignable_roles.includes(roleId)){
-      this.sendErrorMessage(msg.channel, "You do not have access to the specified role");
-      return;
+    if (args.member.roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "Member already has that role");
     }
-    //at this point, everything has been verified, so it's ACTION TIME
-    switch(RoleActions[action]){
-      case RoleActions.Add:
-        if(targetMember.roles.includes(roleId)){
-          this.sendErrorMessage(msg.channel, "Role already applied to user");
-          return;
-        }
-        await this.bot.addGuildMemberRole(this.guildId, user.id, roleId);
-        this.sendSuccessMessage(msg.channel, `Role added to user!`);
-        break;
-      case RoleActions.Remove:
-        if(!targetMember.roles.includes(roleId)){
-          this.sendErrorMessage(msg.channel, "User does not have role");
-          return;
-        }
-        await this.bot.removeGuildMemberRole(this.guildId, user.id, roleId);
-        this.sendSuccessMessage(msg.channel, `Role removed from user!`);
-        break;
-      default:
-        break;
-    }
+
+    this.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
+
+    await args.member.addRole(roleId);
+
+    this.logs.log(LogType.MEMBER_ROLE_ADD, {
+      member: stripObjectToScalars(args.member, ["user", "roles"]),
+      roles: role.name,
+      mod: stripObjectToScalars(msg.author),
+    });
+
+    this.sendSuccessMessage(msg.channel, "Role added to user!");
   }
-    
+
+  @d.command("removerole", "<member:member> [role:string$]", {
+    extra: {
+      info: {
+        description: "Remove a role from the specified member",
+      },
+    },
+  })
+  @d.permission("can_assign")
+  async removeRoleCmd(msg: Message, args: { member: Member; role: string }) {
+    if (!this.canActOn(msg.member, args.member, true)) {
+      return this.sendErrorMessage(msg.channel, "Cannot remove roles from this user: insufficient permissions");
+    }
+
+    const roleId = await this.resolveRoleId(args.role);
+    if (!roleId) {
+      return this.sendErrorMessage(msg.channel, "Invalid role id");
+    }
+
+    const config = this.getConfigForMsg(msg);
+    if (!config.assignable_roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "You cannot remove that role");
+    }
+
+    // Sanity check: make sure the role is configured properly
+    const role = (msg.channel as GuildChannel).guild.roles.get(roleId);
+    if (!role) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Unknown role configured for 'roles' plugin: ${roleId}`,
+      });
+      return this.sendErrorMessage(msg.channel, "You cannot remove that role");
+    }
+
+    if (!args.member.roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "Member doesn't have that role");
+    }
+
+    this.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
+
+    await args.member.removeRole(roleId);
+
+    this.logs.log(LogType.MEMBER_ROLE_REMOVE, {
+      member: stripObjectToScalars(args.member, ["user", "roles"]),
+      roles: role.name,
+      mod: stripObjectToScalars(msg.author),
+    });
+
+    this.sendSuccessMessage(msg.channel, "Role removed from user!");
+  }
 }
