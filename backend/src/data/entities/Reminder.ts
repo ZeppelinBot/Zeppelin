@@ -15,4 +15,6 @@ export class Reminder {
   @Column() remind_at: string;
 
   @Column() body: string;
+
+  @Column() created_at: string
 }
