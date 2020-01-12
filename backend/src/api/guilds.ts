@@ -53,6 +53,7 @@ export function initGuildsAPI(app: express.Express) {
         return res.status(400).json({ errors: [e.message] });
       }
 
+      // tslint:disable-next-line:no-console
       console.error("Error when loading YAML: " + e.message);
       return serverError(res, "Server error");
     }

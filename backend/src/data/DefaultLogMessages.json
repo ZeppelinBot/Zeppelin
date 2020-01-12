@@ -55,8 +55,10 @@
   "MEMBER_MUTE_REJOIN": "⚠ Reapplied active mute for {userMention(member)} on rejoin",
 
   "SCHEDULED_MESSAGE": "⏰ {userMention(author)} scheduled a message to be posted to {channelMention(channel)} on {date} at {time} (UTC)",
+  "SCHEDULED_REPEATED_MESSAGE": "⏰ {userMention(author)} scheduled a message to be posted to {channelMention(channel)} on {date} at {time} (UTC), repeated {repeatDetails}",
+  "REPEATED_MESSAGE": "⏰ {userMention(author)} scheduled a message to be posted to {channelMention(channel)} {repeatDetails}",
   "POSTED_SCHEDULED_MESSAGE": "\uD83D\uDCE8 Posted scheduled message (`{messageId}`) to {channelMention(channel)} as scheduled by {userMention(author)}",
 
   "BOT_ALERT": "⚠ {tmplEval(body)}",
-  "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(user)}. Actions taken: **{actionsTaken}**\n{matchSummary}"
+  "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(user)}\n{matchSummary}\nActions taken: **{actionsTaken}**"
 }

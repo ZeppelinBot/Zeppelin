@@ -212,7 +212,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "force",
-        type: "bool",
+        isSwitch: true,
       },
     ],
   })

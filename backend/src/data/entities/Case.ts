@@ -29,6 +29,9 @@ export class Case {
 
   @Column() pp_name: string;
 
-  @OneToMany(type => CaseNote, note => note.case)
+  @OneToMany(
+    type => CaseNote,
+    note => note.case,
+  )
   notes: CaseNote[];
 }

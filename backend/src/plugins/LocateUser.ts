@@ -91,7 +91,8 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
   }
 
-  @d.command("vcalert", "<member:resolvedMember> <duration:delay> [reminder:string$]", {
+  @d.command("vcalert", "<member:resolvedMember> <duration:delay> <reminder:string$>", {
+    overloads: ["<member:resolvedMember> <duration:delay>", "<member:resolvedMember>"],
     aliases: ["vca"],
     extra: {
       info: {

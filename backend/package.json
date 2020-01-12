@@ -4,18 +4,20 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start-bot-dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/index.js",
-    "watch-bot": "nodemon --config nodemon-bot.json",
+    "watch": "cross-env NODE_ENV=development tsc-watch --onSuccess \"node start-dev.js\"",
     "build": "rimraf dist && tsc",
-    "start-api-dev": "node -r ts-node/register -r tsconfig-paths/register src/api/index.ts",
-    "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-prod-paths.js dist/backend/src/api/index.js",
-    "watch-api": "nodemon --config nodemon-api.json",
-    "format": "prettier --write \"./src/**/*.ts\"",
-    "typeorm": "node -r ts-node/register -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migrate": "npm run typeorm -- migration:run",
-    "migrate-rollback": "npm run typeorm -- migration:revert",
-    "test": "ava"
+    "start-bot-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --inspect=127.0.0.1:9229 dist/backend/src/index.js",
+    "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js --unhandled-rejections=strict dist/backend/src/index.js",
+    "start-api-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --inspect=127.0.0.1:9239 dist/backend/src/api/index.js",
+    "start-api-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js --unhandled-rejections=strict dist/backend/src/api/index.js",
+    "typeorm": "node -r ./register-tsconfig-paths.js ./node_modules/typeorm/cli.js",
+    "migrate-prod": "npm run typeorm -- migration:run",
+    "migrate-dev": "npm run build && npm run typeorm -- migration:run",
+    "migrate-rollback-prod": "npm run typeorm -- migration:revert",
+    "migrate-rollback-dev": "npm run build && npm run typeorm -- migration:revert",
+    "test": "npm run build && npm run run-tests",
+    "run-tests": "ava",
+    "test-watch": "tsc-watch --onSuccess \"npx ava\""
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -30,8 +32,8 @@
     "humanize-duration": "^3.15.0",
     "io-ts": "^2.0.0",
     "js-yaml": "^3.13.1",
-    "knub": "^26.0.2",
-    "knub-command-manager": "^6.1.0",
+    "knub": "^28.0.0",
+    "knub-command-manager": "^7.0.0",
     "last-commit-log": "^2.1.0",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
@@ -49,6 +51,7 @@
     "seedrandom": "^3.0.1",
     "tlds": "^1.203.1",
     "tmp": "0.0.33",
+    "transliteration": "^2.1.7",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.14",
     "uuid": "^3.3.2"
@@ -64,24 +67,21 @@
     "@types/passport": "^1.0.0",
     "@types/passport-oauth2": "^1.4.8",
     "@types/passport-strategy": "^0.2.35",
+    "@types/safe-regex": "^1.1.2",
     "@types/tmp": "0.0.33",
     "ava": "^2.4.0",
-    "nodemon": "^1.19.4",
     "rimraf": "^2.6.2",
-    "ts-node": "^8.4.1",
+    "source-map-support": "^0.5.16",
+    "tsc-watch": "^4.0.0",
     "typescript": "^3.7.2"
   },
   "ava": {
     "compileEnhancements": false,
     "files": [
-      "src/**/*.test.ts"
-    ],
-    "extensions": [
-      "ts"
+      "dist/backend/src/**/*.test.js"
     ],
     "require": [
-      "ts-node/register",
-      "tsconfig-paths/register"
+      "./register-tsconfig-paths.js"
     ]
   }
 }

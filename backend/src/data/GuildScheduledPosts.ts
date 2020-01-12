@@ -38,4 +38,8 @@ export class GuildScheduledPosts extends BaseGuildRepository {
       guild_id: this.guildId,
     });
   }
+
+  async update(id: number, data: Partial<ScheduledPost>) {
+    await this.scheduledPosts.update(id, data);
+  }
 }

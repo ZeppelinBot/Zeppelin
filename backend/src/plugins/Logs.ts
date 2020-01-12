@@ -356,9 +356,11 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
   async onMemberUpdate(_, member: Member, oldMember: Member) {
     if (!oldMember) return;
 
+    const logMember = stripObjectToScalars(member, ["user", "roles"]);
+
     if (member.nick !== oldMember.nick) {
       this.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
-        member,
+        member: logMember,
         oldNick: oldMember.nick != null ? oldMember.nick : "<none>",
         newNick: member.nick != null ? member.nick : "<none>",
       });
@@ -379,7 +381,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
         this.guildLogs.log(
           LogType.MEMBER_ROLE_CHANGES,
           {
-            member,
+            member: logMember,
             addedRoles: addedRoles
               .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name)
@@ -397,7 +399,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
         this.guildLogs.log(
           LogType.MEMBER_ROLE_ADD,
           {
-            member,
+            member: logMember,
             roles: addedRoles
               .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name)
@@ -411,7 +413,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
         this.guildLogs.log(
           LogType.MEMBER_ROLE_REMOVE,
           {
-            member,
+            member: logMember,
             roles: removedRoles
               .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name)

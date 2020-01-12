@@ -197,7 +197,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   clearIgnoredEvent(type: IgnoredEventType, userId: any) {
-    this.ignoredEvents.splice(this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId), 1);
+    this.ignoredEvents.splice(
+      this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId),
+      1,
+    );
   }
 
   formatReasonWithAttachments(reason: string, attachments: Attachment[]) {

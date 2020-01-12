@@ -22,5 +22,14 @@ export class ScheduledPost {
 
   @Column() post_at: string;
 
+  /**
+   * How often to post the message, in milliseconds
+   */
+  @Column() repeat_interval: number;
+
+  @Column() repeat_until: string;
+
+  @Column() repeat_times: number;
+
   @Column() enable_mentions: boolean;
 }

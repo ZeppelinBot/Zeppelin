@@ -12,14 +12,16 @@ import {
   resolveMember,
   resolveUser,
   resolveUserId,
+  tDeepPartial,
   trimEmptyStartEndLines,
   trimIndents,
   UnknownUser,
+  resolveRoleId,
 } from "../utils";
 import { Invite, Member, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { performance } from "perf_hooks";
-import { decodeAndValidateStrict, StrictValidationError } from "../validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
@@ -52,8 +54,8 @@ export interface CommandInfo {
 export function trimPluginDescription(str) {
   const emptyLinesTrimmed = trimEmptyStartEndLines(str);
   const lines = emptyLinesTrimmed.split("\n");
-  const lastLineIndentation = (lines[lines.length - 1].match(/^ +/g) || [""])[0].length;
-  return trimIndents(emptyLinesTrimmed, lastLineIndentation);
+  const firstLineIndentation = (lines[0].match(/^ +/g) || [""])[0].length;
+  return trimIndents(emptyLinesTrimmed, firstLineIndentation);
 }
 
 const inviteCache = new SimpleCache<Promise<Invite>>(10 * MINUTES, 200);
@@ -69,14 +71,14 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     throw new PluginRuntimeError(message, this.runtimePluginName, this.guildId);
   }
 
-  protected canActOn(member1, member2) {
-    if (member1.id === member2.id || member2.id === this.bot.user.id) {
+  protected canActOn(member1: Member, member2: Member, allowSameLevel = false) {
+    if (member2.id === this.bot.user.id) {
       return false;
     }
 
     const ourLevel = this.getMemberLevel(member1);
     const memberLevel = this.getMemberLevel(member2);
-    return ourLevel > memberLevel;
+    return allowSameLevel ? ourLevel >= memberLevel : ourLevel > memberLevel;
   }
 
   /**
@@ -120,6 +122,13 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
     const mergedOverrides = options.replaceDefaultOverrides
       ? options.overrides
       : (defaultOptions.overrides || []).concat(options.overrides || []);
+
+    // Before preprocessing the static config, do a loose check by checking the schema as deeply partial.
+    // This way the preprocessing function can trust that if a property exists, its value will be the correct (partial) type.
+    const initialLooseCheck = this.configSchema ? validate(tDeepPartial(this.configSchema), mergedConfig) : null;
+    if (initialLooseCheck) {
+      throw initialLooseCheck;
+    }
 
     mergedConfig = this.preprocessStaticConfig(mergedConfig);
 
@@ -227,6 +236,16 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
       logger.warn(`Slow user resolve (${rounded}ms): ${userResolvable}`);
     }
     return user;
+  }
+
+  /**
+   * Resolves a role from the passed string. The passed string can be a role ID, a role mention or a role name.
+   * In the event of duplicate role names, this function will return the first one it comes across.
+   * @param roleResolvable
+   */
+  async resolveRoleId(roleResolvable: string): Promise<string | null> {
+    const roleId = await resolveRoleId(this.bot, this.guildId, roleResolvable);
+    return roleId;
   }
 
   /**

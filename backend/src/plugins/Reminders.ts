@@ -70,9 +70,19 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
       const channel = this.guild.channels.get(reminder.channel_id);
       if (channel && channel instanceof TextChannel) {
         try {
-          await channel.createMessage(
-            disableLinkPreviews(`<@!${reminder.user_id}> You asked me to remind you: ${reminder.body}`),
-          );
+          // Only show created at date if one exists
+          if (moment(reminder.created_at).isValid()) {
+            const target = moment();
+            const diff = target.diff(moment(reminder.created_at, "YYYY-MM-DD HH:mm:ss"));
+            const result = humanizeDuration(diff, { largest: 2, round: true });
+            await channel.createMessage(
+              disableLinkPreviews(
+                `Reminder for <@!${reminder.user_id}>: ${reminder.body} \n\`Set at ${reminder.created_at} (${result} ago)\``,
+              ),
+            );
+          } else {
+            await channel.createMessage(disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`));
+          }
         } catch (e) {
           // Probably random Discord internal server error or missing permissions or somesuch
           // Try again next round unless we've already tried to post this a bunch of times
@@ -127,7 +137,13 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const reminderBody = args.reminder || `https://discordapp.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`;
-    await this.reminders.add(msg.author.id, msg.channel.id, reminderTime.format("YYYY-MM-DD HH:mm:ss"), reminderBody);
+    await this.reminders.add(
+      msg.author.id,
+      msg.channel.id,
+      reminderTime.format("YYYY-MM-DD HH:mm:ss"),
+      reminderBody,
+      moment().format("YYYY-MM-DD HH:mm:ss"),
+    );
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
@@ -152,7 +168,10 @@ export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
     const lines = Array.from(reminders.entries()).map(([i, reminder]) => {
       const num = i + 1;
       const paddedNum = num.toString().padStart(longestNum, " ");
-      return `\`${paddedNum}.\` \`${reminder.remind_at}\` ${reminder.body}`;
+      const target = moment(reminder.remind_at, "YYYY-MM-DD HH:mm:ss");
+      const diff = target.diff(moment());
+      const result = humanizeDuration(diff, { largest: 2, round: true });
+      return `\`${paddedNum}.\` \`${reminder.remind_at} (${result})\` ${reminder.body}`;
     });
 
     createChunkedMessage(msg.channel, lines.join("\n"));

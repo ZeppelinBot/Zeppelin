@@ -19,4 +19,6 @@ export class ReactionRole {
   emoji: string;
 
   @Column() role_id: string;
+
+  @Column() is_exclusive: boolean;
 }

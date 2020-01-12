@@ -9,6 +9,7 @@ import {
   GuildAuditLogEntry,
   GuildChannel,
   Member,
+  Message,
   MessageContent,
   TextableChannel,
   TextChannel,
@@ -27,6 +28,10 @@ import https from "https";
 import tmp from "tmp";
 import { logger, waitForReaction } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { either } from "fp-ts/lib/Either";
+import safeRegex from "safe-regex";
+import moment from "moment-timezone";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -34,6 +39,7 @@ const delayStringMultipliers = {
   h: 1000 * 60 * 60,
   m: 1000 * 60,
   s: 1000,
+  x: 1,
 };
 
 export const MS = 1;
@@ -41,10 +47,140 @@ export const SECONDS = 1000 * MS;
 export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
+export const WEEKS = 7 * 24 * HOURS;
 
-export function tNullable<T extends t.Type<any, any, unknown>>(type: T) {
+export const EMPTY_CHAR = "\u200b";
+
+export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }
+
+function typeHasProps(type: any): type is t.TypeC<any> {
+  return type.props != null;
+}
+
+function typeIsArray(type: any): type is t.ArrayC<any> {
+  return type._tag === "ArrayType";
+}
+
+export type TDeepPartial<T> = T extends t.InterfaceType<any>
+  ? TDeepPartialProps<T["props"]>
+  : T extends t.DictionaryType<any, any>
+  ? t.DictionaryType<T["domain"], TDeepPartial<T["codomain"]>>
+  : T extends t.UnionType<any[]>
+  ? t.UnionType<Array<TDeepPartial<T["types"][number]>>>
+  : T extends t.IntersectionType<any>
+  ? t.IntersectionType<Array<TDeepPartial<T["types"][number]>>>
+  : T extends t.ArrayType<any>
+  ? t.ArrayType<TDeepPartial<T["type"]>>
+  : T;
+
+// Based on t.PartialC
+export interface TDeepPartialProps<P extends t.Props>
+  extends t.PartialType<
+    P,
+    {
+      [K in keyof P]?: TDeepPartial<t.TypeOf<P[K]>>;
+    },
+    {
+      [K in keyof P]?: TDeepPartial<t.OutputOf<P[K]>>;
+    }
+  > {}
+
+export function tDeepPartial<T>(type: T): TDeepPartial<T> {
+  if (type instanceof t.InterfaceType) {
+    const newProps = {};
+    for (const [key, prop] of Object.entries(type.props)) {
+      newProps[key] = tDeepPartial(prop);
+    }
+    return t.partial(newProps) as TDeepPartial<T>;
+  } else if (type instanceof t.DictionaryType) {
+    return t.record(type.domain, tDeepPartial(type.codomain)) as TDeepPartial<T>;
+  } else if (type instanceof t.UnionType) {
+    return t.union(type.types.map(unionType => tDeepPartial(unionType))) as TDeepPartial<T>;
+  } else if (type instanceof t.IntersectionType) {
+    const types = type.types.map(intersectionType => tDeepPartial(intersectionType));
+    return (t.intersection(types as [t.Mixed, t.Mixed]) as unknown) as TDeepPartial<T>;
+  } else if (type instanceof t.ArrayType) {
+    return t.array(tDeepPartial(type.type)) as TDeepPartial<T>;
+  } else {
+    return type as TDeepPartial<T>;
+  }
+}
+
+function tDeepPartialProp(prop: any) {
+  if (typeHasProps(prop)) {
+    return tDeepPartial(prop);
+  } else if (typeIsArray(prop)) {
+    return t.array(tDeepPartialProp(prop.type));
+  } else {
+    return prop;
+  }
+}
+
+/**
+ * Mirrors EmbedOptions from Eris
+ */
+export const tEmbed = t.type({
+  title: tNullable(t.string),
+  description: tNullable(t.string),
+  url: tNullable(t.string),
+  timestamp: tNullable(t.string),
+  color: tNullable(t.number),
+  footer: tNullable(
+    t.type({
+      text: t.string,
+      icon_url: tNullable(t.string),
+      proxy_icon_url: tNullable(t.string),
+    }),
+  ),
+  image: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      proxy_url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  thumbnail: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      proxy_url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  video: tNullable(
+    t.type({
+      url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+  provider: tNullable(
+    t.type({
+      name: t.string,
+      url: tNullable(t.string),
+    }),
+  ),
+  fields: tNullable(
+    t.array(
+      t.type({
+        name: tNullable(t.string),
+        value: tNullable(t.string),
+        inline: tNullable(t.boolean),
+      }),
+    ),
+  ),
+  author: tNullable(
+    t.type({
+      name: t.string,
+      url: tNullable(t.string),
+      width: tNullable(t.number),
+      height: tNullable(t.number),
+    }),
+  ),
+});
 
 export function dropPropertiesByName(obj, propName) {
   if (obj.hasOwnProperty(propName)) delete obj[propName];
@@ -54,6 +190,40 @@ export function dropPropertiesByName(obj, propName) {
     }
   }
 }
+
+export const tAlphanumeric = new t.Type<string, string>(
+  "tAlphanumeric",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      return s.match(/\W/) ? t.failure(from, to, "String must be alphanumeric") : t.success(s);
+    }),
+  s => s,
+);
+
+export const tDateTime = new t.Type<string, string>(
+  "tDateTime",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      const parsed =
+        s.length === 10 ? moment(s, "YYYY-MM-DD") : s.length === 19 ? moment(s, "YYYY-MM-DD HH:mm:ss") : null;
+
+      return parsed && parsed.isValid() ? t.success(s) : t.failure(from, to, "Invalid datetime");
+    }),
+  s => s,
+);
+
+export const tDelayString = new t.Type<string, string>(
+  "tDelayString",
+  (s): s is string => typeof s === "string",
+  (from, to) =>
+    either.chain(t.string.validate(from, to), s => {
+      const ms = convertDelayStringToMS(s);
+      return ms === null ? t.failure(from, to, "Invalid delay string") : t.success(s);
+    }),
+  s => s,
+);
 
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
@@ -79,8 +249,23 @@ export function convertDelayStringToMS(str, defaultUnit = "m"): number {
   return ms;
 }
 
+export function convertMSToDelayString(ms: number): string {
+  let result = "";
+  let remaining = ms;
+  for (const [abbr, multiplier] of Object.entries(delayStringMultipliers)) {
+    if (multiplier <= remaining) {
+      const amount = Math.floor(remaining / multiplier);
+      result += `${amount}${abbr}`;
+      remaining -= amount * multiplier;
+    }
+
+    if (remaining === 0) break;
+  }
+  return result;
+}
+
 export function successMessage(str) {
-  return `👌 ${str}`;
+  return `<:zep_check:650361014180904971> ${str}`;
 }
 
 export function errorMessage(str) {
@@ -189,7 +374,7 @@ const urlRegex = /(\S+\.\S+)/g;
 const protocolRegex = /^[a-z]+:\/\//;
 
 export function getUrlsInString(str: string, unique = false): url.URL[] {
-  let matches = (str.match(urlRegex) || []).map(m => m[0]);
+  let matches = str.match(urlRegex) || [];
   if (unique) matches = Array.from(new Set(matches));
 
   return matches.reduce((urls, match) => {
@@ -216,15 +401,7 @@ export function getUrlsInString(str: string, unique = false): url.URL[] {
 
 export function getInviteCodesInString(str: string): string[] {
   const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite)\/([a-z0-9]+)/gi;
-  const inviteCodes = [];
-  let match;
-
-  // tslint:disable-next-line
-  while ((match = inviteCodeRegex.exec(str)) !== null) {
-    inviteCodes.push(match[1]);
-  }
-
-  return inviteCodes;
+  return Array.from(str.matchAll(inviteCodeRegex)).map(m => m[1]);
 }
 
 export const unicodeEmojiRegex = emojiRegex();
@@ -333,7 +510,7 @@ export function getRoleMentions(str: string) {
 }
 
 /**
- * Disables link previews in the given string by wrapping links in < >
+ * Disable link previews in the given string by wrapping links in < >
  */
 export function disableLinkPreviews(str: string): string {
   return str.replace(/(?<!<)(https?:\/\/\S+)/gi, "<$1>");
@@ -343,6 +520,17 @@ export function deactivateMentions(content: string): string {
   return content.replace(/@/g, "@\u200b");
 }
 
+/**
+ * Disable inline code in the given string by replacing backticks/grave accents with acute accents
+ * FIXME: Find a better way that keeps the grave accents? Can't use the code block approach here since it's just 1 character.
+ */
+export function disableInlineCode(content: string): string {
+  return content.replace(/`/g, "\u00b4");
+}
+
+/**
+ * Disable code blocks in the given string by adding invisible unicode characters between backticks
+ */
 export function disableCodeBlocks(content: string): string {
   return content.replace(/`/g, "`\u200b");
 }
@@ -768,6 +956,32 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   return null;
 }
 
+export async function resolveRoleId(bot: Client, guildId: string, value: string) {
+  if (value == null) {
+    return null;
+  }
+
+  // Role mention
+  const mentionMatch = value.match(/^<@&?(\d+)>$/);
+  if (mentionMatch) {
+    return mentionMatch[1];
+  }
+
+  // Role name
+  const roleList = await bot.getRESTGuildRoles(guildId);
+  const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
+  if (role[0]) {
+    return role[0].id;
+  }
+
+  // Role ID
+  const idMatch = value.match(/^\d+$/);
+  if (idMatch) {
+    return value;
+  }
+  return null;
+}
+
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
@@ -804,4 +1018,29 @@ export function verboseUserName(user: User | UnknownUser): string {
 
 export function verboseChannelMention(channel: GuildChannel): string {
   return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+}
+
+export function messageLink(message: Message): string;
+export function messageLink(guildId: string, channelId: string, messageId: string): string;
+export function messageLink(guildIdOrMessage: string | Message | null, channelId?: string, messageId?: string): string {
+  let guildId;
+  if (guildIdOrMessage == null) {
+    // Full arguments without a guild id -> DM/Group chat
+    guildId = "@me";
+  } else if (guildIdOrMessage instanceof Message) {
+    // Message object as the only argument
+    guildId = (guildIdOrMessage.channel as GuildChannel).guild?.id ?? "@me";
+    channelId = guildIdOrMessage.channel.id;
+    messageId = guildIdOrMessage.id;
+  } else {
+    // Full arguments with all IDs
+    guildId = guildIdOrMessage;
+  }
+
+  return `https://discordapp.com/channels/${guildId}/${channelId}/${messageId}`;
+}
+
+export function isValidEmbed(embed: any): boolean {
+  const result = decodeAndValidateStrict(tEmbed, embed);
+  return !(result instanceof StrictValidationError);
 }
