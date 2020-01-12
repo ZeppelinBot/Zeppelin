@@ -101,7 +101,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_alert")
-  async vcalertCmd(msg: Message, args: { member: Member; duration: number; reminder?: string }) {
+  async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
     const time = args.duration || 10 * MINUTES;
     const alertTime = moment().add(time, "millisecond");
     const body = args.reminder || "None";
@@ -184,9 +184,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const member = await resolveMember(this.bot, this.guild, userId);
 
     triggeredAlerts.forEach(alert => {
-      const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${
-        alert.body
-      }\`\n`;
+      const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
       sendWhere(this.guild, member, this.bot.getChannel(alert.channel_id) as TextableChannel, prepend);
       this.alerts.delete(alert.id);
     });
