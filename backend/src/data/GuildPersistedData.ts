@@ -5,7 +5,6 @@ import { getRepository, Repository } from "typeorm";
 export interface IPartialPersistData {
   roles?: string[];
   nickname?: string;
-  is_voice_muted?: boolean;
 }
 
 export class GuildPersistedData extends BaseGuildRepository {
@@ -29,7 +28,6 @@ export class GuildPersistedData extends BaseGuildRepository {
     const finalData: any = {};
     if (data.roles) finalData.roles = data.roles.join(",");
     if (data.nickname) finalData.nickname = data.nickname;
-    if (data.is_voice_muted != null) finalData.is_voice_muted = data.is_voice_muted ? 1 : 0;
 
     const existing = await this.find(userId);
     if (existing) {
