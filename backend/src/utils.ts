@@ -956,6 +956,32 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   return null;
 }
 
+export async function resolveRoleId(bot: Client, guildId: string, value: string){
+  if(value == null){
+    return null;
+  }
+
+  //role mention
+  const mentionMatch = value.match(/^<@&?(\d+)>$/);
+  if(mentionMatch){
+    return mentionMatch[1];
+  }
+
+  //role name
+  let roleList = await bot.getRESTGuildRoles(guildId);
+  let role = roleList.filter(x => x.name.toLocaleLowerCase() == value.toLocaleLowerCase());
+  if(role[0]){
+    return role[0].id;
+  }
+
+  //role ID
+  const idMatch = value.match(/^\d+$/);
+  if (idMatch) {
+    return value;
+  }
+  return null;
+}
+
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {

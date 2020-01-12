@@ -16,6 +16,7 @@ import {
   trimEmptyStartEndLines,
   trimIndents,
   UnknownUser,
+  resolveRoleId,
 } from "../utils";
 import { Invite, Member, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
@@ -235,6 +236,16 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
       logger.warn(`Slow user resolve (${rounded}ms): ${userResolvable}`);
     }
     return user;
+  }
+
+  /**
+   * Resolves a role from the passed string. The passed string can be a role ID, a role mention or a role name.
+   * In the event of duplicate role names, this function will return the first one it comes across.
+   * @param roleResolvable 
+   */
+  async resolveRoleId(roleResolvable: string): Promise<string> {
+    const roleId = await resolveRoleId(this.bot, this.guildId, roleResolvable);
+    return roleId;
   }
 
   /**
