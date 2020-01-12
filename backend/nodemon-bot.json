@@ -1,6 +1,0 @@
-{
-  "watch": ["src", "../shared/src"],
-  "ignore": ["src/api/*", "src/migrations/*"],
-  "ext": "ts",
-  "exec": "node -r ts-node/register -r tsconfig-paths/register ./src/index.ts"
-}

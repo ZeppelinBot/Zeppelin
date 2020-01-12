@@ -6,9 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "esnext",
+    "target": "es2018",
     "lib": [
-      "es2017",
       "esnext"
     ],
     "baseUrl": ".",
@@ -19,7 +18,8 @@
       "@shared/*": [
         "../shared/src/*"
       ]
-    }
+    },
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts"

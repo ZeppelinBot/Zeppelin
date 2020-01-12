@@ -29,6 +29,7 @@ import {
   get,
   getInviteCodesInString,
   isSnowflake,
+  messageLink,
   MINUTES,
   multiSorter,
   noop,
@@ -56,6 +57,9 @@ import { getCurrentUptime } from "../uptime";
 import LCL from "last-commit-log";
 import * as t from "io-ts";
 import { ICommandDefinition } from "knub-command-manager";
+import path from "path";
+import escapeStringRegexp from "escape-string-regexp";
+import safeRegex from "safe-regex";
 
 const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -71,16 +75,20 @@ const ConfigSchema = t.type({
   can_vcmove: t.boolean,
   can_help: t.boolean,
   can_about: t.boolean,
+  can_context: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const { performance } = require("perf_hooks");
 
 const SEARCH_RESULTS_PER_PAGE = 15;
+const SEARCH_ID_RESULTS_PER_PAGE = 50;
+
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5000;
 const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
+const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 
@@ -88,9 +96,13 @@ type MemberSearchParams = {
   query?: string;
   role?: string;
   voice?: boolean;
+  bot?: boolean;
   sort?: string;
   "case-sensitive"?: boolean;
+  regex?: boolean;
 };
+
+class SearchError extends Error {}
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "utility";
@@ -124,6 +136,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_vcmove: false,
         can_help: false,
         can_about: false,
+        can_context: false,
       },
       overrides: [
         {
@@ -138,6 +151,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             can_nickname: true,
             can_vcmove: true,
             can_help: true,
+            can_context: true,
           },
         },
         {
@@ -177,7 +191,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "counts",
-        type: "bool",
+        isSwitch: true,
       },
       {
         name: "sort",
@@ -320,18 +334,27 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchingMembers = matchingMembers.filter(m => m.voiceState.channelID != null);
     }
 
+    if (args.bot) {
+      matchingMembers = matchingMembers.filter(m => m.bot);
+    }
+
     if (args.query) {
-      const query = args["case-sensitive"] ? args.query.trimStart() : args.query.toLowerCase().trimStart();
+      let queryRegex: RegExp;
+      if (args.regex) {
+        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
+      } else {
+        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
+      }
+
+      if (!safeRegex(queryRegex)) {
+        throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
+      }
 
       matchingMembers = matchingMembers.filter(member => {
-        const nick = args["case-sensitive"] ? member.nick : member.nick && member.nick.toLowerCase();
+        if (member.nick && member.nick.match(queryRegex)) return true;
 
-        const fullUsername = args["case-sensitive"]
-          ? `${member.user.username}#${member.user.discriminator}`
-          : `${member.user.username}#${member.user.discriminator}`.toLowerCase();
-
-        if (nick && nick.indexOf(query) !== -1) return true;
-        if (fullUsername.indexOf(query) !== -1) return true;
+        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+        if (fullUsername.match(queryRegex)) return true;
 
         return false;
       });
@@ -344,15 +367,18 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
     } else {
       matchingMembers.sort(
-        multiSorter([[m => m.username.toLowerCase(), realSortDir], [m => m.discriminator, realSortDir]]),
+        multiSorter([
+          [m => m.username.toLowerCase(), realSortDir],
+          [m => m.discriminator, realSortDir],
+        ]),
       );
     }
 
-    const lastPage = Math.ceil(matchingMembers.length / SEARCH_RESULTS_PER_PAGE);
+    const lastPage = Math.max(1, Math.ceil(matchingMembers.length / perPage));
     page = Math.min(lastPage, Math.max(1, page));
 
-    const from = (page - 1) * SEARCH_RESULTS_PER_PAGE;
-    const to = Math.min(from + SEARCH_RESULTS_PER_PAGE, matchingMembers.length);
+    const from = (page - 1) * perPage;
+    const to = Math.min(from + perPage, matchingMembers.length);
 
     const pageMembers = matchingMembers.slice(from, to);
 
@@ -371,15 +397,23 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "page",
+        shortcut: "p",
         type: "number",
       },
       {
         name: "role",
+        shortcut: "r",
         type: "string",
       },
       {
         name: "voice",
-        type: "bool",
+        shortcut: "v",
+        isSwitch: true,
+      },
+      {
+        name: "bot",
+        shortcut: "b",
+        isSwitch: true,
       },
       {
         name: "sort",
@@ -393,6 +427,15 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       {
         name: "export",
         shortcut: "e",
+        isSwitch: true,
+      },
+      {
+        name: "ids",
+        isSwitch: true,
+      },
+      {
+        name: "regex",
+        shortcut: "re",
         isSwitch: true,
       },
     ],
@@ -417,15 +460,18 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg: Message,
     args: {
       query?: string;
-      role?: string;
       page?: number;
+      role?: string;
       voice?: boolean;
+      bot?: boolean;
       sort?: string;
       "case-sensitive"?: boolean;
       export?: boolean;
+      ids?: boolean;
+      regex?: boolean;
     },
   ) {
-    const formatSearchResultLines = (members: Member[]) => {
+    const formatSearchResultList = (members: Member[]): string => {
       const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
       const lines = members.map(member => {
         const paddedId = member.id.padEnd(longestId, " ");
@@ -433,23 +479,38 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (member.nick) line += ` (${member.nick})`;
         return line;
       });
-      return lines;
+      return lines.join("\n");
+    };
+
+    const formatSearchResultIdList = (members: Member[]): string => {
+      return members.map(m => m.id).join(" ");
     };
 
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
-      const results = await this.performMemberSearch(args, 1, Infinity);
+      let results;
+      try {
+        results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
+      } catch (e) {
+        if (e instanceof SearchError) {
+          return this.sendErrorMessage(msg.channel, e.message);
+        }
+
+        throw e;
+      }
+
       if (results.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
 
-      const resultLines = formatSearchResultLines(results.results);
+      const resultList = args.ids ? formatSearchResultIdList(results.results) : formatSearchResultList(results.results);
+
       const archiveId = await this.archives.create(
         trimLines(`
         Search results (total ${results.totalResults}):
 
-        ${resultLines.join("\n")}
+        ${resultList}
       `),
         moment().add(1, "hour"),
       );
@@ -468,6 +529,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     let clearReactionsFn = null;
     let clearReactionsTimeout = null;
 
+    const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
+
     const loadSearchPage = async page => {
       if (searching) return;
       searching = true;
@@ -482,23 +545,37 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         searchMsgPromise.then(m => (originalSearchMsg = m));
       }
 
-      const searchResult = await this.performMemberSearch(args, page, SEARCH_RESULTS_PER_PAGE);
+      let searchResult;
+      try {
+        searchResult = await this.performMemberSearch(args, page, perPage);
+      } catch (e) {
+        if (e instanceof SearchError) {
+          return this.sendErrorMessage(msg.channel, e.message);
+        }
+
+        throw e;
+      }
+
       if (searchResult.totalResults === 0) {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
 
       const resultWord = searchResult.totalResults === 1 ? "matching member" : "matching members";
       const headerText =
-        searchResult.totalResults > SEARCH_RESULTS_PER_PAGE
+        searchResult.totalResults > perPage
           ? trimLines(`
             **Page ${searchResult.page}** (${searchResult.from}-${searchResult.to}) (total ${searchResult.totalResults})
           `)
           : `Found ${searchResult.totalResults} ${resultWord}`;
-      const lines = formatSearchResultLines(searchResult.results);
+
+      const resultList = args.ids
+        ? formatSearchResultIdList(searchResult.results)
+        : formatSearchResultList(searchResult.results);
+
       const result = trimLines(`
         ${headerText}
         \`\`\`js
-        ${lines.join("\n")}
+        ${resultList}
         \`\`\`
       `);
 
@@ -506,7 +583,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       searchMsg.edit(result);
 
       // Set up pagination reactions if needed. The reactions are cleared after a timeout.
-      if (searchResult.totalResults > SEARCH_RESULTS_PER_PAGE) {
+      if (searchResult.totalResults > perPage) {
         if (!hasReactions) {
           hasReactions = true;
           searchMsg.addReaction("⬅");
@@ -514,6 +591,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           searchMsg.addReaction("🔄");
 
           const removeListenerFn = this.on("messageReactionAdd", (rMsg: Message, emoji, userId) => {
+            if (rMsg.id !== searchMsg.id) return;
             if (userId !== msg.author.id) return;
             if (!["⬅", "➡", "🔄"].includes(emoji.name)) return;
 
@@ -571,6 +649,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       count: savedMessages.length,
       archiveUrl,
     });
+
+    return { archiveUrl };
   }
 
   @d.command("clean", "<count:number>", {
@@ -683,17 +763,19 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let responseMsg: Message;
     if (messagesToClean.length > 0) {
-      await this.cleanMessages(targetChannel, messagesToClean, msg.author);
+      const cleanResult = await this.cleanMessages(targetChannel, messagesToClean, msg.author);
 
       let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
-      if (targetChannel.id !== msg.channel.id) responseText += ` in <#${targetChannel.id}>`;
+      if (targetChannel.id !== msg.channel.id) {
+        responseText += ` in <#${targetChannel.id}>\n${cleanResult.archiveUrl}`;
+      }
 
       responseMsg = await msg.channel.createMessage(successMessage(responseText));
     } else {
       responseMsg = await msg.channel.createMessage(errorMessage(`Found no messages to clean!`));
     }
 
-    if (targetChannel.id !== msg.channel.id) {
+    if (targetChannel.id === msg.channel.id) {
       // Delete the !clean command and the bot response if a different channel wasn't specified
       // (so as not to spam the cleaned channel with the command itself)
       setTimeout(() => {
@@ -710,9 +792,16 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         basicUsage: "!info 106391128718245888",
       },
     },
+    options: [
+      {
+        name: "compact",
+        shortcut: "c",
+        isSwitch: true,
+      },
+    ],
   })
   @d.permission("can_info")
-  async infoCmd(msg: Message, args: { user?: User | UnknownUser }) {
+  async infoCmd(msg: Message, args: { user?: User | UnknownUser; compact?: boolean }) {
     const user = args.user || msg.author;
 
     let member;
@@ -734,15 +823,40 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       embed.title = `${user.username}#${user.discriminator}`;
       embed.thumbnail = { url: user.avatarURL };
 
-      embed.fields.push({
-        name: "User information",
-        value:
-          trimLines(`
-          ID: **${user.id}**
-          Profile: <@!${user.id}>
-          Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-        `) + embedPadding,
-      });
+      if (args.compact) {
+        embed.fields.push({
+          name: "User information",
+          value: trimLines(`
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `),
+        });
+        if (member) {
+          const joinedAt = moment(member.joinedAt);
+          const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+            largest: 2,
+            round: true,
+          });
+          embed.fields[0].value += `\nJoined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`;
+        } else {
+          embed.fields.push({
+            name: "!!  USER IS NOT ON THE SERVER  !!",
+            value: embedPadding,
+          });
+        }
+        msg.channel.createMessage({ embed });
+        return;
+      } else {
+        embed.fields.push({
+          name: "User information",
+          value:
+            trimLines(`
+            ID: **${user.id}**
+            Profile: <@!${user.id}>
+            Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+            `) + embedPadding,
+        });
+      }
     } else {
       embed.title = `Unknown user`;
     }
@@ -782,7 +896,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         value: embedPadding,
       });
     }
-
     const cases = (await this.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
 
     if (cases.length > 0) {
@@ -994,7 +1107,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
 
     // Clean up test messages
-    this.bot.deleteMessages(messages[0].channel.id, messages.map(m => m.id)).catch(noop);
+    this.bot
+      .deleteMessages(
+        messages[0].channel.id,
+        messages.map(m => m.id),
+      )
+      .catch(noop);
   }
 
   @d.command("source", "<messageId:string>", {
@@ -1019,6 +1137,30 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const archiveId = await this.archives.create(source, moment().add(1, "hour"));
     const url = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
     msg.channel.createMessage(`Message source: ${url}`);
+  }
+
+  @d.command("context", "<channel:channel> <messageId:string>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Get a link to the context of the specified message",
+        basicUsage: "!context 94882524378968064 650391267720822785",
+      },
+    },
+  })
+  @d.permission("can_context")
+  async contextCmd(msg: Message, args: { channel: Channel; messageId: string }) {
+    if (!(args.channel instanceof TextChannel)) {
+      this.sendErrorMessage(msg.channel, "Channel must be a text channel");
+      return;
+    }
+
+    const previousMessage = (await this.bot.getMessages(args.channel.id, 1, args.messageId))[0];
+    if (!previousMessage) {
+      this.sendErrorMessage(msg.channel, "Message context not found");
+      return;
+    }
+
+    msg.channel.createMessage(messageLink(this.guildId, previousMessage.channel.id, previousMessage.id));
   }
 
   @d.command("vcmove", "<member:resolvedMember> <channel:string$>", {
@@ -1192,8 +1334,25 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const uptime = getCurrentUptime();
     const prettyUptime = humanizeDuration(uptime, { largest: 2, round: true });
 
-    const lcl = new LCL();
-    const lastCommit = await lcl.getLastCommit();
+    let lastCommit;
+
+    try {
+      // From project root
+      // FIXME: Store these paths properly somewhere
+      const lcl = new LCL(path.resolve(__dirname, "..", "..", ".."));
+      lastCommit = await lcl.getLastCommit();
+    } catch (e) {} // tslint:disable-line:no-empty
+
+    let lastUpdate;
+    let version;
+
+    if (lastCommit) {
+      lastUpdate = moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]");
+      version = lastCommit.shortHash;
+    } else {
+      lastUpdate = "?";
+      version = "?";
+    }
 
     const shard = this.bot.shards.get(this.bot.guildShardMap[this.guildId]);
 
@@ -1205,8 +1364,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const basicInfoRows = [
       ["Uptime", prettyUptime],
       ["Last reload", `${lastReload} ago`],
-      ["Last update", moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]")],
-      ["Version", lastCommit.shortHash],
+      ["Last update", lastUpdate],
+      ["Version", version],
       ["API latency", `${shard.latency}ms`],
     ];
 

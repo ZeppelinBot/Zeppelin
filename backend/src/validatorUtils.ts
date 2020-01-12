@@ -57,7 +57,7 @@ function getContextPath(context) {
 // tslint:enable
 
 export class StrictValidationError extends Error {
-  private errors;
+  private readonly errors;
 
   constructor(errors: string[]) {
     errors = Array.from(new Set(errors));
@@ -82,6 +82,17 @@ const report = fold((errors: any): StrictValidationError | void => {
 
   return new StrictValidationError(errorStrings);
 }, noop);
+
+export function validate(schema: t.Type<any>, value: any): StrictValidationError | null {
+  const validationResult = schema.decode(value);
+  return pipe(
+    validationResult,
+    fold(
+      err => report(validationResult),
+      result => null,
+    ),
+  );
+}
 
 /**
  * Decodes and validates the given value against the given schema while also disallowing extra properties

@@ -50,13 +50,14 @@ export class GuildReactionRoles extends BaseGuildRepository {
     await this.reactionRoles.delete(criteria);
   }
 
-  async add(channelId: string, messageId: string, emoji: string, roleId: string) {
+  async add(channelId: string, messageId: string, emoji: string, roleId: string, exclusive?: boolean) {
     await this.reactionRoles.insert({
       guild_id: this.guildId,
       channel_id: channelId,
       message_id: messageId,
       emoji,
       role_id: roleId,
+      is_exclusive: Boolean(exclusive),
     });
   }
 }

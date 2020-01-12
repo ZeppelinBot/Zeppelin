@@ -2,7 +2,7 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "esnext",
-    "target": "esnext",
+    "target": "es2018",
     "sourceMap": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
