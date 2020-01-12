@@ -1044,3 +1044,8 @@ export function isValidEmbed(embed: any): boolean {
   const result = decodeAndValidateStrict(tEmbed, embed);
   return !(result instanceof StrictValidationError);
 }
+
+const formatter = new Intl.NumberFormat("en-US");
+export function formatNumber(numberToFormat: number): string {
+  return formatter.format(numberToFormat);
+}
