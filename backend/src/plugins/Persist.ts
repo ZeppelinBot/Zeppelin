@@ -11,7 +11,6 @@ import * as t from "io-ts";
 const ConfigSchema = t.type({
   persisted_roles: t.array(t.string),
   persist_nicknames: t.boolean,
-  persist_voice_mutes: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -34,7 +33,6 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
       config: {
         persisted_roles: [],
         persist_nicknames: false,
-        persist_voice_mutes: false,
       },
     };
   }
@@ -64,11 +62,6 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
       persistData.nickname = member.nick;
     }
 
-    if (config.persist_voice_mutes && member.voiceState && member.voiceState.mute) {
-      persist = true;
-      persistData.is_voice_muted = true;
-    }
-
     if (persist) {
       this.persistedData.set(member.id, persistData);
     }
@@ -95,11 +88,6 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (config.persist_nicknames && persistedData.nickname) {
       restoredData.push("nickname");
       toRestore.nick = persistedData.nickname;
-    }
-
-    if (config.persist_voice_mutes && persistedData.is_voice_muted) {
-      restoredData.push("voice mute");
-      toRestore.mute = true;
     }
 
     if (restoredData.length) {
