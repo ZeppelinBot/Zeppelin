@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig, IGuildData } from "knub";
+import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig } from "knub";
 import { SimpleError } from "./SimpleError";
 
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
@@ -162,13 +162,15 @@ connect().then(async conn => {
       customArgumentTypes,
 
       sendSuccessMessageFn(channel, body) {
-        const guildId = channel instanceof TextChannel ? channel.guild.id : null;
-        const emoji = (guildId ? bot.getGuildData(guildId).config.success_emoji : null) ?? "default emoji here";
+        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const emoji = guildId ? bot.getGuildData(guildId).config.success_emoji : undefined;
         channel.createMessage(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
-        channel.createMessage(errorMessage(body));
+        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const emoji = guildId ? bot.getGuildData(guildId).config.error_emoji : undefined;
+        channel.createMessage(errorMessage(body, emoji));
       },
     },
   });
