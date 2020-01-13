@@ -62,6 +62,7 @@ import path from "path";
 import escapeStringRegexp from "escape-string-regexp";
 import safeRegex from "safe-regex";
 import fs from "fs";
+import sharp from "sharp";
 
 import { Url, URL, URLSearchParams } from "url";
 const ConfigSchema = t.type({
@@ -1444,35 +1445,70 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_jumbo")
-  async jumboCmd(msg: Message, args: {emoji: string}){
-    let config = this.getConfig();
-        
-    //get emoji url
-    let emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
-    let results = emojiRegex.exec(args.emoji);
-    let url = "https://cdn.discordapp.com/emojis/";
-    let name;
-    switch(results[1]){
-      case "<:":
-        url += `${results[2]}.png`;
-        name = "emoji.png"
-        break;
-      case "<a:":
-        url += `${results[2]}.gif`;
-        name = "emoji.gif"
-        break;
-      default:
-        return;
-    }
-    let downloadedEmoji = await downloadFile(url);
-    let buf = await fsp.readFile(downloadedEmoji.path);
-    //resize image here
+  async jumboCmd(msg: Message, args: { emoji: string }) {
+    // Get emoji url
+    const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
+    const results = emojiRegex.exec(args.emoji);
+    const config = this.getConfig();
+    let extention;
+    let file;
 
-    let file = {
-      name: name,
-      file: buf,
-    };
+    if (results) {
+      let url = "https://cdn.discordapp.com/emojis/";
+      switch (results[1]) {
+        case "<:":
+          extention = ".png";
+          break;
+        case "<a:":
+          extention = ".gif";
+          break;
+      }
+      url += `${results[2]}${extention}`;
+      if (extention === ".png") {
+        const image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+        file = {
+          name: `emoji${extention}`,
+          file: image,
+        };
+      } else {
+        const image = await this.getBufferFromUrl(url);
+        file = {
+          name: `emoji${extention}`,
+          file: image,
+        };
+      }
+    } else {
+      const regexAstralSymbols = /[Dd][C-Fc-f][0-9A-Fa-f]{2}/g;
+
+      let emojiArray = [];
+      for (let i = 0; i < args.emoji.length; i++) {
+        const char = args.emoji.codePointAt(i).toString(16);
+        if (!regexAstralSymbols.test(char)) {
+          emojiArray = emojiArray.concat(args.emoji.codePointAt(i).toString(16));
+        }
+      }
+      const result = emojiArray.join(`-`);
+      const url = `https://twemoji.maxcdn.com/2/72x72/${result}.png`;
+      const image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+      file = {
+        name: `emoji.png`,
+        file: image,
+      };
+    }
     msg.channel.createMessage("", file);
     return;
+  }
+
+  async resizeBuffer(input: Buffer, width: number, height: number): Promise<Buffer> {
+    return sharp(input)
+      .resize(width, height, {
+        fit: "inside",
+      })
+      .toBuffer();
+  }
+
+  async getBufferFromUrl(url: string): Promise<Buffer> {
+    const downloadedEmoji = await downloadFile(url);
+    return fsp.readFile(downloadedEmoji.path);
   }
 }
