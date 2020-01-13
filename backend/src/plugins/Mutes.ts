@@ -37,6 +37,7 @@ const ConfigSchema = t.type({
   message_channel: tNullable(t.string),
   mute_message: tNullable(t.string),
   timed_mute_message: tNullable(t.string),
+  update_mute_message: tNullable(t.string),
 
   can_view_list: t.boolean,
   can_cleanup: t.boolean,
@@ -86,6 +87,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         message_channel: null,
         mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
         timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
+        update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
 
         can_view_list: false,
         can_cleanup: false,
@@ -144,6 +146,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const user = await this.resolveUser(userId);
     const member = await this.getMember(user.id, true); // Grab the fresh member so we don't have stale role info
+    const config = this.getMatchingConfig({ member, userId });
 
     if (member) {
       // Apply mute role if it's missing
@@ -169,29 +172,31 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       await this.mutes.updateExpiryTime(user.id, muteTime);
     } else {
       await this.mutes.addMute(user.id, muteTime);
+    }
 
-      // If it's a new mute, attempt to message the user
-      const config = this.getMatchingConfig({ member, userId });
-      const template = muteTime ? config.timed_mute_message : config.mute_message;
+    const template = existingMute
+      ? config.update_mute_message
+      : muteTime
+      ? config.timed_mute_message
+      : config.mute_message;
 
-      const muteMessage =
-        template &&
-        (await renderTemplate(template, {
-          guildName: this.guild.name,
-          reason,
-          time: timeUntilUnmute,
-        }));
+    const muteMessage =
+      template &&
+      (await renderTemplate(template, {
+        guildName: this.guild.name,
+        reason,
+        time: timeUntilUnmute,
+      }));
 
-      if (reason && muteMessage) {
-        if (user instanceof User) {
-          notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
-            useDM: config.dm_on_mute,
-            useChannel: config.message_on_mute,
-            channelId: config.message_channel,
-          });
-        } else {
-          notifyResult = { status: NotifyUserStatus.Failed };
-        }
+    if (reason && muteMessage) {
+      if (user instanceof User) {
+        notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
+          useDM: config.dm_on_mute,
+          useChannel: config.message_on_mute,
+          channelId: config.message_channel,
+        });
+      } else {
+        notifyResult = { status: NotifyUserStatus.Failed };
       }
     }
 
