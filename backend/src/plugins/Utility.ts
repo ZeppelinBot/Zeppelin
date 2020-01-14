@@ -64,6 +64,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import safeRegex from "safe-regex";
 import fs from "fs";
 import sharp from "sharp";
+import twemoji from "twemoji";
 
 import { Url, URL, URLSearchParams } from "url";
 const ConfigSchema = t.type({
@@ -99,6 +100,7 @@ const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
 const fsp = fs.promises;
+const CDN_URL = "https://twemoji.maxcdn.com/2/svg";
 
 type MemberSearchParams = {
   query?: string;
@@ -1481,21 +1483,16 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_jumbo")
   async jumboCmd(msg: Message, args: { emoji: string }) {
     // Get emoji url
+    const config = this.getConfig();
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
-    const config = this.getConfig();
-    let extention;
+    let extention = ".png";
     let file;
 
     if (results) {
       let url = "https://cdn.discordapp.com/emojis/";
-      switch (results[1]) {
-        case "<:":
-          extention = ".png";
-          break;
-        case "<a:":
-          extention = ".gif";
-          break;
+      if (results[1] === "<a:") {
+        extention = ".gif";
       }
       url += `${results[2]}${extention}`;
       if (extention === ".png") {
@@ -1512,17 +1509,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         };
       }
     } else {
-      const regexAstralSymbols = /[Dd][C-Fc-f][0-9A-Fa-f]{2}/g;
-
-      let emojiArray = [];
-      for (let i = 0; i < args.emoji.length; i++) {
-        const char = args.emoji.codePointAt(i).toString(16);
-        if (!regexAstralSymbols.test(char)) {
-          emojiArray = emojiArray.concat(args.emoji.codePointAt(i).toString(16));
-        }
-      }
-      const result = emojiArray.join(`-`);
-      const url = `https://twemoji.maxcdn.com/2/72x72/${result}.png`;
+      const url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
       const image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
       file = {
         name: `emoji.png`,
@@ -1534,7 +1521,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   async resizeBuffer(input: Buffer, width: number, height: number): Promise<Buffer> {
-    return sharp(input)
+    return sharp(input, { density: 800 })
       .resize(width, height, {
         fit: "inside",
       })
