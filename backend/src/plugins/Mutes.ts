@@ -188,7 +188,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         time: timeUntilUnmute,
       }));
 
-    if (reason && muteMessage) {
+    if ((reason && muteMessage) || existingMute) {
       if (user instanceof User) {
         notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
           useDM: config.dm_on_mute,
