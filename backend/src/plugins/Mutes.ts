@@ -33,7 +33,9 @@ const ConfigSchema = t.type({
   move_to_voice_channel: tNullable(t.string),
 
   dm_on_mute: t.boolean,
+  dm_on_update: t.boolean,
   message_on_mute: t.boolean,
+  message_on_update: t.boolean,
   message_channel: tNullable(t.string),
   mute_message: tNullable(t.string),
   timed_mute_message: tNullable(t.string),
@@ -83,7 +85,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         move_to_voice_channel: null,
 
         dm_on_mute: false,
+        dm_on_update: false,
         message_on_mute: false,
+        message_on_update: false,
         message_channel: null,
         mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
         timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
@@ -137,7 +141,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
-    const timeUntilUnmute = muteTime && humanizeDuration(muteTime);
+    const timeUntilUnmute = muteTime ? muteTime && humanizeDuration(muteTime) : "indefinite";
 
     // No mod specified -> mark Zeppelin as the mod
     if (!caseArgs.modId) {
@@ -184,22 +188,23 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       template &&
       (await renderTemplate(template, {
         guildName: this.guild.name,
-        reason,
+        reason: reason || reason === "" ? "None" : reason,
         time: timeUntilUnmute,
       }));
 
-    if ((reason && muteMessage) || existingMute) {
+    if (muteMessage) {
+      const useDm = existingMute ? config.dm_on_update : config.dm_on_mute;
+      const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
       if (user instanceof User) {
         notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
-          useDM: config.dm_on_mute,
-          useChannel: config.message_on_mute,
+          useDM: useDm.valueOf(),
+          useChannel: useChannel.valueOf(),
           channelId: config.message_channel,
         });
       } else {
         notifyResult = { status: NotifyUserStatus.Failed };
       }
     }
-
     // Create/update a case
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     let theCase;
