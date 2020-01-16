@@ -197,8 +197,8 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
       if (user instanceof User) {
         notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
-          useDM: useDm.valueOf(),
-          useChannel: useChannel.valueOf(),
+          useDM: useDm,
+          useChannel,
           channelId: config.message_channel,
         });
       } else {
