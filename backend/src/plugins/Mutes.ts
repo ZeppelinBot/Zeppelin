@@ -141,7 +141,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) return;
 
-    const timeUntilUnmute = muteTime ? muteTime && humanizeDuration(muteTime) : "indefinite";
+    const timeUntilUnmute = muteTime ? humanizeDuration(muteTime) : "indefinite";
 
     // No mod specified -> mark Zeppelin as the mod
     if (!caseArgs.modId) {
