@@ -1489,6 +1489,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_jumbo")
+  @d.cooldown(5 * SECONDS)
   async jumboCmd(msg: Message, args: { emoji: string }) {
     // Get emoji url
     const config = this.getConfig();
