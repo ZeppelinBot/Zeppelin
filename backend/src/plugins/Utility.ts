@@ -92,6 +92,7 @@ const ConfigSchema = t.type({
   can_context: t.boolean,
   can_jumbo: t.boolean,
   jumbo_size: t.Integer,
+  can_avatar: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -157,6 +158,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_context: false,
         can_jumbo: false,
         jumbo_size: 128,
+        can_avatar: false,
       },
       overrides: [
         {
@@ -173,6 +175,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             can_help: true,
             can_context: true,
             can_jumbo: true,
+            can_avatar: true,
           },
         },
         {
@@ -1535,6 +1538,28 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
     msg.channel.createMessage("", file);
     return;
+  }
+
+  @d.command("avatar", "[user:resolvedUserLoose]", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Retrieves a users profile picture",
+      },
+    },
+  })
+  @d.permission("can_avatar")
+  async avatarCmd(msg: Message, args: { user?: User | UnknownUser }) {
+    const user = args.user || msg.author;
+    if (!(user instanceof UnknownUser)) {
+      const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
+      const embed: EmbedOptions = {
+        image: { url: avatarUrl + ".png?size=2048" },
+      };
+      embed.title = `Avatar of ${user.username}#${user.discriminator}:`;
+      msg.channel.createMessage({ embed });
+    } else {
+      this.sendErrorMessage(msg.channel, "Invalid user ID");
+    }
   }
 
   async resizeBuffer(input: Buffer, width: number, height: number): Promise<Buffer> {
