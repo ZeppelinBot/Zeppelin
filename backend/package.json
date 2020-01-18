@@ -20,6 +20,8 @@
     "test-watch": "tsc-watch --onSuccess \"npx ava\""
   },
   "dependencies": {
+    "@types/sharp": "^0.23.1",
+    "@types/twemoji": "^12.1.0",
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
@@ -49,10 +51,12 @@
     "reflect-metadata": "^0.1.12",
     "safe-regex": "^2.0.2",
     "seedrandom": "^3.0.1",
+    "sharp": "^0.23.4",
     "tlds": "^1.203.1",
     "tmp": "0.0.33",
     "transliteration": "^2.1.7",
     "tsconfig-paths": "^3.9.0",
+    "twemoji": "^12.1.4",
     "typeorm": "^0.2.14",
     "uuid": "^3.3.2"
   },
@@ -63,7 +67,7 @@
     "@types/js-yaml": "^3.12.1",
     "@types/lodash.at": "^4.6.3",
     "@types/moment-timezone": "^0.5.6",
-    "@types/node": "^12.7.5",
+    "@types/node": "^12.12.24",
     "@types/passport": "^1.0.0",
     "@types/passport-oauth2": "^1.4.8",
     "@types/passport-strategy": "^0.2.35",

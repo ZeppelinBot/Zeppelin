@@ -43,6 +43,7 @@ import {
   successMessage,
   trimLines,
   UnknownUser,
+  downloadFile,
 } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -61,7 +62,19 @@ import { ICommandDefinition } from "knub-command-manager";
 import path from "path";
 import escapeStringRegexp from "escape-string-regexp";
 import safeRegex from "safe-regex";
+import fs from "fs";
+import sharp from "sharp";
+import twemoji from "twemoji";
 
+declare global {
+  // This is here so TypeScript doesn't give an error when importing twemoji
+  // since one of the signatures of twemoji.parse() takes an HTMLElement but
+  // we're not in a browser environment so including the DOM lib would not make
+  // sense
+  type HTMLElement = unknown;
+}
+
+import { Url, URL, URLSearchParams } from "url";
 const ConfigSchema = t.type({
   can_roles: t.boolean,
   can_level: t.boolean,
@@ -77,6 +90,8 @@ const ConfigSchema = t.type({
   can_help: t.boolean,
   can_about: t.boolean,
   can_context: t.boolean,
+  can_jumbo: t.boolean,
+  jumbo_size: t.Integer,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -92,6 +107,8 @@ const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full membe
 const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
+const fsp = fs.promises;
+const CDN_URL = "https://twemoji.maxcdn.com/2/svg";
 
 type MemberSearchParams = {
   query?: string;
@@ -138,6 +155,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_help: false,
         can_about: false,
         can_context: false,
+        can_jumbo: false,
+        jumbo_size: 128,
       },
       overrides: [
         {
@@ -153,6 +172,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
             can_vcmove: true,
             can_help: true,
             can_context: true,
+            can_jumbo: true,
           },
         },
         {
@@ -1459,5 +1479,74 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     msg.channel.createMessage("Reloading...");
     this.knub.reloadGuild(this.guildId);
+  }
+
+  @d.command("jumbo", "<emoji:string>", {
+    extra: {
+      info: <CommandInfo>{
+        description: "Makes an emoji jumbo",
+      },
+    },
+  })
+  @d.permission("can_jumbo")
+  @d.cooldown(5 * SECONDS)
+  async jumboCmd(msg: Message, args: { emoji: string }) {
+    // Get emoji url
+    const config = this.getConfig();
+    const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
+    const results = emojiRegex.exec(args.emoji);
+    let extention = ".png";
+    let file;
+
+    if (results) {
+      let url = "https://cdn.discordapp.com/emojis/";
+      if (results[1] === "<a:") {
+        extention = ".gif";
+      }
+      url += `${results[2]}${extention}`;
+      if (extention === ".png") {
+        const image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+        file = {
+          name: `emoji${extention}`,
+          file: image,
+        };
+      } else {
+        const image = await this.getBufferFromUrl(url);
+        file = {
+          name: `emoji${extention}`,
+          file: image,
+        };
+      }
+    } else {
+      let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
+      let image;
+      try {
+        image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+      } catch {
+        if (url.toLocaleLowerCase().endsWith("fe0f.svg")) {
+          url = url.slice(0, url.lastIndexOf("-fe0f")) + ".svg";
+          image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+        }
+      }
+      file = {
+        name: `emoji.png`,
+        file: image,
+      };
+    }
+    msg.channel.createMessage("", file);
+    return;
+  }
+
+  async resizeBuffer(input: Buffer, width: number, height: number): Promise<Buffer> {
+    return sharp(input, { density: 800 })
+      .resize(width, height, {
+        fit: "inside",
+      })
+      .toBuffer();
+  }
+
+  async getBufferFromUrl(url: string): Promise<Buffer> {
+    const downloadedEmoji = await downloadFile(url);
+    return fsp.readFile(downloadedEmoji.path);
   }
 }
