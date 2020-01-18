@@ -8,8 +8,7 @@
     "emitDecoratorMetadata": true,
     "target": "es2018",
     "lib": [
-      "esnext",
-      "DOM"
+      "esnext"
     ],
     "baseUrl": ".",
     "resolveJsonModule": true,

@@ -66,6 +66,14 @@ import fs from "fs";
 import sharp from "sharp";
 import twemoji from "twemoji";
 
+declare global {
+  // This is here so TypeScript doesn't give an error when importing twemoji
+  // since one of the signatures of twemoji.parse() takes an HTMLElement but
+  // we're not in a browser environment so including the DOM lib would not make
+  // sense
+  type HTMLElement = unknown;
+}
+
 import { Url, URL, URLSearchParams } from "url";
 const ConfigSchema = t.type({
   can_roles: t.boolean,
