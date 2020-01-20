@@ -44,6 +44,7 @@ import {
   trimLines,
   UnknownUser,
   downloadFile,
+  memoize,
 } from "../utils";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -103,8 +104,8 @@ const SEARCH_ID_RESULTS_PER_PAGE = 50;
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
-const CLEAN_COMMAND_DELETE_DELAY = 5000;
-const MEMBER_REFRESH_FREQUENCY = 10 * 60 * 1000; // How often to do a full member refresh when using !search or !roles --counts
+const CLEAN_COMMAND_DELETE_DELAY = 5 * SECONDS;
+const MEMBER_REFRESH_FREQUENCY = 10 * MINUTES; // How often to do a full member refresh when using commands that need it
 const SEARCH_EXPORT_LIMIT = 1_000_000;
 
 const activeReloads: Map<string, TextChannel> = new Map();
@@ -137,6 +138,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
 
   protected lastFullMemberRefresh = 0;
+  protected fullMemberRefreshPromise;
   protected lastReload;
 
   public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
@@ -206,9 +208,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   protected async refreshMembersIfNeeded() {
-    if (Date.now() < this.lastFullMemberRefresh + MEMBER_REFRESH_FREQUENCY) return;
-    await this.guild.fetchAllMembers();
+    if (Date.now() < this.lastFullMemberRefresh + MEMBER_REFRESH_FREQUENCY) {
+      return this.fullMemberRefreshPromise;
+    }
+
     this.lastFullMemberRefresh = Date.now();
+    this.fullMemberRefreshPromise = this.guild.fetchAllMembers();
+
+    return this.fullMemberRefreshPromise;
   }
 
   @d.command("roles", "[search:string$]", {
@@ -1022,7 +1029,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   })
   @d.permission("can_server")
   async serverCmd(msg: Message) {
-    await this.guild.fetchAllMembers();
+    await this.refreshMembersIfNeeded();
 
     const embed: EmbedOptions = {
       fields: [],
@@ -1051,16 +1058,34 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       `) + embedPadding,
     });
 
-    const onlineMemberCount = this.guild.members.filter(m => m.status !== "offline").length;
+    const restGuild = await memoize(
+      () => this.bot.getRESTGuild(this.guildId),
+      `getRESTGuild_${this.guildId}`,
+      10 * MINUTES,
+    );
+
+    // For servers with a vanity URL, we can use the numbers from the invite for online count
+    // (which is nowadays usually more accurate for large servers)
+    const invite = this.guild.vanityURL
+      ? await memoize(
+          () => this.bot.getInvite(this.guild.vanityURL, true),
+          `getInvite_${this.guild.vanityURL}`,
+          10 * MINUTES,
+        )
+      : null;
+
+    const totalMembers = invite ? invite.memberCount : this.guild.memberCount;
+
+    const onlineMemberCount = invite
+      ? invite.presenceCount
+      : this.guild.members.filter(m => m.status !== "offline").length;
     const offlineMemberCount = this.guild.memberCount - onlineMemberCount;
 
     const onlineStatusMemberCount = this.guild.members.filter(m => m.status === "online").length;
     const dndStatusMemberCount = this.guild.members.filter(m => m.status === "dnd").length;
     const idleStatusMemberCount = this.guild.members.filter(m => m.status === "idle").length;
 
-    const restGuild = await this.bot.getRESTGuild(this.guildId);
-
-    let memberCountTotalLines = `Total: **${formatNumber(this.guild.memberCount)}**`;
+    let memberCountTotalLines = `Total: **${formatNumber(totalMembers)}**`;
     if (restGuild.maxMembers) {
       memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
     }
