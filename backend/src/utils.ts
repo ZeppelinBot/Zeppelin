@@ -1049,3 +1049,30 @@ const formatter = new Intl.NumberFormat("en-US");
 export function formatNumber(numberToFormat: number): string {
   return formatter.format(numberToFormat);
 }
+
+interface IMemoizedItem {
+  createdAt: number;
+  value: any;
+}
+
+const memoizeCache: Map<any, IMemoizedItem> = new Map();
+export function memoize<T>(fn: (...args: any[]) => T, key?, time?): T {
+  const realKey = key ?? fn;
+
+  if (memoizeCache.has(realKey)) {
+    const memoizedItem = memoizeCache.get(realKey);
+    if (!time || memoizedItem.createdAt > Date.now() - time) {
+      return memoizedItem.value;
+    }
+
+    memoizeCache.delete(realKey);
+  }
+
+  const value = fn();
+  memoizeCache.set(realKey, {
+    createdAt: Date.now(),
+    value,
+  });
+
+  return value;
+}
