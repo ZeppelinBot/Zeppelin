@@ -1051,11 +1051,12 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       `) + embedPadding,
     });
 
-    const onlineMembers = this.guild.members.filter(m => m.status === "online");
-    const dndMembers = this.guild.members.filter(m => m.status === "dnd");
-    const idleMembers = this.guild.members.filter(m => m.status === "idle");
-    const offlineMembers = this.guild.members.filter(m => m.status === "offline");
-    const notOfflineMembers = this.guild.members.filter(m => m.status !== "offline");
+    const onlineMemberCount = this.guild.members.filter(m => m.status !== "offline").length;
+    const offlineMemberCount = this.guild.memberCount - onlineMemberCount;
+
+    const onlineStatusMemberCount = this.guild.members.filter(m => m.status === "online").length;
+    const dndStatusMemberCount = this.guild.members.filter(m => m.status === "dnd").length;
+    const idleStatusMemberCount = this.guild.members.filter(m => m.status === "idle").length;
 
     const restGuild = await this.bot.getRESTGuild(this.guildId);
 
@@ -1064,7 +1065,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
     }
 
-    let memberCountOnlineLines = `Online: **${formatNumber(notOfflineMembers.length)}**`;
+    let memberCountOnlineLines = `Online: **${formatNumber(onlineMemberCount)}**`;
     if (restGuild.maxPresences) {
       memberCountOnlineLines += `\nMax online: ${formatNumber(restGuild.maxPresences)}`;
     }
@@ -1075,10 +1076,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       value: trimLines(`
         ${memberCountTotalLines}
         ${memberCountOnlineLines}
-        Offline: **${formatNumber(offlineMembers.length)}**
-        <:zep_online:665907874450636810> Online: **${formatNumber(onlineMembers.length)}**
-        <:zep_idle:665908128331726848> Idle: **${formatNumber(idleMembers.length)}**
-        <:zep_dnd:665908138741858365> DND: **${formatNumber(dndMembers.length)}**
+        Offline: **${formatNumber(offlineMemberCount)}**
+        <:zep_online:665907874450636810> Online: **${formatNumber(onlineStatusMemberCount)}**
+        <:zep_idle:665908128331726848> Idle: **${formatNumber(idleStatusMemberCount)}**
+        <:zep_dnd:665908138741858365> DND: **${formatNumber(dndStatusMemberCount)}**
       `),
     });
 
