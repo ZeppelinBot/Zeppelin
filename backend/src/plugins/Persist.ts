@@ -83,7 +83,7 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
       const rolesToRestore = intersection(persistedRoles, persistedData.roles);
       if (rolesToRestore.length) {
         restoredData.push("roles");
-        toRestore.roles = rolesToRestore;
+        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles]));
       }
     }
 
