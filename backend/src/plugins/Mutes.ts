@@ -188,7 +188,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       template &&
       (await renderTemplate(template, {
         guildName: this.guild.name,
-        reason: reason || reason === "" ? "None" : reason,
+        reason: !reason || reason === "" ? "None" : reason,
         time: timeUntilUnmute,
       }));
 
