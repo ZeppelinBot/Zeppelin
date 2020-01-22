@@ -28,6 +28,7 @@ import { GuildConfigReloader } from "./GuildConfigReloader";
 import { ChannelArchiverPlugin } from "./ChannelArchiver";
 import { AutomodPlugin } from "./Automod";
 import { RolesPlugin } from "./Roles";
+import { AutoDeletePlugin } from "./AutoDelete";
 
 /**
  * Plugins available to be loaded for individual guilds
@@ -60,6 +61,7 @@ export const availablePlugins = [
   LocatePlugin,
   ChannelArchiverPlugin,
   RolesPlugin,
+  AutoDeletePlugin,
 ];
 
 /**
