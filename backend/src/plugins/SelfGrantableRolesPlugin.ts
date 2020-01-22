@@ -316,15 +316,11 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const mentionRoles = this.getConfig().mention_roles;
-    const addedRolesStr = Array.from(rolesToAdd.values()).map(r => (mentionRoles ? `${r.id}` : `**${r.name}**`));
+    const addedRolesStr = Array.from(rolesToAdd.values()).map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`));
     const addedRolesWord = rolesToAdd.size === 1 ? "role" : "roles";
 
     const messageParts = [];
-    messageParts.push(
-      `Granted you the ${
-        mentionRoles ? `<@&` + addedRolesStr.join(">, <@&") + `>` : addedRolesStr.join(", ")
-      } ${addedRolesWord}`,
-    );
+    messageParts.push(`Granted you the ${addedRolesStr.join(", ")} ${addedRolesWord}`);
 
     if (skipped.size || removed.size) {
       const skippedRolesStr = skipped.size
