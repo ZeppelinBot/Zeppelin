@@ -1092,7 +1092,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     let memberCountOnlineLines = `Online: **${formatNumber(onlineMemberCount)}**`;
     if (restGuild.maxPresences) {
-      memberCountOnlineLines += `\nMax online: ${formatNumber(restGuild.maxPresences)}`;
+      memberCountOnlineLines += `\nMax online: **${formatNumber(restGuild.maxPresences)}**`;
     }
 
     embed.fields.push({
