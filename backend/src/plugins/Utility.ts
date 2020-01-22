@@ -120,6 +120,7 @@ type MemberSearchParams = {
   sort?: string;
   "case-sensitive"?: boolean;
   regex?: boolean;
+  "status-search"?: boolean;
 };
 
 class SearchError extends Error {}
@@ -381,14 +382,24 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
       }
 
-      matchingMembers = matchingMembers.filter(member => {
-        if (member.nick && member.nick.match(queryRegex)) return true;
+      if (args["status-search"]) {
+        matchingMembers = matchingMembers.filter(member => {
+          if (member.game) {
+            if (member.game.name && member.game.name.match(queryRegex)) return true;
+            if (member.game.state && member.game.state.match(queryRegex)) return true;
+          }
+          return false;
+        });
+      } else {
+        matchingMembers = matchingMembers.filter(member => {
+          if (member.nick && member.nick.match(queryRegex)) return true;
 
-        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (fullUsername.match(queryRegex)) return true;
+          const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+          if (fullUsername.match(queryRegex)) return true;
 
-        return false;
-      });
+          return false;
+        });
+      }
     }
 
     const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
@@ -469,6 +480,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         shortcut: "re",
         isSwitch: true,
       },
+      {
+        name: "status-search",
+        shortcut: "ss",
+        isSwitch: true,
+      },
     ],
     extra: {
       info: <CommandInfo>{
@@ -500,6 +516,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       export?: boolean;
       ids?: boolean;
       regex?: boolean;
+      "status-search"?: boolean;
     },
   ) {
     const formatSearchResultList = (members: Member[]): string => {
