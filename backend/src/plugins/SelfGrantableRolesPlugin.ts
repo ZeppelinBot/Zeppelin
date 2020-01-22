@@ -17,6 +17,7 @@ type TSelfGrantableRoleEntry = t.TypeOf<typeof SelfGrantableRoleEntry>;
 
 const ConfigSchema = t.type({
   entries: t.record(t.string, SelfGrantableRoleEntry),
+  mention_roles: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -89,6 +90,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     return {
       config: {
         entries: {},
+        mention_roles: false,
       },
     };
   }
@@ -313,20 +315,27 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    const addedRolesStr = Array.from(rolesToAdd.values()).map(r => `**${r.name}**`);
+    const mentionRoles = this.getConfig().mention_roles;
+    const addedRolesStr = Array.from(rolesToAdd.values()).map(r => (mentionRoles ? `${r.id}` : `**${r.name}**`));
     const addedRolesWord = rolesToAdd.size === 1 ? "role" : "roles";
 
     const messageParts = [];
-    messageParts.push(`Granted you the ${addedRolesStr.join(", ")} ${addedRolesWord}`);
+    messageParts.push(
+      `Granted you the ${
+        mentionRoles ? `<@&` + addedRolesStr.join(">, <@&") + `>` : addedRolesStr.join(", ")
+      } ${addedRolesWord}`,
+    );
 
     if (skipped.size || removed.size) {
       const skippedRolesStr = skipped.size
         ? "skipped " +
           Array.from(skipped.values())
-            .map(r => `**${r.name}**`)
+            .map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
             .join(",")
         : null;
-      const removedRolesStr = removed.size ? "removed " + Array.from(removed.values()).map(r => `**${r.name}**`) : null;
+      const removedRolesStr = removed.size
+        ? "removed " + Array.from(removed.values()).map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
+        : null;
 
       const skippedRemovedStr = [skippedRolesStr, removedRolesStr].filter(Boolean).join(" and ");
 
