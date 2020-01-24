@@ -902,7 +902,6 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    // Find the server member to unmute
     if (!memberToUnmute) {
       const isBanned = await this.isBanned(user.id);
       const prefix = this.guildConfig.prefix;

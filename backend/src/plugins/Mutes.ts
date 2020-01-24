@@ -314,7 +314,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       noteDetails.push(`Unmuted immediately`);
     }
     if (!existingMute) {
-      noteDetails.push(`Removed manual role mute`);
+      noteDetails.push(`Removed external mute`);
     }
 
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
