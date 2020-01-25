@@ -123,6 +123,13 @@ type MemberSearchParams = {
   "status-search"?: boolean;
 };
 
+type BanSearchParams = {
+  query?: string;
+  sort?: string;
+  "case-sensitive"?: boolean;
+  regex?: boolean;
+};
+
 class SearchError extends Error {}
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
@@ -342,6 +349,63 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
 
+  protected async performBanSearch(
+    args: BanSearchParams,
+    page = 1,
+    perPage = SEARCH_RESULTS_PER_PAGE,
+  ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+    let matchingBans = (await this.guild.getBans()).map(x => x.user);
+
+    if (args.query) {
+      let queryRegex: RegExp;
+      if (args.regex) {
+        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
+      } else {
+        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
+      }
+
+      if (!safeRegex(queryRegex)) {
+        throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
+      }
+
+      matchingBans = matchingBans.filter(user => {
+        const fullUsername = `${user.username}#${user.discriminator}`;
+        if (fullUsername.match(queryRegex)) return true;
+      });
+    }
+
+    const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+    const realSortDir = sortDir === "-" ? "DESC" : "ASC";
+
+    if (sortBy === "id") {
+      matchingBans.sort(sorter(m => BigInt(m.id), realSortDir));
+    } else {
+      matchingBans.sort(
+        multiSorter([
+          [m => m.username.toLowerCase(), realSortDir],
+          [m => m.discriminator, realSortDir],
+        ]),
+      );
+    }
+
+    const lastPage = Math.max(1, Math.ceil(matchingBans.length / perPage));
+    page = Math.min(lastPage, Math.max(1, page));
+
+    const from = (page - 1) * perPage;
+    const to = Math.min(from + perPage, matchingBans.length);
+
+    const pageMembers = matchingBans.slice(from, to);
+
+    return {
+      results: pageMembers,
+      totalResults: matchingBans.length,
+      page,
+      lastPage,
+      from: from + 1,
+      to,
+    };
+  }
+
   protected async performMemberSearch(
     args: MemberSearchParams,
     page = 1,
@@ -457,6 +521,21 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
+  protected formatSearchResultList(members: Member[]): string {
+    const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
+    const lines = members.map(member => {
+      const paddedId = member.id.padEnd(longestId, " ");
+      let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+      if (member.nick) line += ` (${member.nick})`;
+      return line;
+    });
+    return lines.join("\n");
+  }
+
+  protected formatSearchResultIdList(members: Member[]): string {
+    return members.map(m => m.id).join(" ");
+  }
+
   @d.command("search", "[query:string$]", {
     aliases: ["s"],
     options: [
@@ -542,21 +621,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       "status-search"?: boolean;
     },
   ) {
-    const formatSearchResultList = (members: Member[]): string => {
-      const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
-      const lines = members.map(member => {
-        const paddedId = member.id.padEnd(longestId, " ");
-        let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
-        if (member.nick) line += ` (${member.nick})`;
-        return line;
-      });
-      return lines.join("\n");
-    };
-
-    const formatSearchResultIdList = (members: Member[]): string => {
-      return members.map(m => m.id).join(" ");
-    };
-
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
@@ -575,7 +639,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         return this.sendErrorMessage(msg.channel, "No results found");
       }
 
-      const resultList = args.ids ? formatSearchResultIdList(results.results) : formatSearchResultList(results.results);
+      const resultList = args.ids
+        ? this.formatSearchResultIdList(results.results)
+        : this.formatSearchResultList(results.results);
 
       const archiveId = await this.archives.create(
         trimLines(`
@@ -640,8 +706,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           : `Found ${searchResult.totalResults} ${resultWord}`;
 
       const resultList = args.ids
-        ? formatSearchResultIdList(searchResult.results)
-        : formatSearchResultList(searchResult.results);
+        ? this.formatSearchResultIdList(searchResult.results)
+        : this.formatSearchResultList(searchResult.results);
 
       const result = trimLines(`
         ${headerText}
@@ -692,6 +758,67 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
 
     loadSearchPage(currentPage);
+  }
+
+  @d.command("bansearch", "[query:string$]", {
+    aliases: ["bs"],
+    options: [
+      {
+        name: "page",
+        shortcut: "p",
+        type: "number",
+      },
+      {
+        name: "sort",
+        type: "string",
+      },
+      {
+        name: "case-sensitive",
+        shortcut: "cs",
+        isSwitch: true,
+      },
+      {
+        name: "export",
+        shortcut: "e",
+        isSwitch: true,
+      },
+      {
+        name: "ids",
+        isSwitch: true,
+      },
+      {
+        name: "regex",
+        shortcut: "re",
+        isSwitch: true,
+      },
+    ],
+    extra: {
+      info: <CommandInfo>{
+        description: "Search banned users",
+        basicUsage: "!bansearch dragory",
+        optionDescriptions: {
+          sort:
+            "Change how the results are sorted. Possible values are 'id' and 'name'. Prefix with a dash, e.g. '-id', to reverse sorting.",
+          "case-sensitive": "By default, the search is case-insensitive. Use this to make it case-sensitive instead.",
+          export: "If set, the full search results are exported as an archive",
+        },
+      },
+    },
+  })
+  @d.permission("can_search")
+  async banSearchCmd(
+    msg: Message,
+    args: {
+      query?: string;
+      page?: number;
+      sort?: string;
+      "case-sensitive"?: boolean;
+      export?: boolean;
+      ids?: boolean;
+      regex?: boolean;
+    },
+  ) {
+    // TODO: implement command
   }
 
   async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
