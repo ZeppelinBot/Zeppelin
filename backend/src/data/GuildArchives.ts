@@ -71,10 +71,7 @@ export class GuildArchives extends BaseGuildRepository {
     return result.identifiers[0].id;
   }
 
-  async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt = null) {
-    if (expiresAt == null) expiresAt = moment().add(DEFAULT_EXPIRY_DAYS, "days");
-
-    const headerStr = await renderTemplate(MESSAGE_ARCHIVE_HEADER_FORMAT, { guild });
+  protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
     const msgLines = [];
     for (const msg of savedMessages) {
       const channel = guild.channels.get(msg.channel_id);
@@ -89,9 +86,27 @@ export class GuildArchives extends BaseGuildRepository {
       });
       msgLines.push(line);
     }
+    return msgLines;
+  }
+
+  async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt = null) {
+    if (expiresAt == null) expiresAt = moment().add(DEFAULT_EXPIRY_DAYS, "days");
+
+    const headerStr = await renderTemplate(MESSAGE_ARCHIVE_HEADER_FORMAT, { guild });
+    const msgLines = await this.renderLinesFromSavedMessages(savedMessages, guild);
     const messagesStr = msgLines.join("\n");
 
     return this.create([headerStr, messagesStr].join("\n\n"), expiresAt);
+  }
+
+  async addSavedMessagesToArchive(archiveId: string, savedMessages: SavedMessage[], guild: Guild) {
+    const msgLines = await this.renderLinesFromSavedMessages(savedMessages, guild);
+    const messagesStr = msgLines.join("\n");
+
+    const archive = await this.find(archiveId);
+    archive.body += "\n" + messagesStr;
+
+    await this.archives.update({ id: archiveId }, { body: archive.body });
   }
 
   getUrl(baseUrl, archiveId) {

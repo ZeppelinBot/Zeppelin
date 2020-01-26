@@ -26,7 +26,7 @@ import { CompanionChannelPlugin } from "./CompanionChannels";
 import { LocatePlugin } from "./LocateUser";
 import { GuildConfigReloader } from "./GuildConfigReloader";
 import { ChannelArchiverPlugin } from "./ChannelArchiver";
-import { AutomodPlugin } from "./Automod";
+import { AutomodPlugin } from "./Automod/Automod";
 import { RolesPlugin } from "./Roles";
 import { AutoDeletePlugin } from "./AutoDelete";
 

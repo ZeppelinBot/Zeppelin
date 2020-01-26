@@ -1,4 +1,4 @@
-import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "../ZeppelinPlugin";
 import * as t from "io-ts";
 import {
   convertDelayStringToMS,
@@ -15,109 +15,64 @@ import {
   SECONDS,
   stripObjectToScalars,
   tDeepPartial,
+  tDelayString,
   tNullable,
   UnknownUser,
   verboseChannelMention,
-} from "../utils";
-import { configUtils, CooldownManager } from "knub";
-import { Member, TextChannel } from "eris";
+} from "../../utils";
+import { configUtils, CooldownManager, IPluginOptions, decorators as d, logger } from "knub";
+import { Member, Message, TextChannel, User } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
-import { SimpleCache } from "../SimpleCache";
-import { Queue } from "../Queue";
-import { ModActionsPlugin } from "./ModActions";
-import { MutesPlugin } from "./Mutes";
-import { LogsPlugin } from "./Logs";
-import { LogType } from "../data/LogType";
-import { TSafeRegex } from "../validatorUtils";
-import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import { GuildArchives } from "../data/GuildArchives";
-import { GuildLogs } from "../data/GuildLogs";
-import { SavedMessage } from "../data/entities/SavedMessage";
+import { SimpleCache } from "../../SimpleCache";
+import { Queue } from "../../Queue";
+import { ModActionsPlugin } from "../ModActions";
+import { MutesPlugin } from "../Mutes";
+import { LogsPlugin } from "../Logs";
+import { LogType } from "../../data/LogType";
+import { TSafeRegex } from "../../validatorUtils";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildLogs } from "../../data/GuildLogs";
+import { SavedMessage } from "../../data/entities/SavedMessage";
 import moment from "moment-timezone";
-import { renderTemplate } from "../templateFormatter";
+import { renderTemplate } from "../../templateFormatter";
 import { transliterate } from "transliteration";
 import Timeout = NodeJS.Timeout;
+import { IMatchParams } from "knub/dist/configUtils";
+import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
+import {
+  AnySpamTriggerMatchResult,
+  AnyTriggerMatchResult,
+  BaseTextSpamTrigger,
+  MessageInfo,
+  OtherRecentAction,
+  OtherSpamTriggerMatchResult,
+  OtherTriggerMatchResult,
+  RecentAction,
+  RecentActionType,
+  RecentSpam,
+  Rule,
+  TBaseSpamTrigger,
+  TBaseTextSpamTrigger,
+  TextRecentAction,
+  TextSpamTriggerMatchResult,
+  TextTriggerMatchResult,
+  TextTriggerWithMultipleMatchTypes,
+  TMatchInvitesTrigger,
+  TMatchLinksTrigger,
+  TMatchRegexTrigger,
+  TMatchWordsTrigger,
+  TMemberJoinTrigger,
+  TRule,
+} from "./types";
+import { pluginInfo } from "./info";
 
-type MessageInfo = { channelId: string; messageId: string };
-
-type TextTriggerWithMultipleMatchTypes = {
-  match_messages: boolean;
-  match_embeds: boolean;
-  match_visible_names: boolean;
-  match_usernames: boolean;
-  match_nicknames: boolean;
-  match_custom_status: boolean;
-};
-
-interface TriggerMatchResult {
-  trigger: string;
-  type: string;
-}
-
-interface MessageTextTriggerMatchResult<T = any> extends TriggerMatchResult {
-  type: "message" | "embed";
-  str: string;
-  userId: string;
-  messageInfo: MessageInfo;
-  matchedValue: T;
-}
-
-interface OtherTextTriggerMatchResult<T = any> extends TriggerMatchResult {
-  type: "username" | "nickname" | "visiblename" | "customstatus";
-  str: string;
-  userId: string;
-  matchedValue: T;
-}
-
-type TextTriggerMatchResult<T = any> = MessageTextTriggerMatchResult<T> | OtherTextTriggerMatchResult<T>;
-
-interface TextSpamTriggerMatchResult extends TriggerMatchResult {
-  type: "textspam";
-  actionType: RecentActionType;
-  channelId: string;
-  userId: string;
-  messageInfos: MessageInfo[];
-}
-
-interface RaidSpamTriggerMatchResult extends TriggerMatchResult {
-  type: "raidspam";
-  actionType: RecentActionType;
-  channelId: string;
-  userIds: string[];
-  messageInfos: MessageInfo[];
-}
-
-interface OtherSpamTriggerMatchResult extends TriggerMatchResult {
-  type: "otherspam";
-  actionType: RecentActionType;
-  userId: string;
-}
-
-type AnyTriggerMatchResult =
-  | TextTriggerMatchResult
-  | TextSpamTriggerMatchResult
-  | RaidSpamTriggerMatchResult
-  | OtherSpamTriggerMatchResult;
+const unactioned = (action: TextRecentAction | OtherRecentAction) => !action.actioned;
 
 /**
- * CONFIG SCHEMA FOR TRIGGERS
+ * DEFAULTS
  */
 
-const MatchWordsTrigger = t.type({
-  words: t.array(t.string),
-  case_sensitive: t.boolean,
-  only_full_words: t.boolean,
-  normalize: t.boolean,
-  loose_matching: t.boolean,
-  loose_matching_threshold: t.number,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
-});
-type TMatchWordsTrigger = t.TypeOf<typeof MatchWordsTrigger>;
 const defaultMatchWordsTrigger: Partial<TMatchWordsTrigger> = {
   case_sensitive: false,
   only_full_words: true,
@@ -132,18 +87,6 @@ const defaultMatchWordsTrigger: Partial<TMatchWordsTrigger> = {
   match_custom_status: false,
 };
 
-const MatchRegexTrigger = t.type({
-  patterns: t.array(TSafeRegex),
-  case_sensitive: t.boolean,
-  normalize: t.boolean,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
-});
-type TMatchRegexTrigger = t.TypeOf<typeof MatchRegexTrigger>;
 const defaultMatchRegexTrigger: Partial<TMatchRegexTrigger> = {
   case_sensitive: false,
   normalize: false,
@@ -155,20 +98,6 @@ const defaultMatchRegexTrigger: Partial<TMatchRegexTrigger> = {
   match_custom_status: false,
 };
 
-const MatchInvitesTrigger = t.type({
-  include_guilds: tNullable(t.array(t.string)),
-  exclude_guilds: tNullable(t.array(t.string)),
-  include_invite_codes: tNullable(t.array(t.string)),
-  exclude_invite_codes: tNullable(t.array(t.string)),
-  allow_group_dm_invites: t.boolean,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
-});
-type TMatchInvitesTrigger = t.TypeOf<typeof MatchInvitesTrigger>;
 const defaultMatchInvitesTrigger: Partial<TMatchInvitesTrigger> = {
   allow_group_dm_invites: false,
   match_messages: true,
@@ -179,18 +108,6 @@ const defaultMatchInvitesTrigger: Partial<TMatchInvitesTrigger> = {
   match_custom_status: false,
 };
 
-const MatchLinksTrigger = t.type({
-  include_domains: tNullable(t.array(t.string)),
-  exclude_domains: tNullable(t.array(t.string)),
-  include_subdomains: t.boolean,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
-});
-type TMatchLinksTrigger = t.TypeOf<typeof MatchLinksTrigger>;
 const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
   include_subdomains: true,
   match_messages: true,
@@ -201,126 +118,14 @@ const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
   match_custom_status: false,
 };
 
-const BaseSpamTrigger = t.type({
-  amount: t.number,
-  within: t.string,
-});
-const BaseTextSpamTrigger = t.intersection([
-  BaseSpamTrigger,
-  t.type({
-    per_channel: t.boolean,
-  }),
-]);
-type TBaseTextSpamTrigger = t.TypeOf<typeof BaseTextSpamTrigger>;
 const defaultTextSpamTrigger: Partial<t.TypeOf<typeof BaseTextSpamTrigger>> = {
   per_channel: true,
 };
 
-const MessageSpamTrigger = BaseTextSpamTrigger;
-type TMessageSpamTrigger = t.TypeOf<typeof MessageSpamTrigger>;
-const MentionSpamTrigger = BaseTextSpamTrigger;
-type TMentionSpamTrigger = t.TypeOf<typeof MentionSpamTrigger>;
-const LinkSpamTrigger = BaseTextSpamTrigger;
-type TLinkSpamTrigger = t.TypeOf<typeof LinkSpamTrigger>;
-const AttachmentSpamTrigger = BaseTextSpamTrigger;
-type TAttachmentSpamTrigger = t.TypeOf<typeof AttachmentSpamTrigger>;
-const EmojiSpamTrigger = BaseTextSpamTrigger;
-type TEmojiSpamTrigger = t.TypeOf<typeof EmojiSpamTrigger>;
-const LineSpamTrigger = BaseTextSpamTrigger;
-type TLineSpamTrigger = t.TypeOf<typeof LineSpamTrigger>;
-const CharacterSpamTrigger = BaseTextSpamTrigger;
-type TCharacterSpamTrigger = t.TypeOf<typeof CharacterSpamTrigger>;
-const VoiceMoveSpamTrigger = BaseSpamTrigger;
-type TVoiceMoveSpamTrigger = t.TypeOf<typeof VoiceMoveSpamTrigger>;
-
-/**
- * CONFIG SCHEMA FOR ACTIONS
- */
-
-const CleanAction = t.boolean;
-
-const WarnAction = t.type({
-  reason: t.string,
-});
-
-const MuteAction = t.type({
-  duration: t.string,
-  reason: tNullable(t.string),
-});
-
-const KickAction = t.type({
-  reason: tNullable(t.string),
-});
-
-const BanAction = t.type({
-  reason: tNullable(t.string),
-});
-
-const AlertAction = t.type({
-  channel: t.string,
-  text: t.string,
-});
-
-const ChangeNicknameAction = t.type({
-  name: t.string,
-});
-
-const LogAction = t.boolean;
-
-const AddRolesAction = t.array(t.string);
-const RemoveRolesAction = t.array(t.string);
-
-/**
- * FULL CONFIG SCHEMA
- */
-
-const Rule = t.type({
-  enabled: t.boolean,
-  name: t.string,
-  presets: tNullable(t.array(t.string)),
-  triggers: t.array(
-    t.type({
-      match_words: tNullable(MatchWordsTrigger),
-      match_regex: tNullable(MatchRegexTrigger),
-      match_invites: tNullable(MatchInvitesTrigger),
-      match_links: tNullable(MatchLinksTrigger),
-      message_spam: tNullable(MessageSpamTrigger),
-      mention_spam: tNullable(MentionSpamTrigger),
-      link_spam: tNullable(LinkSpamTrigger),
-      attachment_spam: tNullable(AttachmentSpamTrigger),
-      emoji_spam: tNullable(EmojiSpamTrigger),
-      line_spam: tNullable(LineSpamTrigger),
-      character_spam: tNullable(CharacterSpamTrigger),
-      // voice_move_spam: tNullable(VoiceMoveSpamTrigger), // TODO
-      // TODO: Duplicates trigger
-    }),
-  ),
-  actions: t.type({
-    clean: tNullable(CleanAction),
-    warn: tNullable(WarnAction),
-    mute: tNullable(MuteAction),
-    kick: tNullable(KickAction),
-    ban: tNullable(BanAction),
-    alert: tNullable(AlertAction),
-    change_nickname: tNullable(ChangeNicknameAction),
-    log: tNullable(LogAction),
-    add_roles: tNullable(AddRolesAction),
-    remove_roles: tNullable(RemoveRolesAction),
-  }),
-  cooldown: tNullable(t.string),
-});
-type TRule = t.TypeOf<typeof Rule>;
-
-const ConfigSchema = t.type({
-  rules: t.record(t.string, Rule),
-});
-type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
-
-const PartialConfigSchema = tDeepPartial(ConfigSchema);
-
-/**
- * DEFAULTS
- */
+const defaultMemberJoinTrigger: Partial<TMemberJoinTrigger> = {
+  only_new: false,
+  new_threshold: "1h",
+};
 
 const defaultTriggers = {
   match_words: defaultMatchWordsTrigger,
@@ -334,165 +139,67 @@ const defaultTriggers = {
   emoji_spam: defaultTextSpamTrigger,
   line_spam: defaultTextSpamTrigger,
   character_spam: defaultTextSpamTrigger,
+  member_join: defaultMemberJoinTrigger,
 };
+
+/**
+ * CONFIG
+ */
+
+const ConfigSchema = t.type({
+  rules: t.record(t.string, Rule),
+  antiraid_levels: t.array(t.string),
+  can_set_antiraid: t.boolean,
+  can_view_antiraid: t.boolean,
+});
+type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+
+const PartialConfigSchema = tDeepPartial(ConfigSchema);
+
+interface ICustomOverrides {
+  antiraid_level: string;
+}
 
 /**
  * MISC
  */
 
-enum RecentActionType {
-  Message = 1,
-  Mention,
-  Link,
-  Attachment,
-  Emoji,
-  Line,
-  Character,
-  VoiceChannelMove,
-}
-
-interface BaseRecentAction {
-  identifier: string;
-  timestamp: number;
-  count: number;
-}
-
-type TextRecentAction = BaseRecentAction & {
-  type:
-    | RecentActionType.Message
-    | RecentActionType.Mention
-    | RecentActionType.Link
-    | RecentActionType.Attachment
-    | RecentActionType.Emoji
-    | RecentActionType.Line
-    | RecentActionType.Character;
-  messageInfo: MessageInfo;
-};
-
-type OtherRecentAction = BaseRecentAction & {
-  type: RecentActionType.VoiceChannelMove;
-};
-
-type RecentAction = (TextRecentAction | OtherRecentAction) & { expiresAt: number };
-
-const SPAM_GRACE_PERIOD_LENGTH = 10 * SECONDS;
+const RECENT_SPAM_EXPIRY_TIME = 30 * SECONDS;
 const RECENT_ACTION_EXPIRY_TIME = 2 * MINUTES;
 const MAX_RECENTLY_DELETED_MESSAGES = 10;
 const RECENT_NICKNAME_CHANGE_EXPIRY_TIME = 5 * MINUTES;
 
 const inviteCache = new SimpleCache(10 * MINUTES);
 
+const RAID_SPAM_IDENTIFIER = "raid";
+
 /**
  * General plugin flow:
- * - When a message is posted:
- *   1. Run logRecentActionsForMessage() -- used for detecting spam
- *   2. Run matchRuleToMessage() for each automod rule. This checks if any triggers in the rule match the message.
- *   3. If a rule matched, run applyActionsOnMatch() for that rule/match
+ *
+ * - Message based triggers:
+ * 	 1. matchRuleToMessage()
+ * 	 2. if match -> applyActionsOnMatch()
+ * 	 3. if spam -> clearTextSpamRecentActions()
+ *
+ * - Non-message based non-spam triggers:
+ * 	 1. bespoke match function
+ * 	 2. if match -> applyActionsOnMatch()
+ *
+ * - Non-message based spam triggers:
+ * 	 1. matchOtherSpamInRule()
+ * 	 2. if match -> applyActionsOnMatch()
+ * 	 3.          -> clearOtherSpamRecentActions()
+ *
+ * To log actions for spam detection, logRecentActionsForMessage() is called for each message, and several other events
+ * call addRecentAction() directly. These are then checked by matchRuleToMessage() and matchOtherSpamInRule() to detect
+ * spam.
  */
-export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverrides> {
   public static pluginName = "automod";
   public static configSchema = ConfigSchema;
   public static dependencies = ["mod_actions", "mutes", "logs"];
 
-  public static pluginInfo: PluginInfo = {
-    prettyName: "Automod",
-    description: trimPluginDescription(`
-      Allows specifying automated actions in response to triggers. Example use cases include word filtering and spam prevention.
-    `),
-    configurationGuide: trimPluginDescription(`
-      The automod plugin is very customizable. For a full list of available triggers, actions, and their options, see Config schema at the bottom of this page.    
-    
-      ### Simple word filter
-      Removes any messages that contain the word 'banana' and sends a warning to the user.
-      Moderators (level >= 50) are ignored by the filter based on the override.
-      
-      ~~~yml
-      automod:
-        config:
-          rules:
-            my_filter:
-              triggers:
-              - match_words:
-                  words: ['banana']
-                  case_sensitive: false
-                  only_full_words: true
-              actions:
-                clean: true
-                warn:
-                  reason: 'Do not talk about bananas!'
-        overrides:
-        - level: '>=50'
-          config:
-            rules:
-              my_filter:
-                enabled: false
-      ~~~
-      
-      ### Spam detection
-      This example includes 2 filters:
-      
-      - The first one is triggered if a user sends 5 messages within 10 seconds OR 3 attachments within 60 seconds.
-        The messages are deleted and the user is muted for 5 minutes.
-      - The second filter is triggered if a user sends more than 2 emoji within 5 seconds.
-        The messages are deleted but the user is not muted.
-      
-      Moderators are ignored by both filters based on the override.
-      
-      ~~~yml
-      automod:
-        config:
-          rules:
-            my_spam_filter:
-              triggers:
-              - message_spam:
-                  amount: 5
-                  within: 10s
-              - attachment_spam:
-                  amount: 3
-                  within: 60s
-              actions:
-                clean: true
-                mute:
-                  duration: 5m
-                  reason: 'Auto-muted for spam'
-            my_second_filter:
-              triggers:
-              - message_spam:
-                  amount: 5
-                  within: 10s
-              actions:
-                clean: true
-        overrides:
-        - level: '>=50'
-          config:
-            rules:
-              my_spam_filter:
-                enabled: false
-              my_second_filter:
-                enabled: false
-      ~~~
-      
-      ### Custom status alerts
-      This example sends an alert any time a user with a matching custom status sends a message.
-      
-      ~~~yml
-      automod:
-        config:
-          rules:
-            bad_custom_statuses:
-              triggers:
-              - match_words:
-                  words: ['banana']
-                  match_custom_status: true
-              actions:
-                alert:
-                  channel: "473087035574321152"
-                  text: |-
-                    Bad custom status on user <@!{user.id}>:
-                    {matchSummary}
-      ~~~
-    `),
-  };
+  public static pluginInfo = pluginInfo;
 
   protected unloaded = false;
 
@@ -503,14 +210,12 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected recentActions: RecentAction[];
   protected recentActionClearInterval: Timeout;
 
-  // After a spam trigger is tripped and the rule's action carried out, a short "grace period" will be placed on the user.
-  // During this grace period, if the user repeats the same type of recent action that tripped the rule, that message will
-  // be deleted and no further action will be carried out. This is mainly to account for the delay between the spam message
-  // being posted and the bot reacting to it, during which the user could keep posting more spam.
-  protected spamGracePeriods: Map<string, { expiresAt: number; deletedMessages: string[] }>; // Key = identifier-actionType
-  protected spamGracePriodClearInterval: Timeout;
-
-  protected recentlyDeletedMessages: string[];
+  // After a spam trigger is tripped and the rule's action carried out, a unique identifier is placed here so further
+  // spam (either messages that were sent before the bot managed to mute the user or, with global spam, other users
+  // continuing to spam) is "included" in the same match and doesn't generate duplicate cases or logs.
+  // Key: rule_name-match_identifier
+  protected recentSpam: Map<string, RecentSpam>;
+  protected recentSpamClearInterval: Timeout;
 
   protected recentNicknameChanges: Map<string, { expiresAt: number }>;
   protected recentNicknameChangesClearInterval: Timeout;
@@ -522,6 +227,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
   protected guildLogs: GuildLogs;
+  protected antiraidLevels: GuildAntiraidLevels;
+
+  protected loadedAntiraidLevel: boolean;
+  protected cachedAntiraidLevel: string | null;
 
   protected static preprocessStaticConfig(config: t.TypeOf<typeof PartialConfigSchema>) {
     if (config.rules) {
@@ -558,22 +267,43 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     return config;
   }
 
-  public static getStaticDefaultOptions() {
+  public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema, ICustomOverrides> {
     return {
-      rules: [],
+      config: {
+        rules: {},
+        antiraid_levels: ["low", "medium", "high"],
+        can_set_antiraid: false,
+        can_view_antiraid: false,
+      },
+      overrides: [
+        {
+          level: ">=50",
+          config: {
+            can_view_antiraid: true,
+          },
+        },
+        {
+          level: ">=100",
+          config: {
+            can_set_antiraid: true,
+          },
+        },
+      ],
     };
   }
 
-  protected onLoad() {
+  protected matchCustomOverrideCriteria(criteria: ICustomOverrides, matchParams: IMatchParams) {
+    return matchParams?.extra?.antiraid_level && matchParams.extra.antiraid_level === this.cachedAntiraidLevel;
+  }
+
+  protected async onLoad() {
     this.automodQueue = new Queue();
 
     this.recentActions = [];
     this.recentActionClearInterval = setInterval(() => this.clearOldRecentActions(), 1 * MINUTES);
 
-    this.spamGracePeriods = new Map();
-    this.spamGracePriodClearInterval = setInterval(() => this.clearExpiredGracePeriods(), 1 * SECONDS);
-
-    this.recentlyDeletedMessages = [];
+    this.recentSpam = new Map();
+    this.recentSpamClearInterval = setInterval(() => this.clearExpiredRecentSpam(), 1 * SECONDS);
 
     this.recentNicknameChanges = new Map();
     this.recentNicknameChangesClearInterval = setInterval(() => this.clearExpiredRecentNicknameChanges(), 30 * SECONDS);
@@ -583,6 +313,9 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.archives = GuildArchives.getGuildInstance(this.guildId);
     this.guildLogs = new GuildLogs(this.guildId);
+    this.antiraidLevels = GuildAntiraidLevels.getGuildInstance(this.guildId);
+
+    this.cachedAntiraidLevel = await this.antiraidLevels.get();
 
     this.onMessageCreateFn = msg => this.onMessageCreate(msg);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
@@ -604,7 +337,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.unloaded = true;
     this.savedMessages.events.off("create", this.onMessageCreateFn);
     clearInterval(this.recentActionClearInterval);
-    clearInterval(this.spamGracePriodClearInterval);
+    clearInterval(this.recentSpamClearInterval);
     clearInterval(this.recentNicknameChangesClearInterval);
   }
 
@@ -731,11 +464,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     recentActionType: RecentActionType,
     trigger: TBaseTextSpamTrigger,
     msg: SavedMessage,
-  ): Partial<TextSpamTriggerMatchResult> {
+  ): Omit<TextSpamTriggerMatchResult, "trigger" | "rule"> {
     const since = moment.utc(msg.posted_at).valueOf() - convertDelayStringToMS(trigger.within);
-    const recentActions = trigger.per_channel
-      ? this.getMatchingRecentActions(recentActionType, `${msg.channel_id}-${msg.user_id}`, since)
-      : this.getMatchingRecentActions(recentActionType, msg.user_id, since);
+    const identifier = trigger.per_channel ? `${msg.channel_id}-${msg.user_id}` : msg.user_id;
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since);
     const totalCount = recentActions.reduce((total, action) => {
       return total + action.count;
     }, 0);
@@ -744,9 +476,31 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       return {
         type: "textspam",
         actionType: recentActionType,
-        channelId: trigger.per_channel ? msg.channel_id : null,
-        messageInfos: recentActions.map(action => (action as TextRecentAction).messageInfo),
-        userId: msg.user_id,
+        recentActions: recentActions as TextRecentAction[],
+        identifier,
+      };
+    }
+
+    return null;
+  }
+
+  protected matchOtherSpamTrigger(
+    recentActionType: RecentActionType,
+    trigger: TBaseSpamTrigger,
+    identifier: string | null,
+  ): Omit<OtherSpamTriggerMatchResult, "trigger" | "rule"> {
+    const since = moment.utc().valueOf() - convertDelayStringToMS(trigger.within);
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since) as OtherRecentAction[];
+    const totalCount = recentActions.reduce((total, action) => {
+      return total + action.count;
+    }, 0);
+
+    if (totalCount >= trigger.amount) {
+      return {
+        type: "otherspam",
+        actionType: recentActionType,
+        recentActions,
+        identifier,
       };
     }
 
@@ -758,7 +512,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg: SavedMessage,
     matchFn: (str: string) => T | Promise<T> | null,
   ): Promise<Partial<TextTriggerMatchResult<T>>> {
-    const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id };
+    const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
     const member = this.guild.members.get(msg.user_id);
 
     if (trigger.match_messages) {
@@ -877,37 +631,71 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       if (trigger.message_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Message, trigger.message_spam, msg);
-        if (match) return { ...match, trigger: "message_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "message_spam" };
       }
 
       if (trigger.mention_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Mention, trigger.mention_spam, msg);
-        if (match) return { ...match, trigger: "mention_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "mention_spam" };
       }
 
       if (trigger.link_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Link, trigger.link_spam, msg);
-        if (match) return { ...match, trigger: "link_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "link_spam" };
       }
 
       if (trigger.attachment_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Attachment, trigger.attachment_spam, msg);
-        if (match) return { ...match, trigger: "attachment_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "attachment_spam" };
       }
 
       if (trigger.emoji_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Emoji, trigger.emoji_spam, msg);
-        if (match) return { ...match, trigger: "emoji_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "emoji_spam" };
       }
 
       if (trigger.line_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Line, trigger.line_spam, msg);
-        if (match) return { ...match, trigger: "line_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "line_spam" };
       }
 
       if (trigger.character_spam) {
         const match = this.matchTextSpamTrigger(RecentActionType.Character, trigger.character_spam, msg);
-        if (match) return { ...match, trigger: "character_spam" } as TextSpamTriggerMatchResult;
+        if (match) return { ...match, rule, trigger: "character_spam" };
+      }
+    }
+
+    return null;
+  }
+
+  protected async matchOtherSpamInRule(rule: TRule, userId: string): Promise<OtherSpamTriggerMatchResult> {
+    if (!rule.enabled) return;
+
+    for (const trigger of rule.triggers) {
+      if (trigger.member_join_spam) {
+        const match = this.matchOtherSpamTrigger(RecentActionType.MemberJoin, trigger.member_join_spam, null);
+        if (match) return { ...match, rule, trigger: "member_join_spam" };
+      }
+    }
+
+    return null;
+  }
+
+  protected async matchMemberJoinTriggerInRule(rule: TRule, member: Member): Promise<OtherTriggerMatchResult> {
+    if (!rule.enabled) return;
+
+    const result: OtherTriggerMatchResult = { trigger: "member_join", type: "other", userId: member.id };
+
+    for (const trigger of rule.triggers) {
+      if (trigger.member_join) {
+        if (trigger.member_join.only_new) {
+          const threshold = Date.now() - convertDelayStringToMS(trigger.member_join.new_threshold);
+          if (member.createdAt >= threshold) {
+            return result;
+          }
+        } else {
+          return result;
+        }
       }
     }
 
@@ -915,21 +703,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   protected async addRecentMessageAction(action: TextRecentAction) {
-    const gracePeriodKey = `${action.identifier}-${action.type}`;
-    if (this.spamGracePeriods.has(gracePeriodKey)) {
-      // If we're on spam detection grace period, just delete the message
-      if (!this.recentlyDeletedMessages.includes(action.messageInfo.messageId)) {
-        this.bot.deleteMessage(action.messageInfo.channelId, action.messageInfo.messageId);
+    this.recentActions.push({
+      ...action,
+      expiresAt: Date.now() + RECENT_ACTION_EXPIRY_TIME,
+    });
+  }
 
-        this.recentlyDeletedMessages.push(action.messageInfo.messageId);
-        if (this.recentlyDeletedMessages.length > MAX_RECENTLY_DELETED_MESSAGES) {
-          this.recentlyDeletedMessages.splice(0, this.recentlyDeletedMessages.length - MAX_RECENTLY_DELETED_MESSAGES);
-        }
-      }
-
-      return;
-    }
-
+  protected async addRecentAction(action: OtherRecentAction) {
     this.recentActions.push({
       ...action,
       expiresAt: Date.now() + RECENT_ACTION_EXPIRY_TIME,
@@ -943,7 +723,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     const timestamp = moment.utc(msg.posted_at).valueOf();
     const globalIdentifier = msg.user_id;
     const perChannelIdentifier = `${msg.channel_id}-${msg.user_id}`;
-    const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id };
+    const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
 
     this.addRecentMessageAction({
       type: RecentActionType.Message,
@@ -1071,28 +851,16 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  protected getMatchingRecentActions(type: RecentActionType, identifier: string, since: number) {
+  protected getMatchingRecentActions(type: RecentActionType, identifier: string | null, since: number) {
     return this.recentActions.filter(action => {
-      return action.type === type && action.identifier === identifier && action.timestamp >= since;
+      return action.type === type && (!identifier || action.identifier === identifier) && action.timestamp >= since;
     });
   }
 
-  protected async activateGracePeriod(matchResult: TextSpamTriggerMatchResult) {
-    const expiresAt = Date.now() + SPAM_GRACE_PERIOD_LENGTH;
-
-    // Global identifier
-    this.spamGracePeriods.set(`${matchResult.userId}-${matchResult.actionType}`, { expiresAt, deletedMessages: [] });
-    // Per-channel identifier
-    this.spamGracePeriods.set(`${matchResult.channelId}-${matchResult.userId}-${matchResult.actionType}`, {
-      expiresAt,
-      deletedMessages: [],
-    });
-  }
-
-  protected async clearExpiredGracePeriods() {
-    for (const [key, info] of this.spamGracePeriods.entries()) {
+  protected async clearExpiredRecentSpam() {
+    for (const [key, info] of this.recentSpam.entries()) {
       if (info.expiresAt <= Date.now()) {
-        this.spamGracePeriods.delete(key);
+        this.recentSpam.delete(key);
       }
     }
   }
@@ -1111,12 +879,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  protected async clearSpecificRecentActions(type: RecentActionType, identifier: string) {
-    this.recentActions = this.recentActions.filter(info => {
-      return !(info.type === type && info.identifier === identifier);
-    });
-  }
-
   /**
    * Apply the actions of the specified rule on the matched message/member
    */
@@ -1125,26 +887,57 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    const matchSummary = this.getMatchSummary(matchResult);
+    const actionsTaken = [];
+
+    let recentSpamKey: string = null;
+    let recentSpam: RecentSpam = null;
+    let spamUserIdsToAction: string[] = [];
+
+    if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+      recentSpamKey = `${rule.name}-${matchResult.identifier}`;
+      recentSpam = this.recentSpam.get(recentSpamKey);
+
+      if (matchResult.type === "textspam") {
+        spamUserIdsToAction = matchResult.recentActions.map(action => action.messageInfo.userId);
+      } else if (matchResult.type === "otherspam") {
+        spamUserIdsToAction = matchResult.recentActions.map(action => action.userId);
+      }
+
+      spamUserIdsToAction = Array.from(new Set(spamUserIdsToAction)).filter(id => !recentSpam?.actionedUsers.has(id));
+    }
+
+    let archiveId = recentSpam?.archiveId;
+    if (matchResult.type === "textspam") {
+      const messageInfos = matchResult.recentActions.filter(unactioned).map(a => a.messageInfo);
+      if (messageInfos.length) {
+        const savedMessages = await this.savedMessages.getMultiple(messageInfos.map(info => info.messageId));
+
+        if (archiveId) {
+          await this.archives.addSavedMessagesToArchive(archiveId, savedMessages, this.guild);
+        } else {
+          archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
+        }
+      }
+    }
+
+    const matchSummary = this.getMatchSummary(matchResult, archiveId);
 
     let caseExtraNote = `Matched automod rule "${rule.name}"`;
     if (matchSummary) {
       caseExtraNote += `\n${matchSummary}`;
     }
 
-    const actionsTaken = [];
-
-    // Actions
     if (rule.actions.clean) {
-      const messagesToDelete: Array<{ channelId: string; messageId: string }> = [];
+      const messagesToDelete: MessageInfo[] = [];
 
       if (matchResult.type === "message" || matchResult.type === "embed") {
         messagesToDelete.push(matchResult.messageInfo);
-      } else if (matchResult.type === "textspam" || matchResult.type === "raidspam") {
-        messagesToDelete.push(...matchResult.messageInfos);
+      } else if (matchResult.type === "textspam") {
+        messagesToDelete.push(...matchResult.recentActions.filter(unactioned).map(a => a.messageInfo));
       }
 
       for (const { channelId, messageId } of messagesToDelete) {
+        await this.guildLogs.ignoreLog(LogType.MESSAGE_DELETE, messageId);
         await this.bot.deleteMessage(channelId, messageId).catch(noop);
       }
 
@@ -1159,21 +952,22 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         extraNotes: [caseExtraNote],
       };
 
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
-        const member = await this.getMember(matchResult.userId);
-        if (member) {
-          await this.getModActions().warnMember(member, reason, caseArgs);
-        }
-      } else if (matchResult.type === "raidspam") {
-        for (const userId of matchResult.userIds) {
-          const member = await this.getMember(userId);
-          if (member) {
-            await this.getModActions().warnMember(member, reason, caseArgs);
-          }
+      let membersToWarn = [];
+      if (matchResult.type === "message" || matchResult.type === "embed") {
+        membersToWarn = [await this.getMember(matchResult.userId)];
+      } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+        for (const id of spamUserIdsToAction) {
+          membersToWarn.push(await this.getMember(id));
         }
       }
 
-      actionsTaken.push("warn");
+      if (membersToWarn.length) {
+        for (const member of membersToWarn) {
+          await this.getModActions().warnMember(member, reason, caseArgs);
+        }
+
+        actionsTaken.push("warn");
+      }
     }
 
     if (rule.actions.mute) {
@@ -1184,15 +978,20 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         extraNotes: [caseExtraNote],
       };
 
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
-        await this.getMutes().muteUser(matchResult.userId, duration, reason, caseArgs);
-      } else if (matchResult.type === "raidspam") {
-        for (const userId of matchResult.userIds) {
-          await this.getMutes().muteUser(userId, duration, reason, caseArgs);
-        }
+      let userIdsToMute = [];
+      if (matchResult.type === "message" || matchResult.type === "embed") {
+        userIdsToMute = [matchResult.userId];
+      } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+        userIdsToMute.push(...spamUserIdsToAction);
       }
 
-      actionsTaken.push("mute");
+      if (userIdsToMute.length) {
+        for (const member of userIdsToMute) {
+          await this.getMutes().muteUser(member.id, duration, reason, caseArgs);
+        }
+
+        actionsTaken.push("mute");
+      }
     }
 
     if (rule.actions.kick) {
@@ -1202,21 +1001,22 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         extraNotes: [caseExtraNote],
       };
 
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
-        const member = await this.getMember(matchResult.userId);
-        if (member) {
-          await this.getModActions().kickMember(member, reason, caseArgs);
-        }
-      } else if (matchResult.type === "raidspam") {
-        for (const userId of matchResult.userIds) {
-          const member = await this.getMember(userId);
-          if (member) {
-            await this.getModActions().kickMember(member, reason, caseArgs);
-          }
+      let membersToKick = [];
+      if (matchResult.type === "message" || matchResult.type === "embed") {
+        membersToKick = [await this.getMember(matchResult.userId)];
+      } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+        for (const id of spamUserIdsToAction) {
+          membersToKick.push(await this.getMember(id));
         }
       }
 
-      actionsTaken.push("kick");
+      if (membersToKick.length) {
+        for (const member of membersToKick) {
+          await this.getModActions().kickMember(member, reason, caseArgs);
+        }
+
+        actionsTaken.push("kick");
+      }
     }
 
     if (rule.actions.ban) {
@@ -1226,19 +1026,27 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         extraNotes: [caseExtraNote],
       };
 
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "textspam") {
-        await this.getModActions().banUserId(matchResult.userId, reason, caseArgs);
-      } else if (matchResult.type === "raidspam") {
-        for (const userId of matchResult.userIds) {
-          await this.getModActions().banUserId(userId, reason, caseArgs);
-        }
+      let userIdsToBan = [];
+      if (matchResult.type === "message" || matchResult.type === "embed") {
+        userIdsToBan = [matchResult.userId];
+      } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+        userIdsToBan.push(...spamUserIdsToAction);
       }
 
-      actionsTaken.push("ban");
+      if (userIdsToBan.length) {
+        for (const userId of userIdsToBan) {
+          await this.getModActions().banUserId(userId, reason, caseArgs);
+        }
+
+        actionsTaken.push("ban");
+      }
     }
 
     if (rule.actions.change_nickname) {
-      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
+      const userIdsToChange =
+        matchResult.type === "textspam" || matchResult.type === "otherspam"
+          ? [...spamUserIdsToAction]
+          : [matchResult.userId];
 
       for (const userId of userIdsToChange) {
         if (this.recentNicknameChanges.has(userId)) continue;
@@ -1258,7 +1066,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     if (rule.actions.add_roles) {
-      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
+      const userIdsToChange =
+        matchResult.type === "textspam" || matchResult.type === "otherspam"
+          ? [...spamUserIdsToAction]
+          : [matchResult.userId];
+
       for (const userId of userIdsToChange) {
         const member = await this.getMember(userId);
         if (!member) continue;
@@ -1284,7 +1096,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     if (rule.actions.remove_roles) {
-      const userIdsToChange = matchResult.type === "raidspam" ? matchResult.userIds : [matchResult.userId];
+      const userIdsToChange =
+        matchResult.type === "textspam" || matchResult.type === "otherspam"
+          ? [...spamUserIdsToAction]
+          : [matchResult.userId];
+
       for (const userId of userIdsToChange) {
         const member = await this.getMember(userId);
         if (!member) continue;
@@ -1309,12 +1125,46 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       actionsTaken.push("remove roles");
     }
 
+    if (rule.actions.set_antiraid_level !== undefined) {
+      await this.setAntiraidLevel(rule.actions.set_antiraid_level);
+      actionsTaken.push("set antiraid level");
+    }
+
+    if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+      for (const action of matchResult.recentActions) {
+        action.actioned = true;
+      }
+
+      if (recentSpam) {
+        for (const id of spamUserIdsToAction) {
+          recentSpam.actionedUsers.add(id);
+        }
+      } else {
+        const newRecentSpamEntry: RecentSpam = {
+          actionedUsers: new Set(spamUserIdsToAction),
+          expiresAt: Date.now() + RECENT_SPAM_EXPIRY_TIME,
+          archiveId,
+        };
+        this.recentSpam.set(recentSpamKey, newRecentSpamEntry);
+      }
+    }
+
     // Don't wait for the rest before continuing to other automod items in the queue
     (async () => {
-      const user = matchResult.type !== "raidspam" ? this.getUser(matchResult.userId) : new UnknownUser();
-      const users = matchResult.type === "raidspam" ? matchResult.userIds.map(id => this.getUser(id)) : [];
-      const safeUser = stripObjectToScalars(user);
-      const safeUsers = users.map(u => stripObjectToScalars(u));
+      let user;
+      let users;
+      let safeUser;
+      let safeUsers;
+
+      if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+        users = spamUserIdsToAction.map(id => this.getUser(id));
+      } else {
+        user = this.getUser(matchResult.userId);
+        users = [user];
+      }
+
+      safeUser = user ? stripObjectToScalars(user) : null;
+      safeUsers = users.map(u => stripObjectToScalars(u));
 
       const logData = {
         rule: rule.name,
@@ -1323,6 +1173,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         actionsTaken: actionsTaken.length ? actionsTaken.join(", ") : "<none>",
         matchSummary,
       };
+
+      if (recentSpam && !spamUserIdsToAction.length) {
+        // This action was part of a recent spam match and we didn't find any new users to action i.e. the only users
+        // who triggered this match had already been actioned. In that case, we don't need to post any new log messages.
+        return;
+      }
+
       const logMessage = this.getLogs().getLogMessage(LogType.AUTOMOD_ACTION, logData);
 
       if (rule.actions.alert) {
@@ -1359,9 +1216,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected checkAndUpdateCooldown(rule: TRule, matchResult: AnyTriggerMatchResult): boolean {
     let cooldownKey = rule.name + "-";
 
-    if (matchResult.type === "textspam") {
-      cooldownKey += matchResult.channelId ? `${matchResult.channelId}-${matchResult.userId}` : matchResult.userId;
-    } else if (matchResult.type === "message" || matchResult.type === "embed") {
+    if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
+      logger.warn("Spam cooldowns are WIP and not currently functional");
+    }
+
+    if (matchResult.type === "message" || matchResult.type === "embed") {
       cooldownKey += matchResult.userId;
     } else if (
       matchResult.type === "username" ||
@@ -1369,8 +1228,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       matchResult.type === "visiblename" ||
       matchResult.type === "customstatus"
     ) {
-      cooldownKey += matchResult.userId;
-    } else if (matchResult.type === "otherspam") {
       cooldownKey += matchResult.userId;
     } else {
       cooldownKey = null;
@@ -1393,7 +1250,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
   /**
    * Returns a text summary for the match result for use in logs/alerts
    */
-  protected async getMatchSummary(matchResult: AnyTriggerMatchResult): Promise<string> {
+  protected async getMatchSummary(matchResult: AnyTriggerMatchResult, archiveId: string = null): Promise<string> {
     if (matchResult.type === "message" || matchResult.type === "embed") {
       const message = await this.savedMessages.find(matchResult.messageInfo.messageId);
       const channel = this.guild.channels.get(matchResult.messageInfo.channelId);
@@ -1403,9 +1260,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         Matched ${this.getMatchedValueText(matchResult)} in message in ${channelMention}:
         ${messageSummary(message)}
       `);
-    } else if (matchResult.type === "textspam" || matchResult.type === "raidspam") {
-      const savedMessages = await this.savedMessages.getMultiple(matchResult.messageInfos.map(i => i.messageId));
-      const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
+    } else if (matchResult.type === "textspam") {
       const baseUrl = this.knub.getGlobalConfig().url;
       const archiveUrl = this.archives.getUrl(baseUrl, archiveId);
 
@@ -1420,7 +1275,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
       return `Matched ${this.getMatchedValueText(matchResult)} in visible name: ${matchResult.str}`;
     } else if (matchResult.type === "customstatus") {
       return `Matched ${this.getMatchedValueText(matchResult)} in custom status: ${matchResult.str}`;
+    } else if (matchResult.type === "otherspam") {
+      return `Matched other spam`;
     }
+
+    return "";
   }
 
   /**
@@ -1465,5 +1324,86 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema> {
         }
       }
     });
+  }
+
+  /**
+   * When a new member joins, check for both join triggers and join spam triggers
+   */
+  @d.event("guildMemberAdd")
+  protected onMemberJoin(_, member: Member) {
+    if (member.user.bot) return;
+
+    this.automodQueue.add(async () => {
+      if (this.unloaded) return;
+
+      await this.addRecentAction({
+        identifier: RAID_SPAM_IDENTIFIER,
+        type: RecentActionType.MemberJoin,
+        userId: member.id,
+        timestamp: Date.now(),
+        count: 1,
+      });
+
+      const config = this.getConfigForMember(member);
+
+      for (const [name, rule] of Object.entries(config.rules)) {
+        const spamMatch = await this.matchOtherSpamInRule(rule, member.id);
+        if (spamMatch) {
+          await this.applyActionsOnMatch(rule, spamMatch);
+        }
+
+        const joinMatch = await this.matchMemberJoinTriggerInRule(rule, member);
+        if (joinMatch) {
+          await this.applyActionsOnMatch(rule, joinMatch);
+        }
+      }
+    });
+  }
+
+  protected async setAntiraidLevel(level: string | null, user?: User) {
+    this.cachedAntiraidLevel = null;
+    await this.antiraidLevels.set(null);
+
+    if (user) {
+      this.guildLogs.log(LogType.SET_ANTIRAID_USER, {
+        level: level ?? "off",
+        user: stripObjectToScalars(user),
+      });
+    } else {
+      this.guildLogs.log(LogType.SET_ANTIRAID_AUTO, {
+        level: level ?? "off",
+      });
+    }
+  }
+
+  @d.command("antiraid clear", [], {
+    aliases: ["antiraid reset", "antiraid none", "antiraid off"],
+  })
+  @d.permission("can_set_antiraid")
+  public async clearAntiraidCmd(msg: Message) {
+    await this.setAntiraidLevel(null, msg.author);
+    this.sendSuccessMessage(msg.channel, "Anti-raid turned off");
+  }
+
+  @d.command("antiraid", "<level:string>")
+  @d.permission("can_set_antiraid")
+  public async setAntiraidCmd(msg: Message, args: { level: string }) {
+    if (!this.getConfig().antiraid_levels.includes(args.level)) {
+      this.sendErrorMessage(msg.channel, "Unknown anti-raid level");
+      return;
+    }
+
+    await this.setAntiraidLevel(args.level, msg.author);
+    this.sendSuccessMessage(msg.channel, `Anti-raid set to **${args.level}**`);
+  }
+
+  @d.command("antiraid")
+  @d.permission("can_view_antiraid")
+  public async viewAntiraidCmd(msg: Message, args: { level: string }) {
+    if (this.cachedAntiraidLevel) {
+      msg.channel.createMessage(`Anti-raid is set to **${this.cachedAntiraidLevel}**`);
+    } else {
+      msg.channel.createMessage("Anti-raid is off!");
+    }
   }
 }

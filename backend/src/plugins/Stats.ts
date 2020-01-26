@@ -9,6 +9,8 @@ import escapeStringRegexp from "escape-string-regexp";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 
+//region TYPES
+
 const tBaseSource = t.type({
   name: tAlphanumeric,
   track: t.boolean,
@@ -50,7 +52,13 @@ const tConfigSchema = t.type({
 type TConfigSchema = t.TypeOf<typeof tConfigSchema>;
 const tPartialConfigSchema = tDeepPartial(tConfigSchema);
 
+//endregion
+//region CONSTANTS
+
 const DEFAULT_RETENTION_PERIOD = "4w";
+
+//endregion
+//region PLUGIN
 
 export class StatsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "stats";
@@ -71,20 +79,21 @@ export class StatsPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
-  protected static preprocessStaticConfig(config: t.TypeOf<typeof tPartialConfigSchema>) {
-    // TODO: Limit min period, min period start date
+  protected static applyDefaultsToSource(source: Partial<TSource>) {
+    if (source.track == null) {
+      source.track = true;
+    }
 
+    if (source.retention_period == null) {
+      source.retention_period = DEFAULT_RETENTION_PERIOD;
+    }
+  }
+
+  protected static preprocessStaticConfig(config: t.TypeOf<typeof tPartialConfigSchema>) {
     if (config.sources) {
       for (const [key, source] of Object.entries(config.sources)) {
         source.name = key;
-
-        if (source.track == null) {
-          source.track = true;
-        }
-
-        if (source.retention_period == null) {
-          source.retention_period = DEFAULT_RETENTION_PERIOD;
-        }
+        this.applyDefaultsToSource(source);
       }
     }
 

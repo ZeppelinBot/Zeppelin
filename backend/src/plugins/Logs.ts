@@ -198,23 +198,30 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       const values = {
         ...data,
-        userMention: async userOrMember => {
-          if (!userOrMember) return "";
+        userMention: async inputUserOrMember => {
+          if (!inputUserOrMember) return "";
 
-          let user;
-          let member;
+          const usersOrMembers = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
 
-          if (userOrMember.user) {
-            member = userOrMember;
-            user = member.user;
-          } else {
-            user = userOrMember;
-            member = this.guild.members.get(user.id) || { id: user.id, user };
+          const mentions = [];
+          for (const userOrMember of usersOrMembers) {
+            let user;
+            let member;
+
+            if (userOrMember.user) {
+              member = userOrMember;
+              user = member.user;
+            } else {
+              user = userOrMember;
+              member = this.guild.members.get(user.id) || { id: user.id, user };
+            }
+
+            const memberConfig = this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
+
+            mentions.push(memberConfig.ping_user ? verboseUserMention(user) : verboseUserName(user));
           }
 
-          const memberConfig = this.getMatchingConfig({ member, userId: user.id }) || ({} as any);
-
-          return memberConfig.ping_user ? verboseUserMention(user) : verboseUserName(user);
+          return mentions.join(", ");
         },
         channelMention: channel => {
           if (!channel) return "";
