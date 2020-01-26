@@ -62,7 +62,10 @@ export function trimPluginDescription(str) {
 
 const inviteCache = new SimpleCache<Promise<Invite>>(10 * MINUTES, 200);
 
-export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plugin<TConfig> {
+export class ZeppelinPlugin<
+  TConfig extends {} = IBasePluginConfig,
+  TCustomOverrideCriteria extends {} = {}
+> extends Plugin<TConfig, TCustomOverrideCriteria> {
   public static pluginInfo: PluginInfo;
   public static showInDocs: boolean = true;
 
@@ -98,8 +101,11 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   /**
    * Wrapper to fetch the real default options from getStaticDefaultOptions()
    */
-  protected getDefaultOptions(): IPluginOptions<TConfig> {
-    return (this.constructor as typeof ZeppelinPlugin).getStaticDefaultOptions() as IPluginOptions<TConfig>;
+  protected getDefaultOptions(): IPluginOptions<TConfig, TCustomOverrideCriteria> {
+    return (this.constructor as typeof ZeppelinPlugin).getStaticDefaultOptions() as IPluginOptions<
+      TConfig,
+      TCustomOverrideCriteria
+    >;
   }
 
   /**
@@ -165,14 +171,14 @@ export class ZeppelinPlugin<TConfig extends {} = IBasePluginConfig> extends Plug
   /**
    * Wrapper that calls mergeAndValidateStaticOptions()
    */
-  protected getMergedOptions(): IPluginOptions<TConfig> {
+  protected getMergedOptions(): IPluginOptions<TConfig, TCustomOverrideCriteria> {
     if (!this.mergedPluginOptions) {
       this.mergedPluginOptions = ((this.constructor as unknown) as typeof ZeppelinPlugin).mergeAndDecodeStaticOptions(
         this.pluginOptions,
       );
     }
 
-    return this.mergedPluginOptions as IPluginOptions<TConfig>;
+    return this.mergedPluginOptions as IPluginOptions<TConfig, TCustomOverrideCriteria>;
   }
 
   /**

@@ -61,5 +61,8 @@
   "POSTED_SCHEDULED_MESSAGE": "\uD83D\uDCE8 Posted scheduled message (`{messageId}`) to {channelMention(channel)} as scheduled by {userMention(author)}",
 
   "BOT_ALERT": "⚠ {tmplEval(body)}",
-  "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(user)}\n{matchSummary}\nActions taken: **{actionsTaken}**"
+  "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(users)}\n{matchSummary}\nActions taken: **{actionsTaken}**",
+
+  "SET_ANTIRAID_USER": "⚔ {userMention(user)} set anti-raid to **{level}**",
+  "SET_ANTIRAID_AUTO": "⚔ Anti-raid automatically set to **{level}**"
 }
