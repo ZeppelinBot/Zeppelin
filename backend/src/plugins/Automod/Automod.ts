@@ -1361,8 +1361,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   }
 
   protected async setAntiraidLevel(level: string | null, user?: User) {
-    this.cachedAntiraidLevel = null;
-    await this.antiraidLevels.set(null);
+    this.cachedAntiraidLevel = level;
+    await this.antiraidLevels.set(level);
 
     if (user) {
       this.guildLogs.log(LogType.SET_ANTIRAID_USER, {
