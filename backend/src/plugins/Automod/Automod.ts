@@ -953,7 +953,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       };
 
       let membersToWarn = [];
-      if (matchResult.type === "message" || matchResult.type === "embed") {
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
         membersToWarn = [await this.getMember(matchResult.userId)];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         for (const id of spamUserIdsToAction) {
@@ -979,7 +979,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       };
 
       let userIdsToMute = [];
-      if (matchResult.type === "message" || matchResult.type === "embed") {
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
         userIdsToMute = [matchResult.userId];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         userIdsToMute.push(...spamUserIdsToAction);
@@ -1002,7 +1002,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       };
 
       let membersToKick = [];
-      if (matchResult.type === "message" || matchResult.type === "embed") {
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
         membersToKick = [await this.getMember(matchResult.userId)];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         for (const id of spamUserIdsToAction) {
@@ -1027,7 +1027,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       };
 
       let userIdsToBan = [];
-      if (matchResult.type === "message" || matchResult.type === "embed") {
+      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
         userIdsToBan = [matchResult.userId];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         userIdsToBan.push(...spamUserIdsToAction);
