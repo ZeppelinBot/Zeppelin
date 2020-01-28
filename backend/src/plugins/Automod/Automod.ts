@@ -1382,7 +1382,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   @d.permission("can_set_antiraid")
   public async clearAntiraidCmd(msg: Message) {
     await this.setAntiraidLevel(null, msg.author);
-    this.sendSuccessMessage(msg.channel, "Anti-raid turned off");
+    this.sendSuccessMessage(msg.channel, "Anti-raid turned **off**");
   }
 
   @d.command("antiraid", "<level:string>")
