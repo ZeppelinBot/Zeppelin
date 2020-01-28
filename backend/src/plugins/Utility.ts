@@ -1577,9 +1577,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   async avatarCmd(msg: Message, args: { user?: User | UnknownUser }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
+      const extention = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
       const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
       const embed: EmbedOptions = {
-        image: { url: avatarUrl + ".png?size=2048" },
+        image: { url: avatarUrl + `${extention}?size=2048` },
       };
       embed.title = `Avatar of ${user.username}#${user.discriminator}:`;
       msg.channel.createMessage({ embed });
