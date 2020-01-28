@@ -920,7 +920,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       }
     }
 
-    const matchSummary = this.getMatchSummary(matchResult, archiveId);
+    const matchSummary = await this.getMatchSummary(matchResult, archiveId);
 
     let caseExtraNote = `Matched automod rule "${rule.name}"`;
     if (matchSummary) {
