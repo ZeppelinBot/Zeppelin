@@ -521,18 +521,23 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
-  protected formatSearchResultList(members: Member[]): string {
+  protected formatSearchResultList(members: Array<Member | User>): string {
     const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
     const lines = members.map(member => {
       const paddedId = member.id.padEnd(longestId, " ");
-      let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
-      if (member.nick) line += ` (${member.nick})`;
+      let line;
+      if (member instanceof Member) {
+        line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+        if (member.nick) line += ` (${member.nick})`;
+      } else {
+        line = `${paddedId} ${member.username}#${member.discriminator}`;
+      }
       return line;
     });
     return lines.join("\n");
   }
 
-  protected formatSearchResultIdList(members: Member[]): string {
+  protected formatSearchResultIdList(members: Array<Member | User>): string {
     return members.map(m => m.id).join(" ");
   }
 
