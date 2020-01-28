@@ -46,6 +46,8 @@ const ConfigSchema = t.type({
   ban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
+  warn_notify_threshold: t.number,
+  warn_notify_message: t.string,
   can_note: t.boolean,
   can_warn: t.boolean,
   can_mute: t.boolean,
@@ -146,6 +148,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
+        warn_notify_threshold: 1,
+        warn_notify_message:
+          "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
 
         can_note: false,
         can_warn: false,
@@ -197,10 +202,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   clearIgnoredEvent(type: IgnoredEventType, userId: any) {
-    this.ignoredEvents.splice(
-      this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId),
-      1,
-    );
+    this.ignoredEvents.splice(this.ignoredEvents.findIndex(info => type === info.type && userId === info.userId), 1);
   }
 
   formatReasonWithAttachments(reason: string, attachments: Attachment[]) {
@@ -328,7 +330,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (actions.length) {
       const alertChannel: any = this.guild.channels.get(alertChannelId);
       alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
+        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${
+          actions.length
+        } prior record(s)`,
       );
     }
   }
@@ -349,7 +353,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       const existingCaseForThisEntry = await this.cases.findByAuditLogId(kickAuditLogEntry.id);
       if (existingCaseForThisEntry) {
         logger.warn(
-          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${existingCaseForThisEntry.id}`,
+          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${
+            existingCaseForThisEntry.id
+          }`,
         );
       } else {
         const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -605,6 +611,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
+    if (priorWarnAmount >= config.warn_notify_threshold) {
+      const tooManyWarningsMsg = await msg.channel.createMessage(
+        config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
+      );
+
+      const reply = await waitForReaction(this.bot, tooManyWarningsMsg, ["✅", "❌"]);
+      tooManyWarningsMsg.delete();
+      if (!reply || reply.name === "❌") {
+        msg.channel.createMessage(errorMessage("Warn cancelled by moderator"));
+        return;
+      }
+    }
+
     const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
     const warnResult = await this.warnMember(
       memberToWarn,
@@ -626,7 +647,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     this.sendSuccessMessage(
       msg.channel,
-      `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
+      `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${
+        warnResult.case.case_number
+      })${messageResultText}`,
     );
   }
 
@@ -1013,7 +1036,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Confirm the action to the moderator
-    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${kickResult.case.case_number})`;
+    let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${
+      kickResult.case.case_number
+    })`;
 
     if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
     this.sendSuccessMessage(msg.channel, response);
@@ -1074,7 +1099,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Confirm the action to the moderator
-    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${banResult.case.case_number})`;
+    let response = `Banned **${memberToBan.user.username}#${memberToBan.user.discriminator}** (Case #${
+      banResult.case.case_number
+    })`;
 
     if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
     this.sendSuccessMessage(msg.channel, response);
@@ -1159,7 +1186,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Confirm the action to the moderator
     this.sendSuccessMessage(
       msg.channel,
-      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
+      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${
+        createdCase.case_number
+      })`,
     );
 
     // Log the action
