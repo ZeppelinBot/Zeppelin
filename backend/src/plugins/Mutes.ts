@@ -275,14 +275,18 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     caseArgs: Partial<CaseArgs> = {},
   ): Promise<UnmuteResult> {
     const existingMute = await this.mutes.findExistingMuteForUserId(userId);
-    if (!existingMute) return;
-
     const user = await this.resolveUser(userId);
     const member = await this.getMember(userId, true); // Grab the fresh member so we don't have stale role info
 
+    if (!existingMute && !this.hasMutedRole(member)) return;
+
     if (unmuteTime) {
       // Schedule timed unmute (= just set the mute's duration)
-      await this.mutes.updateExpiryTime(userId, unmuteTime);
+      if (!existingMute) {
+        await this.mutes.addMute(userId, unmuteTime);
+      } else {
+        await this.mutes.updateExpiryTime(userId, unmuteTime);
+      }
     } else {
       // Unmute immediately
       if (member) {
@@ -295,8 +299,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
           `Member ${userId} not found in guild ${this.guild.name} (${this.guildId}) when attempting to unmute`,
         );
       }
-
-      await this.mutes.clear(userId);
+      if (existingMute) {
+        await this.mutes.clear(userId);
+      }
     }
 
     const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
@@ -307,6 +312,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       noteDetails.push(`Scheduled unmute in ${timeUntilUnmute}`);
     } else {
       noteDetails.push(`Unmuted immediately`);
+    }
+    if (!existingMute) {
+      noteDetails.push(`Removed external mute`);
     }
 
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
@@ -336,6 +344,13 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     return {
       case: createdCase,
     };
+  }
+
+  public hasMutedRole(member: Member) {
+    if (member.roles.includes(this.getConfig().mute_role)) {
+      return true;
+    }
+    return false;
   }
 
   @d.command("mutes", [], {

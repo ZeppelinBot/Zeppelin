@@ -892,15 +892,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   async unmuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod?: Member }) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
+    const memberToUnmute = await this.getMember(user.id);
+    const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
+    const hasMuteRole = mutesPlugin.hasMutedRole(memberToUnmute);
 
     // Check if they're muted in the first place
-    if (!(await this.mutes.isMuted(args.user))) {
+    if (!(await this.mutes.isMuted(args.user)) && !hasMuteRole) {
       this.sendErrorMessage(msg.channel, "Cannot unmute: member is not muted");
       return;
     }
-
-    // Find the server member to unmute
-    const memberToUnmute = await this.getMember(user.id);
 
     if (!memberToUnmute) {
       const isBanned = await this.isBanned(user.id);
