@@ -256,10 +256,12 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         time: timeUntilUnmute,
       });
     } else {
-      this.serverLogs.log(LogType.MEMBER_MUTE, {
-        mod: stripObjectToScalars(mod),
-        user: stripObjectToScalars(user),
-      });
+      if (!this.serverLogs.isLogIgnored(LogType.MEMBER_MUTE, user.id)) {
+        this.serverLogs.log(LogType.MEMBER_MUTE, {
+          mod: stripObjectToScalars(mod),
+          user: stripObjectToScalars(user),
+        });
+      }
     }
 
     return {
@@ -476,7 +478,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       lines.push(
         ...manuallyMutedMembers.map(member => {
-          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${
+            member.id
+          }\`)   🔧 Manual mute`;
         }),
       );
     }
