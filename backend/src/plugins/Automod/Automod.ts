@@ -293,7 +293,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   }
 
   protected matchCustomOverrideCriteria(criteria: ICustomOverrides, matchParams: IMatchParams) {
-    return matchParams?.extra?.antiraid_level && matchParams.extra.antiraid_level === this.cachedAntiraidLevel;
+    return criteria?.antiraid_level && criteria.antiraid_level === this.cachedAntiraidLevel;
   }
 
   protected async onLoad() {
