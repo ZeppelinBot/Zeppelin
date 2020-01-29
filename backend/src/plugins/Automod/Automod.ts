@@ -999,7 +999,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
-      const contactMethods = this.readContactMethodsFromAction(rule.actions.warn);
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.mute);
 
       let userIdsToMute = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
@@ -1023,7 +1023,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
-      const contactMethods = this.readContactMethodsFromAction(rule.actions.warn);
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.kick);
 
       let membersToKick = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
@@ -1049,7 +1049,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
-      const contactMethods = this.readContactMethodsFromAction(rule.actions.warn);
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.ban);
 
       let userIdsToBan = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
