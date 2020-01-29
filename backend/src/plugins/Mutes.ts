@@ -1,4 +1,4 @@
-import { Member, Message, User } from "eris";
+import { Member, Message, TextChannel, User } from "eris";
 import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -7,15 +7,15 @@ import {
   chunkMessageLines,
   DBDateFormat,
   errorMessage,
-  INotifyUserResult,
+  UserNotificationResult,
   noop,
   notifyUser,
-  NotifyUserStatus,
   stripObjectToScalars,
   successMessage,
   tNullable,
   ucfirst,
   UnknownUser,
+  UserNotificationMethod,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -27,6 +27,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { CaseArgs, CasesPlugin } from "./Cases";
 import { Case } from "../data/entities/Case";
 import * as t from "io-ts";
+import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 
 const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -53,13 +54,18 @@ interface IMuteWithDetails extends Mute {
 
 export type MuteResult = {
   case: Case;
-  notifyResult: INotifyUserResult;
+  notifyResult: UserNotificationResult;
   updatedExistingMute: boolean;
 };
 
 export type UnmuteResult = {
   case: Case;
 };
+
+export interface MuteOptions {
+  caseArgs?: Partial<CaseArgs>;
+  contactMethods?: UserNotificationMethod[];
+}
 
 const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
 let FIRST_CHECK_TIME = Date.now();
@@ -136,16 +142,19 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     userId: string,
     muteTime: number = null,
     reason: string = null,
-    caseArgs: Partial<CaseArgs> = {},
+    muteOptions: MuteOptions = {},
   ): Promise<MuteResult> {
     const muteRole = this.getConfig().mute_role;
-    if (!muteRole) return;
+    if (!muteRole) {
+      this.throwRecoverablePluginError(ERRORS.NO_MUTE_ROLE_IN_CONFIG);
+    }
 
     const timeUntilUnmute = muteTime ? humanizeDuration(muteTime) : "indefinite";
 
     // No mod specified -> mark Zeppelin as the mod
-    if (!caseArgs.modId) {
-      caseArgs.modId = this.bot.user.id;
+    if (!muteOptions.caseArgs?.modId) {
+      muteOptions.caseArgs = muteOptions.caseArgs ?? {};
+      muteOptions.caseArgs.modId = this.bot.user.id;
     }
 
     const user = await this.resolveUser(userId);
@@ -170,7 +179,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // If the user is already muted, update the duration of their existing mute
     const existingMute = await this.mutes.findExistingMuteForUserId(user.id);
-    let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
+    let notifyResult: UserNotificationResult = { method: null, success: true };
 
     if (existingMute) {
       await this.mutes.updateExpiryTime(user.id, muteTime);
@@ -192,19 +201,27 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         time: timeUntilUnmute,
       }));
 
-    if (muteMessage) {
-      const useDm = existingMute ? config.dm_on_update : config.dm_on_mute;
-      const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
-      if (user instanceof User) {
-        notifyResult = await notifyUser(this.bot, this.guild, user, muteMessage, {
-          useDM: useDm,
-          useChannel,
-          channelId: config.message_channel,
-        });
+    if (muteMessage && user instanceof User) {
+      let contactMethods = [];
+
+      if (muteOptions?.contactMethods) {
+        contactMethods = muteOptions.contactMethods;
       } else {
-        notifyResult = { status: NotifyUserStatus.Failed };
+        const useDm = existingMute ? config.dm_on_update : config.dm_on_mute;
+        if (useDm) {
+          contactMethods.push({ type: "dm" });
+        }
+
+        const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
+        const channel = config.message_channel && this.guild.channels.get(config.message_channel);
+        if (useChannel && channel instanceof TextChannel) {
+          contactMethods.push({ type: "channel", channel });
+        }
       }
+
+      notifyResult = await notifyUser(user, muteMessage, contactMethods);
     }
+
     // Create/update a case
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     let theCase;
@@ -215,31 +232,31 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       // but instead we'll post the entire case afterwards
       theCase = await this.cases.find(existingMute.case_id);
       const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
-      const reasons = [reason, ...(caseArgs.extraNotes || [])];
+      const reasons = [reason, ...(muteOptions.caseArgs?.extraNotes || [])];
       for (const noteReason of reasons) {
         await casesPlugin.createCaseNote({
           caseId: existingMute.case_id,
-          modId: caseArgs.modId,
+          modId: muteOptions.caseArgs?.modId,
           body: noteReason,
           noteDetails,
           postInCaseLogOverride: false,
         });
       }
 
-      if (caseArgs.postInCaseLogOverride !== false) {
+      if (muteOptions.caseArgs?.postInCaseLogOverride !== false) {
         casesPlugin.postCaseToCaseLogChannel(existingMute.case_id);
       }
     } else {
       // Create new case
       const noteDetails = [`Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}`];
-      if (notifyResult.status !== NotifyUserStatus.Ignored) {
+      if (notifyResult.text) {
         noteDetails.push(ucfirst(notifyResult.text));
       }
 
       theCase = await casesPlugin.createCase({
-        ...caseArgs,
+        ...(muteOptions.caseArgs || {}),
         userId,
-        modId: caseArgs.modId,
+        modId: muteOptions.caseArgs?.modId,
         type: CaseTypes.Mute,
         reason,
         noteDetails,
@@ -248,7 +265,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Log the action
-    const mod = await this.resolveUser(caseArgs.modId);
+    const mod = await this.resolveUser(muteOptions.caseArgs?.modId);
     if (muteTime) {
       this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
         mod: stripObjectToScalars(mod),

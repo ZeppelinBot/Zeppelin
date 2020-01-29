@@ -7,20 +7,18 @@ import { GuildCases } from "../data/GuildCases";
 import {
   asSingleLine,
   createChunkedMessage,
+  disableUserNotificationStrings,
   errorMessage,
   findRelevantAuditLogEntry,
-  INotifyUserResult,
   multiSorter,
   notifyUser,
-  NotifyUserStatus,
   stripObjectToScalars,
-  successMessage,
   tNullable,
-  trimEmptyStartEndLines,
-  trimIndents,
   trimLines,
   ucfirst,
   UnknownUser,
+  UserNotificationMethod,
+  UserNotificationResult,
 } from "../utils";
 import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
@@ -32,6 +30,7 @@ import { renderTemplate } from "../templateFormatter";
 import { CaseArgs, CasesPlugin } from "./Cases";
 import { MuteResult, MutesPlugin } from "./Mutes";
 import * as t from "io-ts";
+import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 
 const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -78,7 +77,7 @@ export type WarnResult =
   | {
       status: "success";
       case: Case;
-      notifyResult: INotifyUserResult;
+      notifyResult: UserNotificationResult;
     };
 
 export type KickResult =
@@ -89,7 +88,7 @@ export type KickResult =
   | {
       status: "success";
       case: Case;
-      notifyResult: INotifyUserResult;
+      notifyResult: UserNotificationResult;
     };
 
 export type BanResult =
@@ -100,10 +99,26 @@ export type BanResult =
   | {
       status: "success";
       case: Case;
-      notifyResult: INotifyUserResult;
+      notifyResult: UserNotificationResult;
     };
 
 type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
+
+export interface WarnOptions {
+  caseArgs?: Partial<CaseArgs>;
+  contactMethods?: UserNotificationMethod[];
+  retryPromptChannel?: TextChannel;
+}
+
+export interface KickOptions {
+  caseArgs?: Partial<CaseArgs>;
+  contactMethods?: UserNotificationMethod[];
+}
+
+export interface BanOptions {
+  caseArgs?: Partial<CaseArgs>;
+  contactMethods?: UserNotificationMethod[];
+}
 
 export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "mod_actions";
@@ -206,6 +221,50 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   formatReasonWithAttachments(reason: string, attachments: Attachment[]) {
     const attachmentUrls = attachments.map(a => a.url);
     return ((reason || "") + " " + attachmentUrls.join(" ")).trim();
+  }
+
+  getDefaultContactMethods(type: "warn" | "kick" | "ban"): UserNotificationMethod[] {
+    const methods: UserNotificationMethod[] = [];
+    const config = this.getConfig();
+
+    if (config[`dm_on_${type}`]) {
+      methods.push({ type: "dm" });
+    }
+
+    if (config[`message_on_${type}`] && config.message_channel) {
+      const channel = this.guild.channels.get(config.message_channel);
+      if (channel instanceof TextChannel) {
+        methods.push({
+          type: "channel",
+          channel,
+        });
+      }
+    }
+
+    return methods;
+  }
+
+  readContactMethodsFromArgs(args: {
+    notify?: string;
+    "notify-channel"?: TextChannel;
+  }): null | UserNotificationMethod[] {
+    if (args.notify) {
+      if (args.notify === "dm") {
+        return [{ type: "dm" }];
+      } else if (args.notify === "channel") {
+        if (!args["notify-channel"]) {
+          throw new Error("No `-notify-channel` specified");
+        }
+
+        return [{ type: "channel", channel: args["notify-channel"] }];
+      } else if (disableUserNotificationStrings.includes(args.notify)) {
+        return [];
+      } else {
+        throw new Error("Unknown contact method");
+      }
+    }
+
+    return null;
   }
 
   async isBanned(userId): Promise<boolean> {
@@ -373,22 +432,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   /**
    * Kick the specified server member. Generates a case.
    */
-  async kickMember(member: Member, reason: string = null, caseArgs: Partial<CaseArgs> = {}): Promise<KickResult> {
+  async kickMember(member: Member, reason: string = null, kickOptions: KickOptions = {}): Promise<KickResult> {
     const config = this.getConfig();
 
     // Attempt to message the user *before* kicking them, as doing it after may not be possible
-    let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
+    let notifyResult: UserNotificationResult = { method: null, success: true };
     if (reason) {
       const kickMessage = await renderTemplate(config.kick_message, {
         guildName: this.guild.name,
         reason,
       });
 
-      notifyResult = await notifyUser(this.bot, this.guild, member.user, kickMessage, {
-        useDM: config.dm_on_kick,
-        useChannel: config.message_on_kick,
-        channelId: config.message_channel,
-      });
+      const contactMethods = kickOptions?.contactMethods
+        ? kickOptions.contactMethods
+        : this.getDefaultContactMethods("kick");
+      notifyResult = await notifyUser(member.user, kickMessage, contactMethods);
     }
 
     // Kick the user
@@ -406,16 +464,16 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Create a case for this action
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const createdCase = await casesPlugin.createCase({
-      ...caseArgs,
+      ...(kickOptions.caseArgs || {}),
       userId: member.id,
-      modId: caseArgs.modId,
+      modId: kickOptions.caseArgs?.modId,
       type: CaseTypes.Kick,
       reason,
-      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+      noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
     });
 
     // Log the action
-    const mod = await this.resolveUser(caseArgs.modId);
+    const mod = await this.resolveUser(kickOptions.caseArgs?.modId);
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(member.user),
@@ -431,22 +489,22 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   /**
    * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
    */
-  async banUserId(userId: string, reason: string = null, caseArgs: Partial<CaseArgs> = {}): Promise<BanResult> {
+  async banUserId(userId: string, reason: string = null, banOptions: BanOptions = {}): Promise<BanResult> {
     const config = this.getConfig();
     const user = await this.resolveUser(userId);
 
     // Attempt to message the user *before* banning them, as doing it after may not be possible
-    let notifyResult: INotifyUserResult = { status: NotifyUserStatus.Ignored };
+    let notifyResult: UserNotificationResult = { method: null, success: true };
     if (reason && user instanceof User) {
       const banMessage = await renderTemplate(config.ban_message, {
         guildName: this.guild.name,
         reason,
       });
-      notifyResult = await notifyUser(this.bot, this.guild, user, banMessage, {
-        useDM: config.dm_on_ban,
-        useChannel: config.message_on_ban,
-        channelId: config.message_channel,
-      });
+
+      const contactMethods = banOptions?.contactMethods
+        ? banOptions.contactMethods
+        : this.getDefaultContactMethods("ban");
+      notifyResult = await notifyUser(user, banMessage, contactMethods);
     }
 
     // (Try to) ban the user
@@ -464,16 +522,16 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     // Create a case for this action
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const createdCase = await casesPlugin.createCase({
-      ...caseArgs,
+      ...(banOptions.caseArgs || {}),
       userId,
-      modId: caseArgs.modId,
+      modId: banOptions.caseArgs?.modId,
       type: CaseTypes.Ban,
       reason,
-      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+      noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
     });
 
     // Log the action
-    const mod = await this.resolveUser(caseArgs.modId);
+    const mod = await this.resolveUser(banOptions.caseArgs?.modId);
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
@@ -560,7 +618,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("warn", "<user:string> <reason:string$>", {
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description: "Send a warning to the specified user",
@@ -568,7 +630,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_warn")
-  async warnCmd(msg: Message, args: { user: string; reason: string; mod?: Member }) {
+  async warnCmd(
+    msg: Message,
+    args: { user: string; reason: string; mod?: Member; notify?: string; "notify-channel"?: TextChannel },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -605,20 +670,26 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
-    const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
-    const warnResult = await this.warnMember(
-      memberToWarn,
-      warnMessage,
-      {
+    let contactMethods;
+    try {
+      contactMethods = this.readContactMethodsFromArgs(args);
+    } catch (e) {
+      this.sendErrorMessage(msg.channel, e.message);
+      return;
+    }
+
+    const warnResult = await this.warnMember(memberToWarn, reason, {
+      contactMethods,
+      caseArgs: {
         modId: mod.id,
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
         reason,
       },
-      msg.channel as TextChannel,
-    );
+      retryPromptChannel: msg.channel as TextChannel,
+    });
 
     if (warnResult.status === "failed") {
-      msg.channel.createMessage(errorMessage("Failed to warn user"));
+      this.sendErrorMessage(msg.channel, "Failed to warn user");
       return;
     }
 
@@ -630,22 +701,20 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  async warnMember(
-    member: Member,
-    warnMessage: string,
-    caseArgs: Partial<CaseArgs> = {},
-    retryPromptChannel: TextChannel = null,
-  ): Promise<WarnResult | null> {
+  async warnMember(member: Member, reason: string, warnOptions: WarnOptions = {}): Promise<WarnResult | null> {
     const config = this.getConfig();
 
-    const notifyResult = await notifyUser(this.bot, this.guild, member.user, warnMessage, {
-      useDM: config.dm_on_warn,
-      useChannel: config.message_on_warn,
-    });
+    const warnMessage = config.warn_message.replace("{guildName}", this.guild.name).replace("{reason}", reason);
+    const contactMethods = warnOptions?.contactMethods
+      ? warnOptions.contactMethods
+      : this.getDefaultContactMethods("warn");
+    const notifyResult = await notifyUser(member.user, warnMessage, contactMethods);
 
-    if (notifyResult.status === NotifyUserStatus.Failed) {
-      if (retryPromptChannel && this.guild.channels.has(retryPromptChannel.id)) {
-        const failedMsg = await retryPromptChannel.createMessage("Failed to message the user. Log the warning anyway?");
+    if (!notifyResult.success) {
+      if (warnOptions.retryPromptChannel && this.guild.channels.has(warnOptions.retryPromptChannel.id)) {
+        const failedMsg = await warnOptions.retryPromptChannel.createMessage(
+          "Failed to message the user. Log the warning anyway?",
+        );
         const reply = await waitForReaction(this.bot, failedMsg, ["✅", "❌"]);
         failedMsg.delete();
         if (!reply || reply.name === "❌") {
@@ -664,15 +733,15 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const createdCase = await casesPlugin.createCase({
-      ...caseArgs,
+      ...(warnOptions.caseArgs || {}),
       userId: member.id,
-      modId: caseArgs.modId,
+      modId: warnOptions.caseArgs?.modId,
       type: CaseTypes.Warn,
-      reason: caseArgs.reason || warnMessage,
-      noteDetails: notifyResult.status !== NotifyUserStatus.Ignored ? [ucfirst(notifyResult.text)] : [],
+      reason,
+      noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
     });
 
-    const mod = await this.resolveUser(caseArgs.modId);
+    const mod = await this.resolveUser(warnOptions.caseArgs?.modId);
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod),
       member: stripObjectToScalars(member, ["user", "roles"]),
@@ -689,7 +758,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
    * The actual function run by both !mute and !forcemute.
    * The only difference between the two commands is in target member validation.
    */
-  async actualMuteCmd(user: User | UnknownUser, msg: Message, args: { time?: number; reason?: string; mod: Member }) {
+  async actualMuteCmd(
+    user: User | UnknownUser,
+    msg: Message,
+    args: { time?: number; reason?: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
+  ) {
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     let pp = null;
@@ -710,17 +783,30 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     let muteResult: MuteResult;
     const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
 
+    let contactMethods;
+    try {
+      contactMethods = this.readContactMethodsFromArgs(args);
+    } catch (e) {
+      this.sendErrorMessage(msg.channel, e.message);
+      return;
+    }
+
     try {
       muteResult = await mutesPlugin.muteUser(user.id, args.time, reason, {
-        modId: mod.id,
-        ppId: pp && pp.id,
+        contactMethods,
+        caseArgs: {
+          modId: mod.id,
+          ppId: pp && pp.id,
+        },
       });
     } catch (e) {
-      if (e instanceof DiscordRESTError && e.code === 10007) {
-        msg.channel.createMessage(errorMessage("Could not mute the user: unknown member"));
+      if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
+        this.sendErrorMessage(msg.channel, "Could not mute the user: no mute role set in config");
+      } else if (e instanceof DiscordRESTError && e.code === 10007) {
+        this.sendErrorMessage(msg.channel, "Could not mute the user: unknown member");
       } else {
         logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
-        msg.channel.createMessage(errorMessage("Could not mute the user"));
+        this.sendErrorMessage(msg.channel, "Could not mute the user");
       }
 
       return;
@@ -760,7 +846,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("mute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description: "Mute the specified member",
@@ -768,7 +858,17 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_mute")
-  async muteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
+  async muteCmd(
+    msg: Message,
+    args: {
+      user: string;
+      time?: number;
+      reason?: string;
+      mod: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+    },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -803,7 +903,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.command("forcemute", "<user:string> <time:delay> <reason:string$>", {
     overloads: ["<user:string> <time:delay>", "<user:string> [reason:string$]"],
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description: "Force-mute the specified user, even if they're not on the server",
@@ -811,7 +915,17 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_mute")
-  async forcemuteCmd(msg: Message, args: { user: string; time?: number; reason?: string; mod: Member }) {
+  async forcemuteCmd(
+    msg: Message,
+    args: {
+      user: string;
+      time?: number;
+      reason?: string;
+      mod: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+    },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -959,7 +1073,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("kick", "<user:string> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description: "Kick the specified member",
@@ -967,7 +1085,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_kick")
-  async kickCmd(msg, args: { user: string; reason: string; mod: Member }) {
+  async kickCmd(
+    msg,
+    args: { user: string; reason: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -1001,10 +1122,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod = args.mod;
     }
 
+    let contactMethods;
+    try {
+      contactMethods = this.readContactMethodsFromArgs(args);
+    } catch (e) {
+      this.sendErrorMessage(msg.channel, e.message);
+      return;
+    }
+
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
     const kickResult = await this.kickMember(memberToKick, reason, {
-      modId: mod.id,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      contactMethods,
+      caseArgs: {
+        modId: mod.id,
+        ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      },
     });
 
     if (kickResult.status === "failed") {
@@ -1020,7 +1152,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("ban", "<user:string> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description: "Ban the specified member",
@@ -1028,7 +1164,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_ban")
-  async banCmd(msg, args: { user: string; reason?: string; mod?: Member }) {
+  async banCmd(
+    msg,
+    args: { user: string; reason?: string; mod?: Member; notify?: string; "notify-channel"?: TextChannel },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -1062,10 +1201,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod = args.mod;
     }
 
+    let contactMethods;
+    try {
+      contactMethods = this.readContactMethodsFromArgs(args);
+    } catch (e) {
+      this.sendErrorMessage(msg.channel, e.message);
+      return;
+    }
+
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
     const banResult = await this.banUserId(memberToBan.id, reason, {
-      modId: mod.id,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      contactMethods,
+      caseArgs: {
+        modId: mod.id,
+        ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      },
     });
 
     if (banResult.status === "failed") {

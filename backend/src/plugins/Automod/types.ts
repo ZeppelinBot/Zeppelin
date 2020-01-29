@@ -226,20 +226,28 @@ export type TMemberJoinSpamTrigger = t.TypeOf<typeof MemberJoinTrigger>;
 export const CleanAction = t.boolean;
 
 export const WarnAction = t.type({
-  reason: t.string,
+  reason: tNullable(t.string),
+  notify: tNullable(t.string),
+  notifyChannel: tNullable(t.string),
 });
 
 export const MuteAction = t.type({
-  duration: t.string,
   reason: tNullable(t.string),
+  duration: tNullable(tDelayString),
+  notify: tNullable(t.string),
+  notifyChannel: tNullable(t.string),
 });
 
 export const KickAction = t.type({
   reason: tNullable(t.string),
+  notify: tNullable(t.string),
+  notifyChannel: tNullable(t.string),
 });
 
 export const BanAction = t.type({
   reason: tNullable(t.string),
+  notify: tNullable(t.string),
+  notifyChannel: tNullable(t.string),
 });
 
 export const AlertAction = t.type({
