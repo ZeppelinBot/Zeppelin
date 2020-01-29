@@ -11,6 +11,7 @@ import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
 import { tNullable } from "../utils";
+import { ERRORS } from "../RecoverablePluginError";
 
 const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
@@ -146,7 +147,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
   public async createCaseNote(args: CaseNoteArgs): Promise<void> {
     const theCase = await this.cases.find(this.resolveCaseId(args.caseId));
     if (!theCase) {
-      this.throwPluginRuntimeError(`Unknown case ID: ${args.caseId}`);
+      this.throwRecoverablePluginError(ERRORS.UNKNOWN_NOTE_CASE);
     }
 
     const mod = await this.resolveUser(args.modId);

@@ -26,6 +26,19 @@ setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 
 
 if (process.env.NODE_ENV === "production") {
   const errorHandler = err => {
+    if (err instanceof RecoverablePluginError) {
+      // Recoverable plugin errors can be, well, recovered from.
+      // Log it in the console as a warning and post a warning to the guild's log.
+
+      // tslint:disable:no-console
+      console.warn(`${err.guild.name}: [${err.code}] ${err.message}`);
+
+      const logs = new GuildLogs(err.guild.id);
+      logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
+
+      return;
+    }
+
     // tslint:disable:no-console
     console.error(err);
 
@@ -76,6 +89,9 @@ import { errorMessage, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
 import { IZeppelinGuildConfig, IZeppelinGlobalConfig } from "./types";
+import { RecoverablePluginError } from "./RecoverablePluginError";
+import { GuildLogs } from "./data/GuildLogs";
+import { LogType } from "./data/LogType";
 
 logger.info("Connecting to database");
 connect().then(async conn => {
