@@ -149,6 +149,7 @@ const ConfigSchema = t.type({
   antiraid_levels: t.array(t.string),
   can_set_antiraid: t.boolean,
   can_view_antiraid: t.boolean,
+  can_exclude_antiraid: t.boolean,
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -229,6 +230,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   protected loadedAntiraidLevel: boolean;
   protected cachedAntiraidLevel: string | null;
 
+  protected antiraidExemptions: string[];
+
   protected static preprocessStaticConfig(config: t.TypeOf<typeof PartialConfigSchema>) {
     if (config.rules) {
       // Loop through each rule
@@ -271,12 +274,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         antiraid_levels: ["low", "medium", "high"],
         can_set_antiraid: false,
         can_view_antiraid: false,
+        can_exclude_antiraid: false,
       },
       overrides: [
         {
           level: ">=50",
           config: {
             can_view_antiraid: true,
+            can_exclude_antiraid: true,
           },
         },
         {
@@ -311,6 +316,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     this.archives = GuildArchives.getGuildInstance(this.guildId);
     this.guildLogs = new GuildLogs(this.guildId);
     this.antiraidLevels = GuildAntiraidLevels.getGuildInstance(this.guildId);
+
+    this.antiraidExemptions = [];
 
     this.cachedAntiraidLevel = await this.antiraidLevels.get();
 
@@ -685,12 +692,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     for (const trigger of rule.triggers) {
       if (trigger.member_join) {
-        if (trigger.member_join.only_new) {
+        if (trigger.member_join.only_new && !this.antiraidExemptions.includes(member.id)) {
           const threshold = Date.now() - convertDelayStringToMS(trigger.member_join.new_threshold);
           if (member.createdAt >= threshold) {
             return result;
           }
         } else {
+          this.removeAntiraidExemption(member.id);
           return result;
         }
       }
@@ -1420,6 +1428,63 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     await this.setAntiraidLevel(args.level, msg.author);
     this.sendSuccessMessage(msg.channel, `Anti-raid set to **${args.level}**`);
+  }
+
+  @d.command("antiraid exempt", "<user:string>", {
+    aliases: ["antiraid exclude", "antiraid permit", "antiraid allow", "antiraid ignore"],
+    extra: {
+      info: {
+        description: "Exempts a specific user from the antiraid filter once",
+      },
+    },
+  })
+  @d.permission("can_exclude_antiraid")
+  public async excludeFromAntiraidCmd(msg: Message, args: { user: string }) {
+    const success = await this.addAntiraidExemption(args.user);
+    if (success) {
+      this.sendSuccessMessage(msg.channel, "User is now exempt once for 30 minutes!");
+    } else {
+      this.sendErrorMessage(msg.channel, "Failed to exempt user. They might already be exempt!");
+    }
+  }
+
+  @d.command("antiraid unexempt", "<user:string>", {
+    aliases: ["antiraid include", "antiraid disallow", "antiraid target"],
+    extra: {
+      info: {
+        description: "Unexempts a specific user from the antiraid filter",
+      },
+    },
+  })
+  @d.permission("can_exclude_antiraid")
+  public async includeInAntiraidCmd(msg: Message, args: { user: string }) {
+    const success = await this.removeAntiraidExemption(args.user);
+    if (success) {
+      this.sendSuccessMessage(msg.channel, "User is no longer exempt!");
+    } else {
+      this.sendErrorMessage(msg.channel, "User was either not exempt or could not be removed from exemption list!");
+    }
+  }
+
+  public async addAntiraidExemption(userid: string): Promise<boolean> {
+    if (!this.antiraidExemptions.includes(userid)) {
+      this.antiraidExemptions.push(userid);
+      setTimeout(async () => {
+        await this.removeAntiraidExemption(userid);
+      }, 30 * 60000);
+      return true;
+    }
+    return false;
+  }
+
+  public async removeAntiraidExemption(userid: string): Promise<boolean> {
+    for (let i = 0; i < this.antiraidExemptions.length; i++) {
+      if (this.antiraidExemptions[i] === userid) {
+        this.antiraidExemptions.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
   }
 
   @d.command("antiraid")
