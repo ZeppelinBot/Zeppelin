@@ -50,7 +50,7 @@ export class GuildVCAlerts extends BaseGuildRepository {
     });
   }
 
-  async add(requestorId: string, userId: string, channelId: string, expiresAt: string, body: string) {
+  async add(requestorId: string, userId: string, channelId: string, expiresAt: string, body: string, active: boolean) {
     await this.allAlerts.insert({
       guild_id: this.guildId,
       requestor_id: requestorId,
@@ -58,6 +58,7 @@ export class GuildVCAlerts extends BaseGuildRepository {
       channel_id: channelId,
       expires_at: expiresAt,
       body,
+      active,
     });
   }
 }
