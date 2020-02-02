@@ -1,10 +1,10 @@
 import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin, CommandInfo } from "./ZeppelinPlugin";
 import humanizeDuration from "humanize-duration";
-import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
+import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User, Command } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
 import moment from "moment-timezone";
-import { resolveMember, sorter, createChunkedMessage, errorMessage, successMessage, MINUTES } from "../utils";
+import { resolveMember, sorter, createChunkedMessage, MINUTES, SECONDS } from "../utils";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -13,7 +13,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-const ALERT_LOOP_TIME = 30 * 1000;
+const ALERT_LOOP_TIME = 30 * SECONDS;
 
 export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   public static pluginName = "locate_user";
@@ -29,8 +29,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   };
 
   private alerts: GuildVCAlerts;
-  private outdatedAlertsTimeout;
+  private outdatedAlertsTimeout: NodeJS.Timeout;
   private usersWithAlerts: string[] = [];
+  private unloaded = false;
 
   public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
@@ -56,6 +57,11 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     this.fillActiveAlertsList();
   }
 
+  onUnload() {
+    clearTimeout(this.outdatedAlertsTimeout);
+    this.unloaded = true;
+  }
+
   async outdatedAlertsLoop() {
     const outdatedAlerts = await this.alerts.getOutdatedAlerts();
 
@@ -64,7 +70,9 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
       await this.removeUserIdFromActiveAlerts(alert.user_id);
     }
 
-    this.outdatedAlertsTimeout = setTimeout(() => this.outdatedAlertsLoop(), ALERT_LOOP_TIME);
+    if (!this.unloaded) {
+      this.outdatedAlertsTimeout = setTimeout(() => this.outdatedAlertsLoop(), ALERT_LOOP_TIME);
+    }
   }
 
   async fillActiveAlertsList() {
@@ -80,8 +88,12 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("where", "<member:resolvedMember>", {
     aliases: ["w"],
     extra: {
-      info: {
+      info: <CommandInfo>{
         description: "Posts an instant invite to the voice channel that `<member>` is in",
+        basicUsage: "!where @Dark",
+        parameterDescriptions: {
+          member: "The member that we want to find",
+        },
       },
     },
   })
@@ -91,32 +103,94 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
   }
 
-  @d.command("vcalert", "<member:resolvedMember> <duration:delay> <reminder:string$>", {
-    overloads: ["<member:resolvedMember> <duration:delay>", "<member:resolvedMember>"],
+  @d.command("vcalert", "<member:resolvedMember> [reminder:string$]", {
     aliases: ["vca"],
+    options: [
+      {
+        name: "duration",
+        shortcut: "d",
+        type: "delay",
+      },
+      {
+        name: "active",
+        shortcut: "a",
+        isSwitch: true,
+      },
+    ],
     extra: {
-      info: {
+      info: <CommandInfo>{
         description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
+        basicUsage: "!vca @Dark",
+        examples: trimPluginDescription(`
+          To get an alert for 1 hour:  
+          \`!vca 108552944961454080 -d 1h\`
+
+          To get an alert for 2 hours and 30 minutes with the reminder "Earrape":  
+          \`!vca 108552944961454080 -d 2h30m Earrape\` or \`!vca 108552944961454080 Earrape -d 1h\`
+
+          To get an alert for 3 days and be moved to the channel:  
+          \`!vca 108552944961454080 -d 3d -a\`
+        `),
+        optionDescriptions: {
+          duration: "How long the alert shall be active. The alert will be automatically deleted after this time",
+          active: " A switch that, when true, will move you to the channel the user joined",
+        },
+        parameterDescriptions: {
+          member: "The server member we want to set as the alerts target",
+          reminder: "Any text that will be displayed every time the alert triggers",
+        },
       },
     },
   })
   @d.permission("can_alert")
-  async vcalertCmd(msg: Message, args: { member: Member; duration?: number; reminder?: string }) {
+  async vcalertCmd(msg: Message, args: { member: Member; reminder?: string; duration?: number; active?: boolean }) {
     const time = args.duration || 10 * MINUTES;
     const alertTime = moment().add(time, "millisecond");
     const body = args.reminder || "None";
+    const active = args.active || false;
 
-    this.alerts.add(msg.author.id, args.member.id, msg.channel.id, alertTime.format("YYYY-MM-DD HH:mm:ss"), body);
+    if (time < 30 * SECONDS) {
+      this.sendErrorMessage(msg.channel, "Sorry, but the minimum duration for an alert is 30 seconds!");
+      return;
+    }
+
+    this.alerts.add(
+      msg.author.id,
+      args.member.id,
+      msg.channel.id,
+      alertTime.format("YYYY-MM-DD HH:mm:ss"),
+      body,
+      active,
+    );
     if (!this.usersWithAlerts.includes(args.member.id)) {
       this.usersWithAlerts.push(args.member.id);
     }
 
-    msg.channel.createMessage(
-      `If ${args.member.mention} joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
-    );
+    if (active) {
+      this.sendSuccessMessage(
+        msg.channel,
+        `Every time ${args.member.mention} joins or switches VC in the next ${humanizeDuration(
+          time,
+        )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
+      );
+    } else {
+      this.sendSuccessMessage(
+        msg.channel,
+        `Every time ${args.member.mention} joins or switches VC in the next ${humanizeDuration(
+          time,
+        )} i will notify you`,
+      );
+    }
   }
 
-  @d.command("vcalerts")
+  @d.command("vcalerts", [], {
+    aliases: ["vca"],
+    extra: {
+      info: <CommandInfo>{
+        description: "Displays all of your active alerts ordered by expiration time",
+      },
+    },
+  })
   @d.permission("can_alert")
   async listVcalertCmd(msg: Message) {
     const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
@@ -130,22 +204,29 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const lines = Array.from(alerts.entries()).map(([i, alert]) => {
       const num = i + 1;
       const paddedNum = num.toString().padStart(longestNum, " ");
-      return `\`${paddedNum}.\` \`${alert.expires_at}\` Member: <@!${alert.user_id}> Reminder: \`${alert.body}\``;
+      return `\`${paddedNum}.\` \`${alert.expires_at}\` Target: <@!${alert.user_id}> Reminder: \`${
+        alert.body
+      }\` Active: ${alert.active.valueOf()}`;
     });
     createChunkedMessage(msg.channel, lines.join("\n"));
   }
 
   @d.command("vcalerts delete", "<num:number>", {
-    aliases: ["vcalerts d"],
+    aliases: ["vcalerts d", "vca d"],
+    extra: {
+      info: <CommandInfo>{
+        description:
+          "Deletes the alert at the position <num>.\nThe value needed for <num> can be found using `!vcalerts`",
+      },
+    },
   })
   @d.permission("can_alert")
   async deleteVcalertCmd(msg: Message, args: { num: number }) {
     const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
     alerts.sort(sorter("expires_at"));
-    const lastNum = alerts.length + 1;
 
-    if (args.num > lastNum || args.num < 0) {
-      msg.channel.createMessage(errorMessage("Unknown alert"));
+    if (args.num > alerts.length || args.num < 0) {
+      this.sendErrorMessage(msg.channel, "Unknown alert!");
       return;
     }
 
@@ -159,7 +240,6 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   async userJoinedVC(member: Member, channel: Channel) {
     if (this.usersWithAlerts.includes(member.id)) {
       this.sendAlerts(member.id);
-      await this.removeUserIdFromActiveAlerts(member.id);
     }
   }
 
@@ -167,8 +247,20 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   async userSwitchedVC(member: Member, newChannel: Channel, oldChannel: Channel) {
     if (this.usersWithAlerts.includes(member.id)) {
       this.sendAlerts(member.id);
-      await this.removeUserIdFromActiveAlerts(member.id);
     }
+  }
+
+  @d.event("voiceChannelLeave")
+  async userLeftVC(member: Member, channel: Channel) {
+    const triggeredAlerts = await this.alerts.getAlertsByUserId(member.id);
+    const voiceChannel = channel as VoiceChannel;
+
+    triggeredAlerts.forEach(alert => {
+      const txtChannel = this.bot.getChannel(alert.channel_id) as TextableChannel;
+      txtChannel.createMessage(
+        `🔴 <@!${alert.requestor_id}> the user <@!${alert.user_id}> disconnected out of \`${voiceChannel.name}\``,
+      );
+    });
   }
 
   @d.event("guildBanAdd")
@@ -185,8 +277,11 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
 
     triggeredAlerts.forEach(alert => {
       const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
-      sendWhere(this.guild, member, this.bot.getChannel(alert.channel_id) as TextableChannel, prepend);
-      this.alerts.delete(alert.id);
+      const txtChannel = this.bot.getChannel(alert.channel_id) as TextableChannel;
+      sendWhere(this.guild, member, txtChannel, prepend);
+      if (alert.active) {
+        this.moveMember(alert.requestor_id, member, txtChannel);
+      }
     });
   }
 
@@ -194,6 +289,22 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const index = this.usersWithAlerts.indexOf(userId);
     if (index > -1) {
       this.usersWithAlerts.splice(index, 1);
+    }
+  }
+
+  async moveMember(toMoveID: string, target: Member, errorChannel: TextableChannel) {
+    const modMember: Member = await this.bot.getRESTGuildMember(this.guildId, toMoveID);
+    if (modMember.voiceState.channelID != null) {
+      try {
+        await modMember.edit({
+          channelID: target.voiceState.channelID,
+        });
+      } catch (e) {
+        this.sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
+        return;
+      }
+    } else {
+      this.sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
     }
   }
 }
@@ -212,7 +323,7 @@ export async function sendWhere(guild: Guild, member: Member, channel: TextableC
       return;
     }
     channel.createMessage(
-      prepend + ` ${member.mention} is in the following channel: ${voice.name} ${getInviteLink(invite)}`,
+      prepend + ` ${member.mention} is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
     );
   }
 }
