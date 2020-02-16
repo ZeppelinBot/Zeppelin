@@ -1,5 +1,4 @@
 import { GlobalPlugin, IBasePluginConfig, IPluginOptions, logger, configUtils } from "knub";
-import { PluginRuntimeError } from "../PluginRuntimeError";
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";

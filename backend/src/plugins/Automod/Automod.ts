@@ -1,9 +1,10 @@
-import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "../ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "../ZeppelinPlugin";
 import * as t from "io-ts";
 import {
   convertDelayStringToMS,
   disableInlineCode,
   disableLinkPreviews,
+  disableUserNotificationStrings,
   getEmojiInString,
   getInviteCodesInString,
   getRoleMentions,
@@ -15,12 +16,10 @@ import {
   SECONDS,
   stripObjectToScalars,
   tDeepPartial,
-  tDelayString,
-  tNullable,
-  UnknownUser,
+  UserNotificationMethod,
   verboseChannelMention,
 } from "../../utils";
-import { configUtils, CooldownManager, IPluginOptions, decorators as d, logger } from "knub";
+import { configUtils, CooldownManager, decorators as d, IPluginOptions, logger } from "knub";
 import { Member, Message, TextChannel, User } from "eris";
 import escapeStringRegexp from "escape-string-regexp";
 import { SimpleCache } from "../../SimpleCache";
@@ -29,7 +28,6 @@ import { ModActionsPlugin } from "../ModActions";
 import { MutesPlugin } from "../Mutes";
 import { LogsPlugin } from "../Logs";
 import { LogType } from "../../data/LogType";
-import { TSafeRegex } from "../../validatorUtils";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -37,11 +35,9 @@ import { SavedMessage } from "../../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import { renderTemplate } from "../../templateFormatter";
 import { transliterate } from "transliteration";
-import Timeout = NodeJS.Timeout;
 import { IMatchParams } from "knub/dist/configUtils";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import {
-  AnySpamTriggerMatchResult,
   AnyTriggerMatchResult,
   BaseTextSpamTrigger,
   MessageInfo,
@@ -66,6 +62,8 @@ import {
   TRule,
 } from "./types";
 import { pluginInfo } from "./info";
+import { ERRORS, RecoverablePluginError } from "../../RecoverablePluginError";
+import Timeout = NodeJS.Timeout;
 
 const unactioned = (action: TextRecentAction | OtherRecentAction) => !action.actioned;
 
@@ -878,6 +876,30 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     }
   }
 
+  protected readContactMethodsFromAction(action: {
+    notify?: string;
+    notifyChannel?: string;
+  }): UserNotificationMethod[] | null {
+    if (action.notify === "dm") {
+      return [{ type: "dm" }];
+    } else if (action.notify === "channel") {
+      if (!action.notifyChannel) {
+        throw new RecoverablePluginError(ERRORS.NO_USER_NOTIFICATION_CHANNEL);
+      }
+
+      const channel = this.guild.channels.get(action.notifyChannel);
+      if (!(channel instanceof TextChannel)) {
+        throw new RecoverablePluginError(ERRORS.INVALID_USER_NOTIFICATION_CHANNEL);
+      }
+
+      return [{ type: "channel", channel }];
+    } else if (action.notify && disableUserNotificationStrings.includes(action.notify)) {
+      return [];
+    }
+
+    return null;
+  }
+
   /**
    * Apply the actions of the specified rule on the matched message/member
    */
@@ -945,6 +967,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     if (rule.actions.warn) {
       const reason = rule.actions.warn.reason || "Warned automatically";
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.warn);
 
       const caseArgs = {
         modId: this.bot.user.id,
@@ -962,7 +985,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (membersToWarn.length) {
         for (const member of membersToWarn) {
-          await this.getModActions().warnMember(member, reason, caseArgs);
+          await this.getModActions().warnMember(member, reason, { contactMethods, caseArgs });
         }
 
         actionsTaken.push("warn");
@@ -976,6 +999,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.mute);
 
       let userIdsToMute = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
@@ -986,7 +1010,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (userIdsToMute.length) {
         for (const member of userIdsToMute) {
-          await this.getMutes().muteUser(member.id, duration, reason, caseArgs);
+          await this.getMutes().muteUser(member.id, duration, reason, { contactMethods, caseArgs });
         }
 
         actionsTaken.push("mute");
@@ -999,6 +1023,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.kick);
 
       let membersToKick = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
@@ -1011,7 +1036,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (membersToKick.length) {
         for (const member of membersToKick) {
-          await this.getModActions().kickMember(member, reason, caseArgs);
+          await this.getModActions().kickMember(member, reason, { contactMethods, caseArgs });
         }
 
         actionsTaken.push("kick");
@@ -1024,6 +1049,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         modId: this.bot.user.id,
         extraNotes: [caseExtraNote],
       };
+      const contactMethods = this.readContactMethodsFromAction(rule.actions.ban);
 
       let userIdsToBan = [];
       if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
@@ -1034,7 +1060,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (userIdsToBan.length) {
         for (const userId of userIdsToBan) {
-          await this.getModActions().banUserId(userId, reason, caseArgs);
+          await this.getModActions().banUserId(userId, reason, { contactMethods, caseArgs });
         }
 
         actionsTaken.push("ban");

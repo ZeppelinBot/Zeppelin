@@ -1,30 +1,27 @@
-import { IBasePluginConfig, IPluginOptions, logger, Plugin, configUtils } from "knub";
-import { PluginRuntimeError } from "../PluginRuntimeError";
+import { configUtils, IBasePluginConfig, IPluginOptions, logger, Plugin } from "knub";
 import * as t from "io-ts";
-import { pipe } from "fp-ts/lib/pipeable";
-import { fold } from "fp-ts/lib/Either";
-import { PathReporter } from "io-ts/lib/PathReporter";
 import {
   deepKeyIntersect,
   isSnowflake,
   isUnicodeEmoji,
   MINUTES,
+  Not,
   resolveMember,
+  resolveRoleId,
   resolveUser,
   resolveUserId,
   tDeepPartial,
   trimEmptyStartEndLines,
   trimIndents,
   UnknownUser,
-  resolveRoleId,
 } from "../utils";
 import { Invite, Member, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";
-import { Knub } from "knub/dist/Knub";
 import { TZeppelinKnub } from "../types";
+import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 
 const SLOW_RESOLVE_THRESHOLD = 1500;
 
@@ -74,8 +71,8 @@ export class ZeppelinPlugin<
 
   protected readonly knub: TZeppelinKnub;
 
-  protected throwPluginRuntimeError(message: string) {
-    throw new PluginRuntimeError(message, this.runtimePluginName, this.guildId);
+  protected throwRecoverablePluginError(code: ERRORS) {
+    throw new RecoverablePluginError(code, this.guild);
   }
 
   protected canActOn(member1: Member, member2: Member, allowSameLevel = false) {
@@ -217,7 +214,7 @@ export class ZeppelinPlugin<
         }
       }
     } else {
-      throw new PluginRuntimeError(`Invalid emoji: ${snowflake}`, this.runtimePluginName, this.guildId);
+      this.throwRecoverablePluginError(ERRORS.INVALID_EMOJI);
     }
   }
 
@@ -237,7 +234,9 @@ export class ZeppelinPlugin<
    * Resolves a user from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
    * If the user is not found in the cache, it's fetched from the API.
    */
-  async resolveUser(userResolvable: string): Promise<User | UnknownUser> {
+  async resolveUser(userResolvable: string): Promise<User | UnknownUser>;
+  async resolveUser<T>(userResolvable: Not<T, string>): Promise<UnknownUser>;
+  async resolveUser(userResolvable) {
     const start = performance.now();
     const user = await resolveUser(this.bot, userResolvable);
     const time = performance.now() - start;

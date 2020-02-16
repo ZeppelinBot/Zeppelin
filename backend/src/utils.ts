@@ -118,6 +118,9 @@ function tDeepPartialProp(prop: any) {
   }
 }
 
+// https://stackoverflow.com/a/49262929/316944
+export type Not<T, E> = T & Exclude<T, E>;
+
 /**
  * Mirrors EmbedOptions from Eris
  */
@@ -743,63 +746,64 @@ export type CustomEmoji = {
   id: string;
 } & Emoji;
 
-export interface INotifyUserConfig {
-  useDM?: boolean;
-  useChannel?: boolean;
-  channelId?: string;
-}
+export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel };
 
-export enum NotifyUserStatus {
-  Ignored = 1,
-  Failed,
-  DirectMessaged,
-  ChannelMessaged,
-}
+export const disableUserNotificationStrings = ["no", "none", "off"];
 
-export interface INotifyUserResult {
-  status: NotifyUserStatus;
+export interface UserNotificationResult {
+  method: UserNotificationMethod | null;
+  success: boolean;
   text?: string;
 }
 
+/**
+ * Attempts to notify the user using one of the specified methods. Only the first one that succeeds will be used.
+ * @param methods List of methods to try, in priority order
+ */
 export async function notifyUser(
-  bot: Client,
-  guild: Guild,
   user: User,
   body: string,
-  config: INotifyUserConfig,
-): Promise<INotifyUserResult> {
-  if (!config.useDM && !config.useChannel) {
-    return { status: NotifyUserStatus.Ignored };
+  methods: UserNotificationMethod[],
+): Promise<UserNotificationResult> {
+  if (methods.length === 0) {
+    return { method: null, success: true };
   }
 
-  if (config.useDM) {
-    try {
-      const dmChannel = await bot.getDMChannel(user.id);
-      await dmChannel.createMessage(body);
-      logger.info(`Notified ${user.id} via DM: ${body}`);
-      return {
-        status: NotifyUserStatus.DirectMessaged,
-        text: "user notified with a direct message",
-      };
-    } catch (e) {} // tslint:disable-line
-  }
+  let lastError: Error = null;
 
-  if (config.useChannel && config.channelId) {
-    try {
-      const channel = guild.channels.get(config.channelId);
-      if (channel instanceof TextChannel) {
-        await channel.createMessage(`<@!${user.id}> ${body}`);
+  for (const method of methods) {
+    if (method.type === "dm") {
+      try {
+        const dmChannel = await user.getDMChannel();
+        await dmChannel.createMessage(body);
         return {
-          status: NotifyUserStatus.ChannelMessaged,
-          text: `user notified in <#${channel.id}>`,
+          method,
+          success: true,
+          text: "user notified with a direct message",
         };
+      } catch (e) {
+        lastError = e;
       }
-    } catch (e) {} // tslint:disable-line
+    } else if (method.type === "channel") {
+      try {
+        await method.channel.createMessage(`<@!${user.id}> ${body}`);
+        return {
+          method,
+          success: true,
+          text: `user notified in <#${method.channel.id}>`,
+        };
+      } catch (e) {
+        lastError = e;
+      }
+    }
   }
+
+  const errorText = lastError ? `failed to message user: ${lastError.message}` : `failed to message user`;
 
   return {
-    status: NotifyUserStatus.Failed,
-    text: "failed to message user",
+    method: null,
+    success: false,
+    text: errorText,
   };
 }
 
@@ -893,8 +897,10 @@ export function resolveUserId(bot: Client, value: string) {
   return null;
 }
 
-export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser> {
-  if (value == null || typeof value !== "string") {
+export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser>;
+export async function resolveUser<T>(bot: Client, value: Not<T, string>): Promise<UnknownUser>;
+export async function resolveUser<T>(bot, value) {
+  if (typeof value !== "string") {
     return new UnknownUser();
   }
 
