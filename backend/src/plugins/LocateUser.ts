@@ -100,7 +100,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_where")
   async whereCmd(msg: Message, args: { member: Member }) {
     const member = await resolveMember(this.bot, this.guild, args.member.id);
-    sendWhere(this.guild, member, msg.channel, `${msg.member.mention} |`);
+    sendWhere(this.guild, member, msg.channel, `${msg.member.mention} | `);
   }
 
   @d.command("vcalert", "<member:resolvedMember> [reminder:string$]", {
