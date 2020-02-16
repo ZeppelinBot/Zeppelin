@@ -254,8 +254,10 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
               ? convertDelayStringToMS(spamConfig.mute_time.toString())
               : 120 * 1000;
             muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-              modId: this.bot.user.id,
-              postInCaseLogOverride: false,
+              caseArgs: {
+                modId: this.bot.user.id,
+                postInCaseLogOverride: false,
+              },
             });
           }
 
@@ -374,8 +376,10 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
           const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
           const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
           await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-            modId: this.bot.user.id,
-            extraNotes: [`Details: ${details}`],
+            caseArgs: {
+              modId: this.bot.user.id,
+              extraNotes: [`Details: ${details}`],
+            },
           });
         } else {
           // If we're not muting the user, just add a note on them
