@@ -10,7 +10,7 @@
   "MEMBER_UNBAN": "🔓 User (`{userId}`) was unbanned by {userMention(mod)}",
   "MEMBER_FORCEBAN": "🔨 User (`{userId}`) was forcebanned by {userMention(mod)}",
   "MEMBER_SOFTBAN": "🔨 {userMention(member)} was softbanned by {userMention(mod)}",
-  "MEMBER_JOIN": "📥 {userMention(member)} joined{new} (created {account_age} ago)",
+  "MEMBER_JOIN": "📥 {new} {userMention(member)} joined (created {account_age} ago)",
   "MEMBER_LEAVE": "📤 {userMention(member)} left the server",
   "MEMBER_ROLE_ADD": "🔑 {userMention(member)}: role(s) **{roles}** added by {userMention(mod)}",
   "MEMBER_ROLE_REMOVE": "🔑 {userMention(member)}: role(s) **{roles}** removed by {userMention(mod)}",
