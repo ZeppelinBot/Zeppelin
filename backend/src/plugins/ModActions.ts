@@ -520,19 +520,25 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     // Create a case for this action
+    let banType = CaseTypes.Ban;
+    if (banOptions.caseArgs?.type) banType = banOptions.caseArgs.type;
+
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const createdCase = await casesPlugin.createCase({
       ...(banOptions.caseArgs || {}),
       userId,
       modId: banOptions.caseArgs?.modId,
-      type: CaseTypes.Ban,
+      type: banType,
       reason,
       noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
     });
 
     // Log the action
     const mod = await this.resolveUser(banOptions.caseArgs?.modId);
-    this.serverLogs.log(LogType.MEMBER_BAN, {
+    let logtype = LogType.MEMBER_BAN;
+    if (banType === CaseTypes.Softban) logtype = LogType.MEMBER_SOFTBAN;
+
+    this.serverLogs.log(logtype, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
     });
@@ -1231,7 +1237,11 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("softban", "<user:string> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description:
@@ -1240,7 +1250,10 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_ban")
-  async softbanCmd(msg, args: { user: string; reason: string; mod?: Member }) {
+  async softbanCmd(
+    msg,
+    args: { user: string; reason: string; mod?: Member; notify?: string; "notify-channel"?: TextChannel },
+  ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
 
@@ -1277,46 +1290,43 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Softban the user = ban, and immediately unban
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToSoftban.id);
     this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToSoftban.id);
-    this.ignoreEvent(IgnoredEventType.Ban, memberToSoftban.id);
     this.ignoreEvent(IgnoredEventType.Unban, memberToSoftban.id);
 
+    let contactMethods;
     try {
-      await memberToSoftban.ban(1);
+      contactMethods = this.readContactMethodsFromArgs(args);
     } catch (e) {
-      msg.channel.create(errorMessage("Failed to softban the user"));
+      this.sendErrorMessage(msg.channel, e.message);
+      return;
+    }
+
+    const banResult = await this.banUserId(memberToSoftban.id, reason, {
+      contactMethods,
+      caseArgs: {
+        modId: mod.id,
+        ppId: mod.id !== msg.author.id ? msg.author.id : null,
+        type: CaseTypes.Softban,
+      },
+    });
+
+    if (banResult.status === "failed") {
+      this.sendErrorMessage(msg.channel, "Failed to softban the user");
       return;
     }
 
     try {
       await this.guild.unbanMember(memberToSoftban.id);
     } catch (e) {
-      msg.channel.create(errorMessage("Failed to unban the user after softbanning them"));
+      this.sendErrorMessage(msg.channel, "Failed to unban the user after softbanning them");
       return;
     }
-
-    // Create a case for this action
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    const createdCase = await casesPlugin.createCase({
-      userId: memberToSoftban.id,
-      modId: mod.id,
-      type: CaseTypes.Softban,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
-    });
 
     // Confirm the action to the moderator
     this.sendSuccessMessage(
       msg.channel,
-      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
+      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${banResult.case.case_number})`,
     );
-
-    // Log the action
-    this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
-      mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(memberToSoftban, ["user", "roles"]),
-    });
   }
 
   @d.command("unban", "<user:string> [reason:string$]", {
