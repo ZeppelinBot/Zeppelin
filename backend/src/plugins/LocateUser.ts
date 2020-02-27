@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
 import { trimPluginDescription, ZeppelinPlugin, CommandInfo } from "./ZeppelinPlugin";
 import humanizeDuration from "humanize-duration";
-import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User, Command } from "eris";
+import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
 import moment from "moment-timezone";
 import { resolveMember, sorter, createChunkedMessage, MINUTES, SECONDS } from "../utils";
@@ -103,8 +103,8 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     sendWhere(this.guild, member, msg.channel, `${msg.member.mention} | `);
   }
 
-  @d.command("vcalert", "<member:resolvedMember> [reminder:string$]", {
-    aliases: ["vca"],
+  @d.command("follow", "<member:resolvedMember> [reminder:string$]", {
+    aliases: ["f", "vcalert", "vca"],
     options: [
       {
         name: "duration",
@@ -120,20 +120,22 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     extra: {
       info: <CommandInfo>{
         description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
-        basicUsage: "!vca @Dark",
+        basicUsage: "!f @Dark",
         examples: trimPluginDescription(`
           To get an alert for 1 hour:  
-          \`!vca 108552944961454080 -d 1h\`
+          \`!f 108552944961454080 -d 1h\`
 
           To get an alert for 2 hours and 30 minutes with the reminder "Earrape":  
-          \`!vca 108552944961454080 -d 2h30m Earrape\` or \`!vca 108552944961454080 Earrape -d 1h\`
+          \`!f 108552944961454080 -d 2h30m Earrape\`
+          Note: The duration must be specified before the reminder, otherwise it will be part of it
 
           To get an alert for 3 days and be moved to the channel:  
-          \`!vca 108552944961454080 -d 3d -a\`
+          \`!f 108552944961454080 -d 3d -a\`
+          Note: As with the duration, active must be specified before the rminder, otherwise it will be part of it
         `),
         optionDescriptions: {
           duration: "How long the alert shall be active. The alert will be automatically deleted after this time",
-          active: " A switch that, when true, will move you to the channel the user joined",
+          active: "A switch that, when true, will move you to the channel the user joined",
         },
         parameterDescriptions: {
           member: "The server member we want to set as the alerts target",
@@ -143,7 +145,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_alert")
-  async vcalertCmd(msg: Message, args: { member: Member; reminder?: string; duration?: number; active?: boolean }) {
+  async followCmd(msg: Message, args: { member: Member; reminder?: string; duration?: number; active?: boolean }) {
     const time = args.duration || 10 * MINUTES;
     const alertTime = moment().add(time, "millisecond");
     const body = args.reminder || "None";
@@ -154,7 +156,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    this.alerts.add(
+    await this.alerts.add(
       msg.author.id,
       args.member.id,
       msg.channel.id,
@@ -183,8 +185,8 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("vcalerts", [], {
-    aliases: ["vca"],
+  @d.command("follows", [], {
+    aliases: ["fs", "vcalerts", "vca"],
     extra: {
       info: <CommandInfo>{
         description: "Displays all of your active alerts ordered by expiration time",
@@ -192,7 +194,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     },
   })
   @d.permission("can_alert")
-  async listVcalertCmd(msg: Message) {
+  async listFollowCmd(msg: Message) {
     const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
     if (alerts.length === 0) {
       this.sendErrorMessage(msg.channel, "You have no active alerts!");
@@ -204,28 +206,28 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     const lines = Array.from(alerts.entries()).map(([i, alert]) => {
       const num = i + 1;
       const paddedNum = num.toString().padStart(longestNum, " ");
-      return `\`${paddedNum}.\` \`${alert.expires_at}\` Target: <@!${alert.user_id}> Reminder: \`${
+      return `\`${paddedNum}.\` \`${alert.expires_at}\` **Target:** <@!${alert.user_id}> **Reminder:** \`${
         alert.body
-      }\` Active: ${alert.active.valueOf()}`;
+      }\` **Active:** ${alert.active.valueOf()}`;
     });
-    createChunkedMessage(msg.channel, lines.join("\n"));
+    await createChunkedMessage(msg.channel, lines.join("\n"));
   }
 
-  @d.command("vcalerts delete", "<num:number>", {
-    aliases: ["vcalerts d", "vca d"],
+  @d.command("follows delete", "<num:number>", {
+    aliases: ["fs d", "vcalerts delete", "vcalerts d", "vca d"],
     extra: {
       info: <CommandInfo>{
         description:
-          "Deletes the alert at the position <num>.\nThe value needed for <num> can be found using `!vcalerts`",
+          "Deletes the alert at the position <num>.\nThe value needed for <num> can be found using `!follows` (`!fs`)",
       },
     },
   })
   @d.permission("can_alert")
-  async deleteVcalertCmd(msg: Message, args: { num: number }) {
+  async deleteFollowCmd(msg: Message, args: { num: number }) {
     const alerts = await this.alerts.getAlertsByRequestorId(msg.member.id);
     alerts.sort(sorter("expires_at"));
 
-    if (args.num > alerts.length || args.num < 0) {
+    if (args.num > alerts.length || args.num <= 0) {
       this.sendErrorMessage(msg.channel, "Unknown alert!");
       return;
     }
