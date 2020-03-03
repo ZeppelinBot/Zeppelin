@@ -128,14 +128,25 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       realMsg = await this.bot.getMessage(msg.channel_id, msg.id);
     } catch (e) {
-      if (e instanceof DiscordRESTError && e.code === 10008) {
-        // Unknown message, post warning in logs
+      if (e instanceof DiscordRESTError) {
         logger.warn(
-          `Could not apply auto-reactions to ${msg.channel_id}/${msg.id} in guild ${this.guild.name} (${this.guildId}) (error code 10008)`,
+          `Could not load auto-reaction message ${msg.channel_id}/${msg.id} in guild ${this.guild.name} (${this.guildId}) (error code ${e.code})`,
         );
-        this.logs.log(LogType.BOT_ALERT, {
-          body: `Could not apply auto-reactions in <#${msg.channel_id}> for message \`${msg.id}\`. Make sure the bot has **Read Message History** permissions on the channel.`,
-        });
+
+        if (e.code === 50001) {
+          // Missing access
+          this.logs.log(LogType.BOT_ALERT, {
+            body: `Could not load auto-reaction message \`${msg.id}\` in <#${msg.channel_id}>. Make sure the bot has **Read Message History** permissions on the channel.`,
+          });
+        } else if (e.code === 10008) {
+          this.logs.log(LogType.BOT_ALERT, {
+            body: `Could not load auto-reaction message \`${msg.id}\` in <#${msg.channel_id}>. Make sure nothing is deleting the message immediately.`,
+          });
+        } else {
+          this.logs.log(LogType.BOT_ALERT, {
+            body: `Could not load auto-reaction message \`${msg.id}\` in <#${msg.channel_id}>. Error code ${e.code}.`,
+          });
+        }
         return;
       } else {
         throw e;
@@ -143,7 +154,29 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     for (const reaction of autoReaction.reactions) {
-      realMsg.addReaction(reaction);
+      try {
+        await realMsg.addReaction(reaction);
+      } catch (e) {
+        if (e instanceof DiscordRESTError) {
+          logger.warn(
+            `Could not apply auto-reaction to ${msg.channel_id}/${msg.id} in guild ${this.guild.name} (${this.guildId}) (error code ${e.code})`,
+          );
+
+          if (e.code === 10008) {
+            this.logs.log(LogType.BOT_ALERT, {
+              body: `Could not apply auto-reactions in <#${msg.channel_id}> for message \`${msg.id}\`. Make sure nothing is deleting the message before the reactions are applied.`,
+            });
+          } else {
+            this.logs.log(LogType.BOT_ALERT, {
+              body: `Could not apply auto-reactions in <#${msg.channel_id}> for message \`${msg.id}\`. Error code ${e.code}.`,
+            });
+          }
+
+          return;
+        } else {
+          throw e;
+        }
+      }
     }
   }
 }
