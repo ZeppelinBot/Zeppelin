@@ -90,7 +90,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     extra: {
       info: <CommandInfo>{
         description: "Posts an instant invite to the voice channel that `<member>` is in",
-        basicUsage: "!where @Dark",
+        basicUsage: "!w 108552944961454080",
         parameterDescriptions: {
           member: "The member that we want to find",
         },
@@ -120,18 +120,18 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     extra: {
       info: <CommandInfo>{
         description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
-        basicUsage: "!f @Dark",
+        basicUsage: "!f 108552944961454080",
         examples: trimPluginDescription(`
           To get an alert for 1 hour:  
           \`!f 108552944961454080 -d 1h\`
 
           To get an alert for 2 hours and 30 minutes with the reminder "Earrape":  
-          \`!f 108552944961454080 -d 2h30m Earrape\`
-          Note: The duration must be specified before the reminder, otherwise it will be part of it
+          \`!f 108552944961454080 -d 2h30m Earrape\`  
+          *Note: The duration must be specified before the reminder, otherwise it will be part of it*
 
           To get an alert for 3 days and be moved to the channel:  
-          \`!f 108552944961454080 -d 3d -a\`
-          Note: As with the duration, active must be specified before the rminder, otherwise it will be part of it
+          \`!f 108552944961454080 -d 3d -a\`  
+          *Note: As with the duration, active must be specified before the rminder, otherwise it will be part of it*
         `),
         optionDescriptions: {
           duration: "How long the alert shall be active. The alert will be automatically deleted after this time",
