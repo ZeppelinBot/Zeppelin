@@ -387,6 +387,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           if (member.game) {
             if (member.game.name && member.game.name.match(queryRegex)) return true;
             if (member.game.state && member.game.state.match(queryRegex)) return true;
+            if (member.game.details && member.game.details.match(queryRegex)) return true;
+            if (
+              member.game.assets &&
+              (member.game.assets.small_text.match(queryRegex) || member.game.assets.large_text.match(queryRegex))
+            )
+              return true;
+            if (member.game.emoji && member.game.emoji.name.match(queryRegex)) return true;
           }
           return false;
         });
