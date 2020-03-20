@@ -60,10 +60,12 @@ import {
   TMatchWordsTrigger,
   TMemberJoinTrigger,
   TRule,
+  TMatchAttachmentTypeTrigger,
 } from "./types";
 import { pluginInfo } from "./info";
 import { ERRORS, RecoverablePluginError } from "../../RecoverablePluginError";
 import Timeout = NodeJS.Timeout;
+import { StrictValidationError } from "src/validatorUtils";
 
 const unactioned = (action: TextRecentAction | OtherRecentAction) => !action.actioned;
 
@@ -116,6 +118,19 @@ const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
   match_custom_status: false,
 };
 
+const defaultMatchAttachmentTypeTrigger: Partial<TMatchAttachmentTypeTrigger> = {
+  filetype_blacklist: [],
+  blacklist_enabled: false,
+  filetype_whitelist: [],
+  whitelist_enabled: false,
+  match_messages: true,
+  match_embeds: true,
+  match_visible_names: false,
+  match_usernames: false,
+  match_nicknames: false,
+  match_custom_status: false,
+};
+
 const defaultTextSpamTrigger: Partial<t.TypeOf<typeof BaseTextSpamTrigger>> = {
   per_channel: true,
 };
@@ -130,6 +145,7 @@ const defaultTriggers = {
   match_regex: defaultMatchRegexTrigger,
   match_invites: defaultMatchInvitesTrigger,
   match_links: defaultMatchLinksTrigger,
+  match_attachment_type: defaultMatchAttachmentTypeTrigger,
   message_spam: defaultTextSpamTrigger,
   mention_spam: defaultTextSpamTrigger,
   link_spam: defaultTextSpamTrigger,
@@ -247,6 +263,21 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
             for (const [defaultTriggerName, defaultTrigger] of Object.entries(defaultTriggers)) {
               if (trigger[defaultTriggerName]) {
                 trigger[defaultTriggerName] = configUtils.mergeConfig({}, defaultTrigger, trigger[defaultTriggerName]);
+              }
+            }
+
+            if (trigger.match_attachment_type) {
+              const white = trigger.match_attachment_type.whitelist_enabled;
+              const black = trigger.match_attachment_type.blacklist_enabled;
+
+              if (white && black) {
+                throw new StrictValidationError([
+                  `Cannot have both blacklist and whitelist enabled at rule <${rule.name}/match_attachment_type>`,
+                ]);
+              } else if (!white && !black) {
+                throw new StrictValidationError([
+                  `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_attachment_type>`,
+                ]);
               }
             }
           }
@@ -457,6 +488,23 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     return null;
   }
 
+  protected evaluateMatchAttachmentTypeTrigger(trigger: TMatchAttachmentTypeTrigger, msg: SavedMessage): null | string {
+    if (!msg.data.attachments) return null;
+    const attachments: any[] = msg.data.attachments;
+
+    for (const attachment of attachments) {
+      const attachment_type = attachment.filename.split(`.`).pop();
+      if (trigger.blacklist_enabled && trigger.filetype_blacklist.includes(attachment_type)) {
+        return `${attachment_type} - blacklisted`;
+      }
+      if (trigger.whitelist_enabled && !trigger.filetype_whitelist.includes(attachment_type)) {
+        return `${attachment_type} - not whitelisted`;
+      }
+    }
+
+    return null;
+  }
+
   protected matchTextSpamTrigger(
     recentActionType: RecentActionType,
     trigger: TBaseTextSpamTrigger,
@@ -624,6 +672,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
           return this.evaluateMatchLinksTrigger(trigger.match_links, str);
         });
         if (match) return { ...match, trigger: "match_links" } as TextTriggerMatchResult;
+      }
+
+      if (trigger.match_attachment_type) {
+        const match = await this.matchMultipleTextTypesOnMessage(trigger.match_attachment_type, msg, str => {
+          return this.evaluateMatchAttachmentTypeTrigger(trigger.match_attachment_type, msg);
+        });
+        if (match) return { ...match, trigger: "match_attachment_type" } as TextTriggerMatchResult;
       }
 
       if (trigger.message_spam) {
@@ -1319,6 +1374,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       return `invite code \`${disableInlineCode(matchResult.matchedValue)}\``;
     } else if (matchResult.trigger === "match_links") {
       return `link \`${disableInlineCode(matchResult.matchedValue)}\``;
+    } else if (matchResult.trigger === "match_attachment_type") {
+      return `attachment type \`${disableInlineCode(matchResult.matchedValue)}\``;
     }
 
     return typeof matchResult.matchedValue === "string" ? `\`${disableInlineCode(matchResult.matchedValue)}\`` : null;
