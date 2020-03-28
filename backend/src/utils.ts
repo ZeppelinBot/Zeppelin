@@ -16,6 +16,7 @@ import {
   User,
 } from "eris";
 import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -332,6 +333,9 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Attempts to find a relevant audit log entry for the given user and action
  */
+const auditLogNextAttemptAfterFail: Map<string, number> = new Map();
+const AUDIT_LOG_FAIL_COOLDOWN = 2 * MINUTES;
+
 export async function findRelevantAuditLogEntry(
   guild: Guild,
   actionType: number,
@@ -339,10 +343,20 @@ export async function findRelevantAuditLogEntry(
   attempts: number = 3,
   attemptDelay: number = 3000,
 ): Promise<GuildAuditLogEntry> {
+  if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id) > Date.now()) {
+    return null;
+  }
+
   let auditLogs: GuildAuditLog;
   try {
     auditLogs = await guild.getAuditLogs(5, null, actionType);
   } catch (e) {
+    // If we don't have permission to read audit log, set audit log requests on cooldown
+    if (e instanceof DiscordRESTError && e.code === 50013) {
+      auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
+      throw e;
+    }
+
     // Ignore internal server errors which seem to be pretty common with audit log requests
     if (!(e instanceof DiscordHTTPError) || e.code !== 500) {
       throw e;
@@ -1015,10 +1029,18 @@ export function messageSummary(msg: SavedMessage) {
 }
 
 export function verboseUserMention(user: User | UnknownUser): string {
+  if (user.id == null) {
+    return `**${user.username}#${user.discriminator}**`;
+  }
+
   return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
+  if (user.id == null) {
+    return `**${user.username}#${user.discriminator}**`;
+  }
+
   return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
 }
 
