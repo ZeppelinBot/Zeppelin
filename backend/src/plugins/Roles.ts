@@ -1,6 +1,6 @@
 import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
-import { stripObjectToScalars, successMessage } from "../utils";
+import { resolveMember, stripObjectToScalars, successMessage } from "../utils";
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildChannel, Member, Message } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
@@ -103,10 +103,18 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.sendSuccessMessage(msg.channel, "Role added to user!");
   }
 
-  @d.command("massaddrole", "<role:string> <members:member...>")
+  @d.command("massaddrole", "<role:string> <members:string...>")
   @d.permission("can_mass_assign")
-  async massAddRoleCmd(msg: Message, args: { role: string; members: Member[] }) {
-    for (const member of args.members) {
+  async massAddRoleCmd(msg: Message, args: { role: string; members: string[] }) {
+    const members = [];
+    const unknownMembers = [];
+    for (const memberId of args.members) {
+      const member = await resolveMember(this.bot, this.guild, memberId);
+      if (member) members.push(member);
+      else unknownMembers.push(memberId);
+    }
+
+    for (const member of members) {
       if (!this.canActOn(msg.member, member, true)) {
         return this.sendErrorMessage(
           msg.channel,
@@ -126,10 +134,10 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       return this.sendErrorMessage(msg.channel, "You cannot assign that role");
     }
 
-    const membersWithoutTheRole = args.members.filter(m => !m.roles.includes(roleId));
+    const membersWithoutTheRole = members.filter(m => !m.roles.includes(roleId));
     let assigned = 0;
-    let failed = 0;
-    const alreadyHadRole = args.members.length - membersWithoutTheRole.length;
+    const failed = [];
+    const alreadyHadRole = members.length - membersWithoutTheRole.length;
 
     msg.channel.createMessage(`Adding role to specified members...`);
 
@@ -145,16 +153,21 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         assigned++;
       } catch (e) {
         logger.warn(`Error when adding role via !massaddrole: ${e.message}`);
-        failed++;
+        failed.push(member.id);
       }
     }
 
     let resultMessage = `Role added to ${assigned} ${assigned === 1 ? "member" : "members"}!`;
-    if (failed > 0) {
-      resultMessage += ` Failed to add the role to ${failed} ${failed === 1 ? "member" : "members"}.`;
-    }
     if (alreadyHadRole) {
       resultMessage += ` ${alreadyHadRole} ${alreadyHadRole === 1 ? "member" : "members"} already had the role.`;
+    }
+
+    if (failed.length) {
+      resultMessage += `\nFailed to add the role to the following members: ${failed.join(", ")}`;
+    }
+
+    if (unknownMembers.length) {
+      resultMessage += `\nUnknown members: ${unknownMembers.join(", ")}`;
     }
 
     msg.channel.createMessage(successMessage(resultMessage));
@@ -209,10 +222,18 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.sendSuccessMessage(msg.channel, "Role removed from user!");
   }
 
-  @d.command("massremoverole", "<role:string> <members:member...>")
+  @d.command("massremoverole", "<role:string> <members:string...>")
   @d.permission("can_mass_assign")
-  async massRemoveRoleCmd(msg: Message, args: { role: string; members: Member[] }) {
-    for (const member of args.members) {
+  async massRemoveRoleCmd(msg: Message, args: { role: string; members: string[] }) {
+    const members = [];
+    const unknownMembers = [];
+    for (const memberId of args.members) {
+      const member = await resolveMember(this.bot, this.guild, memberId);
+      if (member) members.push(member);
+      else unknownMembers.push(memberId);
+    }
+
+    for (const member of members) {
       if (!this.canActOn(msg.member, member, true)) {
         return this.sendErrorMessage(
           msg.channel,
@@ -232,10 +253,10 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       return this.sendErrorMessage(msg.channel, "You cannot remove that role");
     }
 
-    const membersWithTheRole = args.members.filter(m => m.roles.includes(roleId));
+    const membersWithTheRole = members.filter(m => m.roles.includes(roleId));
     let assigned = 0;
-    let failed = 0;
-    const didNotHaveRole = args.members.length - membersWithTheRole.length;
+    const failed = [];
+    const didNotHaveRole = members.length - membersWithTheRole.length;
 
     msg.channel.createMessage(`Removing role from specified members...`);
 
@@ -251,16 +272,21 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         assigned++;
       } catch (e) {
         logger.warn(`Error when removing role via !massremoverole: ${e.message}`);
-        failed++;
+        failed.push(member.id);
       }
     }
 
     let resultMessage = `Role removed from  ${assigned} ${assigned === 1 ? "member" : "members"}!`;
-    if (failed > 0) {
-      resultMessage += ` Failed to remove the role from  ${failed} ${failed === 1 ? "member" : "members"}.`;
-    }
     if (didNotHaveRole) {
       resultMessage += ` ${didNotHaveRole} ${didNotHaveRole === 1 ? "member" : "members"} didn't have the role.`;
+    }
+
+    if (failed.length) {
+      resultMessage += `\nFailed to remove the role from the following members: ${failed.join(", ")}`;
+    }
+
+    if (unknownMembers.length) {
+      resultMessage += `\nUnknown members: ${unknownMembers.join(", ")}`;
     }
 
     msg.channel.createMessage(successMessage(resultMessage));
