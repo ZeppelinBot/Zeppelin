@@ -1,12 +1,10 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { Attachment, Channel, Constants as ErisConstants, Embed, Guild, Member, TextChannel, User } from "eris";
+import { Attachment, Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import {
   createChunkedMessage,
-  disableCodeBlocks,
-  disableLinkPreviews,
   findRelevantAuditLogEntry,
   messageSummary,
   noop,
@@ -26,7 +24,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
@@ -376,59 +374,74 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!isEqual(oldMember.roles, member.roles)) {
       const addedRoles = diff(member.roles, oldMember.roles);
       const removedRoles = diff(oldMember.roles, member.roles);
+      let skip = false;
 
-      const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
-        ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
-        member.id,
-      );
-      const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
+      if (
+        addedRoles.length &&
+        removedRoles.length &&
+        this.guildLogs.isLogIgnored(LogType.MEMBER_ROLE_CHANGES, member.id)
+      ) {
+        skip = true;
+      } else if (addedRoles.length && this.guildLogs.isLogIgnored(LogType.MEMBER_ROLE_ADD, member.id)) {
+        skip = true;
+      } else if (removedRoles.length && this.guildLogs.isLogIgnored(LogType.MEMBER_ROLE_REMOVE, member.id)) {
+        skip = true;
+      }
 
-      if (addedRoles.length && removedRoles.length) {
-        // Roles added *and* removed
-        this.guildLogs.log(
-          LogType.MEMBER_ROLE_CHANGES,
-          {
-            member: logMember,
-            addedRoles: addedRoles
-              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
-            removedRoles: removedRoles
-              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
-            mod: stripObjectToScalars(mod),
-          },
+      if (!skip) {
+        const relevantAuditLogEntry = await this.findRelevantAuditLogEntry(
+          ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
           member.id,
         );
-      } else if (addedRoles.length) {
-        // Roles added
-        this.guildLogs.log(
-          LogType.MEMBER_ROLE_ADD,
-          {
-            member: logMember,
-            roles: addedRoles
-              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
-            mod: stripObjectToScalars(mod),
-          },
-          member.id,
-        );
-      } else if (removedRoles.length && !addedRoles.length) {
-        // Roles removed
-        this.guildLogs.log(
-          LogType.MEMBER_ROLE_REMOVE,
-          {
-            member: logMember,
-            roles: removedRoles
-              .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
-            mod: stripObjectToScalars(mod),
-          },
-          member.id,
-        );
+        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
+
+        if (addedRoles.length && removedRoles.length) {
+          // Roles added *and* removed
+          this.guildLogs.log(
+            LogType.MEMBER_ROLE_CHANGES,
+            {
+              member: logMember,
+              addedRoles: addedRoles
+                .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
+                .join(", "),
+              removedRoles: removedRoles
+                .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
+                .join(", "),
+              mod: stripObjectToScalars(mod),
+            },
+            member.id,
+          );
+        } else if (addedRoles.length) {
+          // Roles added
+          this.guildLogs.log(
+            LogType.MEMBER_ROLE_ADD,
+            {
+              member: logMember,
+              roles: addedRoles
+                .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
+                .join(", "),
+              mod: stripObjectToScalars(mod),
+            },
+            member.id,
+          );
+        } else if (removedRoles.length && !addedRoles.length) {
+          // Roles removed
+          this.guildLogs.log(
+            LogType.MEMBER_ROLE_REMOVE,
+            {
+              member: logMember,
+              roles: removedRoles
+                .map(roleId => this.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
+                .join(", "),
+              mod: stripObjectToScalars(mod),
+            },
+            member.id,
+          );
+        }
       }
     }
   }
