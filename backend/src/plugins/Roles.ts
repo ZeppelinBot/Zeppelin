@@ -106,6 +106,8 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.command("massaddrole", "<role:string> <members:string...>")
   @d.permission("can_mass_assign")
   async massAddRoleCmd(msg: Message, args: { role: string; members: string[] }) {
+    msg.channel.createMessage(`Resolving members...`);
+
     const members = [];
     const unknownMembers = [];
     for (const memberId of args.members) {
