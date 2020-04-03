@@ -38,7 +38,7 @@
              v-bind:ref="getCommandSlug(command.trigger)" v-bind:class="{target: targetCommandId === getCommandSlug(command.trigger)}">
           <h3 class="text-xl mb-0">
             !{{ command.trigger }}
-            <span v-for="alias in command.config.aliases"> <span class="text-gray-600">/</span> !{{ alias }}</span>
+            <span v-for="alias in command.config.aliases"> <span class="text-gray-600">/</span> !{{ alias }} </span>
           </h3>
           <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description"
                          :content="command.config.extra.info.description"

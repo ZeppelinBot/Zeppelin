@@ -387,6 +387,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           if (member.game) {
             if (member.game.name && member.game.name.match(queryRegex)) return true;
             if (member.game.state && member.game.state.match(queryRegex)) return true;
+            if (member.game.details && member.game.details.match(queryRegex)) return true;
+            if (
+              member.game.assets &&
+              (member.game.assets.small_text.match(queryRegex) || member.game.assets.large_text.match(queryRegex))
+            )
+              return true;
+            if (member.game.emoji && member.game.emoji.name.match(queryRegex)) return true;
           }
           return false;
         });
@@ -1539,6 +1546,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   async jumboCmd(msg: Message, args: { emoji: string }) {
     // Get emoji url
     const config = this.getConfig();
+    const size = config.jumbo_size > 2048 ? 2048 : config.jumbo_size;
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
     let extention = ".png";
@@ -1551,7 +1559,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
       url += `${results[2]}${extention}`;
       if (extention === ".png") {
-        const image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+        const image = await this.resizeBuffer(await this.getBufferFromUrl(url), size, size);
         file = {
           name: `emoji${extention}`,
           file: image,
@@ -1567,11 +1575,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
       let image;
       try {
-        image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+        image = await this.resizeBuffer(await this.getBufferFromUrl(url), size, size);
       } catch {
         if (url.toLocaleLowerCase().endsWith("fe0f.svg")) {
           url = url.slice(0, url.lastIndexOf("-fe0f")) + ".svg";
-          image = await this.resizeBuffer(await this.getBufferFromUrl(url), config.jumbo_size, config.jumbo_size);
+          image = await this.resizeBuffer(await this.getBufferFromUrl(url), size, size);
         }
       }
       file = {
