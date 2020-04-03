@@ -1098,6 +1098,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       { name: "mod", type: "member" },
       { name: "notify", type: "string" },
       { name: "notify-channel", type: "channel" },
+      { name: "clean", isSwitch: true },
     ],
     extra: {
       info: {
@@ -1108,7 +1109,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_kick")
   async kickCmd(
     msg,
-    args: { user: string; reason: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
+    args: {
+      user: string;
+      reason: string;
+      mod: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+      clean?: boolean;
+    },
   ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
@@ -1152,6 +1160,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     const kickResult = await this.kickMember(memberToKick, reason, {
       contactMethods,
       caseArgs: {
@@ -1159,6 +1168,26 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
       },
     });
+
+    if (args.clean) {
+      this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToKick.id);
+      this.ignoreEvent(IgnoredEventType.Ban, memberToKick.id);
+
+      try {
+        await memberToKick.ban(1);
+      } catch (e) {
+        this.sendErrorMessage(msg.channel, "Failed to ban the user to clean messages (-clean)");
+      }
+
+      this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToKick.id);
+      this.ignoreEvent(IgnoredEventType.Unban, memberToKick.id);
+
+      try {
+        await this.guild.unbanMember(memberToKick.id);
+      } catch (e) {
+        this.sendErrorMessage(msg.channel, "Failed to unban the user after banning them (-clean)");
+      }
+    }
 
     if (kickResult.status === "failed") {
       msg.channel.createMessage(errorMessage(`Failed to kick user`));
