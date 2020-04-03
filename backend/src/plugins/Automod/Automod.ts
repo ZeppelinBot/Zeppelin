@@ -1009,8 +1009,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       }
 
       if (userIdsToMute.length) {
-        for (const member of userIdsToMute) {
-          await this.getMutes().muteUser(member.id, duration, reason, { contactMethods, caseArgs });
+        for (const userId of userIdsToMute) {
+          await this.getMutes().muteUser(userId, duration, reason, { contactMethods, caseArgs });
         }
 
         actionsTaken.push("mute");
