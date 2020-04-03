@@ -17,4 +17,6 @@ export class VCAlert {
   @Column() expires_at: string;
 
   @Column() body: string;
+
+  @Column() active: boolean;
 }

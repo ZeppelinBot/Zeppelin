@@ -245,6 +245,21 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
     return { embed };
   }
 
+  public async getCaseTypeAmountForUserId(userID: string, type: CaseTypes): Promise<number> {
+    const cases = (await this.cases.getByUserId(userID)).filter(c => !c.is_hidden);
+    let typeAmount = 0;
+
+    if (cases.length > 0) {
+      cases.forEach(singleCase => {
+        if (singleCase.type === type.valueOf()) {
+          typeAmount++;
+        }
+      });
+    }
+
+    return typeAmount;
+  }
+
   /**
    * A helper for posting to the case log channel.
    * Returns silently if the case log channel isn't specified or is invalid.

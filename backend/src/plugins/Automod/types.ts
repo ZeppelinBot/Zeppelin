@@ -179,6 +179,20 @@ export const MatchLinksTrigger = t.type({
 });
 export type TMatchLinksTrigger = t.TypeOf<typeof MatchLinksTrigger>;
 
+export const MatchAttachmentTypeTrigger = t.type({
+  filetype_blacklist: t.array(t.string),
+  blacklist_enabled: t.boolean,
+  filetype_whitelist: t.array(t.string),
+  whitelist_enabled: t.boolean,
+  match_messages: t.boolean,
+  match_embeds: t.boolean,
+  match_visible_names: t.boolean,
+  match_usernames: t.boolean,
+  match_nicknames: t.boolean,
+  match_custom_status: t.boolean,
+});
+export type TMatchAttachmentTypeTrigger = t.TypeOf<typeof MatchAttachmentTypeTrigger>;
+
 export const BaseSpamTrigger = t.type({
   amount: t.number,
   within: t.string,
@@ -280,6 +294,7 @@ export const Rule = t.type({
       match_regex: tNullable(MatchRegexTrigger),
       match_invites: tNullable(MatchInvitesTrigger),
       match_links: tNullable(MatchLinksTrigger),
+      match_attachment_type: tNullable(MatchAttachmentTypeTrigger),
       message_spam: tNullable(MessageSpamTrigger),
       mention_spam: tNullable(MentionSpamTrigger),
       link_spam: tNullable(LinkSpamTrigger),
