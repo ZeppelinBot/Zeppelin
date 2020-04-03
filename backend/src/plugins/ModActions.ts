@@ -46,6 +46,8 @@ const ConfigSchema = t.type({
   ban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
+  warn_notify_threshold: t.number,
+  warn_notify_message: t.string,
   can_note: t.boolean,
   can_warn: t.boolean,
   can_mute: t.boolean,
@@ -162,6 +164,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
+        warn_notify_threshold: 5,
+        warn_notify_message:
+          "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
 
         can_note: false,
         can_warn: false,
@@ -670,6 +675,21 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     const config = this.getConfig();
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
+    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+    const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
+    if (priorWarnAmount >= config.warn_notify_threshold) {
+      const tooManyWarningsMsg = await msg.channel.createMessage(
+        config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
+      );
+
+      const reply = await waitForReaction(this.bot, tooManyWarningsMsg, ["✅", "❌"]);
+      tooManyWarningsMsg.delete();
+      if (!reply || reply.name === "❌") {
+        msg.channel.createMessage(errorMessage("Warn cancelled by moderator"));
+        return;
+      }
+    }
 
     let contactMethods;
     try {
