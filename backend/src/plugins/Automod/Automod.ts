@@ -1336,10 +1336,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const channel = this.guild.channels.get(matchResult.messageInfo.channelId);
       const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
 
-      return trimPluginDescription(`
+      return (
+        trimPluginDescription(`
         Matched ${this.getMatchedValueText(matchResult)} in message in ${channelMention}:
-        ${messageSummary(message)}
-      `);
+      `) +
+        "\n" +
+        messageSummary(message)
+      );
     } else if (matchResult.type === "textspam") {
       const baseUrl = this.knub.getGlobalConfig().url;
       const archiveUrl = this.archives.getUrl(baseUrl, archiveId);
