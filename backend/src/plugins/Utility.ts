@@ -397,11 +397,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
               return true;
             }
 
-            if (
-              member.game.assets &&
-              (member.game.assets.small_text.match(queryRegex) || member.game.assets.large_text.match(queryRegex))
-            ) {
-              return true;
+            if (member.game.assets) {
+              if (member.game.assets.small_text && member.game.assets.small_text.match(queryRegex)) {
+                return true;
+              }
+
+              if (member.game.assets.large_text && member.game.assets.large_text.match(queryRegex)) {
+                return true;
+              }
             }
 
             if (member.game.emoji && member.game.emoji.name.match(queryRegex)) {
