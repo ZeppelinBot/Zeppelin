@@ -280,6 +280,8 @@ export const RemoveRolesAction = t.array(t.string);
 
 export const SetAntiraidLevelAction = t.string;
 
+export const ReplyAction = t.string;
+
 /**
  * RULES
  */
@@ -320,6 +322,7 @@ export const Rule = t.type({
     add_roles: tNullable(AddRolesAction),
     remove_roles: tNullable(RemoveRolesAction),
     set_antiraid_level: tNullable(SetAntiraidLevelAction),
+    reply: tNullable(ReplyAction),
   }),
   cooldown: tNullable(t.string),
 });

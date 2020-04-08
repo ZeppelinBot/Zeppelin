@@ -1210,6 +1210,21 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       actionsTaken.push("set antiraid level");
     }
 
+    if (rule.actions.reply && matchResult.type === "message") {
+      const channelId = matchResult.messageInfo.channelId;
+      const channel = this.guild.channels.get(channelId);
+      if (channel && channel instanceof TextChannel) {
+        const user = await this.resolveUser(matchResult.userId);
+        const formatted = await renderTemplate(rule.actions.reply, {
+          user: stripObjectToScalars(user),
+        });
+        if (formatted) {
+          await channel.createMessage(formatted);
+          actionsTaken.push("reply");
+        }
+      }
+    }
+
     if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
       for (const action of matchResult.recentActions) {
         action.actioned = true;
