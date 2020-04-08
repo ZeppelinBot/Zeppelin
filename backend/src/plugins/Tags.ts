@@ -192,6 +192,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
     ],
   })
+  @d.permission("can_create")
   async tagSourceCmd(msg: Message, args: { tag: string; delete?: boolean }) {
     if (args.delete) {
       return this.deleteTagCmd(msg, { tag: args.tag });
