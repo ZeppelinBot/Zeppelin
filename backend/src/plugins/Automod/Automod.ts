@@ -1030,7 +1030,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       };
 
       let membersToWarn = [];
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
+      if (
+        matchResult.type === "message" ||
+        matchResult.type === "embed" ||
+        matchResult.type === "other" ||
+        matchResult.type === "username" ||
+        matchResult.type === "nickname" ||
+        matchResult.type === "customstatus"
+      ) {
         membersToWarn = [await this.getMember(matchResult.userId)];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         for (const id of spamUserIdsToAction) {
@@ -1057,7 +1064,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const contactMethods = this.readContactMethodsFromAction(rule.actions.mute);
 
       let userIdsToMute = [];
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
+      if (
+        matchResult.type === "message" ||
+        matchResult.type === "embed" ||
+        matchResult.type === "other" ||
+        matchResult.type === "username" ||
+        matchResult.type === "nickname" ||
+        matchResult.type === "customstatus"
+      ) {
         userIdsToMute = [matchResult.userId];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         userIdsToMute.push(...spamUserIdsToAction);
@@ -1081,7 +1095,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const contactMethods = this.readContactMethodsFromAction(rule.actions.kick);
 
       let membersToKick = [];
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
+      if (
+        matchResult.type === "message" ||
+        matchResult.type === "embed" ||
+        matchResult.type === "other" ||
+        matchResult.type === "username" ||
+        matchResult.type === "nickname" ||
+        matchResult.type === "customstatus"
+      ) {
         membersToKick = [await this.getMember(matchResult.userId)];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         for (const id of spamUserIdsToAction) {
@@ -1107,7 +1128,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const contactMethods = this.readContactMethodsFromAction(rule.actions.ban);
 
       let userIdsToBan = [];
-      if (matchResult.type === "message" || matchResult.type === "embed" || matchResult.type === "other") {
+      if (
+        matchResult.type === "message" ||
+        matchResult.type === "embed" ||
+        matchResult.type === "other" ||
+        matchResult.type === "username" ||
+        matchResult.type === "nickname" ||
+        matchResult.type === "customstatus"
+      ) {
         userIdsToBan = [matchResult.userId];
       } else if (matchResult.type === "textspam" || matchResult.type === "otherspam") {
         userIdsToBan.push(...spamUserIdsToAction);
