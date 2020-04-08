@@ -101,7 +101,7 @@
         const editorElem = this.$refs.aceEditor.$el;
         const newWidth = editorElem.parentNode.clientWidth;
         const rect = editorElem.getBoundingClientRect();
-        const newHeight = window.innerHeight - rect.top - 48;
+        const newHeight = Math.round(window.innerHeight - rect.top - 48);
         this.resizeEditor(newWidth, newHeight);
       },
       resizeEditor(newWidth, newHeight) {
