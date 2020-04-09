@@ -560,7 +560,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
     const member = this.guild.members.get(msg.user_id);
 
-    if (trigger.match_messages) {
+    if (msg.data.content && trigger.match_messages) {
       const str = msg.data.content;
       const matchResult = await matchFn(str);
       if (matchResult) {
