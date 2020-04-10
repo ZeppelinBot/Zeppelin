@@ -560,7 +560,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
     const member = this.guild.members.get(msg.user_id);
 
-    if (msg.data.content && trigger.match_messages) {
+    if (trigger.match_messages && msg.data.content) {
       const str = msg.data.content;
       const matchResult = await matchFn(str);
       if (matchResult) {
@@ -601,7 +601,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     }
 
     // type 4 = custom status
-    if (trigger.match_custom_status && member.game && member.game.type === 4) {
+    if (trigger.match_custom_status && member.game && member.game.type === 4 && member.game.state) {
       const str = member.game.state;
       const matchResult = await matchFn(str);
       if (matchResult) {
