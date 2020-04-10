@@ -1,14 +1,15 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
-import { CustomEmoji, errorMessage, isSnowflake, noop, sleep, successMessage } from "../utils";
+import { CustomEmoji, errorMessage, isSnowflake, noop, sleep } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
-import Timeout = NodeJS.Timeout;
 import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 import * as t from "io-ts";
+import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
+import Timeout = NodeJS.Timeout;
 
 /**
  * Either of:
@@ -335,9 +336,20 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         return;
       }
 
-      if (!this.canUseEmoji(pair[0])) {
-        msg.channel.createMessage(errorMessage("I can only use regular emojis and custom emojis from servers I'm on"));
-        return;
+      try {
+        if (!this.canUseEmoji(pair[0])) {
+          msg.channel.createMessage(
+            errorMessage("I can only use regular emojis and custom emojis from servers I'm on"),
+          );
+          return;
+        }
+      } catch (e) {
+        if (e instanceof RecoverablePluginError && e.code === ERRORS.INVALID_EMOJI) {
+          msg.channel.createMessage(errorMessage(`Invalid emoji: ${pair[0]}`));
+          return;
+        }
+
+        throw e;
       }
 
       if (!this.guild.roles.has(pair[1])) {
