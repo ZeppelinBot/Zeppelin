@@ -1447,6 +1447,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       for (const [name, rule] of Object.entries(config.rules)) {
         const matchResult = await this.matchRuleToMessage(rule, msg);
         if (matchResult) {
+          // Make sure the message still exists in our database when we try to apply actions on it.
+          // In high stress situations, such as raids, detection can be delayed and automod might try to act on messages
+          // we no longer have in our database, i.e. messages deleted over 5 minutes go. Since this is an edge case and
+          // undefined behaviour, don't apply actions on that message.
+          const savedMsg = await this.savedMessages.find(msg.id);
+          if (!savedMsg) return;
+
           await this.applyActionsOnMatch(rule, matchResult);
           break; // Don't apply multiple rules to the same message
         }
