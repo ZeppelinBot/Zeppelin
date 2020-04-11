@@ -106,27 +106,34 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
 
       timeXAgo(timeDiff) {
-        if (typeof timeDiff !== "string")
+        if (typeof timeDiff !== "string") {
           return 'Please pass a valid delay as a string to timeXAgo (e.g. timeXAgo("1w"))';
+        }
 
         const delay = convertDelayStringToMS(timeDiff);
         return moment(moment().valueOf() - delay);
       },
 
       humanizeTime(timems) {
-        if (typeof timems !== "number") return moment().format("DD-MM-YYYY HH:mm");
+        if (typeof timems !== "number") {
+          return moment().format("DD-MM-YYYY HH:mm");
+        }
 
         return moment(timems).format("DD-MM-YYYY HH:mm");
       },
 
       discordDateFormat(timems) {
-        if (typeof timems !== "number") return moment().format("YYYY-MM-DD");
+        if (typeof timems !== "number") {
+          return moment().format("YYYY-MM-DD");
+        }
 
         return moment(timems).format("YYYY-MM-DD");
       },
 
       mention: input => {
-        if (typeof input !== "string") return "";
+        if (typeof input !== "string") {
+          return "";
+        }
         if (input.match(/^<(@#)(!&)\d+>$/)) {
           return input;
         }
