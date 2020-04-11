@@ -1126,6 +1126,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         extraNotes: [caseExtraNote],
       };
       const contactMethods = this.readContactMethodsFromAction(rule.actions.ban);
+      const deleteMessageDays = rule.actions.ban.deleteMessageDays;
 
       let userIdsToBan = [];
       if (
@@ -1143,7 +1144,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (userIdsToBan.length) {
         for (const userId of userIdsToBan) {
-          await this.getModActions().banUserId(userId, reason, { contactMethods, caseArgs });
+          await this.getModActions().banUserId(userId, reason, {
+            contactMethods,
+            caseArgs,
+            deleteMessageDays,
+          });
         }
 
         actionsTaken.push("ban");

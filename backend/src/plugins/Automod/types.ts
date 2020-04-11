@@ -262,6 +262,7 @@ export const BanAction = t.type({
   reason: tNullable(t.string),
   notify: tNullable(t.string),
   notifyChannel: tNullable(t.string),
+  deleteMessageDays: tNullable(t.number),
 });
 
 export const AlertAction = t.type({
