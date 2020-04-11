@@ -48,6 +48,7 @@ const ConfigSchema = t.type({
   alert_channel: tNullable(t.string),
   warn_notify_threshold: t.number,
   warn_notify_message: t.string,
+  ban_delete_message_days: t.number,
   can_note: t.boolean,
   can_warn: t.boolean,
   can_mute: t.boolean,
@@ -121,6 +122,7 @@ export interface KickOptions {
 export interface BanOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
+  deleteMessageDays?: number;
 }
 
 export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
@@ -167,6 +169,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         warn_notify_threshold: 5,
         warn_notify_message:
           "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
+        ban_delete_message_days: 1,
 
         can_note: false,
         can_warn: false,
@@ -517,7 +520,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId);
     this.ignoreEvent(IgnoredEventType.Ban, userId);
     try {
-      await this.guild.banMember(userId, 1);
+      const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
+      await this.guild.banMember(userId, deleteMessageDays);
     } catch (e) {
       return {
         status: "failed",
@@ -1177,6 +1181,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       { name: "mod", type: "member" },
       { name: "notify", type: "string" },
       { name: "notify-channel", type: "channel" },
+      { name: "delete-days", type: "number", shortcut: "d" },
     ],
     extra: {
       info: {
@@ -1187,7 +1192,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_ban")
   async banCmd(
     msg,
-    args: { user: string; reason?: string; mod?: Member; notify?: string; "notify-channel"?: TextChannel },
+    args: {
+      user: string;
+      reason?: string;
+      mod?: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+      "delete-days"?: number;
+    },
   ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
@@ -1230,6 +1242,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
+    const deleteMessageDays = args["delete-days"] ?? this.getConfigForMsg(msg).ban_delete_message_days;
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
     const banResult = await this.banUserId(memberToBan.id, reason, {
       contactMethods,
@@ -1237,6 +1250,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         modId: mod.id,
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
       },
+      deleteMessageDays,
     });
 
     if (banResult.status === "failed") {
