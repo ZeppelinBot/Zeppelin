@@ -390,18 +390,21 @@ export async function findRelevantAuditLogEntry(
 const urlRegex = /(\S+\.\S+)/g;
 const protocolRegex = /^[a-z]+:\/\//;
 
-export function getUrlsInString(str: string, unique = false): url.URL[] {
+interface MatchedURL extends url.URL {
+  input: string;
+}
+
+export function getUrlsInString(str: string, unique = false): MatchedURL[] {
   let matches = str.match(urlRegex) || [];
   if (unique) matches = Array.from(new Set(matches));
 
   return matches.reduce((urls, match) => {
-    if (!protocolRegex.test(match)) {
-      match = `https://${match}`;
-    }
+    const withProtocol = protocolRegex.test(match) ? match : `https://${match}`;
 
-    let matchUrl: url.URL;
+    let matchUrl: MatchedURL;
     try {
-      matchUrl = new url.URL(match);
+      matchUrl = new url.URL(withProtocol) as MatchedURL;
+      matchUrl.input = match;
     } catch (e) {
       return urls;
     }

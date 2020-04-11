@@ -458,14 +458,39 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     for (const link of links) {
       const normalizedHostname = link.hostname.toLowerCase();
 
-      if (trigger.include_domains) {
-        for (const domain of trigger.include_domains) {
-          const normalizedDomain = domain.toLowerCase();
-          if (normalizedDomain === normalizedHostname) {
-            return domain;
+      // Exclude > Include
+      // In order of specificity, regex > word > domain
+
+      if (trigger.exclude_regex) {
+        for (const pattern of trigger.exclude_regex) {
+          if (pattern.test(link.input)) {
+            return null;
           }
-          if (trigger.include_subdomains && normalizedHostname.endsWith(`.${domain}`)) {
-            return domain;
+        }
+      }
+
+      if (trigger.include_regex) {
+        for (const pattern of trigger.include_regex) {
+          if (pattern.test(link.input)) {
+            return link.input;
+          }
+        }
+      }
+
+      if (trigger.exclude_words) {
+        for (const word of trigger.exclude_words) {
+          const regex = new RegExp(escapeStringRegexp(word), "i");
+          if (regex.test(link.input)) {
+            return null;
+          }
+        }
+      }
+
+      if (trigger.include_words) {
+        for (const word of trigger.include_words) {
+          const regex = new RegExp(escapeStringRegexp(word), "i");
+          if (regex.test(link.input)) {
+            return link.input;
           }
         }
       }
@@ -482,6 +507,18 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         }
 
         return link.toString();
+      }
+
+      if (trigger.include_domains) {
+        for (const domain of trigger.include_domains) {
+          const normalizedDomain = domain.toLowerCase();
+          if (normalizedDomain === normalizedHostname) {
+            return domain;
+          }
+          if (trigger.include_subdomains && normalizedHostname.endsWith(`.${domain}`)) {
+            return domain;
+          }
+        }
       }
     }
 
