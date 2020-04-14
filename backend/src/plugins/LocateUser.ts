@@ -100,7 +100,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_where")
   async whereCmd(msg: Message, args: { member: Member }) {
     const member = await resolveMember(this.bot, this.guild, args.member.id);
-    sendWhere(this.guild, member, msg.channel, `${msg.member.mention} | `);
+    sendWhere.call(this, this.guild, member, msg.channel, `${msg.member.mention} | `);
   }
 
   @d.command("follow", "<member:resolvedMember> [reminder:string$]", {
@@ -280,7 +280,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
     triggeredAlerts.forEach(alert => {
       const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
       const txtChannel = this.bot.getChannel(alert.channel_id) as TextableChannel;
-      sendWhere(this.guild, member, txtChannel, prepend);
+      sendWhere.call(this, this.guild, member, txtChannel, prepend);
       if (alert.active) {
         this.moveMember(alert.requestor_id, member, txtChannel);
       }
@@ -311,7 +311,7 @@ export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 }
 
-export async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend: string) {
+async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend: string) {
   const voice = guild.channels.get(member.voiceState.channelID) as VoiceChannel;
 
   if (voice == null) {
@@ -330,7 +330,7 @@ export async function sendWhere(guild: Guild, member: Member, channel: TextableC
   }
 }
 
-export async function createInvite(vc: VoiceChannel) {
+async function createInvite(vc: VoiceChannel) {
   const existingInvites = await vc.getInvites();
 
   if (existingInvites.length !== 0) {
