@@ -6,12 +6,13 @@ import moment from "moment-timezone";
 import { CaseTypeColors } from "../data/CaseTypeColors";
 import { PluginInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildArchives } from "../data/GuildArchives";
-import { IPluginOptions } from "knub";
+import { IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
 import { tNullable } from "../utils";
 import { ERRORS } from "../RecoverablePluginError";
+import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
 
 const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
@@ -264,14 +265,31 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
    * A helper for posting to the case log channel.
    * Returns silently if the case log channel isn't specified or is invalid.
    */
-  public postToCaseLogChannel(content: MessageContent, file: MessageFile = null): Promise<Message> {
+  public async postToCaseLogChannel(content: MessageContent, file: MessageFile = null): Promise<Message> {
     const caseLogChannelId = this.getConfig().case_log_channel;
     if (!caseLogChannelId) return;
 
     const caseLogChannel = this.guild.channels.get(caseLogChannelId);
     if (!caseLogChannel || !(caseLogChannel instanceof TextChannel)) return;
 
-    return caseLogChannel.createMessage(content, file);
+    let result;
+    try {
+      result = await caseLogChannel.createMessage(content, file);
+    } catch (e) {
+      if (e instanceof DiscordRESTError && e.code === 50013) {
+        logger.warn(
+          `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${this.guild.name} (${this.guild.id})`,
+        );
+        this.logs.log(LogType.BOT_ALERT, {
+          body: `Missing permissions to post mod cases in <#${caseLogChannel.id}>`,
+        });
+        return;
+      }
+
+      throw e;
+    }
+
+    return result;
   }
 
   /**
