@@ -596,6 +596,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   ): Promise<Partial<TextTriggerMatchResult<T>>> {
     const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
     const member = await this.getMember(msg.user_id);
+    if (!member) return;
 
     if (trigger.match_messages && msg.data.content) {
       const str = msg.data.content;
