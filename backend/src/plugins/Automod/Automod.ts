@@ -595,7 +595,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     matchFn: (str: string) => T | Promise<T> | null,
   ): Promise<Partial<TextTriggerMatchResult<T>>> {
     const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
-    const member = this.guild.members.get(msg.user_id);
+    const member = await this.getMember(msg.user_id);
 
     if (trigger.match_messages && msg.data.content) {
       const str = msg.data.content;
@@ -638,7 +638,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     }
 
     // type 4 = custom status
-    if (trigger.match_custom_status && member.game && member.game.type === 4 && member.game.state) {
+    if (trigger.match_custom_status && member.game?.type === 4 && member.game?.state) {
       const str = member.game.state;
       const matchResult = await matchFn(str);
       if (matchResult) {
