@@ -174,6 +174,7 @@ export const MatchLinksTrigger = t.type({
   exclude_words: tNullable(t.array(t.string)),
   include_regex: tNullable(t.array(TSafeRegex)),
   exclude_regex: tNullable(t.array(TSafeRegex)),
+  only_real_links: t.boolean,
   match_messages: t.boolean,
   match_embeds: t.boolean,
   match_visible_names: t.boolean,
