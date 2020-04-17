@@ -116,6 +116,7 @@ const defaultMatchLinksTrigger: Partial<TMatchLinksTrigger> = {
   match_usernames: false,
   match_nicknames: false,
   match_custom_status: false,
+  only_real_links: true,
 };
 
 const defaultMatchAttachmentTypeTrigger: Partial<TMatchAttachmentTypeTrigger> = {
@@ -456,6 +457,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     const links = getUrlsInString(str, true);
 
     for (const link of links) {
+      // "real link" = a link that Discord highlights
+      if (trigger.only_real_links && !link.input.match(/^https?:\/\//i)) {
+        continue;
+      }
+
       const normalizedHostname = link.hostname.toLowerCase();
 
       // Exclude > Include
