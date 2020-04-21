@@ -466,7 +466,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     } catch (e) {
       return {
         status: "failed",
-        error: e.getMessage(),
+        error: e.message,
       };
     }
 
@@ -525,7 +525,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     } catch (e) {
       return {
         status: "failed",
-        error: e.getMessage(),
+        error: e.message,
       };
     }
 
