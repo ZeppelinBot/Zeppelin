@@ -387,7 +387,10 @@ export async function findRelevantAuditLogEntry(
   }
 }
 
-const urlRegex = /(\S+\.\S+)/g;
+const realLinkRegex = /https?:\/\/\S+/; // http://anything or https://anything
+const plainLinkRegex = /((?!https?:\/\/)\S)+\.\S+/; // anything.anything, without http:// or https:// preceding it
+// Both of the above, with precedence on the first one
+const urlRegex = new RegExp(`(${realLinkRegex.source}|${plainLinkRegex.source})`, "g");
 const protocolRegex = /^[a-z]+:\/\//;
 
 interface MatchedURL extends url.URL {
