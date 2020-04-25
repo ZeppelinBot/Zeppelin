@@ -111,7 +111,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         }
 
         const delay = convertDelayStringToMS(timeDiff);
-        return moment(moment().valueOf() - delay);
+        return moment(moment().valueOf() - delay).valueOf();
       },
 
       humanizeTime(timems) {
