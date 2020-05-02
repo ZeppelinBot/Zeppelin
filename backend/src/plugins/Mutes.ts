@@ -617,17 +617,32 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.sendSuccessMessage(msg.channel, `Cleared ${cleared} mutes from members that don't have the mute role`);
   }
 
-  @d.command("clear_mute", "<userId:string>")
+  @d.command("clear_mute", "<userIds:string...>")
   @d.permission("can_cleanup")
-  protected async clearMuteCmd(msg: Message, args: { userId: string }) {
-    const mute = await this.mutes.findExistingMuteForUserId(args.userId);
-    if (!mute) {
-      msg.channel.createMessage(errorMessage("No active mutes found for that user id"));
-      return;
+  protected async clearMuteCmd(msg: Message, args: { userIds: string[] }) {
+    const failed = [];
+    for (const id of args.userIds) {
+      const mute = await this.mutes.findExistingMuteForUserId(id);
+      if (!mute) {
+        failed.push(id);
+        continue;
+      }
+      await this.mutes.clear(id);
     }
 
-    await this.mutes.clear(args.userId);
-    this.sendSuccessMessage(msg.channel, `Active mute cleared`);
+    if (failed.length !== args.userIds.length) {
+      this.sendSuccessMessage(msg.channel, `**${args.userIds.length - failed.length} active mute(s) cleared**`);
+    }
+    if (failed.length) {
+      let list = "";
+      for (const id of failed) {
+        list += id + " ";
+      }
+      this.sendErrorMessage(
+        msg.channel,
+        `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${list}`,
+      );
+    }
   }
 
   protected async clearExpiredMutes() {
