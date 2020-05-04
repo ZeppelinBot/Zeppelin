@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-const DISCORD_API_URL = "https://discordapp.com/api";
+const DISCORD_API_URL = "https://discord.com/api";
 
 function simpleDiscordAPIRequest(bearerToken, path): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -94,8 +94,8 @@ export function initAuth(app: express.Express) {
   passport.use(
     new OAuth2Strategy(
       {
-        authorizationURL: "https://discordapp.com/api/oauth2/authorize",
-        tokenURL: "https://discordapp.com/api/oauth2/token",
+        authorizationURL: "https://discord.com/api/oauth2/authorize",
+        tokenURL: "https://discord.com/api/oauth2/token",
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: process.env.OAUTH_CALLBACK_URL,

@@ -423,7 +423,7 @@ export function getUrlsInString(str: string, unique = false): MatchedURL[] {
 }
 
 export function getInviteCodesInString(str: string): string[] {
-  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite)\/([a-z0-9]+)/gi;
+  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite|discord.com\/invite)\/([a-z0-9]+)/gi;
   return Array.from(str.matchAll(inviteCodeRegex)).map(m => m[1]);
 }
 
@@ -559,7 +559,7 @@ export function disableCodeBlocks(content: string): string {
 }
 
 export function useMediaUrls(content: string): string {
-  return content.replace(/cdn\.discordapp\.com/g, "media.discordapp.net");
+  return content.replace(/cdn\.discord(app)?\.com/g, "media.discordapp.net");
 }
 
 export function chunkArray<T>(arr: T[], chunkSize): T[][] {
@@ -1071,7 +1071,7 @@ export function messageLink(guildIdOrMessage: string | Message | null, channelId
     guildId = guildIdOrMessage;
   }
 
-  return `https://discordapp.com/channels/${guildId}/${channelId}/${messageId}`;
+  return `https://discord.com/channels/${guildId}/${channelId}/${messageId}`;
 }
 
 export function isValidEmbed(embed: any): boolean {
