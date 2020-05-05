@@ -1600,7 +1600,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
   public getActionedMessageLink(matchResult: AnyTriggerMatchResult): string {
     if (matchResult.type === "message" || matchResult.type === "embed") {
-      return `https://discordapp.com/channels/${this.guild.id}/${matchResult.messageInfo.channelId}/${matchResult.messageInfo.messageId}`;
+      return `https://discord.com/channels/${this.guild.id}/${matchResult.messageInfo.channelId}/${matchResult.messageInfo.messageId}`;
     } else {
       return ``;
     }
