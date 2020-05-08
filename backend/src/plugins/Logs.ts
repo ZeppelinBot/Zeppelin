@@ -2,7 +2,7 @@ import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Attachment, Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import {
   createChunkedMessage,
   findRelevantAuditLogEntry,

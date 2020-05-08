@@ -12,7 +12,8 @@ import { LogType } from "../data/LogType";
 import * as t from "io-ts";
 import { tNullable } from "../utils";
 import { ERRORS } from "../RecoverablePluginError";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 
 const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
