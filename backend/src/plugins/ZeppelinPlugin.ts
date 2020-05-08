@@ -16,7 +16,7 @@ import {
   UnknownUser,
 } from "../utils";
 import { Invite, Member, User } from "eris";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";

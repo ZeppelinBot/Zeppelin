@@ -14,7 +14,7 @@ import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";

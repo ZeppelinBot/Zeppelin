@@ -5,7 +5,7 @@ import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isEmoji } from "../utils";
 import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import * as t from "io-ts";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";

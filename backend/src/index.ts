@@ -7,8 +7,8 @@ const fsp = fs.promises;
 import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig } from "knub";
 import { SimpleError } from "./SimpleError";
 
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
-import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
+import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
 
 import { Configs } from "./data/Configs";
 

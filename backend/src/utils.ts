@@ -15,8 +15,8 @@ import {
   TextChannel,
   User,
 } from "eris";
-import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";

@@ -6,7 +6,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import * as t from "io-ts";
 import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 import Timeout = NodeJS.Timeout;

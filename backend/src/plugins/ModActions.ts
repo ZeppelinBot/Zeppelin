@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
-import DiscordRESTError from "eris/lib/errors/DiscordRESTError"; // tslint:disable-line
-import DiscordHTTPError from "eris/lib/errors/DiscordHTTPError"; // tslint:disable-line
+import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
+import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
