@@ -2,10 +2,10 @@ import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { Attachment, Channel, Constants as ErisConstants, Embed, Member, TextChannel, User } from "eris";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import {
   createChunkedMessage,
   findRelevantAuditLogEntry,
+  isDiscordRESTError,
   messageSummary,
   noop,
   stripObjectToScalars,
@@ -263,7 +263,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       return await findRelevantAuditLogEntry(this.guild, actionType, userId, attempts, attemptDelay);
     } catch (e) {
-      if (e instanceof DiscordRESTError && e.code === 50013) {
+      if (isDiscordRESTError(e) && e.code === 50013) {
         this.guildLogs.log(LogType.BOT_ALERT, {
           body: "Missing permissions to read audit log",
         });

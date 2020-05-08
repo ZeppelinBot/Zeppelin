@@ -10,10 +10,8 @@ import { IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
-import { tNullable } from "../utils";
+import { isDiscordRESTError, tNullable } from "../utils";
 import { ERRORS } from "../RecoverablePluginError";
-
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 
 const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
@@ -277,7 +275,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       result = await caseLogChannel.createMessage(content, file);
     } catch (e) {
-      if (e instanceof DiscordRESTError && e.code === 50013) {
+      if (isDiscordRESTError(e) && e.code === 50013) {
         logger.warn(
           `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${this.guild.name} (${this.guild.id})`,
         );

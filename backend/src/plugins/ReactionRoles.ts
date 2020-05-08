@@ -1,12 +1,11 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
-import { CustomEmoji, errorMessage, isSnowflake, noop, sleep } from "../utils";
+import { CustomEmoji, errorMessage, isDiscordRESTError, isSnowflake, noop, sleep } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Message, TextChannel } from "eris";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import * as t from "io-ts";
 import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 import Timeout = NodeJS.Timeout;
@@ -143,7 +142,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       targetMessage = await channel.getMessage(messageId);
     } catch (e) {
-      if (e instanceof DiscordRESTError) {
+      if (isDiscordRESTError(e)) {
         if (e.code === 10008) {
           // Unknown message, remove reaction roles from the message
           logger.warn(

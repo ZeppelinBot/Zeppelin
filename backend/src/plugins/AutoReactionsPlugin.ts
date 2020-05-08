@@ -3,9 +3,8 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
-import { customEmojiRegex, errorMessage, isEmoji } from "../utils";
+import { customEmojiRegex, errorMessage, isDiscordRESTError, isEmoji } from "../utils";
 import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import * as t from "io-ts";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -128,7 +127,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       realMsg = await this.bot.getMessage(msg.channel_id, msg.id);
     } catch (e) {
-      if (e instanceof DiscordRESTError) {
+      if (isDiscordRESTError(e)) {
         logger.warn(
           `Could not load auto-reaction message ${msg.channel_id}/${msg.id} in guild ${this.guild.name} (${this.guildId}) (error code ${e.code})`,
         );
@@ -157,7 +156,7 @@ export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       try {
         await realMsg.addReaction(reaction);
       } catch (e) {
-        if (e instanceof DiscordRESTError) {
+        if (isDiscordRESTError(e)) {
           logger.warn(
             `Could not apply auto-reaction to ${msg.channel_id}/${msg.id} in guild ${this.guild.name} (${this.guildId}) (error code ${e.code})`,
           );

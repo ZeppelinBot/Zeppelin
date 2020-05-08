@@ -15,8 +15,6 @@ import {
   TextChannel,
   User,
 } from "eris";
-import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import url from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -51,6 +49,17 @@ export const DAYS = 24 * HOURS;
 export const WEEKS = 7 * 24 * HOURS;
 
 export const EMPTY_CHAR = "\u200b";
+
+export const DISCORD_HTTP_ERROR_NAME = "DiscordHTTPError";
+export const DISCORD_REST_ERROR_NAME = "DiscordRESTError";
+
+export function isDiscordHTTPError(err: Error | string) {
+  return typeof err === "object" && err.constructor?.name === DISCORD_HTTP_ERROR_NAME;
+}
+
+export function isDiscordRESTError(err: Error | string) {
+  return typeof err === "object" && err.constructor?.name === DISCORD_REST_ERROR_NAME;
+}
 
 export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
@@ -352,13 +361,13 @@ export async function findRelevantAuditLogEntry(
     auditLogs = await guild.getAuditLogs(5, null, actionType);
   } catch (e) {
     // If we don't have permission to read audit log, set audit log requests on cooldown
-    if (e instanceof DiscordRESTError && e.code === 50013) {
+    if (isDiscordRESTError(e) && e.code === 50013) {
       auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
       throw e;
     }
 
     // Ignore internal server errors which seem to be pretty common with audit log requests
-    if (!(e instanceof DiscordHTTPError) || e.code !== 500) {
+    if (!isDiscordHTTPError(e) || e.code !== 500) {
       throw e;
     }
   }
