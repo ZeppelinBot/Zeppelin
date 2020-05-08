@@ -4,6 +4,7 @@ import {
   convertDelayStringToMS,
   createChunkedMessage,
   errorMessage,
+  isDiscordRESTError,
   noop,
   stripObjectToScalars,
   successMessage,
@@ -14,7 +15,6 @@ import humanizeDuration from "humanize-duration";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import * as t from "io-ts";
@@ -99,7 +99,7 @@ export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
     } catch (e) {
       const user = this.bot.users.get(userId) || new UnknownUser({ id: userId });
 
-      if (e instanceof DiscordRESTError && e.code === 50013) {
+      if (isDiscordRESTError(e) && e.code === 50013) {
         logger.warn(
           `Missing permissions to apply bot slowmode to user ${userId} on channel ${channel.name} (${channel.id}) on server ${this.guild.name} (${this.guildId})`,
         );

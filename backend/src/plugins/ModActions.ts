@@ -1,7 +1,5 @@
 import { decorators as d, IPluginOptions, logger, waitForReaction, waitForReply } from "knub";
 import { Attachment, Constants as ErisConstants, Guild, Member, Message, TextChannel, User } from "eris";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
-import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
 import humanizeDuration from "humanize-duration";
 import { GuildCases } from "../data/GuildCases";
 import {
@@ -10,6 +8,8 @@ import {
   disableUserNotificationStrings,
   errorMessage,
   findRelevantAuditLogEntry,
+  isDiscordHTTPError,
+  isDiscordRESTError,
   MINUTES,
   multiSorter,
   notifyUser,
@@ -281,7 +281,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       const bans = (await this.guild.getBans()) as any;
       return bans.some(b => b.user.id === userId);
     } catch (e) {
-      if (e instanceof DiscordHTTPError && e.code === 500) {
+      if (isDiscordHTTPError(e) && e.code === 500) {
         return false;
       }
 
@@ -293,7 +293,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       return await findRelevantAuditLogEntry(this.guild, actionType, userId, attempts, attemptDelay);
     } catch (e) {
-      if (e instanceof DiscordRESTError && e.code === 50013) {
+      if (isDiscordRESTError(e) && e.code === 50013) {
         this.serverLogs.log(LogType.BOT_ALERT, {
           body: "Missing permissions to read audit log",
         });
@@ -827,7 +827,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     } catch (e) {
       if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
         this.sendErrorMessage(msg.channel, "Could not mute the user: no mute role set in config");
-      } else if (e instanceof DiscordRESTError && e.code === 10007) {
+      } else if (isDiscordRESTError(e) && e.code === 10007) {
         this.sendErrorMessage(msg.channel, "Could not mute the user: unknown member");
       } else {
         logger.error(`Failed to mute user ${user.id}: ${e.stack}`);

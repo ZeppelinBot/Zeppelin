@@ -7,9 +7,6 @@ const fsp = fs.promises;
 import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig } from "knub";
 import { SimpleError } from "./SimpleError";
 
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
-import DiscordHTTPError = require("eris/lib/errors/DiscordHTTPError.js"); // tslint:disable-line
-
 import { Configs } from "./data/Configs";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
@@ -48,7 +45,7 @@ if (process.env.NODE_ENV === "production") {
         console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
         process.exit(1);
       }
-    } else if (err instanceof DiscordRESTError || err instanceof DiscordHTTPError) {
+    } else if (isDiscordRESTError(err) || isDiscordHTTPError(err)) {
       // Discord API errors, usually safe to just log instead of crash
       // We still bail if we get a ton of them in a short amount of time
       if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
@@ -85,7 +82,7 @@ import { connect } from "./data/db";
 import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { customArgumentTypes } from "./customArgumentTypes";
-import { errorMessage, successMessage } from "./utils";
+import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
 import { IZeppelinGuildConfig, IZeppelinGlobalConfig } from "./types";

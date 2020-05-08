@@ -2,6 +2,7 @@ import { configUtils, IBasePluginConfig, IPluginOptions, logger, Plugin } from "
 import * as t from "io-ts";
 import {
   deepKeyIntersect,
+  isDiscordRESTError,
   isSnowflake,
   isUnicodeEmoji,
   MINUTES,
@@ -16,7 +17,6 @@ import {
   UnknownUser,
 } from "../utils";
 import { Invite, Member, User } from "eris";
-import DiscordRESTError = require("eris/lib/errors/DiscordRESTError.js"); // tslint:disable-line
 import { performance } from "perf_hooks";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "../validatorUtils";
 import { SimpleCache } from "../SimpleCache";
@@ -270,7 +270,7 @@ export class ZeppelinPlugin<
       try {
         member = userId && (await this.bot.getRESTGuildMember(this.guild.id, userId));
       } catch (e) {
-        if (!(e instanceof DiscordRESTError)) {
+        if (!isDiscordRESTError(e)) {
           throw e;
         }
       }
