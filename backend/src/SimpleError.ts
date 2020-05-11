@@ -1,10 +1,10 @@
 import util from "util";
 
-export class SimpleError {
+export class SimpleError extends Error {
   public message: string;
 
   constructor(message: string) {
-    this.message = message;
+    super(message);
   }
 
   [util.inspect.custom](depth, options) {
