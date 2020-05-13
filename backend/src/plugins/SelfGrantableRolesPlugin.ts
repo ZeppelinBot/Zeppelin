@@ -170,7 +170,7 @@ export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     `);
 
     const help2 = asSingleLine(`
-      To remove a role, type \`!role remove ${firstRole}\`,
+      To remove a role, type \`${prefix}role remove ${firstRole}\`,
       again replacing **${firstRole}** with the role you want to remove.
     `);
 
