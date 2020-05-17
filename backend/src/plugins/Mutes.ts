@@ -45,6 +45,8 @@ const ConfigSchema = t.type({
   mute_message: tNullable(t.string),
   timed_mute_message: tNullable(t.string),
   update_mute_message: tNullable(t.string),
+  remove_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
+  role_restore_blacklist: t.union([t.boolean, t.array(t.string)]),
 
   can_view_list: t.boolean,
   can_cleanup: t.boolean,
@@ -103,6 +105,8 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
         timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
         update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
+        remove_roles_on_mute: false,
+        role_restore_blacklist: false,
 
         can_view_list: false,
         can_cleanup: false,
