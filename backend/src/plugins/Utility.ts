@@ -130,6 +130,10 @@ type BanSearchParams = {
   regex?: boolean;
 };
 
+enum SearchType {
+  MemberSearch,
+  BanSearch,
+}
 class SearchError extends Error {}
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
@@ -663,6 +667,101 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       return;
     }
 
+    await this.displaySearchResults(args, SearchType.MemberSearch, msg);
+  }
+
+  @d.command("bansearch", "[query:string$]", {
+    aliases: ["bs"],
+    options: [
+      {
+        name: "page",
+        shortcut: "p",
+        type: "number",
+      },
+      {
+        name: "sort",
+        type: "string",
+      },
+      {
+        name: "case-sensitive",
+        shortcut: "cs",
+        isSwitch: true,
+      },
+      {
+        name: "export",
+        shortcut: "e",
+        isSwitch: true,
+      },
+      {
+        name: "ids",
+        isSwitch: true,
+      },
+      {
+        name: "regex",
+        shortcut: "re",
+        isSwitch: true,
+      },
+    ],
+    extra: {
+      info: <CommandInfo>{
+        description: "Search banned users",
+        basicUsage: "!bansearch dragory",
+        optionDescriptions: {
+          sort:
+            "Change how the results are sorted. Possible values are 'id' and 'name'. Prefix with a dash, e.g. '-id', to reverse sorting.",
+          "case-sensitive": "By default, the search is case-insensitive. Use this to make it case-sensitive instead.",
+          export: "If set, the full search results are exported as an archive",
+        },
+      },
+    },
+  })
+  @d.permission("can_search")
+  async banSearchCmd(
+    msg: Message,
+    args: {
+      query?: string;
+      page?: number;
+      sort?: string;
+      "case-sensitive"?: boolean;
+      export?: boolean;
+      ids?: boolean;
+      regex?: boolean;
+    },
+  ) {
+    await this.displaySearchResults(args, SearchType.BanSearch, msg);
+  }
+
+  async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
+
+    // Delete & archive in ID order
+    savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
+    const idsToDelete = savedMessages.map(m => m.id);
+
+    // Make sure the deletions aren't double logged
+    idsToDelete.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
+
+    // Actually delete the messages
+    await this.bot.deleteMessages(channel.id, idsToDelete);
+    await this.savedMessages.markBulkAsDeleted(idsToDelete);
+
+    // Create an archive
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
+    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+    this.logs.log(LogType.CLEAN, {
+      mod: stripObjectToScalars(mod),
+      channel: stripObjectToScalars(channel),
+      count: savedMessages.length,
+      archiveUrl,
+    });
+
+    return { archiveUrl };
+  }
+
+  async displaySearchResults(args: any, searchType: SearchType, msg: Message) {
     // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
     let originalSearchMsg: Message = null;
     let searching = false;
@@ -689,7 +788,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       let searchResult;
       try {
-        searchResult = await this.performMemberSearch(args, page, perPage);
+        switch (searchType) {
+          case SearchType.MemberSearch:
+            searchResult = await this.performMemberSearch(args, page, perPage);
+            break;
+          case SearchType.BanSearch:
+            searchResult = await this.performBanSearch(args, page, perPage);
+            break;
+        }
       } catch (e) {
         if (e instanceof SearchError) {
           return this.sendErrorMessage(msg.channel, e.message);
@@ -763,97 +869,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
 
     loadSearchPage(currentPage);
-  }
-
-  @d.command("bansearch", "[query:string$]", {
-    aliases: ["bs"],
-    options: [
-      {
-        name: "page",
-        shortcut: "p",
-        type: "number",
-      },
-      {
-        name: "sort",
-        type: "string",
-      },
-      {
-        name: "case-sensitive",
-        shortcut: "cs",
-        isSwitch: true,
-      },
-      {
-        name: "export",
-        shortcut: "e",
-        isSwitch: true,
-      },
-      {
-        name: "ids",
-        isSwitch: true,
-      },
-      {
-        name: "regex",
-        shortcut: "re",
-        isSwitch: true,
-      },
-    ],
-    extra: {
-      info: <CommandInfo>{
-        description: "Search banned users",
-        basicUsage: "!bansearch dragory",
-        optionDescriptions: {
-          sort:
-            "Change how the results are sorted. Possible values are 'id' and 'name'. Prefix with a dash, e.g. '-id', to reverse sorting.",
-          "case-sensitive": "By default, the search is case-insensitive. Use this to make it case-sensitive instead.",
-          export: "If set, the full search results are exported as an archive",
-        },
-      },
-    },
-  })
-  @d.permission("can_search")
-  async banSearchCmd(
-    msg: Message,
-    args: {
-      query?: string;
-      page?: number;
-      sort?: string;
-      "case-sensitive"?: boolean;
-      export?: boolean;
-      ids?: boolean;
-      regex?: boolean;
-    },
-  ) {
-    // TODO: implement command
-  }
-
-  async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
-
-    // Delete & archive in ID order
-    savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-    const idsToDelete = savedMessages.map(m => m.id);
-
-    // Make sure the deletions aren't double logged
-    idsToDelete.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
-
-    // Actually delete the messages
-    await this.bot.deleteMessages(channel.id, idsToDelete);
-    await this.savedMessages.markBulkAsDeleted(idsToDelete);
-
-    // Create an archive
-    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
-    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
-
-    this.logs.log(LogType.CLEAN, {
-      mod: stripObjectToScalars(mod),
-      channel: stripObjectToScalars(channel),
-      count: savedMessages.length,
-      archiveUrl,
-    });
-
-    return { archiveUrl };
   }
 
   @d.command("clean", "<count:number>", {
