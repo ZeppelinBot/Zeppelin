@@ -71,8 +71,13 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.event("guildMemberAdd")
   async onGuildMemberAdd(_, member: Member) {
+    const memberRolesLock = await this.locks.acquire(`member-roles-${member.id}`);
+
     const persistedData = await this.persistedData.find(member.id);
-    if (!persistedData) return;
+    if (!persistedData) {
+      memberRolesLock.unlock();
+      return;
+    }
 
     const toRestore: MemberOptions = {};
     const config = this.getConfig();
@@ -101,5 +106,7 @@ export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
         restoredData: restoredData.join(", "),
       });
     }
+
+    memberRolesLock.unlock();
   }
 }
