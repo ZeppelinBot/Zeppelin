@@ -3,6 +3,7 @@ import { Member, Message, TextChannel } from "eris";
 import {
   convertDelayStringToMS,
   errorMessage,
+  renderRecursively,
   StrictMessageContent,
   stripObjectToScalars,
   tEmbed,
@@ -353,29 +354,6 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     const variableStr = str.slice(prefix.length + tagName.length).trim();
     const tagArgs = parseArguments(variableStr).map(v => v.value);
 
-    // Renders strings in objects and arrays recursively, effectively supporting embeds for tags
-    const renderTagValue = async value => {
-      if (Array.isArray(value)) {
-        const result = [];
-        for (const item of value) {
-          result.push(await renderTagValue(item));
-        }
-        return result;
-      } else if (value == null) {
-        return null;
-      } else if (typeof value === "object") {
-        const result = {};
-        for (const [prop, _value] of Object.entries(value)) {
-          result[prop] = await renderTagValue(_value);
-        }
-        return result;
-      } else if (typeof value === "string") {
-        return renderTagString(value);
-      }
-
-      return value;
-    };
-
     const renderTagString = async _str => {
       let rendered = await this.renderTag(_str, tagArgs, {
         member: stripObjectToScalars(member, ["user"]),
@@ -388,7 +366,9 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // Format the string
     try {
-      return typeof tagBody === "string" ? { content: await renderTagString(tagBody) } : await renderTagValue(tagBody);
+      return typeof tagBody === "string"
+        ? { content: await renderTagString(tagBody) }
+        : await renderRecursively(tagBody, renderTagString);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tagBody}`);

@@ -204,6 +204,8 @@ export const tStrictMessageContent = t.type({
   embed: tNullable(tEmbed),
 });
 
+export const tMessageContent = t.union([t.string, tStrictMessageContent]);
+
 export function dropPropertiesByName(obj, propName) {
   if (obj.hasOwnProperty(propName)) delete obj[propName];
   for (const value of Object.values(obj)) {
@@ -1123,6 +1125,30 @@ export function memoize<T>(fn: (...args: any[]) => T, key?, time?): T {
     createdAt: Date.now(),
     value,
   });
+
+  return value;
+}
+
+type RecursiveRenderFn = (str: string) => string | Promise<string>;
+
+export async function renderRecursively(value, fn: RecursiveRenderFn) {
+  if (Array.isArray(value)) {
+    const result = [];
+    for (const item of value) {
+      result.push(await renderRecursively(item, fn));
+    }
+    return result;
+  } else if (value === null) {
+    return null;
+  } else if (typeof value === "object") {
+    const result = {};
+    for (const [prop, _value] of Object.entries(value)) {
+      result[prop] = await renderRecursively(_value, fn);
+    }
+    return result;
+  } else if (typeof value === "string") {
+    return fn(value);
+  }
 
   return value;
 }

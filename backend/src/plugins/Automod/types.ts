@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { TSafeRegex } from "../../validatorUtils";
-import { tDelayString, tNullable } from "../../utils";
+import { tDelayString, tMessageContent, tNullable } from "../../utils";
 
 export enum RecentActionType {
   Message = 1,
@@ -286,7 +286,13 @@ export const RemoveRolesAction = t.array(t.string);
 
 export const SetAntiraidLevelAction = t.string;
 
-export const ReplyAction = t.string;
+export const ReplyAction = t.union([
+  t.string,
+  t.type({
+    text: tMessageContent,
+    auto_delete: tNullable(t.union([t.string, t.number])),
+  }),
+]);
 
 /**
  * RULES
