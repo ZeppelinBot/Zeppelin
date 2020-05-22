@@ -1536,11 +1536,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         const spamMatch = await this.matchOtherSpamInRule(rule, member.id);
         if (spamMatch) {
           await this.applyActionsOnMatch(rule, spamMatch);
+          break; // Don't apply multiple rules to the same join
         }
 
         const joinMatch = await this.matchMemberJoinTriggerInRule(rule, member);
         if (joinMatch) {
           await this.applyActionsOnMatch(rule, joinMatch);
+          break; // Don't apply multiple rules to the same join
         }
       }
     });
