@@ -17,6 +17,7 @@ import {
   UnknownUser,
   UserNotificationMethod,
   trimLines,
+  MINUTES,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -30,6 +31,7 @@ import { Case } from "../data/entities/Case";
 import * as t from "io-ts";
 import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
 import { GuildArchives } from "src/data/GuildArchives";
+import { humanizeDurationShort } from "../humanizeDurationShort";
 
 const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -378,10 +380,17 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     options: [
       {
         name: "age",
+        shortcut: "a",
         type: "delay",
       },
       {
         name: "left",
+        shortcut: "l",
+        isSwitch: true,
+      },
+      {
+        name: "manual",
+        shortcut: "m",
         isSwitch: true,
       },
       {
@@ -392,11 +401,21 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     ],
   })
   @d.permission("can_view_list")
-  protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean; export?: boolean }) {
-    const lines = [];
+  protected async muteListCmd(
+    msg: Message,
+    args: { age?: number; left?: boolean; manual?: boolean; export?: boolean },
+  ) {
+    const listMessagePromise = msg.channel.createMessage("Loading mutes...");
+    const mutesPerPage = 10;
+    let totalMutes = 0;
+    let hasFilters = false;
 
-    // Create a loading message as this can potentially take some time
-    const loadingMessage = await msg.channel.createMessage("Loading mutes...");
+    let hasReactions = false;
+    let clearReactionsFn;
+    let clearReactionsTimeout;
+    const clearReactionsDebounce = 5 * MINUTES;
+
+    let lines = [];
 
     // Active, logged mutes
     const activeMutes = await this.mutes.getActiveMutes();
@@ -409,85 +428,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       return a.expires_at > b.expires_at ? 1 : -1;
     });
 
-    let filteredMutes: IMuteWithDetails[] = activeMutes;
-    let hasFilters = false;
-    let bannedIds: string[] = null;
-
-    // Filter: mute age
-    if (args.age) {
-      const cutoff = moment()
-        .subtract(args.age, "ms")
-        .format(DBDateFormat);
-      filteredMutes = filteredMutes.filter(m => m.created_at <= cutoff);
-      hasFilters = true;
-    }
-
-    // Fetch some extra details for each mute: the muted member, and whether they've been banned
-    for (const [index, mute] of filteredMutes.entries()) {
-      const muteWithDetails = { ...mute };
-
-      const member = await this.getMember(mute.user_id);
-
-      if (!member) {
-        if (!bannedIds) {
-          const bans = await this.guild.getBans();
-          bannedIds = bans.map(u => u.user.id);
-        }
-
-        muteWithDetails.banned = bannedIds.includes(mute.user_id);
-      } else {
-        muteWithDetails.member = member;
-      }
-
-      filteredMutes[index] = muteWithDetails;
-    }
-
-    // Filter: left the server
-    if (args.left != null) {
-      filteredMutes = filteredMutes.filter(m => (args.left && !m.member) || (!args.left && m.member));
-      hasFilters = true;
-    }
-
-    // Mute count
-    let totalMutes = filteredMutes.length;
-
-    // Create a message lines for each mute
-    const caseIds = filteredMutes.map(m => m.case_id).filter(v => !!v);
-    const muteCases = caseIds.length ? await this.cases.get(caseIds) : [];
-    const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
-
-    for (const mute of filteredMutes) {
-      const user = this.bot.users.get(mute.user_id);
-      const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
-      const theCase = muteCasesById.get(mute.case_id);
-      const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
-
-      let line = `<@!${mute.user_id}> (**${username}**, \`${mute.user_id}\`)   📋 ${caseName}`;
-
-      if (mute.expires_at) {
-        const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
-        const humanizedTime = humanizeDuration(timeUntilExpiry, { largest: 2, round: true });
-        line += `   ⏰ Expires in ${humanizedTime}`;
-      } else {
-        line += `   ⏰ Doesn't expire`;
-      }
-
-      const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
-      const humanizedTimeFromMute = humanizeDuration(timeFromMute, { largest: 2, round: true });
-      line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
-
-      if (mute.banned) {
-        line += `   🔨 User was banned`;
-      } else if (!mute.member) {
-        line += `   ❌ Has left the server`;
-      }
-
-      lines.push(line);
-    }
-
-    // Find manually added mute roles and create a mesage line for each (but only if no filters have been specified)
-    if (!hasFilters) {
-      const muteUserIds = activeMutes.reduce((set, m) => set.add(m.user_id), new Set());
+    if (args.manual) {
+      // Show only manual mutes (i.e. "Muted" role added without a logged mute)
+      const muteUserIds = new Set(activeMutes.map(m => m.user_id));
       const manuallyMutedMembers = [];
       const muteRole = this.getConfig().mute_role;
 
@@ -498,42 +441,170 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         });
       }
 
-      totalMutes += manuallyMutedMembers.length;
+      totalMutes = manuallyMutedMembers.length;
 
-      lines.push(
-        ...manuallyMutedMembers.map(member => {
-          return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
-        }),
-      );
-    }
-
-    let message;
-    if (totalMutes > 0) {
-      message = hasFilters
-        ? `Results (${totalMutes} total):\n\n${lines.join("\n")}`.trim()
-        : `Active mutes (${totalMutes} total):\n\n${lines.join("\n")}`.trim();
+      lines = manuallyMutedMembers.map(member => {
+        return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+      });
     } else {
-      message = hasFilters ? "No mutes found with the specified filters!" : "No active mutes!";
+      // Show filtered active mutes (but not manual mutes)
+      let filteredMutes: IMuteWithDetails[] = activeMutes;
+      let bannedIds: string[] = null;
+
+      // Filter: mute age
+      if (args.age) {
+        const cutoff = moment()
+          .subtract(args.age, "ms")
+          .format(DBDateFormat);
+        filteredMutes = filteredMutes.filter(m => m.created_at <= cutoff);
+        hasFilters = true;
+      }
+
+      // Fetch some extra details for each mute: the muted member, and whether they've been banned
+      for (const [index, mute] of filteredMutes.entries()) {
+        const muteWithDetails = { ...mute };
+
+        const member = await this.getMember(mute.user_id);
+
+        if (!member) {
+          if (!bannedIds) {
+            const bans = await this.guild.getBans();
+            bannedIds = bans.map(u => u.user.id);
+          }
+
+          muteWithDetails.banned = bannedIds.includes(mute.user_id);
+        } else {
+          muteWithDetails.member = member;
+        }
+
+        filteredMutes[index] = muteWithDetails;
+      }
+
+      // Filter: left the server
+      if (args.left != null) {
+        filteredMutes = filteredMutes.filter(m => (args.left && !m.member) || (!args.left && m.member));
+        hasFilters = true;
+      }
+
+      totalMutes = filteredMutes.length;
+
+      // Create a message line for each mute
+      const caseIds = filteredMutes.map(m => m.case_id).filter(v => !!v);
+      const muteCases = caseIds.length ? await this.cases.get(caseIds) : [];
+      const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
+
+      lines = filteredMutes.map(mute => {
+        const user = this.bot.users.get(mute.user_id);
+        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+        const theCase = muteCasesById.get(mute.case_id);
+        const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
+
+        let line = `<@!${mute.user_id}> (**${username}**, \`${mute.user_id}\`)   📋 ${caseName}`;
+
+        if (mute.expires_at) {
+          const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
+          const humanizedTime = humanizeDurationShort(timeUntilExpiry, { largest: 2, round: true });
+          line += `   ⏰ Expires in ${humanizedTime}`;
+        } else {
+          line += `   ⏰ Indefinite`;
+        }
+
+        const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
+        const humanizedTimeFromMute = humanizeDurationShort(timeFromMute, { largest: 2, round: true });
+        line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
+
+        if (mute.banned) {
+          line += `   🔨 Banned`;
+        } else if (!mute.member) {
+          line += `   ❌ Left server`;
+        }
+
+        return line;
+      });
     }
 
-    if (args.export) {
-      const archiveId = await this.archives.create(trimLines(message), moment().add(1, "hour"));
+    const originalLines = Array.from(lines);
+    for (let i = 0; i < 20; i++) {
+      lines = [...lines, ...originalLines];
+    }
+    totalMutes = lines.length;
+
+    const listMessage = await listMessagePromise;
+
+    let currentPage = 1;
+    const totalPages = Math.ceil(lines.length / mutesPerPage);
+
+    const drawListPage = async page => {
+      page = Math.max(1, Math.min(totalPages, page));
+      currentPage = page;
+
+      const pageStart = (page - 1) * mutesPerPage;
+      const pageLines = lines.slice(pageStart, pageStart + mutesPerPage);
+
+      const pageRangeText = `${pageStart + 1}–${pageStart + pageLines.length} of ${totalMutes}`;
+
+      let message;
+      if (args.manual) {
+        message = `Showing manual mutes ${pageRangeText}:`;
+      } else if (hasFilters) {
+        message = `Showing filtered active mutes ${pageRangeText}:`;
+      } else {
+        message = `Showing active mutes ${pageRangeText}:`;
+      }
+
+      message += "\n\n" + pageLines.join("\n");
+
+      listMessage.edit(message);
+      bumpClearReactionsTimeout();
+    };
+
+    const bumpClearReactionsTimeout = () => {
+      if (!hasReactions) return;
+      clearTimeout(clearReactionsTimeout);
+      clearReactionsTimeout = setTimeout(clearReactionsFn, clearReactionsDebounce);
+    };
+
+    if (totalMutes === 0) {
+      if (args.manual) {
+        listMessage.edit("No manual mutes found!");
+      } else if (hasFilters) {
+        listMessage.edit("No mutes found with the specified filters!");
+      } else {
+        listMessage.edit("No active mutes!");
+      }
+    } else if (args.export) {
+      const archiveId = await this.archives.create(lines.join("\n"), moment().add(1, "hour"));
       const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
 
-      await msg.channel.createMessage(`Exported mutes results: ${url}`);
+      await listMessage.edit(`Exported mutes: ${url}`);
+    } else {
+      drawListPage(1);
 
-      return;
-    }
+      if (totalPages > 1) {
+        hasReactions = true;
+        listMessage.addReaction("⬅");
+        listMessage.addReaction("➡");
 
-    await loadingMessage.delete().catch(noop);
-    const chunks = chunkMessageLines(message);
-    for (const chunk of chunks) {
-      msg.channel.createMessage(chunk);
-    }
+        const removeListenerFn = this.on("messageReactionAdd", (rMsg: Message, emoji, userId) => {
+          if (rMsg.id !== listMessage.id) return;
+          if (userId !== msg.author.id) return;
+          if (!["⬅", "➡"].includes(emoji.name)) return;
 
-    // let the user know we are done
-    if (chunks.length > 2) {
-      this.sendSuccessMessage(msg.channel, "All mutes for the specified filters posted!");
+          if (emoji.name === "⬅" && currentPage > 1) {
+            drawListPage(currentPage - 1);
+          } else if (emoji.name === "➡" && currentPage < totalPages) {
+            drawListPage(currentPage + 1);
+          }
+
+          rMsg.removeReaction(emoji.name, userId).catch(noop);
+        });
+
+        clearReactionsFn = () => {
+          listMessage.removeReactions().catch(noop);
+          removeListenerFn();
+        };
+        bumpClearReactionsTimeout();
+      }
     }
   }
 
