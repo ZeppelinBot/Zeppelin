@@ -1363,12 +1363,19 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         const channel = this.guild.channels.get(rule.actions.alert.channel);
         if (channel && channel instanceof TextChannel) {
           const text = rule.actions.alert.text;
+          let messageLink = "";
+          if (!actionsTaken.includes("clean")) {
+            messageLink = this.getActionedMessageLink(matchResult);
+          } else {
+            messageLink = "*Message cleaned - no link*";
+          }
           const rendered = await renderTemplate(rule.actions.alert.text, {
             rule: rule.name,
             user: safeUser,
             users: safeUsers,
             text,
             matchSummary,
+            messageLink,
             logMessage,
           });
           channel.createMessage(rendered);
@@ -1603,6 +1610,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       msg.channel.createMessage(`Anti-raid is set to **${this.cachedAntiraidLevel}**`);
     } else {
       msg.channel.createMessage("Anti-raid is off!");
+    }
+  }
+
+  public getActionedMessageLink(matchResult: AnyTriggerMatchResult): string {
+    if (matchResult.type === "message" || matchResult.type === "embed") {
+      return `https://discord.com/channels/${this.guild.id}/${matchResult.messageInfo.channelId}/${matchResult.messageInfo.messageId}`;
+    } else {
+      return ``;
     }
   }
 }
