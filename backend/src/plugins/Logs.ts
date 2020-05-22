@@ -37,6 +37,7 @@ const LogChannel = t.partial({
   batch_time: t.number,
   excluded_users: t.array(t.string),
   excluded_message_regexes: t.array(TSafeRegex),
+  excluded_channels: t.array(t.string),
 });
 type TLogChannel = t.TypeOf<typeof LogChannel>;
 
@@ -148,10 +149,32 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
           }
         }
 
+        // If this entry is from an excluded channel, skip it
+        if (opts.excluded_channels) {
+          if (type === LogType.MESSAGE_DELETE || type === LogType.MESSAGE_DELETE_BARE) {
+            if (opts.excluded_channels.includes(data.message.channel.id)) {
+              continue logChannelLoop;
+            }
+          }
+
+          if (type === LogType.MESSAGE_EDIT) {
+            if (opts.excluded_channels.includes(data.before.channel.id)) {
+              continue logChannelLoop;
+            }
+          }
+
+          if (type === LogType.MESSAGE_SPAM_DETECTED || type === LogType.CENSOR || type === LogType.CLEAN) {
+            if (opts.excluded_channels.includes(data.channel.id)) {
+              continue logChannelLoop;
+            }
+          }
+        }
+
+        // If this entry contains a message with an excluded regex, skip it
         if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regexes && data.message.data.content) {
           for (const regex of opts.excluded_message_regexes) {
             if (regex.test(data.message.data.content)) {
-              return;
+              continue logChannelLoop;
             }
           }
         }
@@ -159,7 +182,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regexes && data.before.data.content) {
           for (const regex of opts.excluded_message_regexes) {
             if (regex.test(data.before.data.content)) {
-              return;
+              continue logChannelLoop;
             }
           }
         }
