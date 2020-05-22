@@ -89,11 +89,22 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);
 
     this.tagFunctions = {
+      parseDateTime(str) {
+        if (typeof str === "number") {
+          return str; // Unix timestamp
+        }
+
+        if (typeof str !== "string") {
+          return Date.now();
+        }
+
+        return moment(str, "YYYY-MM-DD HH:mm:ss").valueOf();
+      },
+
       countdown(toDate) {
-        if (typeof toDate !== "string") return "";
+        const target = this.parseDateTime(toDate);
 
         const now = moment();
-        const target = moment(toDate, "YYYY-MM-DD HH:mm:ss");
         if (!target.isValid()) return "";
 
         const diff = target.diff(now);
@@ -101,39 +112,70 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         return diff >= 0 ? result : `${result} ago`;
       },
 
-      today() {
-        return moment();
+      now() {
+        return Date.now();
       },
 
-      timeXAgo(timeDiff) {
-        if (typeof timeDiff !== "string") {
-          return 'Please pass a valid delay as a string to timeXAgo (e.g. timeXAgo("1w"))';
+      timeAdd(...args) {
+        let reference;
+        let delay;
+
+        if (args.length >= 2) {
+          // (time, delay)
+          reference = this.parseDateTime(args[0]);
+          delay = args[1];
+        } else {
+          // (delay), implicit "now" as time
+          reference = Date.now();
+          delay = args[0];
         }
 
-        const delay = convertDelayStringToMS(timeDiff);
-        return moment(moment().valueOf() - delay).valueOf();
+        const delayMS = convertDelayStringToMS(delay);
+        return moment(reference)
+          .add(delayMS)
+          .valueOf();
       },
 
-      humanizeTime(timems) {
-        if (typeof timems !== "number") {
-          return moment().format("DD-MM-YYYY HH:mm");
+      timeSub(...args) {
+        let reference;
+        let delay;
+
+        if (args.length >= 2) {
+          // (time, delay)
+          reference = this.parseDateTime(args[0]);
+          delay = args[1];
+        } else {
+          // (delay), implicit "now" as time
+          reference = Date.now();
+          delay = args[0];
         }
 
-        return moment(timems).format("DD-MM-YYYY HH:mm");
+        const delayMS = convertDelayStringToMS(delay);
+        return moment(reference)
+          .subtract(delayMS)
+          .valueOf();
       },
 
-      discordDateFormat(timems) {
-        if (typeof timems !== "number") {
-          return moment().format("YYYY-MM-DD");
-        }
+      timeAgo(delay) {
+        return this.timeSub(delay);
+      },
 
-        return moment(timems).format("YYYY-MM-DD");
+      timeFormat(time, format) {
+        const parsed = this.parseDateTime(time);
+        return moment(parsed).format(format);
+      },
+
+      discordDateFormat(time) {
+        const parsed = time ? this.parseDateTime(time) : Date.now();
+
+        return moment(parsed).format("YYYY-MM-DD");
       },
 
       mention: input => {
         if (typeof input !== "string") {
           return "";
         }
+
         if (input.match(/^<(@#)(!&)\d+>$/)) {
           return input;
         }
