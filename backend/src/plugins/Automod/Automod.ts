@@ -348,6 +348,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     this.onMessageCreateFn = msg => this.onMessageCreate(msg);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
+    this.savedMessages.events.on("update", this.onMessageCreateFn);
   }
 
   protected getModActions(): ModActionsPlugin {
@@ -365,6 +366,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   protected onUnload() {
     this.unloaded = true;
     this.savedMessages.events.off("create", this.onMessageCreateFn);
+    this.savedMessages.events.off("update", this.onMessageCreateFn);
     clearInterval(this.recentActionClearInterval);
     clearInterval(this.recentSpamClearInterval);
     clearInterval(this.recentNicknameChangesClearInterval);
