@@ -191,7 +191,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         return this.timeSub(delay);
       },
 
-      timeFormat(time, format) {
+      formatTime(time, format) {
         const parsed = this.parseDateTime(time);
         return moment(parsed).format(format);
       },
