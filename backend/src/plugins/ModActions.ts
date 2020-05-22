@@ -1308,7 +1308,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
     },
   })
-  @d.permission("can_warn")
+  @d.permission("can_kick")
   async softbanCmd(
     msg: Message,
     args: {
