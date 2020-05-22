@@ -1102,6 +1102,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       { name: "mod", type: "member" },
       { name: "notify", type: "string" },
       { name: "notify-channel", type: "channel" },
+      { name: "clean", isSwitch: true },
     ],
     extra: {
       info: {
@@ -1112,7 +1113,14 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   @d.permission("can_kick")
   async kickCmd(
     msg,
-    args: { user: string; reason: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
+    args: {
+      user: string;
+      reason: string;
+      mod: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+      clean?: boolean;
+    },
   ) {
     const user = await this.resolveUser(args.user);
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
@@ -1156,6 +1164,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
+
     const kickResult = await this.kickMember(memberToKick, reason, {
       contactMethods,
       caseArgs: {
@@ -1163,6 +1172,26 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         ppId: mod.id !== msg.author.id ? msg.author.id : null,
       },
     });
+
+    if (args.clean) {
+      this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToKick.id);
+      this.ignoreEvent(IgnoredEventType.Ban, memberToKick.id);
+
+      try {
+        await memberToKick.ban(1);
+      } catch (e) {
+        this.sendErrorMessage(msg.channel, "Failed to ban the user to clean messages (-clean)");
+      }
+
+      this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToKick.id);
+      this.ignoreEvent(IgnoredEventType.Unban, memberToKick.id);
+
+      try {
+        await this.guild.unbanMember(memberToKick.id);
+      } catch (e) {
+        this.sendErrorMessage(msg.channel, "Failed to unban the user after banning them (-clean)");
+      }
+    }
 
     if (kickResult.status === "failed") {
       msg.channel.createMessage(errorMessage(`Failed to kick user`));
@@ -1266,92 +1295,42 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
   }
 
   @d.command("softban", "<user:string> [reason:string$]", {
-    options: [{ name: "mod", type: "member" }],
+    options: [
+      { name: "mod", type: "member" },
+      { name: "notify", type: "string" },
+      { name: "notify-channel", type: "channel" },
+    ],
     extra: {
       info: {
         description:
-          '"Softban" the specified user by banning and immediately unbanning them. Effectively a kick with message deletions.',
+          '"Softban" the specified user by banning and immediately unbanning them. Effectively a kick with message deletions.' +
+          "This command will be removed in the future, please use kick with the `-clean` argument instead",
       },
     },
   })
-  @d.permission("can_ban")
-  async softbanCmd(msg, args: { user: string; reason: string; mod?: Member }) {
-    const user = await this.resolveUser(args.user);
-    if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
-
-    const memberToSoftban = await this.getMember(user.id);
-
-    if (!memberToSoftban) {
-      const isBanned = await this.isBanned(user.id);
-      if (isBanned) {
-        this.sendErrorMessage(msg.channel, `User is already banned`);
-      } else {
-        this.sendErrorMessage(msg.channel, `User not found on the server`);
-      }
-
-      return;
-    }
-
-    // Make sure we're allowed to ban this member
-    if (!this.canActOn(msg.member, memberToSoftban)) {
-      this.sendErrorMessage(msg.channel, "Cannot ban: insufficient permissions");
-      return;
-    }
-
-    // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
-    if (args.mod) {
-      if (!this.hasPermission("can_act_as_other", { message: msg })) {
-        this.sendErrorMessage(msg.channel, "No permission for -mod");
-        return;
-      }
-
-      mod = args.mod;
-    }
-
-    const reason = this.formatReasonWithAttachments(args.reason, msg.attachments);
-
-    // Softban the user = ban, and immediately unban
-    this.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToSoftban.id);
-    this.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToSoftban.id);
-    this.ignoreEvent(IgnoredEventType.Ban, memberToSoftban.id);
-    this.ignoreEvent(IgnoredEventType.Unban, memberToSoftban.id);
-
-    try {
-      await memberToSoftban.ban(1);
-    } catch (e) {
-      msg.channel.create(errorMessage("Failed to softban the user"));
-      return;
-    }
-
-    try {
-      await this.guild.unbanMember(memberToSoftban.id);
-    } catch (e) {
-      msg.channel.create(errorMessage("Failed to unban the user after softbanning them"));
-      return;
-    }
-
-    // Create a case for this action
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    const createdCase = await casesPlugin.createCase({
-      userId: memberToSoftban.id,
-      modId: mod.id,
-      type: CaseTypes.Softban,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+  @d.permission("can_kick")
+  async softbanCmd(
+    msg: Message,
+    args: {
+      user: string;
+      reason: string;
+      mod?: Member;
+      notify?: string;
+      "notify-channel"?: TextChannel;
+    },
+  ) {
+    await this.kickCmd(msg, {
+      user: args.user,
+      mod: args.mod ? args.mod : msg.member,
+      reason: args.reason,
+      clean: true,
+      notify: args.notify,
+      "notify-channel": args["notify-channel"],
     });
 
-    // Confirm the action to the moderator
-    this.sendSuccessMessage(
-      msg.channel,
-      `Softbanned **${memberToSoftban.user.username}#${memberToSoftban.user.discriminator}** (Case #${createdCase.case_number})`,
+    await msg.channel.createMessage(
+      "Softban will be removed in the future - please use the kick command with the `-clean` argument instead!",
     );
-
-    // Log the action
-    this.serverLogs.log(LogType.MEMBER_SOFTBAN, {
-      mod: stripObjectToScalars(mod.user),
-      member: stripObjectToScalars(memberToSoftban, ["user", "roles"]),
-    });
   }
 
   @d.command("unban", "<user:string> [reason:string$]", {
