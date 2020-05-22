@@ -633,14 +633,11 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (failed.length !== args.userIds.length) {
       this.sendSuccessMessage(msg.channel, `**${args.userIds.length - failed.length} active mute(s) cleared**`);
     }
+
     if (failed.length) {
-      let list = "";
-      for (const id of failed) {
-        list += id + " ";
-      }
       this.sendErrorMessage(
         msg.channel,
-        `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${list}`,
+        `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${failed.join(" ")}`,
       );
     }
   }
