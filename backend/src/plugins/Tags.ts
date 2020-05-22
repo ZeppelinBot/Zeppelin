@@ -17,6 +17,11 @@ const TagCategory = t.type({
   prefix: tNullable(t.string),
   delete_with_command: tNullable(t.boolean),
 
+  user_tag_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag
+  user_category_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag category
+  global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
+  global_category_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per category
+
   tags: t.record(t.string, t.string),
 
   can_use: tNullable(t.boolean),
@@ -25,6 +30,11 @@ const TagCategory = t.type({
 const ConfigSchema = t.type({
   prefix: t.string,
   delete_with_command: t.boolean,
+
+  user_tag_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag
+  global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
+  user_cooldown: tNullable(t.union([t.string, t.number])), // Per user
+  global_cooldown: tNullable(t.union([t.string, t.number])), // Any tag use
 
   categories: t.record(t.string, TagCategory),
 
@@ -56,6 +66,11 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       config: {
         prefix: "!!",
         delete_with_command: true,
+
+        user_tag_cooldown: null,
+        global_tag_cooldown: null,
+        user_cooldown: null,
+        global_cooldown: null,
 
         categories: {},
 
@@ -357,6 +372,8 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     // Find potential matching tag, looping through categories first and checking dynamic tags last
     let renderedTag = null;
+    let matchedTagName;
+    const cooldowns = [];
 
     for (const [name, category] of Object.entries(config.categories)) {
       const canUse = category.can_use != null ? category.can_use : config.can_use;
@@ -366,6 +383,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (prefix !== "" && !msg.data.content.startsWith(prefix)) continue;
 
       const withoutPrefix = msg.data.content.slice(prefix.length);
+
       for (const [tagName, tagBody] of Object.entries(category.tags)) {
         const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\s|$)`);
         if (regex.test(withoutPrefix)) {
@@ -376,11 +394,31 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
             category.tags[tagName],
             member,
           );
-          if (renderedTag) break;
+          if (renderedTag) {
+            matchedTagName = tagName;
+            break;
+          }
         }
       }
 
       if (renderedTag) {
+        if (category.user_tag_cooldown) {
+          const delay = convertDelayStringToMS(String(category.user_tag_cooldown), "s");
+          cooldowns.push([`tags-category-${name}-user-${msg.user_id}-tag-${matchedTagName}`, delay]);
+        }
+        if (category.global_tag_cooldown) {
+          const delay = convertDelayStringToMS(String(category.global_tag_cooldown), "s");
+          cooldowns.push([`tags-category-${name}-tag-${matchedTagName}`, delay]);
+        }
+        if (category.user_category_cooldown) {
+          const delay = convertDelayStringToMS(String(category.user_category_cooldown), "s");
+          cooldowns.push([`tags-category-${name}-user--${msg.user_id}`, delay]);
+        }
+        if (category.global_category_cooldown) {
+          const delay = convertDelayStringToMS(String(category.global_category_cooldown), "s");
+          cooldowns.push([`tags-category-${name}`, delay]);
+        }
+
         deleteWithCommand =
           category.delete_with_command != null ? category.delete_with_command : config.delete_with_command;
 
@@ -402,10 +440,39 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       const tag = await this.tags.find(tagName);
       if (!tag) return;
 
+      matchedTagName = tagName;
+
       renderedTag = await this.renderSafeTagFromMessage(msg.data.content, prefix, tagName, tag.body, member);
     }
 
     if (!renderedTag) return;
+
+    if (config.user_tag_cooldown) {
+      const delay = convertDelayStringToMS(String(config.user_tag_cooldown), "s");
+      cooldowns.push([`tags-user-${msg.user_id}-tag-${matchedTagName}`, delay]);
+    }
+
+    if (config.global_tag_cooldown) {
+      const delay = convertDelayStringToMS(String(config.global_tag_cooldown), "s");
+      cooldowns.push([`tags-tag-${matchedTagName}`, delay]);
+    }
+
+    if (config.user_cooldown) {
+      const delay = convertDelayStringToMS(String(config.user_cooldown), "s");
+      cooldowns.push([`tags-user-${matchedTagName}`, delay]);
+    }
+
+    if (config.global_cooldown) {
+      const delay = convertDelayStringToMS(String(config.global_cooldown), "s");
+      cooldowns.push([`tags`, delay]);
+    }
+
+    const isOnCooldown = cooldowns.some(cd => this.cooldowns.isOnCooldown(cd[0]));
+    if (isOnCooldown) return;
+
+    for (const cd of cooldowns) {
+      this.cooldowns.setCooldown(cd[0], cd[1]);
+    }
 
     deleteWithCommand = config.delete_with_command;
 
