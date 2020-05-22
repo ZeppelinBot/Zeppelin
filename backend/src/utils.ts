@@ -195,6 +195,15 @@ export const tEmbed = t.type({
   ),
 });
 
+export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
+
+export const tStrictMessageContent = t.type({
+  content: tNullable(t.string),
+  tts: tNullable(t.boolean),
+  disableEveryone: tNullable(t.boolean),
+  embed: tNullable(tEmbed),
+});
+
 export function dropPropertiesByName(obj, propName) {
   if (obj.hasOwnProperty(propName)) delete obj[propName];
   for (const value of Object.values(obj)) {
@@ -1016,8 +1025,6 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
   return null;
 }
-
-export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
   const msg = await channel.createMessage(content);

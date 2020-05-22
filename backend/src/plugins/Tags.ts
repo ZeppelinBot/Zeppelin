@@ -1,6 +1,14 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { Member, Message, TextChannel } from "eris";
-import { errorMessage, successMessage, stripObjectToScalars, tNullable, convertDelayStringToMS } from "../utils";
+import {
+  convertDelayStringToMS,
+  errorMessage,
+  StrictMessageContent,
+  stripObjectToScalars,
+  tEmbed,
+  tNullable,
+  tStrictMessageContent,
+} from "../utils";
 import { GuildTags } from "../data/GuildTags";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
@@ -12,6 +20,11 @@ import { GuildArchives } from "../data/GuildArchives";
 import * as t from "io-ts";
 import { parseArguments } from "knub-command-manager";
 import escapeStringRegexp from "escape-string-regexp";
+import { validate } from "../validatorUtils";
+import { GuildLogs } from "../data/GuildLogs";
+import { LogType } from "../data/LogType";
+
+const Tag = t.union([t.string, tEmbed]);
 
 const TagCategory = t.type({
   prefix: tNullable(t.string),
@@ -22,7 +35,7 @@ const TagCategory = t.type({
   global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
   global_category_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per category
 
-  tags: t.record(t.string, t.string),
+  tags: t.record(t.string, Tag),
 
   can_use: tNullable(t.boolean),
 });
@@ -55,6 +68,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected archives: GuildArchives;
   protected tags: GuildTags;
   protected savedMessages: GuildSavedMessages;
+  protected logs: GuildLogs;
 
   private onMessageCreateFn;
   private onMessageDeleteFn;
@@ -96,6 +110,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.archives = GuildArchives.getGuildInstance(this.guildId);
     this.tags = GuildTags.getGuildInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
+    this.logs = new GuildLogs(this.guildId);
 
     this.onMessageCreateFn = this.onMessageCreate.bind(this);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
@@ -332,24 +347,48 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     str: string,
     prefix: string,
     tagName: string,
-    tagBody: string,
+    tagBody: t.TypeOf<typeof Tag>,
     member: Member,
-  ): Promise<string | null> {
+  ): Promise<StrictMessageContent | null> {
     const variableStr = str.slice(prefix.length + tagName.length).trim();
     const tagArgs = parseArguments(variableStr).map(v => v.value);
 
-    // Format the string
-    try {
-      let rendered = await this.renderTag(tagBody, tagArgs, {
+    // Renders strings in objects and arrays recursively, effectively supporting embeds for tags
+    const renderTagValue = async value => {
+      if (Array.isArray(value)) {
+        const result = [];
+        for (const item of value) {
+          result.push(await renderTagValue(item));
+        }
+        return result;
+      } else if (value == null) {
+        return null;
+      } else if (typeof value === "object") {
+        const result = {};
+        for (const [prop, _value] of Object.entries(value)) {
+          result[prop] = await renderTagValue(_value);
+        }
+        return result;
+      } else if (typeof value === "string") {
+        return renderTagString(value);
+      }
+
+      return value;
+    };
+
+    const renderTagString = async _str => {
+      let rendered = await this.renderTag(_str, tagArgs, {
         member: stripObjectToScalars(member, ["user"]),
         user: stripObjectToScalars(member.user),
       });
       rendered = rendered.trim();
 
-      if (rendered === "") return;
-      if (rendered.length > 2000) return;
-
       return rendered;
+    };
+
+    // Format the string
+    try {
+      return typeof tagBody === "string" ? { content: await renderTagString(tagBody) } : await renderTagValue(tagBody);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tagBody}`);
@@ -475,6 +514,14 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
 
     deleteWithCommand = config.delete_with_command;
+
+    const validationError = await validate(tStrictMessageContent, renderedTag);
+    if (validationError) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Rendering tag ${matchedTagName} resulted in an invalid message: ${validationError.message}`,
+      });
+      return;
+    }
 
     const channel = this.guild.channels.get(msg.channel_id) as TextChannel;
     const responseMsg = await channel.createMessage(renderedTag);
