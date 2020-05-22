@@ -237,6 +237,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   protected cooldownManager: CooldownManager;
 
   protected onMessageCreateFn;
+  protected actionedMessageIds: string[];
+  protected actionedMessageMax = 50;
 
   protected savedMessages: GuildSavedMessages;
   protected archives: GuildArchives;
@@ -349,6 +351,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     this.onMessageCreateFn = msg => this.onMessageCreate(msg);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
     this.savedMessages.events.on("update", this.onMessageCreateFn);
+    this.actionedMessageIds = [];
   }
 
   protected getModActions(): ModActionsPlugin {
@@ -1483,6 +1486,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
    */
   protected onMessageCreate(msg: SavedMessage) {
     if (msg.is_bot) return;
+    if (this.actionedMessageIds.includes(msg.id)) return;
 
     this.automodQueue.add(async () => {
       if (this.unloaded) return;
@@ -1506,6 +1510,13 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
           if (!savedMsg) return;
 
           await this.applyActionsOnMatch(rule, matchResult);
+
+          // Add message ID to actioned messages to prevent alert spam on small edits
+          this.actionedMessageIds.push(msg.id);
+          while (this.actionedMessageIds.length > this.actionedMessageMax) {
+            this.actionedMessageIds.shift();
+          }
+
           break; // Don't apply multiple rules to the same message
         }
       }
