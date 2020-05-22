@@ -527,12 +527,6 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       });
     }
 
-    const originalLines = Array.from(lines);
-    for (let i = 0; i < 20; i++) {
-      lines = [...lines, ...originalLines];
-    }
-    totalMutes = lines.length;
-
     const listMessage = await listMessagePromise;
 
     let currentPage = 1;
