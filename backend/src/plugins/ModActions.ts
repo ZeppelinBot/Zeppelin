@@ -486,6 +486,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.log(LogType.MEMBER_KICK, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(member.user),
+      reason,
     });
 
     return {
@@ -545,6 +546,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.log(LogType.MEMBER_BAN, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
+      reason,
     });
 
     return {
@@ -770,6 +772,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.log(LogType.MEMBER_WARN, {
       mod: stripObjectToScalars(mod),
       member: stripObjectToScalars(member, ["user", "roles"]),
+      reason,
     });
 
     return {
@@ -1386,6 +1389,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.log(LogType.MEMBER_UNBAN, {
       mod: stripObjectToScalars(mod.user),
       userId: user.id,
+      reason,
     });
   }
 
@@ -1456,6 +1460,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.log(LogType.MEMBER_FORCEBAN, {
       mod: stripObjectToScalars(mod.user),
       userId: user.id,
+      reason,
     });
   }
 
@@ -1535,6 +1540,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       this.serverLogs.log(LogType.MASSBAN, {
         mod: stripObjectToScalars(msg.author),
         count: successfulBanCount,
+        reason: banReason,
       });
 
       if (failedBans.length) {
@@ -1613,6 +1619,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       userId: user.id,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase(),
+      reason,
     });
   }
 

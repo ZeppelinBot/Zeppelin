@@ -277,11 +277,13 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         mod: stripObjectToScalars(mod),
         user: stripObjectToScalars(user),
         time: timeUntilUnmute,
+        reason,
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_MUTE, {
         mod: stripObjectToScalars(mod),
         user: stripObjectToScalars(user),
+        reason,
       });
     }
 
@@ -356,11 +358,13 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         mod: stripObjectToScalars(mod),
         user: stripObjectToScalars(user),
         time: timeUntilUnmute,
+        reason: caseArgs.reason,
       });
     } else {
       this.serverLogs.log(LogType.MEMBER_UNMUTE, {
         mod: stripObjectToScalars(mod),
         user: stripObjectToScalars(user),
+        reason: caseArgs.reason,
       });
     }
 
