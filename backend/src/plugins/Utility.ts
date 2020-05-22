@@ -1180,9 +1180,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         trimLines(`
         Roles: **${this.guild.roles.size}** / 250
         Emojis: **${this.guild.emojis.length}** / ${maxEmojis}
-        Boosts: **${this.guild.premiumSubscriptionCount ? this.guild.premiumSubscriptionCount : "0"}** (level ${
-          this.guild.premiumTier
-        })
+        Boosts: **${this.guild.premiumSubscriptionCount ?? 0}** (level ${this.guild.premiumTier})
       `) + embedPadding,
     });
 
