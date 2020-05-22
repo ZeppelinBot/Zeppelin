@@ -1749,7 +1749,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("hidecase", "<caseNum:number>", {
+  @d.command("hide", "<caseNum:number>", {
+    aliases: ["hidecase", "hide_case"],
     extra: {
       info: {
         description: "Hide the specified case so it doesn't appear in !cases or !info",
@@ -1771,7 +1772,8 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     );
   }
 
-  @d.command("unhidecase", "<caseNum:number>", {
+  @d.command("unhide", "<caseNum:number>", {
+    aliases: ["unhidecase", "unhide_case"],
     extra: {
       info: {
         description: "Un-hide the specified case, making it appear in !cases and !info again",
