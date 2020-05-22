@@ -13,6 +13,7 @@ import {
   messageSummary,
   MINUTES,
   noop,
+  renderRecursively,
   SECONDS,
   stripObjectToScalars,
   tDeepPartial,
@@ -1297,12 +1298,24 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const channel = this.guild.channels.get(channelId);
       if (channel && channel instanceof TextChannel) {
         const user = await this.resolveUser(matchResult.userId);
-        const formatted = await renderTemplate(rule.actions.reply, {
-          user: stripObjectToScalars(user),
-        });
+        const renderReplyText = async str =>
+          renderTemplate(str, {
+            user: stripObjectToScalars(user),
+          });
+        const formatted =
+          typeof rule.actions.reply === "string"
+            ? await renderReplyText(rule.actions.reply)
+            : await renderRecursively(rule.actions.reply.text, renderReplyText);
+
         if (formatted) {
-          await channel.createMessage(formatted);
+          const replyMsg = await channel.createMessage(formatted);
           actionsTaken.push("reply");
+
+          if (typeof rule.actions.reply === "object" && rule.actions.reply.auto_delete != null) {
+            const delay = convertDelayStringToMS(String(rule.actions.reply.auto_delete));
+            setTimeout(() => replyMsg.delete().catch(noop), delay);
+            console.log("deleting in", delay);
+          }
         }
       }
     }
