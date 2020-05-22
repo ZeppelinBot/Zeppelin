@@ -16,6 +16,7 @@ import {
   ucfirst,
   UnknownUser,
   UserNotificationMethod,
+  trimLines,
 } from "../utils";
 import humanizeDuration from "humanize-duration";
 import { LogType } from "../data/LogType";
@@ -28,6 +29,7 @@ import { CaseArgs, CasesPlugin } from "./Cases";
 import { Case } from "../data/entities/Case";
 import * as t from "io-ts";
 import { ERRORS, RecoverablePluginError } from "../RecoverablePluginError";
+import { GuildArchives } from "src/data/GuildArchives";
 
 const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -83,6 +85,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected cases: GuildCases;
   protected serverLogs: GuildLogs;
   private muteClearIntervalId: NodeJS.Timer;
+  archives: GuildArchives;
 
   public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
@@ -123,6 +126,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.mutes = GuildMutes.getGuildInstance(this.guildId);
     this.cases = GuildCases.getGuildInstance(this.guildId);
     this.serverLogs = new GuildLogs(this.guildId);
+    this.archives = GuildArchives.getGuildInstance(this.guildId);
 
     // Check for expired mutes every 5s
     const firstCheckTime = Math.max(Date.now(), FIRST_CHECK_TIME) + FIRST_CHECK_INCREMENT;
@@ -380,10 +384,15 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         name: "left",
         isSwitch: true,
       },
+      {
+        name: "export",
+        shortcut: "e",
+        isSwitch: true,
+      },
     ],
   })
   @d.permission("can_view_list")
-  protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean }) {
+  protected async muteListCmd(msg: Message, args: { age?: number; left?: boolean; export?: boolean }) {
     const lines = [];
 
     // Create a loading message as this can potentially take some time
@@ -505,6 +514,15 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         : `Active mutes (${totalMutes} total):\n\n${lines.join("\n")}`.trim();
     } else {
       message = hasFilters ? "No mutes found with the specified filters!" : "No active mutes!";
+    }
+
+    if (args.export) {
+      const archiveId = await this.archives.create(trimLines(message), moment().add(1, "hour"));
+      const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+      await msg.channel.createMessage(`Exported mutes results: ${url}`);
+
+      return;
     }
 
     await loadingMessage.delete().catch(noop);
