@@ -1,4 +1,5 @@
 {
+  "MEMBER_NOTE": "🖊 Note added on {userMention(user)} by {userMention(mod)}",
   "MEMBER_WARN": "⚠️ {userMention(member)} was warned by {userMention(mod)}",
   "MEMBER_MUTE": "🔇 {userMention(user)} was muted indefinitely by {userMention(mod)}",
   "MEMBER_TIMED_MUTE": "🔇 {userMention(user)} was muted for **{time}** by {userMention(mod)}",
