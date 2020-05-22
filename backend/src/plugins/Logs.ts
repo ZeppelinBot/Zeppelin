@@ -189,7 +189,10 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
         const message = await this.getLogMessage(type, data);
         if (message) {
-          if (opts.batched) {
+          const batched = opts.batched ?? true; // Default to batched unless explicitly disabled
+          const batchTime = opts.batch_time ?? 1000;
+
+          if (batched) {
             // If we're batching log messages, gather all log messages within the set batch_time into a single message
             if (!this.batches.has(channel.id)) {
               this.batches.set(channel.id, []);
@@ -197,7 +200,7 @@ export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
                 const batchedMessage = this.batches.get(channel.id).join("\n");
                 this.batches.delete(channel.id);
                 createChunkedMessage(channel, batchedMessage).catch(noop);
-              }, opts.batch_time || 2000);
+              }, batchTime);
             }
 
             this.batches.get(channel.id).push(message);
