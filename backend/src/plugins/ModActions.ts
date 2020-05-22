@@ -626,6 +626,12 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       reason,
     });
 
+    this.serverLogs.log(LogType.MEMBER_NOTE, {
+      mod: stripObjectToScalars(msg.author),
+      user: stripObjectToScalars(user, ["user", "roles"]),
+      reason,
+    });
+
     this.sendSuccessMessage(msg.channel, `Note added on **${userName}** (Case #${createdCase.case_number})`);
   }
 
