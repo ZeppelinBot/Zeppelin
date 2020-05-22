@@ -619,7 +619,11 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     }
 
     if (trigger.match_embeds && msg.data.embeds && msg.data.embeds.length) {
-      const str = JSON.stringify(msg.data.embeds[0]);
+      const copiedEmbed = JSON.parse(JSON.stringify(msg.data.embeds[0]));
+      if (copiedEmbed.type === "video") {
+        copiedEmbed.description = ""; // The description is not rendered, hence it doesn't need to be matched
+      }
+      const str = JSON.stringify(copiedEmbed);
       const matchResult = await matchFn(str);
       if (matchResult) {
         return { type: "embed", str, userId: msg.user_id, messageInfo, matchedValue: matchResult };
