@@ -1,6 +1,6 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { Member, Message, TextChannel } from "eris";
-import { errorMessage, successMessage, stripObjectToScalars, tNullable } from "../utils";
+import { errorMessage, successMessage, stripObjectToScalars, tNullable, convertDelayStringToMS } from "../utils";
 import { GuildTags } from "../data/GuildTags";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
@@ -89,11 +89,22 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.savedMessages.events.on("delete", this.onMessageDeleteFn);
 
     this.tagFunctions = {
+      parseDateTime(str) {
+        if (typeof str === "number") {
+          return str; // Unix timestamp
+        }
+
+        if (typeof str !== "string") {
+          return Date.now();
+        }
+
+        return moment(str, "YYYY-MM-DD HH:mm:ss").valueOf();
+      },
+
       countdown(toDate) {
-        if (typeof toDate !== "string") return "";
+        const target = this.parseDateTime(toDate);
 
         const now = moment();
-        const target = moment(toDate, "YYYY-MM-DD HH:mm:ss");
         if (!target.isValid()) return "";
 
         const diff = target.diff(now);
@@ -101,8 +112,70 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         return diff >= 0 ? result : `${result} ago`;
       },
 
+      now() {
+        return Date.now();
+      },
+
+      timeAdd(...args) {
+        let reference;
+        let delay;
+
+        if (args.length >= 2) {
+          // (time, delay)
+          reference = this.parseDateTime(args[0]);
+          delay = args[1];
+        } else {
+          // (delay), implicit "now" as time
+          reference = Date.now();
+          delay = args[0];
+        }
+
+        const delayMS = convertDelayStringToMS(delay);
+        return moment(reference)
+          .add(delayMS)
+          .valueOf();
+      },
+
+      timeSub(...args) {
+        let reference;
+        let delay;
+
+        if (args.length >= 2) {
+          // (time, delay)
+          reference = this.parseDateTime(args[0]);
+          delay = args[1];
+        } else {
+          // (delay), implicit "now" as time
+          reference = Date.now();
+          delay = args[0];
+        }
+
+        const delayMS = convertDelayStringToMS(delay);
+        return moment(reference)
+          .subtract(delayMS)
+          .valueOf();
+      },
+
+      timeAgo(delay) {
+        return this.timeSub(delay);
+      },
+
+      timeFormat(time, format) {
+        const parsed = this.parseDateTime(time);
+        return moment(parsed).format(format);
+      },
+
+      discordDateFormat(time) {
+        const parsed = time ? this.parseDateTime(time) : Date.now();
+
+        return moment(parsed).format("YYYY-MM-DD");
+      },
+
       mention: input => {
-        if (typeof input !== "string") return "";
+        if (typeof input !== "string") {
+          return "";
+        }
+
         if (input.match(/^<(@#)(!&)\d+>$/)) {
           return input;
         }
