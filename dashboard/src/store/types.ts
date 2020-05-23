@@ -24,6 +24,10 @@ export interface GuildState {
   };
 }
 
+export interface StaffState {
+  isStaff: boolean;
+}
+
 export interface ThinDocsPlugin {
   name: string;
   info: {
@@ -57,4 +61,5 @@ export type RootState = {
   auth: AuthState;
   guilds: GuildState;
   docs: DocsState;
+  staff: StaffState;
 };
