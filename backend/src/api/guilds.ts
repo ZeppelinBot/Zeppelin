@@ -7,6 +7,9 @@ import yaml, { YAMLException } from "js-yaml";
 import { apiTokenAuthHandlers } from "./auth";
 import { ApiPermissions } from "@shared/apiPermissions";
 import { hasGuildPermission, requireGuildPermission } from "./permissions";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
+
+const apiPermissionAssignments = new ApiPermissionAssignments();
 
 export function initGuildsAPI(app: express.Express) {
   const allowedGuilds = new AllowedGuilds();
@@ -81,6 +84,15 @@ export function initGuildsAPI(app: express.Express) {
     await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user.userId);
     ok(res);
   });
+
+  guildRouter.get(
+    "/:guildId/permissions",
+    requireGuildPermission(ApiPermissions.ManageAccess),
+    async (req: Request, res: Response) => {
+      const permissions = await apiPermissionAssignments.getByGuildId(req.params.guildId);
+      res.json(permissions);
+    },
+  );
 
   app.use("/guilds", guildRouter);
 }
