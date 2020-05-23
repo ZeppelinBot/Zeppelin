@@ -633,41 +633,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
-      let results;
-      try {
-        results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
-      } catch (e) {
-        if (e instanceof SearchError) {
-          return this.sendErrorMessage(msg.channel, e.message);
-        }
-
-        throw e;
-      }
-
-      if (results.totalResults === 0) {
-        return this.sendErrorMessage(msg.channel, "No results found");
-      }
-
-      const resultList = args.ids
-        ? this.formatSearchResultIdList(results.results)
-        : this.formatSearchResultList(results.results);
-
-      const archiveId = await this.archives.create(
-        trimLines(`
-        Search results (total ${results.totalResults}):
-
-        ${resultList}
-      `),
-        moment().add(1, "hour"),
-      );
-      const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
-
-      msg.channel.createMessage(`Exported search results: ${url}`);
-
-      return;
+      return this.archiveSearch(args, SearchType.MemberSearch, msg);
+    } else {
+      return this.displaySearch(args, SearchType.MemberSearch, msg);
     }
-
-    await this.displaySearchResults(args, SearchType.MemberSearch, msg);
   }
 
   @d.command("bansearch", "[query:string$]", {
@@ -728,7 +697,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       regex?: boolean;
     },
   ) {
-    await this.displaySearchResults(args, SearchType.BanSearch, msg);
+    if (args.export) {
+      return this.archiveSearch(args, SearchType.BanSearch, msg);
+    } else {
+      return this.displaySearch(args, SearchType.BanSearch, msg);
+    }
   }
 
   async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
@@ -761,7 +734,49 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     return { archiveUrl };
   }
 
-  async displaySearchResults(args: any, searchType: SearchType, msg: Message) {
+  async archiveSearch(args: any, searchType: SearchType, msg: Message) {
+    let results;
+    try {
+      switch (searchType) {
+        case SearchType.MemberSearch:
+          results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
+          break;
+        case SearchType.BanSearch:
+          results = await this.performBanSearch(args, 1, SEARCH_EXPORT_LIMIT);
+          break;
+      }
+    } catch (e) {
+      if (e instanceof SearchError) {
+        return this.sendErrorMessage(msg.channel, e.message);
+      }
+
+      throw e;
+    }
+
+    if (results.totalResults === 0) {
+      return this.sendErrorMessage(msg.channel, "No results found");
+    }
+
+    const resultList = args.ids
+      ? this.formatSearchResultIdList(results.results)
+      : this.formatSearchResultList(results.results);
+
+    const archiveId = await this.archives.create(
+      trimLines(`
+        Search results (total ${results.totalResults}):
+
+        ${resultList}
+      `),
+      moment().add(1, "hour"),
+    );
+    const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+    msg.channel.createMessage(`Exported search results: ${url}`);
+
+    return;
+  }
+
+  async displaySearch(args: any, searchType: SearchType, msg: Message) {
     // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
     let originalSearchMsg: Message = null;
     let searching = false;
