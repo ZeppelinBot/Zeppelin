@@ -1495,12 +1495,19 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const loadedPlugins = Array.from(this.knub.getGuildData(this.guildId).loadedPlugins.keys());
     loadedPlugins.sort();
 
+    const supporters = [
+      ["Flokie", 10],
+      ["CmdData", 1],
+      ["JackDaniel", 1],
+    ];
+    supporters.sort(sorter(r => r[1], "DESC"));
+
     const aboutContent: MessageContent = {
       embed: {
         title: `About ${this.bot.user.username}`,
         fields: [
           {
-            name: "Basic info",
+            name: "Status",
             value:
               basicInfoRows
                 .map(([label, value]) => {
@@ -1511,6 +1518,10 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           {
             name: `Loaded plugins on this server (${loadedPlugins.length})`,
             value: loadedPlugins.join(", "),
+          },
+          {
+            name: "Zeppelin supporters 🎉",
+            value: supporters.map(s => `**${s[0]}** ${s[1]}€/mo`).join("\n"),
           },
         ],
       },
