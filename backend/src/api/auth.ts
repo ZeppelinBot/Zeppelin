@@ -12,7 +12,7 @@ import { ok } from "./responses";
 
 interface IPassportApiUser {
   apiKey: string;
-  userId: number;
+  userId: string;
 }
 
 declare global {

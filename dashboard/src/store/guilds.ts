@@ -7,7 +7,7 @@ export const GuildStore: Module<GuildState, RootState> = {
 
   state: {
     availableGuildsLoadStatus: LoadStatus.None,
-    available: [],
+    available: new Map(),
     configs: {},
   },
 
@@ -17,7 +17,22 @@ export const GuildStore: Module<GuildState, RootState> = {
       commit("setAvailableGuildsLoadStatus", LoadStatus.Loading);
 
       const availableGuilds = await get("guilds/available");
-      commit("setAvailableGuilds", availableGuilds);
+      for (const guild of availableGuilds) {
+        commit("addGuild", guild);
+      }
+
+      commit("setAvailableGuildsLoadStatus", LoadStatus.Done);
+    },
+
+    async loadGuild({ commit, state }, guildId) {
+      if (state.available.has(guildId)) {
+        return;
+      }
+
+      const guild = await get(`guilds/${guildId}`);
+      if (guild) {
+        commit("addGuild", guild);
+      }
     },
 
     async loadConfig({ commit }, guildId) {
@@ -35,9 +50,8 @@ export const GuildStore: Module<GuildState, RootState> = {
       state.availableGuildsLoadStatus = status;
     },
 
-    setAvailableGuilds(state: GuildState, guilds) {
-      state.available = guilds;
-      state.availableGuildsLoadStatus = LoadStatus.Done;
+    addGuild(state: GuildState, guild) {
+      state.available.set(guild.id, guild);
     },
 
     setConfig(state: GuildState, { guildId, config }) {

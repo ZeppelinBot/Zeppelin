@@ -11,11 +11,14 @@ export interface AuthState {
 
 export interface GuildState {
   availableGuildsLoadStatus: LoadStatus;
-  available: Array<{
-    guild_id: string;
-    name: string;
-    icon: string | null;
-  }>;
+  available: Map<
+    string,
+    {
+      id: string;
+      name: string;
+      icon: string | null;
+    }
+  >;
   configs: {
     [key: string]: string;
   };
