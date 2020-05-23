@@ -1,7 +1,6 @@
 .splash {
   width: 100vw;
-  height: 100vh;
-  padding: 16px;
+  min-height: 100vh;
 
   background-color: #7289da;
   background-image: linear-gradient(225deg, #7289da 0%, #5d70b4 100%);
@@ -39,31 +38,34 @@
   & .wrapper {
     flex: 0 0 auto;
 
-    width: 750px;
+    width: 800px;
     max-width: 100%;
 
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
 
     & .logo-column {
       flex: 0 0 auto;
+      padding: 24px;
     }
 
     & .info-column {
       flex: 1 1 100%;
+      max-width: 448px;
+      padding: 24px;
+      text-align: center;
     }
 
     & .logo {
       width: 300px;
       height: 300px;
-      margin-right: 48px;
     }
 
     & h1 {
       font-size: 80px;
       font-weight: 300;
-      margin-top: 40px
     }
 
     & .description {
@@ -71,14 +73,16 @@
     }
 
     & .actions {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
       margin-top: 8px;
       margin-left: -12px;
 
       & .btn {
         margin: 12px;
         text-decoration: none;
+        text-align: center;
         padding: 8px 24px;
         border: 1px solid #fff;
         border-radius: 4px;
@@ -97,6 +101,51 @@
       }
     }
 
+    & .links {
+      list-style: none;
+      display: flex;
+      font-size: 14px;
+      justify-content: center;
+
+      margin-top: 12px;
+
+      & li {
+        padding: 0 16px;
+        position: relative;
+      }
+
+      & li:first-child {
+        padding-left: 0;
+      }
+
+      & li:last-child {
+        padding-right: 0;
+      }
+
+      & li:not(:first-child)::before {
+        display: block;
+        content: ' ';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: rgb(226, 232, 253);
+
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translate(-50%, -50%);
+      }
+
+      & a {
+        color: rgb(226, 232, 253);
+        text-decoration: none;
+
+        &:hover {
+          color: white;
+        }
+      }
+    }
+
     & .error {
       margin-top: 8px;
       background-color: hsl(224, 52%, 32%);
@@ -104,4 +153,8 @@
       border-radius: 4px;
     }
   }
+}
+
+@media screen and (min-width: 1024px) {
+
 }
