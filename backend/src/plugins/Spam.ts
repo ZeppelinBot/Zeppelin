@@ -19,7 +19,7 @@ import moment from "moment-timezone";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildMutes } from "../data/GuildMutes";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import { MuteResult, MutesPlugin } from "./Mutes";
 import { CasesPlugin } from "./Cases";
 import * as t from "io-ts";
@@ -78,6 +78,10 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   public static pluginInfo = {
     prettyName: "Spam protection",
+    description: trimPluginDescription(`
+      Basic spam detection and auto-muting.
+      For more advanced spam filtering, check out the Automod plugin!
+    `),
   };
 
   protected logs: GuildLogs;

@@ -44,6 +44,7 @@ export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
     prettyName: "Censor",
     description: trimPluginDescription(`
       Censor words, tokens, links, regex, etc.
+      For more advanced filtering, check out the Automod plugin!
     `),
   };
 
