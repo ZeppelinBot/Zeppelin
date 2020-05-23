@@ -5,35 +5,46 @@ import { Configs } from "../data/Configs";
 import { validateGuildConfig } from "../configValidator";
 import yaml, { YAMLException } from "js-yaml";
 import { apiTokenAuthHandlers } from "./auth";
-import { ApiPermissions, hasPermission, permissionArrToSet } from "@shared/apiPermissions";
-import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
+import { ApiPermissions } from "@shared/apiPermissions";
+import { hasGuildPermission, requireGuildPermission } from "./permissions";
 
 export function initGuildsAPI(app: express.Express) {
   const allowedGuilds = new AllowedGuilds();
-  const apiPermissionAssignments = new ApiPermissionAssignments();
   const configs = new Configs();
 
-  app.get("/guilds/available", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
+  const guildRouter = express.Router();
+  guildRouter.use(...apiTokenAuthHandlers());
+
+  guildRouter.get("/available", async (req: Request, res: Response) => {
     const guilds = await allowedGuilds.getForApiUser(req.user.userId);
     res.json(guilds);
   });
 
-  app.get("/guilds/:guildId/config", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
-    const permAssignment = await apiPermissionAssignments.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!permAssignment || !hasPermission(permissionArrToSet(permAssignment.permissions), ApiPermissions.ReadConfig)) {
+  guildRouter.get("/:guildId", async (req: Request, res: Response) => {
+    if (!(await hasGuildPermission(req.user.userId, req.params.guildId, ApiPermissions.ViewGuild))) {
       return unauthorized(res);
     }
 
-    const config = await configs.getActiveByKey(`guild-${req.params.guildId}`);
-    res.json({ config: config ? config.config : "" });
+    const guild = await allowedGuilds.find(req.params.guildId);
+    res.json(guild);
   });
 
-  app.post("/guilds/:guildId/config", ...apiTokenAuthHandlers(), async (req, res) => {
-    const permAssignment = await apiPermissionAssignments.getByGuildAndUserId(req.params.guildId, req.user.userId);
-    if (!permAssignment || !hasPermission(permissionArrToSet(permAssignment.permissions), ApiPermissions.EditConfig)) {
-      return unauthorized(res);
-    }
+  guildRouter.post("/:guildId/check-permission", async (req: Request, res: Response) => {
+    const permission = req.body.permission;
+    const hasPermission = await hasGuildPermission(req.user.userId, req.params.guildId, permission);
+    res.json({ result: hasPermission });
+  });
 
+  guildRouter.get(
+    "/:guildId/config",
+    requireGuildPermission(ApiPermissions.ReadConfig),
+    async (req: Request, res: Response) => {
+      const config = await configs.getActiveByKey(`guild-${req.params.guildId}`);
+      res.json({ config: config ? config.config : "" });
+    },
+  );
+
+  guildRouter.post("/:guildId/config", requireGuildPermission(ApiPermissions.EditConfig), async (req, res) => {
     let config = req.body.config;
     if (config == null) return clientError(res, "No config supplied");
 
@@ -70,4 +81,6 @@ export function initGuildsAPI(app: express.Express) {
     await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user.userId);
     ok(res);
   });
+
+  app.use("/guilds", guildRouter);
 }

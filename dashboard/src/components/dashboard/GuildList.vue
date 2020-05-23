@@ -42,7 +42,7 @@
     computed: {
       ...mapState('guilds', {
         guilds: state => {
-          const guilds = Array.from(state.available || []);
+          const guilds = Array.from(state.available.values());
           guilds.sort((a, b) => {
             if (a.name > b.name) return 1;
             if (a.name < b.name) return -1;

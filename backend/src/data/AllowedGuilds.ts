@@ -28,6 +28,10 @@ export class AllowedGuilds extends BaseRepository {
     return count !== 0;
   }
 
+  find(guildId) {
+    return this.allowedGuilds.findOne(guildId);
+  }
+
   getForApiUser(userId) {
     return this.allowedGuilds
       .createQueryBuilder("allowed_guilds")

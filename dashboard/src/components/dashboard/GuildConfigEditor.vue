@@ -41,7 +41,17 @@
       AceEditor,
     },
     async mounted() {
-        await this.$store.dispatch("guilds/loadAvailableGuilds");
+        try {
+          await this.$store.dispatch("guilds/loadGuild", this.$route.params.guildId);
+        } catch (err) {
+          if (err instanceof ApiError) {
+            this.$router.push('/dashboard');
+            return;
+          }
+
+          throw err;
+        }
+
         if (this.guild == null) {
           this.$router.push('/dashboard');
           return;
@@ -66,7 +76,7 @@
     computed: {
       ...mapState('guilds', {
         guild() {
-          return this.$store.state.guilds.available.find(g => g.id === this.$route.params.guildId);
+          return this.$store.state.guilds.available.get(this.$route.params.guildId);
         },
         config() {
           return this.$store.state.guilds.configs[this.$route.params.guildId];
