@@ -73,3 +73,7 @@ desktop.ini
 npm-ls.txt
 npm-audit.txt
 .vscode/launch.json
+
+# Debug files
+*.debug.ts
+*.debug.js
