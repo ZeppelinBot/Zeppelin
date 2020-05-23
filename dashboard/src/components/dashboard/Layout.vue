@@ -1,5 +1,7 @@
 <template>
-	<div class="dashboard container mx-auto px-4 py-2">
+  <div class="dashboard container mx-auto px-4 py-2">
+    <Title title="Zeppelin - Dashboard" />
+
     <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl mb-8">
       <div class="flex-initial flex items-center">
         <img class="flex-auto w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
@@ -27,7 +29,7 @@
     <div class="main-content">
       <router-view></router-view>
     </div>
-	</div>
+  </div>
 </template>
 
 <style scoped>
@@ -43,9 +45,12 @@
 </style>
 
 <script>
-  // import "../../style/dashboard.scss";
+  import Title from "../Title.vue";
 
   export default {
+    components: {
+      Title,
+    },
     methods: {
       async logout() {
         await this.$store.dispatch("auth/logout");
