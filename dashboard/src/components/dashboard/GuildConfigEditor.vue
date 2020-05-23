@@ -74,12 +74,12 @@
       };
     },
     computed: {
-      ...mapState('guilds', {
-        guild() {
-          return this.$store.state.guilds.available.get(this.$route.params.guildId);
+      ...mapState("guilds", {
+        guild(guilds) {
+          return guilds.available.get(this.$route.params.guildId);
         },
-        config() {
-          return this.$store.state.guilds.configs[this.$route.params.guildId];
+        config(guilds) {
+          return guilds.configs[this.$route.params.guildId];
         },
       }),
     },

@@ -1,3 +1,6 @@
+import { ApiPermissions } from "@shared/apiPermissions";
+import { ApiPermissionTypes } from "../../../backend/src/data/ApiPermissionAssignments";
+
 export enum LoadStatus {
   None = 1,
   Loading,
@@ -21,6 +24,18 @@ export interface GuildState {
   >;
   configs: {
     [key: string]: string;
+  };
+  myPermissions: {
+    [guildId: string]: {
+      [K in ApiPermissions]?: boolean;
+    };
+  };
+  guildPermissionAssignments: {
+    [guildId: string]: Array<{
+      target_id: string;
+      type: ApiPermissionTypes;
+      permissions: Set<ApiPermissions>;
+    }>;
   };
 }
 

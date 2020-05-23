@@ -4,7 +4,10 @@
     <p>
       <img class="inline-block w-16 mr-4" style="vertical-align: -20px" src="../../img/squint.png"> Or here
     </p>
-    <permission-tree :tree="tree" :granted-permissions="grantedPermissions" :on-change="onChange" />
+    <div v-for="permAssignment in permissionAssignments">
+      <strong>{{ permAssignment.type }} {{ permAssignment.target_id }}</strong>
+      <permission-tree :tree="permAssignment._permissionTree" :granted-permissions="permAssignment.permissions" :on-change="onTreeUpdate.bind(null, permAssignment)" />
+    </div>
   </div>
 </template>
 
@@ -12,27 +15,65 @@
   import { ApiPermissions, permissionHierarchy } from "@shared/apiPermissions";
   import PermissionTree from "./PermissionTree.vue";
   import { applyStateToPermissionHierarchy } from "./permissionTreeUtils";
+  import { mapState } from "vuex";
+  import { GuildState } from "../../store/types";
 
   export default {
     components: {PermissionTree},
     data() {
       return {
-        tree: [],
-        grantedPermissions: new Set([ApiPermissions.EditConfig]),
-        managerPermissions: new Set([ApiPermissions.ManageAccess])
+        managerPermissions: new Set([ApiPermissions.ManageAccess]),
       };
     },
-    beforeMount() {
-      this.tree = applyStateToPermissionHierarchy(permissionHierarchy, this.grantedPermissions, this.managerPermissions);
+    computed: {
+      ...mapState<GuildState>("guilds", {
+        canManage(guilds) {
+          return guilds.myPermissions[this.$route.params.guildId]?.[ApiPermissions.ManageAccess];
+        },
+
+        permissionAssignments(guilds) {
+          return (guilds.guildPermissionAssignments[this.$route.params.guildId] || []).map(permAssignment => {
+            return {
+              ...permAssignment,
+              _permissionTree: applyStateToPermissionHierarchy(permissionHierarchy, permAssignment.permissions, this.managerPermissions),
+            };
+          });
+        },
+      }),
+    },
+    // beforeMount() {
+    //   this.tree = applyStateToPermissionHierarchy(permissionHierarchy, this.grantedPermissions, this.managerPermissions);
+    // },
+    async mounted() {
+      await this.$store.dispatch("guilds/checkPermission", {
+        guildId: this.$route.params.guildId,
+        permission: ApiPermissions.ManageAccess,
+      });
+
+      if (! this.canManage) {
+        this.$router.push('/dashboard');
+        return;
+      }
+
+      await this.$store.dispatch("guilds/loadGuildPermissionAssignments", this.$route.params.guildId);
     },
     methods: {
-      updateTreeState() {
-        this.tree = applyStateToPermissionHierarchy(permissionHierarchy, this.grantedPermissions, this.managerPermissions);
-      },
+      // updateTreeState() {
+      //   this.tree = applyStateToPermissionHierarchy(permissionHierarchy, this.grantedPermissions, this.managerPermissions);
+      // },
+      //
+      // onChange() {
+      //   this.updateTreeState();
+      // }
 
-      onChange() {
-        console.log('changed!', this.grantedPermissions);
-        this.updateTreeState();
+      onTreeUpdate(targetPermissions) {
+        console.log('hi');
+        this.$store.dispatch("guilds/setTargetPermissions", {
+          guildId: this.$route.params.guildId,
+          targetId: targetPermissions.target_id,
+          type: targetPermissions.type,
+          permissions: targetPermissions.permissions,
+        });
       }
     }
   }
