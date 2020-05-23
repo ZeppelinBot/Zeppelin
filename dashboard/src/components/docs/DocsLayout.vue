@@ -1,5 +1,7 @@
 <template>
   <div class="docs container mx-auto px-4 py-2">
+    <Title title="Zeppelin - Documentation" />
+
     <!-- Top bar -->
     <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl">
       <div class="flex-initial flex items-center">
@@ -51,6 +53,7 @@
   import Vue from "vue";
   import {mapState} from "vuex";
   import Alert from 'vue-material-design-icons/Alert.vue';
+  import Title from "../Title.vue";
 
   type TMenuItem = {
     to: string;
@@ -117,7 +120,7 @@
   ];
 
   export default {
-    components: { Alert },
+    components: { Alert, Title },
     async mounted() {
       await this.$store.dispatch("docs/loadAllPlugins");
     },
