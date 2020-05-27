@@ -4,10 +4,15 @@ import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
+import { DAYS, MINUTES } from "../utils";
 
-const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 min
+const CLEANUP_INTERVAL = 5 * MINUTES;
 
-const RETENTION_PERIOD = 5 * 24 * 60 * 60 * 1000; // 5 days
+/**
+ * How long message edits, deletions, etc. will include the original message content.
+ * This is very heavy storage-wise, so keeping it as low as possible is ideal.
+ */
+const RETENTION_PERIOD = 1 * DAYS;
 
 async function cleanup() {
   const repository = getRepository(SavedMessage);
