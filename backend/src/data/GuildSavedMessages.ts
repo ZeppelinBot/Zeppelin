@@ -32,7 +32,7 @@ async function cleanup() {
         qb.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
       }),
     )
-    .limit(100_000) // To avoid long table locks, delete max 100,000 rows at once
+    .limit(50_000) // To avoid long table locks, limit the amount of messages deleted at once
     .delete()
     .execute();
 
