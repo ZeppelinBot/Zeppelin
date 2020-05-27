@@ -1,5 +1,6 @@
 import { connect } from "../data/db";
 import path from "path";
+import { setIsAPI } from "../globals";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "api.env") });
 
@@ -9,6 +10,8 @@ function errorHandler(err) {
 }
 
 process.on("unhandledRejection", errorHandler);
+
+setIsAPI(true);
 
 // Connect to the database before loading the rest of the code (that depend on the database connection)
 console.log("Connecting to database..."); // tslint:disable-line
