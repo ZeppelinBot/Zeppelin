@@ -7,7 +7,7 @@ import moment from "moment-timezone";
 import { DAYS, MINUTES } from "../utils";
 import { isAPI } from "../globals";
 
-const CLEANUP_INTERVAL = 5 * MINUTES;
+const CLEANUP_INTERVAL = 1 * MINUTES;
 
 /**
  * How long message edits, deletions, etc. will include the original message content.
@@ -42,7 +42,7 @@ async function cleanup() {
         qb.andWhere("is_permanent = 0");
       }),
     )
-    .limit(100_000) // To avoid long table locks, limit the amount of messages deleted at once
+    .limit(10_000) // To avoid long table locks, limit the amount of messages deleted at once
     .delete()
     .execute();
 
