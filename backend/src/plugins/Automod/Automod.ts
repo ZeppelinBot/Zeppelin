@@ -260,6 +260,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
           rule["enabled"] = true;
         }
 
+        if (rule["affects_bots"] == null) {
+          rule["affects_bots"] = false;
+        }
+
         // Loop through the rule's triggers
         if (rule["triggers"]) {
           for (const trigger of rule["triggers"]) {
@@ -1509,7 +1513,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
    * Run automod actions on new messages
    */
   protected onMessageCreate(msg: SavedMessage) {
-    if (msg.is_bot) return;
     if (this.actionedMessageIds.includes(msg.id)) return;
 
     this.automodQueue.add(async () => {
@@ -1524,6 +1527,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         channelId: msg.channel_id,
       });
       for (const [name, rule] of Object.entries(config.rules)) {
+        if (msg.is_bot && !rule.affects_bots) continue;
+
         const matchResult = await this.matchRuleToMessage(rule, msg);
         if (matchResult) {
           // Make sure the message still exists in our database when we try to apply actions on it.
@@ -1552,8 +1557,6 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
    */
   @d.event("guildMemberAdd")
   protected onMemberJoin(_, member: Member) {
-    if (member.user.bot) return;
-
     this.automodQueue.add(async () => {
       if (this.unloaded) return;
 
@@ -1568,6 +1571,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       const config = this.getConfigForMember(member);
 
       for (const [name, rule] of Object.entries(config.rules)) {
+        if (member.user.bot && !rule.affects_bots) continue;
+
         const spamMatch = await this.matchOtherSpamInRule(rule, member.id);
         if (spamMatch) {
           await this.applyActionsOnMatch(rule, spamMatch);
