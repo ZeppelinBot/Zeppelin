@@ -8,6 +8,7 @@ import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { GuildArchives } from "../data/GuildArchives";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
 import * as t from "io-ts";
+import escapeStringRegexp from "escape-string-regexp";
 
 let activeReload: [string, string] = null;
 
@@ -121,22 +122,75 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
     }
   }
 
-  @d.command("guilds")
+  @d.command("guilds", "[search:string$]", {
+    aliases: ["servers"],
+    options: [
+      {
+        name: "all",
+        shortcut: "a",
+        isSwitch: true,
+      },
+      {
+        name: "initialized",
+        shortcut: "i",
+        isSwitch: true,
+      },
+      {
+        name: "uninitialized",
+        shortcut: "u",
+        isSwitch: true,
+      },
+    ],
+  })
   @d.permission("can_use")
-  async serversCmd(msg: Message) {
+  async serversCmd(
+    msg: Message,
+    args: { search?: string; all?: boolean; initialized?: boolean; uninitialized?: boolean },
+  ) {
+    const showList = Boolean(args.all || args.initialized || args.uninitialized || args.search);
+    const search = args.search && new RegExp([...args.search].map(s => escapeStringRegexp(s)).join(".*"), "i");
+
     const joinedGuilds = Array.from(this.bot.guilds.values());
     const loadedGuilds = this.knub.getLoadedGuilds();
     const loadedGuildsMap = loadedGuilds.reduce((map, guildData) => map.set(guildData.id, guildData), new Map());
 
-    joinedGuilds.sort(sorter(g => g.name.toLowerCase()));
-    const longestId = joinedGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
-    const lines = joinedGuilds.map(g => {
-      const paddedId = g.id.padEnd(longestId, " ");
-      return `\`${paddedId}\` **${g.name}** (${loadedGuildsMap.has(g.id) ? "initialized" : "not initialized"}) (${
-        g.memberCount
-      } members)`;
-    });
-    createChunkedMessage(msg.channel, lines.join("\n"));
+    if (showList) {
+      let filteredGuilds = Array.from(joinedGuilds);
+
+      if (args.initialized) {
+        filteredGuilds = filteredGuilds.filter(g => loadedGuildsMap.has(g.id));
+      }
+
+      if (args.uninitialized) {
+        filteredGuilds = filteredGuilds.filter(g => !loadedGuildsMap.has(g.id));
+      }
+
+      if (args.search) {
+        filteredGuilds = filteredGuilds.filter(g => search.test(`${g.id} ${g.name}`));
+      }
+
+      if (filteredGuilds.length) {
+        filteredGuilds.sort(sorter(g => g.name.toLowerCase()));
+        const longestId = filteredGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
+        const lines = filteredGuilds.map(g => {
+          const paddedId = g.id.padEnd(longestId, " ");
+          return `\`${paddedId}\` **${g.name}** (${loadedGuildsMap.has(g.id) ? "initialized" : "not initialized"}) (${
+            g.memberCount
+          } members)`;
+        });
+        createChunkedMessage(msg.channel, lines.join("\n"));
+      } else {
+        msg.channel.createMessage("No servers matched the filters");
+      }
+    } else {
+      const total = joinedGuilds.length;
+      const initialized = joinedGuilds.filter(g => loadedGuildsMap.has(g.id)).length;
+      const unInitialized = total - initialized;
+
+      msg.channel.createMessage(
+        `I am on **${total} total servers**, of which **${initialized} are initialized** and **${unInitialized} are not initialized**`,
+      );
+    }
   }
 
   @d.command("leave_guild", "<guildId:string>")
