@@ -302,6 +302,7 @@ export const Rule = t.type({
   enabled: t.boolean,
   name: t.string,
   presets: tNullable(t.array(t.string)),
+  affects_bots: t.boolean,
   triggers: t.array(
     t.type({
       match_words: tNullable(MatchWordsTrigger),
