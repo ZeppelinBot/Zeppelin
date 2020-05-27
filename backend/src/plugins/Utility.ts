@@ -1072,8 +1072,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   })
   @d.permission("can_server")
   async serverCmd(msg: Message) {
-    await this.refreshMembersIfNeeded();
-
     const embed: EmbedOptions = {
       fields: [],
       color: parseInt("6b80cf", 16),
@@ -1124,10 +1122,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       : this.guild.members.filter(m => m.status !== "offline").length;
     const offlineMemberCount = this.guild.memberCount - onlineMemberCount;
 
-    const onlineStatusMemberCount = this.guild.members.filter(m => m.status === "online").length;
-    const dndStatusMemberCount = this.guild.members.filter(m => m.status === "dnd").length;
-    const idleStatusMemberCount = this.guild.members.filter(m => m.status === "idle").length;
-
     let memberCountTotalLines = `Total: **${formatNumber(totalMembers)}**`;
     if (restGuild.maxMembers) {
       memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
@@ -1145,9 +1139,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         ${memberCountTotalLines}
         ${memberCountOnlineLines}
         Offline: **${formatNumber(offlineMemberCount)}**
-        <:zep_online:665907874450636810> Online: **${formatNumber(onlineStatusMemberCount)}**
-        <:zep_idle:665908128331726848> Idle: **${formatNumber(idleStatusMemberCount)}**
-        <:zep_dnd:665908138741858365> DND: **${formatNumber(dndStatusMemberCount)}**
       `),
     });
 
