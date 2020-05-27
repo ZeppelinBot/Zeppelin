@@ -12,7 +12,7 @@ const CLEANUP_INTERVAL = 5 * MINUTES;
  * How long message edits, deletions, etc. will include the original message content.
  * This is very heavy storage-wise, so keeping it as low as possible is ideal.
  */
-const RETENTION_PERIOD = 1 * DAYS;
+const RETENTION_PERIOD = 4 * DAYS;
 
 async function cleanup() {
   const repository = getRepository(SavedMessage);
