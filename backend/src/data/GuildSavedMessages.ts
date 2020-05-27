@@ -14,6 +14,7 @@ const CLEANUP_INTERVAL = 5 * MINUTES;
  * This is very heavy storage-wise, so keeping it as low as possible is ideal.
  */
 const RETENTION_PERIOD = 1 * DAYS;
+const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 
 async function cleanup() {
   const repository = getRepository(SavedMessage);
@@ -29,11 +30,19 @@ async function cleanup() {
     .orWhere(
       // Clear old messages
       new Brackets(qb => {
-        qb.where("is_permanent = 0");
-        qb.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
+        qb.where(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
+        qb.andWhere("is_permanent = 0");
       }),
     )
-    .limit(50_000) // To avoid long table locks, limit the amount of messages deleted at once
+    .orWhere(
+      // Clear old bot messages
+      new Brackets(qb => {
+        qb.where("is_bot = 1");
+        qb.andWhere(`posted_at <= (NOW() - INTERVAL ${BOT_MESSAGE_RETENTION_PERIOD}000 MICROSECOND)`);
+        qb.andWhere("is_permanent = 0");
+      }),
+    )
+    .limit(100_000) // To avoid long table locks, limit the amount of messages deleted at once
     .delete()
     .execute();
 
