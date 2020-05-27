@@ -5,6 +5,7 @@ import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
 import { DAYS, MINUTES } from "../utils";
+import { isAPI } from "../globals";
 
 const CLEANUP_INTERVAL = 5 * MINUTES;
 
@@ -39,8 +40,10 @@ async function cleanup() {
   setTimeout(cleanup, CLEANUP_INTERVAL);
 }
 
-// Start first cleanup 30 seconds after startup
-setTimeout(cleanup, 30 * 1000);
+if (!isAPI()) {
+  // Start first cleanup 30 seconds after startup
+  setTimeout(cleanup, 30 * 1000);
+}
 
 export class GuildSavedMessages extends BaseGuildRepository {
   private messages: Repository<SavedMessage>;
