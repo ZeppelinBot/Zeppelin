@@ -428,9 +428,9 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   }
 
   /**
-   * @return Matched invite code
+   * @return Info about matched invite
    */
-  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<null | string> {
+  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<null | any> {
     const inviteCodes = getInviteCodesInString(str);
     if (inviteCodes.length === 0) return null;
 
@@ -438,22 +438,22 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     for (const code of uniqueInviteCodes) {
       if (trigger.include_invite_codes && trigger.include_invite_codes.includes(code)) {
-        return code;
+        return { code };
       }
       if (trigger.exclude_invite_codes && !trigger.exclude_invite_codes.includes(code)) {
-        return code;
+        return { code };
       }
     }
 
     for (const inviteCode of uniqueInviteCodes) {
       const invite = await this.resolveInvite(inviteCode);
-      if (!invite) return inviteCode;
+      if (!invite) return { code: inviteCode };
 
       if (trigger.include_guilds && trigger.include_guilds.includes(invite.guild.id)) {
-        return inviteCode;
+        return { code: inviteCode, invite };
       }
       if (trigger.exclude_guilds && !trigger.exclude_guilds.includes(invite.guild.id)) {
-        return inviteCode;
+        return { code: inviteCode, invite };
       }
     }
 
@@ -1499,7 +1499,10 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     } else if (matchResult.trigger === "match_regex") {
       return `regex \`${disableInlineCode(matchResult.matchedValue)}\``;
     } else if (matchResult.trigger === "match_invites") {
-      return `invite code \`${disableInlineCode(matchResult.matchedValue)}\``;
+      if (matchResult.matchedValue.invite) {
+        return `invite code \`${matchResult.matchedValue.code}\` (**${matchResult.matchedValue.invite.guild.name}**, \`${matchResult.matchedValue.invite.guild.id}\`)`;
+      }
+      return `invite code \`${disableInlineCode(matchResult.matchedValue.code)}\``;
     } else if (matchResult.trigger === "match_links") {
       return `link \`${disableInlineCode(matchResult.matchedValue)}\``;
     } else if (matchResult.trigger === "match_attachment_type") {
