@@ -189,12 +189,6 @@ export const MatchAttachmentTypeTrigger = t.type({
   blacklist_enabled: t.boolean,
   filetype_whitelist: t.array(t.string),
   whitelist_enabled: t.boolean,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
 });
 export type TMatchAttachmentTypeTrigger = t.TypeOf<typeof MatchAttachmentTypeTrigger>;
 
