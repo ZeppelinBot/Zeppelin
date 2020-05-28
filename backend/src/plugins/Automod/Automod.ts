@@ -125,12 +125,6 @@ const defaultMatchAttachmentTypeTrigger: Partial<TMatchAttachmentTypeTrigger> = 
   blacklist_enabled: false,
   filetype_whitelist: [],
   whitelist_enabled: false,
-  match_messages: true,
-  match_embeds: true,
-  match_visible_names: false,
-  match_usernames: false,
-  match_nicknames: false,
-  match_custom_status: false,
 };
 
 const defaultTextSpamTrigger: Partial<t.TypeOf<typeof BaseTextSpamTrigger>> = {
@@ -541,17 +535,26 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     return null;
   }
 
-  protected evaluateMatchAttachmentTypeTrigger(trigger: TMatchAttachmentTypeTrigger, msg: SavedMessage): null | string {
+  protected evaluateMatchAttachmentTypeTrigger(
+    trigger: TMatchAttachmentTypeTrigger,
+    msg: SavedMessage,
+  ): null | { str: string; matchedValue: string } {
     if (!msg.data.attachments) return null;
     const attachments: any[] = msg.data.attachments;
 
     for (const attachment of attachments) {
       const attachment_type = attachment.filename.split(`.`).pop();
       if (trigger.blacklist_enabled && trigger.filetype_blacklist.includes(attachment_type)) {
-        return `${attachment_type} - blacklisted`;
+        return {
+          str: attachment.filename,
+          matchedValue: `${attachment_type} - blacklisted`,
+        };
       }
       if (trigger.whitelist_enabled && !trigger.filetype_whitelist.includes(attachment_type)) {
-        return `${attachment_type} - not whitelisted`;
+        return {
+          str: attachment.filename,
+          matchedValue: `${attachment_type} - blacklisted`,
+        };
       }
     }
 
@@ -733,10 +736,18 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
       }
 
       if (trigger.match_attachment_type) {
-        const match = await this.matchMultipleTextTypesOnMessage(trigger.match_attachment_type, msg, str => {
-          return this.evaluateMatchAttachmentTypeTrigger(trigger.match_attachment_type, msg);
-        });
-        if (match) return { ...match, trigger: "match_attachment_type" } as TextTriggerMatchResult;
+        const match = this.evaluateMatchAttachmentTypeTrigger(trigger.match_attachment_type, msg);
+        // TODO: Add "attachment" type
+        if (match) {
+          const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
+          return {
+            type: "message",
+            userId: msg.user_id,
+            messageInfo,
+            ...match,
+            trigger: "match_attachment_type",
+          };
+        }
       }
 
       if (trigger.message_spam) {
