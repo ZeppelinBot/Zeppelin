@@ -6,6 +6,7 @@ import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
 import { DAYS, MINUTES } from "../utils";
 import { isAPI } from "../globals";
+import { connection } from "./db";
 
 const CLEANUP_INTERVAL = 1 * MINUTES;
 
@@ -17,34 +18,25 @@ const RETENTION_PERIOD = 1 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 
 async function cleanup() {
-  const repository = getRepository(SavedMessage);
-  await repository
-    .createQueryBuilder("messages")
-    .where(
-      // Clear deleted messages
-      new Brackets(qb => {
-        qb.where("deleted_at IS NOT NULL");
-        qb.andWhere(`deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)`);
-      }),
+  const query = `
+    DELETE FROM messages
+    WHERE (
+      deleted_at IS NOT NULL
+      AND deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)
     )
-    .orWhere(
-      // Clear old messages
-      new Brackets(qb => {
-        qb.where(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
-        qb.andWhere("is_permanent = 0");
-      }),
+    OR (
+      posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)
+      AND is_permanent = 0
     )
-    .orWhere(
-      // Clear old bot messages
-      new Brackets(qb => {
-        qb.where("is_bot = 1");
-        qb.andWhere(`posted_at <= (NOW() - INTERVAL ${BOT_MESSAGE_RETENTION_PERIOD}000 MICROSECOND)`);
-        qb.andWhere("is_permanent = 0");
-      }),
+    OR (
+      is_bot = 1
+      AND posted_at <= (NOW() - INTERVAL ${BOT_MESSAGE_RETENTION_PERIOD}000 MICROSECOND)
+      AND is_permanent = 0
     )
-    .limit(10_000) // To avoid long table locks, limit the amount of messages deleted at once
-    .delete()
-    .execute();
+    LIMIT ${50_000}
+  `;
+
+  await connection.query(query);
 
   setTimeout(cleanup, CLEANUP_INTERVAL);
 }
