@@ -8,7 +8,7 @@ import { DAYS, MINUTES } from "../utils";
 import { isAPI } from "../globals";
 import { connection } from "./db";
 
-const CLEANUP_INTERVAL = 1 * MINUTES;
+const CLEANUP_INTERVAL = 5 * MINUTES;
 
 /**
  * How long message edits, deletions, etc. will include the original message content.
