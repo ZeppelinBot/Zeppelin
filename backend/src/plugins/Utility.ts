@@ -1520,7 +1520,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (supporters.length) {
       aboutContent.embed.fields.push({
         name: "Zeppelin supporters 🎉",
-        value: supporters.map(s => `**${s.name}** ${s.amount && `${s.amount}€/mo`}`).join("\n"),
+        value: supporters.map(s => `**${s.name}** ${s.amount ? `${s.amount}€/mo` : ""}`.trim()).join("\n"),
       });
     }
 
