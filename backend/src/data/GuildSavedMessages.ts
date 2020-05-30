@@ -4,11 +4,12 @@ import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
-import { DAYS, MINUTES } from "../utils";
+import { DAYS, DBDateFormat, MINUTES, SECONDS } from "../utils";
 import { isAPI } from "../globals";
 import { connection } from "./db";
 
 const CLEANUP_INTERVAL = 5 * MINUTES;
+let cleanupPromise = Promise.resolve();
 
 /**
  * How long message edits, deletions, etc. will include the original message content.
@@ -18,32 +19,45 @@ const RETENTION_PERIOD = 1 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 
 async function cleanup() {
+  const deletedAtThreshold = moment()
+    .subtract(CLEANUP_INTERVAL, "ms")
+    .format(DBDateFormat);
+  const postedAtThreshold = moment()
+    .subtract(RETENTION_PERIOD, "ms")
+    .format(DBDateFormat);
+  const botPostedAtThreshold = moment()
+    .subtract(BOT_MESSAGE_RETENTION_PERIOD, "ms")
+    .format(DBDateFormat);
+
   const query = `
     DELETE FROM messages
     WHERE (
       deleted_at IS NOT NULL
-      AND deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)
+      AND deleted_at <= ?
     )
     OR (
-      posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)
+      posted_at <= ?
       AND is_permanent = 0
     )
     OR (
       is_bot = 1
-      AND posted_at <= (NOW() - INTERVAL ${BOT_MESSAGE_RETENTION_PERIOD}000 MICROSECOND)
+      AND posted_at <= ?
       AND is_permanent = 0
     )
-    LIMIT ${50_000}
+    LIMIT ${25_000}
   `;
 
-  await connection.query(query);
+  cleanupPromise = (async () => {
+    await connection.query(query, [deletedAtThreshold, postedAtThreshold, botPostedAtThreshold]);
+  })();
+  await cleanupPromise;
 
   setTimeout(cleanup, CLEANUP_INTERVAL);
 }
 
 if (!isAPI()) {
   // Start first cleanup 30 seconds after startup
-  setTimeout(cleanup, 30 * 1000);
+  setTimeout(cleanup, 30 * SECONDS);
 }
 
 export class GuildSavedMessages extends BaseGuildRepository {
@@ -152,6 +166,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
       this.toBePermanent.delete(data.id);
     }
 
+    await cleanupPromise;
+
     try {
       await this.messages.insert(data);
     } catch (e) {
@@ -167,6 +183,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
   async createFromMsg(msg: Message, overrides = {}) {
     const existingSavedMsg = await this.find(msg.id);
     if (existingSavedMsg) return;
+
+    await cleanupPromise;
 
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
@@ -185,6 +203,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
   }
 
   async markAsDeleted(id) {
+    await cleanupPromise;
+
     await this.messages
       .createQueryBuilder("messages")
       .update()
@@ -208,6 +228,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
    * If any messages were marked as deleted, also emits the deleteBulk event.
    */
   async markBulkAsDeleted(ids) {
+    await cleanupPromise;
+
     const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
 
     await this.messages
@@ -234,6 +256,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
     const oldMessage = await this.messages.findOne(id);
     if (!oldMessage) return;
 
+    await cleanupPromise;
+
     const newMessage = { ...oldMessage, data: newData };
 
     await this.messages.update(
@@ -255,6 +279,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
   async setPermanent(id: string) {
     const savedMsg = await this.find(id);
     if (savedMsg) {
+      await cleanupPromise;
       await this.messages.update(
         { id },
         {
