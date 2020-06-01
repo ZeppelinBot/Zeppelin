@@ -133,7 +133,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       },
 
       countdown(toDate) {
-        const target = this.parseDateTime(toDate);
+        const target = moment(this.parseDateTime(toDate));
 
         const now = moment();
         if (!target.isValid()) return "";
