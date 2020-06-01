@@ -1,4 +1,4 @@
-import { Brackets, getRepository, Repository } from "typeorm";
+import { getRepository, In, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
@@ -9,7 +9,6 @@ import { isAPI } from "../globals";
 import { connection } from "./db";
 
 const CLEANUP_INTERVAL = 5 * MINUTES;
-let cleanupPromise = Promise.resolve();
 
 /**
  * How long message edits, deletions, etc. will include the original message content.
@@ -17,8 +16,11 @@ let cleanupPromise = Promise.resolve();
  */
 const RETENTION_PERIOD = 1 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
+const CLEAN_PER_LOOP = 250;
 
 async function cleanup() {
+  const repo = getRepository(SavedMessage);
+
   const deletedAtThreshold = moment()
     .subtract(CLEANUP_INTERVAL, "ms")
     .format(DBDateFormat);
@@ -29,28 +31,39 @@ async function cleanup() {
     .subtract(BOT_MESSAGE_RETENTION_PERIOD, "ms")
     .format(DBDateFormat);
 
-  const query = `
-    DELETE FROM messages
-    WHERE (
-      deleted_at IS NOT NULL
-      AND deleted_at <= ?
-    )
-    OR (
-      posted_at <= ?
-      AND is_permanent = 0
-    )
-    OR (
-      is_bot = 1
-      AND posted_at <= ?
-      AND is_permanent = 0
-    )
-    LIMIT ${25_000}
-  `;
+  // SELECT + DELETE messages in batches
+  // This is to avoid deadlocks that happened frequently when deleting with the same criteria as the select below
+  // when a message was being inserted at the same time
+  let rows;
+  do {
+    rows = await connection.query(
+      `
+      SELECT id
+      FROM messages
+      WHERE (
+          deleted_at IS NOT NULL
+          AND deleted_at <= ?
+        )
+         OR (
+          posted_at <= ?
+          AND is_permanent = 0
+        )
+         OR (
+          is_bot = 1
+          AND posted_at <= ?
+          AND is_permanent = 0
+        )
+      LIMIT ${CLEAN_PER_LOOP}
+    `,
+      [deletedAtThreshold, postedAtThreshold, botPostedAtThreshold],
+    );
 
-  cleanupPromise = (async () => {
-    await connection.query(query, [deletedAtThreshold, postedAtThreshold, botPostedAtThreshold]);
-  })();
-  await cleanupPromise;
+    if (rows.length > 0) {
+      await repo.delete({
+        id: In(rows.map(r => r.id)),
+      });
+    }
+  } while (rows.length === CLEAN_PER_LOOP);
 
   setTimeout(cleanup, CLEANUP_INTERVAL);
 }
@@ -139,8 +152,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
     let query = this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .andWhere("user_id = :user_id", { user_id: userId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("user_id = :user_id", { user_id: userId })
       .andWhere("id > :afterId", { afterId })
       .andWhere("deleted_at IS NULL");
 
@@ -166,8 +179,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
       this.toBePermanent.delete(data.id);
     }
 
-    await cleanupPromise;
-
     try {
       await this.messages.insert(data);
     } catch (e) {
@@ -183,8 +194,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
   async createFromMsg(msg: Message, overrides = {}) {
     const existingSavedMsg = await this.find(msg.id);
     if (existingSavedMsg) return;
-
-    await cleanupPromise;
 
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
@@ -203,8 +212,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
   }
 
   async markAsDeleted(id) {
-    await cleanupPromise;
-
     await this.messages
       .createQueryBuilder("messages")
       .update()
@@ -228,8 +235,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
    * If any messages were marked as deleted, also emits the deleteBulk event.
    */
   async markBulkAsDeleted(ids) {
-    await cleanupPromise;
-
     const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
 
     await this.messages
@@ -256,8 +261,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
     const oldMessage = await this.messages.findOne(id);
     if (!oldMessage) return;
 
-    await cleanupPromise;
-
     const newMessage = { ...oldMessage, data: newData };
 
     await this.messages.update(
@@ -279,7 +282,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
   async setPermanent(id: string) {
     const savedMsg = await this.find(id);
     if (savedMsg) {
-      await cleanupPromise;
       await this.messages.update(
         { id },
         {
