@@ -8,6 +8,7 @@ import * as t from "io-ts";
 import { NICKNAME_RETENTION_PERIOD } from "../data/cleanup/nicknames";
 import moment from "moment-timezone";
 import { USERNAME_RETENTION_PERIOD } from "../data/cleanup/usernames";
+import { Queue } from "../Queue";
 
 const ConfigSchema = t.type({
   can_view: t.boolean,
@@ -21,6 +22,8 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   protected nicknameHistory: GuildNicknameHistory;
   protected usernameHistory: UsernameHistory;
+
+  protected updateQueue: Queue;
 
   public static getStaticDefaultOptions(): IPluginOptions<TConfigSchema> {
     return {
@@ -42,6 +45,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
   onLoad() {
     this.nicknameHistory = GuildNicknameHistory.getGuildInstance(this.guildId);
     this.usernameHistory = new UsernameHistory();
+    this.updateQueue = new Queue();
   }
 
   @d.command("names", "<userId:userId>")
@@ -91,11 +95,11 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
 
   @d.event("messageCreate")
   async onMessage(msg: Message) {
-    this.updateNickname(msg.member);
+    this.updateQueue.add(() => this.updateNickname(msg.member));
   }
 
   @d.event("voiceChannelJoin")
   async onVoiceChannelJoin(member: Member) {
-    this.updateNickname(member);
+    this.updateQueue.add(() => this.updateNickname(member));
   }
 }
