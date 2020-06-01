@@ -222,6 +222,10 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
         return "";
       },
     };
+
+    for (const [name, fn] of Object.entries(this.tagFunctions)) {
+      this.tagFunctions[name] = (fn as any).bind(this.tagFunctions);
+    }
   }
 
   onUnload() {
