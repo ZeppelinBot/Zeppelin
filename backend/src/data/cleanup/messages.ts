@@ -11,7 +11,7 @@ import { connection } from "../db";
 const RETENTION_PERIOD = 1 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 const DELETED_MESSAGE_RETENTION_PERIOD = 5 * MINUTES;
-const CLEAN_PER_LOOP = 250;
+const CLEAN_PER_LOOP = 500;
 
 export async function cleanupMessages(): Promise<number> {
   let cleaned = 0;
