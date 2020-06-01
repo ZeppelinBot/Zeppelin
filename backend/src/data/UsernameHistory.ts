@@ -15,7 +15,7 @@ if (!isAPI()) {
   }
 
   // Start first cleanup 30 seconds after startup
-  setTimeout(cleanup, 1 * SECONDS);
+  setTimeout(cleanup, 30 * SECONDS);
 }
 
 export const MAX_USERNAME_ENTRIES_PER_USER = 5;
