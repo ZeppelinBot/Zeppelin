@@ -84,6 +84,7 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!member) return;
     const latestEntry = await this.nicknameHistory.getLastEntry(member.id);
     if (!latestEntry || latestEntry.nickname !== member.nick) {
+      if (!latestEntry && member.nick == null) return; // No need to save "no nickname" if there's no previous data
       await this.nicknameHistory.addEntry(member.id, member.nick);
     }
   }
