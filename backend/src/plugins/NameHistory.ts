@@ -1,10 +1,13 @@
 import { decorators as d, IPluginOptions } from "knub";
 import { GuildNicknameHistory, MAX_NICKNAME_ENTRIES_PER_USER } from "../data/GuildNicknameHistory";
 import { Member, Message } from "eris";
-import { createChunkedMessage, disableCodeBlocks } from "../utils";
+import { createChunkedMessage, DAYS, disableCodeBlocks } from "../utils";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
 import { MAX_USERNAME_ENTRIES_PER_USER, UsernameHistory } from "../data/UsernameHistory";
 import * as t from "io-ts";
+import { NICKNAME_RETENTION_PERIOD } from "../data/cleanup/nicknames";
+import moment from "moment-timezone";
+import { USERNAME_RETENTION_PERIOD } from "../data/cleanup/usernames";
 
 const ConfigSchema = t.type({
   can_view: t.boolean,
@@ -59,23 +62,38 @@ export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
     const user = this.bot.users.get(args.userId);
     const currentUsername = user ? `${user.username}#${user.discriminator}` : args.userId;
 
+    const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);
+    const usernameDays = Math.round(USERNAME_RETENTION_PERIOD / DAYS);
+
     let message = `Name history for **${currentUsername}**:`;
     if (nicknameRows.length) {
-      message += `\n\n__Last ${MAX_NICKNAME_ENTRIES_PER_USER} nicknames:__\n${nicknameRows.join("\n")}`;
+      message += `\n\n__Last ${MAX_NICKNAME_ENTRIES_PER_USER} nicknames within ${nicknameDays} days:__\n${nicknameRows.join(
+        "\n",
+      )}`;
     }
     if (usernameRows.length) {
-      message += `\n\n__Last ${MAX_USERNAME_ENTRIES_PER_USER} usernames:__\n${usernameRows.join("\n")}`;
+      message += `\n\n__Last ${MAX_USERNAME_ENTRIES_PER_USER} usernames within ${usernameDays} days:__\n${usernameRows.join(
+        "\n",
+      )}`;
     }
 
     createChunkedMessage(msg.channel, message);
   }
 
-  @d.event("guildMemberUpdate")
-  async onGuildMemberUpdate(_, member: Member) {
+  async updateNickname(member: Member) {
     const latestEntry = await this.nicknameHistory.getLastEntry(member.id);
     if (!latestEntry || latestEntry.nickname !== member.nick) {
-      // tslint:disable-line
       await this.nicknameHistory.addEntry(member.id, member.nick);
     }
+  }
+
+  @d.event("messageCreate")
+  async onMessage(msg: Message) {
+    this.updateNickname(msg.member);
+  }
+
+  @d.event("voiceChannelJoin")
+  async onVoiceChannelJoin(member: Member) {
+    this.updateNickname(member);
   }
 }
