@@ -29,10 +29,6 @@ export async function cleanupUsernames(): Promise<number> {
     );
 
     if (rows.length > 0) {
-      console.log(
-        "ids",
-        rows.map(r => r.id),
-      );
       await usernameHistoryRepository.delete({
         id: In(rows.map(r => r.id)),
       });
