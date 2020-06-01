@@ -1,7 +1,22 @@
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { getRepository, Repository } from "typeorm";
+import { getRepository, In, Repository } from "typeorm";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
-import { sorter } from "../utils";
+import { MINUTES, SECONDS, sorter } from "../utils";
+import { MAX_USERNAME_ENTRIES_PER_USER } from "./UsernameHistory";
+import { isAPI } from "../globals";
+import { cleanupNicknames } from "./cleanup/nicknames";
+
+if (!isAPI()) {
+  const CLEANUP_INTERVAL = 5 * MINUTES;
+
+  async function cleanup() {
+    await cleanupNicknames();
+    setTimeout(cleanup, CLEANUP_INTERVAL);
+  }
+
+  // Start first cleanup 30 seconds after startup
+  setTimeout(cleanup, 30 * SECONDS);
+}
 
 export const MAX_NICKNAME_ENTRIES_PER_USER = 10;
 
@@ -44,25 +59,20 @@ export class GuildNicknameHistory extends BaseGuildRepository {
       nickname,
     });
 
-    // Cleanup (leave only the last MAX_NICKNAME_ENTRIES_PER_USER entries)
-    const lastEntries = await this.getByUserId(userId);
-    if (lastEntries.length > MAX_NICKNAME_ENTRIES_PER_USER) {
-      const earliestEntry = lastEntries
-        .sort(sorter("timestamp", "DESC"))
-        .slice(0, 10)
-        .reduce((earliest, entry) => {
-          if (earliest == null) return entry;
-          if (entry.id < earliest.id) return entry;
-          return earliest;
-        }, null);
+    // Cleanup (leave only the last MAX_USERNAME_ENTRIES_PER_USER entries)
+    const toDelete = await this.nicknameHistory
+      .createQueryBuilder()
+      .where("guild_id = :guildId", { guildId: this.guildId })
+      .andWhere("user_id = :userId", { userId })
+      .orderBy("id", "DESC")
+      .skip(MAX_USERNAME_ENTRIES_PER_USER)
+      .take(99_999)
+      .getMany();
 
-      this.nicknameHistory
-        .createQueryBuilder()
-        .where("guild_id = :guildId", { guildId: this.guildId })
-        .andWhere("user_id = :userId", { userId })
-        .andWhere("id < :id", { id: earliestEntry.id })
-        .delete()
-        .execute();
+    if (toDelete.length > 0) {
+      await this.nicknameHistory.delete({
+        id: In(toDelete.map(v => v.id)),
+      });
     }
   }
 }
