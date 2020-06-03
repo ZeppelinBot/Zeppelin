@@ -94,6 +94,14 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
       ppName = `${pp.username}#${pp.discriminator}`;
     }
 
+    if (args.auditLogId) {
+      const existingAuditLogCase = await this.cases.findByAuditLogId(args.auditLogId);
+      if (existingAuditLogCase) {
+        delete args.auditLogId;
+        logger.warn(`Duplicate audit log ID for mod case: ${args.auditLogId}`);
+      }
+    }
+
     const createdCase = await this.cases.create({
       type: args.type,
       user_id: args.userId,
