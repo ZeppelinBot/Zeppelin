@@ -1,6 +1,6 @@
 import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
 import * as t from "io-ts";
-import { resolveMember, stripObjectToScalars, successMessage } from "../utils";
+import { resolveMember, stripObjectToScalars, successMessage, verboseUserMention } from "../utils";
 import { decorators as d, IPluginOptions, logger } from "knub";
 import { GuildChannel, Member, Message } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
@@ -100,7 +100,7 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod: stripObjectToScalars(msg.author),
     });
 
-    this.sendSuccessMessage(msg.channel, "Role added to user!");
+    this.sendSuccessMessage(msg.channel, `Added role **${role.name}** to ${verboseUserMention(args.member.user)}!`);
   }
 
   @d.command("massaddrole", "<role:string> <members:string...>")
@@ -129,10 +129,17 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!roleId) {
       return this.sendErrorMessage(msg.channel, "Invalid role id");
     }
-    const role = this.guild.roles.get(roleId);
 
     const config = this.getConfigForMsg(msg);
     if (!config.assignable_roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "You cannot assign that role");
+    }
+
+    const role = this.guild.roles.get(roleId);
+    if (!role) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Unknown role configured for 'roles' plugin: ${roleId}`,
+      });
       return this.sendErrorMessage(msg.channel, "You cannot assign that role");
     }
 
@@ -141,7 +148,11 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const failed = [];
     const alreadyHadRole = members.length - membersWithoutTheRole.length;
 
-    msg.channel.createMessage(`Adding role to specified members...`);
+    msg.channel.createMessage(
+      `Adding role **${role.name}** to ${membersWithoutTheRole.length} ${
+        membersWithoutTheRole.length === 1 ? "member" : "members"
+      }...`,
+    );
 
     for (const member of membersWithoutTheRole) {
       try {
@@ -159,7 +170,7 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    let resultMessage = `Role added to ${assigned} ${assigned === 1 ? "member" : "members"}!`;
+    let resultMessage = `Added role **${role.name}** to ${assigned} ${assigned === 1 ? "member" : "members"}!`;
     if (alreadyHadRole) {
       resultMessage += ` ${alreadyHadRole} ${alreadyHadRole === 1 ? "member" : "members"} already had the role.`;
     }
@@ -221,7 +232,10 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       mod: stripObjectToScalars(msg.author),
     });
 
-    this.sendSuccessMessage(msg.channel, "Role removed from user!");
+    this.sendSuccessMessage(
+      msg.channel,
+      `Removed role **${role.name}** removed from ${verboseUserMention(args.member.user)}!`,
+    );
   }
 
   @d.command("massremoverole", "<role:string> <members:string...>")
@@ -248,10 +262,17 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!roleId) {
       return this.sendErrorMessage(msg.channel, "Invalid role id");
     }
-    const role = this.guild.roles.get(roleId);
 
     const config = this.getConfigForMsg(msg);
     if (!config.assignable_roles.includes(roleId)) {
+      return this.sendErrorMessage(msg.channel, "You cannot remove that role");
+    }
+
+    const role = this.guild.roles.get(roleId);
+    if (!role) {
+      this.logs.log(LogType.BOT_ALERT, {
+        body: `Unknown role configured for 'roles' plugin: ${roleId}`,
+      });
       return this.sendErrorMessage(msg.channel, "You cannot remove that role");
     }
 
@@ -260,7 +281,11 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const failed = [];
     const didNotHaveRole = members.length - membersWithTheRole.length;
 
-    msg.channel.createMessage(`Removing role from specified members...`);
+    msg.channel.createMessage(
+      `Removing role **${role.name}** from ${membersWithTheRole.length} ${
+        membersWithTheRole.length === 1 ? "member" : "members"
+      }...`,
+    );
 
     for (const member of membersWithTheRole) {
       try {
@@ -278,7 +303,7 @@ export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
       }
     }
 
-    let resultMessage = `Role removed from  ${assigned} ${assigned === 1 ? "member" : "members"}!`;
+    let resultMessage = `Removed role **${role.name}** from  ${assigned} ${assigned === 1 ? "member" : "members"}!`;
     if (didNotHaveRole) {
       resultMessage += ` ${didNotHaveRole} ${didNotHaveRole === 1 ? "member" : "members"} didn't have the role.`;
     }
