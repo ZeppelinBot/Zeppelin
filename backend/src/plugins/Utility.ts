@@ -124,6 +124,17 @@ type MemberSearchParams = {
   "status-search"?: boolean;
 };
 
+type BanSearchParams = {
+  query?: string;
+  sort?: string;
+  "case-sensitive"?: boolean;
+  regex?: boolean;
+};
+
+enum SearchType {
+  MemberSearch,
+  BanSearch,
+}
 class SearchError extends Error {}
 
 export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
@@ -345,6 +356,63 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     msg.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
   }
 
+  protected async performBanSearch(
+    args: BanSearchParams,
+    page = 1,
+    perPage = SEARCH_RESULTS_PER_PAGE,
+  ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+    let matchingBans = (await this.guild.getBans()).map(x => x.user);
+
+    if (args.query) {
+      let queryRegex: RegExp;
+      if (args.regex) {
+        queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
+      } else {
+        queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
+      }
+
+      if (!safeRegex(queryRegex)) {
+        throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
+      }
+
+      matchingBans = matchingBans.filter(user => {
+        const fullUsername = `${user.username}#${user.discriminator}`;
+        if (fullUsername.match(queryRegex)) return true;
+      });
+    }
+
+    const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+    const realSortDir = sortDir === "-" ? "DESC" : "ASC";
+
+    if (sortBy === "id") {
+      matchingBans.sort(sorter(m => BigInt(m.id), realSortDir));
+    } else {
+      matchingBans.sort(
+        multiSorter([
+          [m => m.username.toLowerCase(), realSortDir],
+          [m => m.discriminator, realSortDir],
+        ]),
+      );
+    }
+
+    const lastPage = Math.max(1, Math.ceil(matchingBans.length / perPage));
+    page = Math.min(lastPage, Math.max(1, page));
+
+    const from = (page - 1) * perPage;
+    const to = Math.min(from + perPage, matchingBans.length);
+
+    const pageMembers = matchingBans.slice(from, to);
+
+    return {
+      results: pageMembers,
+      totalResults: matchingBans.length,
+      page,
+      lastPage,
+      from: from + 1,
+      to,
+    };
+  }
+
   protected async performMemberSearch(
     args: MemberSearchParams,
     page = 1,
@@ -460,6 +528,26 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
   }
 
+  protected formatSearchResultList(members: Array<Member | User>): string {
+    const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
+    const lines = members.map(member => {
+      const paddedId = member.id.padEnd(longestId, " ");
+      let line;
+      if (member instanceof Member) {
+        line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+        if (member.nick) line += ` (${member.nick})`;
+      } else {
+        line = `${paddedId} ${member.username}#${member.discriminator}`;
+      }
+      return line;
+    });
+    return lines.join("\n");
+  }
+
+  protected formatSearchResultIdList(members: Array<Member | User>): string {
+    return members.map(m => m.id).join(" ");
+  }
+
   @d.command("search", "[query:string$]", {
     aliases: ["s"],
     options: [
@@ -545,56 +633,153 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
       "status-search"?: boolean;
     },
   ) {
-    const formatSearchResultList = (members: Member[]): string => {
-      const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
-      const lines = members.map(member => {
-        const paddedId = member.id.padEnd(longestId, " ");
-        let line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
-        if (member.nick) line += ` (${member.nick})`;
-        return line;
-      });
-      return lines.join("\n");
-    };
-
-    const formatSearchResultIdList = (members: Member[]): string => {
-      return members.map(m => m.id).join(" ");
-    };
-
     // If we're exporting the results, we don't need all the fancy schmancy pagination stuff.
     // Just get the results and dump them in an archive.
     if (args.export) {
-      let results;
-      try {
-        results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
-      } catch (e) {
-        if (e instanceof SearchError) {
-          return this.sendErrorMessage(msg.channel, e.message);
-        }
+      return this.archiveSearch(args, SearchType.MemberSearch, msg);
+    } else {
+      return this.displaySearch(args, SearchType.MemberSearch, msg);
+    }
+  }
 
-        throw e;
+  @d.command("bansearch", "[query:string$]", {
+    aliases: ["bs"],
+    options: [
+      {
+        name: "page",
+        shortcut: "p",
+        type: "number",
+      },
+      {
+        name: "sort",
+        type: "string",
+      },
+      {
+        name: "case-sensitive",
+        shortcut: "cs",
+        isSwitch: true,
+      },
+      {
+        name: "export",
+        shortcut: "e",
+        isSwitch: true,
+      },
+      {
+        name: "ids",
+        isSwitch: true,
+      },
+      {
+        name: "regex",
+        shortcut: "re",
+        isSwitch: true,
+      },
+    ],
+    extra: {
+      info: <CommandInfo>{
+        description: "Search banned users",
+        basicUsage: "!bansearch dragory",
+        optionDescriptions: {
+          sort:
+            "Change how the results are sorted. Possible values are 'id' and 'name'. Prefix with a dash, e.g. '-id', to reverse sorting.",
+          "case-sensitive": "By default, the search is case-insensitive. Use this to make it case-sensitive instead.",
+          export: "If set, the full search results are exported as an archive",
+        },
+      },
+    },
+  })
+  @d.permission("can_search")
+  async banSearchCmd(
+    msg: Message,
+    args: {
+      query?: string;
+      page?: number;
+      sort?: string;
+      "case-sensitive"?: boolean;
+      export?: boolean;
+      ids?: boolean;
+      regex?: boolean;
+    },
+  ) {
+    if (args.export) {
+      return this.archiveSearch(args, SearchType.BanSearch, msg);
+    } else {
+      return this.displaySearch(args, SearchType.BanSearch, msg);
+    }
+  }
+
+  async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
+
+    // Delete & archive in ID order
+    savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
+    const idsToDelete = savedMessages.map(m => m.id);
+
+    // Make sure the deletions aren't double logged
+    idsToDelete.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
+
+    // Actually delete the messages
+    await this.bot.deleteMessages(channel.id, idsToDelete);
+    await this.savedMessages.markBulkAsDeleted(idsToDelete);
+
+    // Create an archive
+    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
+    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+
+    this.logs.log(LogType.CLEAN, {
+      mod: stripObjectToScalars(mod),
+      channel: stripObjectToScalars(channel),
+      count: savedMessages.length,
+      archiveUrl,
+    });
+
+    return { archiveUrl };
+  }
+
+  async archiveSearch(args: any, searchType: SearchType, msg: Message) {
+    let results;
+    try {
+      switch (searchType) {
+        case SearchType.MemberSearch:
+          results = await this.performMemberSearch(args, 1, SEARCH_EXPORT_LIMIT);
+          break;
+        case SearchType.BanSearch:
+          results = await this.performBanSearch(args, 1, SEARCH_EXPORT_LIMIT);
+          break;
+      }
+    } catch (e) {
+      if (e instanceof SearchError) {
+        return this.sendErrorMessage(msg.channel, e.message);
       }
 
-      if (results.totalResults === 0) {
-        return this.sendErrorMessage(msg.channel, "No results found");
-      }
+      throw e;
+    }
 
-      const resultList = args.ids ? formatSearchResultIdList(results.results) : formatSearchResultList(results.results);
+    if (results.totalResults === 0) {
+      return this.sendErrorMessage(msg.channel, "No results found");
+    }
 
-      const archiveId = await this.archives.create(
-        trimLines(`
+    const resultList = args.ids
+      ? this.formatSearchResultIdList(results.results)
+      : this.formatSearchResultList(results.results);
+
+    const archiveId = await this.archives.create(
+      trimLines(`
         Search results (total ${results.totalResults}):
 
         ${resultList}
       `),
-        moment().add(1, "hour"),
-      );
-      const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
+      moment().add(1, "hour"),
+    );
+    const url = await this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
 
-      msg.channel.createMessage(`Exported search results: ${url}`);
+    msg.channel.createMessage(`Exported search results: ${url}`);
 
-      return;
-    }
+    return;
+  }
 
+  async displaySearch(args: any, searchType: SearchType, msg: Message) {
     // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
     let originalSearchMsg: Message = null;
     let searching = false;
@@ -621,7 +806,14 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       let searchResult;
       try {
-        searchResult = await this.performMemberSearch(args, page, perPage);
+        switch (searchType) {
+          case SearchType.MemberSearch:
+            searchResult = await this.performMemberSearch(args, page, perPage);
+            break;
+          case SearchType.BanSearch:
+            searchResult = await this.performBanSearch(args, page, perPage);
+            break;
+        }
       } catch (e) {
         if (e instanceof SearchError) {
           return this.sendErrorMessage(msg.channel, e.message);
@@ -643,8 +835,8 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
           : `Found ${searchResult.totalResults} ${resultWord}`;
 
       const resultList = args.ids
-        ? formatSearchResultIdList(searchResult.results)
-        : formatSearchResultList(searchResult.results);
+        ? this.formatSearchResultIdList(searchResult.results)
+        : this.formatSearchResultList(searchResult.results);
 
       const result = trimLines(`
         ${headerText}
@@ -695,36 +887,6 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     };
 
     loadSearchPage(currentPage);
-  }
-
-  async cleanMessages(channel: Channel, savedMessages: SavedMessage[], mod: User) {
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE, savedMessages[0].id);
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, savedMessages[0].id);
-
-    // Delete & archive in ID order
-    savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-    const idsToDelete = savedMessages.map(m => m.id);
-
-    // Make sure the deletions aren't double logged
-    idsToDelete.forEach(id => this.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-    this.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
-
-    // Actually delete the messages
-    await this.bot.deleteMessages(channel.id, idsToDelete);
-    await this.savedMessages.markBulkAsDeleted(idsToDelete);
-
-    // Create an archive
-    const archiveId = await this.archives.createFromSavedMessages(savedMessages, this.guild);
-    const archiveUrl = this.archives.getUrl(this.knub.getGlobalConfig().url, archiveId);
-
-    this.logs.log(LogType.CLEAN, {
-      mod: stripObjectToScalars(mod),
-      channel: stripObjectToScalars(channel),
-      count: savedMessages.length,
-      archiveUrl,
-    });
-
-    return { archiveUrl };
   }
 
   @d.command("clean", "<count:number>", {
