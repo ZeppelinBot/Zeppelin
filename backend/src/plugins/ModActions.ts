@@ -1044,7 +1044,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
     const memberToUnmute = await this.getMember(user.id);
     const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
-    const hasMuteRole = mutesPlugin.hasMutedRole(memberToUnmute);
+    const hasMuteRole = memberToUnmute && mutesPlugin.hasMutedRole(memberToUnmute);
 
     // Check if they're muted in the first place
     if (!(await this.mutes.isMuted(args.user)) && !hasMuteRole) {
