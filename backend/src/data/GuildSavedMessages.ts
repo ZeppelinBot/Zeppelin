@@ -144,7 +144,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     if (existingSavedMsg) return;
 
     const savedMessageData = this.msgToSavedMessageData(msg);
-    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
+    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
     const data = {
       id: msg.id,
@@ -183,7 +183,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
    * If any messages were marked as deleted, also emits the deleteBulk event.
    */
   async markBulkAsDeleted(ids) {
-    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss");
 
     await this.messages
       .createQueryBuilder()
