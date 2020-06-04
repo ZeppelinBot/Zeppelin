@@ -189,8 +189,6 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         timeout: null,
         changes: [],
         applyFn: async () => {
-          this.pendingRoleChanges.delete(memberId);
-
           const lock = await this.locks.acquire(`member-roles-${memberId}`);
 
           const member = await this.getMember(memberId);
@@ -212,6 +210,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
             }
           }
 
+          this.pendingRoleChanges.delete(memberId);
           lock.unlock();
         },
       };
