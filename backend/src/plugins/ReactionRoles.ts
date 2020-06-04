@@ -54,6 +54,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
   protected savedMessages: GuildSavedMessages;
 
   protected reactionRemoveQueue: Queue;
+  protected roleChangeQueue: Queue;
   protected pendingRoleChanges: Map<string, PendingMemberRoleChanges>;
   protected pendingRefreshes: Set<string>;
 
@@ -82,6 +83,7 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.reactionRoles = GuildReactionRoles.getGuildInstance(this.guildId);
     this.savedMessages = GuildSavedMessages.getGuildInstance(this.guildId);
     this.reactionRemoveQueue = new Queue();
+    this.roleChangeQueue = new Queue();
     this.pendingRoleChanges = new Map();
     this.pendingRefreshes = new Set();
 
@@ -189,6 +191,8 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
         timeout: null,
         changes: [],
         applyFn: async () => {
+          this.pendingRoleChanges.delete(memberId);
+
           const lock = await this.locks.acquire(`member-roles-${memberId}`);
 
           const member = await this.getMember(memberId);
@@ -200,17 +204,18 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
             }
 
             try {
-              await member.edit({
-                roles: Array.from(newRoleIds.values()),
-              });
+              await member.edit(
+                {
+                  roles: Array.from(newRoleIds.values()),
+                },
+                "Reaction roles",
+              );
             } catch (e) {
               logger.warn(
                 `Failed to apply role changes to ${member.username}#${member.discriminator} (${member.id}): ${e.message}`,
               );
             }
           }
-
-          this.pendingRoleChanges.delete(memberId);
           lock.unlock();
         },
       };
@@ -222,7 +227,10 @@ export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
     pendingRoleChangeObj.changes.push({ mode, roleId });
 
     if (pendingRoleChangeObj.timeout) clearTimeout(pendingRoleChangeObj.timeout);
-    setTimeout(() => pendingRoleChangeObj.applyFn(), ROLE_CHANGE_BATCH_DEBOUNCE_TIME);
+    pendingRoleChangeObj.timeout = setTimeout(
+      () => this.roleChangeQueue.add(pendingRoleChangeObj.applyFn),
+      ROLE_CHANGE_BATCH_DEBOUNCE_TIME,
+    );
   }
 
   /**
