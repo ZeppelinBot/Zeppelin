@@ -842,6 +842,9 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
         this.sendErrorMessage(msg.channel, "Could not mute the user: unknown member");
       } else {
         logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
+        if (user.id == null) {
+          console.trace("[DEBUG] Null user.id for mute");
+        }
         this.sendErrorMessage(msg.channel, "Could not mute the user");
       }
 
