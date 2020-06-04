@@ -232,6 +232,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   protected cooldownManager: CooldownManager;
 
   protected onMessageCreateFn;
+  protected onMessageUpdateFn;
   protected actionedMessageIds: string[];
   protected actionedMessageMax = 50;
 
@@ -347,9 +348,12 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
     this.cachedAntiraidLevel = await this.antiraidLevels.get();
 
-    this.onMessageCreateFn = msg => this.onMessageCreate(msg);
+    this.onMessageCreateFn = msg => this.runAutomodOnMessage(msg, false);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
-    this.savedMessages.events.on("update", this.onMessageCreateFn);
+
+    this.onMessageUpdateFn = msg => this.runAutomodOnMessage(msg, true);
+    this.savedMessages.events.on("update", this.onMessageUpdateFn);
+
     this.actionedMessageIds = [];
   }
 
@@ -368,7 +372,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   protected onUnload() {
     this.unloaded = true;
     this.savedMessages.events.off("create", this.onMessageCreateFn);
-    this.savedMessages.events.off("update", this.onMessageCreateFn);
+    this.savedMessages.events.off("update", this.onMessageUpdateFn);
     clearInterval(this.recentActionClearInterval);
     clearInterval(this.recentSpamClearInterval);
     clearInterval(this.recentNicknameChangesClearInterval);
@@ -562,13 +566,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   }
 
   protected matchTextSpamTrigger(
-    recentActionType: RecentActionType,
+    recentActionType: TextRecentAction["type"],
     trigger: TBaseTextSpamTrigger,
     msg: SavedMessage,
   ): Omit<TextSpamTriggerMatchResult, "trigger" | "rule"> {
     const since = moment.utc(msg.posted_at).valueOf() - convertDelayStringToMS(trigger.within);
+    const to = moment.utc(msg.posted_at).valueOf();
     const identifier = trigger.per_channel ? `${msg.channel_id}-${msg.user_id}` : msg.user_id;
-    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since);
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since, to);
     const totalCount = recentActions.reduce((total, action) => {
       return total + action.count;
     }, 0);
@@ -591,7 +596,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     identifier: string | null,
   ): Omit<OtherSpamTriggerMatchResult, "trigger" | "rule"> {
     const since = moment.utc().valueOf() - convertDelayStringToMS(trigger.within);
-    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since) as OtherRecentAction[];
+    const to = moment.utc().valueOf();
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since, to) as OtherRecentAction[];
     const totalCount = recentActions.reduce((total, action) => {
       return total + action.count;
     }, 0);
@@ -840,7 +846,7 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   /**
    * Logs recent actions for spam detection purposes
    */
-  protected async logRecentActionsForMessage(msg: SavedMessage) {
+  protected logRecentActionsForMessage(msg: SavedMessage) {
     const timestamp = moment.utc(msg.posted_at).valueOf();
     const globalIdentifier = msg.user_id;
     const perChannelIdentifier = `${msg.channel_id}-${msg.user_id}`;
@@ -972,9 +978,20 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
     }
   }
 
-  protected getMatchingRecentActions(type: RecentActionType, identifier: string | null, since: number) {
+  protected getMatchingRecentActions(type: RecentActionType, identifier: string | null, since: number, to: number) {
     return this.recentActions.filter(action => {
-      return action.type === type && (!identifier || action.identifier === identifier) && action.timestamp >= since;
+      return (
+        action.type === type &&
+        (!identifier || action.identifier === identifier) &&
+        action.timestamp >= since &&
+        action.timestamp <= to
+      );
+    });
+  }
+
+  protected clearRecentActionsForMessage(messageId: string) {
+    this.recentActions = this.recentActions.filter(info => {
+      return !((info as TextRecentAction).messageInfo?.messageId === messageId);
     });
   }
 
@@ -1526,13 +1543,16 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
   /**
    * Run automod actions on new messages
    */
-  protected onMessageCreate(msg: SavedMessage) {
+  protected runAutomodOnMessage(msg: SavedMessage, isEdit: boolean) {
     if (this.actionedMessageIds.includes(msg.id)) return;
 
     this.automodQueue.add(async () => {
       if (this.unloaded) return;
 
-      await this.logRecentActionsForMessage(msg);
+      if (isEdit) {
+        this.clearRecentActionsForMessage(msg.id);
+      }
+      this.logRecentActionsForMessage(msg);
 
       const member = this.guild.members.get(msg.user_id);
       const config = this.getMatchingConfig({
