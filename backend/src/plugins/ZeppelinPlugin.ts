@@ -124,6 +124,12 @@ export class ZeppelinPlugin<
    * the plugin, which is why this has to be a static function.
    */
   protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
+    if (options == null) {
+      options = {
+        enabled: false,
+      };
+    }
+
     const defaultOptions: any = this.getStaticDefaultOptions();
     let mergedConfig = configUtils.mergeConfig({}, defaultOptions.config || {}, options.config || {});
     const mergedOverrides = options.replaceDefaultOverrides
