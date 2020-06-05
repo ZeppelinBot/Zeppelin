@@ -1618,7 +1618,9 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
   async avatarCmd(msg: Message, args: { user?: User | UnknownUser }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      const extention = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
+      let extention = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
+      // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
+      extention = extention === ".gif" ? extention : ".png";
       const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
       const embed: EmbedOptions = {
         image: { url: avatarUrl + `${extention}?size=2048` },
