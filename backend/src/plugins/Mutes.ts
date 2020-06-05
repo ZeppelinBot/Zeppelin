@@ -46,7 +46,7 @@ const ConfigSchema = t.type({
   timed_mute_message: tNullable(t.string),
   update_mute_message: tNullable(t.string),
   remove_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
-  role_restore_blacklist: t.union([t.boolean, t.array(t.string)]),
+  restore_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
 
   can_view_list: t.boolean,
   can_cleanup: t.boolean,
@@ -106,7 +106,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
         update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
         remove_roles_on_mute: false,
-        role_restore_blacklist: false,
+        restore_roles_on_mute: false,
 
         can_view_list: false,
         can_cleanup: false,
@@ -188,119 +188,120 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
           await member.edit({ channelID: moveToVoiceChannelId });
         } catch (e) {} // tslint:disable-line
       }
-    }
-
-    // If the user is already muted, update the duration of their existing mute
-    const existingMute = await this.mutes.findExistingMuteForUserId(user.id);
-    let notifyResult: UserNotificationResult = { method: null, success: true };
-
-    if (existingMute) {
-      await this.mutes.updateExpiryTime(user.id, muteTime);
-    } else {
-      await this.mutes.addMute(user.id, muteTime);
-    }
-
-    const template = existingMute
-      ? config.update_mute_message
-      : muteTime
-      ? config.timed_mute_message
-      : config.mute_message;
-
-    const muteMessage =
-      template &&
-      (await renderTemplate(template, {
-        guildName: this.guild.name,
-        reason: reason || "None",
-        time: timeUntilUnmute,
-      }));
-
-    if (muteMessage && user instanceof User) {
-      let contactMethods = [];
-
-      if (muteOptions?.contactMethods) {
-        contactMethods = muteOptions.contactMethods;
-      } else {
-        const useDm = existingMute ? config.dm_on_update : config.dm_on_mute;
-        if (useDm) {
-          contactMethods.push({ type: "dm" });
-        }
-
-        const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
-        const channel = config.message_channel && this.guild.channels.get(config.message_channel);
-        if (useChannel && channel instanceof TextChannel) {
-          contactMethods.push({ type: "channel", channel });
+      if (config.remove_roles_on_mute) {
+        if (config.remove_roles_on_mute === true) {
+          return;
         }
       }
 
-      notifyResult = await notifyUser(user, muteMessage, contactMethods);
-    }
+      // If the user is already muted, update the duration of their existing mute
+      const existingMute = await this.mutes.findExistingMuteForUserId(user.id);
+      let notifyResult: UserNotificationResult = { method: null, success: true };
 
-    // Create/update a case
-    const casesPlugin = this.getPlugin<CasesPlugin>("cases");
-    let theCase;
+      if (existingMute) {
+        await this.mutes.updateExpiryTime(user.id, muteTime);
+      } else {
+        await this.mutes.addMute(user.id, muteTime);
+      }
 
-    if (existingMute && existingMute.case_id) {
-      // Update old case
-      // Since mutes can often have multiple notes (extraNotes), we won't post each case note individually,
-      // but instead we'll post the entire case afterwards
-      theCase = await this.cases.find(existingMute.case_id);
-      const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
-      const reasons = [reason, ...(muteOptions.caseArgs?.extraNotes || [])];
-      for (const noteReason of reasons) {
-        await casesPlugin.createCaseNote({
-          caseId: existingMute.case_id,
+      const template = existingMute
+        ? config.update_mute_message
+        : muteTime
+        ? config.timed_mute_message
+        : config.mute_message;
+
+      const muteMessage =
+        template &&
+        (await renderTemplate(template, {
+          guildName: this.guild.name,
+          reason: reason || "None",
+          time: timeUntilUnmute,
+        }));
+
+      if (muteMessage && user instanceof User) {
+        let contactMethods = [];
+
+        if (muteOptions?.contactMethods) {
+          contactMethods = muteOptions.contactMethods;
+        } else {
+          const useDm = existingMute ? config.dm_on_update : config.dm_on_mute;
+          if (useDm) {
+            contactMethods.push({ type: "dm" });
+          }
+
+          const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
+          const channel = config.message_channel && this.guild.channels.get(config.message_channel);
+          if (useChannel && channel instanceof TextChannel) {
+            contactMethods.push({ type: "channel", channel });
+          }
+        }
+
+        notifyResult = await notifyUser(user, muteMessage, contactMethods);
+      }
+
+      // Create/update a case
+      const casesPlugin = this.getPlugin<CasesPlugin>("cases");
+      let theCase;
+
+      if (existingMute && existingMute.case_id) {
+        // Update old case
+        // Since mutes can often have multiple notes (extraNotes), we won't post each case note individually,
+        // but instead we'll post the entire case afterwards
+        theCase = await this.cases.find(existingMute.case_id);
+        const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
+        const reasons = [reason, ...(muteOptions.caseArgs?.extraNotes || [])];
+        for (const noteReason of reasons) {
+          await casesPlugin.createCaseNote({
+            caseId: existingMute.case_id,
+            modId: muteOptions.caseArgs?.modId,
+            body: noteReason,
+            noteDetails,
+            postInCaseLogOverride: false,
+          });
+        }
+
+        if (muteOptions.caseArgs?.postInCaseLogOverride !== false) {
+          casesPlugin.postCaseToCaseLogChannel(existingMute.case_id);
+        }
+      } else {
+        // Create new case
+        const noteDetails = [`Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}`];
+        if (notifyResult.text) {
+          noteDetails.push(ucfirst(notifyResult.text));
+        }
+
+        theCase = await casesPlugin.createCase({
+          ...(muteOptions.caseArgs || {}),
+          userId,
           modId: muteOptions.caseArgs?.modId,
-          body: noteReason,
+          type: CaseTypes.Mute,
+          reason,
           noteDetails,
-          postInCaseLogOverride: false,
+        });
+        await this.mutes.setCaseId(user.id, theCase.id);
+      }
+
+      // Log the action
+      const mod = await this.resolveUser(muteOptions.caseArgs?.modId);
+      if (muteTime) {
+        this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
+          mod: stripObjectToScalars(mod),
+          user: stripObjectToScalars(user),
+          time: timeUntilUnmute,
+        });
+      } else {
+        this.serverLogs.log(LogType.MEMBER_MUTE, {
+          mod: stripObjectToScalars(mod),
+          user: stripObjectToScalars(user),
         });
       }
 
-      if (muteOptions.caseArgs?.postInCaseLogOverride !== false) {
-        casesPlugin.postCaseToCaseLogChannel(existingMute.case_id);
-      }
-    } else {
-      // Create new case
-      const noteDetails = [`Muted ${muteTime ? `for ${timeUntilUnmute}` : "indefinitely"}`];
-      if (notifyResult.text) {
-        noteDetails.push(ucfirst(notifyResult.text));
-      }
-
-      theCase = await casesPlugin.createCase({
-        ...(muteOptions.caseArgs || {}),
-        userId,
-        modId: muteOptions.caseArgs?.modId,
-        type: CaseTypes.Mute,
-        reason,
-        noteDetails,
-      });
-      await this.mutes.setCaseId(user.id, theCase.id);
+      return {
+        case: theCase,
+        notifyResult,
+        updatedExistingMute: !!existingMute,
+      };
     }
-
-    // Log the action
-    const mod = await this.resolveUser(muteOptions.caseArgs?.modId);
-    if (muteTime) {
-      this.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-        mod: stripObjectToScalars(mod),
-        user: stripObjectToScalars(user),
-        time: timeUntilUnmute,
-        reason,
-      });
-    } else {
-      this.serverLogs.log(LogType.MEMBER_MUTE, {
-        mod: stripObjectToScalars(mod),
-        user: stripObjectToScalars(user),
-        reason,
-      });
-    }
-
-    lock.unlock();
-
-    return {
-      case: theCase,
-      notifyResult,
-      updatedExistingMute: !!existingMute,
-    };
   }
 
   public async unmuteUser(
