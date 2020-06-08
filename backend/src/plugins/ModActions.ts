@@ -524,7 +524,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.ignoreEvent(IgnoredEventType.Ban, userId);
     try {
       const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
-      await this.guild.banMember(userId, deleteMessageDays);
+      await this.guild.banMember(userId, deleteMessageDays, reason);
     } catch (e) {
       return {
         status: "failed",
@@ -1201,7 +1201,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
       this.ignoreEvent(IgnoredEventType.Unban, memberToKick.id);
 
       try {
-        await this.guild.unbanMember(memberToKick.id);
+        await this.guild.unbanMember(memberToKick.id, reason);
       } catch (e) {
         this.sendErrorMessage(msg.channel, "Failed to unban the user after banning them (-clean)");
       }
@@ -1375,7 +1375,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
 
     try {
       this.ignoreEvent(IgnoredEventType.Unban, user.id);
-      await this.guild.unbanMember(user.id);
+      await this.guild.unbanMember(user.id, reason);
     } catch (e) {
       this.sendErrorMessage(msg.channel, "Failed to unban member; are you sure they're banned?");
       return;
@@ -1448,7 +1448,7 @@ export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
     this.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
     try {
-      await this.guild.banMember(user.id, 1);
+      await this.guild.banMember(user.id, 1, reason);
     } catch (e) {
       this.sendErrorMessage(msg.channel, "Failed to forceban member");
       return;
