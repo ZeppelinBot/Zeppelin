@@ -283,7 +283,7 @@ export class CasesPlugin extends ZeppelinPlugin<TConfigSchema> {
     try {
       result = await caseLogChannel.createMessage(content, file);
     } catch (e) {
-      if (isDiscordRESTError(e) && e.code === 50013) {
+      if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
         logger.warn(
           `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${this.guild.name} (${this.guild.id})`,
         );
