@@ -150,8 +150,11 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     reason: string = null,
     muteOptions: MuteOptions = {},
   ): Promise<MuteResult> {
+    const lock = await this.locks.acquire(`mute-${userId}`);
+
     const muteRole = this.getConfig().mute_role;
     if (!muteRole) {
+      lock.unlock();
       this.throwRecoverablePluginError(ERRORS.NO_MUTE_ROLE_IN_CONFIG);
     }
 
@@ -286,6 +289,8 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         reason,
       });
     }
+
+    lock.unlock();
 
     return {
       case: theCase,
