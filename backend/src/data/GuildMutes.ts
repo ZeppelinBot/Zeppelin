@@ -34,7 +34,7 @@ export class GuildMutes extends BaseGuildRepository {
     return mute != null;
   }
 
-  async addMute(userId, expiryTime): Promise<Mute> {
+  async addMute(userId, expiryTime, rolesToRestore?: string[]): Promise<Mute> {
     const expiresAt = expiryTime
       ? moment()
           .add(expiryTime, "ms")
@@ -45,6 +45,7 @@ export class GuildMutes extends BaseGuildRepository {
       guild_id: this.guildId,
       user_id: userId,
       expires_at: expiresAt,
+      roles_to_restore: rolesToRestore ?? [],
     });
 
     return this.mutes.findOne({ where: result.identifiers[0] });

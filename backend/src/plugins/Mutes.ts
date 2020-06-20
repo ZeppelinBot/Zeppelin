@@ -1,4 +1,4 @@
-import { Member, Message, TextChannel, User } from "eris";
+import { Member, Message, TextChannel, User, MemberOptions } from "eris";
 import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
 import { ZeppelinPlugin } from "./ZeppelinPlugin";
@@ -175,6 +175,31 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     const config = this.getMatchingConfig({ member, userId });
 
     if (member) {
+      // remove and store any roles to be removed/restored
+      const currentUserRoles = member.roles;
+      const memberOptions: MemberOptions = {};
+      let rolesToRestore = [];
+
+      // remove roles
+      if (!Array.isArray(config.remove_roles_on_mute)) {
+        if (config.remove_roles_on_mute) {
+          memberOptions.roles = [];
+          await member.edit(memberOptions);
+        }
+      } else {
+        memberOptions.roles = currentUserRoles.filter(x => !(<string[]>config.remove_roles_on_mute).includes(x));
+        await member.edit(memberOptions);
+      }
+
+      // set roles to be restored
+      if (!Array.isArray(config.restore_roles_on_mute)) {
+        if (config.restore_roles_on_mute) {
+          rolesToRestore = currentUserRoles;
+        }
+      } else {
+        rolesToRestore = currentUserRoles.filter(x => (<string[]>config.restore_roles_on_mute).includes(x));
+      }
+
       // Apply mute role if it's missing
       if (!member.roles.includes(muteRole)) {
         await member.addRole(muteRole);
@@ -188,11 +213,6 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
           await member.edit({ channelID: moveToVoiceChannelId });
         } catch (e) {} // tslint:disable-line
       }
-      if (config.remove_roles_on_mute) {
-        if (config.remove_roles_on_mute === true) {
-          return;
-        }
-      }
 
       // If the user is already muted, update the duration of their existing mute
       const existingMute = await this.mutes.findExistingMuteForUserId(user.id);
@@ -201,7 +221,7 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       if (existingMute) {
         await this.mutes.updateExpiryTime(user.id, muteTime);
       } else {
-        await this.mutes.addMute(user.id, muteTime);
+        await this.mutes.addMute(user.id, muteTime, rolesToRestore);
       }
 
       const template = existingMute
@@ -328,6 +348,15 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
         const muteRole = this.getConfig().mute_role;
         if (member.roles.includes(muteRole)) {
           await member.removeRole(muteRole);
+        }
+
+        // restore roles if appropriate
+        if (existingMute.roles_to_restore) {
+          const memberOptions: MemberOptions = {};
+          memberOptions.roles = Array.from(
+            new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole)]),
+          );
+          member.edit(memberOptions);
         }
       } else {
         logger.warn(

@@ -16,5 +16,5 @@ export class Mute {
 
   @Column() case_id: number;
 
-  @Column() roles_to_restore: string[];
+  @Column("simple-array") roles_to_restore: string[];
 }
