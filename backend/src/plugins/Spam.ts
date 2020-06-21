@@ -29,6 +29,8 @@ const BaseSingleSpamConfig = t.type({
   count: t.number,
   mute: tNullable(t.boolean),
   mute_time: tNullable(t.number),
+  remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
+  restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
   clean: tNullable(t.boolean),
 });
 type TBaseSingleSpamConfig = t.TypeOf<typeof BaseSingleSpamConfig>;
@@ -257,12 +259,19 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
             const muteTime = spamConfig.mute_time
               ? convertDelayStringToMS(spamConfig.mute_time.toString())
               : 120 * 1000;
-            muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-              caseArgs: {
-                modId: this.bot.user.id,
-                postInCaseLogOverride: false,
+            muteResult = await mutesPlugin.muteUser(
+              member.id,
+              muteTime,
+              "Automatic spam detection",
+              {
+                caseArgs: {
+                  modId: this.bot.user.id,
+                  postInCaseLogOverride: false,
+                },
               },
-            });
+              spamConfig.remove_roles_on_mute,
+              spamConfig.restore_roles_on_mute,
+            );
           }
 
           // Get the offending message IDs
@@ -379,12 +388,19 @@ export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
         if (spamConfig.mute && member) {
           const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
           const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
-          await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-            caseArgs: {
-              modId: this.bot.user.id,
-              extraNotes: [`Details: ${details}`],
+          await mutesPlugin.muteUser(
+            member.id,
+            muteTime,
+            "Automatic spam detection",
+            {
+              caseArgs: {
+                modId: this.bot.user.id,
+                extraNotes: [`Details: ${details}`],
+              },
             },
-          });
+            spamConfig.remove_roles_on_mute,
+            spamConfig.restore_roles_on_mute,
+          );
         } else {
           // If we're not muting the user, just add a note on them
           const casesPlugin = this.getPlugin<CasesPlugin>("cases");

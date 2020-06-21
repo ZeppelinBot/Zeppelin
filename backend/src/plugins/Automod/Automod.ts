@@ -1148,6 +1148,8 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
         extraNotes: [caseExtraNote],
       };
       const contactMethods = this.readContactMethodsFromAction(rule.actions.mute);
+      const rolesToRemove = rule.actions.mute.remove_roles_on_mute;
+      const rolesToRestore = rule.actions.mute.restore_roles_on_mute;
 
       let userIdsToMute = [];
       if (
@@ -1165,7 +1167,14 @@ export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverride
 
       if (userIdsToMute.length) {
         for (const userId of userIdsToMute) {
-          await this.getMutes().muteUser(userId, duration, reason, { contactMethods, caseArgs });
+          await this.getMutes().muteUser(
+            userId,
+            duration,
+            reason,
+            { contactMethods, caseArgs },
+            rolesToRemove,
+            rolesToRestore,
+          );
         }
 
         actionsTaken.push("mute");

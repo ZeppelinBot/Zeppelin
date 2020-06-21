@@ -153,6 +153,8 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
     muteTime: number = null,
     reason: string = null,
     muteOptions: MuteOptions = {},
+    removeRolesOnMuteOverride: boolean | string[] = null,
+    restoreRolesOnMuteOverride: boolean | string[] = null,
   ): Promise<MuteResult> {
     const lock = await this.locks.acquire(`mute-${userId}`);
 
@@ -178,26 +180,28 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       // remove and store any roles to be removed/restored
       const currentUserRoles = member.roles;
       const memberOptions: MemberOptions = {};
+      const removeRoles = removeRolesOnMuteOverride ?? config.remove_roles_on_mute;
+      const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_mute;
       let rolesToRestore = [];
 
       // remove roles
-      if (!Array.isArray(config.remove_roles_on_mute)) {
-        if (config.remove_roles_on_mute) {
+      if (!Array.isArray(removeRoles)) {
+        if (removeRoles) {
           memberOptions.roles = [];
           await member.edit(memberOptions);
         }
       } else {
-        memberOptions.roles = currentUserRoles.filter(x => !(<string[]>config.remove_roles_on_mute).includes(x));
+        memberOptions.roles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
         await member.edit(memberOptions);
       }
 
       // set roles to be restored
-      if (!Array.isArray(config.restore_roles_on_mute)) {
-        if (config.restore_roles_on_mute) {
+      if (!Array.isArray(restoreRoles)) {
+        if (restoreRoles) {
           rolesToRestore = currentUserRoles;
         }
       } else {
-        rolesToRestore = currentUserRoles.filter(x => (<string[]>config.restore_roles_on_mute).includes(x));
+        rolesToRestore = currentUserRoles.filter(x => (<string[]>restoreRoles).includes(x));
       }
 
       // Apply mute role if it's missing

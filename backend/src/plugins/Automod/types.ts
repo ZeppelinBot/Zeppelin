@@ -249,6 +249,8 @@ export const MuteAction = t.type({
   duration: tNullable(tDelayString),
   notify: tNullable(t.string),
   notifyChannel: tNullable(t.string),
+  remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
+  restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
 });
 
 export const KickAction = t.type({
