@@ -25,7 +25,7 @@ import { GuildMutes } from "../data/GuildMutes";
 import { CaseTypes } from "../data/CaseTypes";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { Case } from "../data/entities/Case";
 import { renderTemplate } from "../templateFormatter";
 import { CaseArgs, CasesPlugin } from "./Cases";
@@ -125,7 +125,7 @@ export interface BanOptions {
   deleteMessageDays?: number;
 }
 
-export class ModActionsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class ModActionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "mod_actions";
   public static dependencies = ["cases", "mutes"];
   public static configSchema = ConfigSchema;

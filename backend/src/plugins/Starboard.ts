@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions } from "knub";
-import { ZeppelinPlugin, trimPluginDescription } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass, trimPluginDescription } from "./ZeppelinPluginClass";
 import { Embed, EmbedBase, GuildChannel, Message, TextChannel } from "eris";
 import {
   errorMessage,
@@ -43,7 +43,7 @@ const defaultStarboardOpts: Partial<TStarboardOpts> = {
   enabled: true,
 };
 
-export class StarboardPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "starboard";
   public static configSchema = ConfigSchema;
 

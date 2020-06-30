@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions } from "knub";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildReminders } from "../data/GuildReminders";
 import { Message, TextChannel } from "eris";
 import moment from "moment-timezone";
@@ -22,7 +22,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 const REMINDER_LOOP_TIME = 10 * 1000;
 const MAX_TRIES = 3;
 
-export class RemindersPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class RemindersPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "reminders";
   public static configSchema = ConfigSchema;
 

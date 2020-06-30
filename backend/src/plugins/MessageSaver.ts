@@ -2,7 +2,7 @@ import { Plugin, decorators as d, IPluginOptions } from "knub";
 import { GuildChannel, Message, TextChannel } from "eris";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { successMessage } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -10,7 +10,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class MessageSaverPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class MessageSaverPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "message_saver";
   public static showInDocs = false;
   public static configSchema = ConfigSchema;

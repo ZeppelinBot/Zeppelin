@@ -4,10 +4,10 @@ import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { availablePlugins } from "./plugins/availablePlugins";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
-const pluginNameToClass = new Map<string, typeof ZeppelinPlugin>();
+const pluginNameToClass = new Map<string, typeof ZeppelinPluginClass>();
 for (const pluginClass of availablePlugins) {
   // @ts-ignore
   pluginNameToClass.set(pluginClass.pluginName, pluginClass);

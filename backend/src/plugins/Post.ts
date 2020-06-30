@@ -19,7 +19,7 @@ import {
   DAYS,
 } from "../utils";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 
 import fs from "fs";
 import { GuildScheduledPosts } from "../data/GuildScheduledPosts";
@@ -45,7 +45,7 @@ const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
 const MAX_REPEAT_UNTIL = moment().add(100, "years");
 
-export class PostPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class PostPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "post";
   public static configSchema = ConfigSchema;
 

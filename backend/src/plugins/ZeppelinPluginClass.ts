@@ -1,4 +1,4 @@
-import { configUtils, IBasePluginConfig, IPluginOptions, logger, Plugin } from "knub";
+import { BasePluginType, configUtils, logger, PluginClass, PluginOptions, BasePluginConfig } from "knub";
 import * as t from "io-ts";
 import {
   deepKeyIntersect,
@@ -59,10 +59,7 @@ export function trimPluginDescription(str) {
 
 const inviteCache = new SimpleCache<Promise<Invite>>(10 * MINUTES, 200);
 
-export class ZeppelinPlugin<
-  TConfig extends {} = IBasePluginConfig,
-  TCustomOverrideCriteria extends {} = {}
-> extends Plugin<TConfig, TCustomOverrideCriteria> {
+export class ZeppelinPluginClass<TPluginType extends BasePluginType = BasePluginType> extends PluginClass<TPluginType> {
   public static pluginInfo: PluginInfo;
   public static showInDocs: boolean = true;
 
@@ -76,7 +73,7 @@ export class ZeppelinPlugin<
   }
 
   protected canActOn(member1: Member, member2: Member, allowSameLevel = false) {
-    if (member2.id === this.bot.user.id) {
+    if (member2.id === this.client.user.id) {
       return false;
     }
 
@@ -98,11 +95,8 @@ export class ZeppelinPlugin<
   /**
    * Wrapper to fetch the real default options from getStaticDefaultOptions()
    */
-  protected getDefaultOptions(): IPluginOptions<TConfig, TCustomOverrideCriteria> {
-    return (this.constructor as typeof ZeppelinPlugin).getStaticDefaultOptions() as IPluginOptions<
-      TConfig,
-      TCustomOverrideCriteria
-    >;
+  protected getDefaultOptions(): PluginOptions<TPluginType> {
+    return (this.constructor as typeof ZeppelinPluginClass).getStaticDefaultOptions() as PluginOptions<TPluginType>;
   }
 
   /**
@@ -123,7 +117,7 @@ export class ZeppelinPlugin<
    * Like getStaticDefaultOptions(), we also want to use this function for type checking without creating an instance of
    * the plugin, which is why this has to be a static function.
    */
-  protected static mergeAndDecodeStaticOptions(options: any): IPluginOptions {
+  protected static mergeAndDecodeStaticOptions(options: any): PluginOptions<any> {
     const defaultOptions: any = this.getStaticDefaultOptions();
     let mergedConfig = configUtils.mergeConfig({}, defaultOptions.config || {}, options.config || {});
     const mergedOverrides = options.replaceDefaultOverrides
@@ -168,14 +162,13 @@ export class ZeppelinPlugin<
   /**
    * Wrapper that calls mergeAndValidateStaticOptions()
    */
-  protected getMergedOptions(): IPluginOptions<TConfig, TCustomOverrideCriteria> {
+  protected getMergedOptions(): PluginOptions<TPluginType> {
     if (!this.mergedPluginOptions) {
-      this.mergedPluginOptions = ((this.constructor as unknown) as typeof ZeppelinPlugin).mergeAndDecodeStaticOptions(
-        this.pluginOptions,
-      );
+      this.mergedPluginOptions = ((this
+        .constructor as unknown) as typeof ZeppelinPluginClass).mergeAndDecodeStaticOptions(this.pluginOptions);
     }
 
-    return this.mergedPluginOptions as IPluginOptions<TConfig, TCustomOverrideCriteria>;
+    return this.mergedPluginOptions as PluginOptions<TPluginType>;
   }
 
   /**
@@ -208,7 +201,7 @@ export class ZeppelinPlugin<
     if (isUnicodeEmoji(snowflake)) {
       return true;
     } else if (isSnowflake(snowflake)) {
-      for (const guild of this.bot.guilds.values()) {
+      for (const guild of this.client.guilds.values()) {
         if (guild.emojis.some(e => (e as any).id === snowflake)) {
           return true;
         }
@@ -226,8 +219,8 @@ export class ZeppelinPlugin<
   }
 
   getUser(userResolvable: string): User | UnknownUser {
-    const id = resolveUserId(this.bot, userResolvable);
-    return id ? this.bot.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+    const id = resolveUserId(this.client, userResolvable);
+    return id ? this.client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
   }
 
   /**
@@ -238,7 +231,7 @@ export class ZeppelinPlugin<
   async resolveUser<T>(userResolvable: Not<T, string>): Promise<UnknownUser>;
   async resolveUser(userResolvable) {
     const start = performance.now();
-    const user = await resolveUser(this.bot, userResolvable);
+    const user = await resolveUser(this.client, userResolvable);
     const time = performance.now() - start;
     if (time >= SLOW_RESOLVE_THRESHOLD) {
       const rounded = Math.round(time);
@@ -253,7 +246,7 @@ export class ZeppelinPlugin<
    * @param roleResolvable
    */
   async resolveRoleId(roleResolvable: string): Promise<string | null> {
-    const roleId = await resolveRoleId(this.bot, this.guildId, roleResolvable);
+    const roleId = await resolveRoleId(this.client, this.guildId, roleResolvable);
     return roleId;
   }
 
@@ -266,9 +259,9 @@ export class ZeppelinPlugin<
 
     let member;
     if (forceFresh) {
-      const userId = await resolveUserId(this.bot, memberResolvable);
+      const userId = await resolveUserId(this.client, memberResolvable);
       try {
-        member = userId && (await this.bot.getRESTGuildMember(this.guild.id, userId));
+        member = userId && (await this.client.getRESTGuildMember(this.guild.id, userId));
       } catch (e) {
         if (!isDiscordRESTError(e)) {
           throw e;
@@ -277,7 +270,7 @@ export class ZeppelinPlugin<
 
       if (member) member.id = member.user.id;
     } else {
-      member = await resolveMember(this.bot, this.guild, memberResolvable);
+      member = await resolveMember(this.client, this.guild, memberResolvable);
     }
 
     const time = performance.now() - start;
@@ -294,7 +287,7 @@ export class ZeppelinPlugin<
       return inviteCache.get(code);
     }
 
-    const promise = this.bot.getInvite(code).catch(() => null);
+    const promise = this.client.getInvite(code).catch(() => null);
     inviteCache.set(code, promise);
 
     return promise;

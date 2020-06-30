@@ -55,7 +55,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildArchives } from "../data/GuildArchives";
-import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { CommandInfo, trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { getCurrentUptime } from "../uptime";
 import LCL from "last-commit-log";
 import * as t from "io-ts";
@@ -125,7 +125,7 @@ type MemberSearchParams = {
 
 class SearchError extends Error {}
 
-export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class UtilityPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "utility";
   public static configSchema = ConfigSchema;
 
@@ -1377,13 +1377,13 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
     const searchStr = args.command.toLowerCase();
 
     const matchingCommands: Array<{
-      plugin: ZeppelinPlugin;
+      plugin: ZeppelinPluginClass;
       command: ICommandDefinition<ICommandContext, ICommandExtraData>;
     }> = [];
 
     const guildData = this.knub.getGuildData(this.guildId);
     for (const plugin of guildData.loadedPlugins.values()) {
-      if (!(plugin instanceof ZeppelinPlugin)) continue;
+      if (!(plugin instanceof ZeppelinPluginClass)) continue;
 
       const registeredCommands = plugin.getRegisteredCommands();
       for (const registeredCommand of registeredCommands) {

@@ -1,7 +1,7 @@
 import { decorators as d, IPluginOptions } from "knub";
 import { GuildChannel, Message, Role, TextChannel } from "eris";
 import { asSingleLine, chunkArray, errorMessage, sorter, successMessage, tDeepPartial, trimLines } from "../utils";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 
 const RoleMap = t.record(t.string, t.array(t.string));
@@ -29,7 +29,7 @@ const defaultSelfGrantableRoleEntry: t.TypeOf<typeof PartialRoleEntry> = {
   max_roles: 0,
 };
 
-export class SelfGrantableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class SelfGrantableRolesPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "self_grantable_roles";
   public static showInDocs = true;
   public static configSchema = ConfigSchema;

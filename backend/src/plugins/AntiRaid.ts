@@ -1,6 +1,6 @@
 import { IPluginOptions, logger } from "knub";
 import * as t from "io-ts";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { convertDelayStringToMS, MINUTES, sorter, stripObjectToScalars, tDelayString } from "../utils";
@@ -28,7 +28,7 @@ interface IDeletionQueueItem {
 
 const MAX_DELAY = 5 * MINUTES;
 
-export class AntiRaid extends ZeppelinPlugin<TConfigSchema> {
+export class AntiRaid extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "auto_delete";
   public static showInDocs = true;
 

@@ -4,7 +4,7 @@ import { GuildChannel, Message, TextChannel } from "eris";
 import moment from "moment-timezone";
 import { createChunkedMessage, errorMessage, noop, sorter, successMessage, tNullable } from "../utils";
 import { ReactionRolesPlugin } from "./ReactionRoles";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildArchives } from "../data/GuildArchives";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
 import * as t from "io-ts";
@@ -222,7 +222,7 @@ export class BotControlPlugin extends GlobalZeppelinPlugin<TConfigSchema> {
       return;
     }
 
-    if (!(pluginInstance instanceof ZeppelinPlugin)) {
+    if (!(pluginInstance instanceof ZeppelinPluginClass)) {
       msg.channel.createMessage(errorMessage(`Plugin is not a Zeppelin plugin`));
       return;
     }

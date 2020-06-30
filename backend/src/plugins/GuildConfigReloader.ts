@@ -1,5 +1,5 @@
 import moment from "moment-timezone";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { Configs } from "../data/Configs";
 import { logger } from "knub";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";

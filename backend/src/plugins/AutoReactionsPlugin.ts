@@ -4,7 +4,7 @@ import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildAutoReactions } from "../data/GuildAutoReactions";
 import { Message } from "eris";
 import { customEmojiRegex, errorMessage, isDiscordRESTError, isEmoji } from "../utils";
-import { CommandInfo, trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { CommandInfo, trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
@@ -14,7 +14,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class AutoReactionsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class AutoReactionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "auto_reactions";
   public static configSchema = ConfigSchema;
 

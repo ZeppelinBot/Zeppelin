@@ -1,4 +1,4 @@
-import { trimPluginDescription, ZeppelinPlugin } from "../ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "../ZeppelinPluginClass";
 import * as t from "io-ts";
 import {
   convertDelayStringToMS,
@@ -209,7 +209,7 @@ const RAID_SPAM_IDENTIFIER = "raid";
  * call addRecentAction() directly. These are then checked by matchRuleToMessage() and matchOtherSpamInRule() to detect
  * spam.
  */
-export class AutomodPlugin extends ZeppelinPlugin<TConfigSchema, ICustomOverrides> {
+export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOverrides> {
   public static pluginName = "automod";
   public static configSchema = ConfigSchema;
   public static dependencies = ["mod_actions", "mutes", "logs"];

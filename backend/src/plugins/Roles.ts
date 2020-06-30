@@ -1,4 +1,4 @@
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 import { resolveMember, stripObjectToScalars, successMessage } from "../utils";
 import { decorators as d, IPluginOptions, logger } from "knub";
@@ -13,7 +13,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class RolesPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class RolesPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "roles";
   public static configSchema = ConfigSchema;
 

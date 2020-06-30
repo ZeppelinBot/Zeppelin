@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions, getInviteLink, logger } from "knub";
-import { trimPluginDescription, ZeppelinPlugin, CommandInfo } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass, CommandInfo } from "./ZeppelinPluginClass";
 import humanizeDuration from "humanize-duration";
 import { Message, Member, Guild, TextableChannel, VoiceChannel, Channel, User } from "eris";
 import { GuildVCAlerts } from "../data/GuildVCAlerts";
@@ -15,7 +15,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const ALERT_LOOP_TIME = 30 * SECONDS;
 
-export class LocatePlugin extends ZeppelinPlugin<TConfigSchema> {
+export class LocatePlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "locate_user";
   public static configSchema = ConfigSchema;
 

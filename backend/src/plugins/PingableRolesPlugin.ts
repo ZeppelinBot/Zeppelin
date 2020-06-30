@@ -3,7 +3,7 @@ import { Message, Role, TextableChannel } from "eris";
 import { GuildPingableRoles } from "../data/GuildPingableRoles";
 import { PingableRole } from "../data/entities/PingableRole";
 import { errorMessage, successMessage } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -13,7 +13,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 const TIMEOUT = 10 * 1000;
 
-export class PingableRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class PingableRolesPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "pingable_roles";
   public static configSchema = ConfigSchema;
 

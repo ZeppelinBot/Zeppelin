@@ -1,4 +1,4 @@
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { decorators as d, IPluginOptions } from "knub";
 import { Member, TextChannel } from "eris";
 import { renderTemplate } from "../templateFormatter";
@@ -14,7 +14,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class WelcomeMessagePlugin extends ZeppelinPlugin<TConfigSchema> {
+export class WelcomeMessagePlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "welcome_message";
   public static configSchema = ConfigSchema;
 

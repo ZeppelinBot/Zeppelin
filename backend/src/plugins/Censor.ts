@@ -14,7 +14,7 @@ import {
 import { ZalgoRegex } from "../data/Zalgo";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
 import { TSafeRegex } from "../validatorUtils";
@@ -36,7 +36,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class CensorPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class CensorPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "censor";
   public static configSchema = ConfigSchema;
 

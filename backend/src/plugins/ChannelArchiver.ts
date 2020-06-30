@@ -2,7 +2,7 @@ import { decorators as d, ICommandContext, logger } from "knub";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
 import { Attachment, GuildChannel, Message, TextChannel } from "eris";
 import { confirm, downloadFile, errorMessage, noop, SECONDS, trimLines } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import moment from "moment-timezone";
 import https from "https";
 import fs from "fs";
@@ -13,7 +13,7 @@ const MAX_MESSAGES_PER_FETCH = 100;
 const PROGRESS_UPDATE_INTERVAL = 5 * SECONDS;
 const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;
 
-export class ChannelArchiverPlugin extends ZeppelinPlugin {
+export class ChannelArchiverPlugin extends ZeppelinPluginClass {
   public static pluginName = "channel_archiver";
   public static showInDocs = false;
 

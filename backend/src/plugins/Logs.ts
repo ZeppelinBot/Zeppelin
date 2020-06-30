@@ -24,7 +24,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildArchives } from "../data/GuildArchives";
 import { GuildCases } from "../data/GuildCases";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { renderTemplate, TemplateParseError } from "../templateFormatter";
 import cloneDeep from "lodash.clonedeep";
 import * as t from "io-ts";
@@ -56,7 +56,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class LogsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class LogsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "logs";
   public static configSchema = ConfigSchema;
 
