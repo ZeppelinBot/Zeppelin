@@ -2,7 +2,7 @@ import { decorators as d, IPluginOptions } from "knub";
 import { GuildNicknameHistory, MAX_NICKNAME_ENTRIES_PER_USER } from "../data/GuildNicknameHistory";
 import { Member, Message } from "eris";
 import { createChunkedMessage, disableCodeBlocks } from "../utils";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { MAX_USERNAME_ENTRIES_PER_USER, UsernameHistory } from "../data/UsernameHistory";
 import * as t from "io-ts";
 
@@ -11,7 +11,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class NameHistoryPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class NameHistoryPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "name_history";
   public static showInDocs = false;
   public static configSchema = ConfigSchema;

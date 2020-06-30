@@ -1,5 +1,5 @@
 import { decorators as d, IPluginOptions, logger } from "knub";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { Member, Channel, GuildChannel, PermissionOverwrite, Permission, Message, TextChannel } from "eris";
 import * as t from "io-ts";
 import { tNullable } from "../utils";
@@ -26,7 +26,7 @@ const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
   enabled: true,
 };
 
-export class CompanionChannelPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class CompanionChannelPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "companion_channels";
   public static configSchema = ConfigSchema;
 

@@ -12,7 +12,7 @@ import {
 } from "../utils";
 import { GuildSlowmodes } from "../data/GuildSlowmodes";
 import humanizeDuration from "humanize-duration";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildLogs } from "../data/GuildLogs";
@@ -31,7 +31,7 @@ const NATIVE_SLOWMODE_LIMIT = 6 * 60 * 60; // 6 hours
 const MAX_SLOWMODE = 60 * 60 * 24 * 365 * 100; // 100 years
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * 1000;
 
-export class SlowmodePlugin extends ZeppelinPlugin<TConfigSchema> {
+export class SlowmodePlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "slowmode";
   public static configSchema = ConfigSchema;
 

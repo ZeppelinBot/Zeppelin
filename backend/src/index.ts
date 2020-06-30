@@ -77,10 +77,10 @@ for (const [i, part] of actualVersionParts.entries()) {
 import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
 
-import { Client, TextableChannel, TextChannel } from "eris";
+import { Client, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
 import { customArgumentTypes } from "./customArgumentTypes";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
@@ -91,7 +91,7 @@ import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
 
 logger.info("Connecting to database");
-connect().then(async conn => {
+connect().then(async () => {
   const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: false,
     restMode: true,
@@ -108,7 +108,7 @@ connect().then(async conn => {
   const guildConfigs = new Configs();
 
   const bot = new Knub<IZeppelinGuildConfig, IZeppelinGlobalConfig>(client, {
-    plugins: availablePlugins,
+    guildPlugins: availablePlugins,
     globalPlugins: availableGlobalPlugins,
 
     options: {
@@ -126,9 +126,9 @@ connect().then(async conn => {
         const configuredPlugins = guildConfig.plugins || {};
         const pluginNames: string[] = Array.from(this.plugins.keys());
         const plugins: Array<typeof Plugin> = Array.from(this.plugins.values());
-        const zeppelinPlugins: Array<typeof ZeppelinPlugin> = plugins.filter(
-          p => p.prototype instanceof ZeppelinPlugin,
-        ) as Array<typeof ZeppelinPlugin>;
+        const zeppelinPlugins: Array<typeof ZeppelinPluginClass> = plugins.filter(
+          p => p.prototype instanceof ZeppelinPluginClass,
+        ) as Array<typeof ZeppelinPluginClass>;
 
         const enabledBasePlugins = pluginNames.filter(n => basePlugins.includes(n));
         const explicitlyEnabledPlugins = pluginNames.filter(pluginName => {
@@ -176,13 +176,13 @@ connect().then(async conn => {
 
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
-        const emoji = guildId ? bot.getGuildData(guildId).config.success_emoji : undefined;
+        const emoji = guildId ? bot.getLoadedGuild(guildId).config.success_emoji : undefined;
         channel.createMessage(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
-        const emoji = guildId ? bot.getGuildData(guildId).config.error_emoji : undefined;
+        const emoji = guildId ? bot.getLoadedGuild(guildId).config.error_emoji : undefined;
         channel.createMessage(errorMessage(body, emoji));
       },
     },

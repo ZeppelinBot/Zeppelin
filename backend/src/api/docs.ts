@@ -1,6 +1,6 @@
 import express from "express";
 import { availablePlugins } from "../plugins/availablePlugins";
-import { ZeppelinPlugin } from "../plugins/ZeppelinPlugin";
+import { ZeppelinPluginClass } from "../plugins/ZeppelinPluginClass";
 import { notFound } from "./responses";
 import { dropPropertiesByName, indentLines } from "../utils";
 import { IPluginCommandConfig, Plugin, pluginUtils } from "knub";
@@ -75,7 +75,7 @@ export function initDocs(app: express.Express) {
       };
     });
 
-    const defaultOptions = (pluginClass as typeof ZeppelinPlugin).getStaticDefaultOptions();
+    const defaultOptions = (pluginClass as typeof ZeppelinPluginClass).getStaticDefaultOptions();
 
     const configSchema = pluginClass.configSchema && formatConfigSchema(pluginClass.configSchema);
 

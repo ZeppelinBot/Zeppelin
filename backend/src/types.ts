@@ -1,11 +1,11 @@
-import { IGlobalConfig, IGuildConfig, Knub } from "knub";
+import { BaseConfig, Knub } from "knub";
 
-export interface IZeppelinGuildConfig extends IGuildConfig {
+export interface IZeppelinGuildConfig extends BaseConfig<any> {
   success_emoji?: string;
   error_emoji?: string;
 }
 
-export interface IZeppelinGlobalConfig extends IGlobalConfig {
+export interface IZeppelinGlobalConfig extends BaseConfig<any> {
   url: string;
   owners?: string[];
 }

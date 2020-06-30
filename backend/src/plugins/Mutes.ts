@@ -1,7 +1,7 @@
 import { Member, Message, TextChannel, User } from "eris";
 import { GuildCases } from "../data/GuildCases";
 import moment from "moment-timezone";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildMutes } from "../data/GuildMutes";
 import {
   chunkMessageLines,
@@ -75,7 +75,7 @@ const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
 let FIRST_CHECK_TIME = Date.now();
 const FIRST_CHECK_INCREMENT = 5 * 1000;
 
-export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class MutesPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "mutes";
   public static configSchema = ConfigSchema;
 

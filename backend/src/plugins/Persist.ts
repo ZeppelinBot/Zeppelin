@@ -5,7 +5,7 @@ import { Member, MemberOptions } from "eris";
 import { GuildLogs } from "../data/GuildLogs";
 import { LogType } from "../data/LogType";
 import { stripObjectToScalars } from "../utils";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 
 const ConfigSchema = t.type({
@@ -15,7 +15,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class PersistPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class PersistPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "persist";
   public static configSchema = ConfigSchema;
 

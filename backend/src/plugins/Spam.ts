@@ -19,7 +19,7 @@ import moment from "moment-timezone";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { GuildMutes } from "../data/GuildMutes";
-import { trimPluginDescription, ZeppelinPlugin } from "./ZeppelinPlugin";
+import { trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { MuteResult, MutesPlugin } from "./Mutes";
 import { CasesPlugin } from "./Cases";
 import * as t from "io-ts";
@@ -72,7 +72,7 @@ const MAX_INTERVAL = 300;
 
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;
 
-export class SpamPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class SpamPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "spam";
   public static configSchema = ConfigSchema;
 

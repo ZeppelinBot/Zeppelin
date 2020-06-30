@@ -15,7 +15,7 @@ import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { SavedMessage } from "../data/entities/SavedMessage";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { parseTemplate, renderTemplate, TemplateParseError } from "../templateFormatter";
 import { GuildArchives } from "../data/GuildArchives";
 import * as t from "io-ts";
@@ -58,7 +58,7 @@ const ConfigSchema = t.type({
 });
 type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class TagsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "tags";
   public static configSchema = ConfigSchema;
 

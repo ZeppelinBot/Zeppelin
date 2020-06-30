@@ -1,4 +1,4 @@
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { IPluginOptions } from "knub";
 import { Message, TextChannel, VoiceChannel } from "eris";
 import { renderTemplate } from "../templateFormatter";
@@ -68,7 +68,7 @@ type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 class ActionError extends Error {}
 
-export class CustomEventsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class CustomEventsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "custom_events";
   public static showInDocs = false;
   public static dependencies = ["cases"];

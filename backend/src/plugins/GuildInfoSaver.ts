@@ -1,8 +1,8 @@
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { AllowedGuilds } from "../data/AllowedGuilds";
 import { MINUTES } from "../utils";
 
-export class GuildInfoSaverPlugin extends ZeppelinPlugin {
+export class GuildInfoSaverPlugin extends ZeppelinPluginClass {
   public static pluginName = "guild_info_saver";
   public static showInDocs = false;
   protected allowedGuilds: AllowedGuilds;

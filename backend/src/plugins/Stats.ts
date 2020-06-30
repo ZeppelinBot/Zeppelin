@@ -1,4 +1,4 @@
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import * as t from "io-ts";
 import { convertDelayStringToMS, DAYS, HOURS, tAlphanumeric, tDateTime, tDeepPartial, tDelayString } from "../utils";
 import { IPluginOptions } from "knub";
@@ -60,7 +60,7 @@ const DEFAULT_RETENTION_PERIOD = "4w";
 //endregion
 //region PLUGIN
 
-export class StatsPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class StatsPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "stats";
   public static configSchema = tConfigSchema;
   public static showInDocs = false;

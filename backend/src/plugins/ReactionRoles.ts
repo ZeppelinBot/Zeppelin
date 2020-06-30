@@ -2,7 +2,7 @@ import { decorators as d, IPluginOptions, logger } from "knub";
 import { CustomEmoji, errorMessage, isDiscordRESTError, isSnowflake, noop, sleep } from "../utils";
 import { GuildReactionRoles } from "../data/GuildReactionRoles";
 import { Message, TextChannel } from "eris";
-import { ZeppelinPlugin } from "./ZeppelinPlugin";
+import { ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildSavedMessages } from "../data/GuildSavedMessages";
 import { Queue } from "../Queue";
 import { ReactionRole } from "../data/entities/ReactionRole";
@@ -42,7 +42,7 @@ type PendingMemberRoleChanges = {
   }>;
 };
 
-export class ReactionRolesPlugin extends ZeppelinPlugin<TConfigSchema> {
+export class ReactionRolesPlugin extends ZeppelinPluginClass<TConfigSchema> {
   public static pluginName = "reaction_roles";
   public static configSchema = ConfigSchema;
 
