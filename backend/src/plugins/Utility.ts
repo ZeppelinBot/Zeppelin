@@ -81,6 +81,7 @@ const ConfigSchema = t.type({
   can_roles: t.boolean,
   can_level: t.boolean,
   can_search: t.boolean,
+  info_on_single_result: t.boolean,
   can_clean: t.boolean,
   can_info: t.boolean,
   can_server: t.boolean,
@@ -161,6 +162,7 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
         can_roles: false,
         can_level: false,
         can_search: false,
+        info_on_single_result: true,
         can_clean: false,
         can_info: false,
         can_server: false,
@@ -847,6 +849,11 @@ export class UtilityPlugin extends ZeppelinPlugin<TConfigSchema> {
 
       const searchMsg = await searchMsgPromise;
       searchMsg.edit(result);
+
+      const cfg = this.getConfigForUser(msg.author);
+      if (cfg.info_on_single_result && searchResult.totalResults === 1) {
+        this.infoCmd(msg, { user: searchResult.results[0], compact: false });
+      }
 
       // Set up pagination reactions if needed. The reactions are cleared after a timeout.
       if (searchResult.totalResults > perPage) {
