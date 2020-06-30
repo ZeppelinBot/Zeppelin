@@ -2,7 +2,6 @@ import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, In, Repository } from "typeorm";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
 import { MINUTES, SECONDS, sorter } from "../utils";
-import { MAX_USERNAME_ENTRIES_PER_USER } from "./UsernameHistory";
 import { isAPI } from "../globals";
 import { cleanupNicknames } from "./cleanup/nicknames";
 
@@ -65,7 +64,7 @@ export class GuildNicknameHistory extends BaseGuildRepository {
       .where("guild_id = :guildId", { guildId: this.guildId })
       .andWhere("user_id = :userId", { userId })
       .orderBy("id", "DESC")
-      .skip(MAX_USERNAME_ENTRIES_PER_USER)
+      .skip(MAX_NICKNAME_ENTRIES_PER_USER)
       .take(99_999)
       .getMany();
 
