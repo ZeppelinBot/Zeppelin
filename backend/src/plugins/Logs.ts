@@ -151,19 +151,14 @@ export class LogsPlugin extends ZeppelinPluginClass<TConfigSchema> {
 
         // If this entry is from an excluded channel, skip it
         if (opts.excluded_channels) {
-          if (type === LogType.MESSAGE_DELETE || type === LogType.MESSAGE_DELETE_BARE) {
-            if (opts.excluded_channels.includes(data.message.channel.id)) {
-              continue logChannelLoop;
-            }
-          }
-
-          if (type === LogType.MESSAGE_EDIT) {
-            if (opts.excluded_channels.includes(data.before.channel.id)) {
-              continue logChannelLoop;
-            }
-          }
-
-          if (type === LogType.MESSAGE_SPAM_DETECTED || type === LogType.CENSOR || type === LogType.CLEAN) {
+          if (
+            type === LogType.MESSAGE_DELETE ||
+            type === LogType.MESSAGE_DELETE_BARE ||
+            type === LogType.MESSAGE_EDIT ||
+            type === LogType.MESSAGE_SPAM_DETECTED ||
+            type === LogType.CENSOR ||
+            type === LogType.CLEAN
+          ) {
             if (opts.excluded_channels.includes(data.channel.id)) {
               continue logChannelLoop;
             }

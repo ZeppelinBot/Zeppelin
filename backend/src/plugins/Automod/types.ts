@@ -189,12 +189,6 @@ export const MatchAttachmentTypeTrigger = t.type({
   blacklist_enabled: t.boolean,
   filetype_whitelist: t.array(t.string),
   whitelist_enabled: t.boolean,
-  match_messages: t.boolean,
-  match_embeds: t.boolean,
-  match_visible_names: t.boolean,
-  match_usernames: t.boolean,
-  match_nicknames: t.boolean,
-  match_custom_status: t.boolean,
 });
 export type TMatchAttachmentTypeTrigger = t.TypeOf<typeof MatchAttachmentTypeTrigger>;
 
@@ -302,6 +296,7 @@ export const Rule = t.type({
   enabled: t.boolean,
   name: t.string,
   presets: tNullable(t.array(t.string)),
+  affects_bots: t.boolean,
   triggers: t.array(
     t.type({
       match_words: tNullable(MatchWordsTrigger),

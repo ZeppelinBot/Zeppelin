@@ -46,6 +46,7 @@ const ConfigSchema = t.type({
   ban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
+  warn_notify_enabled: t.boolean,
   warn_notify_threshold: t.number,
   warn_notify_message: t.string,
   ban_delete_message_days: t.number,
@@ -166,6 +167,7 @@ export class ModActionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
         ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
         alert_on_rejoin: false,
         alert_channel: null,
+        warn_notify_enabled: false,
         warn_notify_threshold: 5,
         warn_notify_message:
           "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
@@ -690,7 +692,7 @@ export class ModActionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
 
     const casesPlugin = this.getPlugin<CasesPlugin>("cases");
     const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
-    if (priorWarnAmount >= config.warn_notify_threshold) {
+    if (config.warn_notify_enabled && priorWarnAmount >= config.warn_notify_threshold) {
       const tooManyWarningsMsg = await msg.channel.createMessage(
         config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
       );
@@ -840,6 +842,9 @@ export class ModActionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
         this.sendErrorMessage(msg.channel, "Could not mute the user: unknown member");
       } else {
         logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
+        if (user.id == null) {
+          console.trace("[DEBUG] Null user.id for mute");
+        }
         this.sendErrorMessage(msg.channel, "Could not mute the user");
       }
 
@@ -1042,7 +1047,7 @@ export class ModActionsPlugin extends ZeppelinPluginClass<TConfigSchema> {
     if (!user) return this.sendErrorMessage(msg.channel, `User not found`);
     const memberToUnmute = await this.getMember(user.id);
     const mutesPlugin = this.getPlugin<MutesPlugin>("mutes");
-    const hasMuteRole = mutesPlugin.hasMutedRole(memberToUnmute);
+    const hasMuteRole = memberToUnmute && mutesPlugin.hasMutedRole(memberToUnmute);
 
     // Check if they're muted in the first place
     if (!(await this.mutes.isMuted(args.user)) && !hasMuteRole) {

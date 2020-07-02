@@ -133,7 +133,7 @@ export class TagsPlugin extends ZeppelinPluginClass<TConfigSchema> {
       },
 
       countdown(toDate) {
-        const target = this.parseDateTime(toDate);
+        const target = moment(this.parseDateTime(toDate));
 
         const now = moment();
         if (!target.isValid()) return "";
@@ -222,6 +222,10 @@ export class TagsPlugin extends ZeppelinPluginClass<TConfigSchema> {
         return "";
       },
     };
+
+    for (const [name, fn] of Object.entries(this.tagFunctions)) {
+      this.tagFunctions[name] = (fn as any).bind(this.tagFunctions);
+    }
   }
 
   onUnload() {

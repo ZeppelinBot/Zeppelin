@@ -26,6 +26,7 @@ const StarboardOpts = t.type({
   channel_id: t.string,
   stars_required: t.number,
   star_emoji: tNullable(t.array(t.string)),
+  copy_full_embed: tNullable(t.boolean),
   enabled: tNullable(t.boolean),
 });
 type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
@@ -148,6 +149,7 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
       if (cfg.enabled == null) cfg.enabled = defaultStarboardOpts.enabled;
       if (cfg.star_emoji == null) cfg.star_emoji = defaultStarboardOpts.star_emoji;
       if (cfg.stars_required == null) cfg.stars_required = defaultStarboardOpts.stars_required;
+      if (cfg.copy_full_embed == null) cfg.copy_full_embed = false;
     });
 
     return configs;
@@ -224,7 +226,7 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
       const reactions = await this.starboardReactions.getAllReactionsForMessageId(msg.id);
       const reactionsCount = reactions.length;
       if (reactionsCount >= starboard.stars_required) {
-        await this.saveMessageToStarboard(msg, starboard.channel_id);
+        await this.saveMessageToStarboard(msg, starboard);
       }
     }
   }
@@ -243,8 +245,8 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
    * Saves/posts a message to the specified starboard.
    * The message is posted as an embed and image attachments are included as the embed image.
    */
-  async saveMessageToStarboard(msg: Message, starboardChannelId: string) {
-    const channel = this.guild.channels.get(starboardChannelId);
+  async saveMessageToStarboard(msg: Message, starboard: TStarboardOpts) {
+    const channel = this.guild.channels.get(starboard.channel_id);
     if (!channel) return;
 
     const time = moment(msg.timestamp, "x").format("YYYY-MM-DD [at] HH:mm:ss [UTC]");
@@ -256,6 +258,7 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
       author: {
         name: `${msg.author.username}#${msg.author.discriminator}`,
       },
+      fields: [],
       timestamp: new Date(msg.timestamp).toISOString(),
     };
 
@@ -267,24 +270,35 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
       embed.description = msg.content;
     }
 
-    // Include attachments
-    if (msg.attachments.length) {
-      const attachment = msg.attachments[0];
-      const ext = path
-        .extname(attachment.filename)
-        .slice(1)
-        .toLowerCase();
-      if (["jpeg", "jpg", "png", "gif", "webp"].includes(ext)) {
-        embed.image = { url: attachment.url };
+    // Merge media and - if copy_full_embed is enabled - fields and title from the first embed in the original message
+    if (msg.embeds.length > 0) {
+      if (msg.embeds[0].image) embed.image = msg.embeds[0].image;
+
+      if (starboard.copy_full_embed) {
+        if (msg.embeds[0].title) {
+          const titleText = msg.embeds[0].url ? `[${msg.embeds[0].title}](${msg.embeds[0].url})` : msg.embeds[0].title;
+          embed.fields.push({ name: EMPTY_CHAR, value: titleText });
+        }
+
+        if (msg.embeds[0].fields) embed.fields.push(...msg.embeds[0].fields);
       }
     }
 
-    // Include any embed images in the original message
-    if (msg.embeds.length && msg.embeds[0].image) {
-      embed.image = msg.embeds[0].image;
+    // If there are no embeds, add the first image attachment explicitly
+    else if (msg.attachments.length) {
+      for (const attachment of msg.attachments) {
+        const ext = path
+          .extname(attachment.filename)
+          .slice(1)
+          .toLowerCase();
+        if (!["jpeg", "jpg", "png", "gif", "webp"].includes(ext)) continue;
+
+        embed.image = { url: attachment.url };
+        break;
+      }
     }
 
-    embed.fields = [{ name: EMPTY_CHAR, value: `[Jump to message](${messageLink(msg)})` }];
+    embed.fields.push({ name: EMPTY_CHAR, value: `[Jump to message](${messageLink(msg)})` });
 
     const starboardMessage = await (channel as TextChannel).createMessage({ embed });
     await this.starboardMessages.createStarboardMessage(channel.id, msg.id, starboardMessage.id);
@@ -364,7 +378,7 @@ export class StarboardPlugin extends ZeppelinPluginClass<TConfigSchema> {
         pin.id,
       );
       if (existingStarboardMessage.length > 0) continue;
-      await this.saveMessageToStarboard(pin, starboardChannel.id);
+      await this.saveMessageToStarboard(pin, starboard);
     }
 
     this.sendSuccessMessage(msg.channel, `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`);

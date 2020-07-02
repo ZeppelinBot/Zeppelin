@@ -94,6 +94,14 @@ export class CasesPlugin extends ZeppelinPluginClass<TConfigSchema> {
       ppName = `${pp.username}#${pp.discriminator}`;
     }
 
+    if (args.auditLogId) {
+      const existingAuditLogCase = await this.cases.findByAuditLogId(args.auditLogId);
+      if (existingAuditLogCase) {
+        delete args.auditLogId;
+        logger.warn(`Duplicate audit log ID for mod case: ${args.auditLogId}`);
+      }
+    }
+
     const createdCase = await this.cases.create({
       type: args.type,
       user_id: args.userId,
@@ -275,7 +283,7 @@ export class CasesPlugin extends ZeppelinPluginClass<TConfigSchema> {
     try {
       result = await caseLogChannel.createMessage(content, file);
     } catch (e) {
-      if (isDiscordRESTError(e) && e.code === 50013) {
+      if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
         logger.warn(
           `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${this.guild.name} (${this.guild.id})`,
         );

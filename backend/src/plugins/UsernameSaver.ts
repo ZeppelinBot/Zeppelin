@@ -1,15 +1,18 @@
 import { decorators as d, GlobalPlugin } from "knub";
 import { UsernameHistory } from "../data/UsernameHistory";
-import { Member, User } from "eris";
+import { Member, Message, User } from "eris";
 import { GlobalZeppelinPlugin } from "./GlobalZeppelinPlugin";
+import { Queue } from "../Queue";
 
 export class UsernameSaver extends GlobalZeppelinPlugin {
   public static pluginName = "username_saver";
 
   protected usernameHistory: UsernameHistory;
+  protected updateQueue: Queue;
 
   async onLoad() {
     this.usernameHistory = new UsernameHistory();
+    this.updateQueue = new Queue();
   }
 
   protected async updateUsername(user: User) {
@@ -21,13 +24,15 @@ export class UsernameSaver extends GlobalZeppelinPlugin {
     }
   }
 
-  @d.event("userUpdate", null, false)
-  async onUserUpdate(user: User) {
-    this.updateUsername(user);
+  @d.event("messageCreate", null)
+  async onMessage(msg: Message) {
+    if (msg.author.bot) return;
+    this.updateQueue.add(() => this.updateUsername(msg.author));
   }
 
-  @d.event("guildMemberAdd", null, false)
-  async onGuildMemberAdd(_, member: Member) {
-    this.updateUsername(member.user);
+  @d.event("voiceChannelJoin", null)
+  async onVoiceChannelJoin(member: Member) {
+    if (member.user.bot) return;
+    this.updateQueue.add(() => this.updateUsername(member.user));
   }
 }

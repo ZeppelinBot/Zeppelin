@@ -1,15 +1,22 @@
 import { Config } from "./entities/Config";
-import {
-  getConnection,
-  getRepository,
-  Repository,
-  Transaction,
-  TransactionManager,
-  TransactionRepository,
-} from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
+import { getRepository, Repository } from "typeorm";
 import { connection } from "./db";
 import { BaseRepository } from "./BaseRepository";
+import { isAPI } from "../globals";
+import { HOURS, SECONDS } from "../utils";
+import { cleanupConfigs } from "./cleanup/configs";
+
+if (isAPI()) {
+  const CLEANUP_INTERVAL = 1 * HOURS;
+
+  async function cleanup() {
+    await cleanupConfigs();
+    setTimeout(cleanup, CLEANUP_INTERVAL);
+  }
+
+  // Start first cleanup 30 seconds after startup
+  setTimeout(cleanup, 30 * SECONDS);
+}
 
 export class Configs extends BaseRepository {
   private configs: Repository<Config>;

@@ -1,40 +1,25 @@
-import { Brackets, getRepository, Repository } from "typeorm";
+import { getRepository, In, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
+import { DAYS, DBDateFormat, MINUTES, SECONDS } from "../utils";
+import { isAPI } from "../globals";
+import { connection } from "./db";
+import { cleanupMessages } from "./cleanup/messages";
 
-const CLEANUP_INTERVAL = 5 * 60 * 1000; // 5 min
+if (!isAPI()) {
+  const CLEANUP_INTERVAL = 5 * MINUTES;
 
-const RETENTION_PERIOD = 5 * 24 * 60 * 60 * 1000; // 5 days
+  async function cleanup() {
+    await cleanupMessages();
+    setTimeout(cleanup, CLEANUP_INTERVAL);
+  }
 
-async function cleanup() {
-  const repository = getRepository(SavedMessage);
-  await repository
-    .createQueryBuilder("messages")
-    .where(
-      // Clear deleted messages
-      new Brackets(qb => {
-        qb.where("deleted_at IS NOT NULL");
-        qb.andWhere(`deleted_at <= (NOW() - INTERVAL ${CLEANUP_INTERVAL}000 MICROSECOND)`);
-      }),
-    )
-    .orWhere(
-      // Clear old messages
-      new Brackets(qb => {
-        qb.where("is_permanent = 0");
-        qb.andWhere(`posted_at <= (NOW() - INTERVAL ${RETENTION_PERIOD}000 MICROSECOND)`);
-      }),
-    )
-    .delete()
-    .execute();
-
-  setTimeout(cleanup, CLEANUP_INTERVAL);
+  // Start first cleanup 30 seconds after startup
+  setTimeout(cleanup, 30 * SECONDS);
 }
-
-// Start first cleanup 30 seconds after startup
-setTimeout(cleanup, 30 * 1000);
 
 export class GuildSavedMessages extends BaseGuildRepository {
   private messages: Repository<SavedMessage>;
@@ -115,8 +100,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
     let query = this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .andWhere("user_id = :user_id", { user_id: userId })
       .andWhere("channel_id = :channel_id", { channel_id: channelId })
+      .andWhere("user_id = :user_id", { user_id: userId })
       .andWhere("id > :afterId", { afterId })
       .andWhere("deleted_at IS NULL");
 
@@ -159,7 +144,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     if (existingSavedMsg) return;
 
     const savedMessageData = this.msgToSavedMessageData(msg);
-    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss.SSS");
+    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
     const data = {
       id: msg.id,
@@ -198,7 +183,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
    * If any messages were marked as deleted, also emits the deleteBulk event.
    */
   async markBulkAsDeleted(ids) {
-    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss");
 
     await this.messages
       .createQueryBuilder()
