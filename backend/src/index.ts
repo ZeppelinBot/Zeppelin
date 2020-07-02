@@ -100,7 +100,7 @@ connect().then(async () => {
 
   client.on("debug", message => {
     if (message.includes(" 429 ")) {
-      logger.info(`[RATELIMITED] ${message}`);
+      logger.info(`[429] ${message}`);
     }
   });
 

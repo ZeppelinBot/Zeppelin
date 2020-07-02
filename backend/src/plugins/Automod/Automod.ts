@@ -125,12 +125,6 @@ const defaultMatchAttachmentTypeTrigger: Partial<TMatchAttachmentTypeTrigger> = 
   blacklist_enabled: false,
   filetype_whitelist: [],
   whitelist_enabled: false,
-  match_messages: true,
-  match_embeds: true,
-  match_visible_names: false,
-  match_usernames: false,
-  match_nicknames: false,
-  match_custom_status: false,
 };
 
 const defaultTextSpamTrigger: Partial<t.TypeOf<typeof BaseTextSpamTrigger>> = {
@@ -238,6 +232,7 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   protected cooldownManager: CooldownManager;
 
   protected onMessageCreateFn;
+  protected onMessageUpdateFn;
   protected actionedMessageIds: string[];
   protected actionedMessageMax = 50;
 
@@ -258,6 +253,10 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
         // If the rule doesn't have an explicitly set "enabled" property, set it to true
         if (rule["enabled"] == null) {
           rule["enabled"] = true;
+        }
+
+        if (rule["affects_bots"] == null) {
+          rule["affects_bots"] = false;
         }
 
         // Loop through the rule's triggers
@@ -349,9 +348,12 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
 
     this.cachedAntiraidLevel = await this.antiraidLevels.get();
 
-    this.onMessageCreateFn = msg => this.onMessageCreate(msg);
+    this.onMessageCreateFn = msg => this.runAutomodOnMessage(msg, false);
     this.savedMessages.events.on("create", this.onMessageCreateFn);
-    this.savedMessages.events.on("update", this.onMessageCreateFn);
+
+    this.onMessageUpdateFn = msg => this.runAutomodOnMessage(msg, true);
+    this.savedMessages.events.on("update", this.onMessageUpdateFn);
+
     this.actionedMessageIds = [];
   }
 
@@ -370,7 +372,7 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   protected onUnload() {
     this.unloaded = true;
     this.savedMessages.events.off("create", this.onMessageCreateFn);
-    this.savedMessages.events.off("update", this.onMessageCreateFn);
+    this.savedMessages.events.off("update", this.onMessageUpdateFn);
     clearInterval(this.recentActionClearInterval);
     clearInterval(this.recentSpamClearInterval);
     clearInterval(this.recentNicknameChangesClearInterval);
@@ -424,9 +426,9 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   }
 
   /**
-   * @return Matched invite code
+   * @return Info about matched invite
    */
-  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<null | string> {
+  protected async evaluateMatchInvitesTrigger(trigger: TMatchInvitesTrigger, str: string): Promise<null | any> {
     const inviteCodes = getInviteCodesInString(str);
     if (inviteCodes.length === 0) return null;
 
@@ -434,22 +436,22 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
 
     for (const code of uniqueInviteCodes) {
       if (trigger.include_invite_codes && trigger.include_invite_codes.includes(code)) {
-        return code;
+        return { code };
       }
       if (trigger.exclude_invite_codes && !trigger.exclude_invite_codes.includes(code)) {
-        return code;
+        return { code };
       }
     }
 
     for (const inviteCode of uniqueInviteCodes) {
       const invite = await this.resolveInvite(inviteCode);
-      if (!invite) return inviteCode;
+      if (!invite) return { code: inviteCode };
 
       if (trigger.include_guilds && trigger.include_guilds.includes(invite.guild.id)) {
-        return inviteCode;
+        return { code: inviteCode, invite };
       }
       if (trigger.exclude_guilds && !trigger.exclude_guilds.includes(invite.guild.id)) {
-        return inviteCode;
+        return { code: inviteCode, invite };
       }
     }
 
@@ -537,17 +539,26 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
     return null;
   }
 
-  protected evaluateMatchAttachmentTypeTrigger(trigger: TMatchAttachmentTypeTrigger, msg: SavedMessage): null | string {
+  protected evaluateMatchAttachmentTypeTrigger(
+    trigger: TMatchAttachmentTypeTrigger,
+    msg: SavedMessage,
+  ): null | { str: string; matchedValue: string } {
     if (!msg.data.attachments) return null;
     const attachments: any[] = msg.data.attachments;
 
     for (const attachment of attachments) {
       const attachment_type = attachment.filename.split(`.`).pop();
       if (trigger.blacklist_enabled && trigger.filetype_blacklist.includes(attachment_type)) {
-        return `${attachment_type} - blacklisted`;
+        return {
+          str: attachment.filename,
+          matchedValue: `${attachment_type} - blacklisted`,
+        };
       }
       if (trigger.whitelist_enabled && !trigger.filetype_whitelist.includes(attachment_type)) {
-        return `${attachment_type} - not whitelisted`;
+        return {
+          str: attachment.filename,
+          matchedValue: `${attachment_type} - blacklisted`,
+        };
       }
     }
 
@@ -555,13 +566,14 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   }
 
   protected matchTextSpamTrigger(
-    recentActionType: RecentActionType,
+    recentActionType: TextRecentAction["type"],
     trigger: TBaseTextSpamTrigger,
     msg: SavedMessage,
   ): Omit<TextSpamTriggerMatchResult, "trigger" | "rule"> {
     const since = moment.utc(msg.posted_at).valueOf() - convertDelayStringToMS(trigger.within);
+    const to = moment.utc(msg.posted_at).valueOf();
     const identifier = trigger.per_channel ? `${msg.channel_id}-${msg.user_id}` : msg.user_id;
-    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since);
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since, to);
     const totalCount = recentActions.reduce((total, action) => {
       return total + action.count;
     }, 0);
@@ -584,7 +596,8 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
     identifier: string | null,
   ): Omit<OtherSpamTriggerMatchResult, "trigger" | "rule"> {
     const since = moment.utc().valueOf() - convertDelayStringToMS(trigger.within);
-    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since) as OtherRecentAction[];
+    const to = moment.utc().valueOf();
+    const recentActions = this.getMatchingRecentActions(recentActionType, identifier, since, to) as OtherRecentAction[];
     const totalCount = recentActions.reduce((total, action) => {
       return total + action.count;
     }, 0);
@@ -729,10 +742,18 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
       }
 
       if (trigger.match_attachment_type) {
-        const match = await this.matchMultipleTextTypesOnMessage(trigger.match_attachment_type, msg, str => {
-          return this.evaluateMatchAttachmentTypeTrigger(trigger.match_attachment_type, msg);
-        });
-        if (match) return { ...match, trigger: "match_attachment_type" } as TextTriggerMatchResult;
+        const match = this.evaluateMatchAttachmentTypeTrigger(trigger.match_attachment_type, msg);
+        // TODO: Add "attachment" type
+        if (match) {
+          const messageInfo: MessageInfo = { channelId: msg.channel_id, messageId: msg.id, userId: msg.user_id };
+          return {
+            type: "message",
+            userId: msg.user_id,
+            messageInfo,
+            ...match,
+            trigger: "match_attachment_type",
+          };
+        }
       }
 
       if (trigger.message_spam) {
@@ -825,7 +846,7 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   /**
    * Logs recent actions for spam detection purposes
    */
-  protected async logRecentActionsForMessage(msg: SavedMessage) {
+  protected logRecentActionsForMessage(msg: SavedMessage) {
     const timestamp = moment.utc(msg.posted_at).valueOf();
     const globalIdentifier = msg.user_id;
     const perChannelIdentifier = `${msg.channel_id}-${msg.user_id}`;
@@ -957,9 +978,20 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
     }
   }
 
-  protected getMatchingRecentActions(type: RecentActionType, identifier: string | null, since: number) {
+  protected getMatchingRecentActions(type: RecentActionType, identifier: string | null, since: number, to: number) {
     return this.recentActions.filter(action => {
-      return action.type === type && (!identifier || action.identifier === identifier) && action.timestamp >= since;
+      return (
+        action.type === type &&
+        (!identifier || action.identifier === identifier) &&
+        action.timestamp >= since &&
+        action.timestamp <= to
+      );
+    });
+  }
+
+  protected clearRecentActionsForMessage(messageId: string) {
+    this.recentActions = this.recentActions.filter(info => {
+      return !((info as TextRecentAction).messageInfo?.messageId === messageId);
     });
   }
 
@@ -1495,7 +1527,10 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
     } else if (matchResult.trigger === "match_regex") {
       return `regex \`${disableInlineCode(matchResult.matchedValue)}\``;
     } else if (matchResult.trigger === "match_invites") {
-      return `invite code \`${disableInlineCode(matchResult.matchedValue)}\``;
+      if (matchResult.matchedValue.invite) {
+        return `invite code \`${matchResult.matchedValue.code}\` (**${matchResult.matchedValue.invite.guild.name}**, \`${matchResult.matchedValue.invite.guild.id}\`)`;
+      }
+      return `invite code \`${disableInlineCode(matchResult.matchedValue.code)}\``;
     } else if (matchResult.trigger === "match_links") {
       return `link \`${disableInlineCode(matchResult.matchedValue)}\``;
     } else if (matchResult.trigger === "match_attachment_type") {
@@ -1508,14 +1543,16 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
   /**
    * Run automod actions on new messages
    */
-  protected onMessageCreate(msg: SavedMessage) {
-    if (msg.is_bot) return;
+  protected runAutomodOnMessage(msg: SavedMessage, isEdit: boolean) {
     if (this.actionedMessageIds.includes(msg.id)) return;
 
     this.automodQueue.add(async () => {
       if (this.unloaded) return;
 
-      await this.logRecentActionsForMessage(msg);
+      if (isEdit) {
+        this.clearRecentActionsForMessage(msg.id);
+      }
+      this.logRecentActionsForMessage(msg);
 
       const member = this.guild.members.get(msg.user_id);
       const config = this.getMatchingConfig({
@@ -1524,6 +1561,8 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
         channelId: msg.channel_id,
       });
       for (const [name, rule] of Object.entries(config.rules)) {
+        if (msg.is_bot && !rule.affects_bots) continue;
+
         const matchResult = await this.matchRuleToMessage(rule, msg);
         if (matchResult) {
           // Make sure the message still exists in our database when we try to apply actions on it.
@@ -1552,8 +1591,6 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
    */
   @d.event("guildMemberAdd")
   protected onMemberJoin(_, member: Member) {
-    if (member.user.bot) return;
-
     this.automodQueue.add(async () => {
       if (this.unloaded) return;
 
@@ -1568,6 +1605,8 @@ export class AutomodPlugin extends ZeppelinPluginClass<TConfigSchema, ICustomOve
       const config = this.getConfigForMember(member);
 
       for (const [name, rule] of Object.entries(config.rules)) {
+        if (member.user.bot && !rule.affects_bots) continue;
+
         const spamMatch = await this.matchOtherSpamInRule(rule, member.id);
         if (spamMatch) {
           await this.applyActionsOnMatch(rule, spamMatch);

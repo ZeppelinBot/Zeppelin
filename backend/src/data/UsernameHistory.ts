@@ -1,9 +1,24 @@
-import { getRepository, Repository } from "typeorm";
+import { getRepository, In, Repository } from "typeorm";
 import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
-import { sorter } from "../utils";
+import { MINUTES, SECONDS, sorter } from "../utils";
 import { BaseRepository } from "./BaseRepository";
+import { connection } from "./db";
+import { isAPI } from "../globals";
+import { cleanupUsernames } from "./cleanup/usernames";
 
-export const MAX_USERNAME_ENTRIES_PER_USER = 10;
+if (!isAPI()) {
+  const CLEANUP_INTERVAL = 5 * MINUTES;
+
+  async function cleanup() {
+    await cleanupUsernames();
+    setTimeout(cleanup, CLEANUP_INTERVAL);
+  }
+
+  // Start first cleanup 30 seconds after startup
+  setTimeout(cleanup, 30 * SECONDS);
+}
+
+export const MAX_USERNAME_ENTRIES_PER_USER = 5;
 
 export class UsernameHistory extends BaseRepository {
   private usernameHistory: Repository<UsernameHistoryEntry>;
@@ -43,23 +58,18 @@ export class UsernameHistory extends BaseRepository {
     });
 
     // Cleanup (leave only the last MAX_USERNAME_ENTRIES_PER_USER entries)
-    const lastEntries = await this.getByUserId(userId);
-    if (lastEntries.length > MAX_USERNAME_ENTRIES_PER_USER) {
-      const earliestEntry = lastEntries
-        .sort(sorter("timestamp", "DESC"))
-        .slice(0, 10)
-        .reduce((earliest, entry) => {
-          if (earliest == null) return entry;
-          if (entry.id < earliest.id) return entry;
-          return earliest;
-        }, null);
+    const toDelete = await this.usernameHistory
+      .createQueryBuilder()
+      .where("user_id = :userId", { userId })
+      .orderBy("id", "DESC")
+      .skip(MAX_USERNAME_ENTRIES_PER_USER)
+      .take(99_999)
+      .getMany();
 
-      this.usernameHistory
-        .createQueryBuilder()
-        .andWhere("user_id = :userId", { userId })
-        .andWhere("id < :id", { id: earliestEntry.id })
-        .delete()
-        .execute();
+    if (toDelete.length > 0) {
+      await this.usernameHistory.delete({
+        id: In(toDelete.map(v => v.id)),
+      });
     }
   }
 }
