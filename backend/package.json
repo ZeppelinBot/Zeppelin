@@ -27,7 +27,7 @@
     "deep-diff": "^1.0.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
-    "eris": "^0.11.2",
+    "eris": "^0.13.3",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
     "fp-ts": "^2.0.1",
