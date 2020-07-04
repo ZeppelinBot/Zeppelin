@@ -408,7 +408,7 @@ export class TagsPlugin extends ZeppelinPlugin<TConfigSchema> {
       const withoutPrefix = msg.data.content.slice(prefix.length);
 
       for (const [tagName, tagBody] of Object.entries(category.tags)) {
-        const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\s|$)`);
+        const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\\s|$)`);
         if (regex.test(withoutPrefix)) {
           renderedTag = await this.renderSafeTagFromMessage(
             msg.data.content,
