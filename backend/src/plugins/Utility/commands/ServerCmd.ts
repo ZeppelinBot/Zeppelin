@@ -4,17 +4,13 @@ import { embedPadding, formatNumber, memoize, MINUTES, trimLines } from "../../.
 import { utilityCmd } from "../types";
 import humanizeDuration from "humanize-duration";
 
-export const ServerCmd = utilityCmd(
-  "server",
-  {},
+export const ServerCmd = utilityCmd({
+  trigger: "server",
+  description: "Show information about the server",
+  usage: "!server",
+  permission: "can_server",
 
-  {
-    permission: "can_server",
-    description: "Show information about the server",
-    usage: "!server",
-  },
-
-  async ({ message }) => {
+  async run({ message }) {
     const embed: EmbedOptions = {
       fields: [],
       color: parseInt("6b80cf", 16),
@@ -122,5 +118,5 @@ export const ServerCmd = utilityCmd(
     });
 
     message.channel.createMessage({ embed });
-  }
-);
+  },
+});
