@@ -11,6 +11,14 @@ import { Configs } from "./data/Configs";
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
+declare global {
+  // This is here so TypeScript doesn't give an error when importing twemoji
+  // since one of the signatures of twemoji.parse() takes an HTMLElement but
+  // we're not in a browser environment so including the DOM lib would not make
+  // sense
+  type HTMLElement = unknown;
+}
+
 // Error handling
 let recentPluginErrors = 0;
 const RECENT_PLUGIN_ERROR_EXIT_THRESHOLD = 5;
@@ -79,7 +87,7 @@ moment.tz.setDefault("UTC");
 
 import { Client, TextChannel } from "eris";
 import { connect } from "./data/db";
-import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
+import { guildPlugins, globalPlugins } from "./plugins/availablePlugins";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
@@ -107,8 +115,8 @@ connect().then(async () => {
   const guildConfigs = new Configs();
 
   const bot = new Knub<IZeppelinGuildConfig, IZeppelinGlobalConfig>(client, {
-    guildPlugins: availablePlugins,
-    globalPlugins: availableGlobalPlugins,
+    guildPlugins,
+    globalPlugins,
 
     options: {
       canLoadGuild(guildId): Promise<boolean> {
@@ -124,19 +132,11 @@ connect().then(async () => {
       async getEnabledPlugins(this: Knub, guildId, guildConfig): Promise<string[]> {
         const configuredPlugins = guildConfig.plugins || {};
         const pluginNames: string[] = Array.from(this.guildPlugins.keys());
-        const plugins: Array<ZeppelinPlugin> = Array.from(this.guildPlugins.values());
+        const plugins: ZeppelinPlugin[] = Array.from(this.guildPlugins.values());
 
-        const enabledBasePlugins = pluginNames.filter(n => basePlugins.includes(n));
-        const explicitlyEnabledPlugins = pluginNames.filter(pluginName => {
+        return pluginNames.filter(pluginName => {
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
-        const enabledPlugins = new Set([...enabledBasePlugins, ...explicitlyEnabledPlugins]);
-
-        const finalEnabledPlugins = new Set([
-          ...basePlugins,
-          ...explicitlyEnabledPlugins,
-        ]);
-        return Array.from(finalEnabledPlugins.values());
       },
 
       async getConfig(id) {
