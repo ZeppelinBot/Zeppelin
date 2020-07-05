@@ -1,6 +1,6 @@
 import { utilityCmd } from "../types";
 import { baseTypeHelpers as t } from "knub";
-import { customArgumentHelpers as ct } from "../../../customArgumentTypes";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { embedPadding, resolveMember, trimLines, UnknownUser } from "../../../utils";
 import { EmbedOptions, GuildTextableChannel } from "eris";
 import moment from "moment-timezone";

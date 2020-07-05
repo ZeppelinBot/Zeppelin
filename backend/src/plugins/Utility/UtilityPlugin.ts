@@ -11,18 +11,34 @@ import { LevelCmd } from "./commands/LevelCmd";
 import { SearchCmd } from "./commands/SearchCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { InfoCmd } from "./commands/InfoCmd";
+import { NicknameResetCmd } from "./commands/NicknameResetCmd";
+import { NicknameCmd } from "./commands/NicknameCmd";
+import { PingCmd } from "./commands/PingCmd";
+import { SourceCmd } from "./commands/SourceCmd";
+import { ContextCmd } from "./commands/ContextCmd";
+import { VcmoveCmd } from "./commands/VcmoveCmd";
+import { HelpCmd } from "./commands/HelpCmd";
+import { AboutCmd } from "./commands/AboutCmd";
 
 export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
   configSchema: ConfigSchema,
 
   // prettier-ignore
   commands: [
+    SearchCmd,
     BanSearchCmd,
     InfoCmd,
     LevelCmd,
     RolesCmd,
-    SearchCmd,
     ServerCmd,
+    NicknameResetCmd,
+    NicknameCmd,
+    PingCmd,
+    SourceCmd,
+    ContextCmd,
+    VcmoveCmd,
+    HelpCmd,
+    AboutCmd,
   ],
 
   onLoad({ state, guild }) {
