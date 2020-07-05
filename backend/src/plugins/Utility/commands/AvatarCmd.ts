@@ -1,9 +1,8 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { downloadFile, messageLink, SECONDS, UnknownUser } from "../../../utils";
+import { UnknownUser } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { EmbedOptions, TextChannel } from "eris";
-import { activeReloads } from "../guildReloads";
+import { EmbedOptions } from "eris";
 
 export const AvatarCmd = utilityCmd({
   trigger: "avatar",

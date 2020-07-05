@@ -1,7 +1,4 @@
 import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { messageLink } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { activeReloads } from "../guildReloads";
 
