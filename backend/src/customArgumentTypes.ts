@@ -6,7 +6,7 @@ import {
   resolveUser,
   UnknownUser,
 } from "./utils";
-import { Client, GuildChannel, Message } from "eris";
+import { Client, GuildChannel, Member, Message, User } from "eris";
 import { baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 
@@ -50,8 +50,8 @@ export const customArgumentTypes = {
 };
 
 export const customArgumentHelpers = {
-  delay: createTypeHelper(customArgumentTypes.delay),
-  resolvedUser: createTypeHelper(customArgumentTypes.resolvedUser),
-  resolvedUserLoose: createTypeHelper(customArgumentTypes.resolvedUserLoose),
-  resolvedMember: createTypeHelper(customArgumentTypes.resolvedMember),
+  delay: createTypeHelper<number>(customArgumentTypes.delay),
+  resolvedUser: createTypeHelper<Promise<User>>(customArgumentTypes.resolvedUser),
+  resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(customArgumentTypes.resolvedUserLoose),
+  resolvedMember: createTypeHelper<Promise<Member | null>>(customArgumentTypes.resolvedMember),
 };
