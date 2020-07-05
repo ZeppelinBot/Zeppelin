@@ -5,22 +5,20 @@ import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
 import { sendErrorMessage } from "../../../pluginUtils";
 
-export const RolesCmd = utilityCmd(
-  "roles",
-  {
+export const RolesCmd = utilityCmd({
+  trigger: "roles",
+  description: "List all roles or roles matching a search",
+  usage: "!roles mod",
+  permission: "can_roles",
+
+  signature: {
     search: t.string({ catchAll: true }),
 
     counts: t.switchOption(),
     sort: t.string({ option: true }),
   },
 
-  {
-    description: "List all roles or roles matching a search",
-    usage: "!roles mod",
-    permission: "can_roles",
-  },
-
-  async ({ message: msg, args, pluginData }) => {
+  async run({ message: msg, args, pluginData }) {
     const { guild } = pluginData;
 
     let roles: Array<{ _memberCount?: number } & Role> = Array.from((msg.channel as TextChannel).guild.roles.values());
@@ -109,5 +107,5 @@ export const RolesCmd = utilityCmd(
         msg.channel.createMessage("```py\n" + roleLines.join("\n") + "```");
       }
     }
-  }
-);
+  },
+});
