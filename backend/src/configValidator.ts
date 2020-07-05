@@ -3,12 +3,12 @@ import { IPluginOptions } from "knub";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
-import { availablePlugins } from "./plugins/availablePlugins";
+import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const pluginNameToClass = new Map<string, typeof ZeppelinPluginClass>();
-for (const pluginClass of availablePlugins) {
+for (const pluginClass of guildPlugins) {
   // @ts-ignore
   pluginNameToClass.set(pluginClass.pluginName, pluginClass);
 }
