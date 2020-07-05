@@ -15,7 +15,15 @@ import { InfoCmd } from "./commands/InfoCmd";
 export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
   configSchema: ConfigSchema,
 
-  commands: [BanSearchCmd, InfoCmd, LevelCmd, RolesCmd, SearchCmd, ServerCmd],
+  // prettier-ignore
+  commands: [
+    BanSearchCmd,
+    InfoCmd,
+    LevelCmd,
+    RolesCmd,
+    SearchCmd,
+    ServerCmd,
+  ],
 
   onLoad({ state, guild }) {
     state.logs = new GuildLogs(guild.id);
