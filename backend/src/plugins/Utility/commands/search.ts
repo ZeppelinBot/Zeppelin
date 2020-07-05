@@ -20,7 +20,7 @@ export enum SearchType {
   BanSearch,
 }
 
-export class SearchError extends Error {}
+class SearchError extends Error {}
 
 type MemberSearchParams = ArgsFromSignatureOrArray<typeof searchCmdSignature>;
 type BanSearchParams = ArgsFromSignatureOrArray<typeof banSearchSignature>;
