@@ -1,16 +1,19 @@
 import * as t from "io-ts";
-import { IPluginOptions } from "knub";
 import { pipe } from "fp-ts/lib/pipeable";
 import { fold } from "fp-ts/lib/Either";
 import { PathReporter } from "io-ts/lib/PathReporter";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { getPluginName } from "knub/dist/plugins/pluginUtils";
+import { IZeppelinGuildConfig } from "./types";
+import { PluginOptions } from "knub";
 
-const pluginNameToClass = new Map<string, typeof ZeppelinPluginClass>();
-for (const pluginClass of guildPlugins) {
-  // @ts-ignore
-  pluginNameToClass.set(pluginClass.pluginName, pluginClass);
+const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
+for (const plugin of guildPlugins) {
+  const pluginName = getPluginName(plugin);
+  pluginNameToPlugin.set(pluginName, plugin);
 }
 
 const guildConfigRootSchema = t.type({
@@ -33,14 +36,16 @@ export function validateGuildConfig(config: any): string[] | null {
   const validationResult = decodeAndValidateStrict(partialGuildConfigRootSchema, config);
   if (validationResult instanceof StrictValidationError) return validationResult.getErrors();
 
-  if (config.plugins) {
-    for (const [pluginName, pluginOptions] of Object.entries(config.plugins)) {
-      if (!pluginNameToClass.has(pluginName)) {
+  const guildConfig = config as IZeppelinGuildConfig;
+
+  if (guildConfig.plugins) {
+    for (const [pluginName, pluginOptions] of Object.entries(guildConfig.plugins)) {
+      if (!pluginNameToPlugin.has(pluginName)) {
         return [`Unknown plugin: ${pluginName}`];
       }
 
-      const pluginClass = pluginNameToClass.get(pluginName);
-      let pluginErrors = pluginClass.validateOptions(pluginOptions);
+      const plugin = pluginNameToPlugin.get(pluginName);
+      let pluginErrors = plugin.configPreprocessor(pluginOptions as PluginOptions<any>);
       if (pluginErrors) {
         pluginErrors = pluginErrors.map(err => `${pluginName}: ${err}`);
         return pluginErrors;
