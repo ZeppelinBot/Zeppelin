@@ -1,5 +1,6 @@
 import {
-  Attachment, ChannelInvite,
+  Attachment,
+  ChannelInvite,
   Client,
   Embed,
   EmbedOptions,
@@ -7,10 +8,12 @@ import {
   Guild,
   GuildAuditLog,
   GuildAuditLogEntry,
-  GuildChannel, Invite,
+  GuildChannel,
+  Invite,
   Member,
   Message,
   MessageContent,
+  PossiblyUncachedMessage,
   TextableChannel,
   TextChannel,
   User,
@@ -1211,4 +1214,8 @@ export function trimPluginDescription(str) {
   const lines = emptyLinesTrimmed.split("\n");
   const firstLineIndentation = (lines[0].match(/^ +/g) || [""])[0].length;
   return trimIndents(emptyLinesTrimmed, firstLineIndentation);
+}
+
+export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
+  return (msg as Message).createdAt != null;
 }
