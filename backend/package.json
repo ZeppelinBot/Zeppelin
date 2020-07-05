@@ -73,7 +73,7 @@
     "@types/passport-strategy": "^0.2.35",
     "@types/safe-regex": "^1.1.2",
     "@types/tmp": "0.0.33",
-    "ava": "^2.4.0",
+    "ava": "^3.10.0",
     "rimraf": "^2.6.2",
     "source-map-support": "^0.5.16",
     "tsc-watch": "^4.0.0",
