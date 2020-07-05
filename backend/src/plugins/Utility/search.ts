@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
 import safeRegex from "safe-regex";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
-import { sendErrorMessage } from "../../pluginUtils";
+import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
 import { PluginData } from "knub";
 import { ArgsFromSignatureOrArray } from "knub/dist/commands/commandUtils";
 import { searchCmdSignature } from "./commands/SearchCmd";
@@ -205,7 +205,7 @@ export async function archiveSearch(
     moment().add(1, "hour"),
   );
 
-  const baseUrl = (pluginData.getKnubInstance().getGlobalConfig() as any).url; // FIXME: No any cast
+  const baseUrl = getBaseUrl(pluginData);
   const url = await pluginData.state.archives.getUrl(baseUrl, archiveId);
 
   msg.channel.createMessage(`Exported search results: ${url}`);

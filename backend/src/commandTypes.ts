@@ -7,10 +7,12 @@ import {
   UnknownUser,
 } from "./utils";
 import { Client, GuildChannel, Member, Message, User } from "eris";
-import { baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
+import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 
-export const customArgumentTypes = {
+export const commandTypes = {
+  ...baseTypeConverters,
+
   delay(value) {
     const result = convertDelayStringToMS(value);
     if (result == null) {
@@ -49,9 +51,11 @@ export const customArgumentTypes = {
   },
 };
 
-export const customArgumentHelpers = {
-  delay: createTypeHelper<number>(customArgumentTypes.delay),
-  resolvedUser: createTypeHelper<Promise<User>>(customArgumentTypes.resolvedUser),
-  resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(customArgumentTypes.resolvedUserLoose),
-  resolvedMember: createTypeHelper<Promise<Member | null>>(customArgumentTypes.resolvedMember),
+export const commandTypeHelpers = {
+  ...baseTypeHelpers,
+
+  delay: createTypeHelper<number>(commandTypes.delay),
+  resolvedUser: createTypeHelper<Promise<User>>(commandTypes.resolvedUser),
+  resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
+  resolvedMember: createTypeHelper<Promise<Member | null>>(commandTypes.resolvedMember),
 };
