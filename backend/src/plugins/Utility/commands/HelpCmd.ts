@@ -1,9 +1,6 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { createChunkedMessage, messageLink } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
-import { ZeppelinPlugin } from "../../ZeppelinPlugin";
+import { createChunkedMessage } from "../../../utils";
 import { PluginCommandDefinition } from "knub/dist/commands/commandUtils";
 import { LoadedPlugin } from "knub";
 

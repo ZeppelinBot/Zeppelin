@@ -1,9 +1,6 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { downloadFile, messageLink, SECONDS } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
-import { activeReloads } from "../guildReloads";
+import { downloadFile, SECONDS } from "../../../utils";
 import fs from "fs";
 import sharp from "sharp";
 import twemoji from "twemoji";

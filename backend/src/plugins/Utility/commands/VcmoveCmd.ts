@@ -4,12 +4,11 @@ import {
   channelMentionRegex,
   errorMessage,
   isSnowflake,
-  messageLink,
   simpleClosestStringMatch,
   stripObjectToScalars,
 } from "../../../utils";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { TextChannel, VoiceChannel } from "eris";
+import { VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
 
 export const VcmoveCmd = utilityCmd({

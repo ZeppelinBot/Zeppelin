@@ -1,8 +1,6 @@
 import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { messageLink, multiSorter, resolveMember, sorter } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { GuildChannel, MessageContent, TextChannel } from "eris";
+import { multiSorter, resolveMember, sorter } from "../../../utils";
+import { GuildChannel, MessageContent } from "eris";
 import { getCurrentUptime } from "../../../uptime";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
