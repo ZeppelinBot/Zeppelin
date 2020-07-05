@@ -1,10 +1,8 @@
 import express from "express";
-import { availablePlugins } from "../plugins/availablePlugins";
-import { ZeppelinPluginClass } from "../plugins/ZeppelinPluginClass";
+import { guildPlugins } from "../plugins/availablePlugins";
 import { notFound } from "./responses";
-import { dropPropertiesByName, indentLines } from "../utils";
-import { IPluginCommandConfig, Plugin, pluginUtils } from "knub";
-import { parseParameters } from "knub-command-manager";
+import { indentLines } from "../utils";
+import { getPluginName } from "knub/dist/plugins/pluginUtils";
 
 function formatConfigSchema(schema) {
   if (schema._tag === "InterfaceType" || schema._tag === "PartialType") {
@@ -33,14 +31,14 @@ function formatConfigSchema(schema) {
 }
 
 export function initDocs(app: express.Express) {
-  const docsPlugins = availablePlugins.filter(pluginClass => pluginClass.showInDocs);
+  const docsPlugins = guildPlugins.filter(pluginClass => pluginClass.showInDocs);
 
   app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
       docsPlugins.map(pluginClass => {
-        const thinInfo = pluginClass.pluginInfo ? { prettyName: pluginClass.pluginInfo.prettyName } : {};
+        const thinInfo = pluginClass.info ? { prettyName: pluginClass.info.prettyName } : {};
         return {
-          name: pluginClass.pluginName,
+          name: pluginClass.info,
           info: thinInfo,
         };
       }),
@@ -48,40 +46,26 @@ export function initDocs(app: express.Express) {
   });
 
   app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
-    const pluginClass = docsPlugins.find(obj => obj.pluginName === req.params.pluginName);
-    if (!pluginClass) {
+    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName);
+    if (!plugin) {
       return notFound(res);
     }
 
-    const decoratorCommands = pluginUtils.getPluginDecoratorCommands(pluginClass as typeof Plugin) || [];
-    const commands = decoratorCommands.map(cmd => {
-      const trigger = typeof cmd.trigger === "string" ? cmd.trigger : cmd.trigger.source;
-      const parameters = cmd.parameters
-        ? typeof cmd.parameters === "string"
-          ? parseParameters(cmd.parameters)
-          : cmd.parameters
-        : [];
-      const config: IPluginCommandConfig = cmd.config || {};
-      if (config.overloads) {
-        config.overloads = config.overloads.map(overload => {
-          return typeof overload === "string" ? parseParameters(overload) : overload;
-        });
-      }
+    const name = getPluginName(plugin);
+    const info = plugin.info || {};
 
-      return {
-        trigger,
-        parameters,
-        config,
-      };
-    });
+    const commands = plugin.commands.map(cmd => ({
+      trigger: cmd.trigger,
+      signature: cmd.signature,
+      config: cmd.config,
+    }));
 
-    const defaultOptions = (pluginClass as typeof ZeppelinPluginClass).getStaticDefaultOptions();
-
-    const configSchema = pluginClass.configSchema && formatConfigSchema(pluginClass.configSchema);
+    const defaultOptions = plugin.defaultOptions;
+    const configSchema = plugin.configSchema && formatConfigSchema(plugin.configSchema);
 
     res.json({
-      name: pluginClass.pluginName,
-      info: pluginClass.pluginInfo || {},
+      name,
+      info,
       configSchema,
       defaultOptions,
       commands,
