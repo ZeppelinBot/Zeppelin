@@ -19,9 +19,61 @@ import { ContextCmd } from "./commands/ContextCmd";
 import { VcmoveCmd } from "./commands/VcmoveCmd";
 import { HelpCmd } from "./commands/HelpCmd";
 import { AboutCmd } from "./commands/AboutCmd";
+import { PluginOptions } from "knub";
+
+const defaultOptions: PluginOptions<UtilityPluginType> = {
+  config: {
+    can_roles: false,
+    can_level: false,
+    can_search: false,
+    can_clean: false,
+    can_info: false,
+    can_server: false,
+    can_reload_guild: false,
+    can_nickname: false,
+    can_ping: false,
+    can_source: false,
+    can_vcmove: false,
+    can_help: false,
+    can_about: false,
+    can_context: false,
+    can_jumbo: false,
+    jumbo_size: 128,
+    can_avatar: false,
+  },
+  overrides: [
+    {
+      level: ">=50",
+      config: {
+        can_roles: true,
+        can_level: true,
+        can_search: true,
+        can_clean: true,
+        can_info: true,
+        can_server: true,
+        can_nickname: true,
+        can_vcmove: true,
+        can_help: true,
+        can_context: true,
+        can_jumbo: true,
+        can_avatar: true,
+      },
+    },
+    {
+      level: ">=100",
+      config: {
+        can_reload_guild: true,
+        can_ping: true,
+        can_source: true,
+        can_about: true,
+      },
+    },
+  ],
+};
 
 export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
   configSchema: ConfigSchema,
+  defaultOptions,
 
   // prettier-ignore
   commands: [
