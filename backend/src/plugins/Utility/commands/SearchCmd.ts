@@ -1,6 +1,6 @@
 import { utilityCmd } from "../types";
 import { baseTypeHelpers as t } from "knub";
-import { archiveSearch, displaySearch, SearchType } from "./search";
+import { archiveSearch, displaySearch, SearchType } from "../search";
 
 // Separate from SearchCmd to avoid a circular reference from ./search.ts
 export const searchCmdSignature = {

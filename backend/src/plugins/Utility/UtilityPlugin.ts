@@ -8,15 +8,14 @@ import { Supporters } from "../../data/Supporters";
 import { ServerCmd } from "./commands/ServerCmd";
 import { RolesCmd } from "./commands/RolesCmd";
 import { LevelCmd } from "./commands/LevelCmd";
+import { SearchCmd } from "./commands/SearchCmd";
+import { BanSearchCmd } from "./commands/BanSearchCmd";
+import { InfoCmd } from "./commands/InfoCmd";
 
 export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
   configSchema: ConfigSchema,
 
-  commands: [
-    LevelCmd,
-    RolesCmd,
-    ServerCmd,
-  ],
+  commands: [BanSearchCmd, InfoCmd, LevelCmd, RolesCmd, SearchCmd, ServerCmd],
 
   onLoad({ state, guild }) {
     state.logs = new GuildLogs(guild.id);
@@ -26,5 +25,5 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     state.supporters = new Supporters();
 
     state.lastReload = Date.now();
-  }
+  },
 });
