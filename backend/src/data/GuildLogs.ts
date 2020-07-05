@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import * as events from "events";
 import { LogType } from "./LogType";
 
 // Use the same instance for the same guild, even if a new instance is created
@@ -9,7 +9,7 @@ interface IIgnoredLog {
   ignoreId: any;
 }
 
-export class GuildLogs extends EventEmitter {
+export class GuildLogs extends events.EventEmitter {
   protected guildId: string;
   protected ignoredLogs: IIgnoredLog[];
 

@@ -4,4 +4,4 @@ import { ZeppelinPluginBlueprint } from "./ZeppelinPluginBlueprint";
 // prettier-ignore
 export type ZeppelinPlugin =
   | typeof ZeppelinPluginClass
-  | ZeppelinPluginBlueprint;
+  | ZeppelinPluginBlueprint<any>;

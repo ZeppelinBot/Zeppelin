@@ -9,7 +9,6 @@ import {
   GuildAuditLog,
   GuildAuditLogEntry,
   GuildChannel,
-  Invite,
   Member,
   Message,
   MessageContent,
@@ -28,7 +27,7 @@ const fsp = fs.promises;
 
 import https from "https";
 import tmp from "tmp";
-import { logger, waitForReaction } from "knub";
+import { logger, helpers } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { either } from "fp-ts/lib/Either";
@@ -1072,7 +1071,7 @@ export async function resolveInvite(code: string): Promise<ChannelInvite | null>
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
   const msg = await channel.createMessage(content);
-  const reply = await waitForReaction(bot, msg, ["✅", "❌"], userId);
+  const reply = await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId);
   msg.delete().catch(noop);
   return reply && reply.name === "✅";
 }
