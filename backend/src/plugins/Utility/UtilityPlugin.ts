@@ -20,6 +20,11 @@ import { VcmoveCmd } from "./commands/VcmoveCmd";
 import { HelpCmd } from "./commands/HelpCmd";
 import { AboutCmd } from "./commands/AboutCmd";
 import { PluginOptions } from "knub";
+import { activeReloads } from "./guildReloads";
+import { sendSuccessMessage } from "../../pluginUtils";
+import { ReloadGuildCmd } from "./commands/ReloadGuildCmd";
+import { JumboCmd } from "./commands/JumboCmd";
+import { AvatarCmd } from "./commands/AvatarCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -91,9 +96,14 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     VcmoveCmd,
     HelpCmd,
     AboutCmd,
+    ReloadGuildCmd,
+    JumboCmd,
+    AvatarCmd,
   ],
 
-  onLoad({ state, guild }) {
+  onLoad(pluginData) {
+    const { state, guild } = pluginData;
+
     state.logs = new GuildLogs(guild.id);
     state.cases = GuildCases.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
@@ -101,5 +111,10 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     state.supporters = new Supporters();
 
     state.lastReload = Date.now();
+
+    if (activeReloads.has(guild.id)) {
+      sendSuccessMessage(pluginData, activeReloads.get(guild.id), "Reloaded!");
+      activeReloads.delete(guild.id);
+    }
   },
 });
