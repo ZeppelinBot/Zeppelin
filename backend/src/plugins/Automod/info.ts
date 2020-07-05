@@ -1,4 +1,4 @@
-import { PluginInfo, trimPluginDescription } from "../ZeppelinPluginClass";
+import { ZeppelinPluginInfo, trimPluginDescription } from "../ZeppelinPluginClass";
 
 export const pluginInfo: PluginInfo = {
   prettyName: "Automod",

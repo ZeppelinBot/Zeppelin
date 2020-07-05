@@ -1,5 +1,5 @@
 import {
-  Attachment,
+  Attachment, ChannelInvite,
   Client,
   Embed,
   EmbedOptions,
@@ -7,7 +7,7 @@ import {
   Guild,
   GuildAuditLog,
   GuildAuditLogEntry,
-  GuildChannel,
+  GuildChannel, Invite,
   Member,
   Message,
   MessageContent,
@@ -31,6 +31,9 @@ import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils
 import { either } from "fp-ts/lib/Either";
 import safeRegex from "safe-regex";
 import moment from "moment-timezone";
+import { performance } from "perf_hooks";
+import { ERRORS } from "./RecoverablePluginError";
+import { SimpleCache } from "./SimpleCache";
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -937,6 +940,19 @@ export function resolveUserId(bot: Client, value: string) {
   return null;
 }
 
+/**
+ * Finds a matching User for the passed user id, user mention, or full username (with discriminator).
+ * If a user is not found, returns an UnknownUser instead.
+ */
+export function getUser(userResolvable: string): User | UnknownUser {
+  const id = resolveUserId(this.client, userResolvable);
+  return id ? this.client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+}
+
+/**
+ * Resolves a User from the passed string. The passed string can be a user id, a user mention, a full username (with discrim), etc.
+ * If the user is not found in the cache, it's fetched from the API.
+ */
 export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser>;
 export async function resolveUser<T>(bot: Client, value: Not<T, string>): Promise<UnknownUser>;
 export async function resolveUser<T>(bot, value) {
@@ -972,6 +988,10 @@ export async function resolveUser<T>(bot, value) {
   return new UnknownUser({ id: userId });
 }
 
+/**
+ * Resolves a guild Member from the passed user id, user mention, or full username (with discriminator).
+ * If the member is not found in the cache, it's fetched from the API.
+ */
 export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
   const userId = resolveUserId(bot, value);
   if (!userId) return null;
@@ -1002,6 +1022,12 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   return null;
 }
 
+/**
+ * Resolves a role from the passed role ID, role mention, or role name.
+ * In the event of duplicate role names, this function will return the first one it comes across.
+ *
+ * FIXME: Define "first one it comes across" better
+ */
 export async function resolveRoleId(bot: Client, guildId: string, value: string) {
   if (value == null) {
     return null;
@@ -1026,6 +1052,19 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
     return value;
   }
   return null;
+}
+
+const inviteCache = new SimpleCache<Promise<ChannelInvite>>(10 * MINUTES, 200);
+
+export async function resolveInvite(code: string): Promise<ChannelInvite | null> {
+  if (inviteCache.has(code)) {
+    return inviteCache.get(code);
+  }
+
+  const promise = this.client.getInvite(code).catch(() => null);
+  inviteCache.set(code, promise);
+
+  return promise;
 }
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
@@ -1151,4 +1190,25 @@ export async function renderRecursively(value, fn: RecursiveRenderFn) {
   }
 
   return value;
+}
+
+export function canUseEmoji(client: Client, emoji: string): boolean {
+  if (isUnicodeEmoji(emoji)) {
+    return true;
+  } else if (isSnowflake(emoji)) {
+    for (const guild of client.guilds.values()) {
+      if (guild.emojis.some(e => (e as any).id === emoji)) {
+        return true;
+      }
+    }
+  } else {
+    throw new Error(`Invalid emoji ${emoji}`);
+  }
+}
+
+export function trimPluginDescription(str) {
+  const emptyLinesTrimmed = trimEmptyStartEndLines(str);
+  const lines = emptyLinesTrimmed.split("\n");
+  const firstLineIndentation = (lines[0].match(/^ +/g) || [""])[0].length;
+  return trimIndents(emptyLinesTrimmed, firstLineIndentation);
 }
