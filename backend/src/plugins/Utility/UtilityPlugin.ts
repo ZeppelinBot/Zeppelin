@@ -25,6 +25,7 @@ import { sendSuccessMessage } from "../../pluginUtils";
 import { ReloadGuildCmd } from "./commands/ReloadGuildCmd";
 import { JumboCmd } from "./commands/JumboCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
+import { CleanCmd } from "./commands/CleanCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -99,6 +100,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     ReloadGuildCmd,
     JumboCmd,
     AvatarCmd,
+    CleanCmd,
   ],
 
   onLoad(pluginData) {

@@ -54,12 +54,12 @@ export function pluginConfigPreprocessor(
 
 export function sendSuccessMessage(pluginData: PluginData<any>, channel, body) {
   const emoji = pluginData.guildConfig.success_emoji || undefined;
-  channel.createMessage(successMessage(body, emoji));
+  return channel.createMessage(successMessage(body, emoji));
 }
 
 export function sendErrorMessage(pluginData: PluginData<any>, channel, body) {
   const emoji = pluginData.guildConfig.error_emoji || undefined;
-  channel.createMessage(errorMessage(body, emoji));
+  return channel.createMessage(errorMessage(body, emoji));
 }
 
 export function getBaseUrl(pluginData: PluginData<any>) {
