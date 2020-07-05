@@ -4,7 +4,7 @@ import { CaseTypes } from "../data/CaseTypes";
 import { Case } from "../data/entities/Case";
 import moment from "moment-timezone";
 import { CaseTypeColors } from "../data/CaseTypeColors";
-import { PluginInfo, trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
+import { ZeppelinPluginInfo, trimPluginDescription, ZeppelinPluginClass } from "./ZeppelinPluginClass";
 import { GuildArchives } from "../data/GuildArchives";
 import { IPluginOptions, logger } from "knub";
 import { GuildLogs } from "../data/GuildLogs";

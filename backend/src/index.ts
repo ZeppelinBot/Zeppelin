@@ -4,7 +4,7 @@ import yaml from "js-yaml";
 import fs from "fs";
 const fsp = fs.promises;
 
-import { Knub, logger, PluginError, Plugin, IGlobalConfig, IGuildConfig } from "knub";
+import { Knub, logger, PluginError, pluginUtils } from "knub";
 import { SimpleError } from "./SimpleError";
 
 import { Configs } from "./data/Configs";
@@ -63,7 +63,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Verify required Node.js version
-const REQUIRED_NODE_VERSION = "10.14.2";
+const REQUIRED_NODE_VERSION = "14.0.0";
 const requiredParts = REQUIRED_NODE_VERSION.split(".").map(v => parseInt(v, 10));
 const actualVersionParts = process.versions.node.split(".").map(v => parseInt(v, 10));
 for (const [i, part] of actualVersionParts.entries()) {
@@ -80,8 +80,6 @@ moment.tz.setDefault("UTC");
 import { Client, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { availablePlugins, availableGlobalPlugins, basePlugins } from "./plugins/availablePlugins";
-import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
-import { customArgumentTypes } from "./customArgumentTypes";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
@@ -89,6 +87,7 @@ import { IZeppelinGuildConfig, IZeppelinGlobalConfig } from "./types";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 
 logger.info("Connecting to database");
 connect().then(async () => {
@@ -119,16 +118,13 @@ connect().then(async () => {
       /**
        * Plugins are enabled if they...
        * - are base plugins, i.e. always enabled, or
-       * - are dependencies of other enabled plugins, or
        * - are explicitly enabled in the guild config
+       * Dependencies are also automatically loaded by Knub.
        */
-      async getEnabledPlugins(guildId, guildConfig): Promise<string[]> {
+      async getEnabledPlugins(this: Knub, guildId, guildConfig): Promise<string[]> {
         const configuredPlugins = guildConfig.plugins || {};
-        const pluginNames: string[] = Array.from(this.plugins.keys());
-        const plugins: Array<typeof Plugin> = Array.from(this.plugins.values());
-        const zeppelinPlugins: Array<typeof ZeppelinPluginClass> = plugins.filter(
-          p => p.prototype instanceof ZeppelinPluginClass,
-        ) as Array<typeof ZeppelinPluginClass>;
+        const pluginNames: string[] = Array.from(this.guildPlugins.keys());
+        const plugins: Array<ZeppelinPlugin> = Array.from(this.guildPlugins.values());
 
         const enabledBasePlugins = pluginNames.filter(n => basePlugins.includes(n));
         const explicitlyEnabledPlugins = pluginNames.filter(pluginName => {
@@ -136,14 +132,8 @@ connect().then(async () => {
         });
         const enabledPlugins = new Set([...enabledBasePlugins, ...explicitlyEnabledPlugins]);
 
-        const pluginsEnabledAsDependencies = zeppelinPlugins.reduce((arr, pluginClass) => {
-          if (!enabledPlugins.has(pluginClass.pluginName)) return arr;
-          return arr.concat(pluginClass.dependencies);
-        }, []);
-
         const finalEnabledPlugins = new Set([
           ...basePlugins,
-          ...pluginsEnabledAsDependencies,
           ...explicitlyEnabledPlugins,
         ]);
         return Array.from(finalEnabledPlugins.values());
@@ -171,8 +161,6 @@ connect().then(async () => {
         size: 30,
         threshold: 200,
       },
-
-      customArgumentTypes,
 
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;

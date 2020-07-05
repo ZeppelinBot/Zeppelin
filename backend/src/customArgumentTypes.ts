@@ -7,7 +7,8 @@ import {
   UnknownUser,
 } from "./utils";
 import { Client, GuildChannel, Message } from "eris";
-import { ICommandContext, TypeConversionError } from "knub";
+import { baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
+import { createTypeHelper } from "knub-command-manager";
 
 export const customArgumentTypes = {
   delay(value) {
@@ -19,26 +20,26 @@ export const customArgumentTypes = {
     return result;
   },
 
-  async resolvedUser(value, context: ICommandContext) {
-    const result = await resolveUser(context.bot, value);
+  async resolvedUser(value, context: CommandContext<any>) {
+    const result = await resolveUser(context.pluginData.client, value);
     if (result == null || result instanceof UnknownUser) {
       throw new TypeConversionError(`User \`${disableCodeBlocks(value)}\` was not found`);
     }
     return result;
   },
 
-  async resolvedUserLoose(value, context: ICommandContext) {
-    const result = await resolveUser(context.bot, value);
+  async resolvedUserLoose(value, context: CommandContext<any>) {
+    const result = await resolveUser(context.pluginData.client, value);
     if (result == null) {
       throw new TypeConversionError(`Invalid user: \`${disableCodeBlocks(value)}\``);
     }
     return result;
   },
 
-  async resolvedMember(value, context: ICommandContext) {
+  async resolvedMember(value, context: CommandContext<any>) {
     if (!(context.message.channel instanceof GuildChannel)) return null;
 
-    const result = await resolveMember(context.bot, context.message.channel.guild, value);
+    const result = await resolveMember(context.pluginData.client, context.message.channel.guild, value);
     if (result == null) {
       throw new TypeConversionError(
         `Member \`${disableCodeBlocks(value)}\` was not found or they have left the server`,
@@ -46,4 +47,11 @@ export const customArgumentTypes = {
     }
     return result;
   },
+};
+
+export const customArgumentHelpers = {
+  delay: createTypeHelper(customArgumentTypes.delay),
+  resolvedUser: createTypeHelper(customArgumentTypes.resolvedUser),
+  resolvedUserLoose: createTypeHelper(customArgumentTypes.resolvedUserLoose),
+  resolvedMember: createTypeHelper(customArgumentTypes.resolvedMember),
 };

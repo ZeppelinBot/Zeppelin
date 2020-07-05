@@ -33,7 +33,7 @@ import { AutoDeletePlugin } from "./AutoDelete";
 /**
  * Plugins available to be loaded for individual guilds
  */
-export const availablePlugins = [
+export const oldAvailablePlugins = [
   AutomodPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
@@ -67,7 +67,7 @@ export const availablePlugins = [
 /**
  * Plugins that are always loaded (subset of the names of the plugins in availablePlugins)
  */
-export const basePlugins = [
+export const oldBasePlugins = [
   GuildInfoSaverPlugin.pluginName,
   MessageSaverPlugin.pluginName,
   NameHistoryPlugin.pluginName,
@@ -78,4 +78,12 @@ export const basePlugins = [
 /**
  * Available global plugins (can't be loaded per-guild, only globally)
  */
-export const availableGlobalPlugins = [BotControlPlugin, UsernameSaver, GuildConfigReloader];
+export const oldAvailableGlobalPlugins = [BotControlPlugin, UsernameSaver, GuildConfigReloader];
+
+export const availablePlugins = [
+  UtilityPlugin,
+];
+
+export const basePlugins = [];
+
+export const availableGlobalPlugins = [];
