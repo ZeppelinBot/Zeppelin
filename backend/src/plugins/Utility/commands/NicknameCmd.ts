@@ -1,6 +1,5 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { baseTypeHelpers as t } from "knub";
 import { errorMessage } from "../../../utils";
 import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 
@@ -12,7 +11,7 @@ export const NicknameCmd = utilityCmd({
 
   signature: {
     member: ct.resolvedMember(),
-    nickname: t.string({ catchAll: true }),
+    nickname: ct.string({ catchAll: true }),
   },
 
   async run({ message: msg, args, pluginData }) {

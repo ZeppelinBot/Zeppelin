@@ -1,21 +1,21 @@
 import { utilityCmd } from "../types";
-import { baseTypeHelpers as t } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { archiveSearch, displaySearch, SearchType } from "../search";
 
 // Separate from SearchCmd to avoid a circular reference from ./search.ts
 export const searchCmdSignature = {
-  query: t.string({ catchAll: true }),
+  query: ct.string({ catchAll: true }),
 
-  page: t.number({ option: true, shortcut: "p" }),
-  role: t.string({ option: true, shortcut: "r" }),
-  voice: t.switchOption({ shortcut: "v" }),
-  bot: t.switchOption({ shortcut: "b" }),
-  sort: t.string({ option: true }),
-  "case-sensitive": t.switchOption({ shortcut: "cs" }),
-  export: t.switchOption({ shortcut: "e" }),
-  ids: t.switchOption(),
-  regex: t.switchOption({ shortcut: "re" }),
-  "status-search": t.switchOption({ shortcut: "ss" }),
+  page: ct.number({ option: true, shortcut: "p" }),
+  role: ct.string({ option: true, shortcut: "r" }),
+  voice: ct.switchOption({ shortcut: "v" }),
+  bot: ct.switchOption({ shortcut: "b" }),
+  sort: ct.string({ option: true }),
+  "case-sensitive": ct.switchOption({ shortcut: "cs" }),
+  export: ct.switchOption({ shortcut: "e" }),
+  ids: ct.switchOption(),
+  regex: ct.switchOption({ shortcut: "re" }),
+  "status-search": ct.switchOption({ shortcut: "ss" }),
 };
 
 export const SearchCmd = utilityCmd({
