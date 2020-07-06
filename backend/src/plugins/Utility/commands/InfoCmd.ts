@@ -1,5 +1,4 @@
 import { utilityCmd } from "../types";
-import { baseTypeHelpers as t } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { embedPadding, resolveMember, trimLines, UnknownUser } from "../../../utils";
 import { EmbedOptions, GuildTextableChannel } from "eris";
@@ -16,7 +15,7 @@ export const InfoCmd = utilityCmd({
   signature: {
     user: ct.resolvedUserLoose({ required: false }),
 
-    compact: t.switchOption({ shortcut: "c" }),
+    compact: ct.switchOption({ shortcut: "c" }),
   },
 
   async run({ message: msg, args, pluginData }) {

@@ -1,17 +1,17 @@
 import { utilityCmd } from "../types";
-import { baseTypeHelpers as t } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { archiveSearch, displaySearch, SearchType } from "../search";
 
 // Separate from BanSearchCmd to avoid a circular reference from ./search.ts
 export const banSearchSignature = {
-  query: t.string({ catchAll: true }),
+  query: ct.string({ catchAll: true }),
 
-  page: t.number({ option: true, shortcut: "p" }),
-  sort: t.string({ option: true }),
-  "case-sensitive": t.switchOption({ shortcut: "cs" }),
-  export: t.switchOption({ shortcut: "e" }),
-  ids: t.switchOption(),
-  regex: t.switchOption({ shortcut: "re" }),
+  page: ct.number({ option: true, shortcut: "p" }),
+  sort: ct.string({ option: true }),
+  "case-sensitive": ct.switchOption({ shortcut: "cs" }),
+  export: ct.switchOption({ shortcut: "e" }),
+  ids: ct.switchOption(),
+  regex: ct.switchOption({ shortcut: "re" }),
 };
 
 export const BanSearchCmd = utilityCmd({

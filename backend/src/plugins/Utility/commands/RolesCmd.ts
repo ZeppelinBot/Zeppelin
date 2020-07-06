@@ -1,5 +1,5 @@
 import { utilityCmd } from "../types";
-import { baseTypeHelpers as t } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Role, TextChannel } from "eris";
 import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
@@ -12,10 +12,10 @@ export const RolesCmd = utilityCmd({
   permission: "can_roles",
 
   signature: {
-    search: t.string({ catchAll: true }),
+    search: ct.string({ catchAll: true }),
 
-    counts: t.switchOption(),
-    sort: t.string({ option: true }),
+    counts: ct.switchOption(),
+    sort: ct.string({ option: true }),
   },
 
   async run({ message: msg, args, pluginData }) {
