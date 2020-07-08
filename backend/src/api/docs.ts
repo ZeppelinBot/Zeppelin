@@ -3,6 +3,7 @@ import { guildPlugins } from "../plugins/availablePlugins";
 import { notFound } from "./responses";
 import { indentLines } from "../utils";
 import { getPluginName } from "knub/dist/plugins/pluginUtils";
+import { ZeppelinPluginBlueprint } from "src/plugins/ZeppelinPluginBlueprint";
 
 function formatConfigSchema(schema) {
   if (schema._tag === "InterfaceType" || schema._tag === "PartialType") {
@@ -46,7 +47,9 @@ export function initDocs(app: express.Express) {
   });
 
   app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
-    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName);
+    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName) as ZeppelinPluginBlueprint<
+      any
+    >;
     if (!plugin) {
       return notFound(res);
     }
