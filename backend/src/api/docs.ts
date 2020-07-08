@@ -47,9 +47,8 @@ export function initDocs(app: express.Express) {
   });
 
   app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
-    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName) as ZeppelinPluginBlueprint<
-      any
-    >;
+    // prettier-ignore
+    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName) as ZeppelinPluginBlueprint<any>;
     if (!plugin) {
       return notFound(res);
     }
