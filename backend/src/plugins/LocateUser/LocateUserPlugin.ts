@@ -33,13 +33,19 @@ export const LocateUserPlugin = zeppelinPlugin<LocateUserPluginType>()("locate_u
 
   // prettier-ignore
   commands: [
-        WhereCmd,
-        FollowCmd,
-        ListFollowCmd,
-        DeleteFollowCmd,
-    ],
+    WhereCmd,
+    FollowCmd,
+    ListFollowCmd,
+    DeleteFollowCmd,
+  ],
 
-  events: [ChannelJoinEvt, ChannelSwitchEvt, ChannelLeaveEvt, GuildBanAddEvt],
+  // prettier-ignore
+  events: [
+    ChannelJoinEvt, 
+    ChannelSwitchEvt, 
+    ChannelLeaveEvt, 
+    GuildBanAddEvt
+  ],
 
   onLoad(pluginData) {
     const { state, guild } = pluginData;
