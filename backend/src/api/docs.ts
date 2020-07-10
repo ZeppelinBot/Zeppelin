@@ -48,7 +48,7 @@ export function initDocs(app: express.Express) {
 
   app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
     // prettier-ignore
-    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName) as ZeppelinPluginBlueprint<any>;
+    const plugin = docsPlugins.find(obj => getPluginName(obj) === req.params.pluginName);
     if (!plugin) {
       return notFound(res);
     }
@@ -56,13 +56,13 @@ export function initDocs(app: express.Express) {
     const name = getPluginName(plugin);
     const info = plugin.info || {};
 
-    const commands = plugin.commands.map(cmd => ({
+    const commands = (plugin.commands || []).map(cmd => ({
       trigger: cmd.trigger,
       signature: cmd.signature,
       config: cmd.config,
     }));
 
-    const defaultOptions = plugin.defaultOptions;
+    const defaultOptions = plugin.defaultOptions || {};
     const configSchema = plugin.configSchema && formatConfigSchema(plugin.configSchema);
 
     res.json({
