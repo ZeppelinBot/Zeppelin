@@ -13,7 +13,7 @@ export const FollowCmd = locateUserCommand({
 
   signature: {
     member: ct.resolvedMember(),
-    reminder: ct.string({ required: false, rest: true }),
+    reminder: ct.string({ required: false, catchAll: true }),
 
     duration: ct.delay({ option: true, shortcut: "d" }),
     active: ct.bool({ option: true, shortcut: "a" }),
