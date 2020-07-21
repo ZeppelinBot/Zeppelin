@@ -3,7 +3,7 @@ import { isDiscordRESTError } from "src/utils";
 import { logger } from "knub";
 import { LogType } from "src/data/LogType";
 
-export const MessageCreateEvt = autoReactionsEvt({
+export const AddReactionsEvt = autoReactionsEvt({
   event: "messageCreate",
   allowOutsideOfGuild: false,
 
