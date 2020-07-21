@@ -13,9 +13,9 @@ import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   AutoReactionsPlugin,
   LocateUserPlugin,
-  PersistPlugin,
-  NameHistoryPlugin,
   MessageSaverPlugin,
+  NameHistoryPlugin,
+  PersistPlugin,
   RemindersPlugin,
   UsernameSaverPlugin,
   UtilityPlugin,

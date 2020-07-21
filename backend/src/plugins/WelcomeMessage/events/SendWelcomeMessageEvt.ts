@@ -4,7 +4,7 @@ import { stripObjectToScalars, createChunkedMessage } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { TextChannel } from "eris";
 
-export const GuildMemberAddEvt = welcomeEvent({
+export const SendWelcomeMessageEvt = welcomeEvent({
   event: "guildMemberAdd",
 
   async listener(meta) {
