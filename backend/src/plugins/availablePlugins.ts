@@ -10,6 +10,8 @@ import { UsernameSaverPlugin } from "./UsernameSaver/UsernameSaverPlugin";
 import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
 import { PingableRolesPlugin } from "./PingableRoles/PingableRolesPlugin";
 import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigReloaderPlugin";
+import { CasesPlugin } from "./Cases/CasesPlugin";
+import { MutesPlugin } from "./Mutes/MutesPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -23,6 +25,8 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   UsernameSaverPlugin,
   UtilityPlugin,
   WelcomeMessagePlugin,
+  CasesPlugin,
+  MutesPlugin,
 ];
 
 // prettier-ignore
