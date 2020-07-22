@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import passport, { Strategy } from "passport";
+import passport from "passport";
 import OAuth2Strategy from "passport-oauth2";
 import { Strategy as CustomStrategy } from "passport-custom";
 import { ApiLogins } from "../data/ApiLogins";

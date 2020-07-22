@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener, command } from "knub";
+import { BasePluginType, command, eventListener } from "knub";
 import { GuildPingableRoles } from "src/data/GuildPingableRoles";
 import { PingableRole } from "src/data/entities/PingableRole";
 

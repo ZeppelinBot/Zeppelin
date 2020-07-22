@@ -1,6 +1,6 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { WelcomeMessagePluginType, ConfigSchema } from "./types";
+import { ConfigSchema, WelcomeMessagePluginType } from "./types";
 import { GuildLogs } from "src/data/GuildLogs";
 import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
 

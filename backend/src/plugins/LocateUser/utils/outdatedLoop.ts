@@ -12,6 +12,6 @@ export async function outdatedAlertsLoop(pluginData) {
   }
 
   if (!pluginData.state.unloaded) {
-    pluginData.state.outdatedAlertsTimeout = setTimeout(() => this.outdatedAlertsLoop(pluginData), ALERT_LOOP_TIME);
+    pluginData.state.outdatedAlertsTimeout = setTimeout(() => outdatedAlertsLoop(pluginData), ALERT_LOOP_TIME);
   }
 }

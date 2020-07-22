@@ -8,8 +8,8 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildMutes } from "../../data/GuildMutes";
-import Timeout = NodeJS.Timeout;
 import { CaseArgs } from "../Cases/types";
+import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),

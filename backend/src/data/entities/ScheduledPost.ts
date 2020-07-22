@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { Attachment } from "eris";
 import { StrictMessageContent } from "../../utils";
 

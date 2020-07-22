@@ -1,12 +1,11 @@
-import { getRepository, In, Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { GuildChannel, Message } from "eris";
 import moment from "moment-timezone";
-import { DAYS, DBDateFormat, MINUTES, SECONDS } from "../utils";
+import { MINUTES, SECONDS } from "../utils";
 import { isAPI } from "../globals";
-import { connection } from "./db";
 import { cleanupMessages } from "./cleanup/messages";
 
 if (!isAPI()) {

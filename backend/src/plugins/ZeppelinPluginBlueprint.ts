@@ -1,6 +1,6 @@
 import { BasePluginType, plugin, PluginBlueprint } from "knub";
 import * as t from "io-ts";
-import { pluginConfigPreprocessor } from "../pluginUtils";
+import { getPluginConfigPreprocessor } from "../pluginUtils";
 
 export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends PluginBlueprint<TPluginType> {
@@ -23,7 +23,7 @@ export function zeppelinPlugin<TPluginType extends BasePluginType>(): <
 export function zeppelinPlugin(...args) {
   if (args.length) {
     const blueprint: ZeppelinPluginBlueprint = plugin(...(args as Parameters<typeof plugin>));
-    blueprint.configPreprocessor = pluginConfigPreprocessor.bind(blueprint);
+    blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint);
     return blueprint;
   } else {
     return zeppelinPlugin;

@@ -1,6 +1,6 @@
 import { locateUserEvent } from "../types";
 import { sendAlerts } from "../utils/sendAlerts";
-import { VoiceChannel, TextableChannel } from "eris";
+import { TextableChannel, VoiceChannel } from "eris";
 
 export const ChannelJoinAlertsEvt = locateUserEvent({
   event: "voiceChannelJoin",

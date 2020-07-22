@@ -1,7 +1,7 @@
 import { autoReactionsEvt } from "../types";
 import { isDiscordRESTError } from "src/utils";
-import { logger } from "knub";
 import { LogType } from "src/data/LogType";
+import { logger } from "../../../logger";
 
 export const AddReactionsEvt = autoReactionsEvt({
   event: "messageCreate",

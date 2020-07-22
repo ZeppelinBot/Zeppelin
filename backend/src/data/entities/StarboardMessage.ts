@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToMany, ManyToOne, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { SavedMessage } from "./SavedMessage";
 
 @Entity("starboard_messages")

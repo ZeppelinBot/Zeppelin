@@ -1,8 +1,7 @@
 import { getRepository, In, Repository } from "typeorm";
 import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
-import { MINUTES, SECONDS, sorter } from "../utils";
+import { MINUTES, SECONDS } from "../utils";
 import { BaseRepository } from "./BaseRepository";
-import { connection } from "./db";
 import { isAPI } from "../globals";
 import { cleanupUsernames } from "./cleanup/usernames";
 

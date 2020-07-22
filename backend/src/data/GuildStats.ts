@@ -1,5 +1,4 @@
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { connection } from "./db";
 import { getRepository, Repository } from "typeorm";
 import { StatValue } from "./entities/StatValue";
 

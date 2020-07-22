@@ -1,4 +1,4 @@
-import { plugin, PluginData } from "knub";
+import { PluginData } from "knub";
 import { CasesPluginType } from "../types";
 import { Message, MessageContent, MessageFile, TextChannel } from "eris";
 import { isDiscordRESTError } from "../../../utils";
@@ -6,6 +6,7 @@ import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
+import { logger } from "../../../logger";
 
 export async function postToCaseLogChannel(
   pluginData: PluginData<CasesPluginType>,
@@ -23,7 +24,7 @@ export async function postToCaseLogChannel(
     result = await caseLogChannel.createMessage(content, file);
   } catch (e) {
     if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
-      console.warn(
+      logger.warn(
         `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${pluginData.guild.name} (${pluginData.guild.id})`,
       );
       pluginData.state.logs.log(LogType.BOT_ALERT, {

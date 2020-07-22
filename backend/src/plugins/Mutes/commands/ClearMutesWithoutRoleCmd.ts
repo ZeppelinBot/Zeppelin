@@ -1,6 +1,5 @@
 import { command } from "knub";
 import { MutesPluginType } from "../types";
-import { User } from "eris";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 

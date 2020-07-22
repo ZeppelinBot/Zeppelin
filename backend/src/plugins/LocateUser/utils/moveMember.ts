@@ -9,7 +9,7 @@ export async function moveMember(
   target: Member,
   errorChannel: TextableChannel,
 ) {
-  const modMember: Member = await this.bot.getRESTGuildMember(pluginData.guild.id, toMoveID);
+  const modMember: Member = await pluginData.client.getRESTGuildMember(pluginData.guild.id, toMoveID);
   if (modMember.voiceState.channelID != null) {
     try {
       await modMember.edit({

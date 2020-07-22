@@ -21,12 +21,12 @@ export const ContextCmd = utilityCmd({
       return;
     }
 
-    const previousMessage = (await this.bot.getMessages(args.channel.id, 1, args.messageId))[0];
+    const previousMessage = (await pluginData.client.getMessages(args.channel.id, 1, args.messageId))[0];
     if (!previousMessage) {
       sendErrorMessage(pluginData, msg.channel, "Message context not found");
       return;
     }
 
-    msg.channel.createMessage(messageLink(this.guildId, previousMessage.channel.id, previousMessage.id));
+    msg.channel.createMessage(messageLink(pluginData.guild.id, previousMessage.channel.id, previousMessage.id));
   },
 });

@@ -1,5 +1,5 @@
 import { PluginOptions } from "knub";
-import { NameHistoryPluginType, ConfigSchema } from "./types";
+import { ConfigSchema, NameHistoryPluginType } from "./types";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildNicknameHistory } from "src/data/GuildNicknameHistory";
 import { UsernameHistory } from "src/data/UsernameHistory";

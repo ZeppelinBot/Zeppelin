@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("tags")
 export class Tag {

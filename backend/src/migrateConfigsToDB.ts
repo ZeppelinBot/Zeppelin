@@ -3,6 +3,7 @@ import { connect } from "./data/db";
 import { Configs } from "./data/Configs";
 import path from "path";
 import * as _fs from "fs";
+
 const fs = _fs.promises;
 
 const authorId = process.argv[2];

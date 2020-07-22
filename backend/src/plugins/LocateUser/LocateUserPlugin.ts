@@ -1,13 +1,13 @@
 import { PluginOptions } from "knub";
-import { LocateUserPluginType, ConfigSchema } from "./types";
+import { ConfigSchema, LocateUserPluginType } from "./types";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildVCAlerts } from "src/data/GuildVCAlerts";
 import { outdatedAlertsLoop } from "./utils/outdatedLoop";
 import { fillActiveAlertsList } from "./utils/fillAlertsList";
 import { WhereCmd } from "./commands/WhereCmd";
 import { FollowCmd } from "./commands/FollowCmd";
-import { ListFollowCmd, DeleteFollowCmd } from "./commands/ListFollowCmd";
-import { ChannelJoinAlertsEvt, ChannelSwitchAlertsEvt, ChannelLeaveAlertsEvt } from "./events/SendAlertsEvts";
+import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
+import { ChannelJoinAlertsEvt, ChannelLeaveAlertsEvt, ChannelSwitchAlertsEvt } from "./events/SendAlertsEvts";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
@@ -40,9 +40,9 @@ export const LocateUserPlugin = zeppelinPlugin<LocateUserPluginType>()("locate_u
 
   // prettier-ignore
   events: [
-    ChannelJoinAlertsEvt, 
-    ChannelSwitchAlertsEvt, 
-    ChannelLeaveAlertsEvt, 
+    ChannelJoinAlertsEvt,
+    ChannelSwitchAlertsEvt,
+    ChannelLeaveAlertsEvt,
     GuildBanRemoveAlertsEvt
   ],
 

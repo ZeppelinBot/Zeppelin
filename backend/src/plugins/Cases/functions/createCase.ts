@@ -2,7 +2,8 @@ import { CaseArgs, CasesPluginType } from "../types";
 import { resolveUser } from "../../../utils";
 import { PluginData } from "knub";
 import { createCaseNote } from "./createCaseNote";
-import { postToCaseLogChannel } from "./postToCaseLogChannel";
+import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
+import { logger } from "../../../logger";
 
 export async function createCase(pluginData: PluginData<CasesPluginType>, args: CaseArgs) {
   const user = await resolveUser(pluginData.client, args.userId);
@@ -21,7 +22,7 @@ export async function createCase(pluginData: PluginData<CasesPluginType>, args: 
     const existingAuditLogCase = await pluginData.state.cases.findByAuditLogId(args.auditLogId);
     if (existingAuditLogCase) {
       delete args.auditLogId;
-      console.warn(`Duplicate audit log ID for mod case: ${args.auditLogId}`);
+      logger.warn(`Duplicate audit log ID for mod case: ${args.auditLogId}`);
     }
   }
 
@@ -66,7 +67,7 @@ export async function createCase(pluginData: PluginData<CasesPluginType>, args: 
     (!args.automatic || config.log_automatic_actions) &&
     args.postInCaseLogOverride !== false
   ) {
-    await postToCaseLogChannel(pluginData, createdCase);
+    await postCaseToCaseLogChannel(pluginData, createdCase);
   }
 
   return createdCase;

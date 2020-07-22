@@ -5,10 +5,7 @@ import { initAuth } from "./auth";
 import { initGuildsAPI } from "./guilds";
 import { initArchives } from "./archives";
 import { initDocs } from "./docs";
-import { connect } from "../data/db";
-import path from "path";
 import { TokenError } from "passport-oauth2";
-import { PluginError } from "knub";
 
 const app = express();
 

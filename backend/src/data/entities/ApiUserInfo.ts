@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { ApiLogin } from "./ApiLogin";
 import { ApiPermissionAssignment } from "./ApiPermissionAssignment";
 

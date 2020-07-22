@@ -1,19 +1,13 @@
 import * as t from "io-ts";
-import { pipe } from "fp-ts/lib/pipeable";
-import { fold } from "fp-ts/lib/Either";
-import { PathReporter } from "io-ts/lib/PathReporter";
 import { guildPlugins } from "./plugins/availablePlugins";
-import { ZeppelinPluginClass } from "./plugins/ZeppelinPluginClass";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
-import { getPluginName } from "knub/dist/plugins/pluginUtils";
 import { IZeppelinGuildConfig } from "./types";
 import { PluginOptions } from "knub";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {
-  const pluginName = getPluginName(plugin);
-  pluginNameToPlugin.set(pluginName, plugin);
+  pluginNameToPlugin.set(plugin.name, plugin);
 }
 
 const guildConfigRootSchema = t.type({
@@ -45,10 +39,16 @@ export function validateGuildConfig(config: any): string[] | null {
       }
 
       const plugin = pluginNameToPlugin.get(pluginName);
-      let pluginErrors = plugin.configPreprocessor(pluginOptions as PluginOptions<any>);
-      if (pluginErrors) {
-        pluginErrors = pluginErrors.map(err => `${pluginName}: ${err}`);
-        return pluginErrors;
+      try {
+        plugin.configPreprocessor(pluginOptions as PluginOptions<any>);
+      } catch (err) {
+        if (err instanceof StrictValidationError) {
+          return err.getErrors().map(err => {
+            return `${pluginName}: ${err.toString()}`;
+          });
+        }
+
+        throw err;
       }
     }
   }

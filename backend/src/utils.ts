@@ -23,19 +23,17 @@ import emojiRegex from "emoji-regex";
 import * as t from "io-ts";
 
 import fs from "fs";
-const fsp = fs.promises;
-
 import https from "https";
 import tmp from "tmp";
-import { logger, helpers } from "knub";
+import { helpers } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { either } from "fp-ts/lib/Either";
-import safeRegex from "safe-regex";
 import moment from "moment-timezone";
-import { performance } from "perf_hooks";
-import { ERRORS } from "./RecoverablePluginError";
 import { SimpleCache } from "./SimpleCache";
+import { logger } from "./logger";
+
+const fsp = fs.promises;
 
 const delayStringMultipliers = {
   w: 1000 * 60 * 60 * 24 * 7,
@@ -946,9 +944,9 @@ export function resolveUserId(bot: Client, value: string) {
  * Finds a matching User for the passed user id, user mention, or full username (with discriminator).
  * If a user is not found, returns an UnknownUser instead.
  */
-export function getUser(userResolvable: string): User | UnknownUser {
-  const id = resolveUserId(this.client, userResolvable);
-  return id ? this.client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+export function getUser(client: Client, userResolvable: string): User | UnknownUser {
+  const id = resolveUserId(client, userResolvable);
+  return id ? client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
 }
 
 /**
@@ -1058,12 +1056,12 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
 
 const inviteCache = new SimpleCache<Promise<ChannelInvite>>(10 * MINUTES, 200);
 
-export async function resolveInvite(code: string): Promise<ChannelInvite | null> {
+export async function resolveInvite(client: Client, code: string): Promise<ChannelInvite | null> {
   if (inviteCache.has(code)) {
     return inviteCache.get(code);
   }
 
-  const promise = this.client.getInvite(code).catch(() => null);
+  const promise = client.getInvite(code).catch(() => null);
   inviteCache.set(code, promise);
 
   return promise;
