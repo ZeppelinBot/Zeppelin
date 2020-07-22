@@ -8,14 +8,16 @@ import { AutoReactionsPlugin } from "./AutoReactions/AutoReactionsPlugin";
 import { RemindersPlugin } from "./Reminders/RemindersPlugin";
 import { UsernameSaverPlugin } from "./UsernameSaver/UsernameSaverPlugin";
 import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
+import { PingableRolesPlugin } from "./PingableRoles/PingableRolesPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   AutoReactionsPlugin,
   LocateUserPlugin,
+  PersistPlugin,
+  PingableRolesPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
-  PersistPlugin,
   RemindersPlugin,
   UsernameSaverPlugin,
   UtilityPlugin,
