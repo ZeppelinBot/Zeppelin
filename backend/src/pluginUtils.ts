@@ -66,3 +66,13 @@ export function getBaseUrl(pluginData: PluginData<any>) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
   return knub.getGlobalConfig().url;
 }
+
+export function isOwner(pluginData: PluginData<any>, userId: string) {
+  const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  const owners = knub.getGlobalConfig().owners;
+  if (!owners) {
+    return false;
+  }
+
+  return owners.includes(userId);
+}
