@@ -1,5 +1,5 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, MutesPluginType } from "./types";
+import { ConfigSchema, MuteOptions, MutesPluginType } from "./types";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildCases } from "../../data/GuildCases";
@@ -11,6 +11,7 @@ import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
 import { ClearActiveMuteOnRoleRemovalEvt } from "./events/ClearActiveMuteOnRoleRemovalEvt";
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
+import { muteUser } from "./functions/muteUser";
 
 const defaultOptions = {
   config: {
@@ -55,9 +56,26 @@ export const MutesPlugin = zeppelinPlugin<MutesPluginType>()("mutes", {
 
   dependencies: [CasesPlugin],
 
-  commands: [MutesCmd, ClearBannedMutesCmd, ClearMutesWithoutRoleCmd, ClearMutesCmd],
+  // prettier-ignore
+  commands: [
+    MutesCmd,
+    ClearBannedMutesCmd,
+    ClearMutesWithoutRoleCmd,
+    ClearMutesCmd,
+  ],
 
-  events: [ClearActiveMuteOnRoleRemovalEvt],
+  // prettier-ignore
+  events: [
+    ClearActiveMuteOnRoleRemovalEvt,
+  ],
+
+  public: {
+    muteUser(pluginData) {
+      return (userId: string, muteTime: number = null, reason: string = null, muteOptions: MuteOptions = {}) => {
+        return muteUser(pluginData, userId, muteTime, reason, muteOptions);
+      };
+    },
+  },
 
   onLoad(pluginData) {
     pluginData.state.mutes = GuildMutes.getGuildInstance(pluginData.guild.id);
