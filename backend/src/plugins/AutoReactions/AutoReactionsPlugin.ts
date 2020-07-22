@@ -3,9 +3,9 @@ import { ConfigSchema, AutoReactionsPluginType } from "./types";
 import { PluginOptions } from "knub";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
-import { MessageCreateEvt } from "./events/MessageCreateEvt";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildAutoReactions } from "src/data/GuildAutoReactions";
+import { AddReactionsEvt } from "./events/AddReactionsEvt";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -33,7 +33,7 @@ export const AutoReactionsPlugin = zeppelinPlugin<AutoReactionsPluginType>()("au
 
   // prettier-ignore
   events: [
-    MessageCreateEvt,
+    AddReactionsEvt,
   ],
 
   onLoad(pluginData) {

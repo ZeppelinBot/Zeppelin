@@ -2,7 +2,27 @@ import { locateUserEvent } from "../types";
 import { sendAlerts } from "../utils/sendAlerts";
 import { VoiceChannel, TextableChannel } from "eris";
 
-export const ChannelLeaveEvt = locateUserEvent({
+export const ChannelJoinAlertsEvt = locateUserEvent({
+  event: "voiceChannelJoin",
+
+  async listener(meta) {
+    if (meta.pluginData.state.usersWithAlerts.includes(meta.args.member.id)) {
+      sendAlerts(meta.pluginData, meta.args.member.id);
+    }
+  },
+});
+
+export const ChannelSwitchAlertsEvt = locateUserEvent({
+  event: "voiceChannelSwitch",
+
+  async listener(meta) {
+    if (meta.pluginData.state.usersWithAlerts.includes(meta.args.member.id)) {
+      sendAlerts(meta.pluginData, meta.args.member.id);
+    }
+  },
+});
+
+export const ChannelLeaveAlertsEvt = locateUserEvent({
   event: "voiceChannelLeave",
 
   async listener(meta) {
