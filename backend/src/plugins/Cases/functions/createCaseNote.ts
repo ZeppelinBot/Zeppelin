@@ -1,0 +1,48 @@
+import { CaseNoteArgs, CasesPluginType } from "../types";
+import { PluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { resolveCaseId } from "./resolveCaseId";
+import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
+import { resolveUser } from "../../../utils";
+
+export async function createCaseNote(pluginData: PluginData<CasesPluginType>, args: CaseNoteArgs): Promise<void> {
+  const theCase = await pluginData.state.cases.find(resolveCaseId(args.caseId));
+  if (!theCase) {
+    throw new RecoverablePluginError(ERRORS.UNKNOWN_NOTE_CASE);
+  }
+
+  const mod = await resolveUser(pluginData.client, args.modId);
+  const modName = `${mod.username}#${mod.discriminator}`;
+
+  let body = args.body;
+
+  // Add note details to the beginning of the note
+  if (args.noteDetails && args.noteDetails.length) {
+    body = args.noteDetails.map(d => `__[${d}]__`).join(" ") + " " + body;
+  }
+
+  await pluginData.state.cases.createNote(theCase.id, {
+    mod_id: mod.id,
+    mod_name: modName,
+    body: body || "",
+  });
+
+  if (theCase.mod_id == null) {
+    // If the case has no moderator information, assume the first one to add a note to it did the action
+    await pluginData.state.cases.update(theCase.id, {
+      mod_id: mod.id,
+      mod_name: modName,
+    });
+  }
+
+  const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9\-]+/g);
+  if (archiveLinkMatch) {
+    for (const archiveId of archiveLinkMatch) {
+      pluginData.state.archives.makePermanent(archiveId);
+    }
+  }
+
+  if ((!args.automatic || pluginData.config.get().log_automatic_actions) && args.postInCaseLogOverride !== false) {
+    await postCaseToCaseLogChannel(pluginData, theCase.id);
+  }
+}
