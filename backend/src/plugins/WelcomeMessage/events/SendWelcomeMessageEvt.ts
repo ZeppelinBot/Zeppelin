@@ -1,6 +1,6 @@
 import { welcomeEvent } from "../types";
 import { renderTemplate } from "src/templateFormatter";
-import { stripObjectToScalars, createChunkedMessage } from "src/utils";
+import { createChunkedMessage, stripObjectToScalars } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { TextChannel } from "eris";
 

@@ -3,11 +3,9 @@ import { ApiLogin } from "./entities/ApiLogin";
 import { BaseRepository } from "./BaseRepository";
 import crypto from "crypto";
 import moment from "moment-timezone";
-
 // tslint:disable-next-line:no-submodule-imports
 import uuidv4 from "uuid/v4";
 import { DBDateFormat } from "../utils";
-import { log } from "util";
 
 export class ApiLogins extends BaseRepository {
   private apiLogins: Repository<ApiLogin>;

@@ -1,12 +1,5 @@
-import {
-  convertDelayStringToMS,
-  deactivateMentions,
-  disableCodeBlocks,
-  resolveMember,
-  resolveUser,
-  UnknownUser,
-} from "./utils";
-import { Client, GuildChannel, Member, Message, User } from "eris";
+import { convertDelayStringToMS, disableCodeBlocks, resolveMember, resolveUser, UnknownUser } from "./utils";
+import { GuildChannel, Member, User } from "eris";
 import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 

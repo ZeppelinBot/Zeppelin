@@ -1,6 +1,6 @@
 import { autoReactionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isEmoji, customEmojiRegex, canUseEmoji } from "src/utils";
+import { canUseEmoji, customEmojiRegex, isEmoji } from "src/utils";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 
 export const NewAutoReactionsCmd = autoReactionsCmd({

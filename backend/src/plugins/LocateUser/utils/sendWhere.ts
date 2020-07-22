@@ -1,9 +1,17 @@
-import { Guild, Member, TextableChannel, VoiceChannel } from "eris";
+import { Member, TextableChannel, VoiceChannel } from "eris";
 import { getInviteLink } from "knub/dist/helpers";
 import { createOrReuseInvite } from "./createOrReuseInvite";
+import { PluginData } from "knub";
+import { LocateUserPluginType } from "../types";
+import { sendErrorMessage } from "../../../pluginUtils";
 
-export async function sendWhere(guild: Guild, member: Member, channel: TextableChannel, prepend: string) {
-  const voice = guild.channels.get(member.voiceState.channelID) as VoiceChannel;
+export async function sendWhere(
+  pluginData: PluginData<LocateUserPluginType>,
+  member: Member,
+  channel: TextableChannel,
+  prepend: string,
+) {
+  const voice = pluginData.guild.channels.get(member.voiceState.channelID) as VoiceChannel;
 
   if (voice == null) {
     channel.createMessage(prepend + "That user is not in a channel");
@@ -12,7 +20,7 @@ export async function sendWhere(guild: Guild, member: Member, channel: TextableC
     try {
       invite = await createOrReuseInvite(voice);
     } catch (e) {
-      this.sendErrorMessage(channel, "Cannot create an invite to that channel!");
+      sendErrorMessage(pluginData, channel, "Cannot create an invite to that channel!");
       return;
     }
     channel.createMessage(

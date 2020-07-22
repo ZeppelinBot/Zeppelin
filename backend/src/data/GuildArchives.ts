@@ -1,11 +1,10 @@
-import uuid from "uuid/v4"; // tslint:disable-line
 import moment from "moment-timezone";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
 import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { trimLines } from "../utils";
 import { SavedMessage } from "./entities/SavedMessage";
-import { Channel, Guild, User } from "eris";
+import { Guild } from "eris";
 import { renderTemplate } from "../templateFormatter";
 
 const DEFAULT_EXPIRY_DAYS = 30;

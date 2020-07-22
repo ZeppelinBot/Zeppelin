@@ -1,6 +1,5 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
-import { resolveUser } from "../../utils";
 import { createCase } from "./functions/createCase";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildArchives } from "../../data/GuildArchives";

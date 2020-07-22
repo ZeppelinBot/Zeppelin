@@ -12,7 +12,7 @@ export async function sendAlerts(pluginData: PluginData<LocateUserPluginType>, u
   triggeredAlerts.forEach(alert => {
     const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
     const txtChannel = pluginData.client.getChannel(alert.channel_id) as TextableChannel;
-    sendWhere.call(this, pluginData.guild, member, txtChannel, prepend);
+    sendWhere(pluginData, member, txtChannel, prepend);
     if (alert.active) {
       moveMember(pluginData, alert.requestor_id, member, txtChannel);
     }

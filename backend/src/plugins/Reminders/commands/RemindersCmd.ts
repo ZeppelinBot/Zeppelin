@@ -1,6 +1,6 @@
 import { remindersCommand } from "../types";
 import { sendErrorMessage } from "src/pluginUtils";
-import { sorter, createChunkedMessage } from "src/utils";
+import { createChunkedMessage, sorter } from "src/utils";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 

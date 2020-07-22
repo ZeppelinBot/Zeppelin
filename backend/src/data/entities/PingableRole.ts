@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
-import { ISavedMessageData } from "./SavedMessage";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("pingable_roles")
 export class PingableRole {

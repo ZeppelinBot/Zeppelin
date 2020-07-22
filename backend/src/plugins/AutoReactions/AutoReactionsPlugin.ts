@@ -1,5 +1,5 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, AutoReactionsPluginType } from "./types";
+import { AutoReactionsPluginType, ConfigSchema } from "./types";
 import { PluginOptions } from "knub";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";

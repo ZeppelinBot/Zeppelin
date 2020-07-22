@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryColumn } from "typeorm";
-import { ISavedMessageData } from "./SavedMessage";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("auto_reactions")
 export class AutoReaction {

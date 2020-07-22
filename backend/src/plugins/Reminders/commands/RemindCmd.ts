@@ -45,7 +45,8 @@ export const RemindCmd = remindersCommand({
       return;
     }
 
-    const reminderBody = args.reminder || `https://discord.com/channels/${this.guildId}/${msg.channel.id}/${msg.id}`;
+    const reminderBody =
+      args.reminder || `https://discord.com/channels/${pluginData.guild.id}/${msg.channel.id}/${msg.id}`;
     await pluginData.state.reminders.add(
       msg.author.id,
       msg.channel.id,

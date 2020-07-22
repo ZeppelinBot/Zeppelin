@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn, createQueryBuilder } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableColumn } from "typeorm";
 
 export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

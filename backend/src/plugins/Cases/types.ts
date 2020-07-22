@@ -4,9 +4,7 @@ import { CaseTypes } from "../../data/CaseTypes";
 import { BasePluginType } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
-import { Supporters } from "../../data/Supporters";
 
 export const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,

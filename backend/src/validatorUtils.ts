@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/pipeable";
-import { fold, either } from "fp-ts/lib/Either";
+import { either, fold } from "fp-ts/lib/Either";
 import { noop } from "./utils";
 import deepDiff from "deep-diff";
 import safeRegex from "safe-regex";

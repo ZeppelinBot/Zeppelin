@@ -2,7 +2,7 @@ import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, MessageSaverPluginType } from "./types";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { PluginOptions } from "knub";
-import { MessageCreateEvt, MessageUpdateEvt, MessageDeleteEvt, MessageDeleteBulkEvt } from "./events/SaveMessagesEvts";
+import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 

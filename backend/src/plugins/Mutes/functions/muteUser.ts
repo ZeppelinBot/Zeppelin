@@ -2,14 +2,7 @@ import { PluginData } from "knub";
 import { MuteOptions, MutesPluginType } from "../types";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import humanizeDuration from "humanize-duration";
-import {
-  notifyUser,
-  resolveMember,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
+import { notifyUser, resolveUser, stripObjectToScalars, ucfirst, UserNotificationResult } from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
 import { TextChannel, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";

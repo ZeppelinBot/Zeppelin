@@ -1,10 +1,10 @@
 import { PluginOptions } from "knub";
-import { PingableRolesPluginType, ConfigSchema } from "./types";
+import { ConfigSchema, PingableRolesPluginType } from "./types";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildPingableRoles } from "src/data/GuildPingableRoles";
 import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd";
-import { TypingEnablePingableEvt, MessageCreateDisablePingableEvt } from "./events/ChangePingableEvts";
+import { MessageCreateDisablePingableEvt, TypingEnablePingableEvt } from "./events/ChangePingableEvts";
 
 const defaultOptions: PluginOptions<PingableRolesPluginType> = {
   config: {

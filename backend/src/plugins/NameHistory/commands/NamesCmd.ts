@@ -1,6 +1,6 @@
 import { nameHistoryCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { disableCodeBlocks, createChunkedMessage } from "knub/dist/helpers";
+import { createChunkedMessage, disableCodeBlocks } from "knub/dist/helpers";
 import { NICKNAME_RETENTION_PERIOD } from "src/data/cleanup/nicknames";
 import { DAYS } from "src/utils";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "src/data/GuildNicknameHistory";

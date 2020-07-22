@@ -2,12 +2,27 @@ import path from "path";
 import yaml from "js-yaml";
 
 import fs from "fs";
-const fsp = fs.promises;
-
-import { Knub, logger, PluginError, pluginUtils } from "knub";
+import { Knub, PluginError } from "knub";
 import { SimpleError } from "./SimpleError";
 
 import { Configs } from "./data/Configs";
+// Always use UTC internally
+// This is also enforced for the database in data/db.ts
+import moment from "moment-timezone";
+import { Client, TextChannel } from "eris";
+import { connect } from "./data/db";
+import { globalPlugins, guildPlugins } from "./plugins/availablePlugins";
+import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
+import { startUptimeCounter } from "./uptime";
+import { AllowedGuilds } from "./data/AllowedGuilds";
+import { IZeppelinGlobalConfig, IZeppelinGuildConfig } from "./types";
+import { RecoverablePluginError } from "./RecoverablePluginError";
+import { GuildLogs } from "./data/GuildLogs";
+import { LogType } from "./data/LogType";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { logger } from "./logger";
+
+const fsp = fs.promises;
 
 require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
 
@@ -80,22 +95,7 @@ for (const [i, part] of actualVersionParts.entries()) {
   throw new SimpleError(`Unsupported Node.js version! Must be at least ${REQUIRED_NODE_VERSION}`);
 }
 
-// Always use UTC internally
-// This is also enforced for the database in data/db.ts
-import moment from "moment-timezone";
 moment.tz.setDefault("UTC");
-
-import { Client, TextChannel } from "eris";
-import { connect } from "./data/db";
-import { guildPlugins, globalPlugins } from "./plugins/availablePlugins";
-import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
-import { startUptimeCounter } from "./uptime";
-import { AllowedGuilds } from "./data/AllowedGuilds";
-import { IZeppelinGuildConfig, IZeppelinGlobalConfig } from "./types";
-import { RecoverablePluginError } from "./RecoverablePluginError";
-import { GuildLogs } from "./data/GuildLogs";
-import { LogType } from "./data/LogType";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 
 logger.info("Connecting to database");
 connect().then(async () => {
@@ -152,8 +152,12 @@ connect().then(async () => {
 
       logFn: (level, msg) => {
         if (level === "debug") return;
-        // tslint:disable-next-line
-        console.log(`[${level.toUpperCase()}] ${msg}`);
+
+        if (logger[level]) {
+          logger[level](msg);
+        } else {
+          logger.log(`[${level.toUpperCase()}] ${msg}`);
+        }
       },
 
       performanceDebug: {

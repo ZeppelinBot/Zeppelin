@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableColumn, TableIndex } from "typeorm";
+import { MigrationInterface, QueryRunner, TableIndex } from "typeorm";
 
 export class AddIndexToArchivesExpiresAt1547392046629 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

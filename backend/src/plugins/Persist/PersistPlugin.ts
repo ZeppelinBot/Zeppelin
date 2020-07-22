@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { PersistPluginType, ConfigSchema } from "./types";
+import { ConfigSchema, PersistPluginType } from "./types";
 import { GuildPersistedData } from "src/data/GuildPersistedData";
 import { GuildLogs } from "src/data/GuildLogs";
 import { StoreDataEvt } from "./events/StoreDataEvt";

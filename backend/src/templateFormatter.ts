@@ -1,4 +1,4 @@
-import { has, get } from "./utils";
+import { get, has } from "./utils";
 import seedrandom from "seedrandom";
 
 const TEMPLATE_CACHE_SIZE = 200;

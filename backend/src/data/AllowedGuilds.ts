@@ -1,13 +1,5 @@
 import { AllowedGuild } from "./entities/AllowedGuild";
-import {
-  getConnection,
-  getRepository,
-  Repository,
-  Transaction,
-  TransactionManager,
-  TransactionRepository,
-} from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
+import { getRepository, Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
 import { ApiPermissionTypes } from "./ApiPermissionAssignments";
 

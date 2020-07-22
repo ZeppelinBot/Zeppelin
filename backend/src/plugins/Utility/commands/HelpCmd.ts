@@ -18,7 +18,7 @@ export const HelpCmd = utilityCmd({
     const searchStr = args.command.toLowerCase();
 
     const matchingCommands: Array<{
-      plugin: LoadedPlugin;
+      plugin: LoadedPlugin<any>;
       command: PluginCommandDefinition;
     }> = [];
 
@@ -62,12 +62,10 @@ export const HelpCmd = utilityCmd({
         .toLowerCase()
         .replace(/\s/g, "-");
 
-      const pluginName = plugin.blueprint?.name || plugin.class?.pluginName;
-
       let snippet = `**${prefix}${trigger}**`;
       if (description) snippet += `\n${description}`;
       if (usage) snippet += `\nBasic usage: \`${usage}\``;
-      snippet += `\n<https://zeppelin.gg/docs/plugins/${pluginName}/usage#command-${commandSlug}>`;
+      snippet += `\n<https://zeppelin.gg/docs/plugins/${plugin.blueprint.name}/usage#command-${commandSlug}>`;
 
       return snippet;
     });

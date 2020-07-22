@@ -1,7 +1,7 @@
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, In, Repository } from "typeorm";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
-import { MINUTES, SECONDS, sorter } from "../utils";
+import { MINUTES, SECONDS } from "../utils";
 import { MAX_USERNAME_ENTRIES_PER_USER } from "./UsernameHistory";
 import { isAPI } from "../globals";
 import { cleanupNicknames } from "./cleanup/nicknames";

@@ -1,7 +1,6 @@
 import { messageSaverCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { saveMessagesToDB } from "../saveMessagesToDB";
-import { TextChannel } from "eris";
 import { sendSuccessMessage } from "src/pluginUtils";
 
 export const SaveMessagesToDBCmd = messageSaverCmd({
