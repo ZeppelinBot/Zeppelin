@@ -13,7 +13,7 @@ import { IZeppelinGlobalConfig, IZeppelinGuildConfig, TZeppelinKnub } from "./ty
 const { getMemberLevel } = helpers;
 
 export function canActOn(pluginData: PluginData<any>, member1: Member, member2: Member, allowSameLevel = false) {
-  if (member2.id === this.client.user.id) {
+  if (member2.id === pluginData.client.user.id) {
     return false;
   }
 
