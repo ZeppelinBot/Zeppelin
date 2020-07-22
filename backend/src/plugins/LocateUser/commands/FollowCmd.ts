@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { MINUTES, SECONDS } from "src/utils";
-import { sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 
 export const FollowCmd = locateUserCommand({
   trigger: ["follow", "f"],
@@ -26,7 +26,7 @@ export const FollowCmd = locateUserCommand({
     const active = args.active || false;
 
     if (time < 30 * SECONDS) {
-      this.sendErrorMessage(msg.channel, "Sorry, but the minimum duration for an alert is 30 seconds!");
+      sendErrorMessage(pluginData, msg.channel, "Sorry, but the minimum duration for an alert is 30 seconds!");
       return;
     }
 
