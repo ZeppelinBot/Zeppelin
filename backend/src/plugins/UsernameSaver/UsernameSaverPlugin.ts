@@ -2,14 +2,13 @@ import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { UsernameHistory } from "src/data/UsernameHistory";
 import { Queue } from "src/Queue";
 import { UsernameSaverPluginType } from "./types";
-import { MessageCreateEvt } from "./events/MessageCreateEvt";
-import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
+import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
 
 export const UsernameSaverPlugin = zeppelinPlugin<UsernameSaverPluginType>()("username_saver", {
   // prettier-ignore
   events: [
-    MessageCreateEvt,
-    VoiceChannelJoinEvt,
+    MessageCreateUpdateUsernameEvt,
+    VoiceChannelJoinUpdateUsernameEvt,
   ],
 
   onLoad(pluginData) {
