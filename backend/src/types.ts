@@ -15,7 +15,7 @@ export type TZeppelinKnub = Knub<IZeppelinGuildConfig, IZeppelinGlobalConfig>;
 /**
  * Wrapper for the string type that indicates the text will be parsed as Markdown later
  */
-type TMarkdown = string;
+export type TMarkdown = string;
 
 export interface ZeppelinPluginInfo {
   prettyName: string;
