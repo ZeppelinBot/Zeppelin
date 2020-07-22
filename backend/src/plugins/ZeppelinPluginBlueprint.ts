@@ -8,11 +8,18 @@ export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = Ba
   showInDocs?: boolean;
 }
 
-export function zeppelinPlugin(name: string, blueprint: Omit<ZeppelinPluginBlueprint, "name">): ZeppelinPluginBlueprint;
-export function zeppelinPlugin<TPluginType extends BasePluginType>(): (
+export function zeppelinPlugin<TPartialBlueprint extends Omit<ZeppelinPluginBlueprint, "name">>(
   name: string,
-  blueprint: Omit<ZeppelinPluginBlueprint<TPluginType>, "name">,
-) => ZeppelinPluginBlueprint<TPluginType>;
+  blueprint: TPartialBlueprint,
+): TPartialBlueprint & { name: string };
+
+export function zeppelinPlugin<TPluginType extends BasePluginType>(): <
+  TPartialBlueprint extends Omit<ZeppelinPluginBlueprint<TPluginType>, "name">
+>(
+  name: string,
+  blueprint: TPartialBlueprint,
+) => TPartialBlueprint & { name: string };
+
 export function zeppelinPlugin(...args) {
   if (args.length) {
     const blueprint: ZeppelinPluginBlueprint = plugin(...(args as Parameters<typeof plugin>));
