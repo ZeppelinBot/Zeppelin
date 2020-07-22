@@ -19,7 +19,9 @@
         "../shared/src/*"
       ]
     },
-    "sourceMap": true
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "noImplicitThis": true
   },
   "include": [
     "src/**/*.ts"
