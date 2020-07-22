@@ -2,7 +2,7 @@ import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { WelcomeMessagePluginType, ConfigSchema } from "./types";
 import { GuildLogs } from "src/data/GuildLogs";
-import { GuildMemberAddEvt } from "./events/GuildMemberAddEvt";
+import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
 
 const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   config: {
@@ -18,7 +18,7 @@ export const WelcomeMessagePlugin = zeppelinPlugin<WelcomeMessagePluginType>()("
 
   // prettier-ignore
   events: [
-    GuildMemberAddEvt,
+    SendWelcomeMessageEvt,
   ],
 
   onLoad(pluginData) {
