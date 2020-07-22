@@ -8,6 +8,7 @@ export const LevelCmd = utilityCmd({
   trigger: "level",
   description: "Show the permission level of a user",
   usage: "!level 106391128718245888",
+  permission: "can_level",
 
   signature: {
     member: ct.resolvedMember({ required: false }),
