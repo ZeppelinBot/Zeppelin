@@ -1,11 +1,19 @@
 import { BasePluginType, plugin, PluginBlueprint } from "knub";
 import * as t from "io-ts";
 import { getPluginConfigPreprocessor } from "../pluginUtils";
+import { TMarkdown } from "../types";
 
 export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends PluginBlueprint<TPluginType> {
   configSchema?: t.TypeC<any>;
   showInDocs?: boolean;
+
+  info?: {
+    prettyName: string;
+    description?: TMarkdown;
+    usageGuide?: TMarkdown;
+    configurationGuide?: TMarkdown;
+  };
 }
 
 export function zeppelinPlugin<TPartialBlueprint extends Omit<ZeppelinPluginBlueprint, "name">>(
