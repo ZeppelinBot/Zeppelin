@@ -13,9 +13,11 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
+  AutoDeletePlugin,
   AutoReactionsPlugin,
   LocateUserPlugin,
   PersistPlugin,
