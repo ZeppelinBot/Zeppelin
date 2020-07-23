@@ -13,6 +13,7 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { PostPlugin } from "./Post/PostPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -20,6 +21,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   LocateUserPlugin,
   PersistPlugin,
   PingableRolesPlugin,
+  PostPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
