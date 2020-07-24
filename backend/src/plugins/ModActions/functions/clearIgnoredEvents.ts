@@ -1,7 +1,7 @@
 import { PluginData } from "knub";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 
-export function clearIgnoredEvent(
+export function clearIgnoredEvents(
   pluginData: PluginData<ModActionsPluginType>,
   type: IgnoredEventType,
   userId: string,
