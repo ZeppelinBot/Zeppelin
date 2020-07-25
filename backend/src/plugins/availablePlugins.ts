@@ -13,6 +13,7 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
 import { CensorPlugin } from "./Censor/CensorPlugin";
 import { RolesPlugin } from "./Roles/RolesPlugin";
@@ -22,6 +23,7 @@ import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
+  AutoDeletePlugin,
   AutoReactionsPlugin,
   GuildInfoSaverPlugin,
   CensorPlugin,
