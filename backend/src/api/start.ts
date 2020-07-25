@@ -41,5 +41,5 @@ app.use((req, res, next) => {
   return notFound(res);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
+const port = (process.env.PORT && parseInt(process.env.PORT, 10)) || 3000;
+app.listen(port, "0.0.0.0", () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
