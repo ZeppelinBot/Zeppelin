@@ -1,7 +1,7 @@
 import { eventListener } from "knub";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
-import { clearIgnoredEvent } from "../functions/clearIgnoredEvents";
+import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
 import { safeFindRelevantAuditLogEntry } from "../functions/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -18,7 +18,7 @@ export const CreateKickCaseOnManualKickEvt = eventListener<ModActionsPluginType>
   "guildMemberRemove",
   async ({ pluginData, args: { member } }) => {
     if (isEventIgnored(pluginData, IgnoredEventType.Kick, member.id)) {
-      clearIgnoredEvent(pluginData, IgnoredEventType.Kick, member.id);
+      clearIgnoredEvents(pluginData, IgnoredEventType.Kick, member.id);
       return;
     }
 

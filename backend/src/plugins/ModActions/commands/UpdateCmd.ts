@@ -13,10 +13,15 @@ export const UpdateCmd = modActionsCommand({
   description:
     "Update the specified case (or, if case number is omitted, your latest case) by adding more notes/details to it",
 
-  signature: {
-    caseNumber: ct.number(),
-    note: ct.string({ required: false, catchAll: true }),
-  },
+  signature: [
+    {
+      caseNumber: ct.number(),
+      note: ct.string({ required: false, catchAll: true }),
+    },
+    {
+      note: ct.string({ catchAll: true }),
+    },
+  ],
 
   async run({ pluginData, message: msg, args }) {
     let theCase: Case;

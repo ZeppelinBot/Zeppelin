@@ -9,6 +9,25 @@ import { UpdateCmd } from "./commands/UpdateCmd";
 import { NoteCmd } from "./commands/NoteCmd";
 import { WarnCmd } from "./commands/WarnCmd";
 import { MuteCmd } from "./commands/MuteCmd";
+import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
+import { ForcemuteCmd } from "./commands/ForcemuteCmd";
+import { UnmuteCmd } from "./commands/UnmuteCmd";
+import { KickCmd } from "./commands/KickCmd";
+import { SoftbanCmd } from "./commands/SoftbanCommand";
+import { BanCmd } from "./commands/BanCmd";
+import { UnbanCmd } from "./commands/UnbanCmd";
+import { ForcebanCmd } from "./commands/ForcebanCmd";
+import { MassbanCmd } from "./commands/MassBanCmd";
+import { AddCaseCmd } from "./commands/AddCaseCmd";
+import { CaseCmd } from "./commands/CaseCmd";
+import { CasesUserCmd } from "./commands/CasesUserCmd";
+import { CasesModCmd } from "./commands/CasesModCmd";
+import { HideCaseCmd } from "./commands/HideCaseCmd";
+import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
+import { GuildMutes } from "src/data/GuildMutes";
+import { GuildCases } from "src/data/GuildCases";
+import { GuildLogs } from "src/data/GuildLogs";
+import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
 
 const defaultOptions = {
   config: {
@@ -71,7 +90,42 @@ export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_acti
 
   dependencies: [CasesPlugin, MutesPlugin],
 
-  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, CreateKickCaseOnManualKickEvt],
+  events: [
+    CreateBanCaseOnManualBanEvt,
+    CreateUnbanCaseOnManualUnbanEvt,
+    CreateKickCaseOnManualKickEvt,
+    PostAlertOnMemberJoinEvt,
+  ],
 
-  commands: [UpdateCmd, NoteCmd, WarnCmd, MuteCmd],
+  commands: [
+    UpdateCmd,
+    NoteCmd,
+    WarnCmd,
+    MuteCmd,
+    ForcemuteCmd,
+    UnmuteCmd,
+    ForceUnmuteCmd,
+    KickCmd,
+    SoftbanCmd,
+    BanCmd,
+    UnbanCmd,
+    ForcebanCmd,
+    MassbanCmd,
+    AddCaseCmd,
+    CaseCmd,
+    CasesUserCmd,
+    CasesModCmd,
+    HideCaseCmd,
+    UnhideCaseCmd,
+  ],
+
+  onLoad(pluginData) {
+    const { state, guild } = pluginData;
+
+    state.mutes = GuildMutes.getGuildInstance(guild.id);
+    state.cases = GuildCases.getGuildInstance(guild.id);
+    state.serverLogs = new GuildLogs(guild.id);
+
+    state.ignoredEvents = [];
+  },
 });

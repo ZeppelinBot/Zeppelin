@@ -13,6 +13,7 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { ModActionsPlugin } from "./ModActions/ModActionsPlugin";
 import { PostPlugin } from "./Post/PostPlugin";
 import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
@@ -34,6 +35,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   PingableRolesPlugin,
   PostPlugin,
   MessageSaverPlugin,
+  ModActionsPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
   RolesPlugin,

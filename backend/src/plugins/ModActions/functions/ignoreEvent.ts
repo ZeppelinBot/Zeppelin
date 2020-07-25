@@ -1,7 +1,7 @@
 import { PluginData } from "knub";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { SECONDS } from "../../../utils";
-import { clearIgnoredEvent } from "./clearIgnoredEvents";
+import { clearIgnoredEvents } from "./clearIgnoredEvents";
 
 const DEFAULT_TIMEOUT = 15 * SECONDS;
 
@@ -15,6 +15,6 @@ export function ignoreEvent(
 
   // Clear after expiry (15sec by default)
   setTimeout(() => {
-    clearIgnoredEvent(pluginData, type, userId);
+    clearIgnoredEvents(pluginData, type, userId);
   }, timeout);
 }
