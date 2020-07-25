@@ -13,6 +13,7 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { PostPlugin } from "./Post/PostPlugin";
 import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
 import { CensorPlugin } from "./Censor/CensorPlugin";
@@ -31,6 +32,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   LocateUserPlugin,
   PersistPlugin,
   PingableRolesPlugin,
+  PostPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
