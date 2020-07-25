@@ -13,6 +13,7 @@ import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigRelo
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
+import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
 import { StarboardPlugin } from "./Starboard/StarboardPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 
@@ -26,6 +27,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   MessageSaverPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
+  SlowmodePlugin,
   StarboardPlugin,
   TagsPlugin,
   UsernameSaverPlugin,
