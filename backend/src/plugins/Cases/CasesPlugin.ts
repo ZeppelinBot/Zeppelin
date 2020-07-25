@@ -7,6 +7,8 @@ import { GuildCases } from "../../data/GuildCases";
 import { createCaseNote } from "./functions/createCaseNote";
 import { Case } from "../../data/entities/Case";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
+import { CaseTypes } from "../../data/CaseTypes";
+import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId";
 
 const defaultOptions = {
   config: {
@@ -21,20 +23,26 @@ export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
 
   public: {
     createCase(pluginData) {
-      return async (args: CaseArgs) => {
+      return (args: CaseArgs) => {
         return createCase(pluginData, args);
       };
     },
 
     createCaseNote(pluginData) {
-      return async (args: CaseNoteArgs) => {
+      return (args: CaseNoteArgs) => {
         return createCaseNote(pluginData, args);
       };
     },
 
     postCaseToCaseLogChannel(pluginData) {
-      return async (caseOrCaseId: Case | number) => {
+      return (caseOrCaseId: Case | number) => {
         return postCaseToCaseLogChannel(pluginData, caseOrCaseId);
+      };
+    },
+
+    getCaseTypeAmountForUserId(pluginData) {
+      return (userID: string, type: CaseTypes) => {
+        return getCaseTypeAmountForUserId(pluginData, userID, type);
       };
     },
   },

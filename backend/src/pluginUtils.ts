@@ -8,6 +8,7 @@ import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils
 import { deepKeyIntersect, errorMessage, successMessage } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
 import { TZeppelinKnub } from "./types";
+import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
 
 const { getMemberLevel } = helpers;
 
@@ -19,6 +20,11 @@ export function canActOn(pluginData: PluginData<any>, member1: Member, member2: 
   const ourLevel = getMemberLevel(pluginData, member1);
   const memberLevel = getMemberLevel(pluginData, member2);
   return allowSameLevel ? ourLevel >= memberLevel : ourLevel > memberLevel;
+}
+
+export function hasPermission(pluginData: PluginData<any>, permission: string, matchParams: ExtendedMatchParams) {
+  const config = pluginData.config.getMatchingConfig(matchParams);
+  return helpers.hasPermission(config, permission);
 }
 
 export function getPluginConfigPreprocessor(blueprint: ZeppelinPluginBlueprint) {
@@ -65,4 +71,14 @@ export function sendErrorMessage(pluginData: PluginData<any>, channel, body) {
 export function getBaseUrl(pluginData: PluginData<any>) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
   return knub.getGlobalConfig().url;
+}
+
+export function isOwner(pluginData: PluginData<any>, userId: string) {
+  const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  const owners = knub.getGlobalConfig().owners;
+  if (!owners) {
+    return false;
+  }
+
+  return owners.includes(userId);
 }
