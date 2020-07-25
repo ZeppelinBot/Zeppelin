@@ -1,7 +1,7 @@
 import { eventListener } from "knub";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
-import { clearIgnoredEvent } from "../functions/clearIgnoredEvents";
+import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
 import { safeFindRelevantAuditLogEntry } from "../functions/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -15,7 +15,7 @@ export const CreateBanCaseOnManualBanEvt = eventListener<ModActionsPluginType>()
   "guildBanAdd",
   async ({ pluginData, args: { guild, user } }) => {
     if (isEventIgnored(pluginData, IgnoredEventType.Ban, user.id)) {
-      clearIgnoredEvent(pluginData, IgnoredEventType.Ban, user.id);
+      clearIgnoredEvents(pluginData, IgnoredEventType.Ban, user.id);
       return;
     }
 

@@ -4,7 +4,6 @@ import { BasePluginType, command } from "knub";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
-import { GuildArchives } from "../../data/GuildArchives";
 import { Case } from "../../data/entities/Case";
 import { CaseArgs } from "../Cases/types";
 import { TextChannel } from "eris";

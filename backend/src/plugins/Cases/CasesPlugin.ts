@@ -9,6 +9,7 @@ import { Case } from "../../data/entities/Case";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseTypes } from "../../data/CaseTypes";
 import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId";
+import { getCaseEmbed } from "./functions/getCaseEmbed";
 
 const defaultOptions = {
   config: {
@@ -43,6 +44,12 @@ export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
     getCaseTypeAmountForUserId(pluginData) {
       return (userID: string, type: CaseTypes) => {
         return getCaseTypeAmountForUserId(pluginData, userID, type);
+      };
+    },
+
+    getCaseEmbed(pluginData) {
+      return (caseOrCaseId: Case | number) => {
+        return getCaseEmbed(pluginData, caseOrCaseId);
       };
     },
   },

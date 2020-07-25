@@ -12,6 +12,9 @@ import { ClearActiveMuteOnRoleRemovalEvt } from "./events/ClearActiveMuteOnRoleR
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { muteUser } from "./functions/muteUser";
+import { unmuteUser } from "./functions/unmuteUser";
+import { CaseArgs } from "../Cases/types";
+import { Member } from "eris";
 
 const defaultOptions = {
   config: {
@@ -73,6 +76,16 @@ export const MutesPlugin = zeppelinPlugin<MutesPluginType>()("mutes", {
     muteUser(pluginData) {
       return (userId: string, muteTime: number = null, reason: string = null, muteOptions: MuteOptions = {}) => {
         return muteUser(pluginData, userId, muteTime, reason, muteOptions);
+      };
+    },
+    unmuteUser(pluginData) {
+      return (userId: string, unmuteTime: number = null, args: Partial<CaseArgs>) => {
+        return unmuteUser(pluginData, userId, unmuteTime, args);
+      };
+    },
+    hasMutedRole(pluginData) {
+      return (member: Member) => {
+        return member.roles.includes(pluginData.config.get().mute_role);
       };
     },
   },
