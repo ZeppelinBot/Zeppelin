@@ -14,10 +14,14 @@ import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
 import { RolesPlugin } from "./Roles/RolesPlugin";
+import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
+import { StarboardPlugin } from "./Starboard/StarboardPlugin";
+import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   AutoReactionsPlugin,
+  ChannelArchiverPlugin,
   LocateUserPlugin,
   PersistPlugin,
   PingableRolesPlugin,
@@ -25,6 +29,8 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   NameHistoryPlugin,
   RemindersPlugin,
   RolesPlugin,
+  SlowmodePlugin,
+  StarboardPlugin,
   TagsPlugin,
   UsernameSaverPlugin,
   UtilityPlugin,
