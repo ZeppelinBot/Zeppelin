@@ -14,17 +14,29 @@ import { CasesPlugin } from "./Cases/CasesPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { TagsPlugin } from "./Tags/TagsPlugin";
 import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
+import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
+import { CensorPlugin } from "./Censor/CensorPlugin";
+import { RolesPlugin } from "./Roles/RolesPlugin";
+import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
+import { StarboardPlugin } from "./Starboard/StarboardPlugin";
+import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   AutoDeletePlugin,
   AutoReactionsPlugin,
+  GuildInfoSaverPlugin,
+  CensorPlugin,
+  ChannelArchiverPlugin,
   LocateUserPlugin,
   PersistPlugin,
   PingableRolesPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
+  RolesPlugin,
+  SlowmodePlugin,
+  StarboardPlugin,
   TagsPlugin,
   UsernameSaverPlugin,
   UtilityPlugin,
