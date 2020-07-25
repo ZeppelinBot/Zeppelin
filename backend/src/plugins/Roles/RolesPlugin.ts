@@ -1,0 +1,49 @@
+import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { PluginOptions } from "knub";
+import { ConfigSchema, RolesPluginType } from "./types";
+import { GuildLogs } from "src/data/GuildLogs";
+import { AddRoleCmd } from "./commands/AddRoleCmd";
+import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
+import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
+import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
+
+const defaultOptions: PluginOptions<RolesPluginType> = {
+  config: {
+    can_assign: false,
+    can_mass_assign: false,
+    assignable_roles: ["558037973581430785"],
+  },
+  overrides: [
+    {
+      level: ">=50",
+      config: {
+        can_assign: true,
+      },
+    },
+    {
+      level: ">=100",
+      config: {
+        can_mass_assign: true,
+      },
+    },
+  ],
+};
+
+export const RolesPlugin = zeppelinPlugin<RolesPluginType>()("roles", {
+  configSchema: ConfigSchema,
+  defaultOptions,
+
+  // prettier-ignore
+  commands: [
+    AddRoleCmd,
+    RemoveRoleCmd,
+    MassAddRoleCmd,
+    MassRemoveRoleCmd,
+  ],
+
+  onLoad(pluginData) {
+    const { state, guild } = pluginData;
+
+    state.logs = new GuildLogs(guild.id);
+  },
+});
