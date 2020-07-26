@@ -22,6 +22,7 @@ import { RolesPlugin } from "./Roles/RolesPlugin";
 import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
 import { StarboardPlugin } from "./Starboard/StarboardPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
+import { SpamPlugin } from "./Spam/SpamPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -40,6 +41,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   RemindersPlugin,
   RolesPlugin,
   SlowmodePlugin,
+  SpamPlugin,
   StarboardPlugin,
   TagsPlugin,
   UsernameSaverPlugin,
