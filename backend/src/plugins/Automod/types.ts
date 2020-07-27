@@ -4,7 +4,7 @@ import { BasePluginType } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
 import { SavedMessage } from "../../data/entities/SavedMessage";
-import { User } from "eris";
+import { Member, User } from "eris";
 import { AvailableTriggers } from "./triggers/availableTriggers";
 import { AvailableActions } from "./actions/availableActions";
 import { Queue } from "../../Queue";
@@ -71,6 +71,8 @@ export interface AutomodContext {
 
   user?: User | UnknownUser;
   message?: SavedMessage;
+  member?: Member;
+  joined?: boolean;
 }
 
 export interface RecentAction {
@@ -83,6 +85,6 @@ export interface RecentAction {
 export interface RecentSpam {
   archiveId: string;
   type: RecentActionType;
-  userId: string;
+  userIds: string[];
   timestamp: number;
 }

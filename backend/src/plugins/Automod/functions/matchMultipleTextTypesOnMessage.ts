@@ -1,4 +1,3 @@
-import * as t from "io-ts";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
 import { PluginData } from "knub";

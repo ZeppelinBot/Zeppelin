@@ -7,8 +7,10 @@ export function getMatchingRecentActions(
   type: RecentActionType,
   identifier: string | null,
   since: number,
-  to: number,
+  to?: number,
 ) {
+  to = to || Date.now();
+
   return pluginData.state.recentActions.filter(action => {
     return (
       action.type === type &&

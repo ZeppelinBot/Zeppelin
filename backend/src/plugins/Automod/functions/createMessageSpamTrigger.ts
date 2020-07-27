@@ -52,7 +52,7 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
 
         pluginData.state.recentSpam.push({
           type: spamType,
-          userId: context.message.user_id,
+          userIds: [context.message.user_id],
           archiveId,
           timestamp: Date.now(),
         });

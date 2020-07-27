@@ -1,12 +1,8 @@
 import * as t from "io-ts";
-import { transliterate } from "transliteration";
-import escapeStringRegexp from "escape-string-regexp";
-import { AnyInvite, GuildInvite } from "eris";
+import { GuildInvite } from "eris";
 import { automodTrigger } from "../helpers";
 import {
-  asSingleLine,
   disableCodeBlocks,
-  disableInlineCode,
   getInviteCodesInString,
   isGuildInvite,
   resolveInvite,
