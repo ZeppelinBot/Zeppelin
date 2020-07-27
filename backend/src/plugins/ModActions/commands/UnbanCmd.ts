@@ -42,16 +42,15 @@ export const UnbanCmd = modActionsCommand({
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
+    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
-      await pluginData.guild.unbanMember(user.id);
+      await pluginData.guild.unbanMember(user.id, reason);
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban member; are you sure they're banned?");
       return;
     }
-
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
 
     // Create a case
     const casesPlugin = pluginData.getPlugin(CasesPlugin);

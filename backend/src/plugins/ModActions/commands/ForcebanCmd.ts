@@ -64,7 +64,7 @@ export const ForcebanCmd = modActionsCommand({
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
     try {
-      await pluginData.guild.banMember(user.id, 1);
+      await pluginData.guild.banMember(user.id, 1, reason);
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, "Failed to forceban member");
       return;
