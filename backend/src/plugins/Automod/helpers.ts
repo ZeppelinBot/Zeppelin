@@ -25,20 +25,28 @@ type AutomodTriggerRenderMatchInformationFn<TConfigType, TMatchResultExtra> = (m
   matchResult: AutomodTriggerMatchResult<TMatchResultExtra>;
 }) => Awaitable<string>;
 
-export interface AutomodTriggerBlueprint<TConfigType extends t.Any, TMatchResultExtra extends t.Any> {
+export interface AutomodTriggerBlueprint<TConfigType extends t.Any, TMatchResultExtra> {
   configType: TConfigType;
   defaultConfig: Partial<t.TypeOf<TConfigType>>;
 
-  matchResultType: TMatchResultExtra;
-
-  match: AutomodTriggerMatchFn<t.TypeOf<TConfigType>, t.TypeOf<TMatchResultExtra>>;
-  renderMatchInformation: AutomodTriggerRenderMatchInformationFn<t.TypeOf<TConfigType>, t.TypeOf<TMatchResultExtra>>;
+  match: AutomodTriggerMatchFn<t.TypeOf<TConfigType>, TMatchResultExtra>;
+  renderMatchInformation: AutomodTriggerRenderMatchInformationFn<t.TypeOf<TConfigType>, TMatchResultExtra>;
 }
 
-export function automodTrigger<TConfigType extends t.Any, TMatchResultExtra extends t.Any>(
+export function automodTrigger<TMatchResultExtra>(): <TConfigType extends t.Any>(
   blueprint: AutomodTriggerBlueprint<TConfigType, TMatchResultExtra>,
-): AutomodTriggerBlueprint<TConfigType, TMatchResultExtra> {
-  return blueprint;
+) => AutomodTriggerBlueprint<TConfigType, TMatchResultExtra>;
+
+export function automodTrigger<TConfigType extends t.Any>(
+  blueprint: AutomodTriggerBlueprint<TConfigType, unknown>,
+): AutomodTriggerBlueprint<TConfigType, unknown>;
+
+export function automodTrigger(...args) {
+  if (args.length) {
+    return args[0];
+  } else {
+    return automodTrigger;
+  }
 }
 
 type AutomodActionApplyFn<TConfigType> = (meta: {

@@ -9,10 +9,16 @@ import { EmojiSpamTrigger } from "./emojiSpam";
 import { LineSpamTrigger } from "./lineSpam";
 import { CharacterSpamTrigger } from "./characterSpam";
 import { MatchRegexTrigger } from "./matchRegex";
+import { MatchInvitesTrigger } from "./matchInvites";
+import { MatchLinksTrigger } from "./matchLinks";
+import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   match_words: MatchWordsTrigger,
   match_regex: MatchRegexTrigger,
+  match_invites: MatchInvitesTrigger,
+  match_links: MatchLinksTrigger,
+  match_attachment_type: MatchAttachmentTypeTrigger,
 
   message_spam: MessageSpamTrigger,
   mention_spam: MentionSpamTrigger,
@@ -26,6 +32,9 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
 export const AvailableTriggers = t.type({
   match_words: MatchWordsTrigger.configType,
   match_regex: MatchRegexTrigger.configType,
+  match_invites: MatchInvitesTrigger.configType,
+  match_links: MatchLinksTrigger.configType,
+  match_attachment_type: MatchAttachmentTypeTrigger.configType,
 
   message_spam: MessageSpamTrigger.configType,
   mention_spam: MentionSpamTrigger.configType,

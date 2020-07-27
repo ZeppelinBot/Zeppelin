@@ -1,27 +1,31 @@
 import * as t from "io-ts";
 import { automodTrigger } from "../helpers";
 
-export const ExampleTrigger = automodTrigger({
+interface ExampleMatchResultType {
+  isBanana: boolean;
+}
+
+export const ExampleTrigger = automodTrigger<ExampleMatchResultType>()({
   configType: t.type({
-    some: t.number,
-    value: t.string,
+    allowedFruits: t.array(t.string),
   }),
 
-  defaultConfig: {},
-
-  matchResultType: t.type({
-    thing: t.string,
-  }),
-
-  async match() {
-    return {
-      extra: {
-        thing: "hi",
-      },
-    };
+  defaultConfig: {
+    allowedFruits: ["peach", "banana"],
   },
 
-  renderMatchInformation() {
-    return "";
+  async match({ triggerConfig, context }) {
+    const foundFruit = triggerConfig.allowedFruits.find(fruit => context.message?.data.content === fruit);
+    if (foundFruit) {
+      return {
+        extra: {
+          isBanana: foundFruit === "banana",
+        },
+      };
+    }
+  },
+
+  renderMatchInformation({ matchResult }) {
+    return `Matched fruit, isBanana: ${matchResult.extra.isBanana ? "yes" : "no"}`;
   },
 });

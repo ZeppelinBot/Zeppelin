@@ -14,17 +14,14 @@ const MessageSpamTriggerConfig = t.type({
 });
 type TMessageSpamTriggerConfig = t.TypeOf<typeof MessageSpamTriggerConfig>;
 
-const MessageSpamMatchResultType = t.type({
-  archiveId: t.string,
-});
-type TMessageSpamMatchResultType = t.TypeOf<typeof MessageSpamMatchResultType>;
+interface TMessageSpamMatchResultType {
+  archiveId: string;
+}
 
 export function createMessageSpamTrigger(spamType: RecentActionType, prettyName: string) {
-  return automodTrigger({
+  return automodTrigger<TMessageSpamMatchResultType>()({
     configType: MessageSpamTriggerConfig,
     defaultConfig: {},
-
-    matchResultType: MessageSpamMatchResultType,
 
     async match({ pluginData, context, triggerConfig }) {
       if (!context.message) {

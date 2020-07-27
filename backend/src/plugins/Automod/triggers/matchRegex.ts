@@ -4,10 +4,16 @@ import escapeStringRegexp from "escape-string-regexp";
 import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { TSafeRegex } from "../../../validatorUtils";
 
-export const MatchRegexTrigger = automodTrigger({
+interface MatchResultType {
+  pattern: string;
+  type: MatchableTextType;
+}
+
+export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
-    patterns: t.array(t.string),
+    patterns: t.array(TSafeRegex),
     case_sensitive: t.boolean,
     normalize: t.boolean,
     match_messages: t.boolean,
@@ -29,11 +35,6 @@ export const MatchRegexTrigger = automodTrigger({
     match_custom_status: false,
   },
 
-  matchResultType: t.type({
-    pattern: t.string,
-    type: MatchableTextType,
-  }),
-
   async match({ pluginData, context, triggerConfig: trigger }) {
     if (!context.message) {
       return;
@@ -44,13 +45,13 @@ export const MatchRegexTrigger = automodTrigger({
         str = transliterate(str);
       }
 
-      for (const pattern of trigger.patterns) {
-        const regex = new RegExp(pattern, trigger.case_sensitive ? "" : "i");
+      for (const sourceRegex of trigger.patterns) {
+        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive ? "" : "i");
         const test = regex.test(str);
         if (test) {
           return {
             extra: {
-              pattern,
+              pattern: sourceRegex.source,
               type,
             },
           };

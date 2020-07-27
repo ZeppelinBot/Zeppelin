@@ -1,4 +1,5 @@
 import {
+  AnyInvite,
   Attachment,
   ChannelInvite,
   Client,
@@ -9,6 +10,7 @@ import {
   GuildAuditLog,
   GuildAuditLogEntry,
   GuildChannel,
+  GuildInvite,
   Member,
   Message,
   MessageContent,
@@ -1215,4 +1217,8 @@ export function trimPluginDescription(str) {
 
 export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
   return (msg as Message).createdAt != null;
+}
+
+export function isGuildInvite(invite: AnyInvite): invite is GuildInvite {
+  return (invite as GuildInvite).guild != null;
 }
