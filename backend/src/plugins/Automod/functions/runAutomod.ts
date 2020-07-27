@@ -7,6 +7,7 @@ import { CleanAction } from "../actions/clean";
 
 export async function runAutomod(pluginData: PluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.message?.user_id;
+  const user = userId && pluginData.client.users.get(userId);
   const member = userId && pluginData.guild.members.get(userId);
   const channelId = context.message?.channel_id;
   const channel = channelId && pluginData.guild.channels.get(channelId);
@@ -21,6 +22,7 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
+    if (!rule.affects_bots && user.bot) continue;
 
     let matchResult: AutomodTriggerMatchResult<any>;
     let matchSummary: string;

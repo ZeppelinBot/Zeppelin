@@ -5,7 +5,12 @@ import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 
-export const MatchWordsTrigger = automodTrigger({
+interface MatchResultType {
+  word: string;
+  type: MatchableTextType;
+}
+
+export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
     words: t.array(t.string),
     case_sensitive: t.boolean,
@@ -34,11 +39,6 @@ export const MatchWordsTrigger = automodTrigger({
     match_nicknames: false,
     match_custom_status: false,
   },
-
-  matchResultType: t.type({
-    word: t.string,
-    type: MatchableTextType,
-  }),
 
   async match({ pluginData, context, triggerConfig: trigger }) {
     if (!context.message) {

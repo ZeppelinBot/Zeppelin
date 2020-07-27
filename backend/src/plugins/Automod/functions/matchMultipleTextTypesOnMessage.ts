@@ -13,18 +13,9 @@ type TextTriggerWithMultipleMatchTypes = {
   match_custom_status: boolean;
 };
 
-export const MatchableTextType = t.union([
-  t.literal("message"),
-  t.literal("embed"),
-  t.literal("visiblename"),
-  t.literal("username"),
-  t.literal("nickname"),
-  t.literal("customstatus"),
-]);
+export type MatchableTextType = "message" | "embed" | "visiblename" | "username" | "nickname" | "customstatus";
 
-export type TMatchableTextType = t.TypeOf<typeof MatchableTextType>;
-
-type YieldedContent = [TMatchableTextType, string];
+type YieldedContent = [MatchableTextType, string];
 
 /**
  * Generator function that allows iterating through matchable pieces of text of a SavedMessage
