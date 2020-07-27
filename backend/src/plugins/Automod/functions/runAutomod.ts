@@ -1,5 +1,5 @@
 import { PluginData } from "knub";
-import { AutomodContext, AutomodPluginType, TRule } from "../types";
+import { AutomodContext, AutomodPluginType } from "../types";
 import { availableTriggers } from "../triggers/availableTriggers";
 import { availableActions } from "../actions/availableActions";
 import { AutomodTriggerMatchResult } from "../helpers";

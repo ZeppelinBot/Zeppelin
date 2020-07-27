@@ -7,7 +7,7 @@ export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
   extraContexts?: AutomodContext[];
   extra?: TExtra;
 
-  silentClean?: boolean;
+  silentClean?: boolean; // TODO: Maybe generalize to a "silent" value in general, which mutes alert/log
 }
 
 type AutomodTriggerMatchFn<TConfigType, TMatchResultExtra> = (meta: {

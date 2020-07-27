@@ -1,19 +1,6 @@
 import * as t from "io-ts";
-import { transliterate } from "transliteration";
-import escapeStringRegexp from "escape-string-regexp";
-import { AnyInvite, Attachment, GuildInvite } from "eris";
 import { automodTrigger } from "../helpers";
-import {
-  asSingleLine,
-  disableCodeBlocks,
-  disableInlineCode,
-  getInviteCodesInString,
-  isGuildInvite,
-  resolveInvite,
-  tNullable,
-  verboseChannelMention,
-} from "../../../utils";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { asSingleLine, disableCodeBlocks, disableInlineCode, verboseChannelMention } from "../../../utils";
 
 interface MatchResultType {
   matchedType: string;

@@ -1,6 +1,5 @@
 import * as t from "io-ts";
 import { transliterate } from "transliteration";
-import escapeStringRegexp from "escape-string-regexp";
 import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";

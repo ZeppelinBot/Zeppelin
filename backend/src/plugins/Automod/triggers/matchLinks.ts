@@ -1,16 +1,11 @@
 import * as t from "io-ts";
-import { transliterate } from "transliteration";
 import escapeStringRegexp from "escape-string-regexp";
-import { AnyInvite, GuildInvite } from "eris";
 import { automodTrigger } from "../helpers";
 import {
   asSingleLine,
   disableCodeBlocks,
   disableInlineCode,
-  getInviteCodesInString,
   getUrlsInString,
-  isGuildInvite,
-  resolveInvite,
   tNullable,
   verboseChannelMention,
 } from "../../../utils";

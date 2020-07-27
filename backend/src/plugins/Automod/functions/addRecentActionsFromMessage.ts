@@ -1,4 +1,3 @@
-import moment from "moment-timezone";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { PluginData } from "knub";
 import { RECENT_ACTION_EXPIRY_TIME, RecentActionType } from "../constants";

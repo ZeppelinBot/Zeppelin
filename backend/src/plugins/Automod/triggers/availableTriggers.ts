@@ -12,6 +12,8 @@ import { MatchRegexTrigger } from "./matchRegex";
 import { MatchInvitesTrigger } from "./matchInvites";
 import { MatchLinksTrigger } from "./matchLinks";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
+import { MemberJoinSpamTrigger } from "./memberJoinSpam";
+import { MemberJoinTrigger } from "./memberJoin";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   match_words: MatchWordsTrigger,
@@ -19,6 +21,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   match_invites: MatchInvitesTrigger,
   match_links: MatchLinksTrigger,
   match_attachment_type: MatchAttachmentTypeTrigger,
+  member_join: MemberJoinTrigger,
 
   message_spam: MessageSpamTrigger,
   mention_spam: MentionSpamTrigger,
@@ -27,6 +30,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   emoji_spam: EmojiSpamTrigger,
   line_spam: LineSpamTrigger,
   character_spam: CharacterSpamTrigger,
+  member_join_spam: MemberJoinSpamTrigger,
 };
 
 export const AvailableTriggers = t.type({
@@ -35,6 +39,7 @@ export const AvailableTriggers = t.type({
   match_invites: MatchInvitesTrigger.configType,
   match_links: MatchLinksTrigger.configType,
   match_attachment_type: MatchAttachmentTypeTrigger.configType,
+  member_join: MemberJoinTrigger.configType,
 
   message_spam: MessageSpamTrigger.configType,
   mention_spam: MentionSpamTrigger.configType,
@@ -43,4 +48,5 @@ export const AvailableTriggers = t.type({
   emoji_spam: EmojiSpamTrigger.configType,
   line_spam: LineSpamTrigger.configType,
   character_spam: CharacterSpamTrigger.configType,
+  member_join_spam: MemberJoinSpamTrigger.configType,
 });

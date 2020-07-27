@@ -1,7 +1,7 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { eventListener, PluginData } from "knub";
+import { eventListener } from "knub";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { runAutomod } from "../functions/runAutomod";
+import { RecentActionType } from "../constants";
 
 export const RunAutomodOnJoinEvt = eventListener<AutomodPluginType>()(
   "guildMemberAdd",
@@ -9,8 +9,19 @@ export const RunAutomodOnJoinEvt = eventListener<AutomodPluginType>()(
     const context: AutomodContext = {
       timestamp: Date.now(),
       user: member.user,
+      member,
+      joined: true,
     };
 
-    pluginData.state.queue.add(() => runAutomod(pluginData, context));
+    pluginData.state.queue.add(() => {
+      pluginData.state.recentActions.push({
+        type: RecentActionType.MemberJoin,
+        context,
+        count: 1,
+        identifier: null,
+      });
+
+      runAutomod(pluginData, context);
+    });
   },
 );
