@@ -15,6 +15,6 @@ export const WhereCmd = locateUserCommand({
 
   async run({ message: msg, args, pluginData }) {
     const member = await resolveMember(pluginData.client, pluginData.guild, args.member.id);
-    sendWhere.call(this, pluginData.guild, member, msg.channel, `${msg.member.mention} | `);
+    sendWhere(pluginData, member, msg.channel, `${msg.member.mention} | `);
   },
 });
