@@ -26,12 +26,12 @@ export function zeppelinPlugin<TPluginType extends BasePluginType>(): <
 >(
   name: string,
   blueprint: TPartialBlueprint,
-) => TPartialBlueprint & { name: string };
+) => TPartialBlueprint & { name: string; configPreprocessor: PluginBlueprint<TPluginType>["configPreprocessor"] };
 
 export function zeppelinPlugin(...args) {
   if (args.length) {
     const blueprint: ZeppelinPluginBlueprint = plugin(...(args as Parameters<typeof plugin>));
-    blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint);
+    blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
   } else {
     return zeppelinPlugin;
