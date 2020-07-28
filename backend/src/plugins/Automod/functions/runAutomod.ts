@@ -70,7 +70,12 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
 
     if (matchResult) {
       for (const [actionName, actionConfig] of Object.entries(rule.actions)) {
+        if (actionConfig == null || actionConfig === false) {
+          continue;
+        }
+
         const action = availableActions[actionName];
+
         action.apply({
           ruleName,
           pluginData,
