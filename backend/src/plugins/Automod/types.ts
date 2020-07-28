@@ -55,6 +55,11 @@ export interface AutomodPluginType extends BasePluginType {
     recentSpam: RecentSpam[];
     clearRecentSpamInterval: Timeout;
 
+    recentNicknameChanges: Map<string, { timestamp: number }>;
+    clearRecentNicknameChangesInterval: Timeout;
+
+    cachedAntiraidLevel: string | null;
+
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
     antiraidLevels: GuildAntiraidLevels;

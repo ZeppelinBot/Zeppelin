@@ -1,7 +1,7 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
-import { ConfigSchema, ModActionsPluginType } from "./types";
+import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
 import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
 import { CreateKickCaseOnManualKickEvt } from "./events/CreateKickCaseOnManualKickEvt";
@@ -28,6 +28,10 @@ import { GuildMutes } from "src/data/GuildMutes";
 import { GuildCases } from "src/data/GuildCases";
 import { GuildLogs } from "src/data/GuildLogs";
 import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
+import { warnMember } from "./functions/warnMember";
+import { Member } from "eris";
+import { kickMember } from "./functions/kickMember";
+import { banUserId } from "./functions/banUserId";
 
 const defaultOptions = {
   config: {
@@ -118,6 +122,26 @@ export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_acti
     HideCaseCmd,
     UnhideCaseCmd,
   ],
+
+  public: {
+    warnMember(pluginData) {
+      return (member: Member, reason: string, warnOptions?: WarnOptions) => {
+        warnMember(pluginData, member, reason, warnOptions);
+      };
+    },
+
+    kickMember(pluginData) {
+      return (member: Member, reason: string, kickOptions?: KickOptions) => {
+        kickMember(pluginData, member, reason, kickOptions);
+      };
+    },
+
+    banUserId(pluginData) {
+      return (userId: string, reason?: string, banOptions?: BanOptions) => {
+        banUserId(pluginData, userId, reason, banOptions);
+      };
+    },
+  },
 
   onLoad(pluginData) {
     const { state, guild } = pluginData;
