@@ -3,7 +3,7 @@ import { guildPlugins } from "./plugins/availablePlugins";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { IZeppelinGuildConfig } from "./types";
-import { PluginOptions } from "knub";
+import { configUtils, PluginOptions } from "knub";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {
@@ -26,7 +26,7 @@ const globalConfigRootSchema = t.type({
 
 const partialMegaTest = t.partial({ name: t.string });
 
-export function validateGuildConfig(config: any): string[] | null {
+export async function validateGuildConfig(config: any): Promise<string[] | null> {
   const validationResult = decodeAndValidateStrict(partialGuildConfigRootSchema, config);
   if (validationResult instanceof StrictValidationError) return validationResult.getErrors();
 
@@ -40,7 +40,8 @@ export function validateGuildConfig(config: any): string[] | null {
 
       const plugin = pluginNameToPlugin.get(pluginName);
       try {
-        plugin.configPreprocessor(pluginOptions as PluginOptions<any>);
+        const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
+        await plugin.configPreprocessor(mergedOptions as PluginOptions<any>);
       } catch (err) {
         if (err instanceof StrictValidationError) {
           return err.getErrors().map(err => {
