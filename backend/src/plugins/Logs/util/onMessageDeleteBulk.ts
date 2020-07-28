@@ -7,7 +7,7 @@ import { getBaseUrl } from "src/pluginUtils";
 export async function onMessageDeleteBulk(pluginData: PluginData<LogsPluginType>, savedMessages: SavedMessage[]) {
   const channel = pluginData.guild.channels.get(savedMessages[0].channel_id);
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
-  const archiveUrl = pluginData.state.archives.getUrl(getBaseUrl, archiveId);
+  const archiveUrl = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
 
   pluginData.state.guildLogs.log(
     LogType.MESSAGE_DELETE_BULK,
