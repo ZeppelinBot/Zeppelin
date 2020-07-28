@@ -88,7 +88,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, memberToKick.id);
 
     try {
-      await pluginData.guild.unbanMember(memberToKick.id, reason);
+      await pluginData.guild.unbanMember(memberToKick.id, encodeURIComponent(reason));
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
     }

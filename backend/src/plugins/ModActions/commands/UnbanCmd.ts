@@ -46,7 +46,7 @@ export const UnbanCmd = modActionsCommand({
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
-      await pluginData.guild.unbanMember(user.id, reason);
+      await pluginData.guild.unbanMember(user.id, encodeURIComponent(reason));
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban member; are you sure they're banned?");
       return;
