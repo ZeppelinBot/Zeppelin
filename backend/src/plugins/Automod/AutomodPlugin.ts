@@ -16,6 +16,9 @@ import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges";
+import { LogsPlugin } from "../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
+import { MutesPlugin } from "../Mutes/MutesPlugin";
 
 const defaultOptions = {
   config: {
@@ -106,16 +109,22 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
 };
 
 export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
+  dependencies: [LogsPlugin, ModActionsPlugin, MutesPlugin],
+
   configSchema: ConfigSchema,
   defaultOptions,
   configPreprocessor,
+
+  customOverrideMatcher(pluginData, criteria, matchParams) {
+    return criteria?.antiraid_level && criteria.antiraid_level === pluginData.state.cachedAntiraidLevel;
+  },
 
   events: [
     RunAutomodOnJoinEvt,
     // Messages use message events from SavedMessages, see onLoad below
   ],
 
-  onLoad(pluginData) {
+  async onLoad(pluginData) {
     pluginData.state.queue = new Queue();
 
     pluginData.state.recentActions = [];
@@ -130,8 +139,6 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
       30 * SECONDS,
     );
 
-    pluginData.state.cachedAntiraidLevel = null; // TODO
-
     pluginData.state.logs = new GuildLogs(pluginData.guild.id);
     pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
     pluginData.state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(pluginData.guild.id);
@@ -142,6 +149,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
 
     pluginData.state.onMessageUpdateFn = message => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
+
+    pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
   },
 
   onUnload(pluginData) {

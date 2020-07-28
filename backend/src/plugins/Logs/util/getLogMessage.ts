@@ -7,7 +7,7 @@ import { renderTemplate, TemplateParseError } from "src/templateFormatter";
 import { logger } from "src/logger";
 import moment from "moment-timezone";
 
-export async function getLogMessage(pluginData: PluginData<LogsPluginType>, type, data): Promise<string> {
+export async function getLogMessage(pluginData: PluginData<LogsPluginType>, type: LogType, data: any): Promise<string> {
   const config = pluginData.config.get();
   const format = config.format[LogType[type]] || "";
   if (format === "") return;

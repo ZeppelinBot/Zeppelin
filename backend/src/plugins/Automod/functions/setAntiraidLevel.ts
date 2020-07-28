@@ -1,6 +1,9 @@
 import { User } from "eris";
 import { PluginData } from "knub";
 import { AutomodPluginType } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars } from "../../../utils";
 
 export async function setAntiraidLevel(
   pluginData: PluginData<AutomodPluginType>,
@@ -10,9 +13,16 @@ export async function setAntiraidLevel(
   pluginData.state.cachedAntiraidLevel = newLevel;
   await pluginData.state.antiraidLevels.set(newLevel);
 
+  const logs = pluginData.getPlugin(LogsPlugin);
+
   if (user) {
-    // TODO: Log user action
+    logs.log(LogType.SET_ANTIRAID_USER, {
+      level: newLevel ?? "off",
+      user: stripObjectToScalars(user),
+    });
   } else {
-    // TODO: Log automatic action
+    logs.log(LogType.SET_ANTIRAID_AUTO, {
+      level: newLevel ?? "off",
+    });
   }
 }
