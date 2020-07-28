@@ -22,6 +22,7 @@ import { RolesPlugin } from "./Roles/RolesPlugin";
 import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
 import { StarboardPlugin } from "./Starboard/StarboardPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
+import { SelfGrantableRolesPlugin } from "./SelfGrantableRoles/SelfGrantableRolesPlugin";
 import { SpamPlugin } from "./Spam/SpamPlugin";
 import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
 import { AutomodPlugin } from "./Automod/AutomodPlugin";
@@ -43,6 +44,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   NameHistoryPlugin,
   RemindersPlugin,
   RolesPlugin,
+  SelfGrantableRolesPlugin,
   SlowmodePlugin,
   SpamPlugin,
   StarboardPlugin,
