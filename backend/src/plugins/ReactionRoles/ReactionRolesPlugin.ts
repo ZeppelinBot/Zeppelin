@@ -1,0 +1,70 @@
+import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { PluginOptions } from "knub";
+import { ConfigSchema, ReactionRolesPluginType } from "./types";
+import { GuildReactionRoles } from "src/data/GuildReactionRoles";
+import { GuildSavedMessages } from "src/data/GuildSavedMessages";
+import { Queue } from "src/Queue";
+import { autoRefreshLoop } from "./util/autoRefreshLoop";
+import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
+import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
+import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
+import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
+
+const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
+
+const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
+  config: {
+    auto_refresh_interval: MIN_AUTO_REFRESH,
+
+    can_manage: false,
+  },
+
+  overrides: [
+    {
+      level: ">=100",
+      config: {
+        can_manage: true,
+      },
+    },
+  ],
+};
+
+export const ReactionRolesPlugin = zeppelinPlugin<ReactionRolesPluginType>()("reaction_roles", {
+  configSchema: ConfigSchema,
+  defaultOptions,
+
+  // prettier-ignore
+  commands: [
+    RefreshReactionRolesCmd,
+    ClearReactionRolesCmd,
+    InitReactionRolesCmd,
+  ],
+
+  // prettier-ignore
+  events: [
+    AddReactionRoleEvt,
+  ],
+
+  onLoad(pluginData) {
+    const { state, guild } = pluginData;
+
+    state.reactionRoles = GuildReactionRoles.getGuildInstance(guild.id);
+    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.reactionRemoveQueue = new Queue();
+    state.roleChangeQueue = new Queue();
+    state.pendingRoleChanges = new Map();
+    state.pendingRefreshes = new Set();
+
+    let autoRefreshInterval = pluginData.config.get().auto_refresh_interval;
+    if (autoRefreshInterval != null) {
+      autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
+      autoRefreshLoop(pluginData, autoRefreshInterval);
+    }
+  },
+
+  onUnload(pluginData) {
+    if (pluginData.state.autoRefreshTimeout) {
+      clearTimeout(pluginData.state.autoRefreshTimeout);
+    }
+  },
+});
