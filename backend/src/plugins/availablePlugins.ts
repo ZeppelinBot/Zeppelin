@@ -27,6 +27,7 @@ import { SelfGrantableRolesPlugin } from "./SelfGrantableRoles/SelfGrantableRole
 import { SpamPlugin } from "./Spam/SpamPlugin";
 import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
 import { AutomodPlugin } from "./Automod/AutomodPlugin";
+import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -57,6 +58,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   CasesPlugin,
   MutesPlugin,
   AutomodPlugin,
+  CompanionChannelsPlugin,
 ];
 
 // prettier-ignore
