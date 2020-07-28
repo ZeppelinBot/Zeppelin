@@ -15,7 +15,7 @@ export const NicknameCmd = utilityCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    if (msg.member.id !== args.member.id && canActOn(pluginData, msg.member, args.member)) {
+    if (msg.member.id !== args.member.id && !canActOn(pluginData, msg.member, args.member)) {
       msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
