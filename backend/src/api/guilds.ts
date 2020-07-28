@@ -76,12 +76,14 @@ export function initGuildsAPI(app: express.Express) {
       parsedConfig = {};
     }
 
-    const errors = validateGuildConfig(parsedConfig);
+    const errors = await validateGuildConfig(parsedConfig);
+
     if (errors) {
       return res.status(422).json({ errors });
     }
 
     await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user.userId);
+
     ok(res);
   });
 
