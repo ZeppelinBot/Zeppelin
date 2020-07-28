@@ -48,10 +48,10 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
   // prettier-ignore
   commands: [
     TagEvalCmd,
-    TagCreateCmd,
     TagDeleteCmd,
     TagListCmd,
     TagSourceCmd,
+    TagCreateCmd,
   ],
 
   onLoad(pluginData) {
