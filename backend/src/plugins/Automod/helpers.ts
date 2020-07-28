@@ -8,6 +8,8 @@ export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
   extra?: TExtra;
 
   silentClean?: boolean; // TODO: Maybe generalize to a "silent" value in general, which mutes alert/log
+
+  summary?: string;
 }
 
 type AutomodTriggerMatchFn<TConfigType, TMatchResultExtra> = (meta: {
@@ -54,6 +56,7 @@ type AutomodActionApplyFn<TConfigType> = (meta: {
   pluginData: PluginData<AutomodPluginType>;
   contexts: AutomodContext[];
   actionConfig: TConfigType;
+  matchResult: AutomodTriggerMatchResult;
 }) => Awaitable<void>;
 
 export interface AutomodActionBlueprint<TConfigType extends t.Any> {

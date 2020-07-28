@@ -25,7 +25,6 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
     if (!rule.affects_bots && user.bot) continue;
 
     let matchResult: AutomodTriggerMatchResult<any>;
-    let matchSummary: string;
     let contexts: AutomodContext[];
 
     triggerLoop: for (const triggerItem of rule.triggers) {
@@ -45,23 +44,24 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
             _context.actioned = true;
           }
 
-          if (matchResult.silentClean) {
-            await CleanAction.apply({
-              ruleName,
-              pluginData,
-              contexts,
-              actionConfig: true,
-            });
-            return;
-          }
-
-          matchSummary = await trigger.renderMatchInformation({
+          matchResult.summary = await trigger.renderMatchInformation({
             ruleName,
             pluginData,
             contexts,
             matchResult,
             triggerConfig,
           });
+
+          if (matchResult.silentClean) {
+            await CleanAction.apply({
+              ruleName,
+              pluginData,
+              contexts,
+              actionConfig: true,
+              matchResult,
+            });
+            return;
+          }
 
           break triggerLoop;
         }
@@ -76,6 +76,7 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
           pluginData,
           contexts,
           actionConfig,
+          matchResult,
         });
       }
 

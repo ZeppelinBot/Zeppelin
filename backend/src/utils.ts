@@ -34,6 +34,7 @@ import { either } from "fp-ts/lib/Either";
 import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
 import { logger } from "./logger";
+import { Awaitable } from "knub/dist/utils";
 
 const fsp = fs.promises;
 
@@ -1221,4 +1222,8 @@ export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
 
 export function isGuildInvite(invite: AnyInvite): invite is GuildInvite {
   return (invite as GuildInvite).guild != null;
+}
+
+export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
+  return Promise.all(arr.map((item, index) => fn(item)));
 }

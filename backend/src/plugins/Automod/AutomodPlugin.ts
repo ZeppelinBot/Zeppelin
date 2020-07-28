@@ -15,6 +15,7 @@ import { MINUTES, SECONDS } from "../../utils";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
+import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges";
 
 const defaultOptions = {
   config: {
@@ -94,9 +95,9 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
           }
         }
 
-        // if (rule["actions"]["log"] == null) {
-        //   rule["actions"]["log"] = true;
-        // }
+        if (rule["actions"]["log"] == null) {
+          rule["actions"]["log"] = true;
+        }
       }
     }
   }
@@ -123,6 +124,14 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
     pluginData.state.recentSpam = [];
     pluginData.state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
 
+    pluginData.state.recentNicknameChanges = new Map();
+    pluginData.state.clearRecentNicknameChangesInterval = setInterval(
+      () => clearOldRecentNicknameChanges(pluginData),
+      30 * SECONDS,
+    );
+
+    pluginData.state.cachedAntiraidLevel = null; // TODO
+
     pluginData.state.logs = new GuildLogs(pluginData.guild.id);
     pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
     pluginData.state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(pluginData.guild.id);
@@ -141,6 +150,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
     clearInterval(pluginData.state.clearRecentActionsInterval);
 
     clearInterval(pluginData.state.clearRecentSpamInterval);
+
+    clearInterval(pluginData.state.clearRecentNicknameChangesInterval);
 
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
     pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
