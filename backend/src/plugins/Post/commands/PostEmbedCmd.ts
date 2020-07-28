@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { actualPostCmd } from "../util/actualPostCmd";
 import { sendErrorMessage } from "src/pluginUtils";
 import { Embed } from "eris";
-import { isValidEmbed } from "src/utils";
+import { isValidEmbed, trimLines } from "src/utils";
 import { formatContent } from "../util/formatContent";
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
@@ -69,6 +69,17 @@ export const PostEmbedCmd = postCmd({
       } else {
         embed.description = formatContent(content);
       }
+    }
+
+    if (args.content) {
+      const prefix = pluginData.guildConfig.prefix || "!";
+      msg.channel.createMessage(
+        trimLines(`
+        <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
+        \`${prefix}edit_embed -title "Some title" content goes here\`
+        The \`-content\` option will soon be removed in favor of this.
+      `),
+      );
     }
 
     actualPostCmd(pluginData, msg, args.channel, { embed }, args);
