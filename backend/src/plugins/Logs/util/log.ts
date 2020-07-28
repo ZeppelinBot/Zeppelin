@@ -5,7 +5,7 @@ import { TextChannel } from "eris";
 import { createChunkedMessage, noop } from "src/utils";
 import { getLogMessage } from "./getLogMessage";
 
-export async function log(pluginData: PluginData<LogsPluginType>, type, data) {
+export async function log(pluginData: PluginData<LogsPluginType>, type: LogType, data: any) {
   const logChannels: TLogChannelMap = pluginData.config.get().channels;
   const typeStr = LogType[type];
 

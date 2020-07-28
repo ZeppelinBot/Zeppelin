@@ -34,6 +34,11 @@ export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface AutomodPluginType extends BasePluginType {
   config: TConfigSchema;
+
+  customOverrideCriteria: {
+    antiraid_level?: string;
+  };
+
   state: {
     /**
      * Automod checks/actions are handled in a queue so we don't get overlap on the same user

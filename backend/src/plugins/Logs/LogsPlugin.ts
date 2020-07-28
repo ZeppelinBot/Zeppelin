@@ -17,6 +17,8 @@ import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannel
 import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
 import { LogsVoiceJoinEvt, LogsVoiceLeaveEvt, LogsVoiceSwitchEvt } from "./events/LogsVoiceChannelEvts";
 import { log } from "./util/log";
+import { LogType } from "../../data/LogType";
+import { getLogMessage } from "./util/getLogMessage";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -57,6 +59,20 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
     LogsVoiceLeaveEvt,
     LogsVoiceSwitchEvt,
   ],
+
+  public: {
+    log(pluginData) {
+      return (type: LogType, data: any) => {
+        return log(pluginData, type, data);
+      };
+    },
+
+    getLogMessage(pluginData) {
+      return (type: LogType, data: any) => {
+        return getLogMessage(pluginData, type, data);
+      };
+    },
+  },
 
   onLoad(pluginData) {
     const { state, guild } = pluginData;

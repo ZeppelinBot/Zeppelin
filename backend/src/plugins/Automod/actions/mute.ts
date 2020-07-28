@@ -14,7 +14,7 @@ export const MuteAction = automodAction({
     notifyChannel: tNullable(t.string),
   }),
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration) : null;
     const reason = actionConfig.reason || "Muted automatically";
     const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
@@ -22,7 +22,7 @@ export const MuteAction = automodAction({
     const caseArgs = {
       modId: pluginData.client.user.id,
       extraNotes: [
-        /* TODO */
+        matchResult.summary, // TODO
       ],
     };
 

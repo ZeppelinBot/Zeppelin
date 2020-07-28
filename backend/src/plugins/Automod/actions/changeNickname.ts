@@ -1,9 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable } from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const ChangeNicknameAction = automodAction({
   configType: t.type({
@@ -18,7 +16,9 @@ export const ChangeNicknameAction = automodAction({
       if (pluginData.state.recentNicknameChanges.has(member.id)) continue;
 
       member.edit({ nick: actionConfig.name }).catch(err => {
-        /* TODO: Log this error */
+        pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+          body: `Failed to change the nickname of \`${member.id}\``,
+        });
       });
 
       pluginData.state.recentNicknameChanges.set(member.id, { timestamp: Date.now() });

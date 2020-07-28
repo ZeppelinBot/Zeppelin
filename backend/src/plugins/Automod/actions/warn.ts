@@ -12,14 +12,14 @@ export const WarnAction = automodAction({
     notifyChannel: tNullable(t.string),
   }),
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Warned automatically";
     const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
 
     const caseArgs = {
       modId: pluginData.client.user.id,
       extraNotes: [
-        /* TODO */
+        matchResult.summary, // TODO
       ],
     };
 

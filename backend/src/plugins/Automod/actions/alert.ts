@@ -6,6 +6,7 @@ import { resolveActionContactMethods } from "../functions/resolveActionContactMe
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { TextChannel } from "eris";
 import { renderTemplate } from "../../../templateFormatter";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const AlertAction = automodAction({
   configType: t.type({
@@ -15,6 +16,7 @@ export const AlertAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
     const channel = pluginData.guild.channels.get(actionConfig.channel);
+    const logs = pluginData.getPlugin(LogsPlugin);
 
     if (channel && channel instanceof TextChannel) {
       const text = actionConfig.text;
@@ -23,26 +25,31 @@ export const AlertAction = automodAction({
 
       const safeUsers = contexts.map(c => c.user && stripObjectToScalars(c.user)).filter(Boolean);
       const safeUser = safeUsers[0];
+      const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions);
 
-      const takenActions = Object.keys(pluginData.config.get().rules[ruleName].actions);
-      // TODO: Generate logMessage
-      const logMessage = "";
+      const logMessage = logs.getLogMessage(LogType.AUTOMOD_ACTION, {
+        rule: ruleName,
+        user: safeUser,
+        users: safeUsers,
+        actionsTaken,
+        matchSummary: matchResult.summary,
+      });
 
       const rendered = await renderTemplate(actionConfig.text, {
         rule: ruleName,
         user: safeUser,
         users: safeUsers,
         text,
+        actionsTaken,
         matchSummary: matchResult.summary,
         messageLink: theMessageLink,
         logMessage,
       });
       channel.createMessage(rendered);
     } else {
-      // TODO: Post BOT_ALERT log
-      /*this.getLogs().log(LogType.BOT_ALERT, {
-        body: `Invalid channel id \`${actionConfig.channel}\` for alert action in automod rule **${rule.name}**`,
-      });*/
+      logs.log(LogType.BOT_ALERT, {
+        body: `Invalid channel id \`${actionConfig.channel}\` for alert action in automod rule **${ruleName}**`,
+      });
     }
   },
 });

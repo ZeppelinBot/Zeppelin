@@ -12,14 +12,14 @@ export const KickAction = automodAction({
     notifyChannel: tNullable(t.string),
   }),
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";
     const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
 
     const caseArgs = {
       modId: pluginData.client.user.id,
       extraNotes: [
-        /* TODO */
+        matchResult.summary, // TODO
       ],
     };
 
