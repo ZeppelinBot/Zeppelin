@@ -11,7 +11,7 @@ export const LogsGuildBanAddEvt = logsEvent({
     const user = meta.args.user;
 
     const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      pluginData.guildConfig,
+      pluginData.guild,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id,
     );
