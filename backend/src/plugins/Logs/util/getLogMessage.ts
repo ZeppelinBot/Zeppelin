@@ -27,7 +27,7 @@ export async function getLogMessage(pluginData: PluginData<LogsPluginType>, type
           let member;
 
           if (userOrMember.user) {
-            member = await resolveMember(pluginData.client, pluginData.guild, userOrMember.id);
+            member = userOrMember;
             user = member.user;
           } else {
             user = userOrMember;
