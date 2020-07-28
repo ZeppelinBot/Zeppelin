@@ -1,4 +1,4 @@
-import { PluginOptions } from "knub";
+import { CooldownManager, PluginOptions } from "knub";
 import { SelfGrantableRolesPluginType, ConfigSchema, defaultSelfGrantableRoleEntry } from "./types";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { trimPluginDescription } from "src/utils";
@@ -91,5 +91,9 @@ export const SelfGrantableRolesPlugin = zeppelinPlugin<SelfGrantableRolesPluginT
     RoleHelpCmd,
     RoleRemoveCmd,
     RoleAddCmd,
-  ]
+  ],
+
+  onLoad(pluginData) {
+    pluginData.state.cooldowns = new CooldownManager();
+  },
 });

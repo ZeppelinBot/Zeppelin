@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command } from "knub";
+import { BasePluginType, command, CooldownManager } from "knub";
 
 const RoleMap = t.record(t.string, t.array(t.string));
 
@@ -26,6 +26,9 @@ export const defaultSelfGrantableRoleEntry: t.TypeOf<typeof PartialRoleEntry> = 
 
 export interface SelfGrantableRolesPluginType extends BasePluginType {
   config: TConfigSchema;
+  state: {
+    cooldowns: CooldownManager;
+  };
 }
 
 export const selfGrantableRolesCmd = command<SelfGrantableRolesPluginType>();
