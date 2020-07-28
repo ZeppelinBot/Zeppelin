@@ -16,7 +16,7 @@ export const RemindersDeleteCmd = remindersCommand({
     reminders.sort(sorter("remind_at"));
     const lastNum = reminders.length + 1;
 
-    if (args.num > lastNum || args.num < 0) {
+    if (args.num > lastNum || args.num <= 0) {
       sendErrorMessage(pluginData, msg.channel, "Unknown reminder");
       return;
     }
