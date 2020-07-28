@@ -41,4 +41,8 @@ export class Queue {
       setTimeout(resolve, this.timeout);
     }).then(() => this.next());
   }
+
+  public clear() {
+    this.queue.splice(0, this.queue.length);
+  }
 }
