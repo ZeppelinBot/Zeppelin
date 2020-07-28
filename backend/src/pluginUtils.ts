@@ -3,7 +3,7 @@
  */
 
 import { Member } from "eris";
-import { configUtils, helpers, PluginData, PluginOptions } from "knub";
+import { configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
@@ -27,8 +27,15 @@ export function hasPermission(pluginData: PluginData<any>, permission: string, m
   return helpers.hasPermission(config, permission);
 }
 
-export function getPluginConfigPreprocessor(blueprint: ZeppelinPluginBlueprint) {
-  return (options: PluginOptions<any>) => {
+export function getPluginConfigPreprocessor(
+  blueprint: ZeppelinPluginBlueprint,
+  customPreprocessor?: PluginBlueprint<any>["configPreprocessor"],
+) {
+  return async (options: PluginOptions<any>) => {
+    if (customPreprocessor) {
+      options = await customPreprocessor(options);
+    }
+
     const decodedConfig = blueprint.configSchema
       ? decodeAndValidateStrict(blueprint.configSchema, options.config)
       : options.config;
