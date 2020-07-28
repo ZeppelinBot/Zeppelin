@@ -23,6 +23,7 @@ import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
 import { StarboardPlugin } from "./Starboard/StarboardPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
+import { AutomodPlugin } from "./Automod/AutomodPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -49,6 +50,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   WelcomeMessagePlugin,
   CasesPlugin,
   MutesPlugin,
+  AutomodPlugin,
 ];
 
 // prettier-ignore
