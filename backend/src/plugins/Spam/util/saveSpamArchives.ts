@@ -8,5 +8,5 @@ export async function saveSpamArchives(pluginData, savedMessages: SavedMessage[]
   const expiresAt = moment().add(SPAM_ARCHIVE_EXPIRY_DAYS, "days");
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild, expiresAt);
 
-  return pluginData.state.archives.getUrl(getBaseUrl, archiveId);
+  return pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
 }
