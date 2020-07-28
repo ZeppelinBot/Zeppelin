@@ -15,6 +15,8 @@ import { muteUser } from "./functions/muteUser";
 import { unmuteUser } from "./functions/unmuteUser";
 import { CaseArgs } from "../Cases/types";
 import { Member } from "eris";
+import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
+import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
 
 const defaultOptions = {
   config: {
@@ -70,6 +72,8 @@ export const MutesPlugin = zeppelinPlugin<MutesPluginType>()("mutes", {
   // prettier-ignore
   events: [
     ClearActiveMuteOnRoleRemovalEvt,
+    ClearActiveMuteOnMemberBanEvt,
+    ReapplyActiveMuteOnJoinEvt,
   ],
 
   public: {
