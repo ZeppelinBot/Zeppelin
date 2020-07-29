@@ -67,7 +67,6 @@
       // }
 
       onTreeUpdate(targetPermissions) {
-        console.log('hi');
         this.$store.dispatch("guilds/setTargetPermissions", {
           guildId: this.$route.params.guildId,
           targetId: targetPermissions.target_id,
