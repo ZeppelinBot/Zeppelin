@@ -8,6 +8,8 @@ import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 export const RemoveRolesAction = automodAction({
   configType: t.array(t.string),
 
+  defaultConfig: [],
+
   async apply({ pluginData, contexts, actionConfig }) {
     const members = unique(contexts.map(c => c.member).filter(Boolean));
 

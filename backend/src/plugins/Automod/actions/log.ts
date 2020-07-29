@@ -6,6 +6,7 @@ import { stripObjectToScalars } from "../../../utils";
 
 export const LogAction = automodAction({
   configType: t.boolean,
+  defaultConfig: true,
 
   async apply({ pluginData, contexts, ruleName, matchResult }) {
     const safeUsers = contexts.map(c => c.user && stripObjectToScalars(c.user)).filter(Boolean);

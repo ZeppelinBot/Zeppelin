@@ -14,6 +14,8 @@ export const AlertAction = automodAction({
     text: t.string,
   }),
 
+  defaultConfig: {},
+
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
     const channel = pluginData.guild.channels.get(actionConfig.channel);
     const logs = pluginData.getPlugin(LogsPlugin);

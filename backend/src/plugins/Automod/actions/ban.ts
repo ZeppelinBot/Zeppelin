@@ -13,6 +13,10 @@ export const BanAction = automodAction({
     deleteMessageDays: tNullable(t.number),
   }),
 
+  defaultConfig: {
+    notify: null, // Use defaults from ModActions
+  },
+
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";
     const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
@@ -20,9 +24,7 @@ export const BanAction = automodAction({
 
     const caseArgs = {
       modId: pluginData.client.user.id,
-      extraNotes: [
-        matchResult.summary, // TODO
-      ],
+      extraNotes: [matchResult.fullSummary],
     };
 
     const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(Boolean));

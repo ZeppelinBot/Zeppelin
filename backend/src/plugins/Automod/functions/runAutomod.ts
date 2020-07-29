@@ -55,13 +55,16 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
             return;
           }
 
-          matchResult.summary = await trigger.renderMatchInformation({
-            ruleName,
-            pluginData,
-            contexts,
-            matchResult,
-            triggerConfig,
-          });
+          matchResult.summary =
+            (await trigger.renderMatchInformation({
+              ruleName,
+              pluginData,
+              contexts,
+              matchResult,
+              triggerConfig,
+            })) ?? "";
+
+          matchResult.fullSummary = `Triggered automod rule **${ruleName}**\n${matchResult.summary}`.trim();
 
           break triggerLoop;
         }
