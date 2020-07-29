@@ -1,7 +1,7 @@
 import { RecentActionType } from "../constants";
 import { automodTrigger } from "../helpers";
 import { getBaseUrl } from "../../../pluginUtils";
-import { convertDelayStringToMS, tDelayString, tNullable } from "../../../utils";
+import { convertDelayStringToMS, sorter, tDelayString, tNullable } from "../../../utils";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
@@ -30,7 +30,12 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
 
       const recentSpam = findRecentSpam(pluginData, spamType, context.message.user_id);
       if (recentSpam) {
-        // TODO: Combine with old archive
+        await pluginData.state.archives.addSavedMessagesToArchive(
+          recentSpam.archiveId,
+          [context.message],
+          pluginData.guild,
+        );
+
         return {
           silentClean: true,
         };
@@ -47,8 +52,12 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
       );
 
       if (matchedSpam) {
-        // TODO: Generate archive link
-        const archiveId = "TODO";
+        const messages = matchedSpam.recentActions
+          .map(action => action.context.message)
+          .filter(Boolean)
+          .sort(sorter("posted_at"));
+
+        const archiveId = await pluginData.state.archives.createFromSavedMessages(messages, pluginData.guild);
 
         pluginData.state.recentSpam.push({
           type: spamType,
