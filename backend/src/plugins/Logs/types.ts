@@ -5,7 +5,10 @@ import { GuildLogs } from "src/data/GuildLogs";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildArchives } from "src/data/GuildArchives";
 import { GuildCases } from "src/data/GuildCases";
-import { tMessageContent } from "../../utils";
+import { tMessageContent, tNullable } from "../../utils";
+
+export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
+export type TLogFormats = t.TypeOf<typeof tLogFormats>;
 
 const LogChannel = t.partial({
   include: t.array(t.string),
@@ -15,22 +18,21 @@ const LogChannel = t.partial({
   excluded_users: t.array(t.string),
   excluded_message_regexes: t.array(TSafeRegex),
   excluded_channels: t.array(t.string),
+  format: tNullable(tLogFormats),
 });
 export type TLogChannel = t.TypeOf<typeof LogChannel>;
 
 const LogChannelMap = t.record(t.string, LogChannel);
 export type TLogChannelMap = t.TypeOf<typeof LogChannelMap>;
 
-const tLogFormats = t.intersection([
-  t.record(t.string, t.union([t.string, tMessageContent])),
-  t.type({
-    timestamp: t.string,
-  }),
-]);
-
 export const ConfigSchema = t.type({
   channels: LogChannelMap,
-  format: tLogFormats,
+  format: t.intersection([
+    tLogFormats,
+    t.type({
+      timestamp: t.string,
+    }),
+  ]),
   ping_user: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

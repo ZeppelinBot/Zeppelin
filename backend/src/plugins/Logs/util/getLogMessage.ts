@@ -1,5 +1,5 @@
 import { PluginData } from "knub";
-import { LogsPluginType } from "../types";
+import { LogsPluginType, TLogFormats } from "../types";
 import { LogType } from "src/data/LogType";
 import {
   verboseUserMention,
@@ -14,9 +14,14 @@ import { renderTemplate, TemplateParseError } from "src/templateFormatter";
 import { logger } from "src/logger";
 import moment from "moment-timezone";
 
-export async function getLogMessage(pluginData: PluginData<LogsPluginType>, type: LogType, data: any): Promise<string> {
+export async function getLogMessage(
+  pluginData: PluginData<LogsPluginType>,
+  type: LogType,
+  data: any,
+  formats?: TLogFormats,
+): Promise<string> {
   const config = pluginData.config.get();
-  const format = config.format[LogType[type]] || "";
+  const format = (formats && formats[LogType[type]]) || config.format[LogType[type]] || "";
   if (format === "") return;
 
   const values = {
