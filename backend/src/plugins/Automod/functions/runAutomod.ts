@@ -44,14 +44,6 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
             _context.actioned = true;
           }
 
-          matchResult.summary = await trigger.renderMatchInformation({
-            ruleName,
-            pluginData,
-            contexts,
-            matchResult,
-            triggerConfig,
-          });
-
           if (matchResult.silentClean) {
             await CleanAction.apply({
               ruleName,
@@ -62,6 +54,14 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
             });
             return;
           }
+
+          matchResult.summary = await trigger.renderMatchInformation({
+            ruleName,
+            pluginData,
+            contexts,
+            matchResult,
+            triggerConfig,
+          });
 
           break triggerLoop;
         }
