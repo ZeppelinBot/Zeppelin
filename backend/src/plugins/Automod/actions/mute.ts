@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, convertDelayStringToMS, resolveMember, tDelayString, tNullable } from "../../../utils";
+import { asyncMap, convertDelayStringToMS, resolveMember, tDelayString, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
@@ -26,7 +26,7 @@ export const MuteAction = automodAction({
       ],
     };
 
-    const userIdsToMute = contexts.map(c => c.user?.id).filter(Boolean);
+    const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(Boolean));
 
     const mutes = pluginData.getPlugin(MutesPlugin);
     for (const userId of userIdsToMute) {

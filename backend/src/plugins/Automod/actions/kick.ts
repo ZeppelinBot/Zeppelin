@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable } from "../../../utils";
+import { asyncMap, resolveMember, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 
@@ -23,7 +23,7 @@ export const KickAction = automodAction({
       ],
     };
 
-    const userIdsToKick = contexts.map(c => c.user?.id).filter(Boolean);
+    const userIdsToKick = unique(contexts.map(c => c.user?.id).filter(Boolean));
     const membersToKick = await asyncMap(userIdsToKick, id => resolveMember(pluginData.client, pluginData.guild, id));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);

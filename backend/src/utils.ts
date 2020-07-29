@@ -423,9 +423,11 @@ interface MatchedURL extends url.URL {
   input: string;
 }
 
-export function getUrlsInString(str: string, unique = false): MatchedURL[] {
+export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
   let matches = str.match(urlRegex) || [];
-  if (unique) matches = Array.from(new Set(matches));
+  if (onlyUnique) {
+    matches = unique(matches);
+  }
 
   return matches.reduce((urls, match) => {
     const withProtocol = protocolRegex.test(match) ? match : `https://${match}`;
@@ -1229,4 +1231,8 @@ export function isGuildInvite(invite: AnyInvite): invite is GuildInvite {
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
   return Promise.all(arr.map((item, index) => fn(item)));
+}
+
+export function unique<T>(arr: T[]): T[] {
+  return Array.from(new Set(arr));
 }

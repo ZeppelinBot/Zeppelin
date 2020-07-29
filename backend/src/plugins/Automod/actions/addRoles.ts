@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable } from "../../../utils";
+import { asyncMap, resolveMember, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 
@@ -9,11 +9,10 @@ export const AddRolesAction = automodAction({
   configType: t.array(t.string),
 
   async apply({ pluginData, contexts, actionConfig }) {
-    const members = contexts.map(c => c.member).filter(Boolean);
-    const uniqueMembers = new Set(members);
+    const members = unique(contexts.map(c => c.member).filter(Boolean));
 
     await Promise.all(
-      Array.from(uniqueMembers.values()).map(async member => {
+      members.map(async member => {
         const memberRoles = new Set(member.roles);
         for (const roleId of actionConfig) {
           memberRoles.add(roleId);
