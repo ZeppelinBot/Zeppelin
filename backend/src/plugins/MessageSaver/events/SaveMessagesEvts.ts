@@ -3,7 +3,8 @@ import { Message } from "eris";
 
 export const MessageCreateEvt = messageSaverEvt({
   event: "messageCreate",
-  allowOutsideOfGuild: false,
+  allowBots: true,
+  allowSelf: true,
 
   async listener(meta) {
     // Only save regular chat messages
@@ -17,7 +18,8 @@ export const MessageCreateEvt = messageSaverEvt({
 
 export const MessageUpdateEvt = messageSaverEvt({
   event: "messageUpdate",
-  allowOutsideOfGuild: false,
+  allowBots: true,
+  allowSelf: true,
 
   async listener(meta) {
     if (meta.args.message.type !== 0) {
@@ -30,7 +32,8 @@ export const MessageUpdateEvt = messageSaverEvt({
 
 export const MessageDeleteEvt = messageSaverEvt({
   event: "messageDelete",
-  allowOutsideOfGuild: false,
+  allowBots: true,
+  allowSelf: true,
 
   async listener(meta) {
     const msg = meta.args.message as Message;
@@ -44,7 +47,8 @@ export const MessageDeleteEvt = messageSaverEvt({
 
 export const MessageDeleteBulkEvt = messageSaverEvt({
   event: "messageDeleteBulk",
-  allowOutsideOfGuild: false,
+  allowBots: true,
+  allowSelf: true,
 
   async listener(meta) {
     const ids = meta.args.messages.map(m => m.id);
