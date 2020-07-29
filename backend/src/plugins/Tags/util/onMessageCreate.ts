@@ -138,6 +138,13 @@ export async function onMessageCreate(pluginData: PluginData<TagsPluginType>, ms
     return;
   }
 
+  if (typeof renderedTag === "string" && renderedTag.trim() === "") {
+    pluginData.state.logs.log(LogType.BOT_ALERT, {
+      body: `Tag \`${matchedTagName}\` resulted in an empty message, so it couldn't be sent`,
+    });
+    return;
+  }
+
   const responseMsg = await channel.createMessage(renderedTag);
 
   // Save the command-response message pair once the message is in our database
