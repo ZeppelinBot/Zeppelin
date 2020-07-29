@@ -4,6 +4,7 @@ import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { TSafeRegex } from "../../../validatorUtils";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 
 interface MatchResultType {
   pattern: string;
@@ -62,11 +63,7 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.get(contexts[0].message.channel_id);
-    const prettyChannel = verboseChannelMention(channel);
-
-    return `Matched regex \`${disableInlineCode(matchResult.extra.pattern)}\` in message (\`${
-      contexts[0].message.id
-    }\`) in ${prettyChannel}:`;
+    const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
+    return `Matched regex \`${disableInlineCode(matchResult.extra.pattern)}\` in ${partialSummary}`;
   },
 });

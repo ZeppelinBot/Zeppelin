@@ -1,6 +1,12 @@
 import * as t from "io-ts";
 import { automodTrigger } from "../helpers";
-import { asSingleLine, disableCodeBlocks, disableInlineCode, verboseChannelMention } from "../../../utils";
+import {
+  asSingleLine,
+  disableCodeBlocks,
+  disableInlineCode,
+  messageSummary,
+  verboseChannelMention,
+} from "../../../utils";
 
 interface MatchResultType {
   matchedType: string;
@@ -64,10 +70,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
         Matched attachment type \`${disableInlineCode(matchResult.extra.matchedType)}\`
         (${matchResult.extra.mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
         in message (\`${contexts[0].message.id}\`) in ${prettyChannel}:
-      `) +
-      "\n```" +
-      disableCodeBlocks(contexts[0].message.data.content) +
-      "```"
+      `) + messageSummary(contexts[0].message)
     );
   },
 });

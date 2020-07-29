@@ -3,6 +3,7 @@ import { GuildInvite } from "eris";
 import { automodTrigger } from "../helpers";
 import {
   disableCodeBlocks,
+  disableInlineCode,
   getInviteCodesInString,
   isGuildInvite,
   resolveInvite,
@@ -10,6 +11,7 @@ import {
   verboseChannelMention,
 } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 
 interface MatchResultType {
   type: MatchableTextType;
@@ -79,9 +81,6 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.get(contexts[0].message.channel_id);
-    const prettyChannel = verboseChannelMention(channel);
-
     let matchedText;
 
     if (matchResult.extra.invite) {
@@ -91,11 +90,7 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
       matchedText = `invite code \`${matchResult.extra.code}\``;
     }
 
-    return (
-      `${matchedText} in message (\`${contexts[0].message.id}\`) in ${prettyChannel}:\n` +
-      "```" +
-      disableCodeBlocks(contexts[0].message.data.content) +
-      "```"
-    );
+    const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
+    return `Matched ${matchedText} in ${partialSummary}`;
   },
 });
