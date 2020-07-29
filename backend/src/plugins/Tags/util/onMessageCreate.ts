@@ -15,7 +15,12 @@ export async function onMessageCreate(pluginData: PluginData<TagsPluginType>, ms
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const config = pluginData.config.getMatchingConfig({ member, channelId: msg.channel_id });
+  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
+  const config = pluginData.config.getMatchingConfig({
+    member,
+    channelId: msg.channel_id,
+    categoryId: channel.parentID,
+  });
   let deleteWithCommand = false;
 
   // Find potential matching tag, looping through categories first and checking dynamic tags last
@@ -133,7 +138,6 @@ export async function onMessageCreate(pluginData: PluginData<TagsPluginType>, ms
     return;
   }
 
-  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
   const responseMsg = await channel.createMessage(renderedTag);
 
   // Save the command-response message pair once the message is in our database
