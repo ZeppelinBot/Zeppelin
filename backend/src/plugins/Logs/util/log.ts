@@ -59,7 +59,14 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
 
       const message = await getLogMessage(pluginData, type, data);
       if (message) {
-        const batched = opts.batched ?? true; // Default to batched unless explicitly disabled
+        // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
+        if (typeof message !== "string") {
+          await channel.createMessage(message).catch(noop);
+          return;
+        }
+
+        // Default to batched unless explicitly disabled
+        const batched = opts.batched ?? true;
         const batchTime = opts.batch_time ?? 1000;
 
         if (batched) {
