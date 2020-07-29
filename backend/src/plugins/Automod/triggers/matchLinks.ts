@@ -11,6 +11,7 @@ import {
 } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { TSafeRegex } from "../../../validatorUtils";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 
 interface MatchResultType {
   type: MatchableTextType;
@@ -131,17 +132,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.get(contexts[0].message.channel_id);
-    const prettyChannel = verboseChannelMention(channel);
-
-    return (
-      asSingleLine(`
-      Matched link \`${disableInlineCode(matchResult.extra.link)}\`
-      in message (\`${contexts[0].message.id}\`) in ${prettyChannel}:
-    `) +
-      "\n```" +
-      disableCodeBlocks(contexts[0].message.data.content) +
-      "```"
-    );
+    const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
+    return `Matched link \`${disableInlineCode(matchResult.extra.link)}\` in ${partialSummary}`;
   },
 });
