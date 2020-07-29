@@ -49,6 +49,7 @@
   "CASE_CREATE": "✏ {userMention(mod)} manually created new **{caseType}** case (#{caseNum})",
 
   "MASSBAN": "⚒ {userMention(mod)} massbanned {count} users",
+  "MASSMUTE": "📢🚫 {userMention(mod)} massmuted {count} users",
 
   "MEMBER_JOIN_WITH_PRIOR_RECORDS": "⚠ {userMention(member)} joined with prior records. Recent cases:\n{recentCaseSummary}",
 
