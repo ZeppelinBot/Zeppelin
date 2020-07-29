@@ -23,6 +23,8 @@ export const ReplyAction = automodAction({
     }),
   ]),
 
+  defaultConfig: {},
+
   async apply({ pluginData, contexts, actionConfig }) {
     const contextsWithTextChannels = contexts
       .filter(c => c.message?.channel_id)

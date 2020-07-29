@@ -6,6 +6,8 @@ export const ExampleAction = automodAction({
     someValue: t.string,
   }),
 
+  defaultConfig: {},
+
   async apply({ pluginData, contexts, actionConfig }) {
     // TODO: Everything
   },

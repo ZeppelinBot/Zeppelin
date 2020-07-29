@@ -4,6 +4,7 @@ import { LogType } from "../../../data/LogType";
 
 export const CleanAction = automodAction({
   configType: t.boolean,
+  defaultConfig: false,
 
   async apply({ pluginData, contexts }) {
     const messageIdsToDeleteByChannelId: Map<string, string[]> = new Map();

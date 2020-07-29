@@ -10,6 +10,7 @@ export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
   silentClean?: boolean; // TODO: Maybe generalize to a "silent" value in general, which mutes alert/log
 
   summary?: string;
+  fullSummary?: string;
 }
 
 type AutomodTriggerMatchFn<TConfigType, TMatchResultExtra> = (meta: {
@@ -61,6 +62,8 @@ type AutomodActionApplyFn<TConfigType> = (meta: {
 
 export interface AutomodActionBlueprint<TConfigType extends t.Any> {
   configType: TConfigType;
+  defaultConfig: Partial<t.TypeOf<TConfigType>>;
+
   apply: AutomodActionApplyFn<t.TypeOf<TConfigType>>;
 }
 

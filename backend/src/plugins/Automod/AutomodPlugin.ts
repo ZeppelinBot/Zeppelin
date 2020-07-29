@@ -93,6 +93,23 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
         }
       }
 
+      if (rule["actions"]) {
+        for (const actionName in rule["actions"]) {
+          if (!availableActions[actionName]) {
+            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule.name}'`]);
+          }
+
+          const actionBlueprint = availableActions[actionName];
+          const actionConfig = rule["actions"][actionName];
+
+          if (typeof actionConfig !== "object" || Array.isArray(actionConfig) || actionConfig == null) {
+            rule["actions"][actionName] = actionConfig;
+          } else {
+            rule["actions"][actionName] = configUtils.mergeConfig(actionBlueprint.defaultConfig, actionConfig);
+          }
+        }
+      }
+
       // Enable logging of automod actions by default
       if (rule["actions"]) {
         for (const actionName in rule.actions) {

@@ -9,6 +9,8 @@ export const ChangeNicknameAction = automodAction({
     name: t.string,
   }),
 
+  defaultConfig: {},
+
   async apply({ pluginData, contexts, actionConfig }) {
     const members = unique(contexts.map(c => c.member).filter(Boolean));
 
