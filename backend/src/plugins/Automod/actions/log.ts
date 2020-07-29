@@ -10,7 +10,7 @@ export const LogAction = automodAction({
   async apply({ pluginData, contexts, ruleName, matchResult }) {
     const safeUsers = contexts.map(c => c.user && stripObjectToScalars(c.user)).filter(Boolean);
     const safeUser = safeUsers[0];
-    const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions);
+    const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 
     pluginData.getPlugin(LogsPlugin).log(LogType.AUTOMOD_ACTION, {
       rule: ruleName,

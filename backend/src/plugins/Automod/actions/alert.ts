@@ -25,7 +25,7 @@ export const AlertAction = automodAction({
 
       const safeUsers = contexts.map(c => c.user && stripObjectToScalars(c.user)).filter(Boolean);
       const safeUser = safeUsers[0];
-      const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions);
+      const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 
       const logMessage = logs.getLogMessage(LogType.AUTOMOD_ACTION, {
         rule: ruleName,
