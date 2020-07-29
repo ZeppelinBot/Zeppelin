@@ -40,7 +40,6 @@ export function getPluginConfigPreprocessor(
       ? decodeAndValidateStrict(blueprint.configSchema, options.config)
       : options.config;
     if (decodedConfig instanceof StrictValidationError) {
-      console.log("o", options);
       throw decodedConfig;
     }
 
