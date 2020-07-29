@@ -1,6 +1,6 @@
 import { starboardEvt } from "../types";
-import { Message } from "eris";
-import { UnknownUser, resolveMember, noop } from "src/utils";
+import { Message, TextChannel } from "eris";
+import { UnknownUser, resolveMember, noop, resolveUser } from "src/utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
 export const StarboardReactionAddEvt = starboardEvt({
@@ -26,11 +26,15 @@ export const StarboardReactionAddEvt = starboardEvt({
     // No self-votes!
     if (msg.author.id === userId) return;
 
-    const user = await resolveMember(pluginData.client, pluginData.guild, userId);
-    if (user instanceof UnknownUser) return;
-    if (user.bot) return;
+    const member = await resolveMember(pluginData.client, pluginData.guild, userId);
+    if (!member || member.bot) return;
 
-    const config = pluginData.config.getMatchingConfig({ member: user, channelId: msg.channel.id });
+    const config = pluginData.config.getMatchingConfig({
+      member,
+      channelId: msg.channel.id,
+      categoryId: (msg.channel as TextChannel).parentID,
+    });
+
     const applicableStarboards = Object.values(config.boards)
       .filter(board => board.enabled)
       // Can't star messages in the starboard channel itself
