@@ -8,6 +8,7 @@ import {
   tDelayString,
   tMessageContent,
   tNullable,
+  unique,
 } from "../../../utils";
 import { TextChannel } from "eris";
 import { AutomodContext } from "../types";
@@ -37,7 +38,7 @@ export const ReplyAction = automodAction({
     }, new Map());
 
     for (const [channelId, _contexts] of contextsByChannelId.entries()) {
-      const users = Array.from(new Set(_contexts.map(c => c.user).filter(Boolean)));
+      const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean))));
       const user = users[0];
 
       const renderReplyText = async str =>

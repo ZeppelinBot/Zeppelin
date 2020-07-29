@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable } from "../../../utils";
+import { asyncMap, resolveMember, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 
@@ -25,7 +25,7 @@ export const BanAction = automodAction({
       ],
     };
 
-    const userIdsToBan = contexts.map(c => c.user?.id).filter(Boolean);
+    const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(Boolean));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const userId of userIdsToBan) {
