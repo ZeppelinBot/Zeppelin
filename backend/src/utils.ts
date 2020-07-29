@@ -633,9 +633,12 @@ export function chunkLines(str: string, maxChunkLength = 2000): string[] {
 
 /**
  * Chunks a long message to multiple smaller messages, retaining leading and trailing line breaks, open code blocks, etc.
+ *
+ * Default maxChunkLength is 1990, a bit under the message length limit of 2000, so we have space to add code block
+ * shenanigans to the start/end when needed. Take this into account when choosing a custom maxChunkLength as well.
  */
-export function chunkMessageLines(str: string): string[] {
-  const chunks = chunkLines(str, 1990); // We don't split at exactly 2000 to be able to do the stuff below
+export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] {
+  const chunks = chunkLines(str, maxChunkLength);
   let openCodeBlock = false;
 
   return chunks.map(chunk => {
