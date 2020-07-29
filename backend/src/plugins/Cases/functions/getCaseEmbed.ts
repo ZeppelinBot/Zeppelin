@@ -2,10 +2,11 @@ import { Case } from "../../../data/entities/Case";
 import { MessageContent } from "eris";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { PluginData } from "knub";
+import { PluginData, helpers } from "knub";
 import { CasesPluginType } from "../types";
 import { CaseTypeColors } from "../../../data/CaseTypeColors";
 import { resolveCaseId } from "./resolveCaseId";
+import { chunkLines, chunkMessageLines, emptyEmbedValue } from "../../../utils";
 
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
@@ -51,10 +52,21 @@ export async function getCaseEmbed(
   if (theCase.notes.length) {
     theCase.notes.forEach((note: any) => {
       const noteDate = moment(note.created_at);
-      embed.fields.push({
-        name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
-        value: note.body,
-      });
+      const chunks = chunkMessageLines(note.body, 1014);
+
+      for (let i = 0; i < chunks.length; i++) {
+        if (i === 0) {
+          embed.fields.push({
+            name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
+            value: chunks[i],
+          });
+        } else {
+          embed.fields.push({
+            name: emptyEmbedValue,
+            value: chunks[i],
+          });
+        }
+      }
     });
   } else {
     embed.fields.push({
