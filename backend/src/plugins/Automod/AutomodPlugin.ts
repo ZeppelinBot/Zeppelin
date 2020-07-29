@@ -5,7 +5,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { Queue } from "../../Queue";
-import { configUtils } from "knub";
+import { configUtils, CooldownManager } from "knub";
 import { availableTriggers } from "./triggers/availableTriggers";
 import { StrictValidationError } from "../../validatorUtils";
 import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
@@ -160,6 +160,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
       () => clearOldRecentNicknameChanges(pluginData),
       30 * SECONDS,
     );
+
+    pluginData.state.cooldownManager = new CooldownManager();
 
     pluginData.state.logs = new GuildLogs(pluginData.guild.id);
     pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);

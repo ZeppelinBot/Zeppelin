@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable, UnknownUser } from "../../utils";
-import { BasePluginType } from "knub";
+import { BasePluginType, CooldownManager } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
 import { SavedMessage } from "../../data/entities/SavedMessage";
@@ -64,6 +64,8 @@ export interface AutomodPluginType extends BasePluginType {
     clearRecentNicknameChangesInterval: Timeout;
 
     cachedAntiraidLevel: string | null;
+
+    cooldownManager: CooldownManager;
 
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;

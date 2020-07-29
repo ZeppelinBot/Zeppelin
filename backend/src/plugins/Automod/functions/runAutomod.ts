@@ -4,6 +4,7 @@ import { availableTriggers } from "../triggers/availableTriggers";
 import { availableActions } from "../actions/availableActions";
 import { AutomodTriggerMatchResult } from "../helpers";
 import { CleanAction } from "../actions/clean";
+import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 
 export async function runAutomod(pluginData: PluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.message?.user_id;
@@ -23,6 +24,10 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
     if (!rule.affects_bots && user.bot) continue;
+
+    if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
+      return;
+    }
 
     let matchResult: AutomodTriggerMatchResult<any>;
     let contexts: AutomodContext[];
