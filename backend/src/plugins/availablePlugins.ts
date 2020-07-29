@@ -28,6 +28,7 @@ import { SpamPlugin } from "./Spam/SpamPlugin";
 import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
 import { AutomodPlugin } from "./Automod/AutomodPlugin";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
+import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -59,6 +60,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   MutesPlugin,
   AutomodPlugin,
   CompanionChannelsPlugin,
+  CustomEventsPlugin,
 ];
 
 // prettier-ignore
