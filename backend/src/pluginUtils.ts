@@ -4,11 +4,13 @@
 
 import { Member } from "eris";
 import { configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { deepKeyIntersect, errorMessage, successMessage } from "./utils";
+import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
+import { deepKeyIntersect, errorMessage, successMessage, tNullable } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
 import { TZeppelinKnub } from "./types";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
+import * as t from "io-ts";
+import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
 
 const { getMemberLevel } = helpers;
 
@@ -27,35 +29,69 @@ export function hasPermission(pluginData: PluginData<any>, permission: string, m
   return helpers.hasPermission(config, permission);
 }
 
+const PluginOverrideCriteriaType = t.recursion("PluginOverrideCriteriaType", () =>
+  t.type({
+    channel: tNullable(t.union([t.string, t.array(t.string)])),
+    category: tNullable(t.union([t.string, t.array(t.string)])),
+    level: tNullable(t.union([t.string, t.array(t.string)])),
+    user: tNullable(t.union([t.string, t.array(t.string)])),
+    role: tNullable(t.union([t.string, t.array(t.string)])),
+
+    all: tNullable(t.array(PluginOverrideCriteriaType)),
+    any: tNullable(t.array(PluginOverrideCriteriaType)),
+    not: tNullable(PluginOverrideCriteriaType),
+
+    extra: t.unknown,
+  }),
+);
+
+const BasicPluginStructureType = t.type({
+  enabled: tNullable(t.boolean),
+  config: tNullable(t.unknown),
+  overrides: tNullable(t.array(PluginOverrideCriteriaType)),
+  replaceDefaultOverrides: tNullable(t.boolean),
+});
+
 export function getPluginConfigPreprocessor(
   blueprint: ZeppelinPluginBlueprint,
   customPreprocessor?: PluginBlueprint<any>["configPreprocessor"],
 ) {
   return async (options: PluginOptions<any>) => {
+    const basicOptionsValidation = validate(BasicPluginStructureType, options);
+    if (basicOptionsValidation instanceof StrictValidationError) {
+      throw basicOptionsValidation;
+    }
+
     if (customPreprocessor) {
       options = await customPreprocessor(options);
     }
 
-    const decodedConfig = blueprint.configSchema
-      ? decodeAndValidateStrict(blueprint.configSchema, options.config)
-      : options.config;
-    if (decodedConfig instanceof StrictValidationError) {
-      throw decodedConfig;
+    let decodedConfig = {};
+    const decodedOverrides = [];
+
+    if (options.config) {
+      decodedConfig = blueprint.configSchema
+        ? decodeAndValidateStrict(blueprint.configSchema, options.config)
+        : options.config;
+      if (decodedConfig instanceof StrictValidationError) {
+        throw decodedConfig;
+      }
     }
 
-    const decodedOverrides = [];
-    for (const override of options.overrides || []) {
-      const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config, override.config || {});
-      const decodedOverrideConfig = blueprint.configSchema
-        ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
-        : overrideConfigMergedWithBaseConfig;
-      if (decodedOverrideConfig instanceof StrictValidationError) {
-        throw decodedOverrideConfig;
+    if (options.overrides) {
+      for (const override of options.overrides || []) {
+        const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config, override.config || {});
+        const decodedOverrideConfig = blueprint.configSchema
+          ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
+          : overrideConfigMergedWithBaseConfig;
+        if (decodedOverrideConfig instanceof StrictValidationError) {
+          throw decodedOverrideConfig;
+        }
+        decodedOverrides.push({
+          ...override,
+          config: deepKeyIntersect(decodedOverrideConfig, override.config || {}),
+        });
       }
-      decodedOverrides.push({
-        ...override,
-        config: deepKeyIntersect(decodedOverrideConfig, override.config || {}),
-      });
     }
 
     return {

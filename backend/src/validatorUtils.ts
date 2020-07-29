@@ -98,7 +98,7 @@ export function validate(schema: t.Type<any>, value: any): StrictValidationError
  * Decodes and validates the given value against the given schema while also disallowing extra properties
  * See: https://github.com/gcanti/io-ts/issues/322
  */
-export function decodeAndValidateStrict(schema: t.HasProps, value: any): StrictValidationError | any {
+export function decodeAndValidateStrict<T extends t.HasProps>(schema: T, value: any): StrictValidationError | any {
   const validationResult = t.exact(schema).decode(value);
   return pipe(
     validationResult,
