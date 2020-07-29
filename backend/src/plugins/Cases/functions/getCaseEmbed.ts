@@ -52,7 +52,12 @@ export async function getCaseEmbed(
   if (theCase.notes.length) {
     theCase.notes.forEach((note: any) => {
       const noteDate = moment(note.created_at);
-      const chunks = chunkMessageLines(note.body, 1014);
+      let noteBody = note.body.trim();
+      if (noteBody === "") {
+        noteBody = emptyEmbedValue;
+      }
+
+      const chunks = chunkMessageLines(noteBody, 1014);
 
       for (let i = 0; i < chunks.length; i++) {
         if (i === 0) {
