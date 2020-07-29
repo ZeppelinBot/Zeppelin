@@ -16,7 +16,7 @@ export const FollowCmd = locateUserCommand({
     reminder: ct.string({ required: false, catchAll: true }),
 
     duration: ct.delay({ option: true, shortcut: "d" }),
-    active: ct.bool({ option: true, shortcut: "a" }),
+    active: ct.bool({ option: true, shortcut: "a", isSwitch: true }),
   },
 
   async run({ message: msg, args, pluginData }) {
