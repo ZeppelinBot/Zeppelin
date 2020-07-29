@@ -26,6 +26,7 @@ import { ReloadGuildCmd } from "./commands/ReloadGuildCmd";
 import { JumboCmd } from "./commands/JumboCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { CleanCmd } from "./commands/CleanCmd";
+import { Message } from "eris";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -46,6 +47,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_jumbo: false,
     jumbo_size: 128,
     can_avatar: false,
+    info_on_single_result: true,
   },
   overrides: [
     {
