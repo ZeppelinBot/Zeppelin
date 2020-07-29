@@ -1,5 +1,5 @@
 import { PluginOptions } from "knub";
-import { ConfigSchema, StarboardPluginType } from "./types";
+import { ConfigSchema, defaultStarboardOpts, StarboardPluginType } from "./types";
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { trimPluginDescription } from "src/utils";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
@@ -87,6 +87,16 @@ export const StarboardPlugin = zeppelinPlugin<StarboardPluginType>()("starboard"
                   enabled: true
       ~~~
     `),
+  },
+
+  configPreprocessor(options) {
+    if (options.config?.boards) {
+      for (const [name, opts] of Object.entries(options.config.boards)) {
+        options.config.boards[name] = Object.assign({}, defaultStarboardOpts, options.config.boards[name]);
+      }
+    }
+
+    return options;
   },
 
   // prettier-ignore
