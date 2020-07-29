@@ -14,9 +14,8 @@ export const RemindersDeleteCmd = remindersCommand({
   async run({ message: msg, args, pluginData }) {
     const reminders = await pluginData.state.reminders.getRemindersByUserId(msg.author.id);
     reminders.sort(sorter("remind_at"));
-    const lastNum = reminders.length + 1;
 
-    if (args.num > lastNum || args.num < 0) {
+    if (args.num > reminders.length || args.num <= 0) {
       sendErrorMessage(pluginData, msg.channel, "Unknown reminder");
       return;
     }

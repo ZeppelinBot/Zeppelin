@@ -43,6 +43,6 @@ export const ForcemuteCmd = modActionsCommand({
       return;
     }
 
-    actualMuteUserCmd(pluginData, user, msg, args);
+    actualMuteUserCmd(pluginData, user, msg, { ...args, notify: "none" });
   },
 });
