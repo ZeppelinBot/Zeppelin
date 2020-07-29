@@ -19,6 +19,9 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
+import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
+import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
+import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
 
 const defaultOptions = {
   config: {
@@ -123,6 +126,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
     RunAutomodOnJoinEvt,
     // Messages use message events from SavedMessages, see onLoad below
   ],
+
+  commands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
 
   async onLoad(pluginData) {
     pluginData.state.queue = new Queue();
