@@ -57,7 +57,7 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
         }
       }
 
-      const message = await getLogMessage(pluginData, type, data);
+      const message = await getLogMessage(pluginData, type, data, opts.format);
       if (message) {
         // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
         if (typeof message !== "string") {
