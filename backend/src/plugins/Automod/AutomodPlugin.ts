@@ -53,6 +53,11 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
+      if (rule == null) {
+        delete options.config.rules[name];
+        continue;
+      }
+
       rule["name"] = name;
 
       // If the rule doesn't have an explicitly set "enabled" property, set it to true
