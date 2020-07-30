@@ -6,7 +6,8 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const AddReactionsEvt = autoReactionsEvt({
   event: "messageCreate",
-  allowOutsideOfGuild: false,
+  allowBots: true,
+  allowSelf: true,
 
   async listener(meta) {
     const pluginData = meta.pluginData;
