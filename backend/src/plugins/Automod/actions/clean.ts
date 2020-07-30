@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
+import { noop } from "../../../utils";
 
 export const CleanAction = automodAction({
   configType: t.boolean,
@@ -28,7 +29,7 @@ export const CleanAction = automodAction({
         pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id);
       }
 
-      await pluginData.client.deleteMessages(channelId, messageIds);
+      await pluginData.client.deleteMessages(channelId, messageIds).catch(noop);
     }
   },
 });
