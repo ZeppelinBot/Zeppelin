@@ -30,6 +30,7 @@ import { AutomodPlugin } from "./Automod/AutomodPlugin";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
 import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { BotControlPlugin } from "./BotControl/BotControlPlugin";
+import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -68,6 +69,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
 export const globalPlugins = [
   GuildConfigReloaderPlugin,
   BotControlPlugin,
+  GuildAccessMonitorPlugin,
 ];
 
 // prettier-ignore
