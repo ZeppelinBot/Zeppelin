@@ -112,7 +112,7 @@ connect().then(async () => {
     intents: [
       // Privileged
       "guildMembers",
-      "guildPresences",
+      // "guildPresences",
 
       // Regular
       "directMessages",
