@@ -76,10 +76,9 @@ export function initGuildsAPI(app: express.Express) {
       parsedConfig = {};
     }
 
-    const errors = await validateGuildConfig(parsedConfig);
-
-    if (errors) {
-      return res.status(422).json({ errors });
+    const error = await validateGuildConfig(parsedConfig);
+    if (error) {
+      return res.status(422).json({ errors: [error] });
     }
 
     await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user.userId);

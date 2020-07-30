@@ -21,6 +21,7 @@ import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { logger } from "./logger";
+import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 
 const fsp = fs.promises;
 
@@ -56,6 +57,12 @@ if (process.env.NODE_ENV === "production") {
       const logs = new GuildLogs(err.guild.id);
       logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
 
+      return;
+    }
+
+    if (err instanceof PluginLoadError) {
+      // tslint:disable:no-console
+      console.warn(`${err.guild.name} (${err.guild.id}): Failed to load plugin '${err.pluginName}': ${err.message}`);
       return;
     }
 

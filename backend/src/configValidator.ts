@@ -3,7 +3,7 @@ import { guildPlugins } from "./plugins/availablePlugins";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { IZeppelinGuildConfig } from "./types";
-import { configUtils, PluginOptions } from "knub";
+import { configUtils, ConfigValidationError, PluginOptions } from "knub";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {
@@ -26,7 +26,7 @@ const globalConfigRootSchema = t.type({
 
 const partialMegaTest = t.partial({ name: t.string });
 
-export async function validateGuildConfig(config: any): Promise<string[] | null> {
+export async function validateGuildConfig(config: any): Promise<string | null> {
   const validationResult = decodeAndValidateStrict(partialGuildConfigRootSchema, config);
   if (validationResult instanceof StrictValidationError) return validationResult.getErrors();
 
@@ -35,7 +35,7 @@ export async function validateGuildConfig(config: any): Promise<string[] | null>
   if (guildConfig.plugins) {
     for (const [pluginName, pluginOptions] of Object.entries(guildConfig.plugins)) {
       if (!pluginNameToPlugin.has(pluginName)) {
-        return [`Unknown plugin: ${pluginName}`];
+        return `Unknown plugin: ${pluginName}`;
       }
 
       const plugin = pluginNameToPlugin.get(pluginName);
@@ -43,10 +43,8 @@ export async function validateGuildConfig(config: any): Promise<string[] | null>
         const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
         await plugin.configPreprocessor(mergedOptions as PluginOptions<any>);
       } catch (err) {
-        if (err instanceof StrictValidationError) {
-          return err.getErrors().map(err => {
-            return `${pluginName}: ${err.toString()}`;
-          });
+        if (err instanceof ConfigValidationError) {
+          return `${pluginName}: ${err.toString()}`;
         }
 
         throw err;
