@@ -69,3 +69,13 @@ export const globalPlugins = [
   GuildConfigReloaderPlugin,
   BotControlPlugin,
 ];
+
+// prettier-ignore
+export const baseGuildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
+  GuildInfoSaverPlugin,
+  MessageSaverPlugin,
+  NameHistoryPlugin,
+  CasesPlugin,
+  MutesPlugin,
+  // TODO: Replace these with proper dependencies
+];
