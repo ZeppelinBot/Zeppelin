@@ -8,6 +8,7 @@ import { stripObjectToScalars, verboseUserMention, resolveRoleId } from "src/uti
 export const RemoveRoleCmd = rolesCmd({
   trigger: "removerole",
   permission: "can_assign",
+  description: "Remove a role from the specified member",
 
   signature: {
     member: ct.resolvedMember(),

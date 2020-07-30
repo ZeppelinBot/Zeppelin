@@ -8,6 +8,7 @@ import { GuildChannel } from "eris";
 export const AddRoleCmd = rolesCmd({
   trigger: "addrole",
   permission: "can_assign",
+  description: "Add a role to the specified member",
 
   signature: {
     member: ct.resolvedMember(),

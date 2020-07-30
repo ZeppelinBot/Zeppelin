@@ -8,6 +8,7 @@ import { GuildMutes } from "src/data/GuildMutes";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { clearOldRecentActions } from "./util/clearOldRecentActions";
 import { SpamVoiceJoinEvt, SpamVoiceSwitchEvt } from "./events/SpamVoiceEvt";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<SpamPluginType> = {
   config: {
@@ -41,6 +42,15 @@ const defaultOptions: PluginOptions<SpamPluginType> = {
 };
 
 export const SpamPlugin = zeppelinPlugin<SpamPluginType>()("spam", {
+  showInDocs: true,
+  info: {
+    prettyName: "Spam protection",
+    description: trimPluginDescription(`
+      Basic spam detection and auto-muting.
+      For more advanced spam filtering, check out the Automod plugin!
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

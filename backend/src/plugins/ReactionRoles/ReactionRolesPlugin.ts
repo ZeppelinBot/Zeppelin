@@ -30,6 +30,11 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
 };
 
 export const ReactionRolesPlugin = zeppelinPlugin<ReactionRolesPluginType>()("reaction_roles", {
+  showInDocs: true,
+  info: {
+    prettyName: "Reaction roles",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

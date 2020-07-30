@@ -45,6 +45,11 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
 };
 
 export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
+  showInDocs: true,
+  info: {
+    prettyName: "Tags",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

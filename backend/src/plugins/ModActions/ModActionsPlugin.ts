@@ -32,6 +32,7 @@ import { warnMember } from "./functions/warnMember";
 import { Member } from "eris";
 import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions = {
   config: {
@@ -89,6 +90,14 @@ const defaultOptions = {
 };
 
 export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_actions", {
+  showInDocs: true,
+  info: {
+    prettyName: "Mod actions",
+    description: trimPluginDescription(`
+      This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -8,11 +8,16 @@ const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   config: {
     send_dm: false,
     send_to_channel: null,
-    message: "",
+    message: null,
   },
 };
 
 export const WelcomeMessagePlugin = zeppelinPlugin<WelcomeMessagePluginType>()("welcome_message", {
+  showInDocs: true,
+  info: {
+    prettyName: "Welcome message",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

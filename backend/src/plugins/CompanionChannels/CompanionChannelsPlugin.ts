@@ -3,6 +3,7 @@ import { CompanionChannelsPluginType, ConfigSchema, TCompanionChannelOpts } from
 import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
 import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions = {
   config: {
@@ -11,6 +12,16 @@ const defaultOptions = {
 };
 
 export const CompanionChannelsPlugin = zeppelinPlugin<CompanionChannelsPluginType>()("companion_channels", {
+  showInDocs: true,
+  info: {
+    prettyName: "Companion channels",
+    description: trimPluginDescription(`
+      Set up 'companion channels' between text and voice channels.
+      Once set up, any time a user joins one of the specified voice channels,
+      they'll get channel permissions applied to them for the text channels.
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

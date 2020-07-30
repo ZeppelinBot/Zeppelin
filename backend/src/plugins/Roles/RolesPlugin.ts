@@ -6,6 +6,7 @@ import { AddRoleCmd } from "./commands/AddRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
 import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
 import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {
@@ -30,6 +31,14 @@ const defaultOptions: PluginOptions<RolesPluginType> = {
 };
 
 export const RolesPlugin = zeppelinPlugin<RolesPluginType>()("roles", {
+  showInDocs: true,
+  info: {
+    prettyName: "Roles",
+    description: trimPluginDescription(`
+      Enables authorised users to add and remove whitelisted roles with a command.
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

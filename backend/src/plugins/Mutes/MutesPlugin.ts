@@ -56,6 +56,11 @@ let FIRST_CHECK_TIME = Date.now();
 const FIRST_CHECK_INCREMENT = 5 * 1000;
 
 export const MutesPlugin = zeppelinPlugin<MutesPluginType>()("mutes", {
+  showInDocs: true,
+  info: {
+    prettyName: "Mutes",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

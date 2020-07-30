@@ -5,6 +5,8 @@ import { UsernameSaverPluginType } from "./types";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
 
 export const UsernameSaverPlugin = zeppelinPlugin<UsernameSaverPluginType>()("username_saver", {
+  showInDocs: false,
+
   // prettier-ignore
   events: [
     MessageCreateUpdateUsernameEvt,

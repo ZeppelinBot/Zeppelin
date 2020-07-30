@@ -10,6 +10,7 @@ import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseTypes } from "../../data/CaseTypes";
 import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId";
 import { getCaseEmbed } from "./functions/getCaseEmbed";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions = {
   config: {
@@ -19,6 +20,14 @@ const defaultOptions = {
 };
 
 export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
+  showInDocs: true,
+  info: {
+    prettyName: "Cases",
+    description: trimPluginDescription(`
+      This plugin contains basic configuration for cases created by other plugins
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

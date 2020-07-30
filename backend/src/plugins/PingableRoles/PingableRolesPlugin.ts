@@ -21,6 +21,11 @@ const defaultOptions: PluginOptions<PingableRolesPluginType> = {
 };
 
 export const PingableRolesPlugin = zeppelinPlugin<PingableRolesPluginType>()("pingable_roles", {
+  showInDocs: true,
+  info: {
+    prettyName: "Pingable roles",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

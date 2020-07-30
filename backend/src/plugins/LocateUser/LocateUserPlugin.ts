@@ -9,6 +9,7 @@ import { FollowCmd } from "./commands/FollowCmd";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
 import { ChannelJoinAlertsEvt, ChannelLeaveAlertsEvt, ChannelSwitchAlertsEvt } from "./events/SendAlertsEvts";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {
@@ -27,6 +28,16 @@ const defaultOptions: PluginOptions<LocateUserPluginType> = {
 };
 
 export const LocateUserPlugin = zeppelinPlugin<LocateUserPluginType>()("locate_user", {
+  showInDocs: true,
+  info: {
+    prettyName: "Locate user",
+    description: trimPluginDescription(`
+      This plugin allows users with access to the commands the following:
+      * Instantly receive an invite to the voice channel of a user
+      * Be notified as soon as a user switches or joins a voice channel
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

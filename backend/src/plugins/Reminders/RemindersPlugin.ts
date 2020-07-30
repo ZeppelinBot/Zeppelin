@@ -22,6 +22,11 @@ const defaultOptions: PluginOptions<RemindersPluginType> = {
 };
 
 export const RemindersPlugin = zeppelinPlugin<RemindersPluginType>()("reminders", {
+  showInDocs: true,
+  info: {
+    prettyName: "Reminders",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

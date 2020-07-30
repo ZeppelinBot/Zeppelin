@@ -14,6 +14,8 @@ const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
 };
 
 export const SelfGrantableRolesPlugin = zeppelinPlugin<SelfGrantableRolesPluginType>()("self_grantable_roles", {
+  showInDocs: true,
+
   configSchema: ConfigSchema,
   defaultOptions,
 

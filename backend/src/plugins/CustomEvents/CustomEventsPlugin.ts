@@ -12,6 +12,8 @@ const defaultOptions = {
 };
 
 export const CustomEventsPlugin = zeppelinPlugin<CustomEventsPluginType>()("custom_events", {
+  showInDocs: false,
+
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -30,14 +30,14 @@ function formatConfigSchema(schema) {
 }
 
 export function initDocs(app: express.Express) {
-  const docsPlugins = guildPlugins.filter(pluginClass => pluginClass.showInDocs);
+  const docsPlugins = guildPlugins.filter(plugin => plugin.showInDocs);
 
   app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
-      docsPlugins.map(pluginClass => {
-        const thinInfo = pluginClass.info ? { prettyName: pluginClass.info.prettyName } : {};
+      docsPlugins.map(plugin => {
+        const thinInfo = plugin.info ? { prettyName: plugin.info.prettyName } : {};
         return {
-          name: pluginClass.info,
+          name: plugin.name,
           info: thinInfo,
         };
       }),
@@ -56,7 +56,10 @@ export function initDocs(app: express.Express) {
 
     const commands = (plugin.commands || []).map(cmd => ({
       trigger: cmd.trigger,
+      permission: cmd.permission,
       signature: cmd.signature,
+      description: cmd.description,
+      usage: cmd.usage,
       config: cmd.config,
     }));
 

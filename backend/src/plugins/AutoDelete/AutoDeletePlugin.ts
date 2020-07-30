@@ -15,6 +15,13 @@ const defaultOptions: PluginOptions<AutoDeletePluginType> = {
 };
 
 export const AutoDeletePlugin = zeppelinPlugin<AutoDeletePluginType>()("auto_delete", {
+  showInDocs: true,
+  info: {
+    prettyName: "Auto-delete",
+    description: "Allows Zeppelin to auto-delete messages from a channel after a delay",
+    configurationGuide: "Maximum deletion delay is currently 5 minutes",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 
