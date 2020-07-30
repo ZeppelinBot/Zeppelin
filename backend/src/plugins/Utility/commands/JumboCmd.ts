@@ -1,9 +1,10 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { downloadFile, SECONDS } from "../../../utils";
+import { downloadFile, isEmoji, SECONDS } from "../../../utils";
 import fs from "fs";
 import sharp from "sharp";
 import twemoji from "twemoji";
+import { sendErrorMessage } from "../../../pluginUtils";
 
 const fsp = fs.promises;
 
@@ -40,6 +41,11 @@ export const JumboCmd = utilityCmd({
     const results = emojiRegex.exec(args.emoji);
     let extention = ".png";
     let file;
+
+    if (!isEmoji(args.emoji)) {
+      sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
+      return;
+    }
 
     if (results) {
       let url = "https://cdn.discordapp.com/emojis/";
