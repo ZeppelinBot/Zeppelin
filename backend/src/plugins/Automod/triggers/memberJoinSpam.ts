@@ -36,7 +36,7 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
         type: RecentActionType.MemberJoin,
         timestamp: Date.now(),
         archiveId: null,
-        userIds: [],
+        identifiers: [],
       });
 
       return {

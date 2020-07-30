@@ -6,6 +6,7 @@ import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
 import * as t from "io-ts";
+import { getMessageSpamIdentifier } from "./getSpamIdentifier";
 
 const MessageSpamTriggerConfig = t.type({
   amount: t.number,
@@ -28,7 +29,9 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
         return;
       }
 
-      const recentSpam = findRecentSpam(pluginData, spamType, context.message.user_id);
+      const spamIdentifier = getMessageSpamIdentifier(context.message, triggerConfig.per_channel);
+
+      const recentSpam = findRecentSpam(pluginData, spamType, spamIdentifier);
       if (recentSpam) {
         await pluginData.state.archives.addSavedMessagesToArchive(
           recentSpam.archiveId,
@@ -46,9 +49,9 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
         pluginData,
         context.message,
         spamType,
+        spamIdentifier,
         triggerConfig.amount,
         within,
-        triggerConfig.per_channel,
       );
 
       if (matchedSpam) {
@@ -61,7 +64,7 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
 
         pluginData.state.recentSpam.push({
           type: spamType,
-          userIds: [context.message.user_id],
+          identifiers: [spamIdentifier],
           archiveId,
           timestamp: Date.now(),
         });

@@ -16,7 +16,8 @@ export function getMatchingRecentActions(
       action.type === type &&
       (!identifier || action.identifier === identifier) &&
       action.context.timestamp >= since &&
-      action.context.timestamp <= to
+      action.context.timestamp <= to &&
+      !action.context.actioned
     );
   });
 }

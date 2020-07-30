@@ -97,6 +97,6 @@ export interface RecentAction {
 export interface RecentSpam {
   archiveId: string;
   type: RecentActionType;
-  userIds: string[];
+  identifiers: string[];
   timestamp: number;
 }
