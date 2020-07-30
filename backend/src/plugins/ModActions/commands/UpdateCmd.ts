@@ -19,7 +19,7 @@ export const UpdateCmd = modActionsCommand({
       note: ct.string({ required: false, catchAll: true }),
     },
     {
-      note: ct.string({ catchAll: true }),
+      note: ct.string({ required: false, catchAll: true }),
     },
   ],
 
