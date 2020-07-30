@@ -6,7 +6,7 @@ import { GuildLogs } from "src/data/GuildLogs";
 export const ConfigSchema = t.type({
   send_dm: t.boolean,
   send_to_channel: tNullable(t.string),
-  message: t.string,
+  message: tNullable(t.string),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
