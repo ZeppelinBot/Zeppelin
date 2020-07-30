@@ -109,6 +109,7 @@ connect().then(async () => {
   const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: false,
     restMode: true,
+    compress: true,
     intents: [
       // Privileged
       "guildMembers",
