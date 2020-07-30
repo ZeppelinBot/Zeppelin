@@ -13,7 +13,7 @@ const opts = {
   mod: ct.member({ option: true }),
   notify: ct.string({ option: true }),
   "notify-channel": ct.textChannel({ option: true }),
-  "delete-deays": ct.number({ option: true, shortcut: "d" }),
+  "delete-days": ct.number({ option: true, shortcut: "d" }),
 };
 
 export const BanCmd = modActionsCommand({
