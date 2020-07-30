@@ -138,12 +138,10 @@ connect().then(async () => {
        * - are explicitly enabled in the guild config
        * Dependencies are also automatically loaded by Knub.
        */
-      async getEnabledPlugins(this: Knub, guildId, guildConfig): Promise<string[]> {
-        const configuredPlugins = guildConfig.plugins || {};
-        const pluginNames: string[] = Array.from(this.guildPlugins.keys());
-        const plugins = Array.from(this.guildPlugins.values()) as ZeppelinPlugin[];
+      async getEnabledGuildPlugins(ctx, plugins): Promise<string[]> {
+        const configuredPlugins = ctx.config.plugins || [];
 
-        return pluginNames.filter(pluginName => {
+        return Array.from(plugins.keys()).filter(pluginName => {
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
       },
