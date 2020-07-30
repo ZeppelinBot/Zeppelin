@@ -24,12 +24,14 @@
   "dependencies": {
     "@types/sharp": "^0.23.1",
     "@types/twemoji": "^12.1.0",
+    "bufferutil": "^4.0.1",
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "eris": "^0.13.3",
+    "erlpack": "github:abalabahaha/erlpack",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
     "fp-ts": "^2.0.1",
@@ -60,7 +62,8 @@
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
     "typeorm": "^0.2.14",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
     "@types/cors": "^2.8.5",
