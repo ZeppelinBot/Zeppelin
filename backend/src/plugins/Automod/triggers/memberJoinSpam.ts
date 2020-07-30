@@ -30,11 +30,7 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
     const totalCount = sumRecentActionCounts(matchingActions);
 
     if (totalCount >= triggerConfig.amount) {
-      const contexts = [context, ...matchingActions.map(a => a.context).filter(c => c !== context)];
-
-      for (const _context of contexts) {
-        _context.actioned = true;
-      }
+      const extraContexts = matchingActions.map(a => a.context).filter(c => c !== context);
 
       pluginData.state.recentSpam.push({
         type: RecentActionType.MemberJoin,
@@ -44,7 +40,7 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
       });
 
       return {
-        extraContexts: contexts,
+        extraContexts,
       };
     }
   },
