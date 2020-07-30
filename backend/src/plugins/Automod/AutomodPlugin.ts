@@ -79,7 +79,10 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
             }
 
             const triggerBlueprint = availableTriggers[triggerName];
-            triggerObj[triggerName] = configUtils.mergeConfig(triggerBlueprint.defaultConfig, triggerObj[triggerName]);
+            triggerObj[triggerName] = configUtils.mergeConfig(
+              triggerBlueprint.defaultConfig,
+              triggerObj[triggerName] || {},
+            );
 
             if (triggerObj[triggerName].match_attachment_type) {
               const white = triggerObj[triggerName].match_attachment_type.whitelist_enabled;
