@@ -5,6 +5,8 @@ import { TextChannel } from "eris";
 import { createChunkedMessage, noop } from "src/utils";
 import { getLogMessage } from "./getLogMessage";
 
+const excludedUserProps = ["user", "member", "mod"];
+
 export async function log(pluginData: PluginData<LogsPluginType>, type: LogType, data: any) {
   const logChannels: TLogChannelMap = pluginData.config.get().channels;
   const typeStr = LogType[type];
@@ -17,7 +19,7 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
       // If this log entry is about an excluded user, skip it
       // TODO: Quick and dirty solution, look into changing at some point
       if (opts.excluded_users) {
-        for (const prop of pluginData.state.excludedUserProps) {
+        for (const prop of excludedUserProps) {
           if (data && data[prop] && opts.excluded_users.includes(data[prop].id)) {
             continue logChannelLoop;
           }

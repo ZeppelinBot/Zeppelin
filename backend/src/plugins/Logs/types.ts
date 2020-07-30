@@ -52,8 +52,6 @@ export interface LogsPluginType extends BasePluginType {
     onMessageDeleteFn;
     onMessageDeleteBulkFn;
     onMessageUpdateFn;
-
-    excludedUserProps: string[];
   };
 }
 
