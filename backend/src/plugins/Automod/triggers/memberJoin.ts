@@ -20,9 +20,7 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
 
     if (triggerConfig.only_new) {
       const threshold = Date.now() - convertDelayStringToMS(triggerConfig.new_threshold);
-      if (context.member.createdAt >= threshold) {
-        return {};
-      }
+      return context.member.createdAt >= threshold ? {} : null;
     }
 
     return {};
