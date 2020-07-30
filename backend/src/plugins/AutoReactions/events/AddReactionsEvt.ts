@@ -2,6 +2,7 @@ import { autoReactionsEvt } from "../types";
 import { isDiscordRESTError } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { logger } from "../../../logger";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const AddReactionsEvt = autoReactionsEvt({
   event: "messageCreate",
@@ -23,12 +24,13 @@ export const AddReactionsEvt = autoReactionsEvt({
             `Could not apply auto-reaction to ${msg.channel.id}/${msg.id} in guild ${pluginData.guild.name} (${pluginData.guild.id}) (error code ${e.code})`,
           );
 
+          const logs = pluginData.getPlugin(LogsPlugin);
           if (e.code === 10008) {
-            pluginData.state.logs.log(LogType.BOT_ALERT, {
+            logs.log(LogType.BOT_ALERT, {
               body: `Could not apply auto-reactions in <#${msg.channel.id}> for message \`${msg.id}\`. Make sure nothing is deleting the message before the reactions are applied.`,
             });
           } else {
-            pluginData.state.logs.log(LogType.BOT_ALERT, {
+            logs.log(LogType.BOT_ALERT, {
               body: `Could not apply auto-reactions in <#${msg.channel.id}> for message \`${msg.id}\`. Error code ${e.code}.`,
             });
           }

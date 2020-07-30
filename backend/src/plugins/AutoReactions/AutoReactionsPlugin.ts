@@ -7,6 +7,7 @@ import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildAutoReactions } from "src/data/GuildAutoReactions";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
 import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -31,6 +32,7 @@ export const AutoReactionsPlugin = zeppelinPlugin<AutoReactionsPluginType>()("au
     `),
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
