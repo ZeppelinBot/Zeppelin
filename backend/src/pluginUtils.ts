@@ -5,7 +5,7 @@
 import { Member } from "eris";
 import { CommandContext, configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
-import { deepKeyIntersect, errorMessage, successMessage, tNullable } from "./utils";
+import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
 import { TZeppelinKnub } from "./types";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
@@ -57,15 +57,38 @@ export function getPluginConfigPreprocessor(
   customPreprocessor?: PluginBlueprint<any>["configPreprocessor"],
 ) {
   return async (options: PluginOptions<any>) => {
+    // 1. Validate the basic structure of plugin config
     const basicOptionsValidation = validate(BasicPluginStructureType, options);
     if (basicOptionsValidation instanceof StrictValidationError) {
       throw basicOptionsValidation;
     }
 
+    // 2. Validate config/overrides against *partial* config schema. This ensures valid properties have valid types.
+    const partialConfigSchema = tDeepPartial(blueprint.configSchema);
+    // if (blueprint.name === "automod") console.log(partialConfigSchema);
+
+    if (options.config) {
+      const partialConfigValidation = validate(partialConfigSchema, options.config);
+      if (partialConfigValidation instanceof StrictValidationError) {
+        throw partialConfigValidation;
+      }
+    }
+
+    if (options.overrides) {
+      for (const override of options.overrides) {
+        const partialOverrideConfigValidation = validate(partialConfigSchema, override.config || {});
+        if (partialOverrideConfigValidation) {
+          throw partialOverrideConfigValidation;
+        }
+      }
+    }
+
+    // 3. Run custom preprocessor, if any
     if (customPreprocessor) {
       options = await customPreprocessor(options);
     }
 
+    // 4. Merge with default options and validate/decode the entire config
     let decodedConfig = {};
     const decodedOverrides = [];
 
@@ -79,7 +102,7 @@ export function getPluginConfigPreprocessor(
     }
 
     if (options.overrides) {
-      for (const override of options.overrides || []) {
+      for (const override of options.overrides) {
         const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config, override.config || {});
         const decodedOverrideConfig = blueprint.configSchema
           ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)

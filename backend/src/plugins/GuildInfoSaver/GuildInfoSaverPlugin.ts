@@ -3,9 +3,12 @@ import { PluginData } from "knub";
 import { AllowedGuilds } from "src/data/AllowedGuilds";
 import { GuildInfoSaverPluginType } from "./types";
 import { MINUTES } from "src/utils";
+import * as t from "io-ts";
 
 export const GuildInfoSaverPlugin = zeppelinPlugin<GuildInfoSaverPluginType>()("guild_info_saver", {
   showInDocs: false,
+
+  configSchema: t.type({}),
 
   onLoad(pluginData) {
     const { state, guild } = pluginData;
