@@ -4,7 +4,7 @@ import { archiveSearch, displaySearch, SearchType } from "../search";
 
 // Separate from SearchCmd to avoid a circular reference from ./search.ts
 export const searchCmdSignature = {
-  query: ct.string({ catchAll: true }),
+  query: ct.string({ catchAll: true, required: false }),
 
   page: ct.number({ option: true, shortcut: "p" }),
   role: ct.string({ option: true, shortcut: "r" }),
