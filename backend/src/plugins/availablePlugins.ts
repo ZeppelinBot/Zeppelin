@@ -29,6 +29,7 @@ import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
 import { AutomodPlugin } from "./Automod/AutomodPlugin";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
 import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
+import { BotControlPlugin } from "./BotControl/BotControlPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -66,4 +67,5 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
 // prettier-ignore
 export const globalPlugins = [
   GuildConfigReloaderPlugin,
+  BotControlPlugin,
 ];

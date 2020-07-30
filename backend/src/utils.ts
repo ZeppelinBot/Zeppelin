@@ -34,7 +34,6 @@ import { either } from "fp-ts/lib/Either";
 import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
 import { logger } from "./logger";
-import { Awaitable } from "knub/dist/utils";
 
 const fsp = fs.promises;
 

@@ -3,7 +3,7 @@
  */
 
 import { Member } from "eris";
-import { configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
+import { CommandContext, configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage, tNullable } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
@@ -125,3 +125,7 @@ export function isOwner(pluginData: PluginData<any>, userId: string) {
 
   return owners.includes(userId);
 }
+
+export const isOwnerPreFilter = (_, context: CommandContext<any>) => {
+  return isOwner(context.pluginData, context.message.author.id);
+};
