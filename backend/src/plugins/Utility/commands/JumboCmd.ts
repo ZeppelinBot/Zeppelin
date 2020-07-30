@@ -77,6 +77,6 @@ export const JumboCmd = utilityCmd({
       };
     }
 
-    msg.channel.createMessage(null, file);
+    msg.channel.createMessage("", file);
   },
 });
