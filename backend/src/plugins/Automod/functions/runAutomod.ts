@@ -7,7 +7,7 @@ import { CleanAction } from "../actions/clean";
 import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 
 export async function runAutomod(pluginData: PluginData<AutomodPluginType>, context: AutomodContext) {
-  const userId = context.user?.id || context.message?.user_id;
+  const userId = context.user?.id || context.member?.id || context.message?.user_id;
   const user = userId && pluginData.client.users.get(userId);
   const member = userId && pluginData.guild.members.get(userId);
   const channelId = context.message?.channel_id;
@@ -23,7 +23,7 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
-    if (!rule.affects_bots && user.bot) continue;
+    if (!rule.affects_bots && user?.bot) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
       return;
