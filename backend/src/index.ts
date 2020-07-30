@@ -132,7 +132,7 @@ connect().then(async () => {
   client.on("debug", message => {
     if (message.includes(" 429 ")) {
       logger.info(`[429] ${message}`);
-    } else {
+    } else if (!message.includes(" Reset ") && !message.includes('"token"')) {
       logger.info(`[ERIS DEBUG] ${message}`);
     }
   });
