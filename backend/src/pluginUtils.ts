@@ -3,7 +3,15 @@
  */
 
 import { Member } from "eris";
-import { CommandContext, configUtils, helpers, PluginBlueprint, PluginData, PluginOptions } from "knub";
+import {
+  CommandContext,
+  configUtils,
+  ConfigValidationError,
+  helpers,
+  PluginBlueprint,
+  PluginData,
+  PluginOptions,
+} from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
 import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
@@ -52,6 +60,15 @@ const BasicPluginStructureType = t.type({
   replaceDefaultOverrides: tNullable(t.boolean),
 });
 
+export function strictValidationErrorToConfigValidationError(err: StrictValidationError) {
+  return new ConfigValidationError(
+    err
+      .getErrors()
+      .map(e => e.toString())
+      .join("\n"),
+  );
+}
+
 export function getPluginConfigPreprocessor(
   blueprint: ZeppelinPluginBlueprint,
   customPreprocessor?: PluginBlueprint<any>["configPreprocessor"],
@@ -60,17 +77,16 @@ export function getPluginConfigPreprocessor(
     // 1. Validate the basic structure of plugin config
     const basicOptionsValidation = validate(BasicPluginStructureType, options);
     if (basicOptionsValidation instanceof StrictValidationError) {
-      throw basicOptionsValidation;
+      throw strictValidationErrorToConfigValidationError(basicOptionsValidation);
     }
 
     // 2. Validate config/overrides against *partial* config schema. This ensures valid properties have valid types.
     const partialConfigSchema = tDeepPartial(blueprint.configSchema);
-    // if (blueprint.name === "automod") console.log(partialConfigSchema);
 
     if (options.config) {
       const partialConfigValidation = validate(partialConfigSchema, options.config);
       if (partialConfigValidation instanceof StrictValidationError) {
-        throw partialConfigValidation;
+        throw strictValidationErrorToConfigValidationError(partialConfigValidation);
       }
     }
 
@@ -78,7 +94,7 @@ export function getPluginConfigPreprocessor(
       for (const override of options.overrides) {
         const partialOverrideConfigValidation = validate(partialConfigSchema, override.config || {});
         if (partialOverrideConfigValidation) {
-          throw partialOverrideConfigValidation;
+          throw strictValidationErrorToConfigValidationError(partialOverrideConfigValidation);
         }
       }
     }
@@ -97,7 +113,7 @@ export function getPluginConfigPreprocessor(
         ? decodeAndValidateStrict(blueprint.configSchema, options.config)
         : options.config;
       if (decodedConfig instanceof StrictValidationError) {
-        throw decodedConfig;
+        throw strictValidationErrorToConfigValidationError(decodedConfig);
       }
     }
 
@@ -108,7 +124,7 @@ export function getPluginConfigPreprocessor(
           ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
           : overrideConfigMergedWithBaseConfig;
         if (decodedOverrideConfig instanceof StrictValidationError) {
-          throw decodedOverrideConfig;
+          throw strictValidationErrorToConfigValidationError(decodedOverrideConfig);
         }
         decodedOverrides.push({
           ...override,
