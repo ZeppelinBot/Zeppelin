@@ -109,6 +109,22 @@ connect().then(async () => {
   const client = new Client(`Bot ${process.env.TOKEN}`, {
     getAllUsers: false,
     restMode: true,
+    intents: [
+      // Privileged
+      "guildMembers",
+      "guildPresences",
+
+      // Regular
+      "directMessages",
+      "guildBans",
+      "guildEmojis",
+      "guildInvites",
+      "guildMessageReactions",
+      "guildMessages",
+      "guilds",
+      "guildMessageTyping",
+      "guildVoiceStates",
+    ],
   });
   client.setMaxListeners(200);
 
