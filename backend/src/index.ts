@@ -122,7 +122,7 @@ connect().then(async () => {
       "guildMessageReactions",
       "guildMessages",
       "guilds",
-      "guildMessageTyping",
+      // "guildMessageTyping",
       "guildVoiceStates",
     ],
   });
