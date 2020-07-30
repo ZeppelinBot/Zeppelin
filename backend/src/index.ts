@@ -11,7 +11,7 @@ import { Configs } from "./data/Configs";
 import moment from "moment-timezone";
 import { Client, TextChannel } from "eris";
 import { connect } from "./data/db";
-import { globalPlugins, guildPlugins } from "./plugins/availablePlugins";
+import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
@@ -156,8 +156,10 @@ connect().then(async () => {
        */
       async getEnabledGuildPlugins(ctx, plugins): Promise<string[]> {
         const configuredPlugins = ctx.config.plugins || [];
+        const basePluginNames = baseGuildPlugins.map(p => p.name);
 
         return Array.from(plugins.keys()).filter(pluginName => {
+          if (basePluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
       },
