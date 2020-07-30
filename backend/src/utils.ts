@@ -29,7 +29,7 @@ import https from "https";
 import tmp from "tmp";
 import { helpers } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { either } from "fp-ts/lib/Either";
 import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
@@ -103,7 +103,7 @@ export interface TDeepPartialProps<P extends t.Props>
   > {}
 
 export function tDeepPartial<T>(type: T): TDeepPartial<T> {
-  if (type instanceof t.InterfaceType) {
+  if (type instanceof t.InterfaceType || type instanceof t.PartialType) {
     const newProps = {};
     for (const [key, prop] of Object.entries(type.props)) {
       newProps[key] = tDeepPartial(prop);

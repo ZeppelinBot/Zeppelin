@@ -134,7 +134,7 @@ connect().then(async () => {
       async getEnabledPlugins(this: Knub, guildId, guildConfig): Promise<string[]> {
         const configuredPlugins = guildConfig.plugins || {};
         const pluginNames: string[] = Array.from(this.guildPlugins.keys());
-        const plugins: ZeppelinPlugin[] = Array.from(this.guildPlugins.values());
+        const plugins = Array.from(this.guildPlugins.values()) as ZeppelinPlugin[];
 
         return pluginNames.filter(pluginName => {
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;

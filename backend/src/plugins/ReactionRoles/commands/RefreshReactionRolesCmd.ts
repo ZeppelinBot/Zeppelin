@@ -14,7 +14,6 @@ export const RefreshReactionRolesCmd = reactionRolesCmd({
   async run({ message: msg, args, pluginData }) {
     const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
     if (!savedMessage) {
-      console.log("ah");
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;
     }

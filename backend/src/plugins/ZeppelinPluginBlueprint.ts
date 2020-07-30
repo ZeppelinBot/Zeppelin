@@ -5,7 +5,7 @@ import { TMarkdown } from "../types";
 
 export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends PluginBlueprint<TPluginType> {
-  configSchema?: t.TypeC<any>;
+  configSchema: t.TypeC<any>;
   showInDocs?: boolean;
 
   info?: {
@@ -19,21 +19,24 @@ export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = Ba
 export function zeppelinPlugin<TPartialBlueprint extends Omit<ZeppelinPluginBlueprint, "name">>(
   name: string,
   blueprint: TPartialBlueprint,
-): TPartialBlueprint & { name: string };
+): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinPluginBlueprint["configPreprocessor"] };
 
 export function zeppelinPlugin<TPluginType extends BasePluginType>(): <
   TPartialBlueprint extends Omit<ZeppelinPluginBlueprint<TPluginType>, "name">
 >(
   name: string,
   blueprint: TPartialBlueprint,
-) => TPartialBlueprint & { name: string; configPreprocessor: PluginBlueprint<TPluginType>["configPreprocessor"] };
+) => TPartialBlueprint & {
+  name: string;
+  configPreprocessor: ZeppelinPluginBlueprint<TPluginType>["configPreprocessor"];
+};
 
 export function zeppelinPlugin(...args) {
   if (args.length) {
-    const blueprint: ZeppelinPluginBlueprint = plugin(...(args as Parameters<typeof plugin>));
+    const blueprint = (plugin(...(args as Parameters<typeof plugin>)) as unknown) as ZeppelinPluginBlueprint;
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
   } else {
-    return zeppelinPlugin;
+    return zeppelinPlugin as (name, blueprint) => ZeppelinPluginBlueprint;
   }
 }

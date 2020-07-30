@@ -46,7 +46,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     const emojiRolePairs: TReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
-      .map(v => v.split("=").map(v => v.trim())) // tslint:disable-line
+      .map(v => v.split(/(\s|[=,])+/).map(v => v.trim())) // tslint:disable-line
       .map(
         (pair): TReactionRolePair => {
           const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
