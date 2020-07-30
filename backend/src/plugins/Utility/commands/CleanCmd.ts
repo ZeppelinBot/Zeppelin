@@ -78,7 +78,9 @@ export const CleanCmd = utilityCmd({
     if (targetChannel.id !== msg.channel.id) {
       const configForTargetChannel = pluginData.config.getMatchingConfig({
         userId: msg.author.id,
+        member: msg.member,
         channelId: targetChannel.id,
+        categoryId: targetChannel.parentID,
       });
       if (configForTargetChannel.can_clean !== true) {
         sendErrorMessage(pluginData, msg.channel, `Missing permissions to use clean on that channel`);
