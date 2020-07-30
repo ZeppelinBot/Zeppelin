@@ -5,11 +5,12 @@ import { GuildLogs } from "src/data/GuildLogs";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageUpdate } from "./util/onMessageUpdate";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<CensorPluginType> = {
   config: {
     filter_zalgo: false,
-    filter_invites: true,
+    filter_invites: false,
     invite_guild_whitelist: null,
     invite_guild_blacklist: null,
     invite_code_whitelist: null,
@@ -41,6 +42,15 @@ const defaultOptions: PluginOptions<CensorPluginType> = {
 };
 
 export const CensorPlugin = zeppelinPlugin<CensorPluginType>()("censor", {
+  showInDocs: true,
+  info: {
+    prettyName: "Censor",
+    description: trimPluginDescription(`
+      Censor words, tokens, links, regex, etc.
+      For more advanced filtering, check out the Automod plugin!
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

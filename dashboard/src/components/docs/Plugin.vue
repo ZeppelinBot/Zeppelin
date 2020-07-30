@@ -19,6 +19,8 @@
 
     <!-- Usage tab -->
     <div class="usage" v-if="tab === 'usage'">
+      <h2 class="sr-only">Usage</h2>
+
       <div v-if="!hasUsageInfo">
         This plugin has no usage information.
         See <router-link v-bind:to="'/docs/plugins/' + pluginName + '/configuration'">Configuration</router-link>.
@@ -26,33 +28,32 @@
 
       <!-- Usage guide -->
       <div v-if="data.info.usageGuide">
-        <h2 id="usage-guide">Usage guide</h2>
         <MarkdownBlock :content="data.info.usageGuide" class="content" />
       </div>
 
       <!-- Command list -->
       <div v-if="data.commands.length">
-        <h2 id="commands">Commands</h2>
+        <h3 id="commands" class="text-2xl">Commands</h3>
         <div v-for="command in data.commands"
              class="command mb-4"
-             v-bind:ref="getCommandSlug(command.trigger)" v-bind:class="{target: targetCommandId === getCommandSlug(command.trigger)}">
-          <h3 class="text-xl mb-0">
-            !{{ command.trigger }}
-            <span v-for="alias in command.config.aliases"> <span class="text-gray-600">/</span> !{{ alias }} </span>
-          </h3>
-          <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.description"
-                         :content="command.config.extra.info.description"
+             v-bind:ref="getCommandSlug(command)" v-bind:class="{target: targetCommandId === getCommandSlug(command)}">
+          <h4 class="text-xl font-semibold mb-0">
+            <span v-for="(trigger, index) in getTriggers(command)"> <span class="text-gray-600" v-if="index > 0">/</span> !{{ trigger }} </span>
+          </h4>
+          <MarkdownBlock v-if="command.description"
+                         :content="command.description"
                          class="content" />
 
-          <div v-bind:class="{'-mt-2': command.config.extra.info && command.config.extra.info.description}">
-            <div v-if="command.config.extra.info && command.config.extra.info.basicUsage">
-              <span class="font-semibold">Basic usage:</span> <code class="inline-code">{{ command.config.extra.info.basicUsage }}</code>
+          <div v-bind:class="{'-mt-2': command.description}">
+            <div v-if="command.usage">
+              <span class="font-semibold">Basic usage:</span> <code class="inline-code">{{ command.usage }}</code>
             </div>
           </div>
 
           <Expandable class="mt-4">
             <template v-slot:title>Additional information</template>
             <template v-slot:content>
+              <!--
               <div v-if="command.config.extra.info && command.config.extra.info.usageGuide">
                 <div class="font-semibold">Usage guide:</div>
                 <MarkdownBlock :content="command.config.extra.info.usageGuide"
@@ -66,46 +67,51 @@
                                class="content">
                 </MarkdownBlock>
               </div>
+              -->
 
-              <p v-if="command.config.extra.requiredPermission">
+              <p v-if="command.permission">
                 <span class="font-semibold">Permission:</span>
-                <code class="inline-code">{{ command.config.extra.requiredPermission }}</code>
+                <code class="inline-code">{{ command.permission }}</code>
               </p>
 
-              <span class="font-semibold">Signatures:</span>
-              <ul>
-                <li>
-                  <code class="inline-code bg-gray-900">
-                    !{{ command.trigger }}
-                    <span v-for="param in command.parameters">{{ renderParameter(param) }} </span>
-                  </code>
-                </li>
-              </ul>
+              <div v-if="command.signature">
+                <h5 class="font-semibold mb-2">Signatures:</h5>
+                <ul class="list-none">
+                  <li v-for="(signature, index) in getCommandSignatures(command)" v-bind:class="{'mt-8': index !== 0}">
+                    <code class="inline-code bg-gray-900">
+                      !{{ getTriggers(command)[0] }}
+                      <span v-for="paramInfo in getSignatureParameters(signature)">{{ renderParameterOrOption(paramInfo.name, paramInfo.param) }} </span>
+                    </code>
 
-              <div class="mt-2" v-if="command.parameters.length">
-                <span class="font-semibold">Command arguments:</span>
-                <ul>
-                  <li v-for="param in command.parameters">
-                    <code>{{ renderParameter(param) }}</code>
-                    <router-link :to="'/docs/reference/argument-types#' + (param.type || 'string')">{{ param.type || 'string' }}</router-link>
-                    <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.parameterDescriptions && command.config.extra.info.parameterDescriptions[param.name]"
-                                   :content="command.config.extra.info.parameterDescriptions[param.name]"
-                                   class="content">
-                    </MarkdownBlock>
-                  </li>
-                </ul>
-              </div>
+                    <div class="pl-4">
+                      <div v-if="getSignatureParameters(signature).length">
+                        <div class="font-semibold text-sm mt-2">Parameters</div>
+                        <ul>
+                          <li v-for="paramInfo in getSignatureParameters(signature)">
+                            <code>{{ renderParameter(paramInfo.name, paramInfo.param) }}</code>
+                            <router-link :to="'/docs/reference/argument-types#' + (paramInfo.param.type || 'string')">{{ paramInfo.param.type || 'string' }}</router-link>
+                            <MarkdownBlock v-if="paramInfo.param.description"
+                                           :content="paramInfo.param.description"
+                                           class="content">
+                            </MarkdownBlock>
+                          </li>
+                        </ul>
+                      </div>
 
-              <div class="mt-2" v-if="command.config.options && command.config.options.length">
-                <span class="font-semibold">Options:</span>
-                <ul>
-                  <li v-for="opt in command.config.options">
-                    <code>{{ renderOption(opt) }}</code>
-                    <router-link :to="'/docs/reference/argument-types#' + (opt.type || 'string')">{{ opt.type || 'string' }}</router-link>
-                    <MarkdownBlock v-if="command.config.extra.info && command.config.extra.info.optionDescriptions && command.config.extra.info.optionDescriptions[opt.name]"
-                                   :content="command.config.extra.info.optionDescriptions[opt.name]"
-                                   class="content">
-                    </MarkdownBlock>
+                      <div v-if="getSignatureOptions(signature).length">
+                        <div class="font-semibold text-sm mt-2">Options</div>
+                        <ul>
+                          <li v-for="optionInfo in getSignatureOptions(signature)">
+                            <code>{{ renderOption(optionInfo.name, optionInfo.option) }}</code>
+                            <router-link :to="'/docs/reference/argument-types#' + (optionInfo.option.type || 'string')">{{ optionInfo.option.type || 'string' }}</router-link>
+                            <MarkdownBlock v-if="optionInfo.option.description"
+                                           :content="optionInfo.option.description"
+                                           class="content">
+                            </MarkdownBlock>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </li>
                 </ul>
               </div>
@@ -203,17 +209,48 @@
           [this.pluginName]: options,
         });
       },
-      renderParameter(param) {
-        let str = `${param.name}`;
+      getTriggers(command) {
+        return Array.isArray(command.trigger)
+          ? command.trigger
+          : [command.trigger];
+      },
+      getCommandSignatures(command) {
+        if (!command.signature) {
+          return [];
+        }
+
+        return Array.isArray(command.signature)
+          ? command.signature
+          : [command.signature];
+      },
+      getSignatureParameters(signature) {
+        return Array.from(Object.entries(signature))
+          .filter(([name, paramOrOption]) => !(paramOrOption as any).option)
+          .map(([name, param]) => ({ name, param }));
+      },
+      getSignatureOptions(signature) {
+        return Array.from(Object.entries(signature))
+          .filter(([name, paramOrOption]) => Boolean((paramOrOption as any).option))
+          .map(([name, option]) => ({ name, option }));
+      },
+      renderParameterOrOption(name, paramOrOption) {
+        if (paramOrOption.option) {
+          return this.renderOption(name, paramOrOption);
+        }
+
+        return this.renderParameter(name, paramOrOption);
+      },
+      renderParameter(name, param) {
+        let str = name;
         if (param.rest) str += '...';
-        if (param.required) {
+        if (param.required !== false) {
           return `<${str}>`;
         } else {
           return `[${str}]`;
         }
       },
-      renderOption(opt) {
-        let str = `-${opt.name}`;
+      renderOption(name, opt) {
+        let str = `-${name}`;
         if (opt.shortcut) {
           str += `|-${opt.shortcut}`;
         }
@@ -223,8 +260,9 @@
           return `[${str}]`;
         }
       },
-      getCommandSlug(str) {
-        return 'command-' + str.trim().toLowerCase().replace(/\s/g, '-');
+      getCommandSlug(command) {
+        const mainTrigger = this.getTriggers(command)[0];
+        return 'command-' + mainTrigger.trim().toLowerCase().replace(/\s/g, '-');
       },
       scrollToCommand(hash) {
         if (this.$refs[hash]) {

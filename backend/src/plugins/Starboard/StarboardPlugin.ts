@@ -27,6 +27,8 @@ const defaultOptions: PluginOptions<StarboardPluginType> = {
 };
 
 export const StarboardPlugin = zeppelinPlugin<StarboardPluginType>()("starboard", {
+  showInDocs: true,
+
   configSchema: ConfigSchema,
   defaultOptions,
 

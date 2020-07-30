@@ -5,6 +5,7 @@ import { GuildPersistedData } from "src/data/GuildPersistedData";
 import { GuildLogs } from "src/data/GuildLogs";
 import { StoreDataEvt } from "./events/StoreDataEvt";
 import { LoadDataEvt } from "./events/LoadDataEvt";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<PersistPluginType> = {
   config: {
@@ -15,6 +16,15 @@ const defaultOptions: PluginOptions<PersistPluginType> = {
 };
 
 export const PersistPlugin = zeppelinPlugin<PersistPluginType>()("persist", {
+  showInDocs: true,
+  info: {
+    prettyName: "Persist",
+    description: trimPluginDescription(`
+      Re-apply roles or nicknames for users when they rejoin the server.
+      Mute roles are re-applied automatically, this plugin is not required for that.
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

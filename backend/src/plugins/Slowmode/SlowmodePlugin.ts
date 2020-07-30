@@ -35,6 +35,11 @@ const defaultOptions: PluginOptions<SlowmodePluginType> = {
 };
 
 export const SlowmodePlugin = zeppelinPlugin<SlowmodePluginType>()("slowmode", {
+  showInDocs: true,
+  info: {
+    prettyName: "Slowmode",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

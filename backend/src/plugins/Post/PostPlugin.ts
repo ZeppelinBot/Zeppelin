@@ -28,6 +28,11 @@ const defaultOptions: PluginOptions<PostPluginType> = {
 };
 
 export const PostPlugin = zeppelinPlugin<PostPluginType>()("post", {
+  showInDocs: true,
+  info: {
+    prettyName: "Post",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

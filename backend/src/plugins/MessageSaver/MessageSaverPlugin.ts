@@ -21,10 +21,10 @@ const defaultOptions: PluginOptions<MessageSaverPluginType> = {
 };
 
 export const MessageSaverPlugin = zeppelinPlugin<MessageSaverPluginType>()("message_saver", {
+  showInDocs: false,
+
   configSchema: ConfigSchema,
   defaultOptions,
-
-  showInDocs: false,
 
   // prettier-ignore
   commands: [

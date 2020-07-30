@@ -41,6 +41,11 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
 };
 
 export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
+  showInDocs: true,
+  info: {
+    prettyName: "Logs",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -22,6 +22,8 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
 };
 
 export const NameHistoryPlugin = zeppelinPlugin<NameHistoryPluginType>()("name_history", {
+  showInDocs: false,
+
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -6,6 +6,7 @@ import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildAutoReactions } from "src/data/GuildAutoReactions";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -22,6 +23,14 @@ const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
 };
 
 export const AutoReactionsPlugin = zeppelinPlugin<AutoReactionsPluginType>()("auto_reactions", {
+  showInDocs: true,
+  info: {
+    prettyName: "Auto-reactions",
+    description: trimPluginDescription(`
+      Allows setting up automatic reactions to all new messages on a channel
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 

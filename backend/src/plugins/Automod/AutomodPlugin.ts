@@ -22,6 +22,7 @@ import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
+import { pluginInfo } from "./info";
 
 const defaultOptions = {
   config: {
@@ -134,6 +135,9 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
 };
 
 export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
+  showInDocs: true,
+  info: pluginInfo,
+
   dependencies: [LogsPlugin, ModActionsPlugin, MutesPlugin],
 
   configSchema: ConfigSchema,

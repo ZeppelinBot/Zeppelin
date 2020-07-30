@@ -78,6 +78,11 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
 };
 
 export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
+  showInDocs: true,
+  info: {
+    prettyName: "Utility",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 
