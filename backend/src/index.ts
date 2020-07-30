@@ -103,11 +103,13 @@ connect().then(async () => {
     getAllUsers: false,
     restMode: true,
   });
-  client.setMaxListeners(100);
+  client.setMaxListeners(200);
 
   client.on("debug", message => {
     if (message.includes(" 429 ")) {
       logger.info(`[429] ${message}`);
+    } else {
+      logger.info(`[ERIS DEBUG] ${message}`);
     }
   });
 
