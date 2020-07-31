@@ -2,7 +2,14 @@ import { PluginData } from "knub";
 import { MuteOptions, MutesPluginType } from "../types";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import humanizeDuration from "humanize-duration";
-import { notifyUser, resolveUser, stripObjectToScalars, ucfirst, UserNotificationResult } from "../../../utils";
+import {
+  notifyUser,
+  resolveUser,
+  stripObjectToScalars,
+  ucfirst,
+  UserNotificationResult,
+  resolveMember,
+} from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
 import { TextChannel, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -33,7 +40,7 @@ export async function muteUser(
   }
 
   const user = await resolveUser(pluginData.client, userId);
-  const member = await pluginData.client.getRESTGuildMember(pluginData.guild.id, user.id); // Grab the fresh member so we don't have stale role info
+  const member = await resolveMember(pluginData.client, pluginData.guild, user.id); // Grab the fresh member so we don't have stale role info
   const config = pluginData.config.getMatchingConfig({ member, userId });
 
   if (member) {
