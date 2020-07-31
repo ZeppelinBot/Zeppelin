@@ -46,7 +46,7 @@ export const UnmuteCmd = modActionsCommand({
     }
 
     if (!memberToUnmute) {
-      const banned = await isBanned(pluginData, memberToUnmute.id);
+      const banned = await isBanned(pluginData, user.id);
       const prefix = pluginData.guildConfig.prefix;
       if (banned) {
         sendErrorMessage(
