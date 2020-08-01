@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable } from "../../utils";
-import { BasePluginType } from "knub";
+import { BasePluginType, CooldownManager } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 
@@ -24,5 +24,7 @@ export interface ICompanionChannelMap {
 
 export interface CompanionChannelsPluginType extends BasePluginType {
   config: TConfigSchema;
-  state: {};
+  state: {
+    errorCooldownManager: CooldownManager;
+  };
 }

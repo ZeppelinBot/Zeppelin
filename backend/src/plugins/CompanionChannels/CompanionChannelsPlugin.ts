@@ -4,6 +4,8 @@ import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
 import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
 import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
+import { CooldownManager } from "knub";
 
 const defaultOptions = {
   config: {
@@ -22,8 +24,13 @@ export const CompanionChannelsPlugin = zeppelinPlugin<CompanionChannelsPluginTyp
     `),
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
   events: [VoiceChannelJoinEvt, VoiceChannelSwitchEvt, VoiceChannelLeaveEvt],
+
+  onLoad(pluginData) {
+    pluginData.state.errorCooldownManager = new CooldownManager();
+  },
 });
