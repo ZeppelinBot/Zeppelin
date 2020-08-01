@@ -43,6 +43,7 @@ export async function applyReactionRoleReactionsToMessage(
 
   // Remove old reactions, if any
   await targetMessage.removeReactions();
+  await sleep(1500);
 
   // Add reaction role reactions
   for (const rr of reactionRoles) {
@@ -50,6 +51,7 @@ export async function applyReactionRoleReactionsToMessage(
 
     try {
       await targetMessage.addReaction(emoji);
+      await sleep(1250); // Make sure we don't hit rate limits
     } catch (e) {
       if (isDiscordRESTError(e) && e.code === 10014) {
         pluginData.state.reactionRoles.removeFromMessage(messageId, rr.emoji);
