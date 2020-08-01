@@ -47,6 +47,7 @@ export async function postMessage(
       }
     }
 
+    content.allowedMentions = content.allowedMentions || {};
     content.allowedMentions.everyone = false;
   }
 
