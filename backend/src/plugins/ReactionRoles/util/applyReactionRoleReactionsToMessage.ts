@@ -4,6 +4,8 @@ import { ReactionRole } from "src/data/entities/ReactionRole";
 import { TextChannel } from "eris";
 import { isDiscordRESTError, sleep, isSnowflake } from "src/utils";
 import { logger } from "src/logger";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -40,17 +42,26 @@ export async function applyReactionRoleReactionsToMessage(
   }
 
   // Remove old reactions, if any
-  const removeSleep = sleep(1250);
   await targetMessage.removeReactions();
-  await removeSleep;
 
   // Add reaction role reactions
   for (const rr of reactionRoles) {
     const emoji = isSnowflake(rr.emoji) ? `foo:${rr.emoji}` : rr.emoji;
 
-    const sleepTime = sleep(1250); // Make sure we only add 1 reaction per ~second so as not to hit rate limits
-    await targetMessage.addReaction(emoji);
-    await sleepTime;
+    try {
+      await targetMessage.addReaction(emoji);
+    } catch (e) {
+      if (isDiscordRESTError(e) && e.code === 10014) {
+        pluginData.state.reactionRoles.removeFromMessage(messageId, rr.emoji);
+        const logs = pluginData.getPlugin(LogsPlugin);
+        logs.log(LogType.BOT_ALERT, {
+          body: `Could not add unknown reaction role emoji ${emoji} to message ${channelId}/${messageId}`,
+        });
+        continue;
+      }
+
+      throw e;
+    }
   }
 
   // Add the "clear reactions" button

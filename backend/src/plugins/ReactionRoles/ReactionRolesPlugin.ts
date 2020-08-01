@@ -9,6 +9,7 @@ import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
 import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 
@@ -35,6 +36,7 @@ export const ReactionRolesPlugin = zeppelinPlugin<ReactionRolesPluginType>()("re
     prettyName: "Reaction roles",
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
