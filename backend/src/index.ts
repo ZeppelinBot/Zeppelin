@@ -12,7 +12,7 @@ import moment from "moment-timezone";
 import { Client, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
-import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
+import { errorMessage, isDiscordHTTPError, isDiscordRESTError, MINUTES, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
 import { IZeppelinGlobalConfig, IZeppelinGuildConfig } from "./types";
@@ -208,6 +208,20 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
+
+    // tslint:disable:no-console
+    setInterval(() => {
+      const shards = Array.from(client.shards.values());
+      console.log("Shards:", shards.length);
+      for (const shard of shards) {
+        console.log(`=== SHARD #${shard.id} ===`);
+        console.log("lastHeartbeatSent", shard.lastHeartbeatSent);
+        console.log("lastHeartbeatReceived", shard.lastHeartbeatReceived);
+        console.log("latency", shard.latency);
+        console.log("diff", shard.lastHeartbeatReceived - shard.lastHeartbeatSent);
+      }
+    }, 1 * MINUTES);
+    // tslint:enable:no-console
   });
 
   logger.info("Starting the bot");
