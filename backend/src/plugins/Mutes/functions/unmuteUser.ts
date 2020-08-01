@@ -1,7 +1,7 @@
 import { PluginData } from "knub";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { CaseArgs } from "../../Cases/types";
-import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { resolveUser, stripObjectToScalars, resolveMember } from "../../../utils";
 import { memberHasMutedRole } from "./memberHasMutedRole";
 import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -16,7 +16,7 @@ export async function unmuteUser(
 ): Promise<UnmuteResult> {
   const existingMute = await pluginData.state.mutes.findExistingMuteForUserId(userId);
   const user = await resolveUser(pluginData.client, userId);
-  const member = await pluginData.client.getRESTGuildMember(pluginData.guild.id, userId); // Grab the fresh member so we don't have stale role info
+  const member = await resolveMember(pluginData.client, pluginData.guild, userId); // Grab the fresh member so we don't have stale role info
 
   if (!existingMute && !memberHasMutedRole(pluginData, member)) return;
 
