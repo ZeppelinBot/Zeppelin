@@ -88,6 +88,8 @@ export const CleanCmd = utilityCmd({
       }
     }
 
+    const cleaningMessage = msg.channel.createMessage("Cleaning...");
+
     const messagesToClean = [];
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
@@ -131,6 +133,8 @@ export const CleanCmd = utilityCmd({
     } else {
       responseMsg = await sendErrorMessage(pluginData, msg.channel, `Found no messages to clean!`);
     }
+
+    await (await cleaningMessage).delete();
 
     if (targetChannel.id === msg.channel.id) {
       // Delete the !clean command and the bot response if a different channel wasn't specified
