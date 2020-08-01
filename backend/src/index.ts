@@ -132,8 +132,6 @@ connect().then(async () => {
   client.on("debug", message => {
     if (message.includes(" 429 ")) {
       logger.info(`[429] ${message}`);
-    } else if (!message.includes(" Reset ") && !message.includes('"token"') && !message.includes('"op":1')) {
-      logger.info(`[ERIS DEBUG] ${message}`);
     }
   });
 
@@ -208,20 +206,6 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
-
-    // tslint:disable:no-console
-    setInterval(() => {
-      const shards = Array.from(client.shards.values());
-      console.log("Shards:", shards.length);
-      for (const shard of shards) {
-        console.log(`=== SHARD #${shard.id} ===`);
-        console.log("lastHeartbeatSent", shard.lastHeartbeatSent);
-        console.log("lastHeartbeatReceived", shard.lastHeartbeatReceived);
-        console.log("latency", shard.latency);
-        console.log("diff", shard.lastHeartbeatReceived - shard.lastHeartbeatSent);
-      }
-    }, 1 * MINUTES);
-    // tslint:enable:no-console
   });
 
   logger.info("Starting the bot");
