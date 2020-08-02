@@ -87,6 +87,7 @@ export const ForcebanCmd = modActionsCommand({
     pluginData.state.serverLogs.log(LogType.MEMBER_FORCEBAN, {
       mod: stripObjectToScalars(mod.user),
       userId: user.id,
+      caseNumber: createdCase.case_number,
       reason,
     });
   },
