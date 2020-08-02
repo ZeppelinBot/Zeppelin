@@ -28,7 +28,7 @@ export const SendWelcomeMessageEvt = welcomeEvent({
       } catch (e) {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome DM to {userMention(member)}`,
-          member: stripObjectToScalars(member),
+          member: stripObjectToScalars(member, ["user"]),
         });
       }
     }
