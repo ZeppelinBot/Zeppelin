@@ -1,4 +1,5 @@
 import { tagsCmd } from "../types";
+import { createChunkedMessage } from "../../../utils";
 
 export const TagListCmd = tagsCmd({
   trigger: ["tag list", "tags", "taglist"],
@@ -13,6 +14,7 @@ export const TagListCmd = tagsCmd({
 
     const prefix = pluginData.config.getForMessage(msg).prefix;
     const tagNames = tags.map(tag => tag.tag).sort();
-    msg.channel.createMessage(`Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\``);
+
+    createChunkedMessage(msg.channel, `Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\``);
   },
 });
