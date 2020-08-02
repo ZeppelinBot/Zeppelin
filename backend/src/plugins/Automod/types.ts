@@ -81,7 +81,7 @@ export interface AutomodContext {
   timestamp: number;
   actioned?: boolean;
 
-  user?: User | UnknownUser;
+  user?: User;
   message?: SavedMessage;
   member?: Member;
   joined?: boolean;

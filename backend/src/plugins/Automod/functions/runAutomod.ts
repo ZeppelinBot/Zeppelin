@@ -8,8 +8,8 @@ import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 
 export async function runAutomod(pluginData: PluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
-  const user = userId && pluginData.client.users.get(userId);
-  const member = userId && pluginData.guild.members.get(userId);
+  const user = context.user || (userId && pluginData.client.users.get(userId));
+  const member = context.member || (userId && pluginData.guild.members.get(userId));
   const channelId = context.message?.channel_id;
   const channel = channelId && pluginData.guild.channels.get(channelId);
   const categoryId = channel?.parentID;
