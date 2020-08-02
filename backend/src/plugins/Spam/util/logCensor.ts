@@ -4,9 +4,11 @@ import { SavedMessage } from "src/data/entities/SavedMessage";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function logCensor(pluginData: PluginData<SpamPluginType>, savedMessage: SavedMessage) {
+  const member = pluginData.guild.members.get(savedMessage.user_id);
   const config = pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,
+    member,
   });
   const spamConfig = config.max_censor;
 
