@@ -7,9 +7,11 @@ import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 export async function onMessageCreate(pluginData: PluginData<SpamPluginType>, savedMessage: SavedMessage) {
   if (savedMessage.is_bot) return;
 
+  const member = pluginData.guild.members.get(savedMessage.user_id);
   const config = pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,
+    member,
   });
 
   const maxMessages = config.max_messages;
