@@ -72,6 +72,7 @@ export async function unmuteUser(
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
+      caseNumber: createdCase.case_number,
       time: timeUntilUnmute,
       reason: caseArgs.reason,
     });
@@ -79,6 +80,7 @@ export async function unmuteUser(
     pluginData.state.serverLogs.log(LogType.MEMBER_UNMUTE, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
+      caseNumber: createdCase.case_number,
       reason: caseArgs.reason,
     });
   }

@@ -6,6 +6,8 @@ import { Constants as ErisConstants } from "eris";
 import { safeFindRelevantAuditLogEntry } from "../functions/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { stripObjectToScalars, resolveUser } from "src/utils";
+import { LogType } from "src/data/LogType";
 
 /**
  * Create an UNBAN case automatically when a user is unbanned manually.
@@ -26,11 +28,16 @@ export const CreateUnbanCaseOnManualUnbanEvt = eventListener<ModActionsPluginTyp
     );
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
+
+    let createdCase;
+    let mod = null;
+
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      casesPlugin.createCase({
+      mod = resolveUser(pluginData.client, modId);
+      createdCase = await casesPlugin.createCase({
         userId: user.id,
         modId,
         type: CaseTypes.Unban,
@@ -38,12 +45,19 @@ export const CreateUnbanCaseOnManualUnbanEvt = eventListener<ModActionsPluginTyp
         automatic: true,
       });
     } else {
-      casesPlugin.createCase({
+      createdCase = await casesPlugin.createCase({
         userId: user.id,
         modId: null,
         type: CaseTypes.Unban,
         automatic: true,
       });
     }
+
+    mod = await mod;
+    pluginData.state.serverLogs.log(LogType.MEMBER_UNBAN, {
+      mod: mod ? stripObjectToScalars(mod, ["user"]) : null,
+      userId: user.id,
+      caseNumber: createdCase.case_number,
+    });
   },
 );
