@@ -12,7 +12,7 @@ export const RolesCmd = utilityCmd({
   permission: "can_roles",
 
   signature: {
-    search: ct.string({ catchAll: true }),
+    search: ct.string({ required: false, catchAll: true }),
 
     counts: ct.switchOption(),
     sort: ct.string({ option: true }),
