@@ -40,7 +40,11 @@ export async function banUserId(
   ignoreEvent(pluginData, IgnoredEventType.Ban, userId);
   try {
     const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
-    await pluginData.guild.banMember(userId, deleteMessageDays, encodeURIComponent(reason));
+    await pluginData.guild.banMember(
+      userId,
+      deleteMessageDays,
+      reason != null ? encodeURIComponent(reason) : undefined,
+    );
   } catch (e) {
     return {
       status: "failed",
