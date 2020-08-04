@@ -62,6 +62,7 @@ export async function kickMember(
   pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
     mod: stripObjectToScalars(mod),
     user: stripObjectToScalars(member.user),
+    caseNumber: createdCase.case_number,
     reason,
   });
 

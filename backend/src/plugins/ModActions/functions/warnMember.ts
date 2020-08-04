@@ -57,6 +57,7 @@ export async function warnMember(
   pluginData.state.serverLogs.log(LogType.MEMBER_WARN, {
     mod: stripObjectToScalars(mod),
     member: stripObjectToScalars(member, ["user", "roles"]),
+    caseNumber: createdCase.case_number,
     reason,
   });
 

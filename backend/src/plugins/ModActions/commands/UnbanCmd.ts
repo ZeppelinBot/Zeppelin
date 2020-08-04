@@ -70,6 +70,7 @@ export const UnbanCmd = modActionsCommand({
     pluginData.state.serverLogs.log(LogType.MEMBER_UNBAN, {
       mod: stripObjectToScalars(mod.user),
       userId: user.id,
+      caseNumber: createdCase.case_number,
       reason,
     });
   },

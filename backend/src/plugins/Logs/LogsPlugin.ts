@@ -11,7 +11,6 @@ import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
 import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
-import { LogsGuildBanAddEvt, LogsGuildBanRemoveEvt } from "./events/LogsGuildBanEvts";
 import { LogsGuildMemberUpdateEvt, LogsUserUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannelModifyEvts";
 import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
@@ -55,8 +54,6 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
   events: [
     LogsGuildMemberAddEvt,
     LogsGuildMemberRemoveEvt,
-    LogsGuildBanAddEvt,
-    LogsGuildBanRemoveEvt,
     LogsGuildMemberUpdateEvt,
     LogsUserUpdateEvt,
     LogsChannelCreateEvt,
