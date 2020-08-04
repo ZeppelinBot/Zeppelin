@@ -16,10 +16,12 @@ export const AvatarCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      const extention = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
+      let extension = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
+      // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
+      extension = extension === ".gif" ? extension : ".png";
       const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
       const embed: EmbedOptions = {
-        image: { url: avatarUrl + `${extention}?size=2048` },
+        image: { url: avatarUrl + `${extension}?size=2048` },
       };
       embed.title = `Avatar of ${user.username}#${user.discriminator}:`;
       msg.channel.createMessage({ embed });
