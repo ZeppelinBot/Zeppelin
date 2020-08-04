@@ -10,8 +10,9 @@ import {
   verboseChannelMention,
 } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { TSafeRegex } from "../../../validatorUtils";
+import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { allowTimeout } from "../../../RegExpRunner";
 
 interface MatchResultType {
   type: MatchableTextType;
@@ -25,8 +26,8 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
     include_subdomains: t.boolean,
     include_words: tNullable(t.array(t.string)),
     exclude_words: tNullable(t.array(t.string)),
-    include_regex: tNullable(t.array(TSafeRegex)),
-    exclude_regex: tNullable(t.array(TSafeRegex)),
+    include_regex: tNullable(t.array(TRegex)),
+    exclude_regex: tNullable(t.array(TRegex)),
     only_real_links: t.boolean,
     match_messages: t.boolean,
     match_embeds: t.boolean,
@@ -67,16 +68,18 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
         // In order of specificity, regex > word > domain
 
         if (trigger.exclude_regex) {
-          for (const pattern of trigger.exclude_regex) {
-            if (pattern.test(link.input)) {
+          for (const sourceRegex of trigger.exclude_regex) {
+            const matches = await pluginData.state.regexRunner.exec(sourceRegex, link.input).catch(allowTimeout);
+            if (matches) {
               continue typeLoop;
             }
           }
         }
 
         if (trigger.include_regex) {
-          for (const pattern of trigger.include_regex) {
-            if (pattern.test(link.input)) {
+          for (const sourceRegex of trigger.include_regex) {
+            const matches = await pluginData.state.regexRunner.exec(sourceRegex, link.input).catch(allowTimeout);
+            if (matches) {
               return { extra: { type, link: link.input } };
             }
           }

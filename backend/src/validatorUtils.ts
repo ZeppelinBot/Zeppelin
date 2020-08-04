@@ -8,23 +8,20 @@ import safeRegex from "safe-regex";
 const regexWithFlags = /^\/(.*?)\/([i]*)$/;
 
 /**
- * The TSafeRegex type supports two syntaxes for regexes: /<regex>/<flags> and just <regex>
- * The value is then checked for "catastrophic exponential-time regular expressions" by
- * https://www.npmjs.com/package/safe-regex
+ * This function supports two input syntaxes for regexes: /<pattern>/<flags> and just <pattern>
  */
-const safeRegexAllowedFlags = ["i"];
-export const TSafeRegex = new t.Type<RegExp, string>(
-  "TSafeRegex",
+export function inputPatternToRegExp(pattern: string) {
+  const advancedSyntaxMatch = pattern.match(regexWithFlags);
+  const [finalPattern, flags] = advancedSyntaxMatch ? [advancedSyntaxMatch[1], advancedSyntaxMatch[2]] : [pattern, ""];
+  return new RegExp(finalPattern, flags);
+}
+
+export const TRegex = new t.Type<RegExp, string>(
+  "TRegex",
   (s): s is RegExp => s instanceof RegExp,
   (from, to) =>
     either.chain(t.string.validate(from, to), s => {
-      const advancedSyntaxMatch = s.match(regexWithFlags);
-      const [regexStr, flags] = advancedSyntaxMatch ? [advancedSyntaxMatch[1], advancedSyntaxMatch[2]] : [s, ""];
-      const finalFlags = flags
-        .split("")
-        .filter(flag => safeRegexAllowedFlags.includes(flag))
-        .join("");
-      return safeRegex(regexStr) ? t.success(new RegExp(regexStr, finalFlags)) : t.failure(from, to, "Unsafe regex");
+      return t.success(inputPatternToRegExp(s));
     }),
   s => `/${s.source}/${s.flags}`,
 );
