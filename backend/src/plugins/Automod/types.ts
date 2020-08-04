@@ -12,6 +12,7 @@ import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { RecentActionType } from "./constants";
 import Timeout = NodeJS.Timeout;
+import { RegExpRunner } from "../../RegExpRunner";
 
 export const Rule = t.type({
   enabled: t.boolean,
@@ -44,6 +45,11 @@ export interface AutomodPluginType extends BasePluginType {
      * Automod checks/actions are handled in a queue so we don't get overlap on the same user
      */
     queue: Queue;
+
+    /**
+     * Per-server regex runner
+     */
+    regexRunner: RegExpRunner;
 
     /**
      * Recent actions are used for spam triggers

@@ -3,8 +3,9 @@ import { transliterate } from "transliteration";
 import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { TSafeRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { allowTimeout } from "../../../RegExpRunner";
+import { TRegex } from "../../../validatorUtils";
 
 interface MatchResultType {
   pattern: string;
@@ -13,7 +14,7 @@ interface MatchResultType {
 
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
-    patterns: t.array(TSafeRegex),
+    patterns: t.array(TRegex),
     case_sensitive: t.boolean,
     normalize: t.boolean,
     match_messages: t.boolean,
@@ -46,9 +47,9 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
       }
 
       for (const sourceRegex of trigger.patterns) {
-        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive ? "" : "i");
-        const test = regex.test(str);
-        if (test) {
+        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive && !sourceRegex.ignoreCase ? "" : "i");
+        const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
+        if (matches?.length) {
           return {
             extra: {
               pattern: sourceRegex.source,

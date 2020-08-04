@@ -19,6 +19,9 @@ import { LogsVoiceJoinEvt, LogsVoiceLeaveEvt, LogsVoiceSwitchEvt } from "./event
 import { log } from "./util/log";
 import { LogType } from "../../data/LogType";
 import { getLogMessage } from "./util/getLogMessage";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { disableCodeBlocks } from "../../utils";
+import { logger } from "../../logger";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -100,6 +103,24 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
 
     state.onMessageUpdateFn = (newMsg, oldMsg) => onMessageUpdate(pluginData, newMsg, oldMsg);
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
+
+    state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+    state.regexRunnerTimeoutListener = (regexSource, timeoutMs) => {
+      logger.warn(`Heavy regex (${timeoutMs}): ${regexSource}`);
+    };
+    state.regexRunnerRepeatedTimeoutListener = (regexSource, timeoutMs, failedTimes) => {
+      log(pluginData, LogType.BOT_ALERT, {
+        body:
+          `
+            The following regex has taken longer than ${timeoutMs}ms for ${failedTimes} times and has been temporarily disabled:
+          `.trim() +
+          "\n```" +
+          disableCodeBlocks(regexSource) +
+          "```",
+      });
+    };
+    state.regexRunner.on("timeout", state.regexRunnerTimeoutListener);
+    state.regexRunner.on("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
   },
 
   onUnload(pluginData) {
@@ -108,5 +129,9 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
     pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
     pluginData.state.savedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
     pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+
+    pluginData.state.regexRunner.off("timeout", pluginData.state.regexRunnerTimeoutListener);
+    pluginData.state.regexRunner.off("repeatedTimeout", pluginData.state.regexRunnerRepeatedTimeoutListener);
+    discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
 });

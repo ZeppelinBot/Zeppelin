@@ -4,6 +4,7 @@ import { LogType } from "src/data/LogType";
 import { TextChannel } from "eris";
 import { createChunkedMessage, noop } from "src/utils";
 import { getLogMessage } from "./getLogMessage";
+import { allowTimeout } from "../../../RegExpRunner";
 
 const excludedUserProps = ["user", "member", "mod"];
 
@@ -45,7 +46,8 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
       // If this entry contains a message with an excluded regex, skip it
       if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regexes && data.message.data.content) {
         for (const regex of opts.excluded_message_regexes) {
-          if (regex.test(data.message.data.content)) {
+          const matches = await pluginData.state.regexRunner.exec(regex, data.message.data.content).catch(allowTimeout);
+          if (matches) {
             continue logChannelLoop;
           }
         }
@@ -53,7 +55,8 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
 
       if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regexes && data.before.data.content) {
         for (const regex of opts.excluded_message_regexes) {
-          if (regex.test(data.before.data.content)) {
+          const matches = await pluginData.state.regexRunner.exec(regex, data.message.data.content).catch(allowTimeout);
+          if (matches) {
             continue logChannelLoop;
           }
         }

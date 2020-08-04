@@ -8,6 +8,7 @@ import cloneDeep from "lodash.clonedeep";
 import { censorMessage } from "./censorMessage";
 import escapeStringRegexp from "escape-string-regexp";
 import { logger } from "src/logger";
+import { allowTimeout } from "../../../RegExpRunner";
 
 export async function applyFiltersToMsg(
   pluginData: PluginData<CensorPluginType>,
@@ -137,17 +138,13 @@ export async function applyFiltersToMsg(
   }
 
   // Filter regex
-  const blockedRegex: RegExp[] = config.blocked_regex || [];
-  for (const [i, regex] of blockedRegex.entries()) {
-    if (typeof regex.test !== "function") {
-      logger.info(
-        `[DEBUG] Regex <${regex}> was not a regex; index ${i} of censor.blocked_regex for guild ${pluginData.guild.name} (${pluginData.guild.id})`,
-      );
-      continue;
-    }
-
+  for (const regex of config.blocked_regex || []) {
     // We're testing both the original content and content + attachments/embeds here so regexes that use ^ and $ still match the regular content properly
-    if (regex.test(savedMessage.data.content) || regex.test(messageContent)) {
+    const matches =
+      (await pluginData.state.regexRunner.exec(regex, savedMessage.data.content).catch(allowTimeout)) ||
+      (await pluginData.state.regexRunner.exec(regex, messageContent).catch(allowTimeout));
+
+    if (matches) {
       censorMessage(pluginData, savedMessage, `blocked regex (\`${regex.source}\`) found`);
       return true;
     }

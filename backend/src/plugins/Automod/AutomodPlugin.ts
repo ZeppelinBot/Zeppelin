@@ -11,7 +11,7 @@ import { StrictValidationError } from "../../validatorUtils";
 import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 import { availableActions } from "./actions/availableActions";
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
-import { MINUTES, SECONDS } from "../../utils";
+import { disableCodeBlocks, MINUTES, SECONDS } from "../../utils";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -23,6 +23,10 @@ import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
 import { pluginInfo } from "./info";
+import { RegExpRunner } from "../../RegExpRunner";
+import { LogType } from "../../data/LogType";
+import { logger } from "../../logger";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 
 const defaultOptions = {
   config: {
@@ -161,6 +165,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
   async onLoad(pluginData) {
     pluginData.state.queue = new Queue();
 
+    pluginData.state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+
     pluginData.state.recentActions = [];
     pluginData.state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
 
@@ -189,8 +195,10 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
     pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
   },
 
-  onUnload(pluginData) {
+  async onUnload(pluginData) {
     pluginData.state.queue.clear();
+
+    discardRegExpRunner(`guild-${pluginData.guild.id}`);
 
     clearInterval(pluginData.state.clearRecentActionsInterval);
 

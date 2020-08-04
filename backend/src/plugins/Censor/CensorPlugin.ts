@@ -6,6 +6,8 @@ import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 import { trimPluginDescription } from "../../utils";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<CensorPluginType> = {
   config: {
@@ -51,6 +53,7 @@ export const CensorPlugin = zeppelinPlugin<CensorPluginType>()("censor", {
     `),
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -60,6 +63,8 @@ export const CensorPlugin = zeppelinPlugin<CensorPluginType>()("censor", {
     state.serverLogs = new GuildLogs(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
 
+    state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
 
@@ -68,6 +73,8 @@ export const CensorPlugin = zeppelinPlugin<CensorPluginType>()("censor", {
   },
 
   onUnload(pluginData) {
+    discardRegExpRunner(`guild-${pluginData.guild.id}`);
+
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
     pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
   },

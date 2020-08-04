@@ -1,11 +1,12 @@
 import * as t from "io-ts";
 import { BasePluginType, eventListener } from "knub";
-import { TSafeRegex } from "src/validatorUtils";
+import { TRegex } from "src/validatorUtils";
 import { GuildLogs } from "src/data/GuildLogs";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildArchives } from "src/data/GuildArchives";
 import { GuildCases } from "src/data/GuildCases";
 import { tMessageContent, tNullable } from "../../utils";
+import { RegExpRunner } from "../../RegExpRunner";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;
@@ -16,7 +17,7 @@ const LogChannel = t.partial({
   batched: t.boolean,
   batch_time: t.number,
   excluded_users: t.array(t.string),
-  excluded_message_regexes: t.array(TSafeRegex),
+  excluded_message_regexes: t.array(TRegex),
   excluded_channels: t.array(t.string),
   format: tNullable(tLogFormats),
 });
@@ -44,6 +45,10 @@ export interface LogsPluginType extends BasePluginType {
     savedMessages: GuildSavedMessages;
     archives: GuildArchives;
     cases: GuildCases;
+
+    regexRunner: RegExpRunner;
+    regexRunnerTimeoutListener;
+    regexRunnerRepeatedTimeoutListener;
 
     logListener;
 
