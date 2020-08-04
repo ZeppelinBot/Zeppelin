@@ -1,7 +1,8 @@
 import { logsEvent } from "../types";
-import { stripObjectToScalars, findRelevantAuditLogEntry, UnknownUser } from "src/utils";
+import { stripObjectToScalars, UnknownUser } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { Constants as ErisConstants } from "eris";
+import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
 export const LogsGuildBanAddEvt = logsEvent({
   event: "guildBanAdd",
@@ -10,8 +11,8 @@ export const LogsGuildBanAddEvt = logsEvent({
     const pluginData = meta.pluginData;
     const user = meta.args.user;
 
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      pluginData.guild,
+    const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
+      pluginData,
       ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
       user.id,
     );
@@ -35,8 +36,8 @@ export const LogsGuildBanRemoveEvt = logsEvent({
     const pluginData = meta.pluginData;
     const user = meta.args.user;
 
-    const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-      pluginData.guild,
+    const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
+      pluginData,
       ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
       user.id,
     );

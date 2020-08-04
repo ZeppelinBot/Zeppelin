@@ -1,9 +1,10 @@
 import { logsEvent } from "../types";
-import { stripObjectToScalars, findRelevantAuditLogEntry, UnknownUser } from "src/utils";
+import { stripObjectToScalars, UnknownUser } from "src/utils";
 import { Constants as ErisConstants } from "eris";
 import { LogType } from "src/data/LogType";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
+import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
 export const LogsGuildMemberUpdateEvt = logsEvent({
   event: "guildMemberUpdate",
@@ -46,8 +47,8 @@ export const LogsGuildMemberUpdateEvt = logsEvent({
       }
 
       if (!skip) {
-        const relevantAuditLogEntry = await findRelevantAuditLogEntry(
-          pluginData.guild,
+        const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
+          pluginData,
           ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
           member.id,
         );

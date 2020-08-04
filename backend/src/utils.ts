@@ -376,16 +376,17 @@ export async function findRelevantAuditLogEntry(
   try {
     auditLogs = await guild.getAuditLogs(5, null, actionType);
   } catch (e) {
+    // Ignore internal server errors which seem to be pretty common with audit log requests
+    if (!isDiscordHTTPError(e) || e.code !== 500) {
+      // Ignore, try again next attempt
+    }
+
     // If we don't have permission to read audit log, set audit log requests on cooldown
     if (isDiscordRESTError(e) && e.code === 50013) {
       auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
-      throw e;
     }
 
-    // Ignore internal server errors which seem to be pretty common with audit log requests
-    if (!isDiscordHTTPError(e) || e.code !== 500) {
-      throw e;
-    }
+    throw e;
   }
 
   const entries = auditLogs ? auditLogs.entries : [];

@@ -3,9 +3,9 @@ import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
-import { safeFindRelevantAuditLogEntry } from "../functions/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
 /**
  * Create an UNBAN case automatically when a user is unbanned manually.
