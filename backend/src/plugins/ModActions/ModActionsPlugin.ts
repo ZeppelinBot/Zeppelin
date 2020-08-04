@@ -32,6 +32,7 @@ import { warnMember } from "./functions/warnMember";
 import { Member } from "eris";
 import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
+import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { trimPluginDescription } from "../../utils";
 
 const defaultOptions = {
@@ -62,6 +63,7 @@ const defaultOptions = {
     can_view: false,
     can_addcase: false,
     can_massban: false,
+    can_massmute: false,
     can_hidecase: false,
     can_act_as_other: false,
   },
@@ -82,6 +84,7 @@ const defaultOptions = {
       level: ">=100",
       config: {
         can_massban: true,
+        can_massmute: true,
         can_hidecase: true,
         can_act_as_other: true,
       },
@@ -124,6 +127,7 @@ export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_acti
     UnbanCmd,
     ForcebanCmd,
     MassbanCmd,
+    MassmuteCmd,
     AddCaseCmd,
     CaseCmd,
     CasesUserCmd,
