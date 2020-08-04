@@ -49,7 +49,7 @@ async function cleanMessages(
 }
 
 export const CleanCmd = utilityCmd({
-  trigger: "clean",
+  trigger: ["clean", "clear"],
   description: "Remove a number of recent messages",
   usage: "!clean 20",
   permission: "can_clean",
