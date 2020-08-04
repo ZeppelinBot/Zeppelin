@@ -1,12 +1,14 @@
 import { Tag, TagsPluginType } from "../types";
 import { Member } from "eris";
 import * as t from "io-ts";
-import { StrictMessageContent, stripObjectToScalars, renderRecursively } from "src/utils";
+import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "src/utils";
 import { parseArguments } from "knub-command-manager";
 import { TemplateParseError } from "src/templateFormatter";
 import { PluginData } from "knub";
 import { renderTag } from "./renderTag";
 import { logger } from "src/logger";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
 
 export async function renderSafeTagFromMessage(
   pluginData: PluginData<TagsPluginType>,
@@ -36,10 +38,13 @@ export async function renderSafeTagFromMessage(
       : await renderRecursively(tagBody, renderTagString);
   } catch (e) {
     if (e instanceof TemplateParseError) {
-      logger.warn(`Invalid tag format!\nError: ${e.message}\nFormat: ${tagBody}`);
+      const logs = pluginData.getPlugin(LogsPlugin);
+      logs.log(LogType.BOT_ALERT, {
+        body: `Failed to render tag \`${prefix}${tagName}\`: ${e.message}`,
+      });
       return null;
-    } else {
-      throw e;
     }
+
+    throw e;
   }
 }
