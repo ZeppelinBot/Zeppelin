@@ -10,6 +10,7 @@ import { searchCmdSignature } from "./commands/SearchCmd";
 import { banSearchSignature } from "./commands/BanSearchCmd";
 import { UtilityPluginType } from "./types";
 import { refreshMembersIfNeeded } from "./refreshMembers";
+import { actualInfoCmd } from "./actualInfoCmd";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -109,6 +110,14 @@ export async function displaySearch(
       `);
 
     const searchMsg = await searchMsgPromise;
+
+    const cfg = pluginData.config.getForUser(msg.author);
+    if (cfg.info_on_single_result && searchResult.totalResults === 1) {
+      searchMsg.edit("Only one result:");
+      actualInfoCmd(msg, { user: searchResult.results[0], compact: false }, pluginData);
+      return;
+    }
+
     searchMsg.edit(result);
 
     // Set up pagination reactions if needed. The reactions are cleared after a timeout.
