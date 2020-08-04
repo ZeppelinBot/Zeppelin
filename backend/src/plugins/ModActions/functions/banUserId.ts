@@ -64,6 +64,7 @@ export async function banUserId(
   pluginData.state.serverLogs.log(LogType.MEMBER_BAN, {
     mod: stripObjectToScalars(mod),
     user: stripObjectToScalars(user),
+    caseNumber: createdCase.case_number,
     reason,
   });
 
