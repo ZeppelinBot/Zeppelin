@@ -21,7 +21,7 @@ export function allowTimeout(err: RegExpTimeoutError | Error) {
   throw err;
 }
 
-const REGEX_TIMEOUT = 100; // ms
+const REGEX_TIMEOUT = 250; // ms
 
 const REGEX_FAIL_TO_COOLDOWN_COUNT = 3; // If a regex fails this many times, it goes on cooldown...
 const REGEX_FAIL_COOLDOWN = 5 * MINUTES; // ...for this long
