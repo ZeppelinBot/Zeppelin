@@ -1,7 +1,8 @@
 import { RegExpWorker, TimeoutError } from "regexp-worker";
 import { CooldownManager } from "knub";
-import { MINUTES } from "./utils";
+import { MINUTES, SECONDS } from "./utils";
 import { EventEmitter } from "events";
+import Timeout = NodeJS.Timeout;
 
 const isTimeoutError = (a): a is TimeoutError => {
   return a.message != null && a.elapsedTimeMs != null;
@@ -21,10 +22,20 @@ export function allowTimeout(err: RegExpTimeoutError | Error) {
   throw err;
 }
 
-const REGEX_TIMEOUT = 250; // ms
+// Regex timeout starts at a higher value while the bot loads initially, and gets lowered afterwards
+const INITIAL_REGEX_TIMEOUT = 750; // ms
+const INITIAL_REGEX_TIMEOUT_DURATION = 30 * SECONDS;
+const FINAL_REGEX_TIMEOUT = 250; // ms
 
-const REGEX_FAIL_TO_COOLDOWN_COUNT = 3; // If a regex fails this many times, it goes on cooldown...
+const regexTimeoutUpgradePromise = new Promise(resolve => setTimeout(resolve, INITIAL_REGEX_TIMEOUT_DURATION));
+
+let newWorkerTimeout = INITIAL_REGEX_TIMEOUT;
+regexTimeoutUpgradePromise.then(() => (newWorkerTimeout = FINAL_REGEX_TIMEOUT));
+
+const REGEX_FAIL_TO_COOLDOWN_COUNT = 3; // If a regex times out this many times, it goes on cooldown...
 const REGEX_FAIL_COOLDOWN = 5 * MINUTES; // ...for this long
+
+const REGEX_FAIL_DECAY_TIME = 5 * MINUTES; // Interval time to decrement all fail counters by 1
 
 export interface RegExpRunner {
   on(event: "timeout", listener: (regexSource: string, timeoutMs: number) => void);
@@ -37,6 +48,7 @@ export interface RegExpRunner {
  */
 export class RegExpRunner extends EventEmitter {
   private _worker: RegExpWorker;
+  private _failedTimesInterval: Timeout;
 
   private cooldown: CooldownManager;
   private failedTimes: Map<string, number>;
@@ -45,11 +57,19 @@ export class RegExpRunner extends EventEmitter {
     super();
     this.cooldown = new CooldownManager();
     this.failedTimes = new Map();
+    this._failedTimesInterval = setInterval(() => {
+      for (const [pattern, times] of this.failedTimes.entries()) {
+        this.failedTimes.set(pattern, times - 1);
+      }
+    }, REGEX_FAIL_DECAY_TIME);
   }
 
   private get worker(): RegExpWorker {
     if (!this._worker) {
-      this._worker = new RegExpWorker(REGEX_TIMEOUT);
+      this._worker = new RegExpWorker(newWorkerTimeout);
+      if (newWorkerTimeout !== FINAL_REGEX_TIMEOUT) {
+        regexTimeoutUpgradePromise.then(() => (this._worker.timeout = FINAL_REGEX_TIMEOUT));
+      }
     }
 
     return this._worker;
@@ -77,10 +97,10 @@ export class RegExpRunner extends EventEmitter {
           // Regex has failed too many times, set it on cooldown
           this.cooldown.setCooldown(regex.source, REGEX_FAIL_COOLDOWN);
           this.failedTimes.delete(regex.source);
-          this.emit("repeatedTimeout", regex.source, REGEX_TIMEOUT, REGEX_FAIL_TO_COOLDOWN_COUNT);
+          this.emit("repeatedTimeout", regex.source, this.worker.timeout, REGEX_FAIL_TO_COOLDOWN_COUNT);
         }
 
-        this.emit("timeout", regex.source, REGEX_TIMEOUT);
+        this.emit("timeout", regex.source, this.worker.timeout);
 
         throw new RegExpTimeoutError(e.message, e.elapsedTimeMs);
       }
@@ -92,5 +112,6 @@ export class RegExpRunner extends EventEmitter {
   public async dispose() {
     await this.worker.dispose();
     this._worker = null;
+    clearInterval(this._failedTimesInterval);
   }
 }
