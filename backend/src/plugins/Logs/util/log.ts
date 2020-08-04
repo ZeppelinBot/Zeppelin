@@ -55,7 +55,7 @@ export async function log(pluginData: PluginData<LogsPluginType>, type: LogType,
 
       if (type === LogType.MESSAGE_EDIT && opts.excluded_message_regexes && data.before.data.content) {
         for (const regex of opts.excluded_message_regexes) {
-          const matches = await pluginData.state.regexRunner.exec(regex, data.message.data.content).catch(allowTimeout);
+          const matches = await pluginData.state.regexRunner.exec(regex, data.before.data.content).catch(allowTimeout);
           if (matches) {
             continue logChannelLoop;
           }
