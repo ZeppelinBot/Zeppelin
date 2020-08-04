@@ -30,13 +30,14 @@ export const CreateKickCaseOnManualKickEvt = eventListener<ModActionsPluginType>
 
     if (kickAuditLogEntry) {
       const existingCaseForThisEntry = await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id);
+      let createdCase;
       if (existingCaseForThisEntry) {
         logger.warn(
           `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${existingCaseForThisEntry.id}`,
         );
       } else {
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        casesPlugin.createCase({
+        createdCase = await casesPlugin.createCase({
           userId: member.id,
           modId: kickAuditLogEntry.user.id,
           type: CaseTypes.Kick,
@@ -49,6 +50,7 @@ export const CreateKickCaseOnManualKickEvt = eventListener<ModActionsPluginType>
       pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
         user: stripObjectToScalars(member.user),
         mod: stripObjectToScalars(kickAuditLogEntry.user),
+        caseNumber: createdCase.case_number,
       });
     }
   },

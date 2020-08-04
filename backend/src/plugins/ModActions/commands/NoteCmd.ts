@@ -36,6 +36,7 @@ export const NoteCmd = modActionsCommand({
     pluginData.state.serverLogs.log(LogType.MEMBER_NOTE, {
       mod: stripObjectToScalars(msg.author),
       user: stripObjectToScalars(user, ["user", "roles"]),
+      caseNumber: createdCase.case_number,
       reason,
     });
 
