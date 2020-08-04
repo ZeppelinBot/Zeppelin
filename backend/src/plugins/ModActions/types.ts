@@ -33,6 +33,7 @@ export const ConfigSchema = t.type({
   can_view: t.boolean,
   can_addcase: t.boolean,
   can_massban: t.boolean,
+  can_massmute: t.boolean,
   can_hidecase: t.boolean,
   can_act_as_other: t.boolean,
 });
