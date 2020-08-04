@@ -15,6 +15,7 @@ import { TextChannel, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { Case } from "src/data/entities/Case";
 
 export async function muteUser(
   pluginData: PluginData<MutesPluginType>,
@@ -106,7 +107,7 @@ export async function muteUser(
 
   // Create/update a case
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
-  let theCase;
+  let theCase: Case;
 
   if (existingMute && existingMute.case_id) {
     // Update old case
@@ -153,12 +154,14 @@ export async function muteUser(
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
       time: timeUntilUnmute,
+      caseNumber: theCase.case_number,
       reason,
     });
   } else {
     pluginData.state.serverLogs.log(LogType.MEMBER_MUTE, {
       mod: stripObjectToScalars(mod),
       user: stripObjectToScalars(user),
+      caseNumber: theCase.case_number,
       reason,
     });
   }
