@@ -66,7 +66,7 @@ export const MassbanCmd = modActionsCommand({
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     for (const userId of args.userIds) {
       try {
-        await pluginData.guild.banMember(userId, 1, encodeURIComponent(banReason));
+        await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
 
         await casesPlugin.createCase({
           userId,
