@@ -38,7 +38,7 @@ export async function kickMember(
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_KICK, member.id);
   ignoreEvent(pluginData, IgnoredEventType.Kick, member.id);
   try {
-    await member.kick();
+    await member.kick(reason != null ? encodeURIComponent(reason) : undefined);
   } catch (e) {
     return {
       status: "failed",
