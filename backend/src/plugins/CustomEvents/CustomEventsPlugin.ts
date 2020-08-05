@@ -31,6 +31,7 @@ export const CustomEventsPlugin = zeppelinPlugin<CustomEventsPluginType>()("cust
             runEvent(pluginData, event, { msg: message, args }, { args, msg: strippedMsg });
           },
         });
+        pluginData.commands.add(eventCommand);
       }
     }
   },
