@@ -28,6 +28,7 @@ import { AvatarCmd } from "./commands/AvatarCmd";
 import { CleanCmd } from "./commands/CleanCmd";
 import { Message } from "eris";
 import { InviteInfoCmd } from "./commands/InviteInfoCmd";
+import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -38,6 +39,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_info: false,
     can_server: false,
     can_invite: false,
+    can_channel: false,
     can_reload_guild: false,
     can_nickname: false,
     can_ping: false,
@@ -62,6 +64,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_info: true,
         can_server: true,
         can_invite: true,
+        can_channel: true,
         can_nickname: true,
         can_vcmove: true,
         can_help: true,
@@ -112,6 +115,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     AvatarCmd,
     CleanCmd,
     InviteInfoCmd,
+    ChannelInfoCmd,
   ],
 
   onLoad(pluginData) {
