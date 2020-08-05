@@ -38,6 +38,10 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
         return `Unknown plugin: ${pluginName}`;
       }
 
+      if (typeof pluginOptions !== "object" || pluginOptions == null) {
+        return `Invalid options specified for plugin ${pluginName}`;
+      }
+
       const plugin = pluginNameToPlugin.get(pluginName);
       try {
         const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
