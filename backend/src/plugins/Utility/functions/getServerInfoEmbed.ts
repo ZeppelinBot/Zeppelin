@@ -32,7 +32,6 @@ export async function getServerInfoEmbed(
 
   const embed: EmbedOptions = {
     fields: [],
-    color: parseInt("6b80cf", 16),
   };
 
   embed.author = {
