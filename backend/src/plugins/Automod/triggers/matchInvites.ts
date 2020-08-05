@@ -66,7 +66,7 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
 
       for (const code of uniqueInviteCodes) {
         const invite = await resolveInvite(pluginData.client, code);
-        if (!invite || !isGuildInvite(invite)) return { code };
+        if (!invite || !isGuildInvite(invite)) return { extra: { type, code } };
 
         if (trigger.include_guilds && trigger.include_guilds.includes(invite.guild.id)) {
           return { extra: { type, code, invite } };
