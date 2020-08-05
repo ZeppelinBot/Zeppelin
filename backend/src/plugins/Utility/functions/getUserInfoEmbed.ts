@@ -1,7 +1,7 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
 import { PluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser } from "src/utils";
+import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding } from "src/utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
@@ -22,21 +22,25 @@ export async function getUserInfoEmbed(
     fields: [],
   };
 
+  embed.author = {
+    name: `User:  ${user.username}#${user.discriminator}`,
+  };
+
+  const avatarURL = user.avatarURL || user.defaultAvatarURL;
+  embed.author.icon_url = avatarURL;
+
   const createdAt = moment(user.createdAt);
   const accountAge = humanizeDuration(moment().valueOf() - user.createdAt, {
     largest: 2,
     round: true,
   });
 
-  embed.title = `${user.username}#${user.discriminator}`;
-  embed.thumbnail = { url: user.avatarURL };
-
   if (compact) {
     embed.fields.push({
-      name: "User information",
+      name: preEmbedPadding + "User information",
       value: trimLines(`
           Profile: <@!${user.id}>
-          Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
+          Created: **${accountAge} ago** (\`${createdAt.format("MMM D, YYYY")}\`)
           `),
     });
     if (member) {
@@ -45,11 +49,11 @@ export async function getUserInfoEmbed(
         largest: 2,
         round: true,
       });
-      embed.fields[0].value += `\nJoined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**`;
+      embed.fields[0].value += `\nJoined: **${joinAge} ago** (\`${joinedAt.format("MMM D, YYYY")}\`)`;
     } else {
       embed.fields.push({
-        name: "!!  USER IS NOT ON THE SERVER  !!",
-        value: embedPadding,
+        name: preEmbedPadding + "!! NOTE !!",
+        value: "User is not on the server",
       });
     }
 
@@ -57,13 +61,13 @@ export async function getUserInfoEmbed(
   }
 
   embed.fields.push({
-    name: "User information",
-    value:
-      trimLines(`
-        ID: **${user.id}**
-        Profile: <@!${user.id}>
-        Created: **${accountAge} ago (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-        `) + embedPadding,
+    name: preEmbedPadding + "User information",
+    value: trimLines(`
+        Name: **${user.username}#${user.discriminator}**
+        ID: \`${user.id}\`
+        Created: **${accountAge} ago** (\`${createdAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
+        Mention: <@!${user.id}>
+        `),
   });
 
   if (member) {
@@ -75,12 +79,11 @@ export async function getUserInfoEmbed(
     const roles = member.roles.map(id => pluginData.guild.roles.get(id)).filter(r => !!r);
 
     embed.fields.push({
-      name: "Member information",
-      value:
-        trimLines(`
-          Joined: **${joinAge} ago (${joinedAt.format("YYYY-MM-DD[T]HH:mm:ss")})**
-          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
-        `) + embedPadding,
+      name: preEmbedPadding + "Member information",
+      value: trimLines(`
+          Joined: **${joinAge} ago** (\`${joinedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
+          ${roles.length > 0 ? "Roles: `" + roles.map(r => r.name).join("`, `") + "`" : ""}
+        `),
     });
 
     const voiceChannel = member.voiceState.channelID
@@ -88,19 +91,18 @@ export async function getUserInfoEmbed(
       : null;
     if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
       embed.fields.push({
-        name: "Voice information",
-        value:
-          trimLines(`
+        name: preEmbedPadding + "Voice information",
+        value: trimLines(`
           ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
           ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
           ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
-        `) + embedPadding,
+        `),
       });
     }
   } else {
     embed.fields.push({
-      name: "!!  USER IS NOT ON THE SERVER  !!",
-      value: embedPadding,
+      name: preEmbedPadding + "!! NOTE !!",
+      value: "User is not on the server",
     });
   }
   const cases = (await pluginData.state.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
@@ -111,13 +113,13 @@ export async function getUserInfoEmbed(
     });
 
     const caseSummary = cases.slice(0, 3).map(c => {
-      return `${CaseTypes[c.type]} (#${c.case_number})`;
+      return `${CaseTypes[c.type]} (\`#${c.case_number}\`)`;
     });
 
     const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
 
     embed.fields.push({
-      name: "Cases",
+      name: preEmbedPadding + "Cases",
       value: trimLines(`
           Total cases: **${cases.length}**
           ${summaryText}: ${caseSummary.join(", ")}
