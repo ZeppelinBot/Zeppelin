@@ -30,7 +30,7 @@ export async function getInviteInfoEmbed(
     };
 
     embed.author = {
-      name: `Server Invite - ${invite.guild.name}`,
+      name: `Server invite:  ${invite.guild.name}`,
       url: `https://discord.gg/${invite.code}`,
     };
 
@@ -108,7 +108,7 @@ export async function getInviteInfoEmbed(
     };
 
     embed.author = {
-      name: invite.channel.name ? `Group DM Invite - ${invite.channel.name}` : `Group DM Invite`,
+      name: invite.channel.name ? `Group DM invite:  ${invite.channel.name}` : `Group DM invite`,
       url: `https://discord.gg/${invite.code}`,
     };
 
