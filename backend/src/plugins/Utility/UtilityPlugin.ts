@@ -10,7 +10,7 @@ import { RolesCmd } from "./commands/RolesCmd";
 import { LevelCmd } from "./commands/LevelCmd";
 import { SearchCmd } from "./commands/SearchCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
-import { InfoCmd } from "./commands/InfoCmd";
+import { UserInfoCmd } from "./commands/UserInfoCmd";
 import { NicknameResetCmd } from "./commands/NicknameResetCmd";
 import { NicknameCmd } from "./commands/NicknameCmd";
 import { PingCmd } from "./commands/PingCmd";
@@ -42,6 +42,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_invite: false,
     can_channel: false,
     can_message: false,
+    can_userinfo: false,
     can_reload_guild: false,
     can_nickname: false,
     can_ping: false,
@@ -68,6 +69,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_invite: true,
         can_channel: true,
         can_message: true,
+        can_userinfo: true,
         can_nickname: true,
         can_vcmove: true,
         can_help: true,
@@ -101,7 +103,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
   commands: [
     SearchCmd,
     BanSearchCmd,
-    InfoCmd,
+    UserInfoCmd,
     LevelCmd,
     RolesCmd,
     ServerCmd,

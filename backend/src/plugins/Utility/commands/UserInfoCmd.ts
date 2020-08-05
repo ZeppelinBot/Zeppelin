@@ -3,11 +3,11 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { sendErrorMessage } from "../../../pluginUtils";
 
-export const InfoCmd = utilityCmd({
-  trigger: "info",
-  description: "Show basic information about a user",
-  usage: "!info 106391128718245888",
-  permission: "can_info",
+export const UserInfoCmd = utilityCmd({
+  trigger: ["user", "userinfo"],
+  description: "Show information about a user",
+  usage: "!user 106391128718245888",
+  permission: "can_userinfo",
 
   signature: {
     user: ct.resolvedUserLoose({ required: false }),
