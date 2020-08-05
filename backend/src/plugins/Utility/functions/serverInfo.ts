@@ -1,0 +1,161 @@
+import { PluginData } from "knub";
+import { UtilityPluginType } from "../types";
+import { embedPadding, formatNumber, memoize, MINUTES, resolveUser, trimLines } from "../../../utils";
+import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, VoiceChannel } from "eris";
+import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
+
+export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serverId: string): Promise<EmbedOptions> {
+  const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
+  const [restGuild, guildPreview] = await Promise.all([
+    thisServer
+      ? memoize(() => pluginData.client.getRESTGuild(serverId), `getRESTGuild_${serverId}`, 10 * MINUTES)
+      : null,
+    memoize(
+      () => pluginData.client.getGuildPreview(serverId).catch(() => null),
+      `getGuildPreview_${serverId}`,
+      10 * MINUTES,
+    ),
+  ]);
+
+  if (!restGuild && !guildPreview) {
+    return null;
+  }
+
+  const embed: EmbedOptions = {
+    fields: [],
+    color: parseInt("6b80cf", 16),
+  };
+
+  embed.thumbnail = { url: (guildPreview || restGuild).iconURL };
+
+  // BASIC INFORMATION
+  const createdAt = moment((guildPreview || restGuild).createdAt);
+  const serverAge = humanizeDuration(moment().valueOf() - createdAt.valueOf(), {
+    largest: 2,
+    round: true,
+  });
+
+  const basicInformation = [];
+  basicInformation.push(`Created: **${serverAge} ago** (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})`);
+
+  if (thisServer) {
+    const owner = await resolveUser(pluginData.client, thisServer.ownerID);
+    const ownerName = `${owner.username}#${owner.discriminator}`;
+
+    basicInformation.push(`Owner: **${ownerName}** (${thisServer.ownerID})`);
+    basicInformation.push(`Voice region: **${thisServer.region}**`);
+  }
+
+  const features = (guildPreview || restGuild).features;
+  if (features.length > 0) {
+    basicInformation.push(`Features: ${features.join(", ")}`);
+  }
+
+  embed.fields.push({
+    name: `Server information - ${(guildPreview || restGuild).name}`,
+    value: basicInformation.join("\n") + embedPadding,
+  });
+
+  // MEMBER COUNTS
+  const totalMembers =
+    guildPreview?.approximateMemberCount ||
+    restGuild?.approximateMemberCount ||
+    restGuild?.memberCount ||
+    thisServer?.memberCount ||
+    thisServer?.members.size ||
+    0;
+
+  let onlineMemberCount = guildPreview?.approximatePresenceCount || restGuild?.approximatePresenceCount;
+
+  if (onlineMemberCount == null && restGuild?.vanityURL) {
+    // For servers with a vanity URL, we can also use the numbers from the invite for online count
+    const invite = (await memoize(
+      () => pluginData.client.getInvite(restGuild.vanityURL, true),
+      `getInvite_${restGuild.vanityURL}`,
+      10 * MINUTES,
+    )) as RESTChannelInvite;
+
+    if (invite) {
+      onlineMemberCount = invite.presenceCount;
+    }
+  }
+
+  if (!onlineMemberCount && thisServer) {
+    onlineMemberCount = thisServer.members.filter(m => m.status !== "offline").length; // Extremely inaccurate fallback
+  }
+
+  const offlineMemberCount = totalMembers - onlineMemberCount;
+
+  let memberCountTotalLines = `Total: **${formatNumber(totalMembers)}**`;
+  if (restGuild?.maxMembers) {
+    memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
+  }
+
+  let memberCountOnlineLines = `Online: **${formatNumber(onlineMemberCount)}**`;
+  if (restGuild?.maxPresences) {
+    memberCountOnlineLines += `\nMax online: **${formatNumber(restGuild.maxPresences)}**`;
+  }
+
+  embed.fields.push({
+    name: "Members",
+    inline: true,
+    value: trimLines(`
+          ${memberCountTotalLines}
+          ${memberCountOnlineLines}
+          Offline: **${formatNumber(offlineMemberCount)}**
+        `),
+  });
+
+  // CHANNEL COUNTS
+  if (thisServer) {
+    const totalChannels = thisServer.channels.size;
+    const categories = thisServer.channels.filter(channel => channel instanceof CategoryChannel);
+    const textChannels = thisServer.channels.filter(channel => channel instanceof TextChannel);
+    const voiceChannels = thisServer.channels.filter(channel => channel instanceof VoiceChannel);
+
+    embed.fields.push({
+      name: "Channels",
+      inline: true,
+      value:
+        trimLines(`
+          Total: **${totalChannels}** / 500
+          Categories: **${categories.length}**
+          Text: **${textChannels.length}**
+          Voice: **${voiceChannels.length}**
+        `) + embedPadding,
+    });
+  }
+
+  // OTHER STATS
+  const otherStats = [];
+
+  if (thisServer) {
+    otherStats.push(`Roles: **${thisServer.roles.size}** / 250`);
+  }
+
+  if (restGuild) {
+    const maxEmojis =
+      {
+        0: 50,
+        1: 100,
+        2: 150,
+        3: 250,
+      }[restGuild.premiumTier] || 50;
+    otherStats.push(`Emojis: **${restGuild.emojis.length}** / ${maxEmojis}`);
+  } else {
+    otherStats.push(`Emojis: **${guildPreview.emojis.length}**`);
+  }
+
+  if (thisServer) {
+    otherStats.push(`Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${thisServer.premiumTier})`);
+  }
+
+  embed.fields.push({
+    name: "Other stats",
+    inline: true,
+    value: otherStats.join("\n") + embedPadding,
+  });
+
+  return embed;
+}
