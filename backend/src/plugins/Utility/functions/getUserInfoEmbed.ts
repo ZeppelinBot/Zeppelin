@@ -82,7 +82,7 @@ export async function getUserInfoEmbed(
       name: preEmbedPadding + "Member information",
       value: trimLines(`
           Joined: **${joinAge} ago** (\`${joinedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
-          ${roles.length > 0 ? "Roles: `" + roles.map(r => r.name).join("`, `") + "`" : ""}
+          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
         `),
     });
 
@@ -113,7 +113,7 @@ export async function getUserInfoEmbed(
     });
 
     const caseSummary = cases.slice(0, 3).map(c => {
-      return `${CaseTypes[c.type]} (\`#${c.case_number}\`)`;
+      return `${CaseTypes[c.type]} (#${c.case_number})`;
     });
 
     const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
