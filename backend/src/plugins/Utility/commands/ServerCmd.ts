@@ -46,20 +46,23 @@ export const ServerCmd = utilityCmd({
       10 * MINUTES,
     );
 
-    // For servers with a vanity URL, we can use the numbers from the invite for online count
-    // (which is nowadays usually more accurate for large servers)
-    const invite = guild.vanityURL
-      ? ((await memoize(
-          () => pluginData.client.getInvite(guild.vanityURL, true),
-          `getInvite_${guild.vanityURL}`,
-          10 * MINUTES,
-        )) as RESTChannelInvite)
-      : null;
+    const totalMembers = restGuild.memberCount ?? restGuild.approximateMemberCount;
+    let onlineMemberCount = restGuild.approximatePresenceCount;
 
-    const totalMembers = invite?.memberCount || guild.memberCount;
+    if (totalMembers == null || onlineMemberCount == null) {
+      // For servers with a vanity URL, we can also use the numbers from the invite for online count
+      const invite = guild.vanityURL
+        ? ((await memoize(
+            () => pluginData.client.getInvite(guild.vanityURL, true),
+            `getInvite_${guild.vanityURL}`,
+            10 * MINUTES,
+          )) as RESTChannelInvite)
+        : null;
 
-    const onlineMemberCount = invite ? invite.presenceCount : guild.members.filter(m => m.status !== "offline").length;
-    const offlineMemberCount = guild.memberCount - onlineMemberCount;
+      onlineMemberCount = invite ? invite.presenceCount : guild.members.filter(m => m.status !== "offline").length;
+    }
+
+    const offlineMemberCount = totalMembers - onlineMemberCount;
 
     let memberCountTotalLines = `Total: **${formatNumber(totalMembers)}**`;
     if (restGuild.maxMembers) {
