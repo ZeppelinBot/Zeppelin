@@ -22,6 +22,11 @@ export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serv
     return null;
   }
 
+  const features = (restGuild || guildPreview).features;
+  if (!thisServer && !features.includes("DISCOVERABLE")) {
+    return null;
+  }
+
   const embed: EmbedOptions = {
     fields: [],
     color: parseInt("6b80cf", 16),
@@ -47,7 +52,6 @@ export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serv
     basicInformation.push(`Voice region: **${thisServer.region}**`);
   }
 
-  const features = (guildPreview || restGuild).features;
   if (features.length > 0) {
     basicInformation.push(`Features: ${features.join(", ")}`);
   }
@@ -156,6 +160,12 @@ export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serv
     inline: true,
     value: otherStats.join("\n") + embedPadding,
   });
+
+  if (!thisServer) {
+    embed.footer = {
+      text: "⚠️ Only showing publicly available information for this server",
+    };
+  }
 
   return embed;
 }
