@@ -1,8 +1,11 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { errorMessage } from "../../../utils";
-import { getBaseUrl } from "../../../pluginUtils";
+import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
+import { Constants, TextChannel } from "eris";
+import { hasPermissions } from "../../../utils/hasPermissions";
+import { canReadChannel } from "../../../utils/canReadChannel";
 
 export const SourceCmd = utilityCmd({
   trigger: "source",
@@ -11,22 +14,36 @@ export const SourceCmd = utilityCmd({
   permission: "can_source",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
   },
 
-  async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
-    if (!savedMessage) {
-      msg.channel.createMessage(errorMessage("Unknown message"));
+  async run({ message: cmdMessage, args, pluginData }) {
+    if (!canReadChannel(args.message.channel, cmdMessage.member.id)) {
+      sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;
     }
 
-    const source =
-      (savedMessage.data.content || "<no text content>") + "\n\nSource:\n\n" + JSON.stringify(savedMessage.data);
+    const message = await pluginData.client
+      .getMessage(args.message.channel.id, args.message.messageId)
+      .catch(() => null);
+    if (!message) {
+      sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
+      return;
+    }
+
+    const textSource = message.content || "<no text content>";
+    const fullSource = JSON.stringify({
+      id: message.id,
+      content: message.content,
+      attachments: message.attachments,
+      embeds: message.embeds,
+    });
+
+    const source = `${textSource}\n\nSource:\n\n${fullSource}`;
 
     const archiveId = await pluginData.state.archives.create(source, moment().add(1, "hour"));
     const baseUrl = getBaseUrl(pluginData);
     const url = pluginData.state.archives.getUrl(baseUrl, archiveId);
-    msg.channel.createMessage(`Message source: ${url}`);
+    cmdMessage.channel.createMessage(`Message source: ${url}`);
   },
 });

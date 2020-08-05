@@ -71,6 +71,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_context: true,
         can_jumbo: true,
         can_avatar: true,
+        can_source: true,
       },
     },
     {
@@ -78,7 +79,6 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
       config: {
         can_reload_guild: true,
         can_ping: true,
-        can_source: true,
         can_about: true,
       },
     },
