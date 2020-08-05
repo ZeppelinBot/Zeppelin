@@ -30,6 +30,7 @@ import { Message } from "eris";
 import { InviteInfoCmd } from "./commands/InviteInfoCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
 import { MessageInfoCmd } from "./commands/MessageInfoCmd";
+import { InfoCmd } from "./commands/InfoCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -39,9 +40,9 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_clean: false,
     can_info: false,
     can_server: false,
-    can_invite: false,
-    can_channel: false,
-    can_message: false,
+    can_inviteinfo: false,
+    can_channelinfo: false,
+    can_messageinfo: false,
     can_userinfo: false,
     can_reload_guild: false,
     can_nickname: false,
@@ -66,9 +67,9 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_clean: true,
         can_info: true,
         can_server: true,
-        can_invite: true,
-        can_channel: true,
-        can_message: true,
+        can_inviteinfo: true,
+        can_channelinfo: true,
+        can_messageinfo: true,
         can_userinfo: true,
         can_nickname: true,
         can_vcmove: true,
@@ -122,6 +123,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     InviteInfoCmd,
     ChannelInfoCmd,
     MessageInfoCmd,
+    InfoCmd,
   ],
 
   onLoad(pluginData) {

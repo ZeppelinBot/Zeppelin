@@ -4,6 +4,7 @@ import { embedPadding, formatNumber, memoize, MINUTES, preEmbedPadding, resolveU
 import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, VoiceChannel } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import { getGuildPreview } from "./getGuildPreview";
 
 export async function getServerInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
@@ -14,11 +15,7 @@ export async function getServerInfoEmbed(
     thisServer
       ? memoize(() => pluginData.client.getRESTGuild(serverId), `getRESTGuild_${serverId}`, 10 * MINUTES)
       : null,
-    memoize(
-      () => pluginData.client.getGuildPreview(serverId).catch(() => null),
-      `getGuildPreview_${serverId}`,
-      10 * MINUTES,
-    ),
+    getGuildPreview(pluginData.client, serverId),
   ]);
 
   if (!restGuild && !guildPreview) {
