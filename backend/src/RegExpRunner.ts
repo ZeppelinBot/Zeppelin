@@ -25,7 +25,7 @@ export function allowTimeout(err: RegExpTimeoutError | Error) {
 // Regex timeout starts at a higher value while the bot loads initially, and gets lowered afterwards
 const INITIAL_REGEX_TIMEOUT = 750; // ms
 const INITIAL_REGEX_TIMEOUT_DURATION = 30 * SECONDS;
-const FINAL_REGEX_TIMEOUT = 250; // ms
+const FINAL_REGEX_TIMEOUT = 500; // ms
 
 const regexTimeoutUpgradePromise = new Promise(resolve => setTimeout(resolve, INITIAL_REGEX_TIMEOUT_DURATION));
 
@@ -35,7 +35,7 @@ regexTimeoutUpgradePromise.then(() => (newWorkerTimeout = FINAL_REGEX_TIMEOUT));
 const REGEX_FAIL_TO_COOLDOWN_COUNT = 3; // If a regex times out this many times, it goes on cooldown...
 const REGEX_FAIL_COOLDOWN = 5 * MINUTES; // ...for this long
 
-const REGEX_FAIL_DECAY_TIME = 5 * MINUTES; // Interval time to decrement all fail counters by 1
+const REGEX_FAIL_DECAY_TIME = 1 * MINUTES; // Interval time to decrement all fail counters by 1
 
 export interface RegExpRunner {
   on(event: "timeout", listener: (regexSource: string, timeoutMs: number) => void);
