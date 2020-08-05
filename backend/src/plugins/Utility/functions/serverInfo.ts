@@ -146,7 +146,7 @@ export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serv
         2: 150,
         3: 250,
       }[restGuild.premiumTier] || 50;
-    otherStats.push(`Emojis: **${restGuild.emojis.length}** / ${maxEmojis}`);
+    otherStats.push(`Emojis: **${restGuild.emojis.length}** / ${maxEmojis * 2}`);
   } else {
     otherStats.push(`Emojis: **${guildPreview.emojis.length}**`);
   }
