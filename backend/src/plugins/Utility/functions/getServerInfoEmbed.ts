@@ -1,6 +1,6 @@
 import { PluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { embedPadding, formatNumber, memoize, MINUTES, resolveUser, trimLines } from "../../../utils";
+import { embedPadding, formatNumber, memoize, MINUTES, preEmbedPadding, resolveUser, trimLines } from "../../../utils";
 import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, VoiceChannel } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
@@ -35,7 +35,10 @@ export async function getServerInfoEmbed(
     color: parseInt("6b80cf", 16),
   };
 
-  embed.thumbnail = { url: (guildPreview || restGuild).iconURL };
+  embed.author = {
+    name: `Server:  ${(guildPreview || restGuild).name}`,
+    icon_url: (guildPreview || restGuild).iconURL,
+  };
 
   // BASIC INFORMATION
   const createdAt = moment((guildPreview || restGuild).createdAt);
@@ -60,8 +63,8 @@ export async function getServerInfoEmbed(
   }
 
   embed.fields.push({
-    name: `Server information - ${(guildPreview || restGuild).name}`,
-    value: basicInformation.join("\n") + embedPadding,
+    name: preEmbedPadding + "Basic information",
+    value: basicInformation.join("\n"),
   });
 
   // MEMBER COUNTS
@@ -105,7 +108,7 @@ export async function getServerInfoEmbed(
   }
 
   embed.fields.push({
-    name: "Members",
+    name: preEmbedPadding + "Members",
     inline: true,
     value: trimLines(`
           ${memberCountTotalLines}
@@ -122,15 +125,14 @@ export async function getServerInfoEmbed(
     const voiceChannels = thisServer.channels.filter(channel => channel instanceof VoiceChannel);
 
     embed.fields.push({
-      name: "Channels",
+      name: preEmbedPadding + "Channels",
       inline: true,
-      value:
-        trimLines(`
+      value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.length}**
           Text: **${textChannels.length}**
           Voice: **${voiceChannels.length}**
-        `) + embedPadding,
+        `),
     });
   }
 
@@ -159,9 +161,9 @@ export async function getServerInfoEmbed(
   }
 
   embed.fields.push({
-    name: "Other stats",
+    name: preEmbedPadding + "Other stats",
     inline: true,
-    value: otherStats.join("\n") + embedPadding,
+    value: otherStats.join("\n"),
   });
 
   if (!thisServer) {
