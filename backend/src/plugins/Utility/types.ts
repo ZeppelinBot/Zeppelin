@@ -13,6 +13,7 @@ export const ConfigSchema = t.type({
   can_clean: t.boolean,
   can_info: t.boolean,
   can_server: t.boolean,
+  can_invite: t.boolean,
   can_reload_guild: t.boolean,
   can_nickname: t.boolean,
   can_ping: t.boolean,
