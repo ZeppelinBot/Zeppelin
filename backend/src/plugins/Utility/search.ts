@@ -10,7 +10,7 @@ import { searchCmdSignature } from "./commands/SearchCmd";
 import { banSearchSignature } from "./commands/BanSearchCmd";
 import { UtilityPluginType } from "./types";
 import { refreshMembersIfNeeded } from "./refreshMembers";
-import { actualInfoCmd } from "./actualInfoCmd";
+import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -113,9 +113,12 @@ export async function displaySearch(
 
     const cfg = pluginData.config.getForUser(msg.author);
     if (cfg.info_on_single_result && searchResult.totalResults === 1) {
-      searchMsg.edit("Only one result:");
-      actualInfoCmd(msg, { user: searchResult.results[0], compact: false }, pluginData);
-      return;
+      const embed = await getUserInfoEmbed(pluginData, searchResult.results[0].id, false);
+      if (embed) {
+        searchMsg.edit("Only one result:");
+        msg.channel.createMessage({ embed });
+        return;
+      }
     }
 
     searchMsg.edit(result);

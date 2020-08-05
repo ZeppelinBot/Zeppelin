@@ -1,6 +1,7 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { actualInfoCmd } from "../actualInfoCmd";
+import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
+import { sendErrorMessage } from "../../../pluginUtils";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",
@@ -14,7 +15,13 @@ export const InfoCmd = utilityCmd({
     compact: ct.switchOption({ shortcut: "c" }),
   },
 
-  async run({ message: msg, args, pluginData }) {
-    actualInfoCmd(msg, args, pluginData);
+  async run({ message, args, pluginData }) {
+    const embed = await getUserInfoEmbed(pluginData, args.user.id, args.compact);
+    if (!embed) {
+      sendErrorMessage(pluginData, message.channel, "User not found");
+      return;
+    }
+
+    message.channel.createMessage({ embed });
   },
 });
