@@ -101,8 +101,8 @@ export async function getUserInfoEmbed(
     }
   } else {
     embed.fields.push({
-      name: preEmbedPadding + "!! NOTE !!",
-      value: "User is not on the server",
+      name: preEmbedPadding + "Member information",
+      value: "⚠ User is not on the server",
     });
   }
   const cases = (await pluginData.state.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
