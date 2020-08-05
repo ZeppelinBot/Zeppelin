@@ -11,14 +11,7 @@ import { GuildChannel, Member, TextChannel, User } from "eris";
 import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import { getChannelIdFromMessageId } from "./data/getChannelIdFromMessageId";
-
-export interface MessageTarget {
-  channel: TextChannel;
-  messageId: string;
-}
-
-const channelAndMessageIdRegex = /^(\d+)[\-\/](\d+)$/;
-const messageLinkRegex = /^https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/\d+\/(\d+)\/(\d+)$/i;
+import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
 
 export const commandTypes = {
   ...baseTypeConverters,
@@ -63,47 +56,12 @@ export const commandTypes = {
   async messageTarget(value: string, context: CommandContext<any>) {
     value = String(value).trim();
 
-    const result = await (async () => {
-      if (isSnowflake(value)) {
-        const channelId = await getChannelIdFromMessageId(value);
-        if (!channelId) {
-          throw new TypeConversionError(`Could not find channel for message ID \`${disableInlineCode(value)}\``);
-        }
-
-        return {
-          channelId,
-          messageId: value,
-        };
-      }
-
-      const channelAndMessageIdMatch = value.match(channelAndMessageIdRegex);
-      if (channelAndMessageIdMatch) {
-        return {
-          channelId: channelAndMessageIdMatch[1],
-          messageId: channelAndMessageIdMatch[2],
-        };
-      }
-
-      const messageLinkMatch = value.match(messageLinkRegex);
-      if (messageLinkMatch) {
-        return {
-          channelId: messageLinkMatch[1],
-          messageId: messageLinkMatch[2],
-        };
-      }
-
-      throw new TypeConversionError(`Invalid message ID \`${disableInlineCode(value)}\``);
-    })();
-
-    const channel = context.pluginData.guild.channels.get(result.channelId);
-    if (!channel || !(channel instanceof TextChannel)) {
-      throw new TypeConversionError(`Invalid channel ID \`${disableInlineCode(result.channelId)}\``);
+    const result = await resolveMessageTarget(context.pluginData, value);
+    if (!result) {
+      throw new TypeConversionError(`Unknown message \`${disableInlineCode(value)}\``);
     }
 
-    return {
-      channel,
-      messageId: result.messageId,
-    };
+    return result;
   },
 };
 
