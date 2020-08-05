@@ -1,6 +1,7 @@
 import {
   AnyInvite,
   Attachment,
+  BaseInvite,
   ChannelInvite,
   Client,
   Embed,
@@ -15,6 +16,8 @@ import {
   Message,
   MessageContent,
   PossiblyUncachedMessage,
+  RESTChannelInvite,
+  RESTPrivateInvite,
   TextableChannel,
   TextChannel,
   User,
@@ -448,6 +451,14 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
 
     return urls;
   }, []);
+}
+
+export function parseInviteCodeInput(str: string): string {
+  if (str.match(/^[a-z0-9]{6,}$/i)) {
+    return str;
+  }
+
+  return getInviteCodesInString(str)[0];
 }
 
 export function getInviteCodesInString(str: string): string[] {
@@ -1064,13 +1075,15 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
 
 const inviteCache = new SimpleCache<Promise<ChannelInvite>>(10 * MINUTES, 200);
 
-export async function resolveInvite(client: Client, code: string): Promise<ChannelInvite | null> {
-  if (inviteCache.has(code)) {
-    return inviteCache.get(code);
+export async function resolveInvite(client: Client, code: string, withCounts?: boolean): Promise<AnyInvite | null> {
+  const key = `${code}:${withCounts ? 1 : 0}`;
+
+  if (inviteCache.has(key)) {
+    return inviteCache.get(key);
   }
 
-  const promise = client.getInvite(code).catch(() => null);
-  inviteCache.set(code, promise);
+  const promise = client.getInvite(code, withCounts).catch(() => null);
+  inviteCache.set(key, promise);
 
   return promise;
 }
@@ -1227,6 +1240,14 @@ export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
 
 export function isGuildInvite(invite: AnyInvite): invite is GuildInvite {
   return (invite as GuildInvite).guild != null;
+}
+
+export function isRESTGuildInvite(invite: BaseInvite): invite is RESTChannelInvite {
+  return (invite as any).guild != null;
+}
+
+export function isRESTGroupDMInvite(invite: BaseInvite): invite is RESTPrivateInvite {
+  return (invite as any).guild == null && (invite as any).channel != null;
 }
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {

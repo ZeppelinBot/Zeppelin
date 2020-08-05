@@ -1,9 +1,16 @@
 import { PluginData } from "knub";
 import { CensorPluginType } from "../types";
 import { SavedMessage } from "src/data/entities/SavedMessage";
-import { Embed, GuildInvite } from "eris";
+import { AnyInvite, Embed, GuildInvite } from "eris";
 import { ZalgoRegex } from "src/data/Zalgo";
-import { getInviteCodesInString, getUrlsInString, resolveMember, resolveInvite } from "src/utils";
+import {
+  getInviteCodesInString,
+  getUrlsInString,
+  resolveMember,
+  resolveInvite,
+  isGuildInvite,
+  isRESTGuildInvite,
+} from "src/utils";
 import cloneDeep from "lodash.clonedeep";
 import { censorMessage } from "./censorMessage";
 import escapeStringRegexp from "escape-string-regexp";
@@ -52,7 +59,7 @@ export async function applyFiltersToMsg(
 
     const inviteCodes = getInviteCodesInString(messageContent);
 
-    const invites: Array<GuildInvite | null> = await Promise.all(
+    const invites: Array<AnyInvite | null> = await Promise.all(
       inviteCodes.map(code => resolveInvite(pluginData.client, code)),
     );
 
@@ -63,27 +70,29 @@ export async function applyFiltersToMsg(
         return true;
       }
 
-      if (!invite.guild && !allowGroupDMInvites) {
+      if (!isGuildInvite(invite) && !allowGroupDMInvites) {
         censorMessage(pluginData, savedMessage, `group dm invites are not allowed`);
         return true;
       }
 
-      if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
-        censorMessage(
-          pluginData,
-          savedMessage,
-          `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) not found in whitelist`,
-        );
-        return true;
-      }
+      if (isRESTGuildInvite(invite)) {
+        if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
+          censorMessage(
+            pluginData,
+            savedMessage,
+            `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) not found in whitelist`,
+          );
+          return true;
+        }
 
-      if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild.id)) {
-        censorMessage(
-          pluginData,
-          savedMessage,
-          `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) found in blacklist`,
-        );
-        return true;
+        if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild.id)) {
+          censorMessage(
+            pluginData,
+            savedMessage,
+            `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) found in blacklist`,
+          );
+          return true;
+        }
       }
 
       if (inviteCodeWhitelist && !inviteCodeWhitelist.includes(invite.code)) {
