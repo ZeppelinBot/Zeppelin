@@ -4,7 +4,14 @@ import { BaseInvite, Constants, EmbedOptions, RESTChannelInvite, RESTPrivateInvi
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { emptyEmbedValue, formatNumber, isRESTGroupDMInvite, isRESTGuildInvite, resolveInvite } from "../../../utils";
+import {
+  emptyEmbedValue,
+  formatNumber,
+  isRESTGroupDMInvite,
+  isRESTGuildInvite,
+  resolveInvite,
+  trimLines,
+} from "../../../utils";
 
 export async function getInviteInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
@@ -61,6 +68,17 @@ export async function getInviteInfoEmbed(
       inline: true,
     });
 
+    if (invite.inviter) {
+      embed.fields.push({
+        name: "Invite creator",
+        value: trimLines(`
+          <@!${invite.inviter.id}>
+          ${invite.inviter.username}#${invite.inviter.discriminator}
+          \`${invite.inviter.id}\`
+        `),
+      });
+    }
+
     return embed;
   }
 
@@ -86,6 +104,17 @@ export async function getInviteInfoEmbed(
       name: "Members",
       value: formatNumber((invite as any).memberCount),
     });
+
+    if (invite.inviter) {
+      embed.fields.push({
+        name: "Invite creator",
+        value: trimLines(`
+          <@!${invite.inviter.id}>
+          ${invite.inviter.username}#${invite.inviter.discriminator}
+          \`${invite.inviter.id}\`
+        `),
+      });
+    }
 
     return embed;
   }
