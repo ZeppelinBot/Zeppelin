@@ -1,9 +1,9 @@
 import { reactionRolesCmd, TReactionRolePair } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { RecoverablePluginError, ERRORS } from "src/RecoverablePluginError";
-import { canUseEmoji } from "src/utils";
+import { canUseEmoji, noop } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 
 const CLEAR_ROLES_EMOJI = "❌";
@@ -46,7 +46,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     const emojiRolePairs: TReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
-      .map(v => v.split(/(\s|[=,])+/).map(v => v.trim())) // tslint:disable-line
+      .map(v => v.split(/[\s=,]+/).map(v => v.trim())) // tslint:disable-line
       .map(
         (pair): TReactionRolePair => {
           const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
@@ -93,6 +93,8 @@ export const InitReactionRolesCmd = reactionRolesCmd({
       }
     }
 
+    const progressMessage = msg.channel.createMessage("Adding reaction roles...");
+
     // Save the new reaction roles to the database
     for (const pair of emojiRolePairs) {
       await pluginData.state.reactionRoles.add(channel.id, targetMessage.id, pair[0], pair[1], args.exclusive);
@@ -103,5 +105,6 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     await applyReactionRoleReactionsToMessage(pluginData, targetMessage.channel.id, targetMessage.id, reactionRoles);
 
     sendSuccessMessage(pluginData, msg.channel, "Reaction roles added");
+    (await progressMessage).delete().catch(noop);
   },
 });
