@@ -8,22 +8,16 @@ export const RefreshReactionRolesCmd = reactionRolesCmd({
   permission: "can_manage",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
-    if (!savedMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
-      return;
-    }
-
-    if (pluginData.state.pendingRefreshes.has(`${savedMessage.channel_id}-${savedMessage.id}`)) {
+    if (pluginData.state.pendingRefreshes.has(`${args.message.channel.id}-${args.message.messageId}`)) {
       sendErrorMessage(pluginData, msg.channel, "Another refresh in progress");
       return;
     }
 
-    await refreshReactionRoles(pluginData, savedMessage.channel_id, savedMessage.id);
+    await refreshReactionRoles(pluginData, args.message.channel.id, args.message.messageId);
 
     sendSuccessMessage(pluginData, msg.channel, "Reaction roles refreshed");
   },

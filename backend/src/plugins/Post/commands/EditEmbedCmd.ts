@@ -12,7 +12,7 @@ export const EditEmbedCmd = postCmd({
   permission: "can_post",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
     maincontent: ct.string({ catchAll: true }),
 
     title: ct.string({ option: true }),
@@ -21,7 +21,7 @@ export const EditEmbedCmd = postCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
+    const savedMessage = await pluginData.state.savedMessages.find(args.message.messageId);
     if (!savedMessage) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;

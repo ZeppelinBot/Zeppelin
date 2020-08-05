@@ -5,6 +5,7 @@ import { TextChannel } from "eris";
 import { RecoverablePluginError, ERRORS } from "src/RecoverablePluginError";
 import { canUseEmoji, noop } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
+import { canReadChannel } from "../../../utils/canReadChannel";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -13,26 +14,19 @@ export const InitReactionRolesCmd = reactionRolesCmd({
   permission: "can_manage",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
     reactionRolePairs: ct.string({ catchAll: true }),
 
     exclusive: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
-    if (!savedMessage) {
+    if (!canReadChannel(args.message.channel, msg.member.id)) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;
     }
 
-    const channel = (await pluginData.guild.channels.get(savedMessage.channel_id)) as TextChannel;
-    if (!channel || !(channel instanceof TextChannel)) {
-      sendErrorMessage(pluginData, msg.channel, "Channel no longer exists");
-      return;
-    }
-
-    const targetMessage = await channel.getMessage(args.messageId);
+    const targetMessage = await args.message.channel.getMessage(args.message.messageId);
     if (!targetMessage) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message (2)");
       return;
@@ -97,7 +91,13 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     // Save the new reaction roles to the database
     for (const pair of emojiRolePairs) {
-      await pluginData.state.reactionRoles.add(channel.id, targetMessage.id, pair[0], pair[1], args.exclusive);
+      await pluginData.state.reactionRoles.add(
+        args.message.channel.id,
+        targetMessage.id,
+        pair[0],
+        pair[1],
+        args.exclusive,
+      );
     }
 
     // Apply the reactions themselves

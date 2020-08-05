@@ -8,26 +8,19 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
   permission: "can_manage",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
-    if (!savedMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
-      return;
-    }
-
-    const existingReactionRoles = pluginData.state.reactionRoles.getForMessage(args.messageId);
+    const existingReactionRoles = pluginData.state.reactionRoles.getForMessage(args.message.messageId);
     if (!existingReactionRoles) {
       sendErrorMessage(pluginData, msg.channel, "Message doesn't have reaction roles on it");
       return;
     }
 
-    pluginData.state.reactionRoles.removeFromMessage(args.messageId);
+    pluginData.state.reactionRoles.removeFromMessage(args.message.messageId);
 
-    const channel = pluginData.guild.channels.get(savedMessage.channel_id) as TextChannel;
-    const targetMessage = await channel.getMessage(savedMessage.id);
+    const targetMessage = await args.message.channel.getMessage(args.message.messageId);
     await targetMessage.removeReactions();
 
     sendSuccessMessage(pluginData, msg.channel, "Reaction roles cleared");
