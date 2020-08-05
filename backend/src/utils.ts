@@ -492,6 +492,13 @@ export function trimLines(str: string) {
     .trim();
 }
 
+export function trimEmptyLines(str: string) {
+  return str
+    .split("\n")
+    .filter(l => l.trim() !== "")
+    .join("\n");
+}
+
 export function asSingleLine(str: string) {
   return trimLines(str).replace(/\n/g, " ");
 }
