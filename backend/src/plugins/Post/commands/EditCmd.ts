@@ -8,12 +8,12 @@ export const EditCmd = postCmd({
   permission: "can_post",
 
   signature: {
-    messageId: ct.string(),
+    message: ct.messageTarget(),
     content: ct.string({ catchAll: true }),
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.messageId);
+    const savedMessage = await pluginData.state.savedMessages.find(args.message.messageId);
     if (!savedMessage) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;

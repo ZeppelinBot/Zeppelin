@@ -3,6 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { messageLink } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
+import { canReadChannel } from "../../../utils/canReadChannel";
 
 export const ContextCmd = utilityCmd({
   trigger: "context",
@@ -10,18 +11,31 @@ export const ContextCmd = utilityCmd({
   usage: "!context 94882524378968064 650391267720822785",
   permission: "can_context",
 
-  signature: {
-    channel: ct.channel(),
-    messageId: ct.string(),
-  },
+  signature: [
+    {
+      message: ct.messageTarget(),
+    },
+    {
+      channel: ct.channel(),
+      messageId: ct.string(),
+    },
+  ],
 
   async run({ message: msg, args, pluginData }) {
-    if (!(args.channel instanceof TextChannel)) {
+    if (args.channel && !(args.channel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, "Channel must be a text channel");
       return;
     }
 
-    const previousMessage = (await pluginData.client.getMessages(args.channel.id, 1, args.messageId))[0];
+    const channel = args.channel || args.message.channel;
+    const messageId = args.messageId || args.message.messageId;
+
+    if (!canReadChannel(channel, msg.member.id)) {
+      sendErrorMessage(pluginData, msg.channel, "Message context not found");
+      return;
+    }
+
+    const previousMessage = (await pluginData.client.getMessages(channel.id, 1, messageId))[0];
     if (!previousMessage) {
       sendErrorMessage(pluginData, msg.channel, "Message context not found");
       return;
