@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { transliterate } from "transliteration";
 import escapeStringRegexp from "escape-string-regexp";
 import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { normalizeText } from "../../../utils/normalizeText";
 
 interface MatchResultType {
   word: string;
@@ -48,7 +48,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
 
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       if (trigger.normalize) {
-        str = transliterate(str);
+        str = normalizeText(str);
       }
 
       const looseMatchingThreshold = Math.min(Math.max(trigger.loose_matching_threshold, 1), 64);

@@ -1,11 +1,11 @@
 import * as t from "io-ts";
-import { transliterate } from "transliteration";
 import { automodTrigger } from "../helpers";
 import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { allowTimeout } from "../../../RegExpRunner";
 import { TRegex } from "../../../validatorUtils";
+import { normalizeText } from "../../../utils/normalizeText";
 
 interface MatchResultType {
   pattern: string;
@@ -43,7 +43,7 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       if (trigger.normalize) {
-        str = transliterate(str);
+        str = normalizeText(str);
       }
 
       for (const sourceRegex of trigger.patterns) {
