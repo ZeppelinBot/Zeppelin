@@ -539,6 +539,7 @@ export function indentLines(str: string, indentLength: number) {
 }
 
 export const emptyEmbedValue = "\u200b";
+export const preEmbedPadding = emptyEmbedValue + "\n";
 export const embedPadding = "\n" + emptyEmbedValue;
 
 export const userMentionRegex = /<@!?([0-9]+)>/g;
