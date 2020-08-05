@@ -5,7 +5,10 @@ import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, V
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 
-export async function serverInfo(pluginData: PluginData<UtilityPluginType>, serverId: string): Promise<EmbedOptions> {
+export async function getServerInfoEmbed(
+  pluginData: PluginData<UtilityPluginType>,
+  serverId: string,
+): Promise<EmbedOptions> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
