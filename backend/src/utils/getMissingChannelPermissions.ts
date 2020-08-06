@@ -1,15 +1,15 @@
 import { Constants, GuildChannel, Member, Permission } from "eris";
-import { PluginData } from "knub";
-import { hasDiscordPermissions } from "./hasDiscordPermissions";
+import { getMissingPermissions } from "./getMissingPermissions";
 
 /**
  * @param requiredPermissions Bitmask of required permissions
+ * @return Bitmask of missing permissions
  */
-export function memberHasChannelPermissions(
+export function getMissingChannelPermissions(
   member: Member,
   channel: GuildChannel,
   requiredPermissions: number | bigint,
-) {
+): bigint {
   const memberChannelPermissions = channel.permissionsOf(member.id);
-  return hasDiscordPermissions(memberChannelPermissions, requiredPermissions);
+  return getMissingPermissions(memberChannelPermissions, requiredPermissions);
 }

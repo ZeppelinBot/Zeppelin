@@ -1,7 +1,8 @@
 import { Constants, GuildChannel, Member } from "eris";
-import { memberHasChannelPermissions } from "./memberHasChannelPermissions";
 import { readChannelPermissions } from "./readChannelPermissions";
+import { getMissingChannelPermissions } from "./getMissingChannelPermissions";
 
 export function canReadChannel(channel: GuildChannel, member: Member) {
-  return memberHasChannelPermissions(member, channel, readChannelPermissions);
+  // Not missing permissions required to read the channel = can read channel
+  return !getMissingChannelPermissions(member, channel, readChannelPermissions);
 }

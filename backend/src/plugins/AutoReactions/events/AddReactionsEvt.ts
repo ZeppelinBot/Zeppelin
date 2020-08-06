@@ -4,7 +4,9 @@ import { LogType } from "src/data/LogType";
 import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Constants, GuildChannel } from "eris";
-import { memberHasChannelPermissions } from "../../../utils/memberHasChannelPermissions";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { readChannelPermissions } from "../../../utils/readChannelPermissions";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
 
 const p = Constants.Permissions;
 
@@ -17,16 +19,16 @@ export const AddReactionsEvt = autoReactionsEvt({
     const autoReaction = await pluginData.state.autoReactions.getForChannel(message.channel.id);
     if (!autoReaction) return;
 
-    if (
-      !memberHasChannelPermissions(message.member, message.channel as GuildChannel, [
-        p.readMessages,
-        p.readMessageHistory,
-        p.addReactions,
-      ])
-    ) {
+    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const missingPermissions = getMissingChannelPermissions(
+      me,
+      message.channel as GuildChannel,
+      readChannelPermissions | p.addReactions,
+    );
+    if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
-        body: `Missing permissions to apply auto-reactions in <#${message.channel.id}>. Ensure I can read messages, read message history, and add reactions.`,
+        body: `Cannot apply auto-reactions in <#${message.channel.id}>. ${missingPermissionError(missingPermissions)}`,
       });
       return;
     }
