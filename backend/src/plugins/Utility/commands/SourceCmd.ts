@@ -4,7 +4,7 @@ import { errorMessage } from "../../../utils";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
 import { Constants, TextChannel } from "eris";
-import { hasPermissions } from "../../../utils/hasPermissions";
+import { hasChannelPermissions } from "../../../utils/hasChannelPermissions";
 import { canReadChannel } from "../../../utils/canReadChannel";
 
 export const SourceCmd = utilityCmd({

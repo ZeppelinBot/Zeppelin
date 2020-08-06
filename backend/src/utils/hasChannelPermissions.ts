@@ -1,6 +1,6 @@
 import { Constants, Permission } from "eris";
 
-export function hasPermissions(channelPermissions: Permission, permissions: number | number[]) {
+export function hasChannelPermissions(channelPermissions: Permission, permissions: number | number[]) {
   if (Boolean(channelPermissions.allow & Constants.Permissions.administrator)) {
     return true;
   }
