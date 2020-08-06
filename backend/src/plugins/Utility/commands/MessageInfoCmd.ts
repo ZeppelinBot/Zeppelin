@@ -15,7 +15,7 @@ export const MessageInfoCmd = utilityCmd({
   },
 
   async run({ message, args, pluginData }) {
-    if (!canReadChannel(args.message.channel, message.author.id)) {
+    if (!canReadChannel(args.message.channel, message.member)) {
       sendErrorMessage(pluginData, message.channel, "Unknown message");
       return;
     }
