@@ -61,7 +61,7 @@ export const InfoCmd = utilityCmd({
     // 4. Message
     const messageTarget = await resolveMessageTarget(pluginData, value);
     if (messageTarget) {
-      if (canReadChannel(messageTarget.channel, message.author.id)) {
+      if (canReadChannel(messageTarget.channel, message.member)) {
         const embed = await getMessageInfoEmbed(pluginData, messageTarget.channel.id, messageTarget.messageId);
         if (embed) {
           message.channel.createMessage({ embed });

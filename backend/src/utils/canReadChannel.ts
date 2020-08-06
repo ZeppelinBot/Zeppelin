@@ -1,10 +1,7 @@
-import { Constants, GuildChannel } from "eris";
-import { hasChannelPermissions } from "./hasChannelPermissions";
+import { Constants, GuildChannel, Member } from "eris";
+import { memberHasChannelPermissions } from "./memberHasChannelPermissions";
+import { readChannelPermissions } from "./readChannelPermissions";
 
-export function canReadChannel(channel: GuildChannel, memberId: string) {
-  const channelPermissions = channel.permissionsOf(memberId);
-  return hasChannelPermissions(channelPermissions, [
-    Constants.Permissions.readMessages,
-    Constants.Permissions.readMessageHistory,
-  ]);
+export function canReadChannel(channel: GuildChannel, member: Member) {
+  return memberHasChannelPermissions(member, channel, readChannelPermissions);
 }

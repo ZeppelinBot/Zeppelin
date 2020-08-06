@@ -4,7 +4,6 @@ import { errorMessage } from "../../../utils";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
 import { Constants, TextChannel } from "eris";
-import { hasChannelPermissions } from "../../../utils/hasChannelPermissions";
 import { canReadChannel } from "../../../utils/canReadChannel";
 
 export const SourceCmd = utilityCmd({
@@ -18,7 +17,7 @@ export const SourceCmd = utilityCmd({
   },
 
   async run({ message: cmdMessage, args, pluginData }) {
-    if (!canReadChannel(args.message.channel, cmdMessage.member.id)) {
+    if (!canReadChannel(args.message.channel, cmdMessage.member)) {
       sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;
     }

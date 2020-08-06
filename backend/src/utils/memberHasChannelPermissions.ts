@@ -1,8 +1,15 @@
 import { Constants, GuildChannel, Member, Permission } from "eris";
 import { PluginData } from "knub";
-import { hasChannelPermissions } from "./hasChannelPermissions";
+import { hasDiscordPermissions } from "./hasDiscordPermissions";
 
-export function memberHasChannelPermissions(member: Member, channel: GuildChannel, permissions: number | number[]) {
+/**
+ * @param requiredPermissions Bitmask of required permissions
+ */
+export function memberHasChannelPermissions(
+  member: Member,
+  channel: GuildChannel,
+  requiredPermissions: number | bigint,
+) {
   const memberChannelPermissions = channel.permissionsOf(member.id);
-  return hasChannelPermissions(memberChannelPermissions, permissions);
+  return hasDiscordPermissions(memberChannelPermissions, requiredPermissions);
 }

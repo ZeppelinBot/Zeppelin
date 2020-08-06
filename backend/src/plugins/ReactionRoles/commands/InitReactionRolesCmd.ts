@@ -21,7 +21,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    if (!canReadChannel(args.message.channel, msg.member.id)) {
+    if (!canReadChannel(args.message.channel, msg.member)) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;
     }
