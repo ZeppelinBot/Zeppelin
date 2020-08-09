@@ -2,35 +2,27 @@ import * as t from "io-ts";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
-import { IZeppelinGuildConfig } from "./types";
+import { PartialZeppelinGuildConfigSchema, ZeppelinGuildConfig } from "./types";
 import { configUtils, ConfigValidationError, PluginOptions } from "knub";
+import moment from "moment-timezone";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {
   pluginNameToPlugin.set(plugin.name, plugin);
 }
 
-const guildConfigRootSchema = t.type({
-  prefix: t.string,
-  levels: t.record(t.string, t.number),
-  success_emoji: t.string,
-  plugins: t.record(t.string, t.unknown),
-});
-const partialGuildConfigRootSchema = t.partial(guildConfigRootSchema.props);
-
-const globalConfigRootSchema = t.type({
-  url: t.string,
-  owners: t.array(t.string),
-  plugins: t.record(t.string, t.unknown),
-});
-
-const partialMegaTest = t.partial({ name: t.string });
-
 export async function validateGuildConfig(config: any): Promise<string | null> {
-  const validationResult = decodeAndValidateStrict(partialGuildConfigRootSchema, config);
+  const validationResult = decodeAndValidateStrict(PartialZeppelinGuildConfigSchema, config);
   if (validationResult instanceof StrictValidationError) return validationResult.getErrors();
 
-  const guildConfig = config as IZeppelinGuildConfig;
+  const guildConfig = config as ZeppelinGuildConfig;
+
+  if (guildConfig.timezone) {
+    const validTimezones = moment.tz.names();
+    if (!validTimezones.includes(guildConfig.timezone)) {
+      return `Invalid timezone: ${guildConfig.timezone}`;
+    }
+  }
 
   if (guildConfig.plugins) {
     for (const [pluginName, pluginOptions] of Object.entries(guildConfig.plugins)) {

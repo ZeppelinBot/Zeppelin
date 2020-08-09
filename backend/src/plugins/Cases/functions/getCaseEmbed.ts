@@ -7,6 +7,8 @@ import { CasesPluginType } from "../types";
 import { CaseTypeColors } from "../../../data/CaseTypeColors";
 import { resolveCaseId } from "./resolveCaseId";
 import { chunkLines, chunkMessageLines, emptyEmbedValue } from "../../../utils";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
@@ -15,7 +17,7 @@ export async function getCaseEmbed(
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) return null;
 
-  const createdAt = moment(theCase.created_at);
+  const createdAt = moment.utc(theCase.created_at);
   const actionTypeStr = CaseTypes[theCase.type].toUpperCase();
 
   let userName = theCase.user_name;
@@ -27,7 +29,7 @@ export async function getCaseEmbed(
   const embed: any = {
     title: `${actionTypeStr} - Case #${theCase.case_number}`,
     footer: {
-      text: `Case created at ${createdAt.format("YYYY-MM-DD [at] HH:mm")}`,
+      text: `Case created on ${inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"))}`,
     },
     fields: [
       {
@@ -57,7 +59,7 @@ export async function getCaseEmbed(
 
   if (theCase.notes.length) {
     theCase.notes.forEach((note: any) => {
-      const noteDate = moment(note.created_at);
+      const noteDate = moment.utc(note.created_at);
       let noteBody = note.body.trim();
       if (noteBody === "") {
         noteBody = emptyEmbedValue;
@@ -67,8 +69,9 @@ export async function getCaseEmbed(
 
       for (let i = 0; i < chunks.length; i++) {
         if (i === 0) {
+          const prettyNoteDate = inGuildTz(pluginData, noteDate).format(getDateFormat(pluginData, "pretty_datetime"));
           embed.fields.push({
-            name: `${note.mod_name} at ${noteDate.format("YYYY-MM-DD [at] HH:mm")}:`,
+            name: `${note.mod_name} at ${prettyNoteDate}:`,
             value: chunks[i],
           });
         } else {

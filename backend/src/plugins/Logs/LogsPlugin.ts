@@ -26,7 +26,7 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
     format: {
-      timestamp: "YYYY-MM-DD HH:mm:ss",
+      timestamp: "YYYY-MM-DD HH:mm:ss z",
       ...DefaultLogMessages,
     },
     ping_user: true,

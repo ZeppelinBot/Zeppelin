@@ -32,7 +32,7 @@ export const TagSourceCmd = tagsCmd({
       return;
     }
 
-    const archiveId = await pluginData.state.archives.create(tag.body, moment().add(10, "minutes"));
+    const archiveId = await pluginData.state.archives.create(tag.body, moment.utc().add(10, "minutes"));
     const url = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
 
     msg.channel.createMessage(`Tag source:\n${url}`);

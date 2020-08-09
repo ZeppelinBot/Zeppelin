@@ -214,7 +214,7 @@ export async function archiveSearch(
 
       ${resultList}
     `),
-    moment().add(1, "hour"),
+    moment.utc().add(1, "hour"),
   );
 
   const baseUrl = getBaseUrl(pluginData);

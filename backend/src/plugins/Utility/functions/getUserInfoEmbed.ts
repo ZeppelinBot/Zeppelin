@@ -5,6 +5,8 @@ import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEm
 import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export async function getUserInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
@@ -29,8 +31,9 @@ export async function getUserInfoEmbed(
   const avatarURL = user.avatarURL || user.defaultAvatarURL;
   embed.author.icon_url = avatarURL;
 
-  const createdAt = moment(user.createdAt);
-  const accountAge = humanizeDuration(moment().valueOf() - user.createdAt, {
+  const createdAt = moment.utc(user.createdAt, "x");
+  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
+  const accountAge = humanizeDuration(moment.utc().valueOf() - user.createdAt, {
     largest: 2,
     round: true,
   });
@@ -40,16 +43,17 @@ export async function getUserInfoEmbed(
       name: preEmbedPadding + "User information",
       value: trimLines(`
           Profile: <@!${user.id}>
-          Created: **${accountAge} ago** (\`${createdAt.format("MMM D, YYYY")}\`)
+          Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
           `),
     });
     if (member) {
-      const joinedAt = moment(member.joinedAt);
-      const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+      const joinedAt = moment.utc(member.joinedAt, "x");
+      const prettyJoinedAt = inGuildTz(pluginData, joinedAt).format(getDateFormat(pluginData, "pretty_datetime"));
+      const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
         largest: 2,
         round: true,
       });
-      embed.fields[0].value += `\nJoined: **${joinAge} ago** (\`${joinedAt.format("MMM D, YYYY")}\`)`;
+      embed.fields[0].value += `\nJoined: **${joinAge} ago** (\`${prettyJoinedAt}\`)`;
     } else {
       embed.fields.push({
         name: preEmbedPadding + "!! NOTE !!",
@@ -65,14 +69,15 @@ export async function getUserInfoEmbed(
     value: trimLines(`
         Name: **${user.username}#${user.discriminator}**
         ID: \`${user.id}\`
-        Created: **${accountAge} ago** (\`${createdAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
+        Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
         Mention: <@!${user.id}>
         `),
   });
 
   if (member) {
-    const joinedAt = moment(member.joinedAt);
-    const joinAge = humanizeDuration(moment().valueOf() - member.joinedAt, {
+    const joinedAt = moment.utc(member.joinedAt, "x");
+    const prettyJoinedAt = inGuildTz(pluginData, joinedAt).format(getDateFormat(pluginData, "pretty_datetime"));
+    const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
       largest: 2,
       round: true,
     });
@@ -81,7 +86,7 @@ export async function getUserInfoEmbed(
     embed.fields.push({
       name: preEmbedPadding + "Member information",
       value: trimLines(`
-          Joined: **${joinAge} ago** (\`${joinedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
+          Joined: **${joinAge} ago** (\`${prettyJoinedAt}\`)
           ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
         `),
     });

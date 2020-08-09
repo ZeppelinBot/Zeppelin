@@ -3,7 +3,7 @@ import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/Ap
 import { BaseRepository } from "./BaseRepository";
 import { connection } from "./db";
 import moment from "moment-timezone";
-import { DBDateFormat } from "../utils";
+import { DBDateFormat } from "../utils/dateFormats";
 
 export class ApiUserInfo extends BaseRepository {
   private apiUserInfo: Repository<ApiUserInfoEntity>;
@@ -26,7 +26,7 @@ export class ApiUserInfo extends BaseRepository {
       const repo = entityManager.getRepository(ApiUserInfoEntity);
 
       const existingInfo = await repo.findOne({ where: { id } });
-      const updatedAt = moment().format(DBDateFormat);
+      const updatedAt = moment.utc().format(DBDateFormat);
 
       if (existingInfo) {
         await repo.update({ id }, { data, updated_at: updatedAt });

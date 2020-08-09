@@ -36,7 +36,8 @@ export class GuildMutes extends BaseGuildRepository {
 
   async addMute(userId, expiryTime): Promise<Mute> {
     const expiresAt = expiryTime
-      ? moment()
+      ? moment
+          .utc()
           .add(expiryTime, "ms")
           .format("YYYY-MM-DD HH:mm:ss")
       : null;
@@ -52,7 +53,8 @@ export class GuildMutes extends BaseGuildRepository {
 
   async updateExpiryTime(userId, newExpiryTime) {
     const expiresAt = newExpiryTime
-      ? moment()
+      ? moment
+          .utc()
           .add(newExpiryTime, "ms")
           .format("YYYY-MM-DD HH:mm:ss")
       : null;

@@ -6,6 +6,8 @@ import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 
@@ -29,7 +31,8 @@ export function getSnowflakeInfoEmbed(
   }
 
   const createdAtMS = snowflakeToTimestamp(snowflake);
-  const createdAt = moment(createdAtMS, "x");
+  const createdAt = moment.utc(createdAtMS, "x");
+  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
   const snowflakeAge = humanizeDuration(Date.now() - createdAtMS, {
     largest: 2,
     round: true,
@@ -37,7 +40,7 @@ export function getSnowflakeInfoEmbed(
 
   embed.fields.push({
     name: preEmbedPadding + "Basic information",
-    value: `Created: **${snowflakeAge} ago** (\`${createdAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)`,
+    value: `Created: **${snowflakeAge} ago** (\`${prettyCreatedAt}\`)`,
   });
 
   return embed;

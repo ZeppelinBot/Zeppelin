@@ -5,6 +5,8 @@ import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, V
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { getGuildPreview } from "./getGuildPreview";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export async function getServerInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
@@ -37,14 +39,15 @@ export async function getServerInfoEmbed(
   };
 
   // BASIC INFORMATION
-  const createdAt = moment((guildPreview || restGuild).createdAt);
-  const serverAge = humanizeDuration(moment().valueOf() - createdAt.valueOf(), {
+  const createdAt = moment.utc((guildPreview || restGuild).createdAt, "x");
+  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
+  const serverAge = humanizeDuration(moment.utc().valueOf() - createdAt.valueOf(), {
     largest: 2,
     round: true,
   });
 
   const basicInformation = [];
-  basicInformation.push(`Created: **${serverAge} ago** (${createdAt.format("YYYY-MM-DD[T]HH:mm:ss")})`);
+  basicInformation.push(`Created: **${serverAge} ago** (${prettyCreatedAt})`);
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerID);

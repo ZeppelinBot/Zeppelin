@@ -15,6 +15,7 @@ import { TagSourceCmd } from "./commands/TagSourceCmd";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { convertDelayStringToMS } from "../../utils";
+import { getGuildTz, inGuildTz } from "../../utils/timezones";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -76,6 +77,7 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
     state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
+    const tz = getGuildTz(pluginData);
     state.tagFunctions = {
       parseDateTime(str) {
         if (typeof str === "number") {
@@ -86,13 +88,13 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
           return Date.now();
         }
 
-        return moment(str, "YYYY-MM-DD HH:mm:ss").valueOf();
+        return moment.tz(str, "YYYY-MM-DD HH:mm:ss", tz).valueOf();
       },
 
       countdown(toDate) {
-        const target = moment(this.parseDateTime(toDate));
+        const target = moment.utc(this.parseDateTime(toDate), "x");
 
-        const now = moment();
+        const now = moment.utc();
         if (!target.isValid()) return "";
 
         const diff = target.diff(now);
@@ -119,7 +121,8 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
         }
 
         const delayMS = convertDelayStringToMS(delay);
-        return moment(reference)
+        return moment
+          .utc(reference, "x")
           .add(delayMS)
           .valueOf();
       },
@@ -139,7 +142,8 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
         }
 
         const delayMS = convertDelayStringToMS(delay);
-        return moment(reference)
+        return moment
+          .utc(reference, "x")
           .subtract(delayMS)
           .valueOf();
       },
@@ -150,13 +154,13 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
 
       formatTime(time, format) {
         const parsed = this.parseDateTime(time);
-        return moment(parsed).format(format);
+        return inGuildTz(parsed).format(format);
       },
 
       discordDateFormat(time) {
         const parsed = time ? this.parseDateTime(time) : Date.now();
 
-        return moment(parsed).format("YYYY-MM-DD");
+        return inGuildTz(parsed).format("YYYY-MM-DD");
       },
 
       mention: input => {

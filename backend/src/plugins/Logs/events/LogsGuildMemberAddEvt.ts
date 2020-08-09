@@ -11,8 +11,8 @@ export const LogsGuildMemberAddEvt = logsEvent({
     const pluginData = meta.pluginData;
     const member = meta.args.member;
 
-    const newThreshold = moment().valueOf() - 1000 * 60 * 60;
-    const accountAge = humanizeDuration(moment().valueOf() - member.createdAt, {
+    const newThreshold = moment.utc().valueOf() - 1000 * 60 * 60;
+    const accountAge = humanizeDuration(moment.utc().valueOf() - member.createdAt, {
       largest: 2,
       round: true,
     });

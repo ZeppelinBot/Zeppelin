@@ -15,7 +15,7 @@ import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availab
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, MINUTES, successMessage } from "./utils";
 import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
-import { IZeppelinGlobalConfig, IZeppelinGuildConfig } from "./types";
+import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
@@ -138,7 +138,7 @@ connect().then(async () => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub<IZeppelinGuildConfig, IZeppelinGlobalConfig>(client, {
+  const bot = new Knub<ZeppelinGuildConfig, ZeppelinGlobalConfig>(client, {
     guildPlugins,
     globalPlugins,
 

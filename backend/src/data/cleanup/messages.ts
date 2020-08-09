@@ -1,8 +1,9 @@
-import { DAYS, DBDateFormat, MINUTES } from "../../utils";
+import { DAYS, MINUTES } from "../../utils";
 import { getRepository, In } from "typeorm";
 import { SavedMessage } from "../entities/SavedMessage";
 import moment from "moment-timezone";
 import { connection } from "../db";
+import { DBDateFormat } from "../../utils/dateFormats";
 
 /**
  * How long message edits, deletions, etc. will include the original message content.
@@ -18,13 +19,16 @@ export async function cleanupMessages(): Promise<number> {
 
   const messagesRepository = getRepository(SavedMessage);
 
-  const deletedAtThreshold = moment()
+  const deletedAtThreshold = moment
+    .utc()
     .subtract(DELETED_MESSAGE_RETENTION_PERIOD, "ms")
     .format(DBDateFormat);
-  const postedAtThreshold = moment()
+  const postedAtThreshold = moment
+    .utc()
     .subtract(RETENTION_PERIOD, "ms")
     .format(DBDateFormat);
-  const botPostedAtThreshold = moment()
+  const botPostedAtThreshold = moment
+    .utc()
     .subtract(BOT_MESSAGE_RETENTION_PERIOD, "ms")
     .format(DBDateFormat);
 

@@ -1,6 +1,9 @@
 import { postCmd } from "../types";
 import { trimLines, sorter, disableCodeBlocks, deactivateMentions, createChunkedMessage } from "src/utils";
 import humanizeDuration from "humanize-duration";
+import moment from "moment-timezone";
+import { inGuildTz } from "../../../utils/timezones";
+import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
 
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 
@@ -28,7 +31,10 @@ export const ScheduledPostsListCmd = postCmd({
         .replace(/\s+/g, " ")
         .slice(0, SCHEDULED_POST_PREVIEW_TEXT_LENGTH);
 
-      const parts = [`\`#${i++}\` \`[${p.post_at}]\` ${previewText}${isTruncated ? "..." : ""}`];
+      const prettyPostAt = inGuildTz(pluginData, moment.utc(p.post_at, DBDateFormat)).format(
+        getDateFormat(pluginData, "pretty_datetime"),
+      );
+      const parts = [`\`#${i++}\` \`[${prettyPostAt}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");
       if (p.content.embed) parts.push("*(embed)*");
       if (p.repeat_until) {

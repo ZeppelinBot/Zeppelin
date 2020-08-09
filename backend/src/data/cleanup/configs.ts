@@ -2,7 +2,7 @@ import { connection } from "../db";
 import { getRepository, In } from "typeorm";
 import { Config } from "../entities/Config";
 import moment from "moment-timezone";
-import { DBDateFormat } from "../../utils";
+import { DBDateFormat } from "../../utils/dateFormats";
 
 const CLEAN_PER_LOOP = 50;
 
@@ -13,7 +13,8 @@ export async function cleanupConfigs() {
   let rows;
 
   // >1 month old: 1 config retained per month
-  const oneMonthCutoff = moment()
+  const oneMonthCutoff = moment
+    .utc()
     .subtract(30, "days")
     .format(DBDateFormat);
   do {
@@ -53,7 +54,8 @@ export async function cleanupConfigs() {
   } while (rows.length === CLEAN_PER_LOOP);
 
   // >2 weeks old: 1 config retained per day
-  const twoWeekCutoff = moment()
+  const twoWeekCutoff = moment
+    .utc()
     .subtract(2, "weeks")
     .format(DBDateFormat);
   do {

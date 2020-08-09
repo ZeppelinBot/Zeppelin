@@ -182,7 +182,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
    * If any messages were marked as deleted, also emits the deleteBulk event.
    */
   async markBulkAsDeleted(ids) {
-    const deletedAt = moment().format("YYYY-MM-DD HH:mm:ss");
+    const deletedAt = moment.utc().format("YYYY-MM-DD HH:mm:ss");
 
     await this.messages
       .createQueryBuilder()

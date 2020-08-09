@@ -1,5 +1,5 @@
 import { Message, Channel, TextChannel } from "eris";
-import { StrictMessageContent, errorMessage, DBDateFormat, stripObjectToScalars, MINUTES } from "src/utils";
+import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES } from "src/utils";
 import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
 import humanizeDuration from "humanize-duration";
@@ -8,10 +8,11 @@ import { PluginData } from "knub";
 import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
+import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
-const MAX_REPEAT_UNTIL = moment().add(100, "years");
+const MAX_REPEAT_UNTIL = moment.utc().add(100, "years");
 
 export async function actualPostCmd(
   pluginData: PluginData<PostPluginType>,
@@ -53,12 +54,12 @@ export async function actualPostCmd(
   let postAt;
   if (opts.schedule) {
     // Schedule the post to be posted later
-    postAt = parseScheduleTime(opts.schedule);
+    postAt = parseScheduleTime(pluginData, opts.schedule);
     if (!postAt) {
       return sendErrorMessage(pluginData, msg.channel, "Invalid schedule time");
     }
   } else if (opts.repeat) {
-    postAt = moment().add(opts.repeat, "ms");
+    postAt = moment.utc().add(opts.repeat, "ms");
   }
 
   // For repeated posts, make sure repeat-until or repeat-times is specified
@@ -67,13 +68,13 @@ export async function actualPostCmd(
   let repeatDetailsStr: string = null;
 
   if (opts["repeat-until"]) {
-    repeatUntil = parseScheduleTime(opts["repeat-until"]);
+    repeatUntil = parseScheduleTime(pluginData, opts["repeat-until"]);
 
     // Invalid time
     if (!repeatUntil) {
       return sendErrorMessage(pluginData, msg.channel, "Invalid time specified for -repeat-until");
     }
-    if (repeatUntil.isBefore(moment())) {
+    if (repeatUntil.isBefore(moment.utc())) {
       return sendErrorMessage(pluginData, msg.channel, "You can't set -repeat-until in the past");
     }
     if (repeatUntil.isAfter(MAX_REPEAT_UNTIL)) {
@@ -110,7 +111,7 @@ export async function actualPostCmd(
 
   // Save schedule/repeat information in DB
   if (postAt) {
-    if (postAt < moment()) {
+    if (postAt < moment.utc()) {
       return sendErrorMessage(pluginData, msg.channel, "Post can't be scheduled to be posted in the past");
     }
 
@@ -120,10 +121,18 @@ export async function actualPostCmd(
       channel_id: targetChannel.id,
       content,
       attachments: msg.attachments,
-      post_at: postAt.format(DBDateFormat),
+      post_at: postAt
+        .clone()
+        .tz("Etc/UTC")
+        .format(DBDateFormat),
       enable_mentions: opts["enable-mentions"],
       repeat_interval: opts.repeat,
-      repeat_until: repeatUntil ? repeatUntil.format(DBDateFormat) : null,
+      repeat_until: repeatUntil
+        ? repeatUntil
+            .clone()
+            .tz("Etc/UTC")
+            .format(DBDateFormat)
+        : null,
       repeat_times: repeatTimes ?? null,
     });
 
@@ -131,8 +140,9 @@ export async function actualPostCmd(
       pluginData.state.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
         author: stripObjectToScalars(msg.author),
         channel: stripObjectToScalars(targetChannel),
-        date: postAt.format("YYYY-MM-DD"),
-        time: postAt.format("HH:mm:ss"),
+        datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
+        date: postAt.format(getDateFormat(pluginData, "date")),
+        time: postAt.format(getDateFormat(pluginData, "time")),
         repeatInterval: humanizeDuration(opts.repeat),
         repeatDetails: repeatDetailsStr,
       });
@@ -140,8 +150,9 @@ export async function actualPostCmd(
       pluginData.state.logs.log(LogType.SCHEDULED_MESSAGE, {
         author: stripObjectToScalars(msg.author),
         channel: stripObjectToScalars(targetChannel),
-        date: postAt.format("YYYY-MM-DD"),
-        time: postAt.format("HH:mm:ss"),
+        datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
+        date: postAt.format(getDateFormat(pluginData, "date")),
+        time: postAt.format(getDateFormat(pluginData, "time")),
       });
     }
   }
@@ -155,8 +166,9 @@ export async function actualPostCmd(
     pluginData.state.logs.log(LogType.REPEATED_MESSAGE, {
       author: stripObjectToScalars(msg.author),
       channel: stripObjectToScalars(targetChannel),
-      date: postAt.format("YYYY-MM-DD"),
-      time: postAt.format("HH:mm:ss"),
+      datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
+      date: postAt.format(getDateFormat(pluginData, "date")),
+      time: postAt.format(getDateFormat(pluginData, "time")),
       repeatInterval: humanizeDuration(opts.repeat),
       repeatDetails: repeatDetailsStr,
     });
@@ -164,14 +176,16 @@ export async function actualPostCmd(
 
   // Bot reply schenanigans
   let successMessage = opts.schedule
-    ? `Message scheduled to be posted in <#${targetChannel.id}> on ${postAt.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`
+    ? `Message scheduled to be posted in <#${targetChannel.id}> on ${postAt.format(
+        getDateFormat(pluginData, "pretty_datetime"),
+      )}`
     : `Message posted in <#${targetChannel.id}>`;
 
   if (opts.repeat) {
     successMessage += `. Message will be automatically reposted every ${humanizeDuration(opts.repeat)}`;
 
     if (repeatUntil) {
-      successMessage += ` until ${repeatUntil.format("YYYY-MM-DD [at] HH:mm:ss")} (UTC)`;
+      successMessage += ` until ${repeatUntil.format(getDateFormat(pluginData, "pretty_datetime"))}`;
     } else if (repeatTimes) {
       successMessage += `, ${repeatTimes} times in total`;
     }

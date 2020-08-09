@@ -21,7 +21,7 @@ export const FollowCmd = locateUserCommand({
 
   async run({ message: msg, args, pluginData }) {
     const time = args.duration || 10 * MINUTES;
-    const alertTime = moment().add(time, "millisecond");
+    const alertTime = moment.utc().add(time, "millisecond");
     const body = args.reminder || "None";
     const active = args.active || false;
 
