@@ -34,6 +34,7 @@ import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { trimPluginDescription } from "../../utils";
+import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
 
 const defaultOptions = {
   config: {
@@ -65,6 +66,7 @@ const defaultOptions = {
     can_massban: false,
     can_massmute: false,
     can_hidecase: false,
+    can_deletecase: false,
     can_act_as_other: false,
   },
   overrides: [
@@ -134,6 +136,7 @@ export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_acti
     CasesModCmd,
     HideCaseCmd,
     UnhideCaseCmd,
+    DeleteCaseCmd,
   ],
 
   public: {

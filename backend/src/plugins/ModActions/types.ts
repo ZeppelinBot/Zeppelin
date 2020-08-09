@@ -35,6 +35,7 @@ export const ConfigSchema = t.type({
   can_massban: t.boolean,
   can_massmute: t.boolean,
   can_hidecase: t.boolean,
+  can_deletecase: t.boolean,
   can_act_as_other: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

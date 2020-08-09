@@ -75,4 +75,6 @@ export enum LogType {
   MASS_UNASSIGN_ROLES,
 
   MEMBER_NOTE,
+
+  CASE_DELETE,
 }

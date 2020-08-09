@@ -66,5 +66,7 @@
   "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(users)}\n{matchSummary}\nActions taken: **{actionsTaken}**",
 
   "SET_ANTIRAID_USER": "⚔ {userMention(user)} set anti-raid to **{level}**",
-  "SET_ANTIRAID_AUTO": "⚔ Anti-raid automatically set to **{level}**"
+  "SET_ANTIRAID_AUTO": "⚔ Anti-raid automatically set to **{level}**",
+
+  "CASE_DELETE": "✂️ **Case #{case.case_number}** was deleted by {userMention(mod)}"
 }

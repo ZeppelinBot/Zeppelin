@@ -5,6 +5,7 @@ import { getRepository, In, Repository } from "typeorm";
 import { disableLinkPreviews } from "../utils";
 import { CaseTypes } from "./CaseTypes";
 import moment = require("moment-timezone");
+import { connection } from "./db";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
@@ -117,6 +118,37 @@ export class GuildCases extends BaseGuildRepository {
 
   update(id, data) {
     return this.cases.update(id, data);
+  }
+
+  async softDelete(id: number, deletedById: string, deletedByName: string, deletedByText: string) {
+    return connection.transaction(async entityManager => {
+      const cases = entityManager.getRepository(Case);
+      const caseNotes = entityManager.getRepository(CaseNote);
+
+      await Promise.all([
+        caseNotes.delete({
+          case_id: id,
+        }),
+        cases.update(id, {
+          user_id: "0",
+          user_name: "Unknown#0000",
+          mod_id: null,
+          mod_name: "Unknown#0000",
+          type: CaseTypes.Deleted,
+          audit_log_id: null,
+          is_hidden: false,
+          pp_id: null,
+          pp_name: null,
+        }),
+      ]);
+
+      await caseNotes.insert({
+        case_id: id,
+        mod_id: deletedById,
+        mod_name: deletedByName,
+        body: deletedByText,
+      });
+    });
   }
 
   async createNote(caseId: number, data: any): Promise<void> {
