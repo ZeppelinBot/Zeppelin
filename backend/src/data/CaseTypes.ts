@@ -6,6 +6,6 @@ export enum CaseTypes {
   Kick,
   Mute,
   Unmute,
-  Expunged,
+  Deleted,
   Softban,
 }

@@ -1,5 +1,5 @@
 import { Case } from "../../../data/entities/Case";
-import { MessageContent } from "eris";
+import { AdvancedMessageContent, MessageContent } from "eris";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { PluginData, helpers } from "knub";
@@ -11,12 +11,18 @@ import { chunkLines, chunkMessageLines, emptyEmbedValue } from "../../../utils";
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
-): Promise<MessageContent> {
+): Promise<AdvancedMessageContent> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) return null;
 
   const createdAt = moment(theCase.created_at);
   const actionTypeStr = CaseTypes[theCase.type].toUpperCase();
+
+  let userName = theCase.user_name;
+  if (theCase.user_id && theCase.user_id !== "0") userName += `\n<@!${theCase.user_id}>`;
+
+  let modName = theCase.mod_name;
+  if (theCase.mod_id) modName += `\n<@!${theCase.mod_id}>`;
 
   const embed: any = {
     title: `${actionTypeStr} - Case #${theCase.case_number}`,
@@ -26,12 +32,12 @@ export async function getCaseEmbed(
     fields: [
       {
         name: "User",
-        value: `${theCase.user_name}\n<@!${theCase.user_id}>`,
+        value: userName,
         inline: true,
       },
       {
         name: "Moderator",
-        value: `${theCase.mod_name}\n<@!${theCase.mod_id}>`,
+        value: modName,
         inline: true,
       },
     ],
