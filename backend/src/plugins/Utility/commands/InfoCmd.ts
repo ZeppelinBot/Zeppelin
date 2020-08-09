@@ -2,7 +2,7 @@ import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
-import { parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
+import { isValidSnowflake, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
 import { canReadChannel } from "../../../utils/canReadChannel";
@@ -11,6 +11,7 @@ import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
 import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
 import { getChannelId } from "knub/dist/utils";
 import { getGuildPreview } from "../functions/getGuildPreview";
+import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",
@@ -91,6 +92,13 @@ export const InfoCmd = utilityCmd({
         message.channel.createMessage({ embed });
         return;
       }
+    }
+
+    // 7. Arbitrary ID
+    if (isValidSnowflake(value)) {
+      const embed = getSnowflakeInfoEmbed(pluginData, value, true);
+      message.channel.createMessage({ embed });
+      return;
     }
 
     // 7. No can do
