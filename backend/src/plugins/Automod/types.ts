@@ -69,6 +69,12 @@ export interface AutomodPluginType extends BasePluginType {
     recentNicknameChanges: Map<string, { timestamp: number }>;
     clearRecentNicknameChangesInterval: Timeout;
 
+    ignoredRoleChanges: Set<{
+      memberId: string;
+      roleId: string;
+      timestamp: number;
+    }>;
+
     cachedAntiraidLevel: string | null;
 
     cooldownManager: CooldownManager;
@@ -91,6 +97,10 @@ export interface AutomodContext {
   message?: SavedMessage;
   member?: Member;
   joined?: boolean;
+  rolesChanged?: {
+    added?: string[];
+    removed?: string[];
+  };
 }
 
 export interface RecentAction {

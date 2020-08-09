@@ -14,6 +14,8 @@ import { MatchLinksTrigger } from "./matchLinks";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
 import { MemberJoinSpamTrigger } from "./memberJoinSpam";
 import { MemberJoinTrigger } from "./memberJoin";
+import { RoleAddedTrigger } from "./roleAdded";
+import { RoleRemovedTrigger } from "./roleRemoved";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   match_words: MatchWordsTrigger,
@@ -22,6 +24,8 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   match_links: MatchLinksTrigger,
   match_attachment_type: MatchAttachmentTypeTrigger,
   member_join: MemberJoinTrigger,
+  role_added: RoleAddedTrigger,
+  role_removed: RoleRemovedTrigger,
 
   message_spam: MessageSpamTrigger,
   mention_spam: MentionSpamTrigger,

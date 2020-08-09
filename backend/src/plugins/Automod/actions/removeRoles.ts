@@ -9,6 +9,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { Constants } from "eris";
+import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 
 const p = Constants.Permissions;
 
@@ -57,6 +58,7 @@ export const RemoveRolesAction = automodAction({
         const memberRoles = new Set(member.roles);
         for (const roleId of rolesToRemove) {
           memberRoles.delete(roleId);
+          ignoreRoleChange(pluginData, member.id, roleId);
         }
 
         if (memberRoles.size === member.roles.length) {

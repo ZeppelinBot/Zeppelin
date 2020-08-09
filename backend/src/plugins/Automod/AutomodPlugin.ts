@@ -27,6 +27,7 @@ import { RegExpRunner } from "../../RegExpRunner";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 
 const defaultOptions = {
   config: {
@@ -83,10 +84,15 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
             }
 
             const triggerBlueprint = availableTriggers[triggerName];
-            triggerObj[triggerName] = configUtils.mergeConfig(
-              triggerBlueprint.defaultConfig,
-              triggerObj[triggerName] || {},
-            );
+
+            if (typeof triggerBlueprint.defaultConfig === "object" && triggerBlueprint.defaultConfig != null) {
+              triggerObj[triggerName] = configUtils.mergeConfig(
+                triggerBlueprint.defaultConfig,
+                triggerObj[triggerName] || {},
+              );
+            } else {
+              triggerObj[triggerName] = triggerObj[triggerName] || triggerBlueprint.defaultConfig;
+            }
 
             if (triggerObj[triggerName].match_attachment_type) {
               const white = triggerObj[triggerName].match_attachment_type.whitelist_enabled;
@@ -157,6 +163,7 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
 
   events: [
     RunAutomodOnJoinEvt,
+    RunAutomodOnMemberUpdate,
     // Messages use message events from SavedMessages, see onLoad below
   ],
 
@@ -178,6 +185,8 @@ export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
       () => clearOldRecentNicknameChanges(pluginData),
       30 * SECONDS,
     );
+
+    pluginData.state.ignoredRoleChanges = new Set();
 
     pluginData.state.cooldownManager = new CooldownManager();
 
