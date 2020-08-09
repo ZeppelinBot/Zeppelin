@@ -7,6 +7,7 @@ import moment from "moment-timezone";
 import { PluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { allowTimeout } from "../../../RegExpRunner";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -61,6 +62,7 @@ export const CleanCmd = utilityCmd({
     channel: ct.channelId({ option: true, shortcut: "c" }),
     bots: ct.switchOption({ shortcut: "b" }),
     "has-invites": ct.switchOption({ shortcut: "i" }),
+    match: ct.regex({ option: true, shortcut: "m" }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -102,13 +104,19 @@ export const CleanCmd = utilityCmd({
       );
       if (potentialMessagesToClean.length === 0) break;
 
-      const filtered = potentialMessagesToClean.filter(message => {
-        if (args.user && message.user_id !== args.user) return false;
-        if (args.bots && !message.is_bot) return false;
-        if (args["has-invites"] && getInviteCodesInString(message.data.content || "").length === 0) return false;
-        if (moment.utc(message.posted_at).valueOf() < timeCutoff) return false;
-        return true;
-      });
+      const filtered = [];
+      for (const message of potentialMessagesToClean) {
+        const contentString = message.data.content || "";
+        if (args.user && message.user_id !== args.user) continue;
+        if (args.bots && !message.is_bot) continue;
+        if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
+        if (moment.utc(message.posted_at).valueOf() < timeCutoff) continue;
+        if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
+          continue;
+        }
+
+        filtered.push(message);
+      }
       const remaining = args.count - messagesToClean.length;
       const withoutOverflow = filtered.slice(0, remaining);
       messagesToClean.push(...withoutOverflow);

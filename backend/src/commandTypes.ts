@@ -16,6 +16,7 @@ import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionErro
 import { createTypeHelper } from "knub-command-manager";
 import { getChannelIdFromMessageId } from "./data/getChannelIdFromMessageId";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
+import { inputPatternToRegExp } from "./validatorUtils";
 
 export const commandTypes = {
   ...baseTypeConverters,
@@ -84,6 +85,14 @@ export const commandTypes = {
 
     throw new TypeConversionError(`Could not parse ID: \`${disableInlineCode(value)}\``);
   },
+
+  regex(value: string, context: CommandContext<any>): RegExp {
+    try {
+      return inputPatternToRegExp(value);
+    } catch (e) {
+      throw new TypeConversionError(`Could not parse RegExp: \`${disableInlineCode(e.message)}\``);
+    }
+  },
 };
 
 export const commandTypeHelpers = {
@@ -95,4 +104,5 @@ export const commandTypeHelpers = {
   resolvedMember: createTypeHelper<Promise<Member | null>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
   anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
+  regex: createTypeHelper<RegExp>(commandTypes.regex),
 };
