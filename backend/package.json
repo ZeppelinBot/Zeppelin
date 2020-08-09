@@ -49,6 +49,7 @@
     "lodash.pick": "^4.4.0",
     "moment-timezone": "^0.5.21",
     "mysql": "^2.16.0",
+    "parse-color": "^1.0.0",
     "passport": "^0.4.0",
     "passport-custom": "^1.0.5",
     "passport-oauth2": "^1.5.0",
