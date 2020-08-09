@@ -6,7 +6,9 @@ import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
 import path from "path";
 import moment from "moment-timezone";
-import { getGuildTz } from "../../../utils/timezones";
+import { getGuildTz, inGuildTz } from "../../../utils/timezones";
+import { rootDir } from "../../../paths";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -20,9 +22,7 @@ export const AboutCmd = utilityCmd({
     let lastCommit;
 
     try {
-      // From project root
-      // FIXME: Store these paths properly somewhere
-      const lcl = new LCL(path.resolve(__dirname, "..", "..", ".."));
+      const lcl = new LCL(rootDir);
       lastCommit = await lcl.getLastCommit();
     } catch (e) {} // tslint:disable-line:no-empty
 
@@ -30,7 +30,9 @@ export const AboutCmd = utilityCmd({
     let version;
 
     if (lastCommit) {
-      lastUpdate = moment.utc(lastCommit.committer.date, "X").format("LL [at] H:mm z");
+      lastUpdate = inGuildTz(pluginData, moment.utc(lastCommit.committer.date, "X")).format(
+        getDateFormat(pluginData, "pretty_datetime"),
+      );
       version = lastCommit.shortHash;
     } else {
       lastUpdate = "?";
