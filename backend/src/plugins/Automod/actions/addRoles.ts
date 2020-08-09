@@ -8,6 +8,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 
 const p = Constants.Permissions;
 
@@ -55,6 +56,7 @@ export const AddRolesAction = automodAction({
         const memberRoles = new Set(member.roles);
         for (const roleId of rolesToAssign) {
           memberRoles.add(roleId);
+          ignoreRoleChange(pluginData, member.id, roleId);
         }
 
         if (memberRoles.size === member.roles.length) {
