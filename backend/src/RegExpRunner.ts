@@ -68,7 +68,10 @@ export class RegExpRunner extends EventEmitter {
     if (!this._worker) {
       this._worker = new RegExpWorker(newWorkerTimeout);
       if (newWorkerTimeout !== FINAL_REGEX_TIMEOUT) {
-        regexTimeoutUpgradePromise.then(() => (this._worker.timeout = FINAL_REGEX_TIMEOUT));
+        regexTimeoutUpgradePromise.then(() => {
+          if (!this._worker) return;
+          this._worker.timeout = FINAL_REGEX_TIMEOUT;
+        });
       }
     }
 
