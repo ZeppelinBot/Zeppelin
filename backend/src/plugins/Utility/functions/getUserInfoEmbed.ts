@@ -119,16 +119,23 @@ export async function getUserInfoEmbed(
     });
 
     const caseSummary = cases.slice(0, 3).map(c => {
-      return `${CaseTypes[c.type]} (#${c.case_number})`;
+      const summaryText = `${CaseTypes[c.type]} (#${c.case_number})`;
+
+      if (c.log_message_id) {
+        const [channelId, messageId] = c.log_message_id.split("-");
+        return `[${summaryText}](https://discord.com/channels/${pluginData.guild.id}/${channelId}/${messageId})`;
+      }
+
+      return summaryText;
     });
 
-    const summaryText = cases.length > 3 ? "Last 3 cases" : "Summary";
+    const summaryLabel = cases.length > 3 ? "Last 3 cases" : "Summary";
 
     embed.fields.push({
       name: preEmbedPadding + "Cases",
       value: trimLines(`
           Total cases: **${cases.length}**
-          ${summaryText}: ${caseSummary.join(", ")}
+          ${summaryLabel}: ${caseSummary.join(", ")}
         `),
     });
   }
