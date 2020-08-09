@@ -7,13 +7,19 @@ import safeRegex from "safe-regex";
 
 const regexWithFlags = /^\/(.*?)\/([i]*)$/;
 
+export class InvalidRegexError extends Error {}
+
 /**
  * This function supports two input syntaxes for regexes: /<pattern>/<flags> and just <pattern>
  */
 export function inputPatternToRegExp(pattern: string) {
   const advancedSyntaxMatch = pattern.match(regexWithFlags);
   const [finalPattern, flags] = advancedSyntaxMatch ? [advancedSyntaxMatch[1], advancedSyntaxMatch[2]] : [pattern, ""];
-  return new RegExp(finalPattern, flags);
+  try {
+    return new RegExp(finalPattern, flags);
+  } catch (e) {
+    throw new InvalidRegexError(e.message);
+  }
 }
 
 export const TRegex = new t.Type<RegExp, string>(
