@@ -35,6 +35,7 @@ export const UnmuteCmd = modActionsCommand({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user) return sendErrorMessage(pluginData, msg.channel, `User not found`);
+
     const memberToUnmute = await resolveMember(pluginData.client, pluginData.guild, user.id);
     const mutesPlugin = pluginData.getPlugin(MutesPlugin);
     const hasMuteRole = memberToUnmute && mutesPlugin.hasMutedRole(memberToUnmute);

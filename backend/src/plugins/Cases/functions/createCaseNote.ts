@@ -12,6 +12,10 @@ export async function createCaseNote(pluginData: PluginData<CasesPluginType>, ar
   }
 
   const mod = await resolveUser(pluginData.client, args.modId);
+  if (!mod) {
+    throw new RecoverablePluginError(ERRORS.INVALID_USER);
+  }
+
   const modName = `${mod.username}#${mod.discriminator}`;
 
   let body = args.body;

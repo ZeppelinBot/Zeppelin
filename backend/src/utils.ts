@@ -972,8 +972,7 @@ export function resolveUserId(bot: Client, value: string) {
   }
 
   // Just a user ID?
-  const idMatch = value.match(/^\d+$/);
-  if (idMatch) {
+  if (isValidSnowflake(value)) {
     return value;
   }
 
@@ -1000,12 +999,12 @@ export async function resolveUser<T>(bot, value) {
     return new UnknownUser();
   }
 
-  // If we have the user cached, return that directly
   const userId = resolveUserId(bot, value);
   if (!userId) {
-    return new UnknownUser({ id: userId });
+    return null;
   }
 
+  // If we have the user cached, return that directly
   if (bot.users.has(userId)) {
     return bot.users.get(userId);
   }
