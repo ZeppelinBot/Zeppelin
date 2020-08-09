@@ -230,9 +230,7 @@ export async function archiveSearch(
   const baseUrl = getBaseUrl(pluginData);
   const url = await pluginData.state.archives.getUrl(baseUrl, archiveId);
 
-  msg.channel.createMessage(`Exported search results: ${url}`);
-
-  return;
+  await msg.channel.createMessage(`Exported search results: ${url}`);
 }
 
 async function performMemberSearch(
@@ -241,7 +239,7 @@ async function performMemberSearch(
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: Member[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
-  refreshMembersIfNeeded(pluginData.guild);
+  await refreshMembersIfNeeded(pluginData.guild);
 
   let matchingMembers = Array.from(pluginData.guild.members.values());
 
@@ -325,8 +323,9 @@ async function performMemberSearch(
       });
     } else {
       matchingMembers = await asyncFilter(matchingMembers, async member => {
-        if (member.nick && (await pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout)))
+        if (member.nick && (await pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout))) {
           return true;
+        }
 
         const fullUsername = `${member.user.username}#${member.user.discriminator}`;
         if (await pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
