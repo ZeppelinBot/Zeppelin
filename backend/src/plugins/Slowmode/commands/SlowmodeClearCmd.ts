@@ -2,6 +2,10 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { slowmodeCmd } from "../types";
 import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
+import { asSingleLine, disableInlineCode } from "../../../utils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
 
 export const SlowmodeClearCmd = slowmodeCmd({
   trigger: ["slowmode clear", "slowmode c"],
@@ -21,14 +25,29 @@ export const SlowmodeClearCmd = slowmodeCmd({
       return;
     }
 
+    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const missingPermissions = getMissingChannelPermissions(me, args.channel, BOT_SLOWMODE_CLEAR_PERMISSIONS);
+    if (missingPermissions) {
+      sendErrorMessage(
+        pluginData,
+        msg.channel,
+        `Unable to clear slowmode. ${missingPermissionError(missingPermissions)}`,
+      );
+      return;
+    }
+
     try {
       await clearBotSlowmodeFromUserId(pluginData, args.channel, args.user.id, args.force);
     } catch (e) {
-      return sendErrorMessage(
+      sendErrorMessage(
         pluginData,
         msg.channel,
-        `Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
+        asSingleLine(`
+          Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>:
+          \`${disableInlineCode(e.message)}\`
+        `),
       );
+      return;
     }
 
     sendSuccessMessage(
