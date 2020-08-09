@@ -4,6 +4,8 @@ import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { Embed } from "eris";
 import { trimLines } from "src/utils";
 import { formatContent } from "../util/formatContent";
+import { parseColor } from "../../../utils/parseColor";
+import { rgbToInt } from "../../../utils/rgbToInt";
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 
@@ -31,13 +33,13 @@ export const EditEmbedCmd = postCmd({
 
     let color = null;
     if (args.color) {
-      const colorMatch = args.color.match(COLOR_MATCH_REGEX);
-      if (!colorMatch) {
-        sendErrorMessage(pluginData, msg.channel, "Invalid color specified, use hex colors");
+      const colorRgb = parseColor(args.color);
+      if (colorRgb) {
+        color = rgbToInt(colorRgb);
+      } else {
+        sendErrorMessage(pluginData, msg.channel, "Invalid color specified");
         return;
       }
-
-      color = parseInt(colorMatch[1], 16);
     }
 
     const embed: Embed = savedMessage.data.embeds[0] as Embed;
