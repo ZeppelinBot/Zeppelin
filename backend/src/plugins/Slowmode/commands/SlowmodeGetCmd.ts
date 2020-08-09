@@ -3,7 +3,7 @@ import { slowmodeCmd } from "../types";
 import { TextChannel } from "eris";
 import humanizeDuration from "humanize-duration";
 
-export const SlowmodeGetChannelCmd = slowmodeCmd({
+export const SlowmodeGetCmd = slowmodeCmd({
   trigger: "slowmode",
   permission: "can_manage",
   source: "guild",

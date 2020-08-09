@@ -1,7 +1,7 @@
 import { SlowmodePluginType } from "../types";
 import { PluginData } from "knub";
-import { GuildChannel, TextChannel, Constants } from "eris";
-import { UnknownUser, isDiscordRESTError, stripObjectToScalars } from "src/utils";
+import { Constants, GuildChannel, TextChannel } from "eris";
+import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
 

@@ -2,6 +2,9 @@ import { Message } from "eris";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel";
 import { noop } from "src/utils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
 
 export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const botSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(args.channel.id);
@@ -9,6 +12,17 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
 
   if (!botSlowmode && hasNativeSlowmode === 0) {
     sendErrorMessage(pluginData, msg.channel, "Channel is not on slowmode!");
+    return;
+  }
+
+  const me = pluginData.guild.members.get(pluginData.client.user.id);
+  const missingPermissions = getMissingChannelPermissions(me, args.channel, BOT_SLOWMODE_DISABLE_PERMISSIONS);
+  if (missingPermissions) {
+    sendErrorMessage(
+      pluginData,
+      msg.channel,
+      `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`,
+    );
     return;
   }
 

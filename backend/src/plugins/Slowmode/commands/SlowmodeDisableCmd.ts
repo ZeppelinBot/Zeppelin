@@ -1,8 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { slowmodeCmd } from "../types";
-import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
-import { noop } from "src/utils";
 import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
 
 export const SlowmodeDisableCmd = slowmodeCmd({

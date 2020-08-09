@@ -3,7 +3,7 @@ import { SlowmodePluginType } from "../types";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
 import { GuildChannel, TextChannel } from "eris";
-import { UnknownUser, stripObjectToScalars } from "src/utils";
+import { stripObjectToScalars, UnknownUser } from "src/utils";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
 
 export async function clearExpiredSlowmodes(pluginData: PluginData<SlowmodePluginType>) {

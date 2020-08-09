@@ -1,6 +1,6 @@
 import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { SlowmodePluginType, ConfigSchema } from "./types";
+import { ConfigSchema, SlowmodePluginType } from "./types";
 import { GuildSlowmodes } from "src/data/GuildSlowmodes";
 import { GuildSavedMessages } from "src/data/GuildSavedMessages";
 import { GuildLogs } from "src/data/GuildLogs";
@@ -10,8 +10,9 @@ import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
 import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd";
 import { SlowmodeListCmd } from "./commands/SlowmodeListCmd";
-import { SlowmodeGetChannelCmd } from "./commands/SlowmodeGetChannelCmd";
-import { SlowmodeSetChannelCmd } from "./commands/SlowmodeSetChannelCmd";
+import { SlowmodeGetCmd } from "./commands/SlowmodeGetCmd";
+import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 
@@ -40,6 +41,7 @@ export const SlowmodePlugin = zeppelinPlugin<SlowmodePluginType>()("slowmode", {
     prettyName: "Slowmode",
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -48,8 +50,8 @@ export const SlowmodePlugin = zeppelinPlugin<SlowmodePluginType>()("slowmode", {
     SlowmodeDisableCmd,
     SlowmodeClearCmd,
     SlowmodeListCmd,
-    SlowmodeGetChannelCmd,
-    SlowmodeSetChannelCmd,
+    SlowmodeGetCmd,
+    SlowmodeSetCmd,
   ],
 
   onLoad(pluginData) {

@@ -1,15 +1,20 @@
 import { SavedMessage } from "src/data/entities/SavedMessage";
-import { GuildChannel, TextChannel } from "eris";
+import { TextChannel } from "eris";
 import { PluginData } from "knub";
 import { SlowmodePluginType } from "../types";
 import { resolveMember } from "src/utils";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
 import { hasPermission } from "src/pluginUtils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
 
 export async function onMessageCreate(pluginData: PluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 
-  const channel = pluginData.guild.channels.get(msg.channel_id) as GuildChannel & TextChannel;
+  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
   if (!channel) return;
 
   // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
@@ -24,6 +29,17 @@ export async function onMessageCreate(pluginData: PluginData<SlowmodePluginType>
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   const isAffected = hasPermission(pluginData, "is_affected", { channelId: channel.id, userId: msg.user_id, member });
   if (!isAffected) return thisMsgLock.unlock();
+
+  // Make sure we have the appropriate permissions to manage this slowmode
+  const me = pluginData.guild.members.get(pluginData.client.user.id);
+  const missingPermissions = getMissingChannelPermissions(me, channel, BOT_SLOWMODE_PERMISSIONS);
+  if (missingPermissions) {
+    const logs = pluginData.getPlugin(LogsPlugin);
+    logs.log(LogType.BOT_ALERT, {
+      body: `Unable to manage bot slowmode in <#${channel.id}>. ${missingPermissionError(missingPermissions)}`,
+    });
+    return;
+  }
 
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
