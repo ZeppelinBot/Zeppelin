@@ -1,10 +1,14 @@
 import {
+  channelMentionRegex,
   convertDelayStringToMS,
   disableCodeBlocks,
   disableInlineCode,
   isSnowflake,
+  isValidSnowflake,
   resolveMember,
   resolveUser,
+  resolveUserId,
+  roleMentionRegex,
   UnknownUser,
 } from "./utils";
 import { GuildChannel, Member, TextChannel, User } from "eris";
@@ -63,6 +67,23 @@ export const commandTypes = {
 
     return result;
   },
+
+  async anyId(value: string, context: CommandContext<any>) {
+    const userId = resolveUserId(context.pluginData.client, value);
+    if (userId) return userId;
+
+    const channelIdMatch = value.match(channelMentionRegex);
+    if (channelIdMatch) return channelIdMatch[1];
+
+    const roleIdMatch = value.match(roleMentionRegex);
+    if (roleIdMatch) return roleIdMatch[1];
+
+    if (isValidSnowflake(value)) {
+      return value;
+    }
+
+    throw new TypeConversionError(`Could not parse ID: \`${disableInlineCode(value)}\``);
+  },
 };
 
 export const commandTypeHelpers = {
@@ -73,4 +94,5 @@ export const commandTypeHelpers = {
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
   resolvedMember: createTypeHelper<Promise<Member | null>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
+  anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
 };

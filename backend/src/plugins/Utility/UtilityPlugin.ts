@@ -31,6 +31,7 @@ import { InviteInfoCmd } from "./commands/InviteInfoCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
 import { MessageInfoCmd } from "./commands/MessageInfoCmd";
 import { InfoCmd } from "./commands/InfoCmd";
+import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -44,6 +45,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_channelinfo: false,
     can_messageinfo: false,
     can_userinfo: false,
+    can_snowflake: false,
     can_reload_guild: false,
     can_nickname: false,
     can_ping: false,
@@ -71,6 +73,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_channelinfo: true,
         can_messageinfo: true,
         can_userinfo: true,
+        can_snowflake: true,
         can_nickname: true,
         can_vcmove: true,
         can_help: true,
@@ -124,6 +127,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     ChannelInfoCmd,
     MessageInfoCmd,
     InfoCmd,
+    SnowflakeInfoCmd,
   ],
 
   onLoad(pluginData) {
