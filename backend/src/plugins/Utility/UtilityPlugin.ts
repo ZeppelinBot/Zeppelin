@@ -32,6 +32,7 @@ import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
 import { MessageInfoCmd } from "./commands/MessageInfoCmd";
 import { InfoCmd } from "./commands/InfoCmd";
 import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -139,11 +140,17 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.supporters = new Supporters();
 
+    state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+
     state.lastReload = Date.now();
 
     if (activeReloads.has(guild.id)) {
       sendSuccessMessage(pluginData, activeReloads.get(guild.id), "Reloaded!");
       activeReloads.delete(guild.id);
     }
+  },
+
+  onUnload(pluginData) {
+    discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
 });
