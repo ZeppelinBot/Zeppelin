@@ -1,7 +1,6 @@
 import { Member, Message, User } from "eris";
 import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
-import safeRegex from "safe-regex";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
 import { PluginData } from "knub";
@@ -11,6 +10,7 @@ import { banSearchSignature } from "./commands/BanSearchCmd";
 import { UtilityPluginType } from "./types";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
+import { allowTimeout } from "../../RegExpRunner";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -262,36 +262,47 @@ async function performMemberSearch(
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
-    if (!safeRegex(queryRegex)) {
-      throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
-    }
-
     if (args["status-search"]) {
       matchingMembers = matchingMembers.filter(member => {
         if (member.game) {
-          if (member.game.name && member.game.name.match(queryRegex)) {
+          if (member.game.name && pluginData.state.regexRunner.exec(queryRegex, member.game.name).catch(allowTimeout)) {
             return true;
           }
 
-          if (member.game.state && member.game.state.match(queryRegex)) {
+          if (
+            member.game.state &&
+            pluginData.state.regexRunner.exec(queryRegex, member.game.state).catch(allowTimeout)
+          ) {
             return true;
           }
 
-          if (member.game.details && member.game.details.match(queryRegex)) {
+          if (
+            member.game.details &&
+            pluginData.state.regexRunner.exec(queryRegex, member.game.details).catch(allowTimeout)
+          ) {
             return true;
           }
 
           if (member.game.assets) {
-            if (member.game.assets.small_text && member.game.assets.small_text.match(queryRegex)) {
+            if (
+              member.game.assets.small_text &&
+              pluginData.state.regexRunner.exec(queryRegex, member.game.assets.small_text).catch(allowTimeout)
+            ) {
               return true;
             }
 
-            if (member.game.assets.large_text && member.game.assets.large_text.match(queryRegex)) {
+            if (
+              member.game.assets.large_text &&
+              pluginData.state.regexRunner.exec(queryRegex, member.game.assets.large_text).catch(allowTimeout)
+            ) {
               return true;
             }
           }
 
-          if (member.game.emoji && member.game.emoji.name.match(queryRegex)) {
+          if (
+            member.game.emoji &&
+            pluginData.state.regexRunner.exec(queryRegex, member.game.emoji.name).catch(allowTimeout)
+          ) {
             return true;
           }
         }
@@ -299,10 +310,10 @@ async function performMemberSearch(
       });
     } else {
       matchingMembers = matchingMembers.filter(member => {
-        if (member.nick && member.nick.match(queryRegex)) return true;
+        if (member.nick && pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout)) return true;
 
         const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (fullUsername.match(queryRegex)) return true;
+        if (pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
         return false;
       });
@@ -357,13 +368,9 @@ async function performBanSearch(
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
-    if (!safeRegex(queryRegex)) {
-      throw new SearchError("Unsafe/too complex regex (star depth is limited to 1)");
-    }
-
     matchingBans = matchingBans.filter(user => {
       const fullUsername = `${user.username}#${user.discriminator}`;
-      if (fullUsername.match(queryRegex)) return true;
+      if (pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
     });
   }
 

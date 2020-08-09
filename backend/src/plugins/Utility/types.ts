@@ -5,6 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
 import { Supporters } from "../../data/Supporters";
+import { RegExpRunner } from "../../RegExpRunner";
 
 export const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -41,6 +42,7 @@ export interface UtilityPluginType extends BasePluginType {
     savedMessages: GuildSavedMessages;
     archives: GuildArchives;
     supporters: Supporters;
+    regexRunner: RegExpRunner;
 
     lastReload: number;
   };
