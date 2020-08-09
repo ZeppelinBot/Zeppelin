@@ -39,8 +39,8 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
         const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
         await plugin.configPreprocessor(mergedOptions as PluginOptions<any>);
       } catch (err) {
-        if (err instanceof ConfigValidationError) {
-          return `${pluginName}: ${err.toString()}`;
+        if (err instanceof ConfigValidationError || err instanceof StrictValidationError) {
+          return `${pluginName}: ${err.message}`;
         }
 
         throw err;
