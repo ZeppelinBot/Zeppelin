@@ -11,6 +11,8 @@ import { UtilityPluginType } from "./types";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 import { allowTimeout } from "../../RegExpRunner";
+import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
+import { asyncFilter } from "../../utils/async";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -80,6 +82,10 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
+        return sendErrorMessage(pluginData, msg.channel, e.message);
+      }
+
+      if (e instanceof InvalidRegexError) {
         return sendErrorMessage(pluginData, msg.channel, e.message);
       }
 
@@ -199,6 +205,10 @@ export async function archiveSearch(
       return sendErrorMessage(pluginData, msg.channel, e.message);
     }
 
+    if (e instanceof InvalidRegexError) {
+      return sendErrorMessage(pluginData, msg.channel, e.message);
+    }
+
     throw e;
   }
 
@@ -257,28 +267,33 @@ async function performMemberSearch(
   if (args.query) {
     let queryRegex: RegExp;
     if (args.regex) {
-      queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
+      const flags = args["case-sensitive"] ? "" : "i";
+      queryRegex = inputPatternToRegExp(args.query.trimStart());
+      queryRegex = new RegExp(queryRegex.source, flags);
     } else {
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
     if (args["status-search"]) {
-      matchingMembers = matchingMembers.filter(member => {
+      matchingMembers = await asyncFilter(matchingMembers, async member => {
         if (member.game) {
-          if (member.game.name && pluginData.state.regexRunner.exec(queryRegex, member.game.name).catch(allowTimeout)) {
+          if (
+            member.game.name &&
+            (await pluginData.state.regexRunner.exec(queryRegex, member.game.name).catch(allowTimeout))
+          ) {
             return true;
           }
 
           if (
             member.game.state &&
-            pluginData.state.regexRunner.exec(queryRegex, member.game.state).catch(allowTimeout)
+            (await pluginData.state.regexRunner.exec(queryRegex, member.game.state).catch(allowTimeout))
           ) {
             return true;
           }
 
           if (
             member.game.details &&
-            pluginData.state.regexRunner.exec(queryRegex, member.game.details).catch(allowTimeout)
+            (await pluginData.state.regexRunner.exec(queryRegex, member.game.details).catch(allowTimeout))
           ) {
             return true;
           }
@@ -286,14 +301,14 @@ async function performMemberSearch(
           if (member.game.assets) {
             if (
               member.game.assets.small_text &&
-              pluginData.state.regexRunner.exec(queryRegex, member.game.assets.small_text).catch(allowTimeout)
+              (await pluginData.state.regexRunner.exec(queryRegex, member.game.assets.small_text).catch(allowTimeout))
             ) {
               return true;
             }
 
             if (
               member.game.assets.large_text &&
-              pluginData.state.regexRunner.exec(queryRegex, member.game.assets.large_text).catch(allowTimeout)
+              (await pluginData.state.regexRunner.exec(queryRegex, member.game.assets.large_text).catch(allowTimeout))
             ) {
               return true;
             }
@@ -301,7 +316,7 @@ async function performMemberSearch(
 
           if (
             member.game.emoji &&
-            pluginData.state.regexRunner.exec(queryRegex, member.game.emoji.name).catch(allowTimeout)
+            (await pluginData.state.regexRunner.exec(queryRegex, member.game.emoji.name).catch(allowTimeout))
           ) {
             return true;
           }
@@ -309,11 +324,12 @@ async function performMemberSearch(
         return false;
       });
     } else {
-      matchingMembers = matchingMembers.filter(member => {
-        if (member.nick && pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout)) return true;
+      matchingMembers = await asyncFilter(matchingMembers, async member => {
+        if (member.nick && (await pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout)))
+          return true;
 
         const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
+        if (await pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
         return false;
       });
@@ -363,14 +379,17 @@ async function performBanSearch(
   if (args.query) {
     let queryRegex: RegExp;
     if (args.regex) {
-      queryRegex = new RegExp(args.query.trimStart(), args["case-sensitive"] ? "" : "i");
+      const flags = args["case-sensitive"] ? "" : "i";
+      queryRegex = inputPatternToRegExp(args.query.trimStart());
+      queryRegex = new RegExp(queryRegex.source, flags);
     } else {
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
-    matchingBans = matchingBans.filter(user => {
+    matchingBans = await asyncFilter(matchingBans, async user => {
       const fullUsername = `${user.username}#${user.discriminator}`;
-      if (pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
+      if (await pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
+      return false;
     });
   }
 
