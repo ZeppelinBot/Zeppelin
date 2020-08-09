@@ -8,6 +8,8 @@ import { SECONDS, stripObjectToScalars, trimLines } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export const DeleteCaseCmd = modActionsCommand({
   trigger: ["delete_case", "deletecase"],
@@ -52,7 +54,7 @@ export const DeleteCaseCmd = modActionsCommand({
     }
 
     const deletedByName = `${message.author.username}#${message.author.discriminator}`;
-    const deletedAt = moment().format(`MMM D, YYYY [at] H:mm [UTC]`);
+    const deletedAt = inGuildTz(pluginData).format(getDateFormat(pluginData, "pretty_datetime"));
 
     await pluginData.state.cases.softDelete(
       theCase.id,

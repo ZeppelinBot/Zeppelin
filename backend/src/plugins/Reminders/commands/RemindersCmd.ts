@@ -3,6 +3,8 @@ import { sendErrorMessage } from "src/pluginUtils";
 import { createChunkedMessage, sorter } from "src/utils";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import { inGuildTz } from "../../../utils/timezones";
+import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
 
 export const RemindersCmd = remindersCommand({
   trigger: "reminders",
@@ -20,10 +22,13 @@ export const RemindersCmd = remindersCommand({
     const lines = Array.from(reminders.entries()).map(([i, reminder]) => {
       const num = i + 1;
       const paddedNum = num.toString().padStart(longestNum, " ");
-      const target = moment(reminder.remind_at, "YYYY-MM-DD HH:mm:ss");
-      const diff = target.diff(moment());
+      const target = moment.utc(reminder.remind_at, "YYYY-MM-DD HH:mm:ss");
+      const diff = target.diff(moment.utc());
       const result = humanizeDuration(diff, { largest: 2, round: true });
-      return `\`${paddedNum}.\` \`${reminder.remind_at} (${result})\` ${reminder.body}`;
+      const prettyRemindAt = inGuildTz(pluginData, moment.utc(reminder.remind_at, DBDateFormat)).format(
+        getDateFormat(pluginData, "pretty_datetime"),
+      );
+      return `\`${paddedNum}.\` \`${prettyRemindAt} (${result})\` ${reminder.body}`;
     });
 
     createChunkedMessage(msg.channel, lines.join("\n"));

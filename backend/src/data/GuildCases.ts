@@ -6,6 +6,7 @@ import { disableLinkPreviews } from "../utils";
 import { CaseTypes } from "./CaseTypes";
 import moment = require("moment-timezone");
 import { connection } from "./db";
+import { DBDateFormat } from "../utils/dateFormats";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
@@ -158,6 +159,7 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
+  // TODO: Move this to the cases plugin, use server timezone + date formats
   getSummaryText(theCase: Case) {
     const firstNote = theCase.notes[0];
     let reason = firstNote ? firstNote.body : "";
@@ -172,7 +174,7 @@ export class GuildCases extends BaseGuildRepository {
 
     reason = disableLinkPreviews(reason);
 
-    const timestamp = moment(theCase.created_at).format("YYYY-MM-DD");
+    const timestamp = moment.utc(theCase.created_at, DBDateFormat).format("YYYY-MM-DD");
     let line = `\`[${timestamp}]\` \`Case #${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
     if (theCase.notes.length > 1) {
       line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;

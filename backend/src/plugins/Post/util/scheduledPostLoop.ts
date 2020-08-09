@@ -1,11 +1,12 @@
 import { PluginData } from "knub";
 import { PostPluginType } from "../types";
 import { logger } from "src/logger";
-import { stripObjectToScalars, DBDateFormat, SECONDS } from "src/utils";
+import { stripObjectToScalars, SECONDS } from "src/utils";
 import { LogType } from "src/data/LogType";
 import moment from "moment-timezone";
 import { TextChannel, User } from "eris";
 import { postMessage } from "./postMessage";
+import { DBDateFormat } from "../../../utils/dateFormats";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 
@@ -49,10 +50,10 @@ export async function scheduledPostLoop(pluginData: PluginData<PostPluginType>) 
     let shouldClear = true;
 
     if (post.repeat_interval) {
-      const nextPostAt = moment().add(post.repeat_interval, "ms");
+      const nextPostAt = moment.utc().add(post.repeat_interval, "ms");
 
       if (post.repeat_until) {
-        const repeatUntil = moment(post.repeat_until, DBDateFormat);
+        const repeatUntil = moment.utc(post.repeat_until, DBDateFormat);
         if (nextPostAt.isSameOrBefore(repeatUntil)) {
           await pluginData.state.scheduledPosts.update(post.id, {
             post_at: nextPostAt.format(DBDateFormat),

@@ -58,7 +58,7 @@ export class GuildArchives extends BaseGuildRepository {
    */
   async create(body: string, expiresAt: moment.Moment = null): Promise<string> {
     if (!expiresAt) {
-      expiresAt = moment().add(DEFAULT_EXPIRY_DAYS, "days");
+      expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
 
     const result = await this.archives.insert({
@@ -78,7 +78,7 @@ export class GuildArchives extends BaseGuildRepository {
 
       const line = await renderTemplate(MESSAGE_ARCHIVE_MESSAGE_FORMAT, {
         id: msg.id,
-        timestamp: moment(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
+        timestamp: moment.utc(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
         content: msg.data.content,
         user,
         channel,
@@ -89,7 +89,9 @@ export class GuildArchives extends BaseGuildRepository {
   }
 
   async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt = null) {
-    if (expiresAt == null) expiresAt = moment().add(DEFAULT_EXPIRY_DAYS, "days");
+    if (expiresAt == null) {
+      expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
+    }
 
     const headerStr = await renderTemplate(MESSAGE_ARCHIVE_HEADER_FORMAT, { guild });
     const msgLines = await this.renderLinesFromSavedMessages(savedMessages, guild);

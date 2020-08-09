@@ -13,8 +13,6 @@ export async function saveMessageToStarboard(
   const channel = pluginData.guild.channels.get(starboard.channel_id);
   if (!channel) return;
 
-  const time = moment(msg.timestamp, "x").format("YYYY-MM-DD [at] HH:mm:ss [UTC]");
-
   const embed: Embed = {
     footer: {
       text: `#${(msg.channel as GuildChannel).name}`,

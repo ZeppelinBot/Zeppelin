@@ -43,7 +43,7 @@ export async function getInviteInfoEmbed(
     }
 
     const serverCreatedAtTimestamp = snowflakeToTimestamp(invite.guild.id);
-    const serverCreatedAt = moment(serverCreatedAtTimestamp, "x");
+    const serverCreatedAt = moment.utc(serverCreatedAtTimestamp, "x");
     const serverAge = humanizeDuration(Date.now() - serverCreatedAtTimestamp, {
       largest: 2,
       round: true,
@@ -66,7 +66,7 @@ export async function getInviteInfoEmbed(
         : `#${invite.channel.name}`;
 
     const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-    const channelCreatedAt = moment(channelCreatedAtTimestamp, "x");
+    const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
     const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
       largest: 2,
       round: true,
@@ -117,7 +117,7 @@ export async function getInviteInfoEmbed(
     }
 
     const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-    const channelCreatedAt = moment(channelCreatedAtTimestamp, "x");
+    const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
     const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
       largest: 2,
       round: true,

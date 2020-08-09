@@ -14,6 +14,7 @@ import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
 import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
+import { DBDateFormat } from "../../../utils/dateFormats";
 
 export async function logAndDetectMessageSpam(
   pluginData: PluginData<SpamPluginType>,
@@ -36,7 +37,7 @@ export async function logAndDetectMessageSpam(
 
   pluginData.state.spamDetectionQueue = pluginData.state.spamDetectionQueue.then(
     async () => {
-      const timestamp = moment(savedMessage.posted_at).valueOf();
+      const timestamp = moment.utc(savedMessage.posted_at, DBDateFormat).valueOf();
       const member = await resolveMember(pluginData.client, pluginData.guild, savedMessage.user_id);
 
       // Log this action...

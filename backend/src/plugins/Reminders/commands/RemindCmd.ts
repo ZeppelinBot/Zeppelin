@@ -4,6 +4,8 @@ import { convertDelayStringToMS } from "src/utils";
 import humanizeDuration from "humanize-duration";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { remindersCommand } from "../types";
+import { getGuildTz, inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 export const RemindCmd = remindersCommand({
   trigger: ["remind", "remindme"],
@@ -16,19 +18,20 @@ export const RemindCmd = remindersCommand({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const now = moment();
+    const now = moment.utc();
+    const tz = getGuildTz(pluginData);
 
-    let reminderTime;
+    let reminderTime: moment.Moment;
     if (args.time.match(/^\d{4}-\d{1,2}-\d{1,2}$/)) {
       // Date in YYYY-MM-DD format, remind at current time on that date
-      reminderTime = moment(args.time, "YYYY-M-D").set({
+      reminderTime = moment.tz(args.time, "YYYY-M-D", tz).set({
         hour: now.hour(),
         minute: now.minute(),
         second: now.second(),
       });
     } else if (args.time.match(/^\d{4}-\d{1,2}-\d{1,2}T\d{2}:\d{2}$/)) {
       // Date and time in YYYY-MM-DD[T]HH:mm format
-      reminderTime = moment(args.time, "YYYY-M-D[T]HH:mm").second(0);
+      reminderTime = moment.tz(args.time, "YYYY-M-D[T]HH:mm", tz).second(0);
     } else {
       // "Delay string" i.e. e.g. "2h30m"
       const ms = convertDelayStringToMS(args.time);
@@ -37,7 +40,7 @@ export const RemindCmd = remindersCommand({
         return;
       }
 
-      reminderTime = moment().add(ms, "millisecond");
+      reminderTime = moment.utc().add(ms, "millisecond");
     }
 
     if (!reminderTime.isValid() || reminderTime.isBefore(now)) {
@@ -50,17 +53,21 @@ export const RemindCmd = remindersCommand({
     await pluginData.state.reminders.add(
       msg.author.id,
       msg.channel.id,
-      reminderTime.format("YYYY-MM-DD HH:mm:ss"),
+      reminderTime
+        .clone()
+        .tz("Etc/UTC")
+        .format("YYYY-MM-DD HH:mm:ss"),
       reminderBody,
-      moment().format("YYYY-MM-DD HH:mm:ss"),
+      moment.utc().format("YYYY-MM-DD HH:mm:ss"),
     );
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
+    const prettyReminderTime = inGuildTz(pluginData, reminderTime).format(getDateFormat(pluginData, "pretty_datetime"));
     sendSuccessMessage(
       pluginData,
       msg.channel,
-      `I will remind you in **${timeUntilReminder}** at **${reminderTime.format("YYYY-MM-DD, HH:mm")}**`,
+      `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`,
     );
   },
 });

@@ -1,10 +1,11 @@
 import { command } from "knub";
 import { IMuteWithDetails, MutesPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
+import { isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
 import moment from "moment-timezone";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
+import { DBDateFormat } from "../../../utils/dateFormats";
 
 export const MutesCmd = command<MutesPluginType>()({
   trigger: "mutes",
@@ -70,7 +71,8 @@ export const MutesCmd = command<MutesPluginType>()({
 
       // Filter: mute age
       if (args.age) {
-        const cutoff = moment()
+        const cutoff = moment
+          .utc()
           .subtract(args.age, "ms")
           .format(DBDateFormat);
         filteredMutes = filteredMutes.filter(m => m.created_at <= cutoff);
@@ -119,14 +121,14 @@ export const MutesCmd = command<MutesPluginType>()({
         let line = `<@!${mute.user_id}> (**${username}**, \`${mute.user_id}\`)   📋 ${caseName}`;
 
         if (mute.expires_at) {
-          const timeUntilExpiry = moment().diff(moment(mute.expires_at, DBDateFormat));
+          const timeUntilExpiry = moment.utc().diff(moment.utc(mute.expires_at, DBDateFormat));
           const humanizedTime = humanizeDurationShort(timeUntilExpiry, { largest: 2, round: true });
           line += `   ⏰ Expires in ${humanizedTime}`;
         } else {
           line += `   ⏰ Indefinite`;
         }
 
-        const timeFromMute = moment(mute.created_at, DBDateFormat).diff(moment());
+        const timeFromMute = moment.utc(mute.created_at, DBDateFormat).diff(moment.utc());
         const humanizedTimeFromMute = humanizeDurationShort(timeFromMute, { largest: 2, round: true });
         line += `   🕒 Muted ${humanizedTimeFromMute} ago`;
 
@@ -184,7 +186,7 @@ export const MutesCmd = command<MutesPluginType>()({
         listMessage.edit("No active mutes!");
       }
     } else if (args.export) {
-      const archiveId = await pluginData.state.archives.create(lines.join("\n"), moment().add(1, "hour"));
+      const archiveId = await pluginData.state.archives.create(lines.join("\n"), moment.utc().add(1, "hour"));
       const baseUrl = getBaseUrl(pluginData);
       const url = await pluginData.state.archives.getUrl(baseUrl, archiveId);
 

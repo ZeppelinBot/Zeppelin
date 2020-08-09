@@ -6,6 +6,7 @@ import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
 import path from "path";
 import moment from "moment-timezone";
+import { getGuildTz } from "../../../utils/timezones";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -29,7 +30,7 @@ export const AboutCmd = utilityCmd({
     let version;
 
     if (lastCommit) {
-      lastUpdate = moment(lastCommit.committer.date, "X").format("LL [at] H:mm [(UTC)]");
+      lastUpdate = moment.utc(lastCommit.committer.date, "X").format("LL [at] H:mm z");
       version = lastCommit.shortHash;
     } else {
       lastUpdate = "?";
@@ -49,6 +50,7 @@ export const AboutCmd = utilityCmd({
       ["Last update", lastUpdate],
       ["Version", version],
       ["API latency", `${shard.latency}ms`],
+      ["Server timezone", getGuildTz(pluginData)],
     ];
 
     const loadedPlugins = Array.from(

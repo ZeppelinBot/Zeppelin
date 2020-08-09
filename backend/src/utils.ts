@@ -32,7 +32,7 @@ import https from "https";
 import tmp from "tmp";
 import { helpers } from "knub";
 import { SavedMessage } from "./data/entities/SavedMessage";
-import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { either } from "fp-ts/lib/Either";
 import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
@@ -252,7 +252,7 @@ export const tDateTime = new t.Type<string, string>(
   (from, to) =>
     either.chain(t.string.validate(from, to), s => {
       const parsed =
-        s.length === 10 ? moment(s, "YYYY-MM-DD") : s.length === 19 ? moment(s, "YYYY-MM-DD HH:mm:ss") : null;
+        s.length === 10 ? moment.utc(s, "YYYY-MM-DD") : s.length === 19 ? moment.utc(s, "YYYY-MM-DD HH:mm:ss") : null;
 
       return parsed && parsed.isValid() ? t.success(s) : t.failure(from, to, "Invalid datetime");
     }),
@@ -822,8 +822,6 @@ export function sorter(getter: sorterGetterResolvable, direction: sorterDirectio
 export function noop() {
   // IT'S LITERALLY NOTHING
 }
-
-export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
 
 export type CustomEmoji = {
   id: string;

@@ -5,6 +5,8 @@ import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { chunkMessageLines, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
 
@@ -27,13 +29,15 @@ export async function getMessageInfoEmbed(
     icon_url: MESSAGE_ICON,
   };
 
-  const createdAt = moment(message.createdAt, "x");
+  const createdAt = moment.utc(message.createdAt, "x");
+  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
   const messageAge = humanizeDuration(Date.now() - message.createdAt, {
     largest: 2,
     round: true,
   });
 
-  const editedAt = message.editedTimestamp && moment(message.editedTimestamp, "x");
+  const editedAt = message.editedTimestamp && moment.utc(message.editedTimestamp, "x");
+  const prettyEditedAt = inGuildTz(pluginData, editedAt).format(getDateFormat(pluginData, "pretty_datetime"));
   const editAge =
     message.editedTimestamp &&
     humanizeDuration(Date.now() - message.editedTimestamp, {
@@ -62,8 +66,8 @@ export async function getMessageInfoEmbed(
       ID: \`${message.id}\`
       Channel: <#${message.channel.id}>
       Channel ID: \`${message.channel.id}\`
-      Created: **${messageAge} ago** (\`${createdAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
-      ${editedAt ? `Edited at: **${editAge} ago** (\`${editedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)` : ""}
+      Created: **${messageAge} ago** (\`${prettyCreatedAt}\`)
+      ${editedAt ? `Edited at: **${editAge} ago** (\`${prettyEditedAt}\`)` : ""}
       Type: **${type}**
       Link: [**Go to message ➔**](https://discord.com/channels/${pluginData.guild.id}/${message.channel.id}/${
         message.id
@@ -72,13 +76,19 @@ export async function getMessageInfoEmbed(
     ),
   });
 
-  const authorCreatedAt = moment(message.author.createdAt);
+  const authorCreatedAt = moment.utc(message.author.createdAt, "x");
+  const prettyAuthorCreatedAt = inGuildTz(pluginData, authorCreatedAt).format(
+    getDateFormat(pluginData, "pretty_datetime"),
+  );
   const authorAccountAge = humanizeDuration(Date.now() - message.author.createdAt, {
     largest: 2,
     round: true,
   });
 
-  const authorJoinedAt = message.member && moment(message.member.joinedAt);
+  const authorJoinedAt = message.member && moment.utc(message.member.joinedAt, "x");
+  const prettyAuthorJoinedAt = inGuildTz(pluginData, authorJoinedAt).format(
+    getDateFormat(pluginData, "pretty_datetime"),
+  );
   const authorServerAge =
     message.member &&
     humanizeDuration(Date.now() - message.member.joinedAt, {
@@ -91,12 +101,8 @@ export async function getMessageInfoEmbed(
     value: trimLines(`
       Name: **${message.author.username}#${message.author.discriminator}**
       ID: \`${message.author.id}\`
-      Created: **${authorAccountAge} ago** (\`${authorCreatedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
-      ${
-        authorJoinedAt
-          ? `Joined: **${authorServerAge} ago** (\`${authorJoinedAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)`
-          : ""
-      }
+      Created: **${authorAccountAge} ago** (\`${prettyAuthorCreatedAt}\`)
+      ${authorJoinedAt ? `Joined: **${authorServerAge} ago** (\`${prettyAuthorJoinedAt}\`)` : ""}
       Mention: <@!${message.author.id}>
     `),
   });

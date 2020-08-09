@@ -4,6 +4,8 @@ import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { formatNumber, preEmbedPadding, trimLines } from "../../../utils";
+import { inGuildTz } from "../../../utils/timezones";
+import { getDateFormat } from "../../../utils/dateFormats";
 
 const TEXT_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/740656843545772062/text-channel.png";
@@ -55,7 +57,8 @@ export async function getChannelInfoEmbed(
     channelName = `#${channel.name}`;
   }
 
-  const createdAt = moment(channel.createdAt, "x");
+  const createdAt = moment.utc(channel.createdAt, "x");
+  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
   const channelAge = humanizeDuration(Date.now() - channel.createdAt, {
     largest: 2,
     round: true,
@@ -69,7 +72,7 @@ export async function getChannelInfoEmbed(
     value: trimLines(`
       Name: **${channelName}**
       ID: \`${channel.id}\`
-      Created: **${channelAge} ago** (\`${createdAt.format("MMM D, YYYY [at] H:mm [UTC]")}\`)
+      Created: **${channelAge} ago** (\`${prettyCreatedAt}\`)
       Type: **${channelType}**
       ${showMention ? `Mention: <#${channel.id}>` : ""}
     `),

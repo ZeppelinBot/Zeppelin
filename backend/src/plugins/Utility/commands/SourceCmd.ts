@@ -40,7 +40,7 @@ export const SourceCmd = utilityCmd({
 
     const source = `${textSource}\n\nSource:\n\n${fullSource}`;
 
-    const archiveId = await pluginData.state.archives.create(source, moment().add(1, "hour"));
+    const archiveId = await pluginData.state.archives.create(source, moment.utc().add(1, "hour"));
     const baseUrl = getBaseUrl(pluginData);
     const url = pluginData.state.archives.getUrl(baseUrl, archiveId);
     cmdMessage.channel.createMessage(`Message source: ${url}`);

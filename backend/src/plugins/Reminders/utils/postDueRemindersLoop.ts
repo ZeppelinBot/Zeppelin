@@ -16,9 +16,9 @@ export async function postDueRemindersLoop(pluginData: PluginData<RemindersPlugi
     if (channel && channel instanceof TextChannel) {
       try {
         // Only show created at date if one exists
-        if (moment(reminder.created_at).isValid()) {
-          const target = moment();
-          const diff = target.diff(moment(reminder.created_at, "YYYY-MM-DD HH:mm:ss"));
+        if (moment.utc(reminder.created_at).isValid()) {
+          const target = moment.utc();
+          const diff = target.diff(moment.utc(reminder.created_at, "YYYY-MM-DD HH:mm:ss"));
           const result = humanizeDuration(diff, { largest: 2, round: true });
           await channel.createMessage(
             disableLinkPreviews(
