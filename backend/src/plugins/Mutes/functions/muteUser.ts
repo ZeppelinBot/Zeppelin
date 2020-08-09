@@ -41,6 +41,11 @@ export async function muteUser(
   }
 
   const user = await resolveUser(pluginData.client, userId);
+  if (!user) {
+    lock.unlock();
+    throw new RecoverablePluginError(ERRORS.INVALID_USER);
+  }
+
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id); // Grab the fresh member so we don't have stale role info
   const config = pluginData.config.getMatchingConfig({ member, userId });
 

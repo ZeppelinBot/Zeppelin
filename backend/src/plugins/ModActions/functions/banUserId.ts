@@ -20,6 +20,12 @@ export async function banUserId(
 ): Promise<BanResult> {
   const config = pluginData.config.get();
   const user = await resolveUser(pluginData.client, userId);
+  if (!user) {
+    return {
+      status: "failed",
+      error: "Invalid user",
+    };
+  }
 
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   let notifyResult: UserNotificationResult = { method: null, success: true };
