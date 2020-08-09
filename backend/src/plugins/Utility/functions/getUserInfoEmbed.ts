@@ -1,7 +1,7 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
 import { PluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding } from "src/utils";
+import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding, sorter } from "src/utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
@@ -82,12 +82,13 @@ export async function getUserInfoEmbed(
       round: true,
     });
     const roles = member.roles.map(id => pluginData.guild.roles.get(id)).filter(r => !!r);
+    roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
       name: preEmbedPadding + "Member information",
       value: trimLines(`
           Joined: **${joinAge} ago** (\`${prettyJoinedAt}\`)
-          ${roles.length > 0 ? "Roles: " + roles.map(r => r.name).join(", ") : ""}
+          ${roles.length > 0 ? "Roles: " + roles.map(r => `<@&${r.id}>`).join(", ") : ""}
         `),
     });
 
