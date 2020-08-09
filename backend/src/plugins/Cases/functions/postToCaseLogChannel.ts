@@ -12,7 +12,7 @@ export async function postToCaseLogChannel(
   pluginData: PluginData<CasesPluginType>,
   content: MessageContent,
   file: MessageFile = null,
-): Promise<Message> {
+): Promise<Message | null> {
   const caseLogChannelId = pluginData.config.get().case_log_channel;
   if (!caseLogChannelId) return;
 
@@ -42,15 +42,30 @@ export async function postToCaseLogChannel(
 export async function postCaseToCaseLogChannel(
   pluginData: PluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
-): Promise<Message> {
+): Promise<Message | null> {
   const theCase = await pluginData.state.cases.find(resolveCaseId(caseOrCaseId));
   if (!theCase) return;
 
   const caseEmbed = await getCaseEmbed(pluginData, caseOrCaseId);
   if (!caseEmbed) return;
 
+  if (theCase.log_message_id) {
+    const [channelId, messageId] = theCase.log_message_id.split("-");
+
+    try {
+      await pluginData.client.editMessage(channelId, messageId, caseEmbed);
+      return;
+    } catch (e) {} // tslint:disable-line:no-empty
+  }
+
   try {
-    return postToCaseLogChannel(pluginData, caseEmbed);
+    const postedMessage = await postToCaseLogChannel(pluginData, caseEmbed);
+    if (postedMessage) {
+      await pluginData.state.cases.update(theCase.id, {
+        log_message_id: `${postedMessage.channel.id}-${postedMessage.id}`,
+      });
+    }
+    return postedMessage;
   } catch (e) {
     pluginData.state.logs.log(LogType.BOT_ALERT, {
       body: `Failed to post case #${theCase.case_number} to the case log channel`,

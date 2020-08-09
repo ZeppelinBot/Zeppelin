@@ -29,6 +29,12 @@ export class Case {
 
   @Column() pp_name: string;
 
+  /**
+   * ID of the channel and message where this case was logged.
+   * Format: "channelid-messageid"
+   */
+  @Column() log_message_id: string;
+
   @OneToMany(
     type => CaseNote,
     note => note.case,

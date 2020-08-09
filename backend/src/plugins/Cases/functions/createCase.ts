@@ -1,6 +1,6 @@
 import { CaseArgs, CasesPluginType } from "../types";
 import { resolveUser } from "../../../utils";
-import { PluginData } from "knub";
+import { plugin, PluginData } from "knub";
 import { createCaseNote } from "./createCaseNote";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { logger } from "../../../logger";
