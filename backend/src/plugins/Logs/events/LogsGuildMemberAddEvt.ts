@@ -32,7 +32,7 @@ export const LogsGuildMemberAddEvt = logsEvent({
       const recentCases = cases.slice(0, 2);
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
       for (const theCase of recentCases) {
-        recentCaseLines.push(await casesPlugin.getCaseSummary(theCase, true));
+        recentCaseLines.push(await casesPlugin.getCaseSummary(theCase));
       }
 
       let recentCaseSummary = recentCaseLines.join("\n");
