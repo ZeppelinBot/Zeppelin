@@ -392,17 +392,16 @@ export async function findRelevantAuditLogEntry(
   try {
     auditLogs = await guild.getAuditLogs(5, null, actionType);
   } catch (e) {
-    // Ignore internal server errors which seem to be pretty common with audit log requests
-    if (!isDiscordHTTPError(e) || e.code !== 500) {
-      // Ignore, try again next attempt
-    }
-
-    // If we don't have permission to read audit log, set audit log requests on cooldown
     if (isDiscordRESTError(e) && e.code === 50013) {
+      // If we don't have permission to read audit log, set audit log requests on cooldown
       auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
+    } else if (isDiscordHTTPError(e) && e.code === 500) {
+      // Ignore internal server errors which seem to be pretty common with audit log requests
+    } else if (e.message.startsWith("Request timed out")) {
+      // Ignore timeouts, try again next loop
+    } else {
+      throw e;
     }
-
-    throw e;
   }
 
   const entries = auditLogs ? auditLogs.entries : [];
