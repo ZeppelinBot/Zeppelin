@@ -3,7 +3,7 @@ import { UtilityPluginType } from "../types";
 import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { chunkMessageLines, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
+import { chunkMessageLines, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { inGuildTz } from "../../../utils/timezones";
 import { getDateFormat } from "../../../utils/dateFormats";
@@ -69,9 +69,7 @@ export async function getMessageInfoEmbed(
       Created: **${messageAge} ago** (\`${prettyCreatedAt}\`)
       ${editedAt ? `Edited at: **${editAge} ago** (\`${prettyEditedAt}\`)` : ""}
       Type: **${type}**
-      Link: [**Go to message ➔**](https://discord.com/channels/${pluginData.guild.id}/${message.channel.id}/${
-        message.id
-      })
+      Link: [**Go to message ➔**](${messageLink(pluginData.guild.id, message.channel.id, message.id)})
     `),
     ),
   });

@@ -1,6 +1,6 @@
 import { PluginData } from "knub";
 import { CasesPluginType } from "../types";
-import { disableLinkPreviews } from "../../../utils";
+import { disableLinkPreviews, messageLink } from "../../../utils";
 import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
 import { CaseTypes } from "../../../data/CaseTypes";
 import moment from "moment-timezone";
@@ -37,7 +37,7 @@ export async function getCaseSummary(
   let caseTitle = `\`Case #${theCase.case_number}\``;
   if (withLinks && theCase.log_message_id) {
     const [channelId, messageId] = theCase.log_message_id.split("-");
-    caseTitle = `[${caseTitle}](https://discord.com/channels/${pluginData.guild.id}/${channelId}/${messageId})`;
+    caseTitle = `[${caseTitle}](${messageLink(pluginData.guild.id, channelId, messageId)})`;
   } else {
     caseTitle = `\`${caseTitle}\``;
   }

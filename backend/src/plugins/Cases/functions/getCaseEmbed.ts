@@ -6,10 +6,9 @@ import { PluginData, helpers } from "knub";
 import { CasesPluginType } from "../types";
 import { CaseTypeColors } from "../../../data/CaseTypeColors";
 import { resolveCaseId } from "./resolveCaseId";
-import { chunkLines, chunkMessageLines, emptyEmbedValue } from "../../../utils";
+import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
 import { inGuildTz } from "../../../utils/timezones";
 import { getDateFormat } from "../../../utils/dateFormats";
-import { buildMessageLink } from "../../../utils/buildMessageLink";
 
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
@@ -92,7 +91,7 @@ export async function getCaseEmbed(
 
   if (theCase.log_message_id) {
     const [channelId, messageId] = theCase.log_message_id.split("-");
-    const link = buildMessageLink(pluginData.guild.id, channelId, messageId);
+    const link = messageLink(pluginData.guild.id, channelId, messageId);
     embed.fields.push({
       name: emptyEmbedValue,
       value: `[Go to original case in case log channel](${link})`,
