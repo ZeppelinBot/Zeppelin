@@ -1,15 +1,19 @@
 import { PluginData } from "knub";
 import { CasesPluginType } from "../types";
-import { disableLinkPreviews, messageLink } from "../../../utils";
+import { convertDelayStringToMS, DAYS, disableLinkPreviews, messageLink } from "../../../utils";
 import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
 import { CaseTypes } from "../../../data/CaseTypes";
 import moment from "moment-timezone";
 import { Case } from "../../../data/entities/Case";
 import { inGuildTz } from "../../../utils/timezones";
+import humanizeDuration from "humanize-duration";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;
 const UPDATED_STR = "__[Update]__";
+
+const RELATIVE_TIME_THRESHOLD = 7 * DAYS;
 
 export async function getCaseSummary(
   pluginData: PluginData<CasesPluginType>,
@@ -41,7 +45,12 @@ export async function getCaseSummary(
   reason = disableLinkPreviews(reason);
 
   const timestamp = moment.utc(theCase.created_at, DBDateFormat);
-  const prettyTimestamp = inGuildTz(pluginData, timestamp).format(getDateFormat(pluginData, "date"));
+  const config = pluginData.config.get();
+  const relativeTimeCutoff = convertDelayStringToMS(config.relative_time_cutoff);
+  const useRelativeTime = config.show_relative_times && Date.now() - timestamp.valueOf() < relativeTimeCutoff;
+  const prettyTimestamp = useRelativeTime
+    ? moment.utc().to(timestamp)
+    : inGuildTz(pluginData, timestamp).format(getDateFormat(pluginData, "date"));
 
   let caseTitle = `\`Case #${theCase.case_number}\``;
   if (withLinks && theCase.log_message_id) {
