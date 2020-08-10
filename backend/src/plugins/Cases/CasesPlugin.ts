@@ -17,6 +17,8 @@ const defaultOptions = {
   config: {
     log_automatic_actions: true,
     case_log_channel: null,
+    show_relative_times: true,
+    relative_time_cutoff: "7d",
   },
 };
 

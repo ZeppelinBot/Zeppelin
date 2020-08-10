@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { tNullable } from "../../utils";
+import { tDelayString, tNullable } from "../../utils";
 import { CaseTypes } from "../../data/CaseTypes";
 import { BasePluginType } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -9,6 +9,8 @@ import { GuildArchives } from "../../data/GuildArchives";
 export const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
   case_log_channel: tNullable(t.string),
+  show_relative_times: t.boolean,
+  relative_time_cutoff: tDelayString,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
