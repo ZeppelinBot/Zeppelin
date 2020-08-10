@@ -11,6 +11,7 @@ import { CaseTypes } from "../../data/CaseTypes";
 import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId";
 import { getCaseEmbed } from "./functions/getCaseEmbed";
 import { trimPluginDescription } from "../../utils";
+import { getCaseSummary } from "./functions/getCaseSummary";
 
 const defaultOptions = {
   config: {
@@ -59,6 +60,12 @@ export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
     getCaseEmbed(pluginData) {
       return (caseOrCaseId: Case | number) => {
         return getCaseEmbed(pluginData, caseOrCaseId);
+      };
+    },
+
+    getCaseSummary(pluginData) {
+      return (caseOrCaseId: Case | number, withLinks = false) => {
+        return getCaseSummary(pluginData, caseOrCaseId, withLinks);
       };
     },
   },

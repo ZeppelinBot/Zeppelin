@@ -158,32 +158,4 @@ export class GuildCases extends BaseGuildRepository {
       case_id: caseId,
     });
   }
-
-  // TODO: Move this to the cases plugin, use server timezone + date formats
-  getSummaryText(theCase: Case) {
-    const firstNote = theCase.notes[0];
-    let reason = firstNote ? firstNote.body : "";
-
-    if (reason.length > CASE_SUMMARY_REASON_MAX_LENGTH) {
-      const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
-      const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index : CASE_SUMMARY_REASON_MAX_LENGTH;
-      if (nextWhitespaceIndex < reason.length) {
-        reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
-      }
-    }
-
-    reason = disableLinkPreviews(reason);
-
-    const timestamp = moment.utc(theCase.created_at, DBDateFormat).format("YYYY-MM-DD");
-    let line = `\`[${timestamp}]\` \`Case #${theCase.case_number}\` __${CaseTypes[theCase.type]}__ ${reason}`;
-    if (theCase.notes.length > 1) {
-      line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
-    }
-
-    if (theCase.is_hidden) {
-      line += " *(hidden)*";
-    }
-
-    return line;
-  }
 }

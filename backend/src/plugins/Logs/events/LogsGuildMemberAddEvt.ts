@@ -3,6 +3,7 @@ import { stripObjectToScalars } from "src/utils";
 import { LogType } from "src/data/LogType";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
 
 export const LogsGuildMemberAddEvt = logsEvent({
   event: "guildMemberAdd",
@@ -29,8 +30,9 @@ export const LogsGuildMemberAddEvt = logsEvent({
     if (cases.length) {
       const recentCaseLines = [];
       const recentCases = cases.slice(0, 2);
+      const casesPlugin = pluginData.getPlugin(CasesPlugin);
       for (const theCase of recentCases) {
-        recentCaseLines.push(pluginData.state.cases.getSummaryText(theCase));
+        recentCaseLines.push(await casesPlugin.getCaseSummary(theCase, true));
       }
 
       let recentCaseSummary = recentCaseLines.join("\n");
