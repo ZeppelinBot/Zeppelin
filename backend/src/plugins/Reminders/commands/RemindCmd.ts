@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import moment from "moment-timezone";
-import { convertDelayStringToMS } from "src/utils";
+import { convertDelayStringToMS, messageLink } from "src/utils";
 import humanizeDuration from "humanize-duration";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { remindersCommand } from "../types";
@@ -48,8 +48,7 @@ export const RemindCmd = remindersCommand({
       return;
     }
 
-    const reminderBody =
-      args.reminder || `https://discord.com/channels/${pluginData.guild.id}/${msg.channel.id}/${msg.id}`;
+    const reminderBody = args.reminder || messageLink(pluginData.guild.id, msg.channel.id, msg.id);
     await pluginData.state.reminders.add(
       msg.author.id,
       msg.channel.id,

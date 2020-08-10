@@ -1,7 +1,16 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
 import { PluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding, sorter } from "src/utils";
+import {
+  UnknownUser,
+  trimLines,
+  embedPadding,
+  resolveMember,
+  resolveUser,
+  preEmbedPadding,
+  sorter,
+  messageLink,
+} from "src/utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
@@ -123,7 +132,7 @@ export async function getUserInfoEmbed(
 
       if (c.log_message_id) {
         const [channelId, messageId] = c.log_message_id.split("-");
-        return `[${summaryText}](https://discord.com/channels/${pluginData.guild.id}/${channelId}/${messageId})`;
+        return `[${summaryText}](${messageLink(pluginData.guild.id, channelId, messageId)})`;
       }
 
       return summaryText;
