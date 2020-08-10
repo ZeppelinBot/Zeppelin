@@ -1,7 +1,13 @@
 import { modActionsCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { trimLines, createChunkedMessage } from "src/utils";
+import { trimLines, createChunkedMessage, emptyEmbedValue } from "src/utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { asyncMap } from "../../../utils/async";
+import { EmbedOptions } from "eris";
+import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
+import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -28,16 +34,26 @@ export const CasesModCmd = modActionsCommand({
     if (recentCases.length === 0) {
       sendErrorMessage(pluginData, msg.channel, `No cases by **${modName}**`);
     } else {
-      const lines = recentCases.map(c => pluginData.state.cases.getSummaryText(c));
-      const finalMessage = trimLines(`
-        Most recent 5 cases by **${modName}**:
-
-        ${lines.join("\n")}
-
-        Use the \`case <num>\` command to see more info about individual cases
-        Use the \`cases <user>\` command to see a specific user's cases
-      `);
-      createChunkedMessage(msg.channel, finalMessage);
+      const casesPlugin = pluginData.getPlugin(CasesPlugin);
+      const lines = await asyncMap(recentCases, c => casesPlugin.getCaseSummary(c, true));
+      const prefix = getGuildPrefix(pluginData);
+      const embed: EmbedOptions = {
+        author: {
+          name: `Most recent 5 cases by ${modName}`,
+          icon_url: mod ? mod.avatarURL || mod.defaultAvatarURL : undefined,
+        },
+        fields: [
+          ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
+          {
+            name: emptyEmbedValue,
+            value: trimLines(`
+              Use \`${prefix}case <num>\` to see more information about an individual case
+              Use \`${prefix}cases <user>\` to see a specific user's cases
+            `),
+          },
+        ],
+      };
+      msg.channel.createMessage({ embed });
     }
   },
 });

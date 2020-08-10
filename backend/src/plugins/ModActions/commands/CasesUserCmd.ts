@@ -2,7 +2,19 @@ import { modActionsCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
-import { UnknownUser, multiSorter, trimLines, createChunkedMessage, resolveUser } from "src/utils";
+import {
+  UnknownUser,
+  multiSorter,
+  trimLines,
+  createChunkedMessage,
+  resolveUser,
+  emptyEmbedValue,
+  chunkArray,
+} from "src/utils";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix";
+import { EmbedOptions, User } from "eris";
+import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
+import { asyncMap } from "../../../utils/async";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
@@ -54,30 +66,50 @@ export const CasesUserCmd = modActionsCommand({
         }
       } else {
         // Compact view (= regular message with a preview of each case)
-        const lines = [];
-        for (const theCase of casesToDisplay) {
-          theCase.notes.sort(multiSorter(["created_at", "id"]));
-          const caseSummary = pluginData.state.cases.getSummaryText(theCase);
-          lines.push(caseSummary);
-        }
+        const casesPlugin = pluginData.getPlugin(CasesPlugin);
+        const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true));
 
-        if (!args.hidden && hiddenCases.length) {
-          if (hiddenCases.length === 1) {
-            lines.push(`*+${hiddenCases.length} hidden case, use "-hidden" to show it*`);
-          } else {
-            lines.push(`*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`);
+        const prefix = getGuildPrefix(pluginData);
+        const linesPerChunk = 15;
+        const lineChunks = chunkArray(lines, linesPerChunk);
+
+        const footerField = {
+          name: emptyEmbedValue,
+          value: trimLines(`
+            Use \`${prefix}case <num>\` to see more information about an individual case
+          `),
+        };
+
+        for (const [i, linesInChunk] of lineChunks.entries()) {
+          const isLastChunk = i === lineChunks.length - 1;
+
+          if (isLastChunk && !args.hidden && hiddenCases.length) {
+            if (hiddenCases.length === 1) {
+              linesInChunk.push(`*+${hiddenCases.length} hidden case, use "-hidden" to show it*`);
+            } else {
+              linesInChunk.push(`*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`);
+            }
           }
+
+          const chunkStart = i * linesPerChunk + 1;
+          const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
+
+          const embed: EmbedOptions = {
+            author: {
+              name:
+                lineChunks.length === 1
+                  ? `Cases for ${userName} (${lines.length} total)`
+                  : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
+              icon_url: user instanceof User ? user.avatarURL || user.defaultAvatarURL : undefined,
+            },
+            fields: [
+              ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
+              ...(isLastChunk ? [footerField] : []),
+            ],
+          };
+
+          msg.channel.createMessage({ embed });
         }
-
-        const finalMessage = trimLines(`
-        Cases for **${userName}**:
-
-        ${lines.join("\n")}
-
-        Use the \`case <num>\` command to see more info about individual cases
-      `);
-
-        createChunkedMessage(msg.channel, finalMessage);
       }
     }
   },

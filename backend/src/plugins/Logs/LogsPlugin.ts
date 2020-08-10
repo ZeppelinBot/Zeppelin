@@ -21,6 +21,7 @@ import { getLogMessage } from "./util/getLogMessage";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { disableCodeBlocks } from "../../utils";
 import { logger } from "../../logger";
+import { CasesPlugin } from "../Cases/CasesPlugin";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -48,6 +49,7 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
     prettyName: "Logs",
   },
 
+  dependencies: [CasesPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
