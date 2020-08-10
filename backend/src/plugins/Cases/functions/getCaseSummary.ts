@@ -8,6 +8,8 @@ import { Case } from "../../../data/entities/Case";
 import { inGuildTz } from "../../../utils/timezones";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
+const INCLUDE_MORE_NOTES_THRESHOLD = 20;
+const UPDATED_STR = "__[Update]__";
 
 export async function getCaseSummary(
   pluginData: PluginData<CasesPluginType>,
@@ -20,6 +22,13 @@ export async function getCaseSummary(
 
   const firstNote = theCase.notes[0];
   let reason = firstNote ? firstNote.body : "";
+  let leftoverNotes = Math.max(0, theCase.notes.length - 1);
+
+  for (let i = 1; i < theCase.notes.length; i++) {
+    if (reason.length >= CASE_SUMMARY_REASON_MAX_LENGTH - UPDATED_STR.length - INCLUDE_MORE_NOTES_THRESHOLD) break;
+    reason += ` ${UPDATED_STR} ${theCase.notes[i].body}`;
+    leftoverNotes--;
+  }
 
   if (reason.length > CASE_SUMMARY_REASON_MAX_LENGTH) {
     const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
@@ -44,8 +53,8 @@ export async function getCaseSummary(
   const caseType = `__${CaseTypes[theCase.type]}__`;
 
   let line = `\`[${prettyTimestamp}]\` ${caseTitle} ${caseType} ${reason}`;
-  if (theCase.notes.length > 1) {
-    line += ` *(+${theCase.notes.length - 1} ${theCase.notes.length === 2 ? "note" : "notes"})*`;
+  if (leftoverNotes > 1) {
+    line += ` *(+${leftoverNotes} ${leftoverNotes === 1 ? "note" : "notes"})*`;
   }
 
   if (theCase.is_hidden) {
