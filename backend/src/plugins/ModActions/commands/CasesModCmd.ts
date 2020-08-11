@@ -1,7 +1,7 @@
 import { modActionsCommand } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { trimLines, createChunkedMessage, emptyEmbedValue } from "src/utils";
+import { trimLines, createChunkedMessage, emptyEmbedValue, sorter } from "src/utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { asyncMap } from "../../../utils/async";
 import { EmbedOptions } from "eris";
@@ -27,6 +27,7 @@ export const CasesModCmd = modActionsCommand({
   async run({ pluginData, message: msg, args }) {
     const modId = args.mod ? args.mod.id : msg.author.id;
     const recentCases = await pluginData.state.cases.with("notes").getRecentByModId(modId, 5);
+    recentCases.sort(sorter("case_number", "ASC"));
 
     const mod = pluginData.client.users.get(modId);
     const modName = mod ? `${mod.username}#${mod.discriminator}` : modId;
