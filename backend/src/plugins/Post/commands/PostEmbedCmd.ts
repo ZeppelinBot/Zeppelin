@@ -56,7 +56,7 @@ export const PostEmbedCmd = postCmd({
         try {
           parsed = JSON.parse(content);
         } catch (e) {
-          sendErrorMessage(pluginData, msg.channel, "Syntax error in embed JSON");
+          sendErrorMessage(pluginData, msg.channel, `Syntax error in embed JSON: ${e.message}`);
           return;
         }
 

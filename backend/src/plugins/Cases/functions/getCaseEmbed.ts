@@ -4,11 +4,11 @@ import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { PluginData, helpers } from "knub";
 import { CasesPluginType } from "../types";
-import { CaseTypeColors } from "../../../data/CaseTypeColors";
 import { resolveCaseId } from "./resolveCaseId";
 import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
 import { inGuildTz } from "../../../utils/timezones";
 import { getDateFormat } from "../../../utils/dateFormats";
+import { getCaseColor } from "./getCaseColor";
 
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
@@ -53,9 +53,7 @@ export async function getCaseEmbed(
     embed.title += " (hidden)";
   }
 
-  if (CaseTypeColors[theCase.type]) {
-    embed.color = CaseTypeColors[theCase.type];
-  }
+  embed.color = getCaseColor(pluginData, theCase.type);
 
   if (theCase.notes.length) {
     theCase.notes.forEach((note: any) => {

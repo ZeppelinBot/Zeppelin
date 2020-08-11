@@ -1,16 +1,19 @@
 import * as t from "io-ts";
-import { tDelayString, tNullable } from "../../utils";
-import { CaseTypes } from "../../data/CaseTypes";
+import { tDelayString, tPartialDictionary, tNullable } from "../../utils";
+import { CaseNameToType, CaseTypes } from "../../data/CaseTypes";
 import { BasePluginType } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";
+import { tColor } from "../../utils/tColor";
 
 export const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
   case_log_channel: tNullable(t.string),
   show_relative_times: t.boolean,
   relative_time_cutoff: tDelayString,
+  case_colors: tNullable(tPartialDictionary(t.keyof(CaseNameToType), tColor)),
+  case_icons: tNullable(tPartialDictionary(t.keyof(CaseNameToType), t.string)),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

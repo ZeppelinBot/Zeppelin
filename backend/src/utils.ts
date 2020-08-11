@@ -37,6 +37,7 @@ import { either } from "fp-ts/lib/Either";
 import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
 import { logger } from "./logger";
+import { unsafeCoerce } from "fp-ts/lib/function";
 
 const fsp = fs.promises;
 
@@ -151,6 +152,29 @@ function tDeepPartialProp(prop: any) {
 
 // https://stackoverflow.com/a/49262929/316944
 export type Not<T, E> = T & Exclude<T, E>;
+
+// io-ts partial dictionary type
+// From https://github.com/gcanti/io-ts/issues/429#issuecomment-655394345
+export interface PartialDictionaryC<D extends t.Mixed, C extends t.Mixed>
+  extends t.DictionaryType<
+    D,
+    C,
+    {
+      [K in t.TypeOf<D>]?: t.TypeOf<C>;
+    },
+    {
+      [K in t.OutputOf<D>]?: t.OutputOf<C>;
+    },
+    unknown
+  > {}
+
+export const tPartialDictionary = <D extends t.Mixed, C extends t.Mixed>(
+  domain: D,
+  codomain: C,
+  name?: string,
+): PartialDictionaryC<D, C> => {
+  return unsafeCoerce(t.record(t.union([domain, t.undefined]), codomain, name));
+};
 
 /**
  * Mirrors EmbedOptions from Eris

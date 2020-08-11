@@ -19,6 +19,8 @@ const defaultOptions = {
     case_log_channel: null,
     show_relative_times: true,
     relative_time_cutoff: "7d",
+    case_colors: null,
+    case_icons: null,
   },
 };
 
