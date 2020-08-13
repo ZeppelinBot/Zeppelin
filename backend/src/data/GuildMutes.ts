@@ -51,22 +51,34 @@ export class GuildMutes extends BaseGuildRepository {
     return this.mutes.findOne({ where: result.identifiers[0] });
   }
 
-  async updateExpiryTime(userId, newExpiryTime) {
+  async updateExpiryTime(userId, newExpiryTime, rolesToRestore?: string[]) {
     const expiresAt = newExpiryTime
       ? moment()
           .add(newExpiryTime, "ms")
           .format("YYYY-MM-DD HH:mm:ss")
       : null;
-
-    return this.mutes.update(
-      {
-        guild_id: this.guildId,
-        user_id: userId,
-      },
-      {
-        expires_at: expiresAt,
-      },
-    );
+    if (rolesToRestore && rolesToRestore.length) {
+      return this.mutes.update(
+        {
+          guild_id: this.guildId,
+          user_id: userId,
+        },
+        {
+          expires_at: expiresAt,
+          roles_to_restore: rolesToRestore,
+        },
+      );
+    } else {
+      return this.mutes.update(
+        {
+          guild_id: this.guildId,
+          user_id: userId,
+        },
+        {
+          expires_at: expiresAt,
+        },
+      );
+    }
   }
 
   async getActiveMutes(): Promise<Mute[]> {

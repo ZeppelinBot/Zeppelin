@@ -187,7 +187,9 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       // remove roles
       if (!Array.isArray(removeRoles)) {
         if (removeRoles) {
-          memberOptions.roles = [];
+          // exclude managed roles from being removed
+          const managedRoles = this.guild.roles.filter(x => x.managed).map(y => y.id);
+          memberOptions.roles = managedRoles.filter(x => member.roles.includes(x));
           await member.edit(memberOptions);
         }
       } else {
@@ -223,7 +225,10 @@ export class MutesPlugin extends ZeppelinPlugin<TConfigSchema> {
       let notifyResult: UserNotificationResult = { method: null, success: true };
 
       if (existingMute) {
-        await this.mutes.updateExpiryTime(user.id, muteTime);
+        if (existingMute.roles_to_restore.length || rolesToRestore.length) {
+          rolesToRestore = Array.from(new Set([...existingMute.roles_to_restore, ...rolesToRestore]));
+        }
+        await this.mutes.updateExpiryTime(user.id, muteTime, rolesToRestore);
       } else {
         await this.mutes.addMute(user.id, muteTime, rolesToRestore);
       }
