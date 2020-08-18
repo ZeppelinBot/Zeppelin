@@ -12,6 +12,7 @@ import { getGuildTz } from "./functions/getGuildTz";
 import { getMemberTz } from "./functions/getMemberTz";
 import { getDateFormat } from "./functions/getDateFormat";
 import { inMemberTz } from "./functions/inMemberTz";
+import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {
@@ -34,7 +35,12 @@ export const TimeAndDatePlugin = zeppelinPlugin<TimeAndDatePluginType>()("time_a
   configSchema: ConfigSchema,
   defaultOptions,
 
-  commands: [SetTimezoneCmd, ViewTimezoneCmd],
+  // prettier-ignore
+  commands: [
+    ResetTimezoneCmd,
+    SetTimezoneCmd,
+    ViewTimezoneCmd,
+  ],
 
   public: {
     getGuildTz: mapToPublicFn(getGuildTz),
