@@ -10,7 +10,7 @@ export const AvatarCmd = utilityCmd({
   permission: "can_avatar",
 
   signature: {
-    user: ct.resolvedUserLoose(),
+    user: ct.resolvedUserLoose({ required: false }),
   },
 
   async run({ message: msg, args, pluginData }) {
