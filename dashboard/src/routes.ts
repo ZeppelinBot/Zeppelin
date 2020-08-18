@@ -10,6 +10,12 @@ export const router = new VueRouter({
     { path: "/login", beforeEnter: authRedirectGuard },
     { path: "/login-callback", beforeEnter: loginCallbackGuard },
 
+    // Privacy policy
+    {
+      path: "/privacy-policy",
+      component: () => import("./components/PrivacyPolicy.vue"),
+    },
+
     // Docs
     {
       path: "/docs",

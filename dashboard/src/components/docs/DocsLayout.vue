@@ -1,5 +1,5 @@
 <template>
-  <div class="docs container mx-auto px-4 py-2">
+  <div class="docs container mx-auto px-6 py-6">
     <Title title="Zeppelin - Documentation" />
 
     <!-- Top bar -->
