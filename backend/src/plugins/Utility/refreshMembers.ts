@@ -1,7 +1,7 @@
 import { Guild } from "eris";
-import { MINUTES, noop } from "../../utils";
+import { HOURS, noop } from "../../utils";
 
-const MEMBER_REFRESH_FREQUENCY = 10 * MINUTES; // How often to do a full member refresh when using commands that need it
+const MEMBER_REFRESH_FREQUENCY = 1 * HOURS; // How often to do a full member refresh when using commands that need it
 const memberRefreshLog = new Map<string, { time: number; promise: Promise<void> }>();
 
 export async function refreshMembersIfNeeded(guild: Guild) {
