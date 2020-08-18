@@ -17,7 +17,7 @@ export const UserInfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     const userId = args.user?.id || message.author.id;
-    const embed = await getUserInfoEmbed(pluginData, userId, args.compact);
+    const embed = await getUserInfoEmbed(pluginData, userId, args.compact, message.author.id);
     if (!embed) {
       sendErrorMessage(pluginData, message.channel, "User not found");
       return;

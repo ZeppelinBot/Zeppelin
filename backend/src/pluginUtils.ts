@@ -19,6 +19,7 @@ import { TZeppelinKnub } from "./types";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
 import * as t from "io-ts";
 import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
+import { Tail } from "./utils/typeUtils";
 
 const { getMemberLevel } = helpers;
 
@@ -168,3 +169,16 @@ export function isOwner(pluginData: PluginData<any>, userId: string) {
 export const isOwnerPreFilter = (_, context: CommandContext<any>) => {
   return isOwner(context.pluginData, context.message.author.id);
 };
+
+type AnyFn = (...args: any[]) => any;
+
+/**
+ * Creates a public plugin function out of a function with pluginData as the first parameter
+ */
+export function mapToPublicFn<T extends AnyFn>(inputFn: T) {
+  return pluginData => {
+    return (...args: Tail<Parameters<typeof inputFn>>): ReturnType<typeof inputFn> => {
+      return inputFn(pluginData, ...args);
+    };
+  };
+}

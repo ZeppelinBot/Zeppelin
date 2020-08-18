@@ -4,8 +4,7 @@ import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { formatNumber, preEmbedPadding, trimLines } from "../../../utils";
-import { inGuildTz } from "../../../utils/timezones";
-import { getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 const TEXT_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/740656843545772062/text-channel.png";
@@ -17,6 +16,7 @@ const ANNOUNCEMENT_CHANNEL_ICON =
 export async function getChannelInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
   channelId: string,
+  requestMemberId?: string,
 ): Promise<EmbedOptions | null> {
   const channel = pluginData.guild.channels.get(channelId);
   if (!channel) {
@@ -58,7 +58,11 @@ export async function getChannelInfoEmbed(
   }
 
   const createdAt = moment.utc(channel.createdAt, "x");
-  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
+  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+  const tzCreatedAt = requestMemberId
+    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
+    : timeAndDate.inGuildTz(createdAt);
+  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
   const channelAge = humanizeDuration(Date.now() - channel.createdAt, {
     largest: 2,
     round: true,

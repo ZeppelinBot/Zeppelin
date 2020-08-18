@@ -1,10 +1,9 @@
 import { remindersCommand } from "../types";
 import { sendErrorMessage } from "src/pluginUtils";
-import { createChunkedMessage, sorter } from "src/utils";
+import { createChunkedMessage, DBDateFormat, sorter } from "src/utils";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { inGuildTz } from "../../../utils/timezones";
-import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export const RemindersCmd = remindersCommand({
   trigger: "reminders",
@@ -17,6 +16,8 @@ export const RemindersCmd = remindersCommand({
       return;
     }
 
+    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
     reminders.sort(sorter("remind_at"));
     const longestNum = (reminders.length + 1).toString().length;
     const lines = Array.from(reminders.entries()).map(([i, reminder]) => {
@@ -25,9 +26,9 @@ export const RemindersCmd = remindersCommand({
       const target = moment.utc(reminder.remind_at, "YYYY-MM-DD HH:mm:ss");
       const diff = target.diff(moment.utc());
       const result = humanizeDuration(diff, { largest: 2, round: true });
-      const prettyRemindAt = inGuildTz(pluginData, moment.utc(reminder.remind_at, DBDateFormat)).format(
-        getDateFormat(pluginData, "pretty_datetime"),
-      );
+      const prettyRemindAt = timeAndDate
+        .inGuildTz(moment.utc(reminder.remind_at, DBDateFormat))
+        .format(timeAndDate.getDateFormat("pretty_datetime"));
       return `\`${paddedNum}.\` \`${prettyRemindAt} (${result})\` ${reminder.body}`;
     });
 

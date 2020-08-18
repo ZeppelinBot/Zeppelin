@@ -1,9 +1,15 @@
 import { postCmd } from "../types";
-import { trimLines, sorter, disableCodeBlocks, deactivateMentions, createChunkedMessage } from "src/utils";
+import {
+  trimLines,
+  sorter,
+  disableCodeBlocks,
+  deactivateMentions,
+  createChunkedMessage,
+  DBDateFormat,
+} from "src/utils";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import { inGuildTz } from "../../../utils/timezones";
-import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 
@@ -31,9 +37,10 @@ export const ScheduledPostsListCmd = postCmd({
         .replace(/\s+/g, " ")
         .slice(0, SCHEDULED_POST_PREVIEW_TEXT_LENGTH);
 
-      const prettyPostAt = inGuildTz(pluginData, moment.utc(p.post_at, DBDateFormat)).format(
-        getDateFormat(pluginData, "pretty_datetime"),
-      );
+      const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+      const prettyPostAt = timeAndDate
+        .inGuildTz(moment.utc(p.post_at, DBDateFormat))
+        .format(timeAndDate.getDateFormat("pretty_datetime"));
       const parts = [`\`#${i++}\` \`[${prettyPostAt}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");
       if (p.content.embed) parts.push("*(embed)*");

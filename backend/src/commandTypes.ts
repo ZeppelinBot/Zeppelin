@@ -17,6 +17,7 @@ import { createTypeHelper } from "knub-command-manager";
 import { getChannelIdFromMessageId } from "./data/getChannelIdFromMessageId";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
 import { inputPatternToRegExp } from "./validatorUtils";
+import { isValidTimezone } from "./utils/isValidTimezone";
 
 export const commandTypes = {
   ...baseTypeConverters,
@@ -93,6 +94,14 @@ export const commandTypes = {
       throw new TypeConversionError(`Could not parse RegExp: \`${disableInlineCode(e.message)}\``);
     }
   },
+
+  timezone(value: string) {
+    if (!isValidTimezone(value)) {
+      throw new TypeConversionError(`Invalid timezone: ${disableInlineCode(value)}`);
+    }
+
+    return value;
+  },
 };
 
 export const commandTypeHelpers = {
@@ -105,4 +114,5 @@ export const commandTypeHelpers = {
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
   anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),
+  timezone: createTypeHelper<string>(commandTypes.timezone),
 };

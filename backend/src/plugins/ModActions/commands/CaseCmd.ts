@@ -23,7 +23,7 @@ export const CaseCmd = modActionsCommand({
     }
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    const embed = await casesPlugin.getCaseEmbed(theCase.id);
+    const embed = await casesPlugin.getCaseEmbed(theCase.id, msg.author.id);
     msg.channel.createMessage(embed);
   },
 });

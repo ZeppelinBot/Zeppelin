@@ -31,6 +31,7 @@ import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPl
 import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { BotControlPlugin } from "./BotControl/BotControlPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
+import { TimeAndDatePlugin } from "./TimeAndDate/TimeAndDatePlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
@@ -63,6 +64,7 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   AutomodPlugin,
   CompanionChannelsPlugin,
   CustomEventsPlugin,
+  TimeAndDatePlugin,
 ];
 
 // prettier-ignore
@@ -79,5 +81,6 @@ export const baseGuildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
   NameHistoryPlugin,
   CasesPlugin,
   MutesPlugin,
+  TimeAndDatePlugin,
   // TODO: Replace these with proper dependencies
 ];

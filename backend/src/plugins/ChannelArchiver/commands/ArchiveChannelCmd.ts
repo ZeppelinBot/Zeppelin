@@ -4,8 +4,7 @@ import { isOwner, sendErrorMessage } from "src/pluginUtils";
 import { confirm, SECONDS, noop } from "src/utils";
 import moment from "moment-timezone";
 import { rehostAttachment } from "../rehostAttachment";
-import { inGuildTz } from "../../../utils/timezones";
-import { getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 const MAX_ARCHIVED_MESSAGES = 5000;
 const MAX_MESSAGES_PER_FETCH = 100;
@@ -98,7 +97,8 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
     archiveLines.reverse();
 
-    const nowTs = inGuildTz(pluginData).format(getDateFormat(pluginData, "pretty_datetime"));
+    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+    const nowTs = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));
 
     let result = `Archived ${archiveLines.length} messages from #${args.channel.name} at ${nowTs}`;
     result += `\n\n${archiveLines.join("\n")}\n`;

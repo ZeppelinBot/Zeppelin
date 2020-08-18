@@ -1,12 +1,11 @@
 import { PluginData } from "knub";
 import { PostPluginType } from "../types";
 import { logger } from "src/logger";
-import { stripObjectToScalars, SECONDS } from "src/utils";
+import { stripObjectToScalars, SECONDS, DBDateFormat } from "src/utils";
 import { LogType } from "src/data/LogType";
 import moment from "moment-timezone";
 import { TextChannel, User } from "eris";
 import { postMessage } from "./postMessage";
-import { DBDateFormat } from "../../../utils/dateFormats";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 

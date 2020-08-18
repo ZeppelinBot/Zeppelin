@@ -20,7 +20,12 @@ export const MessageInfoCmd = utilityCmd({
       return;
     }
 
-    const embed = await getMessageInfoEmbed(pluginData, args.message.channel.id, args.message.messageId);
+    const embed = await getMessageInfoEmbed(
+      pluginData,
+      args.message.channel.id,
+      args.message.messageId,
+      message.author.id,
+    );
     if (!embed) {
       sendErrorMessage(pluginData, message.channel, "Unknown message");
       return;

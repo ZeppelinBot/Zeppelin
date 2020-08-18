@@ -3,7 +3,7 @@ import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/Ap
 import { BaseRepository } from "./BaseRepository";
 import { connection } from "./db";
 import moment from "moment-timezone";
-import { DBDateFormat } from "../utils/dateFormats";
+import { DBDateFormat } from "../utils";
 
 export class ApiUserInfo extends BaseRepository {
   private apiUserInfo: Repository<ApiUserInfoEntity>;

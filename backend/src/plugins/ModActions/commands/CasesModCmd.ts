@@ -36,7 +36,7 @@ export const CasesModCmd = modActionsCommand({
       sendErrorMessage(pluginData, msg.channel, `No cases by **${modName}**`);
     } else {
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
-      const lines = await asyncMap(recentCases, c => casesPlugin.getCaseSummary(c, true));
+      const lines = await asyncMap(recentCases, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
       const prefix = getGuildPrefix(pluginData);
       const embed: EmbedOptions = {
         author: {

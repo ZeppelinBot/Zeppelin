@@ -5,7 +5,7 @@ import { LogType } from "src/data/LogType";
 import moment from "moment-timezone";
 import { PluginData } from "knub";
 import { LogsPluginType } from "../types";
-import { inGuildTz } from "../../../utils/timezones";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function onMessageDelete(pluginData: PluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
@@ -24,9 +24,10 @@ export async function onMessageDelete(pluginData: PluginData<LogsPluginType>, sa
       {
         user: stripObjectToScalars(user),
         channel: stripObjectToScalars(channel),
-        messageDate: inGuildTz(pluginData, moment.utc(savedMessage.data.timestamp, "x")).format(
-          pluginData.config.get().format.timestamp,
-        ),
+        messageDate: pluginData
+          .getPlugin(TimeAndDatePlugin)
+          .inGuildTz(moment.utc(savedMessage.data.timestamp, "x"))
+          .format(pluginData.config.get().format.timestamp),
         message: savedMessage,
       },
       savedMessage.id,

@@ -6,6 +6,7 @@ import { GuildLogs } from "src/data/GuildLogs";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<AutoDeletePluginType> = {
   config: {
@@ -22,6 +23,7 @@ export const AutoDeletePlugin = zeppelinPlugin<AutoDeletePluginType>()("auto_del
     configurationGuide: "Maximum deletion delay is currently 5 minutes",
   },
 
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

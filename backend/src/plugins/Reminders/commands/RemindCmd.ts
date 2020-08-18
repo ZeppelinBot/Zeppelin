@@ -4,8 +4,7 @@ import { convertDelayStringToMS, messageLink } from "src/utils";
 import humanizeDuration from "humanize-duration";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { remindersCommand } from "../types";
-import { getGuildTz, inGuildTz } from "../../../utils/timezones";
-import { getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export const RemindCmd = remindersCommand({
   trigger: ["remind", "remindme"],
@@ -18,8 +17,10 @@ export const RemindCmd = remindersCommand({
   },
 
   async run({ message: msg, args, pluginData }) {
+    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
     const now = moment.utc();
-    const tz = getGuildTz(pluginData);
+    const tz = await timeAndDate.getMemberTz(msg.author.id);
 
     let reminderTime: moment.Moment;
     if (args.time.match(/^\d{4}-\d{1,2}-\d{1,2}$/)) {
@@ -62,7 +63,10 @@ export const RemindCmd = remindersCommand({
 
     const msUntilReminder = reminderTime.diff(now);
     const timeUntilReminder = humanizeDuration(msUntilReminder, { largest: 2, round: true });
-    const prettyReminderTime = inGuildTz(pluginData, reminderTime).format(getDateFormat(pluginData, "pretty_datetime"));
+    const prettyReminderTime = (await timeAndDate.inMemberTz(msg.author.id, reminderTime)).format(
+      pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"),
+    );
+
     sendSuccessMessage(
       pluginData,
       msg.channel,

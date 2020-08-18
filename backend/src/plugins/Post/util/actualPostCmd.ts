@@ -1,5 +1,5 @@
 import { Message, Channel, TextChannel } from "eris";
-import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES } from "src/utils";
+import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES, DBDateFormat } from "src/utils";
 import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
 import humanizeDuration from "humanize-duration";
@@ -8,7 +8,7 @@ import { PluginData } from "knub";
 import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
-import { DBDateFormat, getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
@@ -54,7 +54,7 @@ export async function actualPostCmd(
   let postAt;
   if (opts.schedule) {
     // Schedule the post to be posted later
-    postAt = parseScheduleTime(pluginData, opts.schedule);
+    postAt = await parseScheduleTime(pluginData, msg.author.id, opts.schedule);
     if (!postAt) {
       return sendErrorMessage(pluginData, msg.channel, "Invalid schedule time");
     }
@@ -68,7 +68,7 @@ export async function actualPostCmd(
   let repeatDetailsStr: string = null;
 
   if (opts["repeat-until"]) {
-    repeatUntil = parseScheduleTime(pluginData, opts["repeat-until"]);
+    repeatUntil = await parseScheduleTime(pluginData, msg.author.id, opts["repeat-until"]);
 
     // Invalid time
     if (!repeatUntil) {
@@ -109,6 +109,8 @@ export async function actualPostCmd(
       : `every ${humanizeDuration(opts.repeat)}, ${repeatTimes} times in total`;
   }
 
+  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
   // Save schedule/repeat information in DB
   if (postAt) {
     if (postAt < moment.utc()) {
@@ -140,9 +142,9 @@ export async function actualPostCmd(
       pluginData.state.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
         author: stripObjectToScalars(msg.author),
         channel: stripObjectToScalars(targetChannel),
-        datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
-        date: postAt.format(getDateFormat(pluginData, "date")),
-        time: postAt.format(getDateFormat(pluginData, "time")),
+        datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
+        date: postAt.format(timeAndDate.getDateFormat("date")),
+        time: postAt.format(timeAndDate.getDateFormat("time")),
         repeatInterval: humanizeDuration(opts.repeat),
         repeatDetails: repeatDetailsStr,
       });
@@ -150,9 +152,9 @@ export async function actualPostCmd(
       pluginData.state.logs.log(LogType.SCHEDULED_MESSAGE, {
         author: stripObjectToScalars(msg.author),
         channel: stripObjectToScalars(targetChannel),
-        datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
-        date: postAt.format(getDateFormat(pluginData, "date")),
-        time: postAt.format(getDateFormat(pluginData, "time")),
+        datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
+        date: postAt.format(timeAndDate.getDateFormat("date")),
+        time: postAt.format(timeAndDate.getDateFormat("time")),
       });
     }
   }
@@ -166,9 +168,9 @@ export async function actualPostCmd(
     pluginData.state.logs.log(LogType.REPEATED_MESSAGE, {
       author: stripObjectToScalars(msg.author),
       channel: stripObjectToScalars(targetChannel),
-      datetime: postAt.format(getDateFormat(pluginData, "pretty_datetime")),
-      date: postAt.format(getDateFormat(pluginData, "date")),
-      time: postAt.format(getDateFormat(pluginData, "time")),
+      datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
+      date: postAt.format(timeAndDate.getDateFormat("date")),
+      time: postAt.format(timeAndDate.getDateFormat("time")),
       repeatInterval: humanizeDuration(opts.repeat),
       repeatDetails: repeatDetailsStr,
     });
@@ -177,7 +179,7 @@ export async function actualPostCmd(
   // Bot reply schenanigans
   let successMessage = opts.schedule
     ? `Message scheduled to be posted in <#${targetChannel.id}> on ${postAt.format(
-        getDateFormat(pluginData, "pretty_datetime"),
+        timeAndDate.getDateFormat("pretty_datetime"),
       )}`
     : `Message posted in <#${targetChannel.id}>`;
 
@@ -185,7 +187,7 @@ export async function actualPostCmd(
     successMessage += `. Message will be automatically reposted every ${humanizeDuration(opts.repeat)}`;
 
     if (repeatUntil) {
-      successMessage += ` until ${repeatUntil.format(getDateFormat(pluginData, "pretty_datetime"))}`;
+      successMessage += ` until ${repeatUntil.format(timeAndDate.getDateFormat("pretty_datetime"))}`;
     } else if (repeatTimes) {
       successMessage += `, ${repeatTimes} times in total`;
     }

@@ -14,13 +14,13 @@ import {
 import moment from "moment-timezone";
 import { CaseTypes } from "src/data/CaseTypes";
 import humanizeDuration from "humanize-duration";
-import { inGuildTz } from "../../../utils/timezones";
-import { getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getUserInfoEmbed(
   pluginData: PluginData<UtilityPluginType>,
   userId: string,
   compact = false,
+  requestMemberId?: string,
 ): Promise<EmbedOptions | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {
@@ -33,6 +33,8 @@ export async function getUserInfoEmbed(
     fields: [],
   };
 
+  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
   embed.author = {
     name: `User:  ${user.username}#${user.discriminator}`,
   };
@@ -41,7 +43,10 @@ export async function getUserInfoEmbed(
   embed.author.icon_url = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");
-  const prettyCreatedAt = inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"));
+  const tzCreatedAt = requestMemberId
+    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
+    : timeAndDate.inGuildTz(createdAt);
+  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
   const accountAge = humanizeDuration(moment.utc().valueOf() - user.createdAt, {
     largest: 2,
     round: true,
@@ -57,7 +62,10 @@ export async function getUserInfoEmbed(
     });
     if (member) {
       const joinedAt = moment.utc(member.joinedAt, "x");
-      const prettyJoinedAt = inGuildTz(pluginData, joinedAt).format(getDateFormat(pluginData, "pretty_datetime"));
+      const tzJoinedAt = requestMemberId
+        ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
+        : timeAndDate.inGuildTz(joinedAt);
+      const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
       const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
         largest: 2,
         round: true,
@@ -85,7 +93,10 @@ export async function getUserInfoEmbed(
 
   if (member) {
     const joinedAt = moment.utc(member.joinedAt, "x");
-    const prettyJoinedAt = inGuildTz(pluginData, joinedAt).format(getDateFormat(pluginData, "pretty_datetime"));
+    const tzJoinedAt = requestMemberId
+      ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
+      : timeAndDate.inGuildTz(joinedAt);
+    const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
     const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
       largest: 2,
       round: true,

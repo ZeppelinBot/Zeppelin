@@ -1298,3 +1298,5 @@ export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R
 export function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr));
 }
+
+export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";

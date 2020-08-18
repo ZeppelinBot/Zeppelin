@@ -33,6 +33,7 @@ import { MessageInfoCmd } from "./commands/MessageInfoCmd";
 import { InfoCmd } from "./commands/InfoCmd";
 import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -101,6 +102,7 @@ export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
     prettyName: "Utility",
   },
 
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
