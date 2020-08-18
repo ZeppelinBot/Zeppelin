@@ -51,13 +51,13 @@ export async function getServerInfoEmbed(
   });
 
   const basicInformation = [];
-  basicInformation.push(`Created: **${serverAge} ago** (${prettyCreatedAt})`);
+  basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerID);
     const ownerName = `${owner.username}#${owner.discriminator}`;
 
-    basicInformation.push(`Owner: **${ownerName}** (${thisServer.ownerID})`);
+    basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerID}\`)`);
     basicInformation.push(`Voice region: **${thisServer.region}**`);
   }
 

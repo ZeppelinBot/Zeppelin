@@ -45,4 +45,11 @@ export class GuildMemberTimezones extends BaseGuildRepository {
       }
     });
   }
+
+  reset(memberId: string) {
+    return this.memberTimezones.delete({
+      guild_id: this.guildId,
+      member_id: memberId,
+    });
+  }
 }
