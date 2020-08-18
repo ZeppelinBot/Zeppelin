@@ -3,7 +3,7 @@ import { BotControlPluginType } from "../types";
 import { isOwnerPreFilter } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import escapeStringRegexp from "escape-string-regexp";
-import { createChunkedMessage, sorter } from "../../../utils";
+import { createChunkedMessage, getUser, sorter } from "../../../utils";
 
 export const ServersCmd = command<BotControlPluginType>()({
   trigger: ["servers", "guilds"],
@@ -48,9 +48,8 @@ export const ServersCmd = command<BotControlPluginType>()({
         const longestId = filteredGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
         const lines = filteredGuilds.map(g => {
           const paddedId = g.id.padEnd(longestId, " ");
-          return `\`${paddedId}\` **${g.name}** (${loadedGuildsMap.has(g.id) ? "initialized" : "not initialized"}) (${
-            g.memberCount
-          } members)`;
+          const owner = getUser(pluginData.client, g.ownerID);
+          return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.username}#${owner.discriminator}** \`${owner.id}\`)`;
         });
         createChunkedMessage(msg.channel, lines.join("\n"));
       } else {
