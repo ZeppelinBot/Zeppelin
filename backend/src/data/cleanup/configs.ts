@@ -2,7 +2,7 @@ import { connection } from "../db";
 import { getRepository, In } from "typeorm";
 import { Config } from "../entities/Config";
 import moment from "moment-timezone";
-import { DBDateFormat } from "../../utils/dateFormats";
+import { DBDateFormat } from "../../utils";
 
 const CLEAN_PER_LOOP = 50;
 

@@ -12,6 +12,8 @@ import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUser
 import { getCaseEmbed } from "./functions/getCaseEmbed";
 import { trimPluginDescription } from "../../utils";
 import { getCaseSummary } from "./functions/getCaseSummary";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { mapToPublicFn } from "../../pluginUtils";
 
 const defaultOptions = {
   config: {
@@ -33,6 +35,7 @@ export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
     `),
   },
 
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -61,17 +64,8 @@ export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
       };
     },
 
-    getCaseEmbed(pluginData) {
-      return (caseOrCaseId: Case | number) => {
-        return getCaseEmbed(pluginData, caseOrCaseId);
-      };
-    },
-
-    getCaseSummary(pluginData) {
-      return (caseOrCaseId: Case | number, withLinks = false) => {
-        return getCaseSummary(pluginData, caseOrCaseId, withLinks);
-      };
-    },
+    getCaseEmbed: mapToPublicFn(getCaseEmbed),
+    getCaseSummary: mapToPublicFn(getCaseSummary),
   },
 
   onLoad(pluginData) {

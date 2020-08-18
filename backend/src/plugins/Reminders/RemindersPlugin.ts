@@ -6,6 +6,7 @@ import { postDueRemindersLoop } from "./utils/postDueRemindersLoop";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {
@@ -27,6 +28,7 @@ export const RemindersPlugin = zeppelinPlugin<RemindersPluginType>()("reminders"
     prettyName: "Reminders",
   },
 
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

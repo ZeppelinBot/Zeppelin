@@ -1,19 +1,13 @@
 import { BaseConfig, Knub } from "knub";
 import * as t from "io-ts";
 
-export const DateFormatsSchema = t.type({
-  date: t.string,
-  time: t.string,
-  pretty_datetime: t.string,
-});
-
-export type DateFormats = t.TypeOf<typeof DateFormatsSchema>;
-
 export interface ZeppelinGuildConfig extends BaseConfig<any> {
   success_emoji?: string;
   error_emoji?: string;
+
+  // Deprecated
   timezone?: string;
-  date_formats?: Partial<DateFormats>;
+  date_formats?: any;
 }
 
 export const ZeppelinGuildConfigSchema = t.type({
@@ -25,8 +19,10 @@ export const ZeppelinGuildConfigSchema = t.type({
   // From ZeppelinGuildConfig
   success_emoji: t.string,
   error_emoji: t.string,
+
+  // Deprecated
   timezone: t.string,
-  date_formats: t.partial(DateFormatsSchema.props),
+  date_formats: t.unknown,
 });
 export const PartialZeppelinGuildConfigSchema = t.partial(ZeppelinGuildConfigSchema.props);
 

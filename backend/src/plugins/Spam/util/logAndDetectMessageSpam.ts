@@ -2,7 +2,7 @@ import { SavedMessage } from "src/data/entities/SavedMessage";
 import { RecentActionType, TBaseSingleSpamConfig, SpamPluginType } from "../types";
 import moment from "moment-timezone";
 import { MuteResult } from "src/plugins/Mutes/types";
-import { convertDelayStringToMS, trimLines, stripObjectToScalars, resolveMember, noop } from "src/utils";
+import { convertDelayStringToMS, trimLines, stripObjectToScalars, resolveMember, noop, DBDateFormat } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { CaseTypes } from "src/data/CaseTypes";
 import { logger } from "src/logger";
@@ -14,7 +14,6 @@ import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
 import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
-import { DBDateFormat } from "../../../utils/dateFormats";
 
 export async function logAndDetectMessageSpam(
   pluginData: PluginData<SpamPluginType>,

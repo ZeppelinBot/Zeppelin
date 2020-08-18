@@ -67,7 +67,7 @@ export const CasesUserCmd = modActionsCommand({
       } else {
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true));
+        const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
         const prefix = getGuildPrefix(pluginData);
         const linesPerChunk = 15;

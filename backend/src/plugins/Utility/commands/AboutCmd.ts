@@ -6,9 +6,8 @@ import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
 import path from "path";
 import moment from "moment-timezone";
-import { getGuildTz, inGuildTz } from "../../../utils/timezones";
 import { rootDir } from "../../../paths";
-import { getDateFormat } from "../../../utils/dateFormats";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -16,6 +15,8 @@ export const AboutCmd = utilityCmd({
   permission: "can_about",
 
   async run({ message: msg, pluginData }) {
+    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
     const uptime = getCurrentUptime();
     const prettyUptime = humanizeDuration(uptime, { largest: 2, round: true });
 
@@ -30,9 +31,9 @@ export const AboutCmd = utilityCmd({
     let version;
 
     if (lastCommit) {
-      lastUpdate = inGuildTz(pluginData, moment.utc(lastCommit.committer.date, "X")).format(
-        getDateFormat(pluginData, "pretty_datetime"),
-      );
+      lastUpdate = timeAndDate
+        .inGuildTz(moment.utc(lastCommit.committer.date, "X"))
+        .format(pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"));
       version = lastCommit.shortHash;
     } else {
       lastUpdate = "?";
@@ -52,7 +53,7 @@ export const AboutCmd = utilityCmd({
       ["Last update", lastUpdate],
       ["Version", version],
       ["API latency", `${shard.latency}ms`],
-      ["Server timezone", getGuildTz(pluginData)],
+      ["Server timezone", timeAndDate.getGuildTz()],
     ];
 
     const loadedPlugins = Array.from(

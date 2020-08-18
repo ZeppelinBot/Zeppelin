@@ -32,7 +32,7 @@ export const InfoCmd = utilityCmd({
     const channelId = getChannelId(value);
     const channel = channelId && pluginData.guild.channels.get(channelId);
     if (channel) {
-      const embed = await getChannelInfoEmbed(pluginData, channelId);
+      const embed = await getChannelInfoEmbed(pluginData, channelId, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
         return;
@@ -42,7 +42,7 @@ export const InfoCmd = utilityCmd({
     // 2. Server
     const guild = pluginData.client.guilds.get(value);
     if (guild) {
-      const embed = await getServerInfoEmbed(pluginData, value);
+      const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
         return;
@@ -52,7 +52,7 @@ export const InfoCmd = utilityCmd({
     // 3. User
     const user = await resolveUser(pluginData.client, value);
     if (user) {
-      const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact));
+      const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact), message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
         return;
@@ -63,7 +63,12 @@ export const InfoCmd = utilityCmd({
     const messageTarget = await resolveMessageTarget(pluginData, value);
     if (messageTarget) {
       if (canReadChannel(messageTarget.channel, message.member)) {
-        const embed = await getMessageInfoEmbed(pluginData, messageTarget.channel.id, messageTarget.messageId);
+        const embed = await getMessageInfoEmbed(
+          pluginData,
+          messageTarget.channel.id,
+          messageTarget.messageId,
+          message.author.id,
+        );
         if (embed) {
           message.channel.createMessage({ embed });
           return;
@@ -87,7 +92,7 @@ export const InfoCmd = utilityCmd({
     // 6. Server again (fallback for discovery servers)
     const serverPreview = getGuildPreview(pluginData.client, value).catch(() => null);
     if (serverPreview) {
-      const embed = await getServerInfoEmbed(pluginData, value);
+      const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
         return;
@@ -96,7 +101,7 @@ export const InfoCmd = utilityCmd({
 
     // 7. Arbitrary ID
     if (isValidSnowflake(value)) {
-      const embed = getSnowflakeInfoEmbed(pluginData, value, true);
+      const embed = await getSnowflakeInfoEmbed(pluginData, value, true, message.author.id);
       message.channel.createMessage({ embed });
       return;
     }

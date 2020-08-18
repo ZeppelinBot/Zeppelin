@@ -6,16 +6,18 @@ import { PluginData, helpers } from "knub";
 import { CasesPluginType } from "../types";
 import { resolveCaseId } from "./resolveCaseId";
 import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
-import { inGuildTz } from "../../../utils/timezones";
-import { getDateFormat } from "../../../utils/dateFormats";
 import { getCaseColor } from "./getCaseColor";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getCaseEmbed(
   pluginData: PluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
+  requestMemberId?: string,
 ): Promise<AdvancedMessageContent> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) return null;
+
+  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   const createdAt = moment.utc(theCase.created_at);
   const actionTypeStr = CaseTypes[theCase.type].toUpperCase();
@@ -26,10 +28,14 @@ export async function getCaseEmbed(
   let modName = theCase.mod_name;
   if (theCase.mod_id) modName += `\n<@!${theCase.mod_id}>`;
 
+  const createdAtWithTz = requestMemberId
+    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
+    : timeAndDate.inGuildTz(createdAt);
+
   const embed: any = {
     title: `${actionTypeStr} - Case #${theCase.case_number}`,
     footer: {
-      text: `Case created on ${inGuildTz(pluginData, createdAt).format(getDateFormat(pluginData, "pretty_datetime"))}`,
+      text: `Case created on ${createdAtWithTz.format(timeAndDate.getDateFormat("pretty_datetime"))}`,
     },
     fields: [
       {
@@ -56,7 +62,7 @@ export async function getCaseEmbed(
   embed.color = getCaseColor(pluginData, theCase.type);
 
   if (theCase.notes.length) {
-    theCase.notes.forEach((note: any) => {
+    for (const note of theCase.notes) {
       const noteDate = moment.utc(note.created_at);
       let noteBody = note.body.trim();
       if (noteBody === "") {
@@ -67,7 +73,10 @@ export async function getCaseEmbed(
 
       for (let i = 0; i < chunks.length; i++) {
         if (i === 0) {
-          const prettyNoteDate = inGuildTz(pluginData, noteDate).format(getDateFormat(pluginData, "pretty_datetime"));
+          const noteDateWithTz = requestMemberId
+            ? await timeAndDate.inMemberTz(requestMemberId, noteDate)
+            : timeAndDate.inGuildTz(noteDate);
+          const prettyNoteDate = noteDateWithTz.format(timeAndDate.getDateFormat("pretty_datetime"));
           embed.fields.push({
             name: `${note.mod_name} at ${prettyNoteDate}:`,
             value: chunks[i],
@@ -79,7 +88,7 @@ export async function getCaseEmbed(
           });
         }
       }
-    });
+    }
   } else {
     embed.fields.push({
       name: "!!! THIS CASE HAS NO NOTES !!!",

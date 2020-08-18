@@ -2,11 +2,10 @@ import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, In, Repository } from "typeorm";
-import { disableLinkPreviews } from "../utils";
+import { DBDateFormat, disableLinkPreviews } from "../utils";
 import { CaseTypes } from "./CaseTypes";
 import moment = require("moment-timezone");
 import { connection } from "./db";
-import { DBDateFormat } from "../utils/dateFormats";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 

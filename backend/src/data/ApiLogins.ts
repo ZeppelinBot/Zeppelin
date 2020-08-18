@@ -5,7 +5,7 @@ import crypto from "crypto";
 import moment from "moment-timezone";
 // tslint:disable-next-line:no-submodule-imports
 import uuidv4 from "uuid/v4";
-import { DBDateFormat } from "../utils/dateFormats";
+import { DBDateFormat } from "../utils";
 
 export class ApiLogins extends BaseRepository {
   private apiLogins: Repository<ApiLogin>;

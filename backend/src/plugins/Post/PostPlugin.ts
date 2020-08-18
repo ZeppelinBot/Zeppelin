@@ -12,6 +12,7 @@ import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
 import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
 import { ScheduledPostsDeleteCmd } from "./commands/SchedluedPostsDeleteCmd";
 import { scheduledPostLoop } from "./util/scheduledPostLoop";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
   config: {
@@ -33,6 +34,7 @@ export const PostPlugin = zeppelinPlugin<PostPluginType>()("post", {
     prettyName: "Post",
   },
 
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

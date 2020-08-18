@@ -22,6 +22,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { disableCodeBlocks } from "../../utils";
 import { logger } from "../../logger";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -49,7 +50,7 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
     prettyName: "Logs",
   },
 
-  dependencies: [CasesPlugin],
+  dependencies: [TimeAndDatePlugin, CasesPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

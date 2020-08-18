@@ -35,6 +35,7 @@ import { banUserId } from "./functions/banUserId";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { trimPluginDescription } from "../../utils";
 import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions = {
   config: {
@@ -103,10 +104,9 @@ export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_acti
     `),
   },
 
+  dependencies: [TimeAndDatePlugin, CasesPlugin, MutesPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
-
-  dependencies: [CasesPlugin, MutesPlugin],
 
   events: [
     CreateBanCaseOnManualBanEvt,

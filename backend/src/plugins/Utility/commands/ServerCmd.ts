@@ -15,7 +15,7 @@ export const ServerCmd = utilityCmd({
 
   async run({ message, pluginData, args }) {
     const serverId = args.serverId || pluginData.guild.id;
-    const serverInfoEmbed = await getServerInfoEmbed(pluginData, serverId);
+    const serverInfoEmbed = await getServerInfoEmbed(pluginData, serverId, message.author.id);
     if (!serverInfoEmbed) {
       sendErrorMessage(pluginData, message.channel, "Could not find information for that server");
       return;

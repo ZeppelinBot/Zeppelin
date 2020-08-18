@@ -15,7 +15,7 @@ import { TagSourceCmd } from "./commands/TagSourceCmd";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { convertDelayStringToMS } from "../../utils";
-import { getGuildTz, inGuildTz } from "../../utils/timezones";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -77,7 +77,9 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
     state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
-    const tz = getGuildTz(pluginData);
+    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+
+    const tz = timeAndDate.getGuildTz();
     state.tagFunctions = {
       parseDateTime(str) {
         if (typeof str === "number") {
@@ -154,13 +156,13 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
 
       formatTime(time, format) {
         const parsed = this.parseDateTime(time);
-        return inGuildTz(parsed).format(format);
+        return timeAndDate.inGuildTz(parsed).format(format);
       },
 
       discordDateFormat(time) {
         const parsed = time ? this.parseDateTime(time) : Date.now();
 
-        return inGuildTz(parsed).format("YYYY-MM-DD");
+        return timeAndDate.inGuildTz(parsed).format("YYYY-MM-DD");
       },
 
       mention: input => {

@@ -13,7 +13,7 @@ import { SavedMessage } from "src/data/entities/SavedMessage";
 import { renderTemplate, TemplateParseError } from "src/templateFormatter";
 import { logger } from "src/logger";
 import moment from "moment-timezone";
-import { inGuildTz } from "../../../utils/timezones";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getLogMessage(
   pluginData: PluginData<LogsPluginType>,
@@ -88,7 +88,10 @@ export async function getLogMessage(
 
     const timestampFormat = config.format.timestamp;
     if (timestampFormat) {
-      const timestamp = inGuildTz(pluginData).format(timestampFormat);
+      const timestamp = pluginData
+        .getPlugin(TimeAndDatePlugin)
+        .inGuildTz()
+        .format(timestampFormat);
       formatted = `\`[${timestamp}]\` ${formatted}`;
     }
   }
