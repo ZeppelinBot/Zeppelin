@@ -20,11 +20,10 @@ export const SendWelcomeMessageEvt = welcomeEvent({
     });
 
     if (config.send_dm) {
-      const dmChannel = await member.user.getDMChannel();
-      if (!dmChannel) return;
-
       try {
         console.log(`Sending welcome message to ${member.id}`);
+        const dmChannel = await member.user.getDMChannel();
+        if (!dmChannel) return;
         await createChunkedMessage(dmChannel, formatted);
       } catch (e) {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
