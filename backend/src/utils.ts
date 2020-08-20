@@ -878,6 +878,7 @@ export async function notifyUser(
   for (const method of methods) {
     if (method.type === "dm") {
       try {
+        console.log(`Notifying user ${user.id} via DM`);
         const dmChannel = await user.getDMChannel();
         await dmChannel.createMessage(body);
         return {
