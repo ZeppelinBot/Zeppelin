@@ -61,7 +61,7 @@ export const CleanCmd = utilityCmd({
     user: ct.userId({ option: true, shortcut: "u" }),
     channel: ct.channelId({ option: true, shortcut: "c" }),
     bots: ct.switchOption({ shortcut: "b" }),
-    pins: ct.switchOption({ shortcut: "p" }),
+    "delete-pins": ct.switchOption({ shortcut: "p" }),
     "has-invites": ct.switchOption({ shortcut: "i" }),
     match: ct.regex({ option: true, shortcut: "m" }),
   },
@@ -97,7 +97,7 @@ export const CleanCmd = utilityCmd({
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
 
-    const deletePins = args.pins != null ? args.pins : false;
+    const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
     let pins = [];
     if (!deletePins) {
       pins = await msg.channel.getPins();
