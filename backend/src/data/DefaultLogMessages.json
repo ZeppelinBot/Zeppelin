@@ -47,6 +47,7 @@
   "CLEAN": "🚿 {userMention(mod)} cleaned **{count}** message(s) in {channelMention(channel)}\n{archiveUrl}",
 
   "CASE_CREATE": "✏ {userMention(mod)} manually created new **{caseType}** case (#{caseNum})",
+  "CASE_DELETE": "✂️ **Case #{case.case_number}** was deleted by {userMention(mod)}",
 
   "MASSBAN": "⚒ {userMention(mod)} massbanned {count} users",
   "MASSMUTE": "📢🚫 {userMention(mod)} massmuted {count} users",
@@ -63,10 +64,9 @@
   "POSTED_SCHEDULED_MESSAGE": "\uD83D\uDCE8 Posted scheduled message (`{messageId}`) to {channelMention(channel)} as scheduled by {userMention(author)}",
 
   "BOT_ALERT": "⚠ **BOT ALERT:** {tmplEval(body)}",
+  "DM_FAILED": "\uD83D\uDEA7 Failed to send DM ({source}) to {userMention(user)}",
+
   "AUTOMOD_ACTION": "\uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(users)}\n{matchSummary}\nActions taken: **{actionsTaken}**",
-
   "SET_ANTIRAID_USER": "⚔ {userMention(user)} set anti-raid to **{level}**",
-  "SET_ANTIRAID_AUTO": "⚔ Anti-raid automatically set to **{level}**",
-
-  "CASE_DELETE": "✂️ **Case #{case.case_number}** was deleted by {userMention(mod)}"
+  "SET_ANTIRAID_AUTO": "⚔ Anti-raid automatically set to **{level}**"
 }
