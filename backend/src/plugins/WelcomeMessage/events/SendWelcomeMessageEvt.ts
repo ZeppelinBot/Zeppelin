@@ -16,6 +16,13 @@ export const SendWelcomeMessageEvt = welcomeEvent({
     if (!config.message) return;
     if (!config.send_dm && !config.send_to_channel) return;
 
+    // Only send welcome messages once per user (even if they rejoin) until the plugin is reloaded
+    if (pluginData.state.sentWelcomeMessages.has(member.id)) {
+      return;
+    }
+
+    pluginData.state.sentWelcomeMessages.add(member.id);
+
     const formatted = await renderTemplate(config.message, {
       member: stripObjectToScalars(member, ["user"]),
     });
