@@ -14,6 +14,7 @@ export interface WelcomeMessagePluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
     logs: GuildLogs;
+    sentWelcomeMessages: Set<string>;
   };
 }
 
