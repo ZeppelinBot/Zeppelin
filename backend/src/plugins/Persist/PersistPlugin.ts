@@ -6,6 +6,7 @@ import { GuildLogs } from "src/data/GuildLogs";
 import { StoreDataEvt } from "./events/StoreDataEvt";
 import { LoadDataEvt } from "./events/LoadDataEvt";
 import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<PersistPluginType> = {
   config: {
@@ -25,6 +26,7 @@ export const PersistPlugin = zeppelinPlugin<PersistPluginType>()("persist", {
     `),
   },
 
+  dependencies: [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
