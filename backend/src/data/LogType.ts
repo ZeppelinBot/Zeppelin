@@ -77,4 +77,6 @@ export enum LogType {
   MEMBER_NOTE,
 
   CASE_DELETE,
+
+  DM_FAILED,
 }

@@ -3,6 +3,7 @@ import { renderTemplate } from "src/templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { TextChannel } from "eris";
+import { sendDM } from "../../../utils/sendDM";
 
 export const SendWelcomeMessageEvt = welcomeEvent({
   event: "guildMemberAdd",
@@ -21,14 +22,11 @@ export const SendWelcomeMessageEvt = welcomeEvent({
 
     if (config.send_dm) {
       try {
-        console.log(`Sending welcome message to ${member.id}`);
-        const dmChannel = await member.user.getDMChannel();
-        if (!dmChannel) return;
-        await createChunkedMessage(dmChannel, formatted);
+        await sendDM(member.user, formatted, "welcome message");
       } catch (e) {
-        pluginData.state.logs.log(LogType.BOT_ALERT, {
-          body: `Failed send a welcome DM to {userMention(member)}`,
-          member: stripObjectToScalars(member, ["user"]),
+        pluginData.state.logs.log(LogType.DM_FAILED, {
+          source: "welcome message",
+          user: stripObjectToScalars(member.user),
         });
       }
     }

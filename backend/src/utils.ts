@@ -38,6 +38,8 @@ import moment from "moment-timezone";
 import { SimpleCache } from "./SimpleCache";
 import { logger } from "./logger";
 import { unsafeCoerce } from "fp-ts/lib/function";
+import { sendDM } from "./utils/sendDM";
+import { LogType } from "./data/LogType";
 
 const fsp = fs.promises;
 
@@ -878,9 +880,7 @@ export async function notifyUser(
   for (const method of methods) {
     if (method.type === "dm") {
       try {
-        console.log(`Notifying user ${user.id} via DM`);
-        const dmChannel = await user.getDMChannel();
-        await dmChannel.createMessage(body);
+        await sendDM(user, body, "mod action notification");
         return {
           method,
           success: true,
@@ -1068,8 +1068,6 @@ export async function resolveMember(bot: Client, guild: Guild, value: string): P
   if (unknownMembers.has(unknownKey)) {
     return null;
   }
-
-  logger.debug(`Fetching unknown member (${userId} in ${guild.name} (${guild.id})) from the API`);
 
   const freshMember = await bot.getRESTGuildMember(guild.id, userId).catch(noop);
   if (freshMember) {
