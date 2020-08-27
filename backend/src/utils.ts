@@ -500,7 +500,7 @@ export function parseInviteCodeInput(str: string): string {
 }
 
 export function getInviteCodesInString(str: string): string[] {
-  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite|discord.com\/invite)\/([a-z0-9]+)/gi;
+  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite|discord.com\/invite)\/([a-z0-9\-]+)/gi;
   return Array.from(str.matchAll(inviteCodeRegex)).map(m => m[1]);
 }
 
