@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { RecoverablePluginError, ERRORS } from "src/RecoverablePluginError";
-import { canUseEmoji, noop } from "../../../utils";
+import { canUseEmoji, isDiscordRESTError, noop } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 import { canReadChannel } from "../../../utils/canReadChannel";
 
@@ -22,14 +22,20 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canReadChannel(args.message.channel, msg.member)) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
+      sendErrorMessage(pluginData, msg.channel, "You can't add reaction roles to channels you can't see yourself");
       return;
     }
 
-    const targetMessage = await args.message.channel.getMessage(args.message.messageId);
-    if (!targetMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message (2)");
-      return;
+    let targetMessage;
+    try {
+      targetMessage = await args.message.channel.getMessage(args.message.messageId).catch(noop);
+    } catch (e) {
+      if (isDiscordRESTError(e)) {
+        sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
+        return;
+      }
+
+      throw e;
     }
 
     // Clear old reaction roles for the message from the DB
