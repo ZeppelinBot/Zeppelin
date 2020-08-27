@@ -102,9 +102,19 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     // Apply the reactions themselves
     const reactionRoles = await pluginData.state.reactionRoles.getForMessage(targetMessage.id);
-    await applyReactionRoleReactionsToMessage(pluginData, targetMessage.channel.id, targetMessage.id, reactionRoles);
+    const errors = await applyReactionRoleReactionsToMessage(
+      pluginData,
+      targetMessage.channel.id,
+      targetMessage.id,
+      reactionRoles,
+    );
 
-    sendSuccessMessage(pluginData, msg.channel, "Reaction roles added");
+    if (errors.length) {
+      sendErrorMessage(pluginData, msg.channel, `Errors while adding reaction roles:\n${errors.join("\n")}`);
+    } else {
+      sendSuccessMessage(pluginData, msg.channel, "Reaction roles added");
+    }
+
     (await progressMessage).delete().catch(noop);
   },
 });
