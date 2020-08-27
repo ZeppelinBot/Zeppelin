@@ -150,7 +150,7 @@ const REPLACED_CHARS: Record<string, RegExp> = Array.from(Object.entries(REPLACE
   {},
 );
 
-const NORMAL_CHARS_REGEX = /[\w2689:.-_+()*&^%><;"'}{~,]+/gim;
+const NORMAL_CHARS_REGEX = /[a-z2689:.-_+()*&^%><;"'}{~,]+/gim;
 
 function containsOnlyNormalChars(text: string) {
   const match = text.match(NORMAL_CHARS_REGEX);
