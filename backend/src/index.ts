@@ -153,7 +153,11 @@ connect().then(async () => {
        * Dependencies are also automatically loaded by Knub.
        */
       async getEnabledGuildPlugins(ctx, plugins): Promise<string[]> {
-        const configuredPlugins = ctx.config.plugins || [];
+        if (!ctx.config || !ctx.config.plugins) {
+          return [];
+        }
+
+        const configuredPlugins = ctx.config.plugins;
         const basePluginNames = baseGuildPlugins.map(p => p.name);
 
         return Array.from(plugins.keys()).filter(pluginName => {
