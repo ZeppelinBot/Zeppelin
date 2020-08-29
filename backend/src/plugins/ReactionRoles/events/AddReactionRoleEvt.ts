@@ -16,6 +16,7 @@ export const AddReactionRoleEvt = reactionRolesEvent({
 
     if (userId === pluginData.client.user.id) {
       // Don't act on own reactions
+      // FIXME: This may not be needed? Knub currently requires the *member* to be found for the user to be resolved as well. Need to look into it more.
       return;
     }
 
