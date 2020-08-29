@@ -14,6 +14,11 @@ export const AddReactionRoleEvt = reactionRolesEvent({
     const emoji = meta.args.emoji;
     const userId = meta.args.userID;
 
+    if (userId === pluginData.client.user.id) {
+      // Don't act on own reactions
+      return;
+    }
+
     // Make sure this message has reaction roles on it
     const reactionRoles = await pluginData.state.reactionRoles.getForMessage(msg.id);
     if (reactionRoles.length === 0) return;
