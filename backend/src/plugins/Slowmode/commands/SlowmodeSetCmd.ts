@@ -18,7 +18,7 @@ const validModes = ["bot", "native"];
 type TMode = "bot" | "native";
 
 export const SlowmodeSetCmd = slowmodeCmd({
-  trigger: "slowmode",
+  trigger: ["slowmode", "zawarudo"],
   permission: "can_manage",
   source: "guild",
 
