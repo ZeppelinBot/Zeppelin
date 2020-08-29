@@ -5,6 +5,7 @@ import { sendErrorMessage } from "src/pluginUtils";
 import { EmbedOptions } from "eris";
 import { CaseTypes } from "src/data/CaseTypes";
 import moment from "moment-timezone";
+import humanizeDuration from "humanize-duration";
 
 export const ModStatsCmd = casesCommand({
   trigger: "modstats",
@@ -14,6 +15,7 @@ export const ModStatsCmd = casesCommand({
   signature: [
     {
       moderator: ct.resolvedUser(),
+      within: ct.delay({ required: false }),
     },
   ],
 
@@ -25,7 +27,8 @@ export const ModStatsCmd = casesCommand({
     }
     const latestCase = await pluginData.state.cases.findLatestByModId(args.moderator.id);
 
-    const allAmounts = await getAllCaseTypeAmountsForUserId(pluginData, args.moderator.id);
+    const within = args.within ? moment().subtract(args.within) : null;
+    const allAmounts = await getAllCaseTypeAmountsForUserId(pluginData, args.moderator.id, within);
 
     const embed: EmbedOptions = {
       fields: [],
@@ -36,7 +39,8 @@ export const ModStatsCmd = casesCommand({
       icon_url: args.moderator.avatarURL,
     };
 
-    let embedDesc = `**The user created ${allAmounts.total} cases:**\n`;
+    let embedDesc = "";
+    embedDesc += `**The user created ${allAmounts.total} cases:**\n`;
     for (const type in CaseTypes) {
       if (!isNaN(Number(type))) {
         const typeAmount = allAmounts.typeAmounts.get(Number(type)).amount;
@@ -45,8 +49,17 @@ export const ModStatsCmd = casesCommand({
         embedDesc += `\n**${CaseTypes[type]}:** ${typeAmount}`;
       }
     }
-    embedDesc += `\n\n**First case on:** ${moment(firstCase.created_at).format("LL")}`;
-    embedDesc += `\n**Latest case on:** ${moment(latestCase.created_at).format("LL")}`;
+
+    if (within == null) {
+      embedDesc += `\n\n**First case on:** ${moment(firstCase.created_at)
+        .utc()
+        .format("LL HH:mm UTC")}`;
+      embedDesc += `\n**Latest case on:** ${moment(latestCase.created_at)
+        .utc()
+        .format("LL HH:mm UTC")}`;
+    } else {
+      embedDesc += `\n\n**Only cases after:** ${within.utc().format("LL HH:mm UTC")}\n`;
+    }
     embed.description = embedDesc;
 
     msg.channel.createMessage({ embed });
