@@ -14,6 +14,7 @@ export const ConfigSchema = t.type({
   relative_time_cutoff: tDelayString,
   case_colors: tNullable(tPartialDictionary(t.keyof(CaseNameToType), tColor)),
   case_icons: tNullable(tPartialDictionary(t.keyof(CaseNameToType), t.string)),
+  can_modstats: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -50,3 +51,5 @@ export type CaseNoteArgs = {
   postInCaseLogOverride?: boolean;
   noteDetails?: string[];
 };
+
+export const casesCommand = command<CasesPluginType>();

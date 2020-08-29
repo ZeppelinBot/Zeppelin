@@ -62,6 +62,19 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
+  async findFirstByModId(modId: string): Promise<Case> {
+    return this.cases.findOne({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        mod_id: modId,
+      },
+      order: {
+        case_number: "ASC",
+      },
+    });
+  }
+
   async findByAuditLogId(auditLogId: string): Promise<Case> {
     return this.cases.findOne({
       relations: this.getRelations(),
@@ -78,6 +91,16 @@ export class GuildCases extends BaseGuildRepository {
       where: {
         guild_id: this.guildId,
         user_id: userId,
+      },
+    });
+  }
+
+  async getByModId(modId: string): Promise<Case[]> {
+    return this.cases.find({
+      relations: this.getRelations(),
+      where: {
+        guild_id: this.guildId,
+        mod_id: modId,
       },
     });
   }

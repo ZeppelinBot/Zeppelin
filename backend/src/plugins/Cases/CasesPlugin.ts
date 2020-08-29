@@ -14,6 +14,7 @@ import { trimPluginDescription } from "../../utils";
 import { getCaseSummary } from "./functions/getCaseSummary";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { mapToPublicFn } from "../../pluginUtils";
+import { ModStatsCmd } from "./commands/ModStatsCmd";
 
 const defaultOptions = {
   config: {
@@ -23,7 +24,16 @@ const defaultOptions = {
     relative_time_cutoff: "7d",
     case_colors: null,
     case_icons: null,
+    can_modstats: false,
   },
+  overrides: [
+    {
+      level: ">=100",
+      config: {
+        can_modstats: true,
+      },
+    },
+  ],
 };
 
 export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
@@ -34,6 +44,8 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
       This plugin contains basic configuration for cases created by other plugins
     `),
   },
+
+  commands: [ModStatsCmd],
 
   dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
