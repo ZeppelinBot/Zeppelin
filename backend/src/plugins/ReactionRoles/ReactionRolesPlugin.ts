@@ -16,6 +16,7 @@ const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the A
 const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   config: {
     auto_refresh_interval: MIN_AUTO_REFRESH,
+    remove_user_reactions: true,
 
     can_manage: false,
   },
