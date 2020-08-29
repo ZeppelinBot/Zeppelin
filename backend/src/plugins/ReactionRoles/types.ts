@@ -6,6 +6,7 @@ import { Queue } from "src/Queue";
 
 export const ConfigSchema = t.type({
   auto_refresh_interval: t.number,
+  remove_user_reactions: t.boolean,
   can_manage: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

@@ -51,13 +51,16 @@ export const AddReactionRoleEvt = reactionRolesEvent({
     }
 
     // Remove the reaction after a small delay
-    setTimeout(() => {
-      pluginData.state.reactionRemoveQueue.add(async () => {
-        const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
-        const wait = sleep(1500);
-        await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
-        await wait;
-      });
-    }, 1500);
+    const config = pluginData.config.getForMember(member);
+    if (config.remove_user_reactions) {
+      setTimeout(() => {
+        pluginData.state.reactionRemoveQueue.add(async () => {
+          const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
+          const wait = sleep(1500);
+          await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
+          await wait;
+        });
+      }, 1500);
+    }
   },
 });
