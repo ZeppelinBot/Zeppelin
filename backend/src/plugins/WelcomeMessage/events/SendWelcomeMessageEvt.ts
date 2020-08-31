@@ -1,5 +1,5 @@
 import { welcomeEvent } from "../types";
-import { renderTemplate } from "src/templateFormatter";
+import { renderTemplate, TemplateParseError } from "src/templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { TextChannel } from "eris";
@@ -23,9 +23,22 @@ export const SendWelcomeMessageEvt = welcomeEvent({
 
     pluginData.state.sentWelcomeMessages.add(member.id);
 
-    const formatted = await renderTemplate(config.message, {
-      member: stripObjectToScalars(member, ["user"]),
-    });
+    let formatted;
+
+    try {
+      formatted = await renderTemplate(config.message, {
+        member: stripObjectToScalars(member, ["user"]),
+      });
+    } catch (e) {
+      if (e instanceof TemplateParseError) {
+        pluginData.state.logs.log(LogType.BOT_ALERT, {
+          body: `Error formatting welcome message: ${e.message}`,
+        });
+        return;
+      }
+
+      throw e;
+    }
 
     if (config.send_dm) {
       try {
