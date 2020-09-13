@@ -73,7 +73,7 @@ export async function applyReactionRoleReactionsToMessage(
       await targetMessage.addReaction(emoji);
       await sleep(1250); // Make sure we don't hit rate limits
     } catch (e) {
-      if (isDiscordRESTError(e) && e.code === 10014) {
+      if (isDiscordRESTError(e)) {
         if (e.code === 10014) {
           pluginData.state.reactionRoles.removeFromMessage(messageId, rr.emoji);
           errors.push(`Unknown emoji: ${emoji}`);
