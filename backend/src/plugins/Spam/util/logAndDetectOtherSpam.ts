@@ -8,6 +8,8 @@ import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
 import { CaseTypes } from "src/data/CaseTypes";
 import { clearRecentUserActions } from "./clearRecentUserActions";
 import { LogType } from "src/data/LogType";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function logAndDetectOtherSpam(
   pluginData: PluginData<SpamPluginType>,
@@ -31,16 +33,28 @@ export async function logAndDetectOtherSpam(
     if (recentActionsCount > spamConfig.count) {
       const member = await resolveMember(pluginData.client, pluginData.guild, userId);
       const details = `${description} (over ${spamConfig.count} in ${spamConfig.interval}s)`;
+      const logs = pluginData.getPlugin(LogsPlugin);
 
       if (spamConfig.mute && member) {
         const mutesPlugin = pluginData.getPlugin(MutesPlugin);
         const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
-        await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-          caseArgs: {
-            modId: pluginData.client.user.id,
-            extraNotes: [`Details: ${details}`],
-          },
-        });
+
+        try {
+          await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
+            caseArgs: {
+              modId: pluginData.client.user.id,
+              extraNotes: [`Details: ${details}`],
+            },
+          });
+        } catch (e) {
+          if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
+            logs.log(LogType.BOT_ALERT, {
+              body: `Failed to mute <@!${member.id}> in \`spam\` plugin because a mute role has not been specified in server config`,
+            });
+          } else {
+            throw e;
+          }
+        }
       } else {
         // If we're not muting the user, just add a note on them
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
@@ -55,7 +69,7 @@ export async function logAndDetectOtherSpam(
       // Clear recent cases
       clearRecentUserActions(pluginData, RecentActionType.VoiceChannelMove, userId, actionGroupId);
 
-      pluginData.state.logs.log(LogType.OTHER_SPAM_DETECTED, {
+      logs.log(LogType.OTHER_SPAM_DETECTED, {
         member: stripObjectToScalars(member, ["user", "roles"]),
         description,
         limit: spamConfig.count,

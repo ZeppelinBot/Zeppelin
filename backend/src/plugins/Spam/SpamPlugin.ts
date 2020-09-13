@@ -9,6 +9,7 @@ import { onMessageCreate } from "./util/onMessageCreate";
 import { clearOldRecentActions } from "./util/clearOldRecentActions";
 import { SpamVoiceJoinEvt, SpamVoiceSwitchEvt } from "./events/SpamVoiceEvt";
 import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<SpamPluginType> = {
   config: {
@@ -50,6 +51,8 @@ export const SpamPlugin = zeppelinPlugin<SpamPluginType>()("spam", {
       For more advanced spam filtering, check out the Automod plugin!
     `),
   },
+
+  dependencies: [LogsPlugin],
 
   configSchema: ConfigSchema,
   defaultOptions,

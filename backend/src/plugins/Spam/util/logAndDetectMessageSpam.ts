@@ -1,8 +1,8 @@
 import { SavedMessage } from "src/data/entities/SavedMessage";
-import { RecentActionType, TBaseSingleSpamConfig, SpamPluginType } from "../types";
+import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
 import moment from "moment-timezone";
 import { MuteResult } from "src/plugins/Mutes/types";
-import { convertDelayStringToMS, trimLines, stripObjectToScalars, resolveMember, noop, DBDateFormat } from "src/utils";
+import { convertDelayStringToMS, DBDateFormat, noop, resolveMember, stripObjectToScalars, trimLines } from "src/utils";
 import { LogType } from "src/data/LogType";
 import { CaseTypes } from "src/data/CaseTypes";
 import { logger } from "src/logger";
@@ -14,6 +14,8 @@ import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
 import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 
 export async function logAndDetectMessageSpam(
   pluginData: PluginData<SpamPluginType>,
@@ -38,6 +40,7 @@ export async function logAndDetectMessageSpam(
     async () => {
       const timestamp = moment.utc(savedMessage.posted_at, DBDateFormat).valueOf();
       const member = await resolveMember(pluginData.client, pluginData.guild, savedMessage.user_id);
+      const logs = pluginData.getPlugin(LogsPlugin);
 
       // Log this action...
       addRecentAction(
@@ -69,12 +72,23 @@ export async function logAndDetectMessageSpam(
         if (spamConfig.mute && member) {
           const mutesPlugin = pluginData.getPlugin(MutesPlugin);
           const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
-          muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-            caseArgs: {
-              modId: pluginData.client.user.id,
-              postInCaseLogOverride: false,
-            },
-          });
+
+          try {
+            muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
+              caseArgs: {
+                modId: pluginData.client.user.id,
+                postInCaseLogOverride: false,
+              },
+            });
+          } catch (e) {
+            if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
+              logs.log(LogType.BOT_ALERT, {
+                body: `Failed to mute <@!${member.id}> in \`spam\` plugin because a mute role has not been specified in server config`,
+              });
+            } else {
+              throw e;
+            }
+          }
         }
 
         // Get the offending message IDs
@@ -150,7 +164,7 @@ export async function logAndDetectMessageSpam(
         }
 
         // Create a log entry
-        pluginData.state.logs.log(LogType.MESSAGE_SPAM_DETECTED, {
+        logs.log(LogType.MESSAGE_SPAM_DETECTED, {
           member: stripObjectToScalars(member, ["user", "roles"]),
           channel: stripObjectToScalars(channel),
           description,
