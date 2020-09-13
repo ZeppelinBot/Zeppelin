@@ -47,22 +47,27 @@ setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 
 
 if (process.env.NODE_ENV === "production") {
   const errorHandler = err => {
+    const guildName = err.guild?.name || "Global";
+    const guildId = err.guild?.id || "0";
+
     if (err instanceof RecoverablePluginError) {
       // Recoverable plugin errors can be, well, recovered from.
       // Log it in the console as a warning and post a warning to the guild's log.
 
       // tslint:disable:no-console
-      console.warn(`${err.guild?.name || "Global"}: [${err.code}] ${err.message}`);
+      console.warn(`${guildName}: [${err.code}] ${err.message}`);
 
-      const logs = new GuildLogs(err.guild.id);
-      logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
+      if (err.guild) {
+        const logs = new GuildLogs(err.guild.id);
+        logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
+      }
 
       return;
     }
 
     if (err instanceof PluginLoadError) {
       // tslint:disable:no-console
-      console.warn(`${err.guild.name} (${err.guild.id}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+      console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
       return;
     }
 
