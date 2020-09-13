@@ -66,8 +66,11 @@ export async function applyReactionRoleReactionsToMessage(
   await sleep(1500);
 
   // Add reaction role reactions
-  for (const rr of reactionRoles) {
-    const emoji = isSnowflake(rr.emoji) ? `foo:${rr.emoji}` : rr.emoji;
+  const emojisToAdd = reactionRoles.map(rr => rr.emoji);
+  emojisToAdd.push(CLEAR_ROLES_EMOJI);
+
+  for (const rawEmoji of emojisToAdd) {
+    const emoji = isSnowflake(rawEmoji) ? `foo:${rawEmoji}` : rawEmoji;
 
     try {
       await targetMessage.addReaction(emoji);
@@ -75,7 +78,7 @@ export async function applyReactionRoleReactionsToMessage(
     } catch (e) {
       if (isDiscordRESTError(e)) {
         if (e.code === 10014) {
-          pluginData.state.reactionRoles.removeFromMessage(messageId, rr.emoji);
+          pluginData.state.reactionRoles.removeFromMessage(messageId, rawEmoji);
           errors.push(`Unknown emoji: ${emoji}`);
           logs.log(LogType.BOT_ALERT, {
             body: `Could not add unknown reaction role emoji ${emoji} to message ${channelId}/${messageId}`,
@@ -93,9 +96,6 @@ export async function applyReactionRoleReactionsToMessage(
       throw e;
     }
   }
-
-  // Add the "clear reactions" button
-  await targetMessage.addReaction(CLEAR_ROLES_EMOJI);
 
   return errors;
 }
