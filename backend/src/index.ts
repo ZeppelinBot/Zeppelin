@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === "production") {
       // Log it in the console as a warning and post a warning to the guild's log.
 
       // tslint:disable:no-console
-      console.warn(`${err.guild.name}: [${err.code}] ${err.message}`);
+      console.warn(`${err.guild?.name || "Global"}: [${err.code}] ${err.message}`);
 
       const logs = new GuildLogs(err.guild.id);
       logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
