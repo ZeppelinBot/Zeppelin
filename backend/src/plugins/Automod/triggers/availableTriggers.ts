@@ -44,6 +44,8 @@ export const AvailableTriggers = t.type({
   match_links: MatchLinksTrigger.configType,
   match_attachment_type: MatchAttachmentTypeTrigger.configType,
   member_join: MemberJoinTrigger.configType,
+  role_added: RoleAddedTrigger.configType,
+  role_removed: RoleRemovedTrigger.configType,
 
   message_spam: MessageSpamTrigger.configType,
   mention_spam: MentionSpamTrigger.configType,
