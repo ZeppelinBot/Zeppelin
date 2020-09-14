@@ -5,6 +5,7 @@ import { disableInlineCode, verboseChannelMention } from "../../../utils";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { normalizeText } from "../../../utils/normalizeText";
+import { stripMarkdown } from "../../../utils/stripMarkdown";
 
 interface MatchResultType {
   word: string;
@@ -19,6 +20,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
     normalize: t.boolean,
     loose_matching: t.boolean,
     loose_matching_threshold: t.number,
+    strip_markdown: t.boolean,
     match_messages: t.boolean,
     match_embeds: t.boolean,
     match_visible_names: t.boolean,
@@ -33,6 +35,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
     normalize: false,
     loose_matching: false,
     loose_matching_threshold: 4,
+    strip_markdown: false,
     match_messages: true,
     match_embeds: true,
     match_visible_names: false,
@@ -47,6 +50,10 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
     }
 
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
+      if (trigger.strip_markdown) {
+        str = stripMarkdown(str);
+      }
+
       if (trigger.normalize) {
         str = normalizeText(str);
       }
