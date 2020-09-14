@@ -37,7 +37,7 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
   defaultConfig: {
     allow_group_dm_invites: false,
     match_messages: true,
-    match_embeds: true,
+    match_embeds: false,
     match_visible_names: false,
     match_usernames: false,
     match_nicknames: false,

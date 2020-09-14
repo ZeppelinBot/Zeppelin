@@ -40,7 +40,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
   defaultConfig: {
     include_subdomains: true,
     match_messages: true,
-    match_embeds: true,
+    match_embeds: false,
     match_visible_names: false,
     match_usernames: false,
     match_nicknames: false,
