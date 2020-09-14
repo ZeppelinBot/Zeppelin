@@ -8,7 +8,7 @@ import { GuildLogs } from "src/data/GuildLogs";
 
 export const Tag = t.union([t.string, tEmbed]);
 
-const TagCategory = t.type({
+export const TagCategory = t.type({
   prefix: tNullable(t.string),
   delete_with_command: tNullable(t.boolean),
 
@@ -21,6 +21,7 @@ const TagCategory = t.type({
 
   can_use: tNullable(t.boolean),
 });
+export type TTagCategory = t.TypeOf<typeof TagCategory>;
 
 export const ConfigSchema = t.type({
   prefix: t.string,
