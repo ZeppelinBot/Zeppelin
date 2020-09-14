@@ -32,6 +32,7 @@ const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
 };
 
 export const TimeAndDatePlugin = zeppelinPlugin<TimeAndDatePluginType>()("time_and_date", {
+  showInDocs: true,
   configSchema: ConfigSchema,
   defaultOptions,
 
