@@ -37,7 +37,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
     loose_matching_threshold: 4,
     strip_markdown: false,
     match_messages: true,
-    match_embeds: true,
+    match_embeds: false,
     match_visible_names: false,
     match_usernames: false,
     match_nicknames: false,
