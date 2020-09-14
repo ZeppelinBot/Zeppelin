@@ -1,7 +1,15 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, messageLink, resolveMember, stripObjectToScalars, tNullable } from "../../../utils";
+import {
+  asyncMap,
+  createChunkedMessage,
+  isDiscordRESTError,
+  messageLink,
+  resolveMember,
+  stripObjectToScalars,
+  tNullable,
+} from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { TextChannel } from "eris";
@@ -47,7 +55,8 @@ export const AlertAction = automodAction({
         messageLink: theMessageLink,
         logMessage,
       });
-      channel.createMessage(rendered);
+
+      await createChunkedMessage(channel, rendered);
     } else {
       logs.log(LogType.BOT_ALERT, {
         body: `Invalid channel id \`${actionConfig.channel}\` for alert action in automod rule **${ruleName}**`,
