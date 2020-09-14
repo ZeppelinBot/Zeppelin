@@ -5,12 +5,12 @@ import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "s
 import { parseArguments } from "knub-command-manager";
 import { TemplateParseError } from "src/templateFormatter";
 import { PluginData } from "knub";
-import { renderTag } from "./renderTag";
 import { logger } from "src/logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
+import { renderTagBody } from "./renderTagBody";
 
-export async function renderSafeTagFromMessage(
+export async function renderTagFromString(
   pluginData: PluginData<TagsPluginType>,
   str: string,
   prefix: string,
@@ -21,21 +21,9 @@ export async function renderSafeTagFromMessage(
   const variableStr = str.slice(prefix.length + tagName.length).trim();
   const tagArgs = parseArguments(variableStr).map(v => v.value);
 
-  const renderTagString = async _str => {
-    let rendered = await renderTag(pluginData, _str, tagArgs, {
-      member: stripObjectToScalars(member, ["user"]),
-      user: stripObjectToScalars(member.user),
-    });
-    rendered = rendered.trim();
-
-    return rendered;
-  };
-
   // Format the string
   try {
-    return typeof tagBody === "string"
-      ? { content: await renderTagString(tagBody) }
-      : await renderRecursively(tagBody, renderTagString);
+    return renderTagBody(pluginData, tagBody, tagArgs);
   } catch (e) {
     if (e instanceof TemplateParseError) {
       const logs = pluginData.getPlugin(LogsPlugin);
