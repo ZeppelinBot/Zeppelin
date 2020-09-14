@@ -13,6 +13,7 @@ import { getMemberTz } from "./functions/getMemberTz";
 import { getDateFormat } from "./functions/getDateFormat";
 import { inMemberTz } from "./functions/inMemberTz";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
+import { trimPluginDescription } from "../../utils";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {
@@ -33,6 +34,13 @@ const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
 
 export const TimeAndDatePlugin = zeppelinPlugin<TimeAndDatePluginType>()("time_and_date", {
   showInDocs: true,
+  info: {
+    prettyName: "Time and date",
+    description: trimPluginDescription(`
+      Allows controlling the displayed time/date formats and timezones
+    `),
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
 
