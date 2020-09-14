@@ -18,6 +18,7 @@ import { convertDelayStringToMS } from "../../utils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { mapToPublicFn } from "../../pluginUtils";
 import { renderTagBody } from "./util/renderTagBody";
+import { findTagByName } from "./util/findTagByName";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -67,6 +68,7 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
 
   public: {
     renderTagBody: mapToPublicFn(renderTagBody),
+    findTagByName: mapToPublicFn(findTagByName),
   },
 
   onLoad(pluginData) {
