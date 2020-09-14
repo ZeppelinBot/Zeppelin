@@ -6,6 +6,7 @@ import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSumm
 import { allowTimeout } from "../../../RegExpRunner";
 import { TRegex } from "../../../validatorUtils";
 import { normalizeText } from "../../../utils/normalizeText";
+import { stripMarkdown } from "../../../utils/stripMarkdown";
 
 interface MatchResultType {
   pattern: string;
@@ -17,6 +18,7 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
     patterns: t.array(TRegex),
     case_sensitive: t.boolean,
     normalize: t.boolean,
+    strip_markdown: t.boolean,
     match_messages: t.boolean,
     match_embeds: t.boolean,
     match_visible_names: t.boolean,
@@ -28,8 +30,9 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   defaultConfig: {
     case_sensitive: false,
     normalize: false,
+    strip_markdown: false,
     match_messages: true,
-    match_embeds: true,
+    match_embeds: false,
     match_visible_names: false,
     match_usernames: false,
     match_nicknames: false,
@@ -42,6 +45,10 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
     }
 
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
+      if (trigger.strip_markdown) {
+        str = stripMarkdown(str);
+      }
+
       if (trigger.normalize) {
         str = normalizeText(str);
       }
