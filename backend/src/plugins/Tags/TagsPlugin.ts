@@ -16,6 +16,8 @@ import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { convertDelayStringToMS } from "../../utils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { mapToPublicFn } from "../../pluginUtils";
+import { renderTagBody } from "./util/renderTagBody";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -62,6 +64,10 @@ export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
     TagSourceCmd,
     TagCreateCmd,
   ],
+
+  public: {
+    renderTagBody: mapToPublicFn(renderTagBody),
+  },
 
   onLoad(pluginData) {
     const { state, guild } = pluginData;
