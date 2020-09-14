@@ -3,12 +3,15 @@ import { PluginData, plugin } from "knub";
 import { Tag, TagsPluginType } from "../types";
 import { renderRecursively, StrictMessageContent } from "../../../utils";
 import * as t from "io-ts";
+import { findTagByName } from "./findTagByName";
+import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
 
 export async function renderTagBody(
   pluginData: PluginData<TagsPluginType>,
   body: t.TypeOf<typeof Tag>,
   args = [],
   extraData = {},
+  subTagPermissionMatchParams?: ExtendedMatchParams,
 ): Promise<StrictMessageContent> {
   const dynamicVars = {};
   const maxTagFnCalls = 25;
@@ -30,10 +33,18 @@ export async function renderTagBody(
       if (typeof name !== "string") return "";
       if (name === "") return "";
 
-      // TODO: Incorporate tag categories here
-      const subTag = await pluginData.state.tags.find(name);
-      if (!subTag) return "";
-      return renderTemplate(subTag.body, { ...data, args: subTagArgs });
+      const subTagBody = await findTagByName(pluginData, name, subTagPermissionMatchParams);
+
+      if (!subTagBody) {
+        return "";
+      }
+
+      if (typeof subTagBody !== "string") {
+        return "<embed>";
+      }
+
+      const rendered = await renderTagBody(pluginData, subTagBody, subTagArgs, subTagPermissionMatchParams);
+      return rendered.content!;
     },
   };
 

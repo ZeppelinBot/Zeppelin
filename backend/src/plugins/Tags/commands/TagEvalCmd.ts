@@ -15,7 +15,7 @@ export const TagEvalCmd = tagsCmd({
 
   async run({ message: msg, args, pluginData }) {
     try {
-      const rendered = await renderTagBody(pluginData, args.body);
+      const rendered = await renderTagBody(pluginData, args.body, [], {}, { member: msg.member });
       msg.channel.createMessage(rendered);
     } catch (e) {
       if (e instanceof TemplateParseError) {
