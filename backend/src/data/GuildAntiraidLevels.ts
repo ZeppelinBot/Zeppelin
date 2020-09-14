@@ -27,6 +27,7 @@ export class GuildAntiraidLevels extends BaseGuildRepository {
       });
     } else {
       // Upsert: https://stackoverflow.com/a/47064558/316944
+      // But the MySQL version: https://github.com/typeorm/typeorm/issues/1090#issuecomment-634391487
       await this.antiraidLevels
         .createQueryBuilder()
         .insert()
@@ -34,8 +35,10 @@ export class GuildAntiraidLevels extends BaseGuildRepository {
           guild_id: this.guildId,
           level,
         })
-        .onConflict('("guild_id") DO UPDATE SET "guild_id" = :guildId')
-        .setParameter("guildId", this.guildId)
+        .orUpdate({
+          conflict_target: ["guild_id"],
+          overwrite: ["level"],
+        })
         .execute();
     }
   }
