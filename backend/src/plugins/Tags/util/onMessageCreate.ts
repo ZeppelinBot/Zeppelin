@@ -89,7 +89,11 @@ export async function onMessageCreate(pluginData: PluginData<TagsPluginType>, ms
     return;
   }
 
-  if (typeof tagResult.renderedContent === "string" && tagResult.renderedContent.trim() === "") {
+  if (
+    tagResult.renderedContent.content &&
+    !tagResult.renderedContent.embed &&
+    tagResult.renderedContent.content.trim() === ""
+  ) {
     pluginData.state.logs.log(LogType.BOT_ALERT, {
       body: `Tag \`${tagResult.tagName}\` resulted in an empty message, so it couldn't be sent`,
     });

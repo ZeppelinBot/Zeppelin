@@ -2,12 +2,12 @@ import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
 import { PluginData } from "knub";
 import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
-import { convertDelayStringToMS } from "../../../utils";
+import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
 import escapeStringRegexp from "escape-string-regexp";
-import { Member, MessageContent } from "eris";
+import { Member } from "eris";
 
 interface Result {
-  renderedContent: MessageContent;
+  renderedContent: StrictMessageContent;
   tagName: string;
   categoryName: string | null;
   category: TTagCategory | null;
