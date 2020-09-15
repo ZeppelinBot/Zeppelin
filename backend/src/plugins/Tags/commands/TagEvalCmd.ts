@@ -4,6 +4,7 @@ import { MessageContent } from "eris";
 import { TemplateParseError } from "../../../templateFormatter";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { renderTagBody } from "../util/renderTagBody";
+import { stripObjectToScalars } from "../../../utils";
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",
@@ -15,7 +16,16 @@ export const TagEvalCmd = tagsCmd({
 
   async run({ message: msg, args, pluginData }) {
     try {
-      const rendered = await renderTagBody(pluginData, args.body, [], {}, { member: msg.member });
+      const rendered = await renderTagBody(
+        pluginData,
+        args.body,
+        [],
+        {
+          member: stripObjectToScalars(msg.member, ["user"]),
+          user: stripObjectToScalars(msg.member.user),
+        },
+        { member: msg.member },
+      );
       msg.channel.createMessage(rendered);
     } catch (e) {
       if (e instanceof TemplateParseError) {
