@@ -23,7 +23,16 @@ export async function renderTagFromString(
 
   // Format the string
   try {
-    return renderTagBody(pluginData, tagBody, tagArgs, {}, { member });
+    return renderTagBody(
+      pluginData,
+      tagBody,
+      tagArgs,
+      {
+        member: stripObjectToScalars(member, ["user"]),
+        user: stripObjectToScalars(member.user),
+      },
+      { member },
+    );
   } catch (e) {
     if (e instanceof TemplateParseError) {
       const logs = pluginData.getPlugin(LogsPlugin);
