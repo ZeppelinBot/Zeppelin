@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
+import { createEncryptedJsonTransformer } from "../encryptedJsonTransformer";
 
 export interface ISavedMessageData {
   attachments?: object[];
@@ -25,7 +26,11 @@ export class SavedMessage {
 
   @Column() is_bot: boolean;
 
-  @Column("simple-json") data: ISavedMessageData;
+  @Column({
+    type: "mediumtext",
+    transformer: createEncryptedJsonTransformer<ISavedMessageData>(),
+  })
+  data: ISavedMessageData;
 
   @Column() posted_at: string;
 
