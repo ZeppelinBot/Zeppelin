@@ -4,7 +4,7 @@ import { errorMessage } from "../../../utils";
 import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 
 export const NicknameCmd = utilityCmd({
-  trigger: "nickname",
+  trigger: ["nickname", "nick"],
   description: "Set a member's nickname",
   usage: "!nickname 106391128718245888 Drag",
   permission: "can_nickname",
