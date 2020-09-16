@@ -1,3 +1,5 @@
+import "./loadEnv";
+
 import path from "path";
 import yaml from "js-yaml";
 
@@ -25,7 +27,11 @@ import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 
 const fsp = fs.promises;
 
-require("dotenv").config({ path: path.resolve(process.cwd(), "bot.env") });
+if (!process.env.KEY) {
+  // tslint:disable-next-line:no-console
+  console.error("Project root .env with KEY is required!");
+  process.exit(1);
+}
 
 declare global {
   // This is here so TypeScript doesn't give an error when importing twemoji
