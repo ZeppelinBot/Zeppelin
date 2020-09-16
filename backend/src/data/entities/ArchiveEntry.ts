@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { createEncryptedTextTransformer } from "../encryptedTextTransformer";
 
 @Entity("archives")
 export class ArchiveEntry {
@@ -8,7 +9,11 @@ export class ArchiveEntry {
 
   @Column() guild_id: string;
 
-  @Column() body: string;
+  @Column({
+    type: "mediumtext",
+    transformer: createEncryptedTextTransformer(),
+  })
+  body: string;
 
   @Column() created_at: string;
 
