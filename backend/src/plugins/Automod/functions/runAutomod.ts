@@ -23,7 +23,7 @@ export async function runAutomod(pluginData: PluginData<AutomodPluginType>, cont
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
-    if (!rule.affects_bots && user?.bot) continue;
+    if (!rule.affects_bots && (!user || user.bot)) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
       return;
