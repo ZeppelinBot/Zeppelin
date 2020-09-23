@@ -347,6 +347,7 @@ export function get(obj, path, def?): any {
   let cursor = obj;
   const pathParts = path.split(".");
   for (const part of pathParts) {
+    if (!cursor.hasOwnProperty(part)) return def;
     cursor = cursor[part];
     if (cursor === undefined) return def;
     if (cursor == null) return null;
