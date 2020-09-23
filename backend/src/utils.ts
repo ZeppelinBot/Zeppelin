@@ -347,6 +347,7 @@ export function get(obj, path, def?): any {
   let cursor = obj;
   const pathParts = path.split(".");
   for (const part of pathParts) {
+    // hasOwnProperty check here is necessary to prevent prototype traversal in tags
     if (!cursor.hasOwnProperty(part)) return def;
     cursor = cursor[part];
     if (cursor === undefined) return def;

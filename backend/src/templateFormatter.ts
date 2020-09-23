@@ -222,6 +222,11 @@ async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
   const value = has(values, theVar.identifier) ? get(values, theVar.identifier) : undefined;
 
   if (typeof value === "function") {
+    // Don't allow running functions in nested objects
+    if (values[theVar.identifier] == null) {
+      return "";
+    }
+
     const args = [];
     for (const arg of theVar.args) {
       if (typeof arg === "object") {
