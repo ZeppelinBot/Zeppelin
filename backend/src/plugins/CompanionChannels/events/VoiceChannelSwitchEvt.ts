@@ -5,6 +5,6 @@ import { handleCompanionPermissions } from "../functions/handleCompanionPermissi
 export const VoiceChannelSwitchEvt = eventListener<CompanionChannelsPluginType>()(
   "voiceChannelSwitch",
   ({ pluginData, args: { member, oldChannel, newChannel } }) => {
-    handleCompanionPermissions(pluginData, member.id, newChannel.id, oldChannel.id);
+    handleCompanionPermissions(pluginData, member.id, newChannel, oldChannel);
   },
 );
