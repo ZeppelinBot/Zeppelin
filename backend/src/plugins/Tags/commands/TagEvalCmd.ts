@@ -26,6 +26,12 @@ export const TagEvalCmd = tagsCmd({
         },
         { member: msg.member },
       );
+
+      if (!rendered.content && !rendered.embed) {
+        sendErrorMessage(pluginData, msg.channel, "Evaluation resulted in an empty text");
+        return;
+      }
+
       msg.channel.createMessage(rendered);
     } catch (e) {
       if (e instanceof TemplateParseError) {
