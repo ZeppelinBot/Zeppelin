@@ -66,7 +66,8 @@
     <CodeBlock code-lang="yaml">
       plugins:
         mod_actions:
-          =overrides: # The "=" here means "replace any defaults"
+          replaceDefaultOverrides: true
+          overrides: # The "=" here means "replace any defaults"
             - level: ">=70"
               config:
                 can_warn: true
