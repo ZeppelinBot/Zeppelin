@@ -64,11 +64,15 @@ export const AddRolesAction = automodAction({
           return;
         }
 
+        const memberRolesLock = await pluginData.locks.acquire(`member-roles-${member.id}`);
+
         const rolesArr = Array.from(memberRoles.values());
         await member.edit({
           roles: rolesArr,
         });
         member.roles = rolesArr; // Make sure we know of the new roles internally as well
+
+        memberRolesLock.unlock();
       }),
     );
   },

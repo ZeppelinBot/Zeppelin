@@ -12,7 +12,10 @@ export const ReapplyActiveMuteOnJoinEvt = eventListener<MutesPluginType>()(
     const mute = await pluginData.state.mutes.findExistingMuteForUserId(member.id);
     if (mute) {
       const muteRole = pluginData.config.get().mute_role;
+
+      const memberRolesLock = await pluginData.locks.acquire(`member-roles-${member.id}`);
       await member.addRole(muteRole);
+      memberRolesLock.unlock();
 
       pluginData.state.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {
         member: stripObjectToScalars(member, ["user", "roles"]),
