@@ -43,8 +43,7 @@ export const SelfGrantableRolesPlugin = zeppelinPlugin<SelfGrantableRolesPluginT
             config:
               entries:
                 basic:
-                  roles:
-                    can_use: true
+                  can_use: true
       ~~~
       
       ### Maximum number of roles
