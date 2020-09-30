@@ -1,10 +1,10 @@
-import { PluginData } from "knub";
+import { GlobalPluginData } from "knub";
 import { GuildConfigReloaderPluginType } from "../types";
 import { SECONDS } from "../../../utils";
 
 const CHECK_INTERVAL = 1 * SECONDS;
 
-export async function reloadChangedGuilds(pluginData: PluginData<GuildConfigReloaderPluginType>) {
+export async function reloadChangedGuilds(pluginData: GlobalPluginData<GuildConfigReloaderPluginType>) {
   if (pluginData.state.unloaded) return;
 
   const changedConfigs = await pluginData.state.guildConfigs.getActiveLargerThanId(pluginData.state.highestConfigId);

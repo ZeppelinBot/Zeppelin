@@ -1,9 +1,9 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding } from "src/utils";
+import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding } from "../../../utils";
 import moment from "moment-timezone";
-import { CaseTypes } from "src/data/CaseTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
 import humanizeDuration from "humanize-duration";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -11,7 +11,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 
 export async function getSnowflakeInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   snowflake: string,
   showUnknownWarning = false,
   requestMemberId?: string,

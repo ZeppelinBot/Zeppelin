@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { slowmodeCmd } from "../types";
 import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
 import { asSingleLine, disableInlineCode } from "../../../utils";

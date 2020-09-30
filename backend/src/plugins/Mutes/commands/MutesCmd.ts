@@ -1,12 +1,11 @@
-import { command } from "knub";
-import { IMuteWithDetails, MutesPluginType } from "../types";
+import { IMuteWithDetails, mutesCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
 import moment from "moment-timezone";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
 
-export const MutesCmd = command<MutesPluginType>()({
+export const MutesCmd = mutesCmd({
   trigger: "mutes",
   permission: "can_view_list",
 

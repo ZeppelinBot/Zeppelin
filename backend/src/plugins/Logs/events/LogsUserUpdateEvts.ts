@@ -1,12 +1,12 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars, UnknownUser } from "src/utils";
+import { logsEvt } from "../types";
+import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { Constants as ErisConstants } from "eris";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
-export const LogsGuildMemberUpdateEvt = logsEvent({
+export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",
 
   async listener(meta) {
@@ -106,25 +106,4 @@ export const LogsGuildMemberUpdateEvt = logsEvent({
   },
 });
 
-export const LogsUserUpdateEvt = logsEvent({
-  event: "userUpdate",
-  allowSelf: true,
-
-  async listener(meta) {
-    const pluginData = meta.pluginData;
-    const oldUser = meta.args.oldUser;
-    const user = meta.args.user;
-
-    if (!oldUser) return;
-
-    if (!pluginData.guild.members.has(user.id)) return;
-
-    if (user.username !== oldUser.username || user.discriminator !== oldUser.discriminator) {
-      pluginData.state.guildLogs.log(LogType.MEMBER_USERNAME_CHANGE, {
-        user: stripObjectToScalars(user),
-        oldName: `${oldUser.username}#${oldUser.discriminator}`,
-        newName: `${user.username}#${user.discriminator}`,
-      });
-    }
-  },
-});
+// TODO: Reimplement USERNAME_CHANGE

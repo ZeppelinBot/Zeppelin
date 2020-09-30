@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
@@ -16,7 +16,7 @@ export const CreateCaseAction = t.type({
 export type TCreateCaseAction = t.TypeOf<typeof CreateCaseAction>;
 
 export async function createCaseAction(
-  pluginData: PluginData<CustomEventsPluginType>,
+  pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TCreateCaseAction,
   values: any,
   event: TCustomEvent,

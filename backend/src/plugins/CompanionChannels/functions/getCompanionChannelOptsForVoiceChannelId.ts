@@ -1,5 +1,5 @@
 import { VoiceChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 
 const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
@@ -7,7 +7,7 @@ const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
 };
 
 export function getCompanionChannelOptsForVoiceChannelId(
-  pluginData: PluginData<CompanionChannelsPluginType>,
+  pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
   voiceChannel: VoiceChannel,
 ): TCompanionChannelOpts[] {

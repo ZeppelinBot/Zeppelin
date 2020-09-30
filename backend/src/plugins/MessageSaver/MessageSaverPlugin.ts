@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, MessageSaverPluginType } from "./types";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { PluginOptions } from "knub";
@@ -20,7 +20,7 @@ const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   ],
 };
 
-export const MessageSaverPlugin = zeppelinPlugin<MessageSaverPluginType>()("message_saver", {
+export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()("message_saver", {
   showInDocs: false,
 
   configSchema: ConfigSchema,

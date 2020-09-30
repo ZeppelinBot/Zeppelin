@@ -1,12 +1,12 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType, RoleChangeMode, PendingMemberRoleChanges } from "../types";
-import { resolveMember } from "src/utils";
-import { logger } from "src/logger";
+import { resolveMember } from "../../../utils";
+import { logger } from "../../../logger";
 
 const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 1500;
 
 export async function addMemberPendingRoleChange(
-  pluginData: PluginData<ReactionRolesPluginType>,
+  pluginData: GuildPluginData<ReactionRolesPluginType>,
   memberId: string,
   mode: RoleChangeMode,
   roleId: string,

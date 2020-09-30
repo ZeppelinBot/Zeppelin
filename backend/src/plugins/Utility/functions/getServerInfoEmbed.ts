@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { embedPadding, formatNumber, memoize, MINUTES, preEmbedPadding, resolveUser, trimLines } from "../../../utils";
 import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, VoiceChannel } from "eris";
@@ -8,7 +8,7 @@ import { getGuildPreview } from "./getGuildPreview";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getServerInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
   requestMemberId?: string,
 ): Promise<EmbedOptions> {

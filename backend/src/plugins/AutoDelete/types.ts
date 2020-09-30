@@ -1,9 +1,9 @@
 import * as t from "io-ts";
-import { BasePluginType } from "knub";
-import { tDelayString, MINUTES } from "src/utils";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { tDelayString, MINUTES } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { SavedMessage } from "../../data/entities/SavedMessage";
 
 export const MAX_DELAY = 5 * MINUTES;
 

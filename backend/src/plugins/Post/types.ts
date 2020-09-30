@@ -1,8 +1,8 @@
 import * as t from "io-ts";
-import { BasePluginType, command } from "knub";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildScheduledPosts } from "src/data/GuildScheduledPosts";
-import { GuildLogs } from "src/data/GuildLogs";
+import { BasePluginType, guildCommand } from "knub";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
+import { GuildLogs } from "../../data/GuildLogs";
 
 export const ConfigSchema = t.type({
   can_post: t.boolean,
@@ -20,4 +20,4 @@ export interface PostPluginType extends BasePluginType {
   };
 }
 
-export const postCmd = command<PostPluginType>();
+export const postCmd = guildCommand<PostPluginType>();

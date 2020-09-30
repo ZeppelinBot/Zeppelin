@@ -1,7 +1,7 @@
 import { CooldownManager, PluginOptions } from "knub";
 import { SelfGrantableRolesPluginType, ConfigSchema, defaultSelfGrantableRoleEntry } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { trimPluginDescription } from "src/utils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { trimPluginDescription } from "../../utils";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
@@ -13,7 +13,7 @@ const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   },
 };
 
-export const SelfGrantableRolesPlugin = zeppelinPlugin<SelfGrantableRolesPluginType>()("self_grantable_roles", {
+export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPluginType>()("self_grantable_roles", {
   showInDocs: true,
 
   configSchema: ConfigSchema,

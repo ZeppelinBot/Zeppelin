@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ArgsFromSignatureOrArray } from "knub/dist/commands/commandUtils";
 import { searchCmdSignature } from "./commands/SearchCmd";
 import { banSearchSignature } from "./commands/BanSearchCmd";
@@ -29,19 +29,19 @@ type MemberSearchParams = ArgsFromSignatureOrArray<typeof searchCmdSignature>;
 type BanSearchParams = ArgsFromSignatureOrArray<typeof banSearchSignature>;
 
 export async function displaySearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
   searchType: SearchType.MemberSearch,
   msg: Message,
 );
 export async function displaySearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
   searchType: SearchType.BanSearch,
   msg: Message,
 );
 export async function displaySearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams | BanSearchParams,
   searchType: SearchType,
   msg: Message,
@@ -173,19 +173,19 @@ export async function displaySearch(
 }
 
 export async function archiveSearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
   searchType: SearchType.MemberSearch,
   msg: Message,
 );
 export async function archiveSearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
   searchType: SearchType.BanSearch,
   msg: Message,
 );
 export async function archiveSearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams | BanSearchParams,
   searchType: SearchType,
   msg: Message,
@@ -234,7 +234,7 @@ export async function archiveSearch(
 }
 
 async function performMemberSearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: MemberSearchParams,
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
@@ -368,7 +368,7 @@ async function performMemberSearch(
 }
 
 async function performBanSearch(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   args: BanSearchParams,
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,

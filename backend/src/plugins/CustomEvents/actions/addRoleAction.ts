@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
@@ -15,7 +15,7 @@ export const AddRoleAction = t.type({
 export type TAddRoleAction = t.TypeOf<typeof AddRoleAction>;
 
 export async function addRoleAction(
-  pluginData: PluginData<CustomEventsPluginType>,
+  pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TAddRoleAction,
   values: any,
   event: TCustomEvent,

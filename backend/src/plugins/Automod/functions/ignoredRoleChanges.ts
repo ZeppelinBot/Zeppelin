@@ -1,10 +1,10 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 import { MINUTES } from "../../../utils";
 
 const IGNORED_ROLE_CHANGE_LIFETIME = 5 * MINUTES;
 
-function cleanupIgnoredRoleChanges(pluginData: PluginData<AutomodPluginType>) {
+function cleanupIgnoredRoleChanges(pluginData: GuildPluginData<AutomodPluginType>) {
   const cutoff = Date.now() - IGNORED_ROLE_CHANGE_LIFETIME;
   for (const ignoredChange of pluginData.state.ignoredRoleChanges.values()) {
     if (ignoredChange.timestamp < cutoff) {
@@ -13,7 +13,7 @@ function cleanupIgnoredRoleChanges(pluginData: PluginData<AutomodPluginType>) {
   }
 }
 
-export function ignoreRoleChange(pluginData: PluginData<AutomodPluginType>, memberId: string, roleId: string) {
+export function ignoreRoleChange(pluginData: GuildPluginData<AutomodPluginType>, memberId: string, roleId: string) {
   pluginData.state.ignoredRoleChanges.add({
     memberId,
     roleId,
@@ -26,7 +26,11 @@ export function ignoreRoleChange(pluginData: PluginData<AutomodPluginType>, memb
 /**
  * @return Whether the role change should be ignored
  */
-export function consumeIgnoredRoleChange(pluginData: PluginData<AutomodPluginType>, memberId: string, roleId: string) {
+export function consumeIgnoredRoleChange(
+  pluginData: GuildPluginData<AutomodPluginType>,
+  memberId: string,
+  roleId: string,
+) {
   for (const ignoredChange of pluginData.state.ignoredRoleChanges.values()) {
     if (ignoredChange.memberId === memberId && ignoredChange.roleId === roleId) {
       pluginData.state.ignoredRoleChanges.delete(ignoredChange);

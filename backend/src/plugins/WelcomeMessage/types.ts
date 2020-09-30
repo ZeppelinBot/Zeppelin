@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener } from "knub";
-import { tNullable } from "src/utils";
-import { GuildLogs } from "src/data/GuildLogs";
+import { BasePluginType, guildEventListener } from "knub";
+import { tNullable } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs";
 
 export const ConfigSchema = t.type({
   send_dm: t.boolean,
@@ -18,4 +18,4 @@ export interface WelcomeMessagePluginType extends BasePluginType {
   };
 }
 
-export const welcomeEvent = eventListener<WelcomeMessagePluginType>();
+export const welcomeMessageEvt = guildEventListener<WelcomeMessagePluginType>();

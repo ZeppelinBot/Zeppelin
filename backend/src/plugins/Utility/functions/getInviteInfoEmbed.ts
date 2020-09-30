@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { BaseInvite, Constants, EmbedOptions, RESTChannelInvite, RESTPrivateInvite } from "eris";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
@@ -16,7 +16,7 @@ import {
 } from "../../../utils";
 
 export async function getInviteInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   inviteCode: string,
 ): Promise<EmbedOptions | null> {
   const invite = await resolveInvite(pluginData.client, inviteCode, true);

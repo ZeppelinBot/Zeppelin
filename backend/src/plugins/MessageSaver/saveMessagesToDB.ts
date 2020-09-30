@@ -1,9 +1,9 @@
 import { MessageSaverPluginType } from "./types";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Message, TextChannel } from "eris";
 
 export async function saveMessagesToDB(
-  pluginData: PluginData<MessageSaverPluginType>,
+  pluginData: GuildPluginData<MessageSaverPluginType>,
   channel: TextChannel,
   ids: string[],
 ) {

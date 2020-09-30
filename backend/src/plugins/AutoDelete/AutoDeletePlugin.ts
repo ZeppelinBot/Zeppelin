@@ -1,8 +1,8 @@
 import { PluginOptions } from "knub";
 import { AutoDeletePluginType, ConfigSchema } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildLogs } from "src/data/GuildLogs";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
@@ -15,7 +15,7 @@ const defaultOptions: PluginOptions<AutoDeletePluginType> = {
   },
 };
 
-export const AutoDeletePlugin = zeppelinPlugin<AutoDeletePluginType>()("auto_delete", {
+export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()("auto_delete", {
   showInDocs: true,
   info: {
     prettyName: "Auto-delete",

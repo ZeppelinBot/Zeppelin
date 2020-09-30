@@ -1,10 +1,10 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AutoReactionsPluginType, ConfigSchema } from "./types";
 import { PluginOptions } from "knub";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildAutoReactions } from "src/data/GuildAutoReactions";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -23,7 +23,7 @@ const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   ],
 };
 
-export const AutoReactionsPlugin = zeppelinPlugin<AutoReactionsPluginType>()("auto_reactions", {
+export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>()("auto_reactions", {
   showInDocs: true,
   info: {
     prettyName: "Auto-reactions",

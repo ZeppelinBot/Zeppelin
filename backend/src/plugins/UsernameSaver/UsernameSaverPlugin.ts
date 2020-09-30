@@ -1,11 +1,11 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { UsernameHistory } from "src/data/UsernameHistory";
-import { Queue } from "src/Queue";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { UsernameHistory } from "../../data/UsernameHistory";
+import { Queue } from "../../Queue";
 import { UsernameSaverPluginType } from "./types";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
 import * as t from "io-ts";
 
-export const UsernameSaverPlugin = zeppelinPlugin<UsernameSaverPluginType>()("username_saver", {
+export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>()("username_saver", {
   showInDocs: false,
 
   configSchema: t.type({}),

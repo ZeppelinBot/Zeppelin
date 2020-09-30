@@ -1,18 +1,18 @@
-import { modActionsCommand, IgnoredEventType } from "../types";
+import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { CaseTypes } from "src/data/CaseTypes";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const UnbanCmd = modActionsCommand({
+export const UnbanCmd = modActionsCmd({
   trigger: "unban",
   permission: "can_ban",
   description: "Unban the specified member",

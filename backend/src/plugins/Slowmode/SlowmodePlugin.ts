@@ -1,10 +1,10 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, SlowmodePluginType } from "./types";
-import { GuildSlowmodes } from "src/data/GuildSlowmodes";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildLogs } from "src/data/GuildLogs";
-import { SECONDS } from "src/utils";
+import { GuildSlowmodes } from "../../data/GuildSlowmodes";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
+import { SECONDS } from "../../utils";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
@@ -35,7 +35,7 @@ const defaultOptions: PluginOptions<SlowmodePluginType> = {
   ],
 };
 
-export const SlowmodePlugin = zeppelinPlugin<SlowmodePluginType>()("slowmode", {
+export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()("slowmode", {
   showInDocs: true,
   info: {
     prettyName: "Slowmode",

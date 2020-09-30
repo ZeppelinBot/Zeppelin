@@ -1,8 +1,8 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 
-export const LogsChannelCreateEvt = logsEvent({
+export const LogsChannelCreateEvt = logsEvt({
   event: "channelCreate",
 
   async listener(meta) {
@@ -12,7 +12,7 @@ export const LogsChannelCreateEvt = logsEvent({
   },
 });
 
-export const LogsChannelDeleteEvt = logsEvent({
+export const LogsChannelDeleteEvt = logsEvt({
   event: "channelDelete",
 
   async listener(meta) {

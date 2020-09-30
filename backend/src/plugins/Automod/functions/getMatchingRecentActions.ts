@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 import { RecentActionType } from "../constants";
 
 export function getMatchingRecentActions(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   type: RecentActionType,
   identifier: string | null,
   since: number,

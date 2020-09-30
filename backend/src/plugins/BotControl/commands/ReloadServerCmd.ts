@@ -1,9 +1,8 @@
-import { command } from "knub";
-import { BotControlPluginType } from "../types";
+import { botControlCmd } from "../types";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
-export const ReloadServerCmd = command<BotControlPluginType>()({
+export const ReloadServerCmd = botControlCmd({
   trigger: ["reload_server", "reload_guild"],
   permission: null,
   config: {

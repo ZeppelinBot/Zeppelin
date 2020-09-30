@@ -1,10 +1,10 @@
 import { GuildChannel, TextChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
 
 export async function disableBotSlowmodeForChannel(
-  pluginData: PluginData<SlowmodePluginType>,
+  pluginData: GuildPluginData<SlowmodePluginType>,
   channel: GuildChannel & TextChannel,
 ) {
   // Disable channel slowmode

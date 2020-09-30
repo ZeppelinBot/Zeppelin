@@ -1,11 +1,10 @@
-import { eventListener } from "knub";
-import { MutesPluginType } from "../types";
+import { mutesEvt } from "../types";
 import { memberHasMutedRole } from "../functions/memberHasMutedRole";
 
 /**
  * Clear active mute if the mute role is removed manually
  */
-export const ClearActiveMuteOnRoleRemovalEvt = eventListener<MutesPluginType>()(
+export const ClearActiveMuteOnRoleRemovalEvt = mutesEvt(
   "guildMemberUpdate",
   async ({ pluginData, args: { member } }) => {
     const muteRole = pluginData.config.get().mute_role;

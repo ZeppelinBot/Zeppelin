@@ -1,4 +1,4 @@
-import { modActionsCommand, IgnoredEventType } from "../types";
+import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember } from "../../../utils";
@@ -7,7 +7,7 @@ import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromA
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -16,7 +16,7 @@ const opts = {
   "delete-days": ct.number({ option: true, shortcut: "d" }),
 };
 
-export const BanCmd = modActionsCommand({
+export const BanCmd = modActionsCmd({
   trigger: "ban",
   permission: "can_ban",
   description: "Ban the specified member",

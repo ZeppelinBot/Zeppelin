@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { BasePluginType, command } from "knub";
-import { GuildReminders } from "src/data/GuildReminders";
+import { BasePluginType, guildCommand } from "knub";
+import { GuildReminders } from "../../data/GuildReminders";
 
 export const ConfigSchema = t.type({
   can_use: t.boolean,
@@ -19,4 +19,4 @@ export interface RemindersPluginType extends BasePluginType {
   };
 }
 
-export const remindersCommand = command<RemindersPluginType>();
+export const remindersCmd = guildCommand<RemindersPluginType>();

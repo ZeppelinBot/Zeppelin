@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CasesPluginType } from "../types";
 import { Message, MessageContent, MessageFile, TextChannel } from "eris";
 import { isDiscordRESTError } from "../../../utils";
@@ -9,7 +9,7 @@ import { resolveCaseId } from "./resolveCaseId";
 import { logger } from "../../../logger";
 
 export async function postToCaseLogChannel(
-  pluginData: PluginData<CasesPluginType>,
+  pluginData: GuildPluginData<CasesPluginType>,
   content: MessageContent,
   file: MessageFile = null,
 ): Promise<Message | null> {
@@ -40,7 +40,7 @@ export async function postToCaseLogChannel(
 }
 
 export async function postCaseToCaseLogChannel(
-  pluginData: PluginData<CasesPluginType>,
+  pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
 ): Promise<Message | null> {
   const theCase = await pluginData.state.cases.find(resolveCaseId(caseOrCaseId));

@@ -1,9 +1,9 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
-import { tNullable, tDeepPartial } from "src/utils";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildStarboardMessages } from "src/data/GuildStarboardMessages";
-import { GuildStarboardReactions } from "src/data/GuildStarboardReactions";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { tNullable, tDeepPartial } from "../../utils";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
+import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
 
 const StarboardOpts = t.type({
   channel_id: t.string,
@@ -39,5 +39,5 @@ export interface StarboardPluginType extends BasePluginType {
   };
 }
 
-export const starboardCmd = command<StarboardPluginType>();
-export const starboardEvt = eventListener<StarboardPluginType>();
+export const starboardCmd = guildCommand<StarboardPluginType>();
+export const starboardEvt = guildEventListener<StarboardPluginType>();

@@ -1,14 +1,21 @@
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
 import moment from "moment-timezone";
-import { MuteResult } from "src/plugins/Mutes/types";
-import { convertDelayStringToMS, DBDateFormat, noop, resolveMember, stripObjectToScalars, trimLines } from "src/utils";
-import { LogType } from "src/data/LogType";
-import { CaseTypes } from "src/data/CaseTypes";
-import { logger } from "src/logger";
-import { PluginData } from "knub";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
+import { MuteResult } from "../../../plugins/Mutes/types";
+import {
+  convertDelayStringToMS,
+  DBDateFormat,
+  noop,
+  resolveMember,
+  stripObjectToScalars,
+  trimLines,
+} from "../../../utils";
+import { LogType } from "../../../data/LogType";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { logger } from "../../../logger";
+import { GuildPluginData } from "knub";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { addRecentAction } from "./addRecentAction";
 import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
@@ -18,7 +25,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 
 export async function logAndDetectMessageSpam(
-  pluginData: PluginData<SpamPluginType>,
+  pluginData: GuildPluginData<SpamPluginType>,
   savedMessage: SavedMessage,
   type: RecentActionType,
   spamConfig: TBaseSingleSpamConfig,

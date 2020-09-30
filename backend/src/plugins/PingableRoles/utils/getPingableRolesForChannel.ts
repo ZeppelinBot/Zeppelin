@@ -1,9 +1,9 @@
-import { PingableRole } from "src/data/entities/PingableRole";
-import { PluginData } from "knub";
+import { PingableRole } from "../../../data/entities/PingableRole";
+import { GuildPluginData } from "knub";
 import { PingableRolesPluginType } from "../types";
 
 export async function getPingableRolesForChannel(
-  pluginData: PluginData<PingableRolesPluginType>,
+  pluginData: GuildPluginData<PingableRolesPluginType>,
   channelId: string,
 ): Promise<PingableRole[]> {
   if (!pluginData.state.cache.has(channelId)) {

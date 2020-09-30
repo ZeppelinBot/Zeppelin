@@ -1,5 +1,5 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import {
   UnknownUser,
@@ -10,14 +10,14 @@ import {
   preEmbedPadding,
   sorter,
   messageLink,
-} from "src/utils";
+} from "../../../utils";
 import moment from "moment-timezone";
-import { CaseTypes } from "src/data/CaseTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
 import humanizeDuration from "humanize-duration";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getUserInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
   compact = false,
   requestMemberId?: string,

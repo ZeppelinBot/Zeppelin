@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { trimPluginDescription } from "../../../utils";
 import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
@@ -9,7 +9,7 @@ const opts = {
   "notify-channel": ct.textChannel({ option: true }),
 };
 
-export const SoftbanCmd = modActionsCommand({
+export const SoftbanCmd = modActionsCmd({
   trigger: "softban",
   permission: "can_kick",
   description: trimPluginDescription(`

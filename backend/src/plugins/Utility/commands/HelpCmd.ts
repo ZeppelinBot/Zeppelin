@@ -2,7 +2,7 @@ import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { createChunkedMessage } from "../../../utils";
 import { PluginCommandDefinition } from "knub/dist/commands/commandUtils";
-import { LoadedPlugin } from "knub";
+import { LoadedGuildPlugin } from "knub";
 
 export const HelpCmd = utilityCmd({
   trigger: "help",
@@ -18,7 +18,7 @@ export const HelpCmd = utilityCmd({
     const searchStr = args.command.toLowerCase();
 
     const matchingCommands: Array<{
-      plugin: LoadedPlugin<any>;
+      plugin: LoadedGuildPlugin<any>;
       command: PluginCommandDefinition;
     }> = [];
 

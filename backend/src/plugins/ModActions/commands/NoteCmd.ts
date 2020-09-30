@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -8,7 +8,7 @@ import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { resolveUser, stripObjectToScalars } from "../../../utils";
 
-export const NoteCmd = modActionsCommand({
+export const NoteCmd = modActionsCmd({
   trigger: "note",
   permission: "can_note",
   description: "Add a note to the specified user",

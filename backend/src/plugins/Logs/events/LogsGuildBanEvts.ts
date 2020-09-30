@@ -1,10 +1,10 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars, UnknownUser } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars, UnknownUser } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import { Constants as ErisConstants } from "eris";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
-export const LogsGuildBanAddEvt = logsEvent({
+export const LogsGuildBanAddEvt = logsEvt({
   event: "guildBanAdd",
 
   async listener(meta) {
@@ -29,7 +29,7 @@ export const LogsGuildBanAddEvt = logsEvent({
   },
 });
 
-export const LogsGuildBanRemoveEvt = logsEvent({
+export const LogsGuildBanRemoveEvt = logsEvt({
   event: "guildBanRemove",
 
   async listener(meta) {

@@ -1,9 +1,9 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, PostPluginType } from "./types";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildScheduledPosts } from "src/data/GuildScheduledPosts";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
+import { GuildLogs } from "../../data/GuildLogs";
 import { PostCmd } from "./commands/PostCmd";
 import { PostEmbedCmd } from "./commands/PostEmbedCmd";
 import { EditCmd } from "./commands/EditCmd";
@@ -28,7 +28,7 @@ const defaultOptions: PluginOptions<PostPluginType> = {
   ],
 };
 
-export const PostPlugin = zeppelinPlugin<PostPluginType>()("post", {
+export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()("post", {
   showInDocs: true,
   info: {
     prettyName: "Post",

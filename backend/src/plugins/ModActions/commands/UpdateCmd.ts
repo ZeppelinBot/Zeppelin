@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -7,7 +7,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
 
-export const UpdateCmd = modActionsCommand({
+export const UpdateCmd = modActionsCmd({
   trigger: "update",
   permission: "can_note",
   description:

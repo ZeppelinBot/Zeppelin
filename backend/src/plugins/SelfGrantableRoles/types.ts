@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, command, CooldownManager } from "knub";
+import { BasePluginType, guildCommand, CooldownManager } from "knub";
 
 const RoleMap = t.record(t.string, t.array(t.string));
 
@@ -31,4 +31,4 @@ export interface SelfGrantableRolesPluginType extends BasePluginType {
   };
 }
 
-export const selfGrantableRolesCmd = command<SelfGrantableRolesPluginType>();
+export const selfGrantableRolesCmd = guildCommand<SelfGrantableRolesPluginType>();

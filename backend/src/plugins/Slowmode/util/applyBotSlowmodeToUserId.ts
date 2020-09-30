@@ -1,12 +1,12 @@
 import { SlowmodePluginType } from "../types";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Constants, GuildChannel, TextChannel } from "eris";
-import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "src/utils";
-import { LogType } from "src/data/LogType";
-import { logger } from "src/logger";
+import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 
 export async function applyBotSlowmodeToUserId(
-  pluginData: PluginData<SlowmodePluginType>,
+  pluginData: GuildPluginData<SlowmodePluginType>,
   channel: GuildChannel & TextChannel,
   userId: string,
 ) {

@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AutomodPluginType, ConfigSchema } from "./types";
 import { RunAutomodOnJoinEvt } from "./events/RunAutomodOnJoinEvt";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -147,7 +147,7 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
   return options;
 };
 
-export const AutomodPlugin = zeppelinPlugin<AutomodPluginType>()("automod", {
+export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod", {
   showInDocs: true,
   info: pluginInfo,
 

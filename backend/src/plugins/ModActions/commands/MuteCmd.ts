@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -20,7 +20,7 @@ const opts = {
   "notify-channel": ct.textChannel({ option: true }),
 };
 
-export const MuteCmd = modActionsCommand({
+export const MuteCmd = modActionsCmd({
   trigger: "mute",
   permission: "can_mute",
   description: "Mute the specified member",
@@ -49,7 +49,7 @@ export const MuteCmd = modActionsCommand({
 
     if (!memberToMute) {
       const _isBanned = await isBanned(pluginData, user.id);
-      const prefix = pluginData.guildConfig.prefix;
+      const prefix = pluginData.fullConfig.prefix;
       if (_isBanned) {
         sendErrorMessage(
           pluginData,

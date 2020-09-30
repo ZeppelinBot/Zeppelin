@@ -1,9 +1,8 @@
-import { command } from "knub";
-import { MutesPluginType } from "../types";
+import { mutesCmd } from "../types";
 import { User } from "eris";
 import { sendSuccessMessage } from "../../../pluginUtils";
 
-export const ClearBannedMutesCmd = command<MutesPluginType>()({
+export const ClearBannedMutesCmd = mutesCmd({
   trigger: "clear_banned_mutes",
   permission: "can_cleanup",
   description: "Clear dangling mutes for members who have been banned",

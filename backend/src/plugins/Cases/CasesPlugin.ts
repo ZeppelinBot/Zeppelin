@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
 import { createCase } from "./functions/createCase";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -26,7 +26,7 @@ const defaultOptions = {
   },
 };
 
-export const CasesPlugin = zeppelinPlugin<CasesPluginType>()("cases", {
+export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
   showInDocs: true,
   info: {
     prettyName: "Cases",

@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { BasePluginType, command, eventListener } from "knub";
-import { tNullable, tEmbed } from "src/utils";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildTags } from "src/data/GuildTags";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildLogs } from "src/data/GuildLogs";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { tNullable, tEmbed } from "../../utils";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildTags } from "../../data/GuildTags";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
 
 export const Tag = t.union([t.string, tEmbed]);
 
@@ -55,5 +55,5 @@ export interface TagsPluginType extends BasePluginType {
   };
 }
 
-export const tagsCmd = command<TagsPluginType>();
-export const tagsEvent = eventListener<TagsPluginType>();
+export const tagsCmd = guildCommand<TagsPluginType>();
+export const tagsEvt = guildEventListener<TagsPluginType>();

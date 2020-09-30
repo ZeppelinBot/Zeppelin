@@ -1,9 +1,8 @@
-import { command } from "knub";
-import { BotControlPluginType } from "../types";
+import { botControlCmd } from "../types";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
-export const LeaveServerCmd = command<BotControlPluginType>()({
+export const LeaveServerCmd = botControlCmd({
   trigger: ["leave_server", "leave_guild"],
   permission: null,
   config: {

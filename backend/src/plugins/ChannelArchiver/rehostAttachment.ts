@@ -1,5 +1,5 @@
 import { Attachment, TextChannel } from "eris";
-import { downloadFile } from "src/utils";
+import { downloadFile } from "../../utils";
 import fs from "fs";
 const fsp = fs.promises;
 

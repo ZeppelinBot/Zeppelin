@@ -1,6 +1,6 @@
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { TextChannel, VoiceChannel } from "eris";
 import { isDiscordRESTError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -10,19 +10,19 @@ const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;
 
 export async function handleCompanionPermissions(
-  pluginData: PluginData<CompanionChannelsPluginType>,
+  pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
   voiceChannel: VoiceChannel,
   oldChannel?: VoiceChannel,
 );
 export async function handleCompanionPermissions(
-  pluginData: PluginData<CompanionChannelsPluginType>,
+  pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
   voiceChannel: null,
   oldChannel: VoiceChannel,
 );
 export async function handleCompanionPermissions(
-  pluginData: PluginData<CompanionChannelsPluginType>,
+  pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
   voiceChannel?: VoiceChannel,
   oldChannel?: VoiceChannel,

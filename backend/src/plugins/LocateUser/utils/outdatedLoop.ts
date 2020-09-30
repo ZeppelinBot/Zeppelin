@@ -1,9 +1,11 @@
-import { SECONDS } from "src/utils";
+import { SECONDS } from "../../../utils";
 import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts";
+import { GuildPluginData } from "knub";
+import { LocateUserPluginType } from "../types";
 
 const ALERT_LOOP_TIME = 30 * SECONDS;
 
-export async function outdatedAlertsLoop(pluginData) {
+export async function outdatedAlertsLoop(pluginData: GuildPluginData<LocateUserPluginType>) {
   const outdatedAlerts = await pluginData.state.alerts.getOutdatedAlerts();
 
   for (const alert of outdatedAlerts) {

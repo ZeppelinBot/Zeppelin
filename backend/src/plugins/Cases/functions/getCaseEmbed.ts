@@ -2,7 +2,7 @@ import { Case } from "../../../data/entities/Case";
 import { AdvancedMessageContent, MessageContent } from "eris";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { PluginData, helpers } from "knub";
+import { GuildPluginData, helpers } from "knub";
 import { CasesPluginType } from "../types";
 import { resolveCaseId } from "./resolveCaseId";
 import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
@@ -10,7 +10,7 @@ import { getCaseColor } from "./getCaseColor";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getCaseEmbed(
-  pluginData: PluginData<CasesPluginType>,
+  pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
   requestMemberId?: string,
 ): Promise<AdvancedMessageContent> {

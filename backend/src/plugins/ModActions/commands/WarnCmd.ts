@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -13,7 +13,7 @@ import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromA
 import { warnMember } from "../functions/warnMember";
 import { TextChannel } from "eris";
 
-export const WarnCmd = modActionsCommand({
+export const WarnCmd = modActionsCmd({
   trigger: "warn",
   permission: "can_warn",
   description: "Send a warning to the specified user",

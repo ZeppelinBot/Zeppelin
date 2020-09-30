@@ -1,10 +1,10 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SpamPluginType, RecentActionType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
-import { getUserMentions, getRoleMentions, getUrlsInString, getEmojiInString } from "src/utils";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { getUserMentions, getRoleMentions, getUrlsInString, getEmojiInString } from "../../../utils";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
-export async function onMessageCreate(pluginData: PluginData<SpamPluginType>, savedMessage: SavedMessage) {
+export async function onMessageCreate(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
   if (savedMessage.is_bot) return;
 
   const member = pluginData.guild.members.get(savedMessage.user_id);

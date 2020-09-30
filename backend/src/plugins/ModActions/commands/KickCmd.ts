@@ -1,11 +1,10 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember } from "../../../utils";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
 import { isBanned } from "../functions/isBanned";
-import { plugin } from "knub";
 import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
 
 const opts = {
@@ -15,7 +14,7 @@ const opts = {
   clean: ct.bool({ option: true, isSwitch: true }),
 };
 
-export const KickCmd = modActionsCommand({
+export const KickCmd = modActionsCmd({
   trigger: "kick",
   permission: "can_kick",
   description: "Kick the specified member",

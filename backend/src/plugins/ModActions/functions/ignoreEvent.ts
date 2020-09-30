@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { SECONDS } from "../../../utils";
 import { clearIgnoredEvents } from "./clearIgnoredEvents";
@@ -6,7 +6,7 @@ import { clearIgnoredEvents } from "./clearIgnoredEvents";
 const DEFAULT_TIMEOUT = 15 * SECONDS;
 
 export function ignoreEvent(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   type: IgnoredEventType,
   userId: string,
   timeout = DEFAULT_TIMEOUT,

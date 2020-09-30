@@ -1,12 +1,12 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CensorPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars, resolveUser } from "src/utils";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, resolveUser } from "../../../utils";
 import { disableCodeBlocks, deactivateMentions } from "knub/dist/helpers";
 
 export async function censorMessage(
-  pluginData: PluginData<CensorPluginType>,
+  pluginData: GuildPluginData<CensorPluginType>,
   savedMessage: SavedMessage,
   reason: string,
 ) {

@@ -1,5 +1,4 @@
-import { eventListener } from "knub";
-import { ModActionsPluginType } from "../types";
+import { modActionsEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
@@ -7,7 +6,7 @@ import { TextChannel } from "eris";
 /**
  * Show an alert if a member with prior notes joins the server
  */
-export const PostAlertOnMemberJoinEvt = eventListener<ModActionsPluginType>()(
+export const PostAlertOnMemberJoinEvt = modActionsEvt(
   "guildMemberAdd",
   async ({ pluginData, args: { guild, member } }) => {
     const config = pluginData.config.get();

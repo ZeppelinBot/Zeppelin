@@ -1,11 +1,11 @@
-import { reactionRolesEvent } from "../types";
-import { resolveMember, noop, sleep } from "src/utils";
+import { reactionRolesEvt } from "../types";
+import { resolveMember, noop, sleep } from "../../../utils";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
 import { Message } from "eris";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
-export const AddReactionRoleEvt = reactionRolesEvent({
+export const AddReactionRoleEvt = reactionRolesEvt({
   event: "messageReactionAdd",
 
   async listener(meta) {

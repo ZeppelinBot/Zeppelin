@@ -1,6 +1,6 @@
-import { BasePluginType, eventListener } from "knub";
-import { UsernameHistory } from "src/data/UsernameHistory";
-import { Queue } from "src/Queue";
+import { BasePluginType, guildEventListener } from "knub";
+import { UsernameHistory } from "../../data/UsernameHistory";
+import { Queue } from "../../Queue";
 
 export interface UsernameSaverPluginType extends BasePluginType {
   state: {
@@ -9,4 +9,4 @@ export interface UsernameSaverPluginType extends BasePluginType {
   };
 }
 
-export const usernameEvent = eventListener<UsernameSaverPluginType>();
+export const usernameSaverEvt = guildEventListener<UsernameSaverPluginType>();

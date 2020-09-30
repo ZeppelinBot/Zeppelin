@@ -1,10 +1,10 @@
 import { PluginOptions } from "knub";
 import { ConfigSchema, defaultStarboardOpts, StarboardPluginType } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { trimPluginDescription } from "src/utils";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildStarboardMessages } from "src/data/GuildStarboardMessages";
-import { GuildStarboardReactions } from "src/data/GuildStarboardReactions";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { trimPluginDescription } from "../../utils";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
+import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
@@ -26,7 +26,7 @@ const defaultOptions: PluginOptions<StarboardPluginType> = {
   ],
 };
 
-export const StarboardPlugin = zeppelinPlugin<StarboardPluginType>()("starboard", {
+export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starboard", {
   showInDocs: true,
 
   configSchema: ConfigSchema,

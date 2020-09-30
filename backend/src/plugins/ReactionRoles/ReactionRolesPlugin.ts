@@ -1,9 +1,9 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, ReactionRolesPluginType } from "./types";
-import { GuildReactionRoles } from "src/data/GuildReactionRoles";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { Queue } from "src/Queue";
+import { GuildReactionRoles } from "../../data/GuildReactionRoles";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { Queue } from "../../Queue";
 import { autoRefreshLoop } from "./util/autoRefreshLoop";
 import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
 import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
@@ -31,7 +31,7 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   ],
 };
 
-export const ReactionRolesPlugin = zeppelinPlugin<ReactionRolesPluginType>()("reaction_roles", {
+export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>()("reaction_roles", {
   showInDocs: true,
   info: {
     prettyName: "Reaction roles",

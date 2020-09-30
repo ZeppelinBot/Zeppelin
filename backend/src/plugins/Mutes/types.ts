@@ -3,7 +3,7 @@ import { tNullable, UserNotificationMethod, UserNotificationResult } from "../..
 import { Mute } from "../../data/entities/Mute";
 import { Member } from "eris";
 import { Case } from "../../data/entities/Case";
-import { BasePluginType } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -60,3 +60,6 @@ export interface MuteOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
 }
+
+export const mutesCmd = guildCommand<MutesPluginType>();
+export const mutesEvt = guildEventListener<MutesPluginType>();

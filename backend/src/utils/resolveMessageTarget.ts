@@ -1,6 +1,6 @@
 import { disableInlineCode, isSnowflake } from "../utils";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
-import { PluginData, TypeConversionError } from "knub";
+import { GuildPluginData, TypeConversionError } from "knub";
 import { TextChannel } from "eris";
 
 const channelAndMessageIdRegex = /^(\d+)[\-\/](\d+)$/;
@@ -11,7 +11,7 @@ export interface MessageTarget {
   messageId: string;
 }
 
-export async function resolveMessageTarget(pluginData: PluginData<any>, value: string) {
+export async function resolveMessageTarget(pluginData: GuildPluginData<any>, value: string) {
   const result = await (async () => {
     if (isSnowflake(value)) {
       const channelId = await getChannelIdFromMessageId(value);

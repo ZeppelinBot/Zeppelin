@@ -1,17 +1,16 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember } from "../../../utils";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
 import { isBanned } from "../functions/isBanned";
-import { plugin } from "knub";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const UnmuteCmd = modActionsCommand({
+export const UnmuteCmd = modActionsCmd({
   trigger: "unmute",
   permission: "can_mute",
   description: "Unmute the specified member",
@@ -48,7 +47,7 @@ export const UnmuteCmd = modActionsCommand({
 
     if (!memberToUnmute) {
       const banned = await isBanned(pluginData, user.id);
-      const prefix = pluginData.guildConfig.prefix;
+      const prefix = pluginData.fullConfig.prefix;
       if (banned) {
         sendErrorMessage(
           pluginData,

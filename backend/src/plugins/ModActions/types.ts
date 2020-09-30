@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
-import { BasePluginType, command } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -114,4 +114,5 @@ export interface BanOptions {
   deleteMessageDays?: number;
 }
 
-export const modActionsCommand = command<ModActionsPluginType>();
+export const modActionsCmd = guildCommand<ModActionsPluginType>();
+export const modActionsEvt = guildEventListener<ModActionsPluginType>();

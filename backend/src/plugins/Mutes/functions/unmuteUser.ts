@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { CaseArgs } from "../../Cases/types";
 import { resolveUser, stripObjectToScalars, resolveMember } from "../../../utils";
@@ -9,7 +9,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 
 export async function unmuteUser(
-  pluginData: PluginData<MutesPluginType>,
+  pluginData: GuildPluginData<MutesPluginType>,
   userId: string,
   unmuteTime: number = null,
   caseArgs: Partial<CaseArgs> = {},

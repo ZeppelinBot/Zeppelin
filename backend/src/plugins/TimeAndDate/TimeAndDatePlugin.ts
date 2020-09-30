@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, TimeAndDatePluginType } from "./types";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
 import { PluginOptions } from "knub";
@@ -32,7 +32,7 @@ const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   ],
 };
 
-export const TimeAndDatePlugin = zeppelinPlugin<TimeAndDatePluginType>()("time_and_date", {
+export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()("time_and_date", {
   showInDocs: true,
   info: {
     prettyName: "Time and date",

@@ -1,5 +1,5 @@
 import { selfGrantableRolesCmd } from "../types";
-import { asSingleLine, trimLines } from "src/utils";
+import { asSingleLine, trimLines } from "../../../utils";
 import { getApplyingEntries } from "../util/getApplyingEntries";
 
 export const RoleHelpCmd = selfGrantableRolesCmd({
@@ -19,7 +19,7 @@ export const RoleHelpCmd = selfGrantableRolesCmd({
       }
     }
 
-    const prefix = pluginData.guildConfig.prefix;
+    const prefix = pluginData.fullConfig.prefix;
     const [firstRole, secondRole] = allPrimaryAliases;
 
     const help1 = asSingleLine(`

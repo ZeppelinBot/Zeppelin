@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { ActionError } from "../ActionError";
@@ -9,7 +9,7 @@ import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
 import { messageAction } from "../actions/messageAction";
 
 export async function runEvent(
-  pluginData: PluginData<CustomEventsPluginType>,
+  pluginData: GuildPluginData<CustomEventsPluginType>,
   event: TCustomEvent,
   eventData: any,
   values: any,

@@ -1,18 +1,18 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SpamPluginType, RecentActionType } from "../types";
 import { addRecentAction } from "./addRecentAction";
 import { getRecentActionCount } from "./getRecentActionCount";
-import { resolveMember, convertDelayStringToMS, stripObjectToScalars } from "src/utils";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
-import { CaseTypes } from "src/data/CaseTypes";
+import { resolveMember, convertDelayStringToMS, stripObjectToScalars } from "../../../utils";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { CaseTypes } from "../../../data/CaseTypes";
 import { clearRecentUserActions } from "./clearRecentUserActions";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function logAndDetectOtherSpam(
-  pluginData: PluginData<SpamPluginType>,
+  pluginData: GuildPluginData<SpamPluginType>,
   type: RecentActionType,
   spamConfig: any,
   userId: string,

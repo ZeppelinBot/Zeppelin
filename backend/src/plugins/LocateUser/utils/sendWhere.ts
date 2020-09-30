@@ -1,12 +1,12 @@
 import { Member, TextableChannel, VoiceChannel } from "eris";
 import { getInviteLink } from "knub/dist/helpers";
 import { createOrReuseInvite } from "./createOrReuseInvite";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LocateUserPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 
 export async function sendWhere(
-  pluginData: PluginData<LocateUserPluginType>,
+  pluginData: GuildPluginData<LocateUserPluginType>,
   member: Member,
   channel: TextableChannel,
   prepend: string,

@@ -1,9 +1,9 @@
 import { PluginOptions } from "knub";
 import { ConfigSchema, NameHistoryPluginType } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { GuildNicknameHistory } from "src/data/GuildNicknameHistory";
-import { UsernameHistory } from "src/data/UsernameHistory";
-import { Queue } from "src/Queue";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
+import { UsernameHistory } from "../../data/UsernameHistory";
+import { Queue } from "../../Queue";
 import { NamesCmd } from "./commands/NamesCmd";
 import { ChannelJoinEvt, MessageCreateEvt } from "./events/UpdateNameEvts";
 
@@ -21,7 +21,7 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
   ],
 };
 
-export const NameHistoryPlugin = zeppelinPlugin<NameHistoryPluginType>()("name_history", {
+export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()("name_history", {
   showInDocs: false,
 
   configSchema: ConfigSchema,

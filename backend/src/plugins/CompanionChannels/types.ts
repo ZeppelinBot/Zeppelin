@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable } from "../../utils";
-import { BasePluginType, CooldownManager } from "knub";
+import { BasePluginType, CooldownManager, guildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 
@@ -28,3 +28,5 @@ export interface CompanionChannelsPluginType extends BasePluginType {
     errorCooldownManager: CooldownManager;
   };
 }
+
+export const companionChannelsEvt = guildEventListener<CompanionChannelsPluginType>();

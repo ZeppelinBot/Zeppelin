@@ -1,11 +1,11 @@
-import { eventListener } from "knub";
+import { guildEventListener } from "knub";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { RecentActionType } from "../constants";
 import { runAutomod } from "../functions/runAutomod";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 
-export const RunAutomodOnMemberUpdate = eventListener<AutomodPluginType>()(
+export const RunAutomodOnMemberUpdate = guildEventListener<AutomodPluginType>()(
   "guildMemberUpdate",
   ({ pluginData, args: { member, oldMember } }) => {
     if (!oldMember) return;

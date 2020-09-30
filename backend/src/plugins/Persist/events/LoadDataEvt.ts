@@ -1,8 +1,8 @@
-import { persistEvent } from "../types";
+import { persistEvt } from "../types";
 import { Constants, MemberOptions } from "eris";
 import intersection from "lodash.intersection";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars } from "src/utils";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars } from "../../../utils";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
@@ -10,7 +10,7 @@ import { canAssignRole } from "../../../utils/canAssignRole";
 
 const p = Constants.Permissions;
 
-export const LoadDataEvt = persistEvent({
+export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
 
   async listener(meta) {

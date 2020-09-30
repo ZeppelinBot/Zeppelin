@@ -1,6 +1,6 @@
 import { postCmd } from "../types";
-import { sorter } from "src/utils";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sorter } from "../../../utils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
 export const ScheduledPostsDeleteCmd = postCmd({

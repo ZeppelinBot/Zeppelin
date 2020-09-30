@@ -1,13 +1,13 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LogsPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { Embed } from "eris";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars, resolveUser } from "src/utils";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, resolveUser } from "../../../utils";
 import cloneDeep from "lodash.clonedeep";
 
 export async function onMessageUpdate(
-  pluginData: PluginData<LogsPluginType>,
+  pluginData: GuildPluginData<LogsPluginType>,
   savedMessage: SavedMessage,
   oldSavedMessage: SavedMessage,
 ) {

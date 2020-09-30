@@ -1,13 +1,13 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutoDeletePluginType } from "../types";
 import moment from "moment-timezone";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars, resolveUser } from "src/utils";
-import { logger } from "src/logger";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, resolveUser } from "../../../utils";
+import { logger } from "../../../logger";
 import { scheduleNextDeletion } from "./scheduleNextDeletion";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
-export async function deleteNextItem(pluginData: PluginData<AutoDeletePluginType>) {
+export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePluginType>) {
   const [itemToDelete] = pluginData.state.deletionQueue.splice(0, 1);
   if (!itemToDelete) return;
 

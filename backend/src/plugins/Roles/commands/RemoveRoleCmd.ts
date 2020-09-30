@@ -1,9 +1,9 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage, canActOn } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginUtils";
 import { rolesCmd } from "../types";
 import { GuildChannel } from "eris";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars, verboseUserMention, resolveRoleId } from "src/utils";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, verboseUserMention, resolveRoleId } from "../../../utils";
 
 export const RemoveRoleCmd = rolesCmd({
   trigger: "removerole",

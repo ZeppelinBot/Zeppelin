@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { MuteOptions, MutesPluginType } from "../types";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import humanizeDuration from "humanize-duration";
@@ -15,10 +15,10 @@ import { TextChannel, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { Case } from "src/data/entities/Case";
+import { Case } from "../../../data/entities/Case";
 
 export async function muteUser(
-  pluginData: PluginData<MutesPluginType>,
+  pluginData: GuildPluginData<MutesPluginType>,
   userId: string,
   muteTime: number = null,
   reason: string = null,

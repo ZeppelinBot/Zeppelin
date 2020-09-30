@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener } from "knub";
-import { TRegex } from "src/validatorUtils";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildCases } from "src/data/GuildCases";
+import { BasePluginType, guildEventListener } from "knub";
+import { TRegex } from "../../validatorUtils";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
 import { tMessageContent, tNullable } from "../../utils";
 import { RegExpRunner } from "../../RegExpRunner";
 
@@ -60,4 +60,4 @@ export interface LogsPluginType extends BasePluginType {
   };
 }
 
-export const logsEvent = eventListener<LogsPluginType>();
+export const logsEvt = guildEventListener<LogsPluginType>();

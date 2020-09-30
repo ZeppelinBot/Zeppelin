@@ -6,7 +6,7 @@ import {
   deactivateMentions,
   createChunkedMessage,
   DBDateFormat,
-} from "src/utils";
+} from "../../../utils";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";

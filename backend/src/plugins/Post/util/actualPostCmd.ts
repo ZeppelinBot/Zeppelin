@@ -1,10 +1,10 @@
 import { Message, Channel, TextChannel } from "eris";
-import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES, DBDateFormat } from "src/utils";
+import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES, DBDateFormat } from "../../../utils";
 import moment from "moment-timezone";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import humanizeDuration from "humanize-duration";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
-import { PluginData } from "knub";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { GuildPluginData } from "knub";
 import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
@@ -15,7 +15,7 @@ const MAX_REPEAT_TIME = Math.pow(2, 32);
 const MAX_REPEAT_UNTIL = moment.utc().add(100, "years");
 
 export async function actualPostCmd(
-  pluginData: PluginData<PostPluginType>,
+  pluginData: GuildPluginData<PostPluginType>,
   msg: Message,
   targetChannel: Channel,
   content: StrictMessageContent,

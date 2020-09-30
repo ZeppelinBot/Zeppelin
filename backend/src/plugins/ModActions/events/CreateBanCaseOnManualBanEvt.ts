@@ -1,19 +1,18 @@
-import { eventListener } from "knub";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
+import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
-import { LogType } from "src/data/LogType";
-import { stripObjectToScalars, resolveUser } from "src/utils";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, resolveUser } from "../../../utils";
 
 /**
  * Create a BAN case automatically when a user is banned manually.
  * Attempts to find the ban's details in the audit log.
  */
-export const CreateBanCaseOnManualBanEvt = eventListener<ModActionsPluginType>()(
+export const CreateBanCaseOnManualBanEvt = modActionsEvt(
   "guildBanAdd",
   async ({ pluginData, args: { guild, user } }) => {
     if (isEventIgnored(pluginData, IgnoredEventType.Ban, user.id)) {

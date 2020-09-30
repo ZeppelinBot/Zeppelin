@@ -1,9 +1,9 @@
 import { Member, TextChannel } from "eris";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { errorMessage, resolveUser, resolveMember } from "src/utils";
-import { PluginData } from "knub";
-import { sendErrorMessage, canActOn, sendSuccessMessage } from "src/pluginUtils";
+import { errorMessage, resolveUser, resolveMember } from "../../../utils";
+import { GuildPluginData } from "knub";
+import { sendErrorMessage, canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { hasPermission } from "knub/dist/helpers";
 import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
@@ -12,7 +12,7 @@ import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
 
 export async function actualKickMemberCmd(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   msg,
   args: {
     user: string;

@@ -1,8 +1,8 @@
-import { locateUserEvent } from "../types";
+import { locateUserEvt } from "../types";
 import { sendAlerts } from "../utils/sendAlerts";
 import { TextableChannel, VoiceChannel } from "eris";
 
-export const ChannelJoinAlertsEvt = locateUserEvent({
+export const ChannelJoinAlertsEvt = locateUserEvt({
   event: "voiceChannelJoin",
 
   async listener(meta) {
@@ -12,7 +12,7 @@ export const ChannelJoinAlertsEvt = locateUserEvent({
   },
 });
 
-export const ChannelSwitchAlertsEvt = locateUserEvent({
+export const ChannelSwitchAlertsEvt = locateUserEvt({
   event: "voiceChannelSwitch",
 
   async listener(meta) {
@@ -22,7 +22,7 @@ export const ChannelSwitchAlertsEvt = locateUserEvent({
   },
 });
 
-export const ChannelLeaveAlertsEvt = locateUserEvent({
+export const ChannelLeaveAlertsEvt = locateUserEvt({
   event: "voiceChannelLeave",
 
   async listener(meta) {

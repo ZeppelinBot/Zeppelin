@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
@@ -15,7 +15,7 @@ export const MoveToVoiceChannelAction = t.type({
 export type TMoveToVoiceChannelAction = t.TypeOf<typeof MoveToVoiceChannelAction>;
 
 export async function moveToVoiceChannelAction(
-  pluginData: PluginData<CustomEventsPluginType>,
+  pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TMoveToVoiceChannelAction,
   values: any,
   event: TCustomEvent,

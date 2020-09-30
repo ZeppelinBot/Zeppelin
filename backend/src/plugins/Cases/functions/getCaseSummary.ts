@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CasesPluginType } from "../types";
 import {
   convertDelayStringToMS,
@@ -24,7 +24,7 @@ const UPDATE_STR = "**[Update]**";
 const RELATIVE_TIME_THRESHOLD = 7 * DAYS;
 
 export async function getCaseSummary(
-  pluginData: PluginData<CasesPluginType>,
+  pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
   withLinks = false,
   requestMemberId?: string,

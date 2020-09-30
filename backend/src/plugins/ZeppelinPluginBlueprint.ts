@@ -1,10 +1,14 @@
-import { BasePluginType, plugin, PluginBlueprint } from "knub";
+import { BasePluginType, globalPlugin, GlobalPluginBlueprint, guildPlugin, GuildPluginBlueprint } from "knub";
 import * as t from "io-ts";
 import { getPluginConfigPreprocessor } from "../pluginUtils";
 import { TMarkdown } from "../types";
 
-export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
-  extends PluginBlueprint<TPluginType> {
+/**
+ * GUILD PLUGINS
+ */
+
+export interface ZeppelinGuildPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
+  extends GuildPluginBlueprint<TPluginType> {
   configSchema: t.TypeC<any>;
   showInDocs?: boolean;
 
@@ -16,27 +20,65 @@ export interface ZeppelinPluginBlueprint<TPluginType extends BasePluginType = Ba
   };
 }
 
-export function zeppelinPlugin<TPartialBlueprint extends Omit<ZeppelinPluginBlueprint, "name">>(
+export function zeppelinGuildPlugin<TPartialBlueprint extends Omit<ZeppelinGuildPluginBlueprint, "name">>(
   name: string,
   blueprint: TPartialBlueprint,
-): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinPluginBlueprint["configPreprocessor"] };
+): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinGuildPluginBlueprint["configPreprocessor"] };
 
-export function zeppelinPlugin<TPluginType extends BasePluginType>(): <
-  TPartialBlueprint extends Omit<ZeppelinPluginBlueprint<TPluginType>, "name">
+export function zeppelinGuildPlugin<TPluginType extends BasePluginType>(): <
+  TPartialBlueprint extends Omit<ZeppelinGuildPluginBlueprint<TPluginType>, "name">
 >(
   name: string,
   blueprint: TPartialBlueprint,
 ) => TPartialBlueprint & {
   name: string;
-  configPreprocessor: ZeppelinPluginBlueprint<TPluginType>["configPreprocessor"];
+  configPreprocessor: ZeppelinGuildPluginBlueprint<TPluginType>["configPreprocessor"];
 };
 
-export function zeppelinPlugin(...args) {
+export function zeppelinGuildPlugin(...args) {
   if (args.length) {
-    const blueprint = (plugin(...(args as Parameters<typeof plugin>)) as unknown) as ZeppelinPluginBlueprint;
+    const blueprint = (guildPlugin(
+      ...(args as Parameters<typeof guildPlugin>),
+    ) as unknown) as ZeppelinGuildPluginBlueprint;
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
   } else {
-    return zeppelinPlugin as (name, blueprint) => ZeppelinPluginBlueprint;
+    return zeppelinGuildPlugin as (name, blueprint) => ZeppelinGuildPluginBlueprint;
+  }
+}
+
+/**
+ * GLOBAL PLUGINS
+ */
+
+export interface ZeppelinGlobalPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
+  extends GlobalPluginBlueprint<TPluginType> {
+  configSchema: t.TypeC<any>;
+}
+
+export function zeppelinGlobalPlugin<TPartialBlueprint extends Omit<ZeppelinGlobalPluginBlueprint, "name">>(
+  name: string,
+  blueprint: TPartialBlueprint,
+): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinGlobalPluginBlueprint["configPreprocessor"] };
+
+export function zeppelinGlobalPlugin<TPluginType extends BasePluginType>(): <
+  TPartialBlueprint extends Omit<ZeppelinGlobalPluginBlueprint<TPluginType>, "name">
+>(
+  name: string,
+  blueprint: TPartialBlueprint,
+) => TPartialBlueprint & {
+  name: string;
+  configPreprocessor: ZeppelinGlobalPluginBlueprint<TPluginType>["configPreprocessor"];
+};
+
+export function zeppelinGlobalPlugin(...args) {
+  if (args.length) {
+    const blueprint = (globalPlugin(
+      ...(args as Parameters<typeof globalPlugin>),
+    ) as unknown) as ZeppelinGlobalPluginBlueprint;
+    blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
+    return blueprint;
+  } else {
+    return zeppelinGlobalPlugin as (name, blueprint) => ZeppelinGlobalPluginBlueprint;
   }
 }

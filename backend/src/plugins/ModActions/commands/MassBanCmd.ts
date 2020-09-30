@@ -1,4 +1,4 @@
-import { modActionsCommand, IgnoredEventType } from "../types";
+import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
@@ -6,14 +6,14 @@ import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
-import { CaseTypes } from "src/data/CaseTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
 import { TextChannel } from "eris";
 import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
-import { LogType } from "src/data/LogType";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { LogType } from "../../../data/LogType";
 
-export const MassbanCmd = modActionsCommand({
+export const MassbanCmd = modActionsCmd({
   trigger: "massban",
   permission: "can_massban",
   description: "Mass-ban a list of user IDs",

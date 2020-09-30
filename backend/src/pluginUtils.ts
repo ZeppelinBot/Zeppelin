@@ -3,27 +3,20 @@
  */
 
 import { Member } from "eris";
-import {
-  CommandContext,
-  configUtils,
-  ConfigValidationError,
-  helpers,
-  PluginBlueprint,
-  PluginData,
-  PluginOptions,
-} from "knub";
+import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
-import { ZeppelinPluginBlueprint } from "./plugins/ZeppelinPluginBlueprint";
 import { TZeppelinKnub } from "./types";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
 import * as t from "io-ts";
 import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
 import { Tail } from "./utils/typeUtils";
+import { AnyPluginData } from "knub/dist/plugins/PluginData";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 
 const { getMemberLevel } = helpers;
 
-export function canActOn(pluginData: PluginData<any>, member1: Member, member2: Member, allowSameLevel = false) {
+export function canActOn(pluginData: GuildPluginData<any>, member1: Member, member2: Member, allowSameLevel = false) {
   if (member2.id === pluginData.client.user.id) {
     return false;
   }
@@ -33,7 +26,7 @@ export function canActOn(pluginData: PluginData<any>, member1: Member, member2: 
   return allowSameLevel ? ourLevel >= memberLevel : ourLevel > memberLevel;
 }
 
-export function hasPermission(pluginData: PluginData<any>, permission: string, matchParams: ExtendedMatchParams) {
+export function hasPermission(pluginData: AnyPluginData<any>, permission: string, matchParams: ExtendedMatchParams) {
   const config = pluginData.config.getMatchingConfig(matchParams);
   return helpers.hasPermission(config, permission);
 }
@@ -71,8 +64,8 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
 }
 
 export function getPluginConfigPreprocessor(
-  blueprint: ZeppelinPluginBlueprint,
-  customPreprocessor?: PluginBlueprint<any>["configPreprocessor"],
+  blueprint: ZeppelinPlugin,
+  customPreprocessor?: ZeppelinPlugin["configPreprocessor"],
 ) {
   return async (options: PluginOptions<any>) => {
     // 1. Validate the basic structure of plugin config
@@ -141,22 +134,22 @@ export function getPluginConfigPreprocessor(
   };
 }
 
-export function sendSuccessMessage(pluginData: PluginData<any>, channel, body) {
-  const emoji = pluginData.guildConfig.success_emoji || undefined;
+export function sendSuccessMessage(pluginData: AnyPluginData<any>, channel, body) {
+  const emoji = pluginData.fullConfig.success_emoji || undefined;
   return channel.createMessage(successMessage(body, emoji));
 }
 
-export function sendErrorMessage(pluginData: PluginData<any>, channel, body) {
-  const emoji = pluginData.guildConfig.error_emoji || undefined;
+export function sendErrorMessage(pluginData: AnyPluginData<any>, channel, body) {
+  const emoji = pluginData.fullConfig.error_emoji || undefined;
   return channel.createMessage(errorMessage(body, emoji));
 }
 
-export function getBaseUrl(pluginData: PluginData<any>) {
+export function getBaseUrl(pluginData: AnyPluginData<any>) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
   return knub.getGlobalConfig().url;
 }
 
-export function isOwner(pluginData: PluginData<any>, userId: string) {
+export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
   const owners = knub.getGlobalConfig().owners;
   if (!owners) {

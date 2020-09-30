@@ -1,7 +1,7 @@
 import { Member, Message, TextChannel, User } from "eris";
 import { asSingleLine, isDiscordRESTError, UnknownUser } from "../../../utils";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
 import humanizeDuration from "humanize-duration";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
@@ -16,7 +16,7 @@ import { logger } from "../../../logger";
  * The only difference between the two commands is in target member validation.
  */
 export async function actualMuteUserCmd(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
   msg: Message,
   args: { time?: number; reason?: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },

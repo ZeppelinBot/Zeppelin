@@ -1,8 +1,8 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 
-export const LogsVoiceJoinEvt = logsEvent({
+export const LogsVoiceJoinEvt = logsEvt({
   event: "voiceChannelJoin",
 
   async listener(meta) {
@@ -13,7 +13,7 @@ export const LogsVoiceJoinEvt = logsEvent({
   },
 });
 
-export const LogsVoiceLeaveEvt = logsEvent({
+export const LogsVoiceLeaveEvt = logsEvt({
   event: "voiceChannelLeave",
 
   async listener(meta) {
@@ -24,7 +24,7 @@ export const LogsVoiceLeaveEvt = logsEvent({
   },
 });
 
-export const LogsVoiceSwitchEvt = logsEvent({
+export const LogsVoiceSwitchEvt = logsEvt({
   event: "voiceChannelSwitch",
 
   async listener(meta) {

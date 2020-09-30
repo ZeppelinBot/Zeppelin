@@ -1,6 +1,6 @@
 import { TSelfGrantableRoleEntry } from "../types";
 
-export function findMatchingRoles(roleNames, entries: TSelfGrantableRoleEntry[]): string[] {
+export function findMatchingRoles(roleNames: string[], entries: TSelfGrantableRoleEntry[]): string[] {
   const aliasToRoleId = entries.reduce((map, entry) => {
     for (const [roleId, aliases] of Object.entries(entry.roles)) {
       for (const alias of aliases) {

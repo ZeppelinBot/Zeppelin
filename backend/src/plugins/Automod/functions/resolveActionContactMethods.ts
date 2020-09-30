@@ -1,11 +1,11 @@
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { TextChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 
 export function resolveActionContactMethods(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   actionConfig: {
     notify?: string;
     notifyChannel?: string;

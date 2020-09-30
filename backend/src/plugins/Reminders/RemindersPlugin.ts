@@ -1,7 +1,7 @@
 import { PluginOptions } from "knub";
 import { ConfigSchema, RemindersPluginType } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { GuildReminders } from "src/data/GuildReminders";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildReminders } from "../../data/GuildReminders";
 import { postDueRemindersLoop } from "./utils/postDueRemindersLoop";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
@@ -22,7 +22,7 @@ const defaultOptions: PluginOptions<RemindersPluginType> = {
   ],
 };
 
-export const RemindersPlugin = zeppelinPlugin<RemindersPluginType>()("reminders", {
+export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()("reminders", {
   showInDocs: true,
   info: {
     prettyName: "Reminders",

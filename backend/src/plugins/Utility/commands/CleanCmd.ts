@@ -4,7 +4,7 @@ import { DAYS, getInviteCodesInString, noop, SECONDS, stripObjectToScalars } fro
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { Message, TextChannel, User } from "eris";
 import moment from "moment-timezone";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
@@ -14,7 +14,7 @@ const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5 * SECONDS;
 
 async function cleanMessages(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   channel: TextChannel,
   savedMessages: SavedMessage[],
   mod: User,

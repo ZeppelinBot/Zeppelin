@@ -1,7 +1,7 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, RolesPluginType } from "./types";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildLogs } from "../../data/GuildLogs";
 import { AddRoleCmd } from "./commands/AddRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
 import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
@@ -30,7 +30,7 @@ const defaultOptions: PluginOptions<RolesPluginType> = {
   ],
 };
 
-export const RolesPlugin = zeppelinPlugin<RolesPluginType>()("roles", {
+export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()("roles", {
   showInDocs: true,
   info: {
     prettyName: "Roles",

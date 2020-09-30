@@ -1,6 +1,6 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LogsPluginType, TLogFormats } from "../types";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import {
   verboseUserMention,
   verboseUserName,
@@ -8,15 +8,15 @@ import {
   messageSummary,
   resolveMember,
   renderRecursively,
-} from "src/utils";
-import { SavedMessage } from "src/data/entities/SavedMessage";
-import { renderTemplate, TemplateParseError } from "src/templateFormatter";
-import { logger } from "src/logger";
+} from "../../../utils";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
+import { logger } from "../../../logger";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function getLogMessage(
-  pluginData: PluginData<LogsPluginType>,
+  pluginData: GuildPluginData<LogsPluginType>,
   type: LogType,
   data: any,
   formats?: TLogFormats,

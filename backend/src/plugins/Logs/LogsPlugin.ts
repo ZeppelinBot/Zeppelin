@@ -1,17 +1,17 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, LogsPluginType } from "./types";
 import DefaultLogMessages from "../../data/DefaultLogMessages.json";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildCases } from "src/data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
 import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
-import { LogsGuildMemberUpdateEvt, LogsUserUpdateEvt } from "./events/LogsUserUpdateEvts";
+import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannelModifyEvts";
 import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
 import { LogsVoiceJoinEvt, LogsVoiceLeaveEvt, LogsVoiceSwitchEvt } from "./events/LogsVoiceChannelEvts";
@@ -44,7 +44,7 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   ],
 };
 
-export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
+export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
   showInDocs: true,
   info: {
     prettyName: "Logs",
@@ -58,7 +58,6 @@ export const LogsPlugin = zeppelinPlugin<LogsPluginType>()("logs", {
     LogsGuildMemberAddEvt,
     LogsGuildMemberRemoveEvt,
     LogsGuildMemberUpdateEvt,
-    LogsUserUpdateEvt,
     LogsChannelCreateEvt,
     LogsChannelDeleteEvt,
     LogsRoleCreateEvt,

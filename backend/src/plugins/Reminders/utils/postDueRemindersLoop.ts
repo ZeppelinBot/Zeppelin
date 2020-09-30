@@ -1,15 +1,15 @@
 import { TextChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { RemindersPluginType } from "../types";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { disableLinkPreviews } from "knub/dist/helpers";
-import { SECONDS } from "src/utils";
+import { SECONDS } from "../../../utils";
 
 const REMINDER_LOOP_TIME = 10 * SECONDS;
 const MAX_TRIES = 3;
 
-export async function postDueRemindersLoop(pluginData: PluginData<RemindersPluginType>) {
+export async function postDueRemindersLoop(pluginData: GuildPluginData<RemindersPluginType>) {
   const pendingReminders = await pluginData.state.reminders.getDueReminders();
   for (const reminder of pendingReminders) {
     const channel = pluginData.guild.channels.get(reminder.channel_id);

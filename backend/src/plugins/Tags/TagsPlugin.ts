@@ -1,10 +1,10 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, TagsPluginType } from "./types";
 import { PluginOptions } from "knub";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildTags } from "src/data/GuildTags";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildTags } from "../../data/GuildTags";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
@@ -48,7 +48,7 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
   ],
 };
 
-export const TagsPlugin = zeppelinPlugin<TagsPluginType>()("tags", {
+export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
   showInDocs: true,
   info: {
     prettyName: "Tags",

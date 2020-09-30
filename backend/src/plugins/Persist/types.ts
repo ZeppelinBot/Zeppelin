@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener } from "knub";
-import { GuildPersistedData } from "src/data/GuildPersistedData";
-import { GuildLogs } from "src/data/GuildLogs";
+import { BasePluginType, guildEventListener } from "knub";
+import { GuildPersistedData } from "../../data/GuildPersistedData";
+import { GuildLogs } from "../../data/GuildLogs";
 
 export const ConfigSchema = t.type({
   persisted_roles: t.array(t.string),
@@ -19,4 +19,4 @@ export interface PersistPluginType extends BasePluginType {
   };
 }
 
-export const persistEvent = eventListener<PersistPluginType>();
+export const persistEvt = guildEventListener<PersistPluginType>();

@@ -1,9 +1,9 @@
-import { persistEvent } from "../types";
-import { IPartialPersistData } from "src/data/GuildPersistedData";
+import { persistEvt } from "../types";
+import { IPartialPersistData } from "../../../data/GuildPersistedData";
 import { Member } from "eris";
 import intersection from "lodash.intersection";
 
-export const StoreDataEvt = persistEvent({
+export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",
 
   async listener(meta) {

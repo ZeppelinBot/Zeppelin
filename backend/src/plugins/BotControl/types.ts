@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable } from "../../utils";
-import { BasePluginType } from "knub";
+import { BasePluginType, globalCommand, globalEventListener } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 
 export const ConfigSchema = t.type({
@@ -15,3 +15,6 @@ export interface BotControlPluginType extends BasePluginType {
     archives: GuildArchives;
   };
 }
+
+export const botControlCmd = globalCommand<BotControlPluginType>();
+export const botControlEvt = globalEventListener<BotControlPluginType>();

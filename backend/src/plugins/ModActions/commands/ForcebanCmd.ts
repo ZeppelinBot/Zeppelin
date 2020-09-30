@@ -1,4 +1,4 @@
-import { modActionsCommand, IgnoredEventType } from "../types";
+import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
@@ -7,15 +7,15 @@ import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromA
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { LogType } from "src/data/LogType";
-import { CaseTypes } from "src/data/CaseTypes";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
+import { LogType } from "../../../data/LogType";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const ForcebanCmd = modActionsCommand({
+export const ForcebanCmd = modActionsCmd({
   trigger: "forceban",
   permission: "can_ban",
   description: "Force-ban the specified user, even if they aren't on the server",

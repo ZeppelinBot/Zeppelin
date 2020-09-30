@@ -1,6 +1,6 @@
 import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { formatContent } from "../util/formatContent";
 
 export const EditCmd = postCmd({

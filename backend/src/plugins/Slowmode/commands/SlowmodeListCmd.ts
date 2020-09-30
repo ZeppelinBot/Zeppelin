@@ -1,7 +1,7 @@
 import { slowmodeCmd } from "../types";
 import { GuildChannel, TextChannel } from "eris";
 import { createChunkedMessage } from "knub/dist/helpers";
-import { errorMessage } from "src/utils";
+import { errorMessage } from "../../../utils";
 import humanizeDuration from "humanize-duration";
 
 export const SlowmodeListCmd = slowmodeCmd({

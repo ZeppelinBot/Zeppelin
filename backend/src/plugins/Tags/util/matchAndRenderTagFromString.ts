@@ -1,5 +1,5 @@
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
 import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
@@ -14,7 +14,7 @@ interface Result {
 }
 
 export async function matchAndRenderTagFromString(
-  pluginData: PluginData<TagsPluginType>,
+  pluginData: GuildPluginData<TagsPluginType>,
   str: string,
   member: Member,
   extraMatchParams: ExtendedMatchParams = {},

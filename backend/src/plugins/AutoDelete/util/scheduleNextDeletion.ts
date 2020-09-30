@@ -1,8 +1,8 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutoDeletePluginType } from "../types";
 import { deleteNextItem } from "./deleteNextItem";
 
-export function scheduleNextDeletion(pluginData: PluginData<AutoDeletePluginType>) {
+export function scheduleNextDeletion(pluginData: GuildPluginData<AutoDeletePluginType>) {
   if (pluginData.state.deletionQueue.length === 0) {
     clearTimeout(pluginData.state.nextDeletionTimeout);
     return;

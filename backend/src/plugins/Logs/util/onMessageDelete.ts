@@ -1,13 +1,13 @@
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { Attachment } from "eris";
-import { useMediaUrls, stripObjectToScalars, resolveUser } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { useMediaUrls, stripObjectToScalars, resolveUser } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LogsPluginType } from "../types";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
-export async function onMessageDelete(pluginData: PluginData<LogsPluginType>, savedMessage: SavedMessage) {
+export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
   const channel = pluginData.guild.channels.get(savedMessage.channel_id);
 

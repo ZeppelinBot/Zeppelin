@@ -1,15 +1,15 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { PostPluginType } from "../types";
-import { logger } from "src/logger";
-import { stripObjectToScalars, SECONDS, DBDateFormat } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logger } from "../../../logger";
+import { stripObjectToScalars, SECONDS, DBDateFormat } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import { TextChannel, User } from "eris";
 import { postMessage } from "./postMessage";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 
-export async function scheduledPostLoop(pluginData: PluginData<PostPluginType>) {
+export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginType>) {
   const duePosts = await pluginData.state.scheduledPosts.getDueScheduledPosts();
   for (const post of duePosts) {
     const channel = pluginData.guild.channels.get(post.channel_id);

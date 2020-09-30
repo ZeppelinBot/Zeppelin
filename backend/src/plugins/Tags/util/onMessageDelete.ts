@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { TagsPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { TextChannel } from "eris";
 
-export async function onMessageDelete(pluginData: PluginData<TagsPluginType>, msg: SavedMessage) {
+export async function onMessageDelete(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   // Command message was deleted -> delete the response as well
   const commandMsgResponse = await pluginData.state.tags.findResponseByCommandMessageId(msg.id);
   if (commandMsgResponse) {

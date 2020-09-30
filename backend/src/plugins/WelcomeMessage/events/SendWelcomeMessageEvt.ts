@@ -1,11 +1,11 @@
-import { welcomeEvent } from "../types";
-import { renderTemplate, TemplateParseError } from "src/templateFormatter";
-import { createChunkedMessage, stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { welcomeMessageEvt } from "../types";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
+import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
 import { sendDM } from "../../../utils/sendDM";
 
-export const SendWelcomeMessageEvt = welcomeEvent({
+export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",
 
   async listener(meta) {
