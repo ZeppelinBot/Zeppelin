@@ -1,10 +1,10 @@
-import { command } from "knub";
+import { guildCommand, GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 import { setAntiraidLevel } from "../functions/setAntiraidLevel";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
-export const SetAntiraidCmd = command<AutomodPluginType>()({
+export const SetAntiraidCmd = guildCommand<AutomodPluginType>()({
   trigger: "antiraid",
   permission: "can_set_antiraid",
 

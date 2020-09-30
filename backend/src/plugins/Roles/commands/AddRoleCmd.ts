@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage, canActOn } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginUtils";
 import { rolesCmd } from "../types";
-import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import { GuildChannel } from "eris";
 
 export const AddRoleCmd = rolesCmd({

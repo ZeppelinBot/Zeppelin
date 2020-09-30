@@ -1,12 +1,16 @@
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { runAutomod } from "../functions/runAutomod";
 import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage";
 import moment from "moment-timezone";
 import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage";
 
-export function runAutomodOnMessage(pluginData: PluginData<AutomodPluginType>, message: SavedMessage, isEdit: boolean) {
+export function runAutomodOnMessage(
+  pluginData: GuildPluginData<AutomodPluginType>,
+  message: SavedMessage,
+  isEdit: boolean,
+) {
   const user = pluginData.client.users.get(message.user_id);
   const member = pluginData.guild.members.get(message.user_id);
 

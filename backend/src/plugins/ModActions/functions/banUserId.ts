@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { notifyUser, resolveUser, stripObjectToScalars, ucfirst, UserNotificationResult } from "../../../utils";
 import { User } from "eris";
@@ -13,7 +13,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
  */
 export async function banUserId(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   userId: string,
   reason: string = null,
   banOptions: BanOptions = {},

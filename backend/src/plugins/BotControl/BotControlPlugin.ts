@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { BotControlPluginType, ConfigSchema } from "./types";
 import { GuildArchives } from "../../data/GuildArchives";
 import { TextChannel } from "eris";
@@ -16,7 +16,7 @@ const defaultOptions = {
   },
 };
 
-export const BotControlPlugin = zeppelinPlugin<BotControlPluginType>()("bot_control", {
+export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bot_control", {
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -1,10 +1,14 @@
 import moment, { Moment } from "moment-timezone";
-import { convertDelayStringToMS } from "src/utils";
-import { PluginData } from "knub";
+import { convertDelayStringToMS } from "../../../utils";
+import { GuildPluginData } from "knub";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 // TODO: Extract out of the Post plugin, use everywhere with a date input
-export async function parseScheduleTime(pluginData: PluginData<any>, memberId: string, str: string): Promise<Moment> {
+export async function parseScheduleTime(
+  pluginData: GuildPluginData<any>,
+  memberId: string,
+  str: string,
+): Promise<Moment> {
   const tz = await pluginData.getPlugin(TimeAndDatePlugin).getMemberTz(memberId);
 
   const dt1 = moment.tz(str, "YYYY-MM-DD HH:mm:ss", tz);

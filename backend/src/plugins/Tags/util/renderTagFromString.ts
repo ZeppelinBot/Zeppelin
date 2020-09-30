@@ -1,17 +1,17 @@
 import { Tag, TagsPluginType } from "../types";
 import { Member } from "eris";
 import * as t from "io-ts";
-import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "src/utils";
+import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "../../../utils";
 import { parseArguments } from "knub-command-manager";
-import { TemplateParseError } from "src/templateFormatter";
-import { PluginData } from "knub";
-import { logger } from "src/logger";
+import { TemplateParseError } from "../../../templateFormatter";
+import { GuildPluginData } from "knub";
+import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { renderTagBody } from "./renderTagBody";
 
 export async function renderTagFromString(
-  pluginData: PluginData<TagsPluginType>,
+  pluginData: GuildPluginData<TagsPluginType>,
   str: string,
   prefix: string,
   tagName: string,

@@ -1,11 +1,11 @@
-import { remindersCommand } from "../types";
-import { sendErrorMessage } from "src/pluginUtils";
-import { createChunkedMessage, DBDateFormat, sorter } from "src/utils";
+import { remindersCmd } from "../types";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
-export const RemindersCmd = remindersCommand({
+export const RemindersCmd = remindersCmd({
   trigger: "reminders",
   permission: "can_use",
 

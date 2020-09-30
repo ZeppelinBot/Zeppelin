@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LogsPlugin } from "../plugins/Logs/LogsPlugin";
 import { findRelevantAuditLogEntry, isDiscordRESTError } from "../utils";
 import { LogType } from "../data/LogType";
@@ -8,7 +8,7 @@ import { LogType } from "../data/LogType";
  * Calling plugin must have LogsPlugin as a dependency (or be LogsPlugin itself).
  */
 export async function safeFindRelevantAuditLogEntry(
-  pluginData: PluginData<any>,
+  pluginData: GuildPluginData<any>,
   actionType: number,
   userId: string,
   attempts?: number,

@@ -1,4 +1,7 @@
-export async function fillActiveAlertsList(pluginData) {
+import { GuildPluginData } from "knub";
+import { LocateUserPluginType } from "../types";
+
+export async function fillActiveAlertsList(pluginData: GuildPluginData<LocateUserPluginType>) {
   const allAlerts = await pluginData.state.alerts.getAllGuildAlerts();
 
   allAlerts.forEach(alert => {

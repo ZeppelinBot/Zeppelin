@@ -1,9 +1,8 @@
-import { command } from "knub";
-import { MutesPluginType } from "../types";
+import { mutesCmd } from "../types";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
-export const ClearMutesCmd = command<MutesPluginType>()({
+export const ClearMutesCmd = mutesCmd({
   trigger: "clear_mutes",
   permission: "can_cleanup",
   description: "Clear dangling mute records from the bot. Be careful not to clear valid mutes.",

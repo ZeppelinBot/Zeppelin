@@ -1,7 +1,7 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import {
   UnknownUser,
   multiSorter,
@@ -10,7 +10,7 @@ import {
   resolveUser,
   emptyEmbedValue,
   chunkArray,
-} from "src/utils";
+} from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { EmbedOptions, User } from "eris";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
@@ -21,7 +21,7 @@ const opts = {
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
 };
 
-export const CasesUserCmd = modActionsCommand({
+export const CasesUserCmd = modActionsCmd({
   trigger: "cases",
   permission: "can_view",
   description: "Show a list of cases the specified user has",

@@ -1,7 +1,7 @@
 import { autoReactionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canUseEmoji, customEmojiRegex, isEmoji } from "src/utils";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { Constants, GuildChannel } from "eris";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";

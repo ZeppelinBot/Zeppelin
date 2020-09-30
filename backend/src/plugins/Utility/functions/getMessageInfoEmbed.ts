@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
@@ -10,7 +10,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
 
 export async function getMessageInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
   messageId: string,
   requestMemberId?: string,
@@ -132,7 +132,7 @@ export async function getMessageInfoEmbed(
   }
 
   if (message.embeds.length) {
-    const prefix = pluginData.guildConfig.prefix || getDefaultPrefix(pluginData.client);
+    const prefix = pluginData.fullConfig.prefix || getDefaultPrefix(pluginData.client);
     embed.fields.push({
       name: preEmbedPadding + "Embeds",
       value: `Message contains an embed, use \`${prefix}source\` to see the embed source`,

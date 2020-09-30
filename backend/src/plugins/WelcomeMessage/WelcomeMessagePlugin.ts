@@ -1,7 +1,7 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, WelcomeMessagePluginType } from "./types";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildLogs } from "../../data/GuildLogs";
 import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
 
 const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
@@ -12,7 +12,7 @@ const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   },
 };
 
-export const WelcomeMessagePlugin = zeppelinPlugin<WelcomeMessagePluginType>()("welcome_message", {
+export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType>()("welcome_message", {
   showInDocs: true,
   info: {
     prettyName: "Welcome message",

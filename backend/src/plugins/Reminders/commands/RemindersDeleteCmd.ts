@@ -1,9 +1,9 @@
-import { remindersCommand } from "../types";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
-import { sorter } from "src/utils";
+import { remindersCmd } from "../types";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { sorter } from "../../../utils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
-export const RemindersDeleteCmd = remindersCommand({
+export const RemindersDeleteCmd = remindersCmd({
   trigger: ["reminders delete", "reminders d"],
   permission: "can_use",
 

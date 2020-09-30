@@ -1,7 +1,7 @@
-import { spamEvent, RecentActionType } from "../types";
+import { spamEvt, RecentActionType } from "../types";
 import { logAndDetectOtherSpam } from "../util/logAndDetectOtherSpam";
 
-export const SpamVoiceJoinEvt = spamEvent({
+export const SpamVoiceJoinEvt = spamEvt({
   event: "voiceChannelJoin",
 
   async listener(meta) {
@@ -26,7 +26,7 @@ export const SpamVoiceJoinEvt = spamEvent({
   },
 });
 
-export const SpamVoiceSwitchEvt = spamEvent({
+export const SpamVoiceSwitchEvt = spamEvt({
   event: "voiceChannelSwitch",
 
   async listener(meta) {

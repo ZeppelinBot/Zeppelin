@@ -1,7 +1,7 @@
 import { Message } from "eris";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel";
-import { noop } from "src/utils";
+import { noop } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";

@@ -1,17 +1,17 @@
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { TextChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SlowmodePluginType } from "../types";
-import { resolveMember } from "src/utils";
+import { resolveMember } from "../../../utils";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
-import { hasPermission } from "src/pluginUtils";
+import { hasPermission } from "../../../pluginUtils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 
-export async function onMessageCreate(pluginData: PluginData<SlowmodePluginType>, msg: SavedMessage) {
+export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 
   const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;

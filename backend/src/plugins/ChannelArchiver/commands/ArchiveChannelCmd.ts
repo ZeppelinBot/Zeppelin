@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { channelArchiverCmd } from "../types";
-import { isOwner, sendErrorMessage } from "src/pluginUtils";
-import { confirm, SECONDS, noop } from "src/utils";
+import { isOwner, sendErrorMessage } from "../../../pluginUtils";
+import { confirm, SECONDS, noop } from "../../../utils";
 import moment from "moment-timezone";
 import { rehostAttachment } from "../rehostAttachment";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";

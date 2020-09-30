@@ -1,7 +1,7 @@
-import { usernameEvent } from "../types";
+import { usernameSaverEvt } from "../types";
 import { updateUsername } from "../updateUsername";
 
-export const MessageCreateUpdateUsernameEvt = usernameEvent({
+export const MessageCreateUpdateUsernameEvt = usernameSaverEvt({
   event: "messageCreate",
 
   async listener(meta) {
@@ -10,7 +10,7 @@ export const MessageCreateUpdateUsernameEvt = usernameEvent({
   },
 });
 
-export const VoiceChannelJoinUpdateUsernameEvt = usernameEvent({
+export const VoiceChannelJoinUpdateUsernameEvt = usernameSaverEvt({
   event: "voiceChannelJoin",
 
   async listener(meta) {

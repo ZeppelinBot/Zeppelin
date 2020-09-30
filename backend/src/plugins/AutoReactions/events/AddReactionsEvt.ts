@@ -1,6 +1,6 @@
 import { autoReactionsEvt } from "../types";
-import { isDiscordRESTError } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { isDiscordRESTError } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Constants, GuildChannel } from "eris";

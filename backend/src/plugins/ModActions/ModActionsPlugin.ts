@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
@@ -24,9 +24,9 @@ import { CasesUserCmd } from "./commands/CasesUserCmd";
 import { CasesModCmd } from "./commands/CasesModCmd";
 import { HideCaseCmd } from "./commands/HideCaseCmd";
 import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
-import { GuildMutes } from "src/data/GuildMutes";
-import { GuildCases } from "src/data/GuildCases";
-import { GuildLogs } from "src/data/GuildLogs";
+import { GuildMutes } from "../../data/GuildMutes";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
 import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
 import { warnMember } from "./functions/warnMember";
 import { Member } from "eris";
@@ -95,7 +95,7 @@ const defaultOptions = {
   ],
 };
 
-export const ModActionsPlugin = zeppelinPlugin<ModActionsPluginType>()("mod_actions", {
+export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod_actions", {
   showInDocs: true,
   info: {
     prettyName: "Mod actions",

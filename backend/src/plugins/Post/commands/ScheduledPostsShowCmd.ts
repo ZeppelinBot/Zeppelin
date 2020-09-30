@@ -1,6 +1,6 @@
 import { postCmd } from "../types";
-import { sorter } from "src/utils";
-import { sendErrorMessage } from "src/pluginUtils";
+import { sorter } from "../../../utils";
+import { sendErrorMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { postMessage } from "../util/postMessage";
 import { TextChannel } from "eris";

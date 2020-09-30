@@ -1,13 +1,13 @@
 import { TagsPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
-import { PluginData } from "knub";
-import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "src/utils";
-import { validate } from "src/validatorUtils";
-import { LogType } from "src/data/LogType";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { GuildPluginData } from "knub";
+import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
+import { validate } from "../../../validatorUtils";
+import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
 
-export async function onMessageCreate(pluginData: PluginData<TagsPluginType>, msg: SavedMessage) {
+export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
   if (!msg.data.content) return;
 

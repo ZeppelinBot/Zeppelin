@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { Member } from "eris";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
@@ -9,7 +9,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 
 export async function warnMember(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   member: Member,
   reason: string,
   warnOptions: WarnOptions = {},

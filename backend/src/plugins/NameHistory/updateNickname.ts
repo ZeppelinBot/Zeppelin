@@ -1,8 +1,8 @@
 import { Member } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { NameHistoryPluginType } from "./types";
 
-export async function updateNickname(pluginData: PluginData<NameHistoryPluginType>, member: Member) {
+export async function updateNickname(pluginData: GuildPluginData<NameHistoryPluginType>, member: Member) {
   if (!member) return;
   const latestEntry = await pluginData.state.nicknameHistory.getLastEntry(member.id);
   if (!latestEntry || latestEntry.nickname !== member.nick) {

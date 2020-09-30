@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, MuteOptions, MutesPluginType } from "./types";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { GuildMutes } from "../../data/GuildMutes";
@@ -55,7 +55,7 @@ const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
 let FIRST_CHECK_TIME = Date.now();
 const FIRST_CHECK_INCREMENT = 5 * 1000;
 
-export const MutesPlugin = zeppelinPlugin<MutesPluginType>()("mutes", {
+export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
   showInDocs: true,
   info: {
     prettyName: "Mutes",

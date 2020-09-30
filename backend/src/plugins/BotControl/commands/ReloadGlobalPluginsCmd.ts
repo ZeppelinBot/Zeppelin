@@ -1,10 +1,9 @@
-import { command } from "knub";
-import { BotControlPluginType } from "../types";
+import { botControlCmd } from "../types";
 import { isOwnerPreFilter } from "../../../pluginUtils";
 import { getActiveReload, setActiveReload } from "../activeReload";
 import { TextChannel } from "eris";
 
-export const ReloadGlobalPluginsCmd = command<BotControlPluginType>()({
+export const ReloadGlobalPluginsCmd = botControlCmd({
   trigger: "bot_reload_global_plugins",
   permission: null,
   config: {

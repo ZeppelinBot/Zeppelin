@@ -1,10 +1,10 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, SpamPluginType } from "./types";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildMutes } from "src/data/GuildMutes";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildMutes } from "../../data/GuildMutes";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { clearOldRecentActions } from "./util/clearOldRecentActions";
 import { SpamVoiceJoinEvt, SpamVoiceSwitchEvt } from "./events/SpamVoiceEvt";
@@ -42,7 +42,7 @@ const defaultOptions: PluginOptions<SpamPluginType> = {
   ],
 };
 
-export const SpamPlugin = zeppelinPlugin<SpamPluginType>()("spam", {
+export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()("spam", {
   showInDocs: true,
   info: {
     prettyName: "Spam protection",

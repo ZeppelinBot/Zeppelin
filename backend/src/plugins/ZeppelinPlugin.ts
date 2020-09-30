@@ -1,3 +1,3 @@
-import { ZeppelinPluginBlueprint } from "./ZeppelinPluginBlueprint";
+import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
 
-export type ZeppelinPlugin = ZeppelinPluginBlueprint<any>;
+export type ZeppelinPlugin = ZeppelinGuildPluginBlueprint<any> | ZeppelinGlobalPluginBlueprint<any>;

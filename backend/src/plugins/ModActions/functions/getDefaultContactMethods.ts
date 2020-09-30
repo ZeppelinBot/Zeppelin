@@ -1,10 +1,10 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
 import { UserNotificationMethod } from "../../../utils";
 import { TextChannel } from "eris";
 
 export function getDefaultContactMethods(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   type: "warn" | "kick" | "ban",
 ): UserNotificationMethod[] {
   const methods: UserNotificationMethod[] = [];

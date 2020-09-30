@@ -1,11 +1,10 @@
-import { command } from "knub";
-import { BotControlPluginType } from "../types";
+import { botControlCmd } from "../types";
 import { isOwnerPreFilter } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import escapeStringRegexp from "escape-string-regexp";
 import { createChunkedMessage, getUser, sorter } from "../../../utils";
 
-export const ServersCmd = command<BotControlPluginType>()({
+export const ServersCmd = botControlCmd({
   trigger: ["servers", "guilds"],
   permission: null,
   config: {

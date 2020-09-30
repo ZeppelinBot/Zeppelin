@@ -1,9 +1,8 @@
-import { command } from "knub";
-import { MutesPluginType } from "../types";
+import { mutesCmd } from "../types";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 
-export const ClearMutesWithoutRoleCmd = command<MutesPluginType>()({
+export const ClearMutesWithoutRoleCmd = mutesCmd({
   trigger: "clear_mutes_without_role",
   permission: "can_cleanup",
   description: "Clear dangling mutes for members whose mute role was removed by other means",

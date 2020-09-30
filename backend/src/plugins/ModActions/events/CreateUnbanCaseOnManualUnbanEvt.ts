@@ -1,19 +1,18 @@
-import { eventListener } from "knub";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
+import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
-import { stripObjectToScalars, resolveUser } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { stripObjectToScalars, resolveUser } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 
 /**
  * Create an UNBAN case automatically when a user is unbanned manually.
  * Attempts to find the unban's details in the audit log.
  */
-export const CreateUnbanCaseOnManualUnbanEvt = eventListener<ModActionsPluginType>()(
+export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
   "guildBanRemove",
   async ({ pluginData, args: { guild, user } }) => {
     if (isEventIgnored(pluginData, IgnoredEventType.Unban, user.id)) {

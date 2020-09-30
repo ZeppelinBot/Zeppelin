@@ -1,15 +1,15 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { TextChannel } from "eris";
 import { waitForReply } from "knub/dist/helpers";
-import { LogType } from "src/data/LogType";
-import { logger } from "src/logger";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 
-export const MassmuteCmd = modActionsCommand({
+export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
   permission: "can_massmute",
   description: "Mass-mute a list of user IDs",

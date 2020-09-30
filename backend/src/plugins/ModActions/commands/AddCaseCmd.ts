@@ -1,18 +1,18 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CaseTypes } from "src/data/CaseTypes";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
-import { Case } from "src/data/entities/Case";
-import { LogType } from "src/data/LogType";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const AddCaseCmd = modActionsCommand({
+export const AddCaseCmd = modActionsCmd({
   trigger: "addcase",
   permission: "can_addcase",
   description: "Add an arbitrary case to the specified user without taking any action",

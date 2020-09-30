@@ -1,11 +1,11 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutoDeletePluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { scheduleNextDeletion } from "./scheduleNextDeletion";
-import { sorter } from "src/utils";
+import { sorter } from "../../../utils";
 
 export function addMessageToDeletionQueue(
-  pluginData: PluginData<AutoDeletePluginType>,
+  pluginData: GuildPluginData<AutoDeletePluginType>,
   msg: SavedMessage,
   delay: number,
 ) {

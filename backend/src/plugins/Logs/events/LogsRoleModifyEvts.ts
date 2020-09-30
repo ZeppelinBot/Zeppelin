@@ -1,8 +1,8 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 
-export const LogsRoleCreateEvt = logsEvent({
+export const LogsRoleCreateEvt = logsEvt({
   event: "guildRoleCreate",
 
   async listener(meta) {
@@ -12,7 +12,7 @@ export const LogsRoleCreateEvt = logsEvent({
   },
 });
 
-export const LogsRoleDeleteEvt = logsEvent({
+export const LogsRoleDeleteEvt = logsEvt({
   event: "guildRoleDelete",
 
   async listener(meta) {

@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import moment from "moment-timezone";
@@ -6,7 +6,7 @@ import { getMatchingRecentActions } from "./getMatchingRecentActions";
 import { RecentActionType } from "../constants";
 
 export function getMatchingMessageRecentActions(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   message: SavedMessage,
   type: RecentActionType,
   identifier: string,

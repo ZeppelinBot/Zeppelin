@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CensorPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { applyFiltersToMsg } from "./applyFiltersToMsg";
 
-export async function onMessageUpdate(pluginData: PluginData<CensorPluginType>, savedMessage: SavedMessage) {
+export async function onMessageUpdate(pluginData: GuildPluginData<CensorPluginType>, savedMessage: SavedMessage) {
   if (savedMessage.is_bot) return;
   const lock = await pluginData.locks.acquire(`message-${savedMessage.id}`);
 

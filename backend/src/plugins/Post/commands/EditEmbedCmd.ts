@@ -1,8 +1,8 @@
 import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { Embed } from "eris";
-import { trimLines } from "src/utils";
+import { trimLines } from "../../../utils";
 import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
@@ -52,7 +52,7 @@ export const EditEmbedCmd = postCmd({
     await sendSuccessMessage(pluginData, msg.channel, "Embed edited");
 
     if (args.content) {
-      const prefix = pluginData.guildConfig.prefix || "!";
+      const prefix = pluginData.fullConfig.prefix || "!";
       msg.channel.createMessage(
         trimLines(`
         <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:

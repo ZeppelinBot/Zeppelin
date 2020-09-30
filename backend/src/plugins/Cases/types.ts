@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { tDelayString, tPartialDictionary, tNullable } from "../../utils";
 import { CaseNameToType, CaseTypes } from "../../data/CaseTypes";
-import { BasePluginType } from "knub";
+import { BasePluginType, guildCommand, guildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";

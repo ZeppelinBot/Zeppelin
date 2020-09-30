@@ -1,12 +1,12 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { StarboardPluginType, TStarboardOpts } from "../types";
 import { Message, GuildChannel, TextChannel, Embed } from "eris";
 import moment from "moment-timezone";
-import { EMPTY_CHAR, messageLink } from "src/utils";
+import { EMPTY_CHAR, messageLink } from "../../../utils";
 import path from "path";
 
 export async function saveMessageToStarboard(
-  pluginData: PluginData<StarboardPluginType>,
+  pluginData: GuildPluginData<StarboardPluginType>,
   msg: Message,
   starboard: TStarboardOpts,
 ) {

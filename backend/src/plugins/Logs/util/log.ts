@@ -1,14 +1,14 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LogsPluginType, TLogChannelMap } from "../types";
-import { LogType } from "src/data/LogType";
+import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
-import { createChunkedMessage, noop } from "src/utils";
+import { createChunkedMessage, noop } from "../../../utils";
 import { getLogMessage } from "./getLogMessage";
 import { allowTimeout } from "../../../RegExpRunner";
 
 const excludedUserProps = ["user", "member", "mod"];
 
-export async function log(pluginData: PluginData<LogsPluginType>, type: LogType, data: any) {
+export async function log(pluginData: GuildPluginData<LogsPluginType>, type: LogType, data: any) {
   const logChannels: TLogChannelMap = pluginData.config.get().channels;
   const typeStr = LogType[type];
 

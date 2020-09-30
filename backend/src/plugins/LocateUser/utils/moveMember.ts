@@ -1,10 +1,10 @@
 import { Member, TextableChannel } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { LocateUserPluginType } from "../types";
-import { sendErrorMessage } from "src/pluginUtils";
+import { sendErrorMessage } from "../../../pluginUtils";
 
 export async function moveMember(
-  pluginData: PluginData<LocateUserPluginType>,
+  pluginData: GuildPluginData<LocateUserPluginType>,
   toMoveID: string,
   target: Member,
   errorChannel: TextableChannel,

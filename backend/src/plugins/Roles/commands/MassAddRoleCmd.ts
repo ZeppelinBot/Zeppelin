@@ -1,9 +1,9 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, canActOn } from "src/pluginUtils";
+import { sendErrorMessage, canActOn } from "../../../pluginUtils";
 import { rolesCmd } from "../types";
-import { resolveMember, resolveRoleId, stripObjectToScalars, successMessage } from "src/utils";
-import { LogType } from "src/data/LogType";
-import { logger } from "src/logger";
+import { resolveMember, resolveRoleId, stripObjectToScalars, successMessage } from "../../../utils";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 
 export const MassAddRoleCmd = rolesCmd({
   trigger: "massaddrole",

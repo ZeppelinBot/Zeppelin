@@ -1,5 +1,5 @@
 import { BasePluginType } from "knub";
-import { AllowedGuilds } from "src/data/AllowedGuilds";
+import { AllowedGuilds } from "../../data/AllowedGuilds";
 
 export interface GuildInfoSaverPluginType extends BasePluginType {
   state: {

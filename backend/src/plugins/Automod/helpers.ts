@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Awaitable } from "knub/dist/utils";
 import * as t from "io-ts";
 import { AutomodContext, AutomodPluginType } from "./types";
@@ -15,14 +15,14 @@ export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
 
 type AutomodTriggerMatchFn<TConfigType, TMatchResultExtra> = (meta: {
   ruleName: string;
-  pluginData: PluginData<AutomodPluginType>;
+  pluginData: GuildPluginData<AutomodPluginType>;
   context: AutomodContext;
   triggerConfig: TConfigType;
 }) => Awaitable<null | AutomodTriggerMatchResult<TMatchResultExtra>>;
 
 type AutomodTriggerRenderMatchInformationFn<TConfigType, TMatchResultExtra> = (meta: {
   ruleName: string;
-  pluginData: PluginData<AutomodPluginType>;
+  pluginData: GuildPluginData<AutomodPluginType>;
   contexts: AutomodContext[];
   triggerConfig: TConfigType;
   matchResult: AutomodTriggerMatchResult<TMatchResultExtra>;
@@ -54,7 +54,7 @@ export function automodTrigger(...args) {
 
 type AutomodActionApplyFn<TConfigType> = (meta: {
   ruleName: string;
-  pluginData: PluginData<AutomodPluginType>;
+  pluginData: GuildPluginData<AutomodPluginType>;
   contexts: AutomodContext[];
   actionConfig: TConfigType;
   matchResult: AutomodTriggerMatchResult;

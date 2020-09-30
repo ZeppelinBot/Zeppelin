@@ -1,14 +1,14 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
 import { User, Message, Member } from "eris";
-import { UnknownUser, asSingleLine } from "src/utils";
-import { sendErrorMessage, sendSuccessMessage, hasPermission } from "src/pluginUtils";
+import { UnknownUser, asSingleLine } from "../../../utils";
+import { sendErrorMessage, sendSuccessMessage, hasPermission } from "../../../pluginUtils";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { MutesPlugin } from "src/plugins/Mutes/MutesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import humanizeDuration from "humanize-duration";
 
 export async function actualUnmuteCmd(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
   msg: Message,
   args: { time?: number; reason?: string; mod?: Member },

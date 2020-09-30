@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
@@ -14,7 +14,7 @@ const ANNOUNCEMENT_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/740656841687564348/announcement-channel.png";
 
 export async function getChannelInfoEmbed(
-  pluginData: PluginData<UtilityPluginType>,
+  pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
   requestMemberId?: string,
 ): Promise<EmbedOptions | null> {

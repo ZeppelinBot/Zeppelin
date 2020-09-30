@@ -1,7 +1,7 @@
 import { selfGrantableRolesCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getApplyingEntries } from "../util/getApplyingEntries";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { splitRoleNames } from "../util/splitRoleNames";
 import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { findMatchingRoles } from "../util/findMatchingRoles";

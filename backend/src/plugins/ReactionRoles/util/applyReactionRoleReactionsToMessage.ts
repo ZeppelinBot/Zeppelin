@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType } from "../types";
-import { ReactionRole } from "src/data/entities/ReactionRole";
+import { ReactionRole } from "../../../data/entities/ReactionRole";
 import { TextChannel } from "eris";
-import { isDiscordRESTError, sleep, isSnowflake } from "src/utils";
-import { logger } from "src/logger";
+import { isDiscordRESTError, sleep, isSnowflake } from "../../../utils";
+import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 
@@ -13,7 +13,7 @@ const CLEAR_ROLES_EMOJI = "❌";
  * @return Errors encountered while applying reaction roles, if any
  */
 export async function applyReactionRoleReactionsToMessage(
-  pluginData: PluginData<ReactionRolesPluginType>,
+  pluginData: GuildPluginData<ReactionRolesPluginType>,
   channelId: string,
   messageId: string,
   reactionRoles: ReactionRole[],

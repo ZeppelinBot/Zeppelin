@@ -1,7 +1,7 @@
-import { ZeppelinPluginBlueprint } from "../ZeppelinPluginBlueprint";
+import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
 import { trimPluginDescription } from "../../utils";
 
-export const pluginInfo: ZeppelinPluginBlueprint["info"] = {
+export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   prettyName: "Automod",
   description: trimPluginDescription(`
       Allows specifying automated actions in response to triggers. Example use cases include word filtering and spam prevention.

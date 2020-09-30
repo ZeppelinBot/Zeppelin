@@ -1,7 +1,7 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { trimLines, createChunkedMessage, emptyEmbedValue, sorter } from "src/utils";
+import { trimLines, createChunkedMessage, emptyEmbedValue, sorter } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { asyncMap } from "../../../utils/async";
 import { EmbedOptions } from "eris";
@@ -13,7 +13,7 @@ const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const CasesModCmd = modActionsCommand({
+export const CasesModCmd = modActionsCmd({
   trigger: "cases",
   permission: "can_view",
   description: "Show the most recent 5 cases by the specified -mod",

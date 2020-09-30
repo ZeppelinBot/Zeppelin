@@ -1,9 +1,8 @@
-import { eventListener } from "knub";
-import { CompanionChannelsPluginType } from "../types";
+import { companionChannelsEvt } from "../types";
 import { handleCompanionPermissions } from "../functions/handleCompanionPermissions";
-import { stripObjectToScalars } from "src/utils";
+import { stripObjectToScalars } from "../../../utils";
 
-export const VoiceChannelJoinEvt = eventListener<CompanionChannelsPluginType>()(
+export const VoiceChannelJoinEvt = companionChannelsEvt(
   "voiceChannelJoin",
   ({ pluginData, args: { member, newChannel } }) => {
     handleCompanionPermissions(pluginData, member.id, newChannel);

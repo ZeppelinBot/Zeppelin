@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, UtilityPluginType } from "./types";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
@@ -96,7 +96,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = zeppelinPlugin<UtilityPluginType>()("utility", {
+export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility", {
   showInDocs: true,
   info: {
     prettyName: "Utility",

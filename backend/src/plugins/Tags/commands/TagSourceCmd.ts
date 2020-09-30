@@ -1,6 +1,6 @@
 import { tagsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, getBaseUrl, sendSuccessMessage } from "src/pluginUtils";
+import { sendErrorMessage, getBaseUrl, sendSuccessMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
 
 export const TagSourceCmd = tagsCmd({

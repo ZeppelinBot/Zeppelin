@@ -1,11 +1,11 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 
-export const LogsGuildMemberAddEvt = logsEvent({
+export const LogsGuildMemberAddEvt = logsEvt({
   event: "guildMemberAdd",
 
   async listener(meta) {

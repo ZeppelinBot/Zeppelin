@@ -1,11 +1,11 @@
 import { CaseNoteArgs, CasesPluginType } from "../types";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { resolveCaseId } from "./resolveCaseId";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { resolveUser } from "../../../utils";
 
-export async function createCaseNote(pluginData: PluginData<CasesPluginType>, args: CaseNoteArgs): Promise<void> {
+export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType>, args: CaseNoteArgs): Promise<void> {
   const theCase = await pluginData.state.cases.find(resolveCaseId(args.caseId));
   if (!theCase) {
     throw new RecoverablePluginError(ERRORS.UNKNOWN_NOTE_CASE);

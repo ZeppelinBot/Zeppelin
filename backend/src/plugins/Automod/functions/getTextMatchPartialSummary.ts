@@ -1,11 +1,11 @@
 import { MatchableTextType } from "./matchMultipleTextTypesOnMessage";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { messageSummary, verboseChannelMention } from "../../../utils";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { User } from "eris";
 
 export function getTextMatchPartialSummary(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   type: MatchableTextType,
   context: AutomodContext,
 ) {

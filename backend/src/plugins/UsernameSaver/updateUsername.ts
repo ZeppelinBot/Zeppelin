@@ -1,8 +1,8 @@
 import { User } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { UsernameSaverPluginType } from "./types";
 
-export async function updateUsername(pluginData: PluginData<UsernameSaverPluginType>, user: User) {
+export async function updateUsername(pluginData: GuildPluginData<UsernameSaverPluginType>, user: User) {
   if (!user) return;
   const newUsername = `${user.username}#${user.discriminator}`;
   const latestEntry = await pluginData.state.usernameHistory.getLastEntry(user.id);

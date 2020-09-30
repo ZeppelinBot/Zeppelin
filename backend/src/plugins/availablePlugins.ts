@@ -1,6 +1,6 @@
 import { UtilityPlugin } from "./Utility/UtilityPlugin";
 import { LocateUserPlugin } from "./LocateUser/LocateUserPlugin";
-import { ZeppelinPluginBlueprint } from "./ZeppelinPluginBlueprint";
+import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
 import { PersistPlugin } from "./Persist/PersistPlugin";
 import { NameHistoryPlugin } from "./NameHistory/NameHistoryPlugin";
 import { MessageSaverPlugin } from "./MessageSaver/MessageSaverPlugin";
@@ -34,7 +34,7 @@ import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonito
 import { TimeAndDatePlugin } from "./TimeAndDate/TimeAndDatePlugin";
 
 // prettier-ignore
-export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
+export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   AutoDeletePlugin,
   AutoReactionsPlugin,
   GuildInfoSaverPlugin,
@@ -68,14 +68,14 @@ export const guildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
 ];
 
 // prettier-ignore
-export const globalPlugins = [
+export const globalPlugins: Array<ZeppelinGlobalPluginBlueprint<any>> = [
   GuildConfigReloaderPlugin,
   BotControlPlugin,
   GuildAccessMonitorPlugin,
 ];
 
 // prettier-ignore
-export const baseGuildPlugins: Array<ZeppelinPluginBlueprint<any>> = [
+export const baseGuildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   GuildInfoSaverPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,

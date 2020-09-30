@@ -1,14 +1,14 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { PostPluginType } from "../types";
 import { TextChannel, MessageContent, Attachment, Message, Role } from "eris";
-import { downloadFile, getRoleMentions } from "src/utils";
+import { downloadFile, getRoleMentions } from "../../../utils";
 import fs from "fs";
 import { formatContent } from "./formatContent";
 
 const fsp = fs.promises;
 
 export async function postMessage(
-  pluginData: PluginData<PostPluginType>,
+  pluginData: GuildPluginData<PostPluginType>,
   channel: TextChannel,
   content: MessageContent,
   attachments: Attachment[] = [],

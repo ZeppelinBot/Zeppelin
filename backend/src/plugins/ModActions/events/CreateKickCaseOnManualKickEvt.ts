@@ -1,5 +1,4 @@
-import { eventListener } from "knub";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
+import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { Constants as ErisConstants } from "eris";
@@ -14,7 +13,7 @@ import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAu
  * Create a KICK case automatically when a user is kicked manually.
  * Attempts to find the kick's details in the audit log.
  */
-export const CreateKickCaseOnManualKickEvt = eventListener<ModActionsPluginType>()(
+export const CreateKickCaseOnManualKickEvt = modActionsEvt(
   "guildMemberRemove",
   async ({ pluginData, args: { member } }) => {
     if (isEventIgnored(pluginData, IgnoredEventType.Kick, member.id)) {

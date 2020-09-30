@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener, command } from "knub";
-import { GuildLogs } from "src/data/GuildLogs";
+import { BasePluginType, guildCommand } from "knub";
+import { GuildLogs } from "../../data/GuildLogs";
 
 export const ConfigSchema = t.type({
   can_assign: t.boolean,
@@ -16,4 +16,4 @@ export interface RolesPluginType extends BasePluginType {
   };
 }
 
-export const rolesCmd = command<RolesPluginType>();
+export const rolesCmd = guildCommand<RolesPluginType>();

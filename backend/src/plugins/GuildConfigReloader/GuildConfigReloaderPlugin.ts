@@ -1,23 +1,26 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildConfigReloaderPluginType } from "./types";
 import { Configs } from "../../data/Configs";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds";
 import * as t from "io-ts";
 
-export const GuildConfigReloaderPlugin = zeppelinPlugin<GuildConfigReloaderPluginType>()("guild_config_reloader", {
-  showInDocs: false,
+export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloaderPluginType>()(
+  "guild_config_reloader",
+  {
+    showInDocs: false,
 
-  configSchema: t.type({}),
+    configSchema: t.type({}),
 
-  async onLoad(pluginData) {
-    pluginData.state.guildConfigs = new Configs();
-    pluginData.state.highestConfigId = await pluginData.state.guildConfigs.getHighestId();
+    async onLoad(pluginData) {
+      pluginData.state.guildConfigs = new Configs();
+      pluginData.state.highestConfigId = await pluginData.state.guildConfigs.getHighestId();
 
-    reloadChangedGuilds(pluginData);
+      reloadChangedGuilds(pluginData);
+    },
+
+    onUnload(pluginData) {
+      clearTimeout(pluginData.state.nextCheckTimeout);
+      pluginData.state.unloaded = true;
+    },
   },
-
-  onUnload(pluginData) {
-    clearTimeout(pluginData.state.nextCheckTimeout);
-    pluginData.state.unloaded = true;
-  },
-});
+);

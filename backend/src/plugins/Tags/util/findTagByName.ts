@@ -1,10 +1,10 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { Tag, TagsPluginType } from "../types";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
 import * as t from "io-ts";
 
 export async function findTagByName(
-  pluginData: PluginData<TagsPluginType>,
+  pluginData: GuildPluginData<TagsPluginType>,
   name: string,
   matchParams: ExtendedMatchParams = {},
 ): Promise<t.TypeOf<typeof Tag> | null> {

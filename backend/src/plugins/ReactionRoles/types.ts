@@ -1,8 +1,8 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener, command, PluginData } from "knub";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildReactionRoles } from "src/data/GuildReactionRoles";
-import { Queue } from "src/Queue";
+import { BasePluginType, guildEventListener, guildCommand } from "knub";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildReactionRoles } from "../../data/GuildReactionRoles";
+import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   auto_refresh_interval: t.number,
@@ -41,5 +41,5 @@ export interface ReactionRolesPluginType extends BasePluginType {
   };
 }
 
-export const reactionRolesCmd = command<ReactionRolesPluginType>();
-export const reactionRolesEvent = eventListener<ReactionRolesPluginType>();
+export const reactionRolesCmd = guildCommand<ReactionRolesPluginType>();
+export const reactionRolesEvt = guildEventListener<ReactionRolesPluginType>();

@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
@@ -10,7 +10,7 @@ const opts = {
   "notify-channel": ct.textChannel({ option: true }),
 };
 
-export const ForcemuteCmd = modActionsCommand({
+export const ForcemuteCmd = modActionsCmd({
   trigger: "forcemute",
   permission: "can_mute",
   description: "Force-mute the specified user, even if they're not on the server",

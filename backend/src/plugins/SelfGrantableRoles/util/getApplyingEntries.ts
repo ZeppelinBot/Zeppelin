@@ -1,8 +1,8 @@
 import { TSelfGrantableRoleEntry, SelfGrantableRolesPluginType } from "../types";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 
 export function getApplyingEntries(
-  pluginData: PluginData<SelfGrantableRolesPluginType>,
+  pluginData: GuildPluginData<SelfGrantableRolesPluginType>,
   msg,
 ): TSelfGrantableRoleEntry[] {
   const config = pluginData.config.getForMessage(msg);

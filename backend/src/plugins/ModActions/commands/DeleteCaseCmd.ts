@@ -1,4 +1,4 @@
-import { modActionsCommand } from "../types";
+import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { helpers } from "knub";
@@ -10,7 +10,7 @@ import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
-export const DeleteCaseCmd = modActionsCommand({
+export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],
   permission: "can_deletecase",
   description: trimLines(`

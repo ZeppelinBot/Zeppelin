@@ -1,6 +1,6 @@
-import { locateUserEvent } from "../types";
+import { locateUserEvt } from "../types";
 
-export const GuildBanRemoveAlertsEvt = locateUserEvent({
+export const GuildBanRemoveAlertsEvt = locateUserEvt({
   event: "guildBanAdd",
 
   async listener(meta) {

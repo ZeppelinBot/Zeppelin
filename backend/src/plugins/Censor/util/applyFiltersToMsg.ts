@@ -1,8 +1,8 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CensorPluginType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { AnyInvite, Embed, GuildInvite } from "eris";
-import { ZalgoRegex } from "src/data/Zalgo";
+import { ZalgoRegex } from "../../../data/Zalgo";
 import {
   getInviteCodesInString,
   getUrlsInString,
@@ -10,15 +10,15 @@ import {
   resolveInvite,
   isGuildInvite,
   isRESTGuildInvite,
-} from "src/utils";
+} from "../../../utils";
 import cloneDeep from "lodash.clonedeep";
 import { censorMessage } from "./censorMessage";
 import escapeStringRegexp from "escape-string-regexp";
-import { logger } from "src/logger";
+import { logger } from "../../../logger";
 import { allowTimeout } from "../../../RegExpRunner";
 
 export async function applyFiltersToMsg(
-  pluginData: PluginData<CensorPluginType>,
+  pluginData: GuildPluginData<CensorPluginType>,
   savedMessage: SavedMessage,
 ): Promise<boolean> {
   const member = await resolveMember(pluginData.client, pluginData.guild, savedMessage.user_id);

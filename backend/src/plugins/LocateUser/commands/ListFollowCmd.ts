@@ -1,9 +1,9 @@
-import { locateUserCommand } from "../types";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { locateUserCmd } from "../types";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { createChunkedMessage, sorter } from "src/utils";
+import { createChunkedMessage, sorter } from "../../../utils";
 
-export const ListFollowCmd = locateUserCommand({
+export const ListFollowCmd = locateUserCmd({
   trigger: ["follows", "fs"],
   description: "Displays all of your active alerts ordered by expiration time",
   usage: "!fs",
@@ -29,7 +29,7 @@ export const ListFollowCmd = locateUserCommand({
   },
 });
 
-export const DeleteFollowCmd = locateUserCommand({
+export const DeleteFollowCmd = locateUserCmd({
   trigger: ["follows delete", "fs d"],
   description:
     "Deletes the alert at the position <num>.\nThe value needed for <num> can be found using `!follows` (`!fs`)",

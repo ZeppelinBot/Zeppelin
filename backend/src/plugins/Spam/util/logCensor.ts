@@ -1,9 +1,9 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { SpamPluginType, RecentActionType } from "../types";
-import { SavedMessage } from "src/data/entities/SavedMessage";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
-export async function logCensor(pluginData: PluginData<SpamPluginType>, savedMessage: SavedMessage) {
+export async function logCensor(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
   const member = pluginData.guild.members.get(savedMessage.user_id);
   const config = pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,

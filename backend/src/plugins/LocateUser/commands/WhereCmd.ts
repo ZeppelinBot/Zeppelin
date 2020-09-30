@@ -1,9 +1,9 @@
-import { locateUserCommand } from "../types";
+import { locateUserCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { resolveMember } from "src/utils";
+import { resolveMember } from "../../../utils";
 import { sendWhere } from "../utils/sendWhere";
 
-export const WhereCmd = locateUserCommand({
+export const WhereCmd = locateUserCmd({
   trigger: ["where", "w"],
   description: "Posts an instant invite to the voice channel that `<member>` is in",
   usage: "!w 108552944961454080",

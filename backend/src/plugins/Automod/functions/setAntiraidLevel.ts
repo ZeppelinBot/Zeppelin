@@ -1,12 +1,12 @@
 import { User } from "eris";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
 
 export async function setAntiraidLevel(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   newLevel: string | null,
   user?: User,
 ) {

@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
 import { Member } from "eris";
 import { notifyUser, resolveUser, stripObjectToScalars, ucfirst, UserNotificationResult } from "../../../utils";
@@ -13,7 +13,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
  * Kick the specified server member. Generates a case.
  */
 export async function kickMember(
-  pluginData: PluginData<ModActionsPluginType>,
+  pluginData: GuildPluginData<ModActionsPluginType>,
   member: Member,
   reason: string = null,
   kickOptions: KickOptions = {},

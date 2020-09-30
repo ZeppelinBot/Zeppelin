@@ -1,9 +1,9 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener } from "knub";
-import { tNullable } from "src/utils";
-import { TRegex } from "src/validatorUtils";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
+import { BasePluginType } from "knub";
+import { tNullable } from "../../utils";
+import { TRegex } from "../../validatorUtils";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { RegExpRunner } from "../../RegExpRunner";
 
 export const ConfigSchema = t.type({
@@ -35,5 +35,3 @@ export interface CensorPluginType extends BasePluginType {
     onMessageUpdateFn;
   };
 }
-
-export const censorEvent = eventListener<CensorPluginType>();

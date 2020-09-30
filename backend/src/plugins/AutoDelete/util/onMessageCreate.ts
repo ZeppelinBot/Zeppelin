@@ -1,11 +1,11 @@
 import { AutoDeletePluginType, MAX_DELAY } from "../types";
-import { PluginData } from "knub";
-import { SavedMessage } from "src/data/entities/SavedMessage";
-import { convertDelayStringToMS, resolveMember } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { GuildPluginData } from "knub";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { convertDelayStringToMS, resolveMember } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 import { addMessageToDeletionQueue } from "./addMessageToDeletionQueue";
 
-export async function onMessageCreate(pluginData: PluginData<AutoDeletePluginType>, msg: SavedMessage) {
+export async function onMessageCreate(pluginData: GuildPluginData<AutoDeletePluginType>, msg: SavedMessage) {
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   const config = pluginData.config.getMatchingConfig({ member, channelId: msg.channel_id });
   if (config.enabled) {

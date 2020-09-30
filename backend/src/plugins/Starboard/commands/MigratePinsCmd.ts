@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { starboardCmd } from "../types";
-import { sendSuccessMessage, sendErrorMessage } from "src/pluginUtils";
+import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 

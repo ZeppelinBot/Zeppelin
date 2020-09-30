@@ -1,8 +1,8 @@
-import { logsEvent } from "../types";
-import { stripObjectToScalars } from "src/utils";
-import { LogType } from "src/data/LogType";
+import { logsEvt } from "../types";
+import { stripObjectToScalars } from "../../../utils";
+import { LogType } from "../../../data/LogType";
 
-export const LogsGuildMemberRemoveEvt = logsEvent({
+export const LogsGuildMemberRemoveEvt = logsEvt({
   event: "guildMemberRemove",
 
   async listener(meta) {

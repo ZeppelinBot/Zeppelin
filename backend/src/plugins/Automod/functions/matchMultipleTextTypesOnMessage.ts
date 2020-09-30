@@ -1,6 +1,6 @@
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 
 type TextTriggerWithMultipleMatchTypes = {
@@ -20,7 +20,7 @@ type YieldedContent = [MatchableTextType, string];
  * Generator function that allows iterating through matchable pieces of text of a SavedMessage
  */
 export async function* matchMultipleTextTypesOnMessage(
-  pluginData: PluginData<AutomodPluginType>,
+  pluginData: GuildPluginData<AutomodPluginType>,
   trigger: TextTriggerWithMultipleMatchTypes,
   msg: SavedMessage,
 ): AsyncIterableIterator<YieldedContent> {

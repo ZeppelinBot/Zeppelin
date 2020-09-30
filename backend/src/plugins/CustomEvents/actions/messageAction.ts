@@ -1,4 +1,4 @@
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { CustomEventsPluginType } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
@@ -13,7 +13,7 @@ export const MessageAction = t.type({
 export type TMessageAction = t.TypeOf<typeof MessageAction>;
 
 export async function messageAction(
-  pluginData: PluginData<CustomEventsPluginType>,
+  pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TMessageAction,
   values: any,
 ) {

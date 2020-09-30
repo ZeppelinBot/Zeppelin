@@ -1,7 +1,7 @@
 import { PluginOptions } from "knub";
 import { ConfigSchema, LocateUserPluginType } from "./types";
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
-import { GuildVCAlerts } from "src/data/GuildVCAlerts";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildVCAlerts } from "../../data/GuildVCAlerts";
 import { outdatedAlertsLoop } from "./utils/outdatedLoop";
 import { fillActiveAlertsList } from "./utils/fillAlertsList";
 import { WhereCmd } from "./commands/WhereCmd";
@@ -27,7 +27,7 @@ const defaultOptions: PluginOptions<LocateUserPluginType> = {
   ],
 };
 
-export const LocateUserPlugin = zeppelinPlugin<LocateUserPluginType>()("locate_user", {
+export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()("locate_user", {
   showInDocs: true,
   info: {
     prettyName: "Locate user",

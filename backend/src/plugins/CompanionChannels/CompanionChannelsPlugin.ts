@@ -1,4 +1,4 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { CompanionChannelsPluginType, ConfigSchema, TCompanionChannelOpts } from "./types";
 import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
 import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
@@ -13,7 +13,7 @@ const defaultOptions = {
   },
 };
 
-export const CompanionChannelsPlugin = zeppelinPlugin<CompanionChannelsPluginType>()("companion_channels", {
+export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPluginType>()("companion_channels", {
   showInDocs: true,
   info: {
     prettyName: "Companion channels",

@@ -1,11 +1,11 @@
-import { locateUserCommand } from "../types";
+import { locateUserCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { MINUTES, SECONDS } from "src/utils";
-import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { MINUTES, SECONDS } from "../../../utils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 
-export const FollowCmd = locateUserCommand({
+export const FollowCmd = locateUserCmd({
   trigger: ["follow", "f"],
   description: "Sets up an alert that notifies you any time `<member>` switches or joins voice channels",
   usage: "!f 108552944961454080",

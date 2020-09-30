@@ -1,8 +1,8 @@
-import { zeppelinPlugin } from "../ZeppelinPluginBlueprint";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
 import { ConfigSchema, CensorPluginType } from "./types";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 import { trimPluginDescription } from "../../utils";
@@ -43,7 +43,7 @@ const defaultOptions: PluginOptions<CensorPluginType> = {
   ],
 };
 
-export const CensorPlugin = zeppelinPlugin<CensorPluginType>()("censor", {
+export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()("censor", {
   showInDocs: true,
   info: {
     prettyName: "Censor",

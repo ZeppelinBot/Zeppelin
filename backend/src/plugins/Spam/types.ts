@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { BasePluginType, eventListener } from "knub";
-import { tNullable } from "src/utils";
-import { GuildLogs } from "src/data/GuildLogs";
-import { GuildArchives } from "src/data/GuildArchives";
-import { GuildSavedMessages } from "src/data/GuildSavedMessages";
-import { GuildMutes } from "src/data/GuildMutes";
+import { BasePluginType, guildEventListener } from "knub";
+import { tNullable } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildMutes } from "../../data/GuildMutes";
 
 const BaseSingleSpamConfig = t.type({
   interval: t.number,
@@ -75,4 +75,4 @@ export interface SpamPluginType extends BasePluginType {
   };
 }
 
-export const spamEvent = eventListener<SpamPluginType>();
+export const spamEvt = guildEventListener<SpamPluginType>();

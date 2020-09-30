@@ -1,9 +1,9 @@
 import { AutomodContext, AutomodPluginType } from "../types";
-import { PluginData } from "knub";
+import { GuildPluginData } from "knub";
 import { RECENT_ACTION_EXPIRY_TIME, RecentActionType } from "../constants";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
 
-export function clearRecentActionsForMessage(pluginData: PluginData<AutomodPluginType>, context: AutomodContext) {
+export function clearRecentActionsForMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const globalIdentifier = context.message.user_id;
   const perChannelIdentifier = `${context.message.channel_id}-${context.message.user_id}`;
 
