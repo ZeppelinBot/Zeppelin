@@ -4,7 +4,7 @@ USER root
 
 # Install mariadb
 RUN apt-get update \
- && apt-get install -y mariadb \
+ && apt-get install -y mariadb-server \
  && apt-get clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/* /tmp/* \
  && mkdir /var/run/mariadb \
  && chown -R gitpod:gitpod /etc/mariadb /var/run/mariadb /var/log/mariadb /var/lib/mariadb /var/lib/mariadb-files /var/lib/mariadb-keyring /var/lib/mariadb-upgrade
