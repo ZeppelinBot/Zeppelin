@@ -11,7 +11,7 @@ RUN apt-get update \
 
 RUN ls /etc/mysql/mysql.conf.d/
 # Install our own MySQL config
-COPY mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+COPY mysql.cnf /etc/mysql/my.cnf
 
 # Install default-login for MySQL clients
 COPY client.cnf /etc/mysql/mysql.conf.d/client.cnf

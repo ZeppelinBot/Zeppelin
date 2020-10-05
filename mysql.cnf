@@ -2,9 +2,9 @@
 host     = localhost
 user     = root
 password =
-socket   = /var/run/mariadb/mariadb.sock
-[mariadb_upgrade]
+socket   = /var/run/mysqld/mysqld.sock
+[mysql_upgrade]
 host     = localhost
 user     = root
 password =
-socket   = /var/run/mariadb/mariadb.sock
+socket   = /var/run/mysqld/mysqld.sock
