@@ -19,7 +19,7 @@ COPY mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
 
 USER gitpod
 
-RUN echo "/etc/mariadb/mariadb-bashrc-launch.sh" >> ~/.bashrc
+RUN echo "/etc/mariadb/mysql-bashrc-launch.sh" >> ~/.bashrc
 
 RUN bash -c ". .nvm/nvm.sh \
     && nvm install 14 \
