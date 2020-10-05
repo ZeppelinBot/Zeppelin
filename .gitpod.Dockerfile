@@ -6,16 +6,16 @@ USER root
 RUN apt-get update \
  && apt-get install -y mariadb-server \
  && apt-get clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/* /tmp/* \
- && mkdir /var/run/mariadb \
- && chown -R gitpod:gitpod /etc/mariadb /var/run/mariadb /var/log/mariadb /var/lib/mariadb /var/lib/mariadb-files /var/lib/mariadb-keyring /var/lib/mariadb-upgrade
+ && mkdir /var/run/mysqld \
+ && chown -R gitpod:gitpod /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
 
-# Install our own mariadb config
-COPY mariadb.cnf /etc/mariadb/mariadb.conf.d/mariadb.cnf
+# Install our own MySQL config
+COPY mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
 
-# Install default-login for mariadb clients
-COPY client.cnf /etc/mariadb/mariadb.conf.d/client.cnf
+# Install default-login for MySQL clients
+COPY client.cnf /etc/mysql/mysql.conf.d/client.cnf
 
-COPY mariadb-bashrc-launch.sh /etc/mariadb/mariadb-bashrc-launch.sh
+COPY mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
 
 USER gitpod
 
