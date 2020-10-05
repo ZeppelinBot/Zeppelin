@@ -1,10 +1,25 @@
-FROM gitpod/workspace-mysql
+FROM gitpod/workspace-full:latest
 
-# Install custom tools, runtimes, etc.
-# For example "bastet", a command-line tetris clone:
-# RUN brew install bastet
-#
-# More information: https://www.gitpod.io/docs/config-docker/
+USER root
+
+# Install mariadb
+RUN apt-get update \
+ && apt-get install -y mariadb \
+ && apt-get clean && rm -rf /var/cache/apt/* /var/lib/apt/lists/* /tmp/* \
+ && mkdir /var/run/mariadb \
+ && chown -R gitpod:gitpod /etc/mariadb /var/run/mariadb /var/log/mariadb /var/lib/mariadb /var/lib/mariadb-files /var/lib/mariadb-keyring /var/lib/mariadb-upgrade
+
+# Install our own mariadb config
+COPY mariadb.cnf /etc/mariadb/mariadb.conf.d/mariadb.cnf
+
+# Install default-login for mariadb clients
+COPY client.cnf /etc/mariadb/mariadb.conf.d/client.cnf
+
+COPY mariadb-bashrc-launch.sh /etc/mariadb/mariadb-bashrc-launch.sh
+
+USER gitpod
+
+RUN echo "/etc/mariadb/mariadb-bashrc-launch.sh" >> ~/.bashrc
 
 RUN bash -c ". .nvm/nvm.sh \
     && nvm install 14 \
