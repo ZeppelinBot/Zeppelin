@@ -8,6 +8,7 @@ import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
+import { snowflakeToTimestamp } from "src/utils/snowflakeToTimestamp";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -63,6 +64,7 @@ export const CleanCmd = utilityCmd({
     bots: ct.switchOption({ shortcut: "b" }),
     "has-invites": ct.switchOption({ shortcut: "i" }),
     match: ct.regex({ option: true, shortcut: "m" }),
+    "to-id": ct.anyId({ option: true, shortcut: "id" }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -95,6 +97,8 @@ export const CleanCmd = utilityCmd({
     const messagesToClean = [];
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
+    const upToMsgId = args["to-id"];
+    let foundId = false;
 
     while (messagesToClean.length < args.count) {
       const potentialMessagesToClean = await pluginData.state.savedMessages.getLatestByChannelBeforeId(
@@ -110,6 +114,10 @@ export const CleanCmd = utilityCmd({
         if (args.user && message.user_id !== args.user) continue;
         if (args.bots && !message.is_bot) continue;
         if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
+        if (upToMsgId != null && message.id < upToMsgId) {
+          foundId = true;
+          break;
+        }
         if (moment.utc(message.posted_at).valueOf() < timeCutoff) continue;
         if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
           continue;
@@ -123,7 +131,10 @@ export const CleanCmd = utilityCmd({
 
       beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
 
-      if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff) {
+      if (
+        foundId ||
+        moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff
+      ) {
         break;
       }
     }
