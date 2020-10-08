@@ -25,6 +25,8 @@ export async function getRoleInfoEmbed(
   //   name: role.name,
   //   icon_url: icon,
   // };
+  
+  embed.color = role.color;
 
   const createdAt = moment.utc(role.createdAt, "x");
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
@@ -37,6 +39,12 @@ export async function getRoleInfoEmbed(
     round: true
   });
 
+  let rolePermsArray : Array<string> = [];
+  for (const [x, _x] of Object.entries(role.permissions.json)) {
+    rolePermsArray.push(x.toString())
+  }
+  const rolePerms = rolePermsArray.join(', ')
+
   embed.fields.push({
     name: preEmbedPadding + "Role information",
     value: trimLines(`
@@ -48,9 +56,9 @@ export async function getRoleInfoEmbed(
       Mentionable: ${role.mentionable}
       Hoisted: ${role.hoist}
       Managed: ${role.managed}
-      Permissions: TODO
+      Permissions: ${rolePerms}
       Members: TODO
-      Mention: <@&${role.id}>
+      Mention: <@&${role.id}> (\`<@&${role.id}>\`)
     `),
   });
   
