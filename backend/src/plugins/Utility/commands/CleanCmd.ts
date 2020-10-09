@@ -8,7 +8,6 @@ import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
-import { snowflakeToTimestamp } from "src/utils/snowflakeToTimestamp";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
