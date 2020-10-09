@@ -39,11 +39,7 @@ export async function getRoleInfoEmbed(
     round: true,
   });
 
-  let rolePermsArray: Array<string> = [];
-  for (const [x, _x] of Object.entries(role.permissions.json)) {
-    rolePermsArray.push(x.toString());
-  }
-  const rolePerms = rolePermsArray.join(", ");
+  const rolePerms = Object.keys(role.permissions.json).join(", ");
 
   embed.fields.push({
     name: preEmbedPadding + "Role information",
@@ -52,7 +48,7 @@ export async function getRoleInfoEmbed(
       ID: \`${role.id}\`
       Created: **${roleAge} ago** (\`${prettyCreatedAt}\`)
       Position: ${role.position}
-      Color: #${role.color.toString(16).toUpperCase()}
+      Color: #${role.color.toString(16).toUpperCase().padStart(6, "0")}
       Mentionable: ${role.mentionable}
       Hoisted: ${role.hoist}
       Managed: ${role.managed}
