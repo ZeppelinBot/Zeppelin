@@ -108,7 +108,7 @@ export const InfoCmd = utilityCmd({
       const embed = await getRoleInfoEmbed(pluginData, roleId, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
-	return;
+        return;
       }
     }
 
