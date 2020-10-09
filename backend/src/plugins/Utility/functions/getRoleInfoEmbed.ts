@@ -15,17 +15,17 @@ export async function getRoleInfoEmbed(
   if (!role) {
     return null;
   }
-  
+
   const embed: EmbedOptions = {
-    fields: []
-  }
-  
+    fields: [],
+  };
+
   // TODO Perhaps use a '@' as icon?
   // embed.author = {
   //   name: role.name,
   //   icon_url: icon,
   // };
-  
+
   embed.color = role.color;
 
   const createdAt = moment.utc(role.createdAt, "x");
@@ -36,14 +36,14 @@ export async function getRoleInfoEmbed(
   const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
   const roleAge = humanizeDuration(Date.now() - role.createdAt, {
     largest: 2,
-    round: true
+    round: true,
   });
 
-  let rolePermsArray : Array<string> = [];
+  let rolePermsArray: Array<string> = [];
   for (const [x, _x] of Object.entries(role.permissions.json)) {
-    rolePermsArray.push(x.toString())
+    rolePermsArray.push(x.toString());
   }
-  const rolePerms = rolePermsArray.join(', ')
+  const rolePerms = rolePermsArray.join(", ");
 
   embed.fields.push({
     name: preEmbedPadding + "Role information",
@@ -61,6 +61,6 @@ export async function getRoleInfoEmbed(
       Mention: <@&${role.id}> (\`<@&${role.id}>\`)
     `),
   });
-  
+
   return embed;
 }
