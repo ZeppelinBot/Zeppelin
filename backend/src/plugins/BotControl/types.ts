@@ -4,6 +4,7 @@ import { BasePluginType, globalCommand, globalEventListener } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
+import { Configs } from "../../data/Configs";
 
 export const ConfigSchema = t.type({
   can_use: t.boolean,
@@ -17,6 +18,7 @@ export interface BotControlPluginType extends BasePluginType {
     archives: GuildArchives;
     allowedGuilds: AllowedGuilds;
     apiPermissionAssignments: ApiPermissionAssignments;
+    configs: Configs;
   };
 }
 
