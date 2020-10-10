@@ -62,7 +62,12 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         }
       }
 
-      const message = await getLogMessage(pluginData, type, data, opts.format);
+      const message = await getLogMessage(pluginData, type, data, {
+        format: opts.format,
+        include_embed_timestamp: opts.include_embed_timestamp,
+        timestamp_format: opts.timestamp_format,
+      });
+
       if (message) {
         // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
         if (typeof message !== "string") {
