@@ -125,6 +125,7 @@ connect().then(async () => {
       // Privileged
       "guildMembers",
       "guildPresences",
+      "guildMessageTyping",
 
       // Regular
       "directMessages",
