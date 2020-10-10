@@ -12,7 +12,7 @@ export const AddDashboardUserCmd = botControlCmd({
 
   signature: {
     guildId: ct.string(),
-    users: ct.user({ rest: true }),
+    users: ct.resolvedUser({ rest: true }),
   },
 
   async run({ pluginData, message: msg, args }) {
