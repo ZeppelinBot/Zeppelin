@@ -39,4 +39,18 @@ export class AllowedGuilds extends BaseRepository {
   updateInfo(id, name, icon, ownerId) {
     return this.allowedGuilds.update({ id }, { name, icon, owner_id: ownerId });
   }
+
+  add(id, data: Partial<Omit<AllowedGuild, "id">> = {}) {
+    return this.allowedGuilds.insert({
+      name: "Server",
+      icon: null,
+      owner_id: "0",
+      ...data,
+      id,
+    });
+  }
+
+  remove(id) {
+    return this.allowedGuilds.delete({ id });
+  }
 }

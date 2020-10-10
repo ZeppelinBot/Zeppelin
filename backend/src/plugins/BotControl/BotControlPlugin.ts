@@ -8,6 +8,11 @@ import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { LeaveServerCmd } from "./commands/LeaveServerCmd";
 import { ReloadServerCmd } from "./commands/ReloadServerCmd";
+import { AllowedGuilds } from "../../data/AllowedGuilds";
+import { AllowServerCmd } from "./commands/AllowServerCmd";
+import { DisallowServerCmd } from "./commands/DisallowServerCmd";
+import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
+import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 
 const defaultOptions = {
   config: {
@@ -20,10 +25,21 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bo
   configSchema: ConfigSchema,
   defaultOptions,
 
-  commands: [ReloadGlobalPluginsCmd, ServersCmd, LeaveServerCmd, ReloadServerCmd],
+  // prettier-ignore
+  commands: [
+    ReloadGlobalPluginsCmd,
+    ServersCmd,
+    LeaveServerCmd,
+    ReloadServerCmd,
+    AllowServerCmd,
+    DisallowServerCmd,
+    AddDashboardUserCmd,
+    RemoveDashboardUserCmd,
+  ],
 
   onLoad(pluginData) {
     pluginData.state.archives = new GuildArchives(0);
+    pluginData.state.allowedGuilds = new AllowedGuilds();
 
     if (getActiveReload()) {
       const [guildId, channelId] = getActiveReload();

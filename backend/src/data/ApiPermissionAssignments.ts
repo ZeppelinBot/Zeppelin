@@ -1,6 +1,7 @@
 import { getRepository, Repository } from "typeorm";
 import { ApiPermissionAssignment } from "./entities/ApiPermissionAssignment";
 import { BaseRepository } from "./BaseRepository";
+import { ApiPermissions } from "@shared/apiPermissions";
 
 export enum ApiPermissionTypes {
   User = "USER",
@@ -40,5 +41,18 @@ export class ApiPermissionAssignments extends BaseRepository {
         target_id: userId,
       },
     });
+  }
+
+  addUser(guildId, userId, permissions: ApiPermissions[]) {
+    return this.apiPermissions.insert({
+      guild_id: guildId,
+      type: ApiPermissionTypes.User,
+      target_id: userId,
+      permissions,
+    });
+  }
+
+  removeUser(guildId, userId) {
+    return this.apiPermissions.delete({ guild_id: guildId, type: ApiPermissionTypes.User, target_id: userId });
   }
 }
