@@ -14,6 +14,7 @@ import { DisallowServerCmd } from "./commands/DisallowServerCmd";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { Configs } from "../../data/Configs";
+import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 
 const defaultOptions = {
   config: {
@@ -42,6 +43,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bo
     pluginData.state.archives = new GuildArchives(0);
     pluginData.state.allowedGuilds = new AllowedGuilds();
     pluginData.state.configs = new Configs();
+    pluginData.state.apiPermissionAssignments = new ApiPermissionAssignments();
 
     if (getActiveReload()) {
       const [guildId, channelId] = getActiveReload();
