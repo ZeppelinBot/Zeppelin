@@ -121,6 +121,7 @@ connect().then(async () => {
     getAllUsers: false,
     restMode: true,
     compress: false,
+    guildCreateTimeout: 0,
     intents: [
       // Privileged
       "guildMembers",
