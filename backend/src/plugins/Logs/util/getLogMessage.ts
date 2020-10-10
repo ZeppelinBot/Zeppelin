@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { LogsPluginType, TLogFormats } from "../types";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel, TLogFormats } from "../types";
 import { LogType } from "../../../data/LogType";
 import {
   verboseUserMention,
@@ -19,14 +19,27 @@ export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,
   type: LogType,
   data: any,
-  formats?: TLogFormats,
+  opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
 ): Promise<string> {
   const config = pluginData.config.get();
-  const format = (formats && formats[LogType[type]]) || config.format[LogType[type]] || "";
-  if (format === "") return;
+  const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
+  if (format === "" || format == null) return;
+
+  // See comment on FORMAT_NO_TIMESTAMP in types.ts
+  const timestampFormat =
+    opts?.timestamp_format ??
+    (config.format.timestamp !== FORMAT_NO_TIMESTAMP ? config.format.timestamp : null) ??
+    config.timestamp_format;
+
+  const includeEmbedTimestamp = opts?.include_embed_timestamp ?? config.include_embed_timestamp;
+
+  const time = pluginData.getPlugin(TimeAndDatePlugin).inGuildTz();
+  const isoTimestamp = time.toISOString();
+  const timestamp = timestampFormat ? time.format(timestampFormat) : "";
 
   const values = {
     ...data,
+    timestamp,
     userMention: async inputUserOrMember => {
       if (!inputUserOrMember) return "";
 
@@ -73,7 +86,8 @@ export async function getLogMessage(
 
   let formatted;
   try {
-    formatted = typeof format === "string" ? await renderLogString(format) : renderRecursively(format, renderLogString);
+    formatted =
+      typeof format === "string" ? await renderLogString(format) : await renderRecursively(format, renderLogString);
   } catch (e) {
     if (e instanceof TemplateParseError) {
       logger.error(`Error when parsing template:\nError: ${e.message}\nTemplate: ${format}`);
@@ -85,15 +99,11 @@ export async function getLogMessage(
 
   if (typeof formatted === "string") {
     formatted = formatted.trim();
-
-    const timestampFormat = config.format.timestamp;
-    if (timestampFormat) {
-      const timestamp = pluginData
-        .getPlugin(TimeAndDatePlugin)
-        .inGuildTz()
-        .format(timestampFormat);
+    if (timestamp) {
       formatted = `\`[${timestamp}]\` ${formatted}`;
     }
+  } else if (formatted != null && formatted.embed && includeEmbedTimestamp) {
+    formatted.embed.timestamp = isoTimestamp;
   }
 
   return formatted;

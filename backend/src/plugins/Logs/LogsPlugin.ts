@@ -1,6 +1,6 @@
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { ConfigSchema, LogsPluginType } from "./types";
+import { ConfigSchema, FORMAT_NO_TIMESTAMP, LogsPluginType } from "./types";
 import DefaultLogMessages from "../../data/DefaultLogMessages.json";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -28,10 +28,12 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
     format: {
-      timestamp: "YYYY-MM-DD HH:mm:ss z",
+      timestamp: FORMAT_NO_TIMESTAMP, // Legacy/deprecated, use timestamp_format below instead
       ...DefaultLogMessages,
     },
     ping_user: true,
+    timestamp_format: "YYYY-MM-DD HH:mm:ss z",
+    include_embed_timestamp: true,
   },
 
   overrides: [

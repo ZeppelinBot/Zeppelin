@@ -20,6 +20,8 @@ const LogChannel = t.partial({
   excluded_message_regexes: t.array(TRegex),
   excluded_channels: t.array(t.string),
   format: tNullable(tLogFormats),
+  timestamp_format: t.string,
+  include_embed_timestamp: t.boolean,
 });
 export type TLogChannel = t.TypeOf<typeof LogChannel>;
 
@@ -31,12 +33,19 @@ export const ConfigSchema = t.type({
   format: t.intersection([
     tLogFormats,
     t.type({
-      timestamp: t.string,
+      timestamp: t.string, // Legacy/deprecated
     }),
   ]),
   ping_user: t.boolean,
+  timestamp_format: t.string,
+  include_embed_timestamp: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+
+// Hacky way of allowing a """null""" default value for config.format.timestamp
+// The type cannot be made nullable properly because io-ts's intersection type still considers
+// that it has to match the record type of tLogFormats, which includes string.
+export const FORMAT_NO_TIMESTAMP = "__NO_TIMESTAMP__";
 
 export interface LogsPluginType extends BasePluginType {
   config: TConfigSchema;
