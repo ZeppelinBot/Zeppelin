@@ -1255,6 +1255,10 @@ export async function renderRecursively(value, fn: RecursiveRenderFn) {
   return value;
 }
 
+export function isValidEmoji(emoji: string): boolean {
+  return isUnicodeEmoji(emoji) || isSnowflake(emoji);
+}
+
 export function canUseEmoji(client: Client, emoji: string): boolean {
   if (isUnicodeEmoji(emoji)) {
     return true;
