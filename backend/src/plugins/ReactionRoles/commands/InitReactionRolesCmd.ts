@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { RecoverablePluginError, ERRORS } from "../../../RecoverablePluginError";
-import { canUseEmoji, isDiscordRESTError, noop } from "../../../utils";
+import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 import { canReadChannel } from "../../../utils/canReadChannel";
 
@@ -69,22 +69,18 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         return;
       }
 
-      try {
-        if (!canUseEmoji(pluginData.client, pair[0])) {
-          sendErrorMessage(
-            pluginData,
-            msg.channel,
-            "I can only use regular emojis and custom emojis from servers I'm on",
-          );
-          return;
-        }
-      } catch (e) {
-        if (e instanceof RecoverablePluginError && e.code === ERRORS.INVALID_EMOJI) {
-          sendErrorMessage(pluginData, msg.channel, `Invalid emoji: ${pair[0]}`);
-          return;
-        }
+      if (!isValidEmoji(pair[0])) {
+        sendErrorMessage(pluginData, msg.channel, `Invalid emoji: ${pair[0]}`);
+        return;
+      }
 
-        throw e;
+      if (!canUseEmoji(pluginData.client, pair[0])) {
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          "I can only use regular emojis and custom emojis from servers I'm on",
+        );
+        return;
       }
 
       if (!pluginData.guild.roles.has(pair[1])) {
