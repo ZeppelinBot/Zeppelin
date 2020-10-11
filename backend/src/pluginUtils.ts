@@ -13,6 +13,7 @@ import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
 import { Tail } from "./utils/typeUtils";
 import { AnyPluginData } from "knub/dist/plugins/PluginData";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { logger } from "./logger";
 
 const { getMemberLevel } = helpers;
 
@@ -136,12 +137,16 @@ export function getPluginConfigPreprocessor(
 
 export function sendSuccessMessage(pluginData: AnyPluginData<any>, channel, body) {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
-  return channel.createMessage(successMessage(body, emoji));
+  return channel.createMessage(successMessage(body, emoji)).catch(() => {
+    logger.warn(`Failed to send success message to ${channel.id} (${channel.guild?.id})`);
+  });
 }
 
 export function sendErrorMessage(pluginData: AnyPluginData<any>, channel, body) {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
-  return channel.createMessage(errorMessage(body, emoji));
+  return channel.createMessage(errorMessage(body, emoji)).catch(() => {
+    logger.warn(`Failed to send error message to ${channel.id} (${channel.guild?.id})`);
+  });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
