@@ -137,15 +137,15 @@ export function getPluginConfigPreprocessor(
 
 export function sendSuccessMessage(pluginData: AnyPluginData<any>, channel, body) {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
-  return channel.createMessage(successMessage(body, emoji)).catch(() => {
-    logger.warn(`Failed to send success message to ${channel.id} (${channel.guild?.id})`);
+  return channel.createMessage(successMessage(body, emoji)).catch(err => {
+    logger.warn(`Failed to send success message to ${channel.id} (${channel.guild?.id}): ${err.code} ${err.message}`);
   });
 }
 
 export function sendErrorMessage(pluginData: AnyPluginData<any>, channel, body) {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
-  return channel.createMessage(errorMessage(body, emoji)).catch(() => {
-    logger.warn(`Failed to send error message to ${channel.id} (${channel.guild?.id})`);
+  return channel.createMessage(errorMessage(body, emoji)).catch(err => {
+    logger.warn(`Failed to send error message to ${channel.id} (${channel.guild?.id}): ${err.code} ${err.message}`);
   });
 }
 
