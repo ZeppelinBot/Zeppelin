@@ -70,7 +70,7 @@ export const CasesUserCmd = modActionsCmd({
         const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
         const prefix = getGuildPrefix(pluginData);
-        const linesPerChunk = 15;
+        const linesPerChunk = 10;
         const lineChunks = chunkArray(lines, linesPerChunk);
 
         const footerField = {
