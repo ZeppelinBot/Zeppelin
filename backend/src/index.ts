@@ -147,6 +147,10 @@ connect().then(async () => {
     }
   });
 
+  client.on("error", err => {
+    logger.error(`[ERIS] ${String(err)}`);
+  });
+
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
