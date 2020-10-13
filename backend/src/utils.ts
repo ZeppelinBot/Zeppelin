@@ -296,6 +296,10 @@ export const tDelayString = new t.Type<string, string>(
   s => s,
 );
 
+// To avoid running into issues with the JS max date vaLue, we cap maximum delay strings *far* below that.
+// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#The_ECMAScript_epoch_and_timestamps
+const MAX_DELAY_STRING_AMOUNT = 100 * 365 * DAYS;
+
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
  */
@@ -314,6 +318,10 @@ export function convertDelayStringToMS(str, defaultUnit = "m"): number {
 
   // Invalid delay string
   if (str !== "") {
+    return null;
+  }
+
+  if (ms > MAX_DELAY_STRING_AMOUNT) {
     return null;
   }
 
