@@ -4,7 +4,7 @@ import { useMediaUrls, stripObjectToScalars, resolveUser } from "../../../utils"
 import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
@@ -19,6 +19,11 @@ export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType
       }
     }
 
+    // See comment on FORMAT_NO_TIMESTAMP in types.ts
+    const config = pluginData.config.get();
+    const timestampFormat =
+      (config.format.timestamp !== FORMAT_NO_TIMESTAMP ? config.format.timestamp : null) ?? config.timestamp_format;
+
     pluginData.state.guildLogs.log(
       LogType.MESSAGE_DELETE,
       {
@@ -27,7 +32,7 @@ export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType
         messageDate: pluginData
           .getPlugin(TimeAndDatePlugin)
           .inGuildTz(moment.utc(savedMessage.data.timestamp, "x"))
-          .format(pluginData.config.get().format.timestamp),
+          .format(timestampFormat),
         message: savedMessage,
       },
       savedMessage.id,
