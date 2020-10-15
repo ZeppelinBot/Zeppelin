@@ -10,7 +10,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     const pluginData = meta.pluginData;
 
     let msg = meta.args.message as Message;
-    const userId = meta.args.userID;
+    const userId = meta.args.member.id;
     const emoji = meta.args.emoji;
 
     if (!msg.author) {
