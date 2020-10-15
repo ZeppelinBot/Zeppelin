@@ -137,9 +137,9 @@ export async function displaySearch(
         searchMsg.addReaction("➡");
         searchMsg.addReaction("🔄");
 
-        const listenerFn = pluginData.events.on("messageReactionAdd", ({ args: { message: rMsg, emoji, userID } }) => {
+        const listenerFn = pluginData.events.on("messageReactionAdd", ({ args: { message: rMsg, emoji, member } }) => {
           if (rMsg.id !== searchMsg.id) return;
-          if (userID !== msg.author.id) return;
+          if (member.id !== msg.author.id) return;
           if (!["⬅", "➡", "🔄"].includes(emoji.name)) return;
 
           if (emoji.name === "⬅" && currentPage > 1) {
@@ -151,7 +151,7 @@ export async function displaySearch(
           }
 
           if (isFullMessage(rMsg)) {
-            rMsg.removeReaction(emoji.name, userID);
+            rMsg.removeReaction(emoji.name, member.id);
           }
         });
 

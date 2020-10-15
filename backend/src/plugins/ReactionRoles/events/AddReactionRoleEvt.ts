@@ -12,7 +12,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
     const pluginData = meta.pluginData;
     const msg = meta.args.message as Message;
     const emoji = meta.args.emoji;
-    const userId = meta.args.userID;
+    const userId = meta.args.member.id;
 
     if (userId === pluginData.client.user.id) {
       // Don't act on own reactions

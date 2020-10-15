@@ -199,10 +199,10 @@ export const MutesCmd = mutesCmd({
 
         const paginationReactionListener = pluginData.events.on(
           "messageReactionAdd",
-          ({ args: { message: rMsg, emoji, userID } }) => {
+          ({ args: { message: rMsg, emoji, member } }) => {
             if (!isFullMessage(rMsg)) return;
             if (rMsg.id !== listMessage.id) return;
-            if (userID !== msg.author.id) return;
+            if (member.id !== msg.author.id) return;
             if (!["⬅", "➡"].includes(emoji.name)) return;
 
             if (emoji.name === "⬅" && currentPage > 1) {
@@ -211,7 +211,7 @@ export const MutesCmd = mutesCmd({
               drawListPage(currentPage + 1);
             }
 
-            rMsg.removeReaction(emoji.name, userID).catch(noop);
+            rMsg.removeReaction(emoji.name, member.id).catch(noop);
           },
         );
 

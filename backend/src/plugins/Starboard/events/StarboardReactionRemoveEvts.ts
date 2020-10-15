@@ -4,7 +4,7 @@ export const StarboardReactionRemoveEvt = starboardEvt({
   event: "messageReactionRemove",
 
   async listener(meta) {
-    await meta.pluginData.state.starboardReactions.deleteStarboardReaction(meta.args.message.id, meta.args.userID);
+    await meta.pluginData.state.starboardReactions.deleteStarboardReaction(meta.args.message.id, meta.args.member.id);
   },
 });
 
