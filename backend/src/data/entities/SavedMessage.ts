@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { createEncryptedJsonTransformer } from "../encryptedJsonTransformer";
+import { Sticker } from "eris";
 
 export interface ISavedMessageData {
   attachments?: object[];
@@ -9,6 +10,7 @@ export interface ISavedMessageData {
   };
   content: string;
   embeds?: object[];
+  stickers?: Sticker[];
   timestamp: number;
 }
 

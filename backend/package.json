@@ -30,7 +30,7 @@
     "deep-diff": "^1.0.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
-    "eris": "^0.13.3",
+    "eris": "github:dragory/eris#stickers",
     "erlpack": "github:abalabahaha/erlpack",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",

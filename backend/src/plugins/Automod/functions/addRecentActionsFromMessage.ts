@@ -126,4 +126,21 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
       count: characterCount,
     });
   }
+
+  const stickerCount = (context.message.data.stickers || []).length;
+  if (stickerCount) {
+    pluginData.state.recentActions.push({
+      context,
+      type: RecentActionType.Sticker,
+      identifier: globalIdentifier,
+      count: stickerCount,
+    });
+
+    pluginData.state.recentActions.push({
+      context,
+      type: RecentActionType.Sticker,
+      identifier: perChannelIdentifier,
+      count: stickerCount,
+    });
+  }
 }

@@ -46,6 +46,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
 
     if (msg.attachments.length) data.attachments = msg.attachments;
     if (msg.embeds.length) data.embeds = msg.embeds;
+    if (msg.stickers?.length) data.stickers = msg.stickers;
 
     return data;
   }
