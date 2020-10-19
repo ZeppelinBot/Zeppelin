@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "watch": "cross-env NODE_ENV=development tsc-watch --onSuccess \"node start-dev.js\"",
+    "watch-yaml-parse-test": "cross-env NODE_ENV=development tsc-watch --onSuccess \"node dist/backend/src/yamlParseTest.js\"",
     "build": "rimraf dist && tsc",
     "start-bot-dev": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --inspect=127.0.0.1:9229 dist/backend/src/index.js",
     "start-bot-prod": "cross-env NODE_ENV=production node -r ./register-tsconfig-paths.js --unhandled-rejections=strict dist/backend/src/index.js",
@@ -66,6 +67,7 @@
     "twemoji": "^12.1.4",
     "typeorm": "^0.2.14",
     "uuid": "^3.3.2",
+    "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
