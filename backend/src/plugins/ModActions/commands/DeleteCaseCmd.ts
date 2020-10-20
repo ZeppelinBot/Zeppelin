@@ -19,57 +19,87 @@ export const DeleteCaseCmd = modActionsCmd({
   `),
 
   signature: {
-    caseNumber: ct.number(),
+    caseNumber: ct.number({ rest: true }),
 
     force: ct.switchOption({ shortcut: "f" }),
   },
 
   async run({ pluginData, message, args }) {
-    const theCase = await pluginData.state.cases.findByCaseNumber(args.caseNumber);
-    if (!theCase) {
-      sendErrorMessage(pluginData, message.channel, "Case not found");
+    const failed = [];
+    const validCases = [];
+    let cancelled = 0;
+
+    for (const num of args.caseNumber) {
+      const theCase = await pluginData.state.cases.findByCaseNumber(num);
+      if (!theCase) {
+        failed.push(num);
+        continue;
+      }
+
+      validCases.push(theCase);
+    }
+
+    if (failed.length === args.caseNumber.length) {
+      sendErrorMessage(pluginData, message.channel, "None of the cases were found!");
       return;
     }
 
-    if (!args.force) {
-      const cases = pluginData.getPlugin(CasesPlugin);
-      const embedContent = await cases.getCaseEmbed(theCase);
-      message.channel.createMessage({
-        content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
-        embed: embedContent.embed,
-      });
+    for (const theCase of validCases) {
+      if (!args.force) {
+        const cases = pluginData.getPlugin(CasesPlugin);
+        const embedContent = await cases.getCaseEmbed(theCase);
+        message.channel.createMessage({
+          content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
+          embed: embedContent.embed,
+        });
 
-      const reply = await helpers.waitForReply(
-        pluginData.client,
-        message.channel as TextChannel,
-        message.author.id,
-        15 * SECONDS,
-      );
-      const normalizedReply = (reply?.content || "").toLowerCase().trim();
-      if (normalizedReply !== "yes" && normalizedReply !== "y") {
-        message.channel.createMessage("Cancelled. Case was not deleted.");
-        return;
+        const reply = await helpers.waitForReply(
+          pluginData.client,
+          message.channel as TextChannel,
+          message.author.id,
+          15 * SECONDS,
+        );
+        const normalizedReply = (reply?.content || "").toLowerCase().trim();
+        if (normalizedReply !== "yes" && normalizedReply !== "y") {
+          message.channel.createMessage("Cancelled. Case was not deleted.");
+          cancelled++;
+          continue;
+        }
       }
+
+      const deletedByName = `${message.author.username}#${message.author.discriminator}`;
+
+      const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
+      const deletedAt = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));
+
+      await pluginData.state.cases.softDelete(
+        theCase.id,
+        message.author.id,
+        deletedByName,
+        `Case deleted by **${deletedByName}** (\`${message.author.id}\`) on ${deletedAt}`,
+      );
+
+      const logs = pluginData.getPlugin(LogsPlugin);
+      logs.log(LogType.CASE_DELETE, {
+        mod: stripObjectToScalars(message.member, ["user", "roles"]),
+        case: stripObjectToScalars(theCase),
+      });
     }
 
-    const deletedByName = `${message.author.username}#${message.author.discriminator}`;
+    const failedAddendum =
+      failed.length > 0
+        ? `\nThe following cases were not found: ${failed.toString().replace(new RegExp(",", "g"), ", ")}`
+        : "";
+    const amt = validCases.length - cancelled;
+    if (amt === 0) {
+      sendErrorMessage(pluginData, message.channel, "All deletions were cancelled, no cases were deleted.");
+      return;
+    }
 
-    const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-    const deletedAt = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));
-
-    await pluginData.state.cases.softDelete(
-      theCase.id,
-      message.author.id,
-      deletedByName,
-      `Case deleted by **${deletedByName}** (\`${message.author.id}\`) on ${deletedAt}`,
+    sendSuccessMessage(
+      pluginData,
+      message.channel,
+      `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`,
     );
-
-    const logs = pluginData.getPlugin(LogsPlugin);
-    logs.log(LogType.CASE_DELETE, {
-      mod: stripObjectToScalars(message.member, ["user", "roles"]),
-      case: stripObjectToScalars(theCase),
-    });
-
-    sendSuccessMessage(pluginData, message.channel, `Case #${theCase.case_number} deleted!`);
   },
 });
