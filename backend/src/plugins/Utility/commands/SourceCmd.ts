@@ -36,6 +36,7 @@ export const SourceCmd = utilityCmd({
       content: message.content,
       attachments: message.attachments,
       embeds: message.embeds,
+      stickers: message.stickers,
     });
 
     const source = `${textSource}\n\nSource:\n\n${fullSource}`;
