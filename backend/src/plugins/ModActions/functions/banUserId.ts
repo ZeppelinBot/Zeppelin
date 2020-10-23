@@ -33,7 +33,9 @@ export async function banUserId(
     const banMessage = await renderTemplate(config.ban_message, {
       guildName: pluginData.guild.name,
       reason,
-      moderator: banOptions.caseArgs?.modId ? await resolveUser(pluginData.client, banOptions.caseArgs?.modId) : "",
+      moderator: banOptions.caseArgs?.modId
+        ? stripObjectToScalars(await resolveUser(pluginData.client, banOptions.caseArgs?.modId))
+        : "",
     });
 
     const contactMethods = banOptions?.contactMethods

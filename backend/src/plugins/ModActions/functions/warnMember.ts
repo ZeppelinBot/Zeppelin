@@ -20,7 +20,9 @@ export async function warnMember(
   const warnMessage = await renderTemplate(config.warn_message, {
     guildName: pluginData.guild.name,
     reason,
-    moderator: warnOptions.caseArgs?.modId ? await resolveUser(pluginData.client, warnOptions.caseArgs?.modId) : "",
+    moderator: warnOptions.caseArgs?.modId
+      ? stripObjectToScalars(await resolveUser(pluginData.client, warnOptions.caseArgs?.modId))
+      : "",
   });
   const contactMethods = warnOptions?.contactMethods
     ? warnOptions.contactMethods
