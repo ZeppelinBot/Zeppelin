@@ -27,6 +27,15 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         }
       }
 
+      // If we're excluding bots and the logged user is a bot, skip it
+      if (opts.exclude_bots) {
+        for (const prop of excludedUserProps) {
+          if (data && data[prop] && data[prop].bot) {
+            continue logChannelLoop;
+          }
+        }
+      }
+
       // If this entry is from an excluded channel, skip it
       if (opts.excluded_channels) {
         if (
