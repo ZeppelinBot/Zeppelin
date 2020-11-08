@@ -43,6 +43,22 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         }
       }
 
+      // If this entry is from an excluded category, skip it
+      if (opts.excluded_categories) {
+        if (
+          type === LogType.MESSAGE_DELETE ||
+          type === LogType.MESSAGE_DELETE_BARE ||
+          type === LogType.MESSAGE_EDIT ||
+          type === LogType.MESSAGE_SPAM_DETECTED ||
+          type === LogType.CENSOR ||
+          type === LogType.CLEAN
+        ) {
+          if (data.channel.parent_id && opts.excluded_categories.includes(data.channel.parent_id)) {
+            continue logChannelLoop;
+          }
+        }
+      }
+
       // If this entry contains a message with an excluded regex, skip it
       if (type === LogType.MESSAGE_DELETE && opts.excluded_message_regexes && data.message.data.content) {
         for (const regex of opts.excluded_message_regexes) {
