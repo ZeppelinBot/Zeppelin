@@ -19,8 +19,8 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
 
     const migrateNextBatch = (): Promise<{ finished: boolean; migrated?: number }> => {
       return new Promise(async resolve => {
-        const toInsert = [];
-        const toDelete = [];
+        const toInsert: any[][] = [];
+        const toDelete: number[] = [];
 
         const stream = await queryRunner.stream(
           `SELECT * FROM name_history WHERE type=1 ORDER BY timestamp ASC LIMIT ${BATCH_SIZE}`,

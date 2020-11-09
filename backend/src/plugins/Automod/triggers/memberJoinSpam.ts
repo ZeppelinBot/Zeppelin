@@ -25,7 +25,7 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
       return {};
     }
 
-    const since = Date.now() - convertDelayStringToMS(triggerConfig.within);
+    const since = Date.now() - convertDelayStringToMS(triggerConfig.within)!;
     const matchingActions = getMatchingRecentActions(pluginData, RecentActionType.MemberJoin, null, since);
     const totalCount = sumRecentActionCounts(matchingActions);
 
@@ -46,6 +46,6 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
   },
 
   renderMatchInformation({ pluginData, contexts, triggerConfig }) {
-    return null;
+    return "";
   },
 });

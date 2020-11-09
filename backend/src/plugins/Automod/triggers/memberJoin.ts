@@ -19,7 +19,7 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
     }
 
     if (triggerConfig.only_new) {
-      const threshold = Date.now() - convertDelayStringToMS(triggerConfig.new_threshold);
+      const threshold = Date.now() - convertDelayStringToMS(triggerConfig.new_threshold)!;
       return context.member.createdAt >= threshold ? {} : null;
     }
 
@@ -27,6 +27,6 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
   },
 
   renderMatchInformation({ pluginData, contexts, triggerConfig }) {
-    return null;
+    return "";
   },
 });

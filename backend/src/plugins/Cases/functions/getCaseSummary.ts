@@ -28,12 +28,13 @@ export async function getCaseSummary(
   caseOrCaseId: Case | number,
   withLinks = false,
   requestMemberId?: string,
-) {
+): Promise<string | null> {
   const config = pluginData.config.get();
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   const caseId = caseOrCaseId instanceof Case ? caseOrCaseId.id : caseOrCaseId;
   const theCase = await pluginData.state.cases.with("notes").find(caseId);
+  if (!theCase) return null;
 
   const firstNote = theCase.notes[0];
   let reason = firstNote ? firstNote.body : "";
@@ -47,7 +48,7 @@ export async function getCaseSummary(
 
   if (reason.length > CASE_SUMMARY_REASON_MAX_LENGTH) {
     const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
-    const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index : CASE_SUMMARY_REASON_MAX_LENGTH;
+    const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index! : CASE_SUMMARY_REASON_MAX_LENGTH;
     if (nextWhitespaceIndex < reason.length) {
       reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
     }
@@ -56,7 +57,7 @@ export async function getCaseSummary(
   reason = disableLinkPreviews(reason);
 
   const timestamp = moment.utc(theCase.created_at, DBDateFormat);
-  const relativeTimeCutoff = convertDelayStringToMS(config.relative_time_cutoff);
+  const relativeTimeCutoff = convertDelayStringToMS(config.relative_time_cutoff)!;
   const useRelativeTime = config.show_relative_times && Date.now() - timestamp.valueOf() < relativeTimeCutoff;
   const timestampWithTz = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, timestamp)

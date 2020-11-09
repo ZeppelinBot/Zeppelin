@@ -19,7 +19,7 @@ export const AddReactionsEvt = autoReactionsEvt({
     const autoReaction = await pluginData.state.autoReactions.getForChannel(message.channel.id);
     if (!autoReaction) return;
 
-    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
     const missingPermissions = getMissingChannelPermissions(
       me,
       message.channel as GuildChannel,

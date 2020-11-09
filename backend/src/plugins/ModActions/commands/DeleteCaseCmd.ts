@@ -9,6 +9,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { Case } from "../../../data/entities/Case";
 
 export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],
@@ -25,8 +26,8 @@ export const DeleteCaseCmd = modActionsCmd({
   },
 
   async run({ pluginData, message, args }) {
-    const failed = [];
-    const validCases = [];
+    const failed: number[] = [];
+    const validCases: Case[] = [];
     let cancelled = 0;
 
     for (const num of args.caseNumber) {

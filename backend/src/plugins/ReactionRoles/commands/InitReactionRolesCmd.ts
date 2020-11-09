@@ -111,7 +111,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
       reactionRoles,
     );
 
-    if (errors.length) {
+    if (errors?.length) {
       sendErrorMessage(pluginData, msg.channel, `Errors while adding reaction roles:\n${errors.join("\n")}`);
     } else {
       sendSuccessMessage(pluginData, msg.channel, "Reaction roles added");

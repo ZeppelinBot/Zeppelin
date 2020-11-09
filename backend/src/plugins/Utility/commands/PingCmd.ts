@@ -10,9 +10,9 @@ export const PingCmd = utilityCmd({
   permission: "can_ping",
 
   async run({ message: msg, pluginData }) {
-    const times = [];
+    const times: number[] = [];
     const messages: Message[] = [];
-    let msgToMsgDelay = null;
+    let msgToMsgDelay: number | undefined;
 
     for (let i = 0; i < 4; i++) {
       const start = performance.now();
@@ -20,7 +20,7 @@ export const PingCmd = utilityCmd({
       times.push(performance.now() - start);
       messages.push(message);
 
-      if (msgToMsgDelay === null) {
+      if (msgToMsgDelay === undefined) {
         msgToMsgDelay = message.timestamp - msg.timestamp;
       }
     }
@@ -29,7 +29,7 @@ export const PingCmd = utilityCmd({
     const lowest = Math.round(Math.min(...times));
     const mean = Math.round(times.reduce((total, ms) => total + ms, 0) / times.length);
 
-    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id]);
+    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!;
 
     msg.channel.createMessage(
       trimLines(`
@@ -37,7 +37,7 @@ export const PingCmd = utilityCmd({
       Lowest: **${lowest}ms**
       Highest: **${highest}ms**
       Mean: **${mean}ms**
-      Time between ping command and first reply: **${msgToMsgDelay}ms**
+      Time between ping command and first reply: **${msgToMsgDelay!}ms**
       Shard latency: **${shard.latency}ms**
     `),
     );

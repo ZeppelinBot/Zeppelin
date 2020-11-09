@@ -105,13 +105,13 @@ export interface AutomodContext {
 
 export interface RecentAction {
   type: RecentActionType;
-  identifier: string;
+  identifier: string | null;
   count: number;
   context: AutomodContext;
 }
 
 export interface RecentSpam {
-  archiveId: string;
+  archiveId: string | null;
   type: RecentActionType;
   identifiers: string[];
   timestamp: number;

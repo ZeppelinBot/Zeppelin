@@ -96,7 +96,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
       .getMany();
   }
 
-  getUserMessagesByChannelAfterId(userId, channelId, afterId, limit = null) {
+  getUserMessagesByChannelAfterId(userId, channelId, afterId, limit?: number) {
     let query = this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })
@@ -241,12 +241,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
     }
   }
 
-  async onceMessageAvailable(id: string, handler: (msg: SavedMessage) => any, timeout: number = 60 * 1000) {
+  async onceMessageAvailable(id: string, handler: (msg?: SavedMessage) => any, timeout: number = 60 * 1000) {
     let called = false;
     let onceEventListener;
     let timeoutFn;
 
-    const callHandler = async (msg: SavedMessage) => {
+    const callHandler = async (msg?: SavedMessage) => {
       this.events.off(`create:${id}`, onceEventListener);
       clearTimeout(timeoutFn);
 
@@ -259,7 +259,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     onceEventListener = this.events.once(`create:${id}`, callHandler);
     timeoutFn = setTimeout(() => {
       called = true;
-      callHandler(null);
+      callHandler(undefined);
     }, timeout);
 
     const messageInDB = await this.find(id);

@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable, unique } from "../../../utils";
+import { asyncMap, nonNullish, resolveMember, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 
@@ -20,14 +20,14 @@ export const BanAction = automodAction({
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";
     const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
-    const deleteMessageDays = actionConfig.deleteMessageDays;
+    const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
 
     const caseArgs = {
       modId: pluginData.client.user.id,
-      extraNotes: [matchResult.fullSummary],
+      extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
     };
 
-    const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(Boolean));
+    const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(nonNullish));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const userId of userIdsToBan) {

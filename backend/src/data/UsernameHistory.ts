@@ -39,7 +39,7 @@ export class UsernameHistory extends BaseRepository {
     });
   }
 
-  getLastEntry(userId): Promise<UsernameHistoryEntry> {
+  getLastEntry(userId): Promise<UsernameHistoryEntry | undefined> {
     return this.usernameHistory.findOne({
       where: {
         user_id: userId,

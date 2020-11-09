@@ -1,6 +1,6 @@
 import { utilityCmd } from "../types";
-import { multiSorter, resolveMember, sorter } from "../../../utils";
-import { GuildChannel, MessageContent } from "eris";
+import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
+import { GuildChannel, MessageContent, Role } from "eris";
 import { getCurrentUptime } from "../../../uptime";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
@@ -40,7 +40,7 @@ export const AboutCmd = utilityCmd({
       version = "?";
     }
 
-    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id]);
+    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!;
 
     const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
       largest: 2,
@@ -59,12 +59,12 @@ export const AboutCmd = utilityCmd({
     const loadedPlugins = Array.from(
       pluginData
         .getKnubInstance()
-        .getLoadedGuild(pluginData.guild.id)
+        .getLoadedGuild(pluginData.guild.id)!
         .loadedPlugins.keys(),
     );
     loadedPlugins.sort();
 
-    const aboutContent: MessageContent = {
+    const aboutContent: MessageContent & { embed: EmbedWith<"title" | "fields"> } = {
       embed: {
         title: `About ${pluginData.client.user.username}`,
         fields: [
@@ -101,7 +101,7 @@ export const AboutCmd = utilityCmd({
 
     // For the embed color, find the highest colored role the bot has - this is their color on the server as well
     const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
-    let botRoles = botMember.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r));
+    let botRoles = botMember?.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r)!) || [];
     botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
     botRoles = botRoles.filter(r => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)

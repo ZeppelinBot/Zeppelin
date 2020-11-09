@@ -15,12 +15,12 @@ export const CleanAction = automodAction({
           messageIdsToDeleteByChannelId.set(context.message.channel_id, []);
         }
 
-        if (messageIdsToDeleteByChannelId.get(context.message.channel_id).includes(context.message.id)) {
+        if (messageIdsToDeleteByChannelId.get(context.message.channel_id)!.includes(context.message.id)) {
           console.warn(`Message ID to delete was already present: ${pluginData.guild.name}, rule ${ruleName}`);
           continue;
         }
 
-        messageIdsToDeleteByChannelId.get(context.message.channel_id).push(context.message.id);
+        messageIdsToDeleteByChannelId.get(context.message.channel_id)!.push(context.message.id);
       }
     }
 

@@ -25,7 +25,7 @@ export async function addRoleAction(
   const target = await resolveMember(pluginData.client, pluginData.guild, targetId);
   if (!target) throw new ActionError(`Unknown target member: ${targetId}`);
 
-  if (event.trigger.type === "command" && !canActOn(pluginData, (eventData.msg as Message).member, target)) {
+  if (event.trigger.type === "command" && !canActOn(pluginData, eventData.msg.member, target)) {
     throw new ActionError("Missing permissions");
   }
 

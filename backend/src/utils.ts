@@ -1,9 +1,7 @@
 import {
-  AnyInvite,
   Attachment,
-  BaseInvite,
-  ChannelInvite,
   Client,
+  Constants,
   Embed,
   EmbedOptions,
   Emoji,
@@ -11,13 +9,13 @@ import {
   GuildAuditLog,
   GuildAuditLogEntry,
   GuildChannel,
-  GuildInvite,
+  Invite,
+  InvitePartialChannel,
+  InviteWithMetadata,
   Member,
   Message,
   MessageContent,
   PossiblyUncachedMessage,
-  RESTChannelInvite,
-  RESTPrivateInvite,
   TextableChannel,
   TextChannel,
   User,
@@ -178,6 +176,17 @@ export const tPartialDictionary = <D extends t.Mixed, C extends t.Mixed>(
   return unsafeCoerce(t.record(t.union([domain, t.undefined]), codomain, name));
 };
 
+export function nonNullish<V>(v: V): v is NonNullable<V> {
+  return v != null;
+}
+
+export type GuildInvite = Invite & { guild: Guild };
+export type GroupDMInvite = Invite & { channel: InvitePartialChannel; type: typeof Constants.ChannelTypes.GROUP_DM };
+export type WithInviteCounts = {
+  memberCount: number;
+  presenceCount: number;
+};
+
 /**
  * Mirrors EmbedOptions from Eris
  */
@@ -242,6 +251,8 @@ export const tEmbed = t.type({
   ),
 });
 
+export type EmbedWith<T extends keyof EmbedOptions> = EmbedOptions & Pick<Required<EmbedOptions>, T>;
+
 export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
 
 export const tStrictMessageContent = t.type({
@@ -303,7 +314,7 @@ const MAX_DELAY_STRING_AMOUNT = 100 * 365 * DAYS;
 /**
  * Turns a "delay string" such as "1h30m" to milliseconds
  */
-export function convertDelayStringToMS(str, defaultUnit = "m"): number {
+export function convertDelayStringToMS(str, defaultUnit = "m"): number | null {
   const regex = /^([0-9]+)\s*([wdhms])?[a-z]*\s*/;
   let match;
   let ms = 0;
@@ -419,14 +430,14 @@ export async function findRelevantAuditLogEntry(
   userId: string,
   attempts: number = 3,
   attemptDelay: number = 3000,
-): Promise<GuildAuditLogEntry> {
-  if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id) > Date.now()) {
+): Promise<GuildAuditLogEntry | null> {
+  if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id)! > Date.now()) {
     return null;
   }
 
-  let auditLogs: GuildAuditLog;
+  let auditLogs: GuildAuditLog | null = null;
   try {
-    auditLogs = await guild.getAuditLogs(5, null, actionType);
+    auditLogs = await guild.getAuditLogs(5, undefined, actionType);
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 50013) {
       // If we don't have permission to read audit log, set audit log requests on cooldown
@@ -480,7 +491,7 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
     matches = unique(matches);
   }
 
-  return matches.reduce((urls, match) => {
+  return matches.reduce<MatchedURL[]>((urls, match) => {
     const withProtocol = protocolRegex.test(match) ? match : `https://${match}`;
 
     let matchUrl: MatchedURL;
@@ -572,7 +583,7 @@ export function trimEmptyStartEndLines(str: string) {
     }
   }
 
-  return lines.slice(emptyLinesAtStart, emptyLinesAtEnd ? -1 * emptyLinesAtEnd : null).join("\n");
+  return lines.slice(emptyLinesAtStart, emptyLinesAtEnd ? -1 * emptyLinesAtEnd : undefined).join("\n");
 }
 
 export function trimIndents(str: string, indentLength: number) {
@@ -603,7 +614,7 @@ export const channelMentionRegex = /<#([0-9]+)>/g;
 
 export function getUserMentions(str: string) {
   const regex = new RegExp(userMentionRegex.source, "g");
-  const userIds = [];
+  const userIds: string[] = [];
   let match;
 
   // tslint:disable-next-line
@@ -616,7 +627,7 @@ export function getUserMentions(str: string) {
 
 export function getRoleMentions(str: string) {
   const regex = new RegExp(roleMentionRegex.source, "g");
-  const roleIds = [];
+  const roleIds: string[] = [];
   let match;
 
   // tslint:disable-next-line
@@ -659,7 +670,7 @@ export function useMediaUrls(content: string): string {
 
 export function chunkArray<T>(arr: T[], chunkSize): T[][] {
   const chunks: T[][] = [];
-  let currentChunk = [];
+  let currentChunk: T[] = [];
 
   for (let i = 0; i < arr.length; i++) {
     currentChunk.push(arr[i]);
@@ -677,7 +688,7 @@ export function chunkLines(str: string, maxChunkLength = 2000): string[] {
     return [str];
   }
 
-  const chunks = [];
+  const chunks: string[] = [];
 
   while (str.length) {
     if (str.length <= maxChunkLength) {
@@ -780,11 +791,17 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
 }
 
 type ItemWithRanking<T> = [T, number];
-export function simpleClosestStringMatch<T>(searchStr, haystack: T[], getter = null): T {
+export function simpleClosestStringMatch(searchStr: string, haystack: string[]): string | null;
+export function simpleClosestStringMatch<T extends Not<any, string>>(
+  searchStr,
+  haystack: T[],
+  getter: (item: T) => string,
+): T | null;
+export function simpleClosestStringMatch(searchStr, haystack, getter?) {
   const normalizedSearchStr = searchStr.toLowerCase();
 
   // See if any haystack item contains a part of the search string
-  const itemsWithRankings: Array<ItemWithRanking<T>> = haystack.map(item => {
+  const itemsWithRankings: Array<ItemWithRanking<any>> = haystack.map(item => {
     const itemStr: string = getter ? getter(item) : item;
     const normalizedItemStr = itemStr.toLowerCase();
 
@@ -799,7 +816,7 @@ export function simpleClosestStringMatch<T>(searchStr, haystack: T[], getter = n
       i += 0.5;
     }
 
-    return [item, i] as ItemWithRanking<T>;
+    return [item, i] as ItemWithRanking<any>;
   });
 
   // Sort by best match
@@ -872,6 +889,14 @@ export interface UserNotificationResult {
   text?: string;
 }
 
+export function createUserNotificationError(text: string): UserNotificationResult {
+  return {
+    method: null,
+    success: false,
+    text,
+  };
+}
+
 /**
  * Attempts to notify the user using one of the specified methods. Only the first one that succeeds will be used.
  * @param methods List of methods to try, in priority order
@@ -885,7 +910,7 @@ export async function notifyUser(
     return { method: null, success: true };
   }
 
-  let lastError: Error = null;
+  let lastError: Error | null = null;
 
   for (const method of methods) {
     if (method.type === "dm") {
@@ -928,7 +953,7 @@ export function ucfirst(str) {
 }
 
 export class UnknownUser {
-  public id: string = null;
+  public id: string;
   public username = "Unknown";
   public discriminator = "0000";
 
@@ -1063,13 +1088,13 @@ export async function resolveUser<T>(bot, value) {
  * Resolves a guild Member from the passed user id, user mention, or full username (with discriminator).
  * If the member is not found in the cache, it's fetched from the API.
  */
-export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member> {
+export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member | null> {
   const userId = resolveUserId(bot, value);
   if (!userId) return null;
 
   // If we have the member cached, return that directly
   if (guild.members.has(userId)) {
-    return guild.members.get(userId);
+    return guild.members.get(userId) || null;
   }
 
   // We don't want to spam the API by trying to fetch unknown members again and again,
@@ -1123,19 +1148,25 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
-const inviteCache = new SimpleCache<Promise<ChannelInvite>>(10 * MINUTES, 200);
+const inviteCache = new SimpleCache<Promise<(Invite | (Invite & InviteWithMetadata)) | null>>(10 * MINUTES, 200);
 
-export async function resolveInvite(client: Client, code: string, withCounts?: boolean): Promise<AnyInvite | null> {
+type ResolveInviteReturnType<T extends boolean> = Promise<(T extends true ? Invite & WithInviteCounts : Invite) | null>;
+export async function resolveInvite<T extends boolean>(
+  client: Client,
+  code: string,
+  withCounts?: T,
+): ResolveInviteReturnType<T> {
   const key = `${code}:${withCounts ? 1 : 0}`;
 
   if (inviteCache.has(key)) {
-    return inviteCache.get(key);
+    return inviteCache.get(key) as ResolveInviteReturnType<T>;
   }
 
+  // @ts-ignore: the getInvite() withCounts typings are blergh
   const promise = client.getInvite(code, withCounts).catch(() => null);
   inviteCache.set(key, promise);
 
-  return promise;
+  return promise as ResolveInviteReturnType<T>;
 }
 
 export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
@@ -1222,7 +1253,7 @@ export function memoize<T>(fn: (...args: any[]) => T, key?, time?): T {
   const realKey = key ?? fn;
 
   if (memoizeCache.has(realKey)) {
-    const memoizedItem = memoizeCache.get(realKey);
+    const memoizedItem = memoizeCache.get(realKey)!;
     if (!time || memoizedItem.createdAt > Date.now() - time) {
       return memoizedItem.value;
     }
@@ -1243,7 +1274,7 @@ type RecursiveRenderFn = (str: string) => string | Promise<string>;
 
 export async function renderRecursively(value, fn: RecursiveRenderFn) {
   if (Array.isArray(value)) {
-    const result = [];
+    const result: any[] = [];
     for (const item of value) {
       result.push(await renderRecursively(item, fn));
     }
@@ -1279,6 +1310,8 @@ export function canUseEmoji(client: Client, emoji: string): boolean {
   } else {
     throw new Error(`Invalid emoji ${emoji}`);
   }
+
+  return false;
 }
 
 export function trimPluginDescription(str) {
@@ -1292,16 +1325,12 @@ export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite(invite: AnyInvite): invite is GuildInvite {
-  return (invite as GuildInvite).guild != null;
+export function isGuildInvite(invite: Invite): invite is GuildInvite {
+  return invite.guild != null;
 }
 
-export function isRESTGuildInvite(invite: BaseInvite): invite is RESTChannelInvite {
-  return (invite as any).guild != null;
-}
-
-export function isRESTGroupDMInvite(invite: BaseInvite): invite is RESTPrivateInvite {
-  return (invite as any).guild == null && (invite as any).channel != null;
+export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
+  return invite.guild == null && invite.channel?.type === Constants.ChannelTypes.GROUP_DM;
 }
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {

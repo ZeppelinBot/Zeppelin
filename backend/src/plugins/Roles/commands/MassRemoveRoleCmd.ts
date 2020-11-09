@@ -4,6 +4,7 @@ import { rolesCmd } from "../types";
 import { resolveMember, stripObjectToScalars, successMessage, resolveRoleId } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
+import { Member } from "eris";
 
 export const MassRemoveRoleCmd = rolesCmd({
   trigger: "massremoverole",
@@ -17,8 +18,8 @@ export const MassRemoveRoleCmd = rolesCmd({
   async run({ message: msg, args, pluginData }) {
     msg.channel.createMessage(`Resolving members...`);
 
-    const members = [];
-    const unknownMembers = [];
+    const members: Member[] = [];
+    const unknownMembers: string[] = [];
     for (const memberId of args.members) {
       const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
       if (member) members.push(member);
@@ -55,7 +56,7 @@ export const MassRemoveRoleCmd = rolesCmd({
 
     const membersWithTheRole = members.filter(m => m.roles.includes(roleId));
     let assigned = 0;
-    const failed = [];
+    const failed: string[] = [];
     const didNotHaveRole = members.length - membersWithTheRole.length;
 
     msg.channel.createMessage(

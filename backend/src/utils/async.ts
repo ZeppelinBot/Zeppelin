@@ -26,7 +26,7 @@ export function asyncFilter<T>(
   arr: T[],
   callback: (element: T, index: number, array: T[]) => Awaitable<boolean>,
 ): Promise<T[]> {
-  return asyncReduce(
+  return asyncReduce<T, T[]>(
     arr,
     async (newArray, element, i, _arr) => {
       if (await callback(element, i, _arr)) {
@@ -43,7 +43,7 @@ export function asyncMap<T, V>(
   arr: T[],
   callback: (currentValue: T, index: number, array: T[]) => Awaitable<V>,
 ): Promise<V[]> {
-  return asyncReduce(
+  return asyncReduce<T, V[]>(
     arr,
     async (newArray, element, i, _arr) => {
       newArray.push(await callback(element, i, _arr));

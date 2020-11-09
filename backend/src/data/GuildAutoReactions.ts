@@ -18,7 +18,7 @@ export class GuildAutoReactions extends BaseGuildRepository {
     });
   }
 
-  async getForChannel(channelId: string): Promise<AutoReaction> {
+  async getForChannel(channelId: string): Promise<AutoReaction | undefined> {
     return this.autoReactions.findOne({
       where: {
         guild_id: this.guildId,

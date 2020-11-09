@@ -59,7 +59,7 @@ export const UnbanCmd = modActionsCmd({
       modId: mod.id,
       type: CaseTypes.Unban,
       reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     });
 
     // Confirm the action

@@ -36,9 +36,9 @@ export async function logAndDetectMessageSpam(
 
   // Make sure we're not handling some messages twice
   if (pluginData.state.lastHandledMsgIds.has(savedMessage.user_id)) {
-    const channelMap = pluginData.state.lastHandledMsgIds.get(savedMessage.user_id);
+    const channelMap = pluginData.state.lastHandledMsgIds.get(savedMessage.user_id)!;
     if (channelMap.has(savedMessage.channel_id)) {
-      const lastHandledMsgId = channelMap.get(savedMessage.channel_id);
+      const lastHandledMsgId = channelMap.get(savedMessage.channel_id)!;
       if (lastHandledMsgId >= savedMessage.id) return;
     }
   }
@@ -75,10 +75,11 @@ export async function logAndDetectMessageSpam(
         const recentActions = getRecentActions(pluginData, type, savedMessage.user_id, savedMessage.channel_id, since);
 
         // Start by muting them, if enabled
-        let muteResult: MuteResult;
+        let muteResult: MuteResult | null = null;
         if (spamConfig.mute && member) {
           const mutesPlugin = pluginData.getPlugin(MutesPlugin);
-          const muteTime = spamConfig.mute_time ? convertDelayStringToMS(spamConfig.mute_time.toString()) : 120 * 1000;
+          const muteTime =
+            (spamConfig.mute_time && convertDelayStringToMS(spamConfig.mute_time.toString())) ?? 120 * 1000;
 
           try {
             muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
@@ -120,15 +121,17 @@ export async function logAndDetectMessageSpam(
         // Store the ID of the last handled message
         const uniqueMessages = Array.from(new Set([...savedMessages, ...additionalMessages]));
         uniqueMessages.sort((a, b) => (a.id > b.id ? 1 : -1));
-        const lastHandledMsgId = uniqueMessages.reduce((last: string, m: SavedMessage): string => {
-          return !last || m.id > last ? m.id : last;
-        }, null);
+        const lastHandledMsgId = uniqueMessages
+          .map(m => m.id)
+          .reduce((last, id): string => {
+            return id > last ? id : last;
+          });
 
         if (!pluginData.state.lastHandledMsgIds.has(savedMessage.user_id)) {
           pluginData.state.lastHandledMsgIds.set(savedMessage.user_id, new Map());
         }
 
-        const channelMap = pluginData.state.lastHandledMsgIds.get(savedMessage.user_id);
+        const channelMap = pluginData.state.lastHandledMsgIds.get(savedMessage.user_id)!;
         channelMap.set(savedMessage.channel_id, lastHandledMsgId);
 
         // Clear the handled actions from recentActions
@@ -150,7 +153,7 @@ export async function logAndDetectMessageSpam(
             `);
           casesPlugin.createCaseNote({
             caseId: muteResult.case.id,
-            modId: muteResult.case.mod_id,
+            modId: muteResult.case.mod_id || "0",
             body: updateText,
             automatic: true,
           });

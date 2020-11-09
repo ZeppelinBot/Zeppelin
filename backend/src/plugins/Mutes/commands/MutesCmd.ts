@@ -4,6 +4,7 @@ import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../..
 import moment from "moment-timezone";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
+import { Member } from "eris";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",
@@ -31,7 +32,7 @@ export const MutesCmd = mutesCmd({
     let clearReactionsTimeout;
     const clearReactionsDebounce = 5 * MINUTES;
 
-    let lines = [];
+    let lines: string[] = [];
 
     // Active, logged mutes
     const activeMutes = await pluginData.state.mutes.getActiveMutes();
@@ -41,13 +42,13 @@ export const MutesCmd = mutesCmd({
       if (a.expires_at == null && b.expires_at == null) {
         return a.created_at > b.created_at ? -1 : 1;
       }
-      return a.expires_at > b.expires_at ? 1 : -1;
+      return a.expires_at! > b.expires_at! ? 1 : -1;
     });
 
     if (args.manual) {
       // Show only manual mutes (i.e. "Muted" role added without a logged mute)
       const muteUserIds = new Set(activeMutes.map(m => m.user_id));
-      const manuallyMutedMembers = [];
+      const manuallyMutedMembers: Member[] = [];
       const muteRole = pluginData.config.get().mute_role;
 
       if (muteRole) {
@@ -65,7 +66,7 @@ export const MutesCmd = mutesCmd({
     } else {
       // Show filtered active mutes (but not manual mutes)
       let filteredMutes: IMuteWithDetails[] = activeMutes;
-      let bannedIds: string[] = null;
+      let bannedIds: string[] | null = null;
 
       // Filter: mute age
       if (args.age) {

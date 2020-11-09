@@ -24,7 +24,7 @@ export const hasGuildPermission = async (userId: string, guildId: string, permis
  */
 export function requireGuildPermission(permission: ApiPermissions) {
   return async (req: Request, res: Response, next) => {
-    if (!(await hasGuildPermission(req.user.userId, req.params.guildId, permission))) {
+    if (!(await hasGuildPermission(req.user!.userId, req.params.guildId, permission))) {
       return unauthorized(res);
     }
 

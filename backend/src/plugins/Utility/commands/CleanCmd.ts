@@ -92,7 +92,7 @@ export const CleanCmd = utilityCmd({
 
     const cleaningMessage = msg.channel.createMessage("Cleaning...");
 
-    const messagesToClean = [];
+    const messagesToClean: SavedMessage[] = [];
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
 
@@ -104,7 +104,7 @@ export const CleanCmd = utilityCmd({
       );
       if (potentialMessagesToClean.length === 0) break;
 
-      const filtered = [];
+      const filtered: SavedMessage[] = [];
       for (const message of potentialMessagesToClean) {
         const contentString = message.data.content || "";
         if (args.user && message.user_id !== args.user) continue;

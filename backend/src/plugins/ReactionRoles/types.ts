@@ -14,7 +14,7 @@ export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 export type RoleChangeMode = "+" | "-";
 
 export type PendingMemberRoleChanges = {
-  timeout: NodeJS.Timeout;
+  timeout: NodeJS.Timeout | null;
   applyFn: () => void;
   changes: Array<{
     mode: RoleChangeMode;

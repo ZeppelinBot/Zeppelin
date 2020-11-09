@@ -27,7 +27,7 @@ export class GuildPingableRoles extends BaseGuildRepository {
     });
   }
 
-  async getByChannelAndRoleId(channelId: string, roleId: string): Promise<PingableRole> {
+  async getByChannelAndRoleId(channelId: string, roleId: string): Promise<PingableRole | undefined> {
     return this.pingableRoles.findOne({
       where: {
         guild_id: this.guildId,

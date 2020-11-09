@@ -13,6 +13,7 @@ import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 import { allowTimeout } from "../../RegExpRunner";
 import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
 import { asyncFilter } from "../../utils/async";
+import Timeout = NodeJS.Timeout;
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -47,12 +48,12 @@ export async function displaySearch(
   msg: Message,
 ) {
   // If we're not exporting, load 1 page of search results at a time and allow the user to switch pages with reactions
-  let originalSearchMsg: Message = null;
+  let originalSearchMsg: Message;
   let searching = false;
   let currentPage = args.page || 1;
   let hasReactions = false;
-  let clearReactionsFn = null;
-  let clearReactionsTimeout = null;
+  let clearReactionsFn: () => void;
+  let clearReactionsTimeout: Timeout;
 
   const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
 
@@ -335,7 +336,7 @@ async function performMemberSearch(
     }
   }
 
-  const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+  const [, sortDir, sortBy] = (args.sort && args.sort.match(/^(-?)(.*)$/)) ?? [null, "ASC", "name"];
   const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
   if (sortBy === "id") {
@@ -392,7 +393,7 @@ async function performBanSearch(
     });
   }
 
-  const [, sortDir, sortBy] = args.sort ? args.sort.match(/^(-?)(.*)$/) : [null, "ASC", "name"];
+  const [, sortDir, sortBy] = (args.sort && args.sort.match(/^(-?)(.*)$/)) ?? [null, "ASC", "name"];
   const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
   if (sortBy === "id") {

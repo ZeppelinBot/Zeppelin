@@ -19,13 +19,13 @@ export async function actualPostCmd(
   msg: Message,
   targetChannel: Channel,
   content: StrictMessageContent,
-  opts?: {
+  opts: {
     "enable-mentions"?: boolean;
     schedule?: string;
     repeat?: number;
     "repeat-until"?: string;
     "repeat-times"?: number;
-  },
+  } = {},
 ) {
   if (!(targetChannel instanceof TextChannel)) {
     msg.channel.createMessage(errorMessage("Channel is not a text channel"));
@@ -63,9 +63,9 @@ export async function actualPostCmd(
   }
 
   // For repeated posts, make sure repeat-until or repeat-times is specified
-  let repeatUntil: moment.Moment = null;
-  let repeatTimes: number = null;
-  let repeatDetailsStr: string = null;
+  let repeatUntil: moment.Moment | null = null;
+  let repeatTimes: number | null = null;
+  let repeatDetailsStr: string | null = null;
 
   if (opts["repeat-until"]) {
     repeatUntil = await parseScheduleTime(pluginData, msg.author.id, opts["repeat-until"]);

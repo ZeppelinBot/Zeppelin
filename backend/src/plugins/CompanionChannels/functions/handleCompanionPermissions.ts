@@ -24,7 +24,7 @@ export async function handleCompanionPermissions(
 export async function handleCompanionPermissions(
   pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
-  voiceChannel?: VoiceChannel,
+  voiceChannel: VoiceChannel | null,
   oldChannel?: VoiceChannel,
 ) {
   if (pluginData.state.errorCooldownManager.isOnCooldown(ERROR_COOLDOWN_KEY)) {
@@ -65,7 +65,7 @@ export async function handleCompanionPermissions(
     for (const channelId of permsToDelete) {
       const channel = pluginData.guild.channels.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.deletePermission(userId, `Companion Channel for ${oldChannel.id} | User Left`);
+      await channel.deletePermission(userId, `Companion Channel for ${oldChannel!.id} | User Left`);
     }
 
     for (const [channelId, permissions] of permsToSet) {
@@ -76,7 +76,7 @@ export async function handleCompanionPermissions(
         permissions,
         0,
         "member",
-        `Companion Channel for ${voiceChannel.id} | User Joined`,
+        `Companion Channel for ${voiceChannel!.id} | User Joined`,
       );
     }
   } catch (e) {

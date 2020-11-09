@@ -10,6 +10,7 @@ import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
+import { GuildMessage } from "knub/dist/helpers";
 
 /**
  * The actual function run by both !mute and !forcemute.
@@ -18,12 +19,12 @@ import { logger } from "../../../logger";
 export async function actualMuteUserCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
-  msg: Message,
+  msg: GuildMessage,
   args: { time?: number; reason?: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
-  let mod = msg.member;
-  let pp = null;
+  let mod: Member = msg.member;
+  let pp: User | null = null;
 
   if (args.mod) {
     if (!hasPermission(pluginData, "can_act_as_other", { message: msg })) {
@@ -36,7 +37,7 @@ export async function actualMuteUserCmd(
   }
 
   const timeUntilUnmute = args.time && humanizeDuration(args.time);
-  const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  const reason = args.reason ? formatReasonWithAttachments(args.reason, msg.attachments) : undefined;
 
   let muteResult: MuteResult;
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
@@ -54,7 +55,7 @@ export async function actualMuteUserCmd(
       contactMethods,
       caseArgs: {
         modId: mod.id,
-        ppId: pp && pp.id,
+        ppId: pp ? pp.id : undefined,
       },
     });
   } catch (e) {

@@ -73,15 +73,15 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.get(contexts[0].message.channel_id);
+    const channel = pluginData.guild.channels.get(contexts[0].message!.channel_id)!;
     const prettyChannel = verboseChannelMention(channel);
 
     return (
       asSingleLine(`
         Matched attachment type \`${disableInlineCode(matchResult.extra.matchedType)}\`
         (${matchResult.extra.mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
-        in message (\`${contexts[0].message.id}\`) in ${prettyChannel}:
-      `) + messageSummary(contexts[0].message)
+        in message (\`${contexts[0].message!.id}\`) in ${prettyChannel}:
+      `) + messageSummary(contexts[0].message!)
     );
   },
 });

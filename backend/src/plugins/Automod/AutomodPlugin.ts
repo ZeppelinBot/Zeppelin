@@ -158,7 +158,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
   configPreprocessor,
 
   customOverrideMatcher(pluginData, criteria, matchParams) {
-    return criteria?.antiraid_level && criteria.antiraid_level === pluginData.state.cachedAntiraidLevel;
+    return criteria?.antiraid_level ? criteria.antiraid_level === pluginData.state.cachedAntiraidLevel : false;
   },
 
   events: [

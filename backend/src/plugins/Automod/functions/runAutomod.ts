@@ -5,13 +5,14 @@ import { availableActions } from "../actions/availableActions";
 import { AutomodTriggerMatchResult } from "../helpers";
 import { CleanAction } from "../actions/clean";
 import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
+import { TextChannel } from "eris";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
   const user = context.user || (userId && pluginData.client.users.get(userId));
-  const member = context.member || (userId && pluginData.guild.members.get(userId));
+  const member = context.member || (userId && pluginData.guild.members.get(userId)) || null;
   const channelId = context.message?.channel_id;
-  const channel = channelId && pluginData.guild.channels.get(channelId);
+  const channel = channelId ? (pluginData.guild.channels.get(channelId) as TextChannel) : null;
   const categoryId = channel?.parentID;
 
   const config = pluginData.config.getMatchingConfig({
@@ -29,8 +30,8 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
       return;
     }
 
-    let matchResult: AutomodTriggerMatchResult<any>;
-    let contexts: AutomodContext[];
+    let matchResult: AutomodTriggerMatchResult<any> | null | undefined;
+    let contexts: AutomodContext[] = [];
 
     triggerLoop: for (const triggerItem of rule.triggers) {
       for (const [triggerName, triggerConfig] of Object.entries(triggerItem)) {

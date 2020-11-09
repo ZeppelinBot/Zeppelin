@@ -15,7 +15,7 @@ export async function actualUnmuteCmd(
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
   let mod = msg.author;
-  let pp = null;
+  let pp: User | null = null;
 
   if (args.mod) {
     if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
@@ -27,14 +27,19 @@ export async function actualUnmuteCmd(
     pp = msg.author;
   }
 
-  const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  const reason = args.reason ? formatReasonWithAttachments(args.reason, msg.attachments) : undefined;
 
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
   const result = await mutesPlugin.unmuteUser(user.id, args.time, {
     modId: mod.id,
-    ppId: pp && pp.id,
+    ppId: pp ? pp.id : undefined,
     reason,
   });
+
+  if (!result) {
+    sendErrorMessage(pluginData, msg.channel, "User is not muted!");
+    return;
+  }
 
   // Confirm the action to the moderator
   if (args.time) {

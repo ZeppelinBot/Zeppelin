@@ -9,8 +9,8 @@ export class AllowedGuild {
   @Column()
   name: string;
 
-  @Column()
-  icon: string;
+  @Column({ nullable: true })
+  icon: string | null;
 
   @Column()
   owner_id: string;

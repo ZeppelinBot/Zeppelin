@@ -27,7 +27,7 @@ export class GuildReactionRoles extends BaseGuildRepository {
     });
   }
 
-  async getByMessageAndEmoji(messageId: string, emoji: string): Promise<ReactionRole> {
+  async getByMessageAndEmoji(messageId: string, emoji: string): Promise<ReactionRole | undefined> {
     return this.reactionRoles.findOne({
       where: {
         guild_id: this.guildId,
@@ -37,7 +37,7 @@ export class GuildReactionRoles extends BaseGuildRepository {
     });
   }
 
-  async removeFromMessage(messageId: string, emoji: string = null) {
+  async removeFromMessage(messageId: string, emoji?: string) {
     const criteria: any = {
       guild_id: this.guildId,
       message_id: messageId,

@@ -4,7 +4,7 @@ import { setAntiraidLevel } from "../functions/setAntiraidLevel";
 
 export const SetAntiraidLevelAction = automodAction({
   configType: t.string,
-  defaultConfig: null,
+  defaultConfig: "",
 
   async apply({ pluginData, contexts, actionConfig }) {
     setAntiraidLevel(pluginData, actionConfig);

@@ -12,7 +12,7 @@ export const ClearMutesCmd = mutesCmd({
   },
 
   async run({ pluginData, message: msg, args }) {
-    const failed = [];
+    const failed: string[] = [];
     for (const id of args.userIds) {
       const mute = await pluginData.state.mutes.findExistingMuteForUserId(id);
       if (!mute) {

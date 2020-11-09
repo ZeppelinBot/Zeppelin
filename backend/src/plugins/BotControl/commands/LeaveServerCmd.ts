@@ -19,7 +19,7 @@ export const LeaveServerCmd = botControlCmd({
       return;
     }
 
-    const guildToLeave = pluginData.client.guilds.get(args.guildId);
+    const guildToLeave = pluginData.client.guilds.get(args.guildId)!;
     const guildName = guildToLeave.name;
 
     try {

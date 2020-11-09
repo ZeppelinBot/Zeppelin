@@ -1,9 +1,9 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { createEncryptedJsonTransformer } from "../encryptedJsonTransformer";
-import { Sticker } from "eris";
+import { Attachment, Sticker } from "eris";
 
 export interface ISavedMessageData {
-  attachments?: object[];
+  attachments?: Attachment[];
   author: {
     username: string;
     discriminator: string;

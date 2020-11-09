@@ -24,7 +24,7 @@ export const UpdateCmd = modActionsCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    let theCase: Case;
+    let theCase: Case | undefined;
     if (args.caseNumber != null) {
       theCase = await pluginData.state.cases.findByCaseNumber(args.caseNumber);
     } else {

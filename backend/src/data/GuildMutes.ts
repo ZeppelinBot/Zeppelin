@@ -20,7 +20,7 @@ export class GuildMutes extends BaseGuildRepository {
       .getMany();
   }
 
-  async findExistingMuteForUserId(userId: string): Promise<Mute> {
+  async findExistingMuteForUserId(userId: string): Promise<Mute | undefined> {
     return this.mutes.findOne({
       where: {
         guild_id: this.guildId,
@@ -48,7 +48,7 @@ export class GuildMutes extends BaseGuildRepository {
       expires_at: expiresAt,
     });
 
-    return this.mutes.findOne({ where: result.identifiers[0] });
+    return (await this.mutes.findOne({ where: result.identifiers[0] }))!;
   }
 
   async updateExpiryTime(userId, newExpiryTime) {

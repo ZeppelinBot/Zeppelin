@@ -7,18 +7,20 @@ import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { WithRequiredProps } from "../../../utils/typeUtils";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
   userId: string,
-  unmuteTime: number = null,
+  unmuteTime?: number,
   caseArgs: Partial<CaseArgs> = {},
-): Promise<UnmuteResult> {
+): Promise<UnmuteResult | null> {
   const existingMute = await pluginData.state.mutes.findExistingMuteForUserId(userId);
   const user = await resolveUser(pluginData.client, userId);
   const member = await resolveMember(pluginData.client, pluginData.guild, userId); // Grab the fresh member so we don't have stale role info
+  const modId = caseArgs.modId || pluginData.client.user.id;
 
-  if (!existingMute && !memberHasMutedRole(pluginData, member)) return;
+  if (!existingMute && member && !memberHasMutedRole(pluginData, member)) return null;
 
   if (unmuteTime) {
     // Schedule timed unmute (= just set the mute's duration)
@@ -31,7 +33,7 @@ export async function unmuteUser(
     // Unmute immediately
     if (member) {
       const muteRole = pluginData.config.get().mute_role;
-      if (member.roles.includes(muteRole)) {
+      if (muteRole && member.roles.includes(muteRole)) {
         await member.removeRole(muteRole);
       }
     } else {
@@ -47,7 +49,7 @@ export async function unmuteUser(
   const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);
 
   // Create a case
-  const noteDetails = [];
+  const noteDetails: string[] = [];
   if (unmuteTime) {
     noteDetails.push(`Scheduled unmute in ${timeUntilUnmute}`);
   } else {
@@ -61,13 +63,13 @@ export async function unmuteUser(
   const createdCase = await casesPlugin.createCase({
     ...caseArgs,
     userId,
-    modId: caseArgs.modId,
+    modId,
     type: CaseTypes.Unmute,
     noteDetails,
   });
 
   // Log the action
-  const mod = pluginData.client.users.get(caseArgs.modId);
+  const mod = pluginData.client.users.get(modId);
   if (unmuteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
       mod: stripObjectToScalars(mod),
