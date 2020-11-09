@@ -51,7 +51,7 @@ export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
 
     for await (const [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       const inviteCodes = getInviteCodesInString(str);
-      if (inviteCodes.length === 0) return null;
+      if (inviteCodes.length === 0) continue;
 
       const uniqueInviteCodes = Array.from(new Set(inviteCodes));
 
