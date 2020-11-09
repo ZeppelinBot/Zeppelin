@@ -31,7 +31,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   if (!isAffected) return thisMsgLock.unlock();
 
   // Make sure we have the appropriate permissions to manage this slowmode
-  const me = pluginData.guild.members.get(pluginData.client.user.id);
+  const me = pluginData.guild.members.get(pluginData.client.user.id)!;
   const missingPermissions = getMissingChannelPermissions(me, channel, BOT_SLOWMODE_PERMISSIONS);
   if (missingPermissions) {
     const logs = pluginData.getPlugin(LogsPlugin);

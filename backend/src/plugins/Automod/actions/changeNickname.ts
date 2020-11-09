@@ -2,7 +2,7 @@ import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { unique } from "../../../utils";
+import { nonNullish, unique } from "../../../utils";
 
 export const ChangeNicknameAction = automodAction({
   configType: t.union([
@@ -15,7 +15,7 @@ export const ChangeNicknameAction = automodAction({
   defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig }) {
-    const members = unique(contexts.map(c => c.member).filter(Boolean));
+    const members = unique(contexts.map(c => c.member).filter(nonNullish));
 
     for (const member of members) {
       if (pluginData.state.recentNicknameChanges.has(member.id)) continue;

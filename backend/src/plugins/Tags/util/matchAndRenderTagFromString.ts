@@ -6,12 +6,22 @@ import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
 import escapeStringRegexp from "escape-string-regexp";
 import { Member } from "eris";
 
-interface Result {
+interface BaseResult {
   renderedContent: StrictMessageContent;
   tagName: string;
-  categoryName: string | null;
-  category: TTagCategory | null;
 }
+
+type ResultWithCategory = BaseResult & {
+  categoryName: string;
+  category: TTagCategory;
+};
+
+type ResultWithoutCategory = BaseResult & {
+  categoryName: null;
+  category: null;
+};
+
+type Result = ResultWithCategory | ResultWithoutCategory;
 
 export async function matchAndRenderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,
@@ -45,6 +55,10 @@ export async function matchAndRenderTagFromString(
           category.tags[tagName],
           member,
         );
+
+        if (renderedContent == null) {
+          return null;
+        }
 
         return {
           renderedContent,
@@ -85,6 +99,11 @@ export async function matchAndRenderTagFromString(
     dynamicTag.body,
     member,
   );
+
+  if (renderedDynamicTagContent == null) {
+    return null;
+  }
+
   return {
     renderedContent: renderedDynamicTagContent,
     tagName: dynamicTagName,

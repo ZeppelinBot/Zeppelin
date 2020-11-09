@@ -3,7 +3,7 @@ import { UtilityPluginType } from "../types";
 import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { chunkMessageLines, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
+import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
@@ -22,7 +22,7 @@ export async function getMessageInfoEmbed(
 
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
-  const embed: EmbedOptions = {
+  const embed: EmbedWith<"fields"> = {
     fields: [],
   };
 
@@ -93,10 +93,12 @@ export async function getMessageInfoEmbed(
   });
 
   const authorJoinedAt = message.member && moment.utc(message.member.joinedAt, "x");
-  const tzAuthorJoinedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, authorJoinedAt)
-    : timeAndDate.inGuildTz(authorJoinedAt);
-  const prettyAuthorJoinedAt = tzAuthorJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
+  const tzAuthorJoinedAt = authorJoinedAt
+    ? requestMemberId
+      ? await timeAndDate.inMemberTz(requestMemberId, authorJoinedAt)
+      : timeAndDate.inGuildTz(authorJoinedAt)
+    : null;
+  const prettyAuthorJoinedAt = tzAuthorJoinedAt?.format(timeAndDate.getDateFormat("pretty_datetime"));
   const authorServerAge =
     message.member &&
     humanizeDuration(Date.now() - message.member.joinedAt, {

@@ -1,4 +1,4 @@
-import { Message, GuildTextableChannel, EmbedOptions } from "eris";
+import { Message, GuildTextableChannel, EmbedOptions, Role } from "eris";
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import {
@@ -10,6 +10,7 @@ import {
   preEmbedPadding,
   sorter,
   messageLink,
+  EmbedWith,
 } from "../../../utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -29,7 +30,7 @@ export async function getUserInfoEmbed(
 
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
 
-  const embed: EmbedOptions = {
+  const embed: EmbedWith<"fields"> = {
     fields: [],
   };
 
@@ -101,7 +102,7 @@ export async function getUserInfoEmbed(
       largest: 2,
       round: true,
     });
-    const roles = member.roles.map(id => pluginData.guild.roles.get(id)).filter(r => !!r);
+    const roles = member.roles.map(id => pluginData.guild.roles.get(id)).filter(r => r != null) as Role[];
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({

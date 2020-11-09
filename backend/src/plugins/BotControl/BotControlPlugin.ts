@@ -45,8 +45,9 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bo
     pluginData.state.configs = new Configs();
     pluginData.state.apiPermissionAssignments = new ApiPermissionAssignments();
 
-    if (getActiveReload()) {
-      const [guildId, channelId] = getActiveReload();
+    const activeReload = getActiveReload();
+    if (activeReload) {
+      const [guildId, channelId] = activeReload;
       resetActiveReload();
 
       const guild = pluginData.client.guilds.get(guildId);

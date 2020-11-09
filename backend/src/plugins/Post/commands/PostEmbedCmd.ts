@@ -35,7 +35,7 @@ export const PostEmbedCmd = postCmd({
       return;
     }
 
-    let color = null;
+    let color: number | null = null;
     if (args.color) {
       const colorRgb = parseColor(args.color);
       if (colorRgb) {

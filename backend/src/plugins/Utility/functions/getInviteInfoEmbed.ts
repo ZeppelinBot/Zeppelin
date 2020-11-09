@@ -1,15 +1,16 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { BaseInvite, Constants, EmbedOptions, RESTChannelInvite, RESTPrivateInvite } from "eris";
+import { Constants, EmbedOptions } from "eris";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import {
   embedPadding,
+  EmbedWith,
   emptyEmbedValue,
   formatNumber,
-  isRESTGroupDMInvite,
-  isRESTGuildInvite,
+  isGroupDMInvite,
+  isGuildInvite,
   preEmbedPadding,
   resolveInvite,
   trimLines,
@@ -24,8 +25,8 @@ export async function getInviteInfoEmbed(
     return null;
   }
 
-  if (isRESTGuildInvite(invite)) {
-    const embed: EmbedOptions = {
+  if (isGuildInvite(invite)) {
+    const embed: EmbedWith<"fields"> = {
       fields: [],
     };
 
@@ -102,8 +103,8 @@ export async function getInviteInfoEmbed(
     return embed;
   }
 
-  if (isRESTGroupDMInvite(invite)) {
-    const embed: EmbedOptions = {
+  if (isGroupDMInvite(invite)) {
+    const embed: EmbedWith<"fields"> = {
       fields: [],
     };
 

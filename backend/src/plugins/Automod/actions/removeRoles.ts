@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, resolveMember, tNullable, unique } from "../../../utils";
+import { asyncMap, nonNullish, resolveMember, tNullable, unique } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
@@ -19,8 +19,8 @@ export const RemoveRolesAction = automodAction({
   defaultConfig: [],
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
-    const members = unique(contexts.map(c => c.member).filter(Boolean));
-    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const members = unique(contexts.map(c => c.member).filter(nonNullish));
+    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
 
     const missingPermissions = getMissingPermissions(me.permission, p.manageRoles);
     if (missingPermissions) {
@@ -31,8 +31,8 @@ export const RemoveRolesAction = automodAction({
       return;
     }
 
-    const rolesToRemove = [];
-    const rolesWeCannotRemove = [];
+    const rolesToRemove: string[] = [];
+    const rolesWeCannotRemove: string[] = [];
     for (const roleId of actionConfig) {
       if (canAssignRole(pluginData.guild, me, roleId)) {
         rolesToRemove.push(roleId);

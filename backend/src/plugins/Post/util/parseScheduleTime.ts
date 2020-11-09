@@ -8,7 +8,7 @@ export async function parseScheduleTime(
   pluginData: GuildPluginData<any>,
   memberId: string,
   str: string,
-): Promise<Moment> {
+): Promise<Moment | null> {
   const tz = await pluginData.getPlugin(TimeAndDatePlugin).getMemberTz(memberId);
 
   const dt1 = moment.tz(str, "YYYY-MM-DD HH:mm:ss", tz);

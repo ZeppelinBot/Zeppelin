@@ -20,16 +20,16 @@ export class ScheduledPost {
 
   @Column("simple-json") attachments: Attachment[];
 
-  @Column() post_at: string;
+  @Column({ nullable: true }) post_at: string | null;
 
   /**
    * How often to post the message, in milliseconds
    */
-  @Column() repeat_interval: number;
+  @Column({ nullable: true }) repeat_interval: number | null;
 
-  @Column() repeat_until: string;
+  @Column({ nullable: true }) repeat_until: string | null;
 
-  @Column() repeat_times: number;
+  @Column({ nullable: true }) repeat_times: number | null;
 
   @Column() enable_mentions: boolean;
 }

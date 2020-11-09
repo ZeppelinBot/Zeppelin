@@ -15,7 +15,8 @@ export function getCompanionChannelOptsForVoiceChannelId(
   return Object.values(config.entries)
     .filter(
       opts =>
-        opts.voice_channel_ids.includes(voiceChannel.id) || opts.voice_channel_ids.includes(voiceChannel.parentID),
+        opts.voice_channel_ids.includes(voiceChannel.id) ||
+        (voiceChannel.parentID && opts.voice_channel_ids.includes(voiceChannel.parentID)),
     )
     .map(opts => Object.assign({}, defaultCompanionChannelOpts, opts));
 }

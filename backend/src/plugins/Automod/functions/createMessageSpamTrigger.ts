@@ -7,6 +7,7 @@ import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
 import * as t from "io-ts";
 import { getMessageSpamIdentifier } from "./getSpamIdentifier";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 
 const MessageSpamTriggerConfig = t.type({
   amount: t.number,
@@ -29,22 +30,25 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
         return;
       }
 
-      const spamIdentifier = getMessageSpamIdentifier(context.message, triggerConfig.per_channel);
+      const spamIdentifier = getMessageSpamIdentifier(context.message, Boolean(triggerConfig.per_channel));
 
       const recentSpam = findRecentSpam(pluginData, spamType, spamIdentifier);
       if (recentSpam) {
-        await pluginData.state.archives.addSavedMessagesToArchive(
-          recentSpam.archiveId,
-          [context.message],
-          pluginData.guild,
-        );
+        if (recentSpam.archiveId) {
+          await pluginData.state.archives.addSavedMessagesToArchive(
+            recentSpam.archiveId,
+            [context.message],
+            pluginData.guild,
+          );
+        }
 
         return {
           silentClean: true,
+          extra: { archiveId: "" }, // FIXME: Fix up automod trigger match() typings so extra is not required when doing a silentClean
         };
       }
 
-      const within = convertDelayStringToMS(triggerConfig.within);
+      const within = convertDelayStringToMS(triggerConfig.within) ?? 0;
       const matchedSpam = getMatchingMessageRecentActions(
         pluginData,
         context.message,
@@ -58,7 +62,7 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
         const messages = matchedSpam.recentActions
           .map(action => action.context.message)
           .filter(Boolean)
-          .sort(sorter("posted_at"));
+          .sort(sorter("posted_at")) as SavedMessage[];
 
         const archiveId = await pluginData.state.archives.createFromSavedMessages(messages, pluginData.guild);
 

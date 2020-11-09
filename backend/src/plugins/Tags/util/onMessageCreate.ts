@@ -31,7 +31,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   }
 
   // Check for cooldowns
-  const cooldowns = [];
+  const cooldowns: any[] = [];
 
   if (tagResult.category) {
     // Category-specific cooldowns

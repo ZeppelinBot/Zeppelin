@@ -1,6 +1,13 @@
 import { GuildPluginData } from "knub";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
-import { notifyUser, resolveUser, stripObjectToScalars, ucfirst, UserNotificationResult } from "../../../utils";
+import {
+  createUserNotificationError,
+  notifyUser,
+  resolveUser,
+  stripObjectToScalars,
+  ucfirst,
+  UserNotificationResult,
+} from "../../../utils";
 import { User } from "eris";
 import { renderTemplate } from "../../../templateFormatter";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
@@ -15,7 +22,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 export async function banUserId(
   pluginData: GuildPluginData<ModActionsPluginType>,
   userId: string,
-  reason: string = null,
+  reason?: string,
   banOptions: BanOptions = {},
 ): Promise<BanResult> {
   const config = pluginData.config.get();
@@ -30,15 +37,22 @@ export async function banUserId(
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   let notifyResult: UserNotificationResult = { method: null, success: true };
   if (reason && user instanceof User) {
-    const banMessage = await renderTemplate(config.ban_message, {
-      guildName: pluginData.guild.name,
-      reason,
-    });
-
     const contactMethods = banOptions?.contactMethods
       ? banOptions.contactMethods
       : getDefaultContactMethods(pluginData, "ban");
-    notifyResult = await notifyUser(user, banMessage, contactMethods);
+
+    if (contactMethods.length) {
+      if (config.ban_message) {
+        const banMessage = await renderTemplate(config.ban_message, {
+          guildName: pluginData.guild.name,
+          reason,
+        });
+
+        notifyResult = await notifyUser(user, banMessage, contactMethods);
+      } else {
+        notifyResult = createUserNotificationError("No ban message specified in config");
+      }
+    }
   }
 
   // (Try to) ban the user
@@ -59,18 +73,19 @@ export async function banUserId(
   }
 
   // Create a case for this action
+  const modId = banOptions.caseArgs?.modId || pluginData.client.user.id;
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const createdCase = await casesPlugin.createCase({
     ...(banOptions.caseArgs || {}),
     userId,
-    modId: banOptions.caseArgs?.modId,
+    modId,
     type: CaseTypes.Ban,
     reason,
     noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
   });
 
   // Log the action
-  const mod = await resolveUser(pluginData.client, banOptions.caseArgs?.modId);
+  const mod = await resolveUser(pluginData.client, modId);
   pluginData.state.serverLogs.log(LogType.MEMBER_BAN, {
     mod: stripObjectToScalars(mod),
     user: stripObjectToScalars(user),

@@ -1,4 +1,4 @@
-import { Member, TextableChannel, VoiceChannel } from "eris";
+import { Invite, Member, TextableChannel, VoiceChannel } from "eris";
 import { getInviteLink } from "knub/dist/helpers";
 import { createOrReuseInvite } from "./createOrReuseInvite";
 import { GuildPluginData } from "knub";
@@ -11,12 +11,14 @@ export async function sendWhere(
   channel: TextableChannel,
   prepend: string,
 ) {
-  const voice = pluginData.guild.channels.get(member.voiceState.channelID) as VoiceChannel;
+  const voice = member.voiceState.channelID
+    ? (pluginData.guild.channels.get(member.voiceState.channelID) as VoiceChannel)
+    : null;
 
   if (voice == null) {
     channel.createMessage(prepend + "That user is not in a channel");
   } else {
-    let invite = null;
+    let invite: Invite;
     try {
       invite = await createOrReuseInvite(voice);
     } catch (e) {

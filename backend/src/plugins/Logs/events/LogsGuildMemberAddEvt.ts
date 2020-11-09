@@ -28,11 +28,11 @@ export const LogsGuildMemberAddEvt = logsEvt({
     cases.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
     if (cases.length) {
-      const recentCaseLines = [];
+      const recentCaseLines: string[] = [];
       const recentCases = cases.slice(0, 2);
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
       for (const theCase of recentCases) {
-        recentCaseLines.push(await casesPlugin.getCaseSummary(theCase));
+        recentCaseLines.push((await casesPlugin.getCaseSummary(theCase))!);
       }
 
       let recentCaseSummary = recentCaseLines.join("\n");

@@ -147,7 +147,7 @@ export function initAuth(app: express.Express) {
     res.json({ valid: true });
   });
   app.post("/auth/logout", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
-    await apiLogins.expireApiKey(req.user.apiKey);
+    await apiLogins.expireApiKey(req.user!.apiKey);
     return ok(res);
   });
 }

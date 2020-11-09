@@ -9,7 +9,7 @@ import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
 export async function renderTagBody(
   pluginData: GuildPluginData<TagsPluginType>,
   body: t.TypeOf<typeof Tag>,
-  args = [],
+  args: any[] = [],
   extraData = {},
   subTagPermissionMatchParams?: ExtendedMatchParams,
 ): Promise<StrictMessageContent> {

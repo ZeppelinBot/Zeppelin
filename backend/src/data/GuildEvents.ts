@@ -17,12 +17,12 @@ export class GuildEvents extends BaseGuildRepository {
       this.pluginListeners.set(pluginName, new Map());
     }
 
-    const pluginListeners = this.pluginListeners.get(pluginName);
+    const pluginListeners = this.pluginListeners.get(pluginName)!;
     if (!pluginListeners.has(eventName)) {
       pluginListeners.set(eventName, []);
     }
 
-    const pluginEventListeners = pluginListeners.get(eventName);
+    const pluginEventListeners = pluginListeners.get(eventName)!;
     pluginEventListeners.push(fn);
   }
 

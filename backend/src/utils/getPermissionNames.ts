@@ -19,7 +19,7 @@ for (const key in Constants.Permissions) {
  * @param permissions Bitmask of permissions to get the names for
  */
 export function getPermissionNames(permissions: number | bigint): string[] {
-  const permissionNames = [];
+  const permissionNames: string[] = [];
   for (const [permissionNumber, permissionName] of permissionNumberToName.entries()) {
     if (BigInt(permissions) & permissionNumber) {
       permissionNames.push(permissionName);

@@ -1,7 +1,15 @@
 import { Message, GuildTextableChannel, EmbedOptions } from "eris";
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { UnknownUser, trimLines, embedPadding, resolveMember, resolveUser, preEmbedPadding } from "../../../utils";
+import {
+  UnknownUser,
+  trimLines,
+  embedPadding,
+  resolveMember,
+  resolveUser,
+  preEmbedPadding,
+  EmbedWith,
+} from "../../../utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import humanizeDuration from "humanize-duration";
@@ -16,7 +24,7 @@ export async function getSnowflakeInfoEmbed(
   showUnknownWarning = false,
   requestMemberId?: string,
 ): Promise<EmbedOptions> {
-  const embed: EmbedOptions = {
+  const embed: EmbedWith<"fields"> = {
     fields: [],
   };
 

@@ -47,8 +47,8 @@ export interface RegExpRunner {
  * Repeatedly failing regexes are put on a cooldown where requests to execute them are ignored.
  */
 export class RegExpRunner extends EventEmitter {
-  private _worker: RegExpWorker;
-  private _failedTimesInterval: Timeout;
+  private _worker: RegExpWorker | null;
+  private readonly _failedTimesInterval: Timeout;
 
   private cooldown: CooldownManager;
   private failedTimes: Map<string, number>;
@@ -90,13 +90,13 @@ export class RegExpRunner extends EventEmitter {
       if (isTimeoutError(e)) {
         if (this.failedTimes.has(regex.source)) {
           // Regex has failed before, increment fail counter
-          this.failedTimes.set(regex.source, this.failedTimes.get(regex.source) + 1);
+          this.failedTimes.set(regex.source, this.failedTimes.get(regex.source)! + 1);
         } else {
           // This is the first time this regex failed, init fail counter
           this.failedTimes.set(regex.source, 1);
         }
 
-        if (this.failedTimes.get(regex.source) >= REGEX_FAIL_TO_COOLDOWN_COUNT) {
+        if (this.failedTimes.has(regex.source) && this.failedTimes.get(regex.source)! >= REGEX_FAIL_TO_COOLDOWN_COUNT) {
           // Regex has failed too many times, set it on cooldown
           this.cooldown.setCooldown(regex.source, REGEX_FAIL_COOLDOWN);
           this.failedTimes.delete(regex.source);

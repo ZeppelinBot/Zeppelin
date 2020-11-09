@@ -88,12 +88,14 @@ const report = fold((errors: any): StrictValidationError | void => {
 
 export function validate(schema: t.Type<any>, value: any): StrictValidationError | null {
   const validationResult = schema.decode(value);
-  return pipe(
-    validationResult,
-    fold(
-      err => report(validationResult),
-      result => null,
-    ),
+  return (
+    pipe(
+      validationResult,
+      fold(
+        err => report(validationResult),
+        result => null,
+      ),
+    ) || null
   );
 }
 

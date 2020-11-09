@@ -62,7 +62,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Mute everyone and count fails
     const modId = msg.author.id;
-    const failedMutes = [];
+    const failedMutes: string[] = [];
     const mutesPlugin = pluginData.getPlugin(MutesPlugin);
     for (const userId of args.userIds) {
       try {

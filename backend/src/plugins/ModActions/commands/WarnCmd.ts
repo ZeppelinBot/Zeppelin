@@ -91,7 +91,7 @@ export const WarnCmd = modActionsCmd({
       contactMethods,
       caseArgs: {
         modId: mod.id,
-        ppId: mod.id !== msg.author.id ? msg.author.id : null,
+        ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
         reason,
       },
       retryPromptChannel: msg.channel as TextChannel,

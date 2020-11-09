@@ -13,7 +13,10 @@ export class SimpleCache<T = any> {
 
   constructor(retentionTime: number, maxItems?: number) {
     this.retentionTime = retentionTime;
-    this.maxItems = maxItems;
+
+    if (maxItems) {
+      this.maxItems = maxItems;
+    }
 
     this.store = new Map();
   }
@@ -48,7 +51,7 @@ export class SimpleCache<T = any> {
     }
   }
 
-  get(key: string): T {
+  get(key: string): T | null {
     const info = this.store.get(key);
     if (!info) return null;
 

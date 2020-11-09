@@ -12,7 +12,7 @@ export async function disableBotSlowmodeForChannel(
 
   // Remove currently applied slowmodes
   const users = await pluginData.state.slowmodes.getChannelSlowmodeUsers(channel.id);
-  const failedUsers = [];
+  const failedUsers: string[] = [];
 
   for (const slowmodeUser of users) {
     try {

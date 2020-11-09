@@ -7,7 +7,7 @@ export async function saveMessagesToDB(
   channel: TextChannel,
   ids: string[],
 ) {
-  const failed = [];
+  const failed: string[] = [];
   for (const id of ids) {
     const savedMessage = await pluginData.state.savedMessages.find(id);
     if (savedMessage) continue;

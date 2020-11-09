@@ -29,7 +29,7 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const initMsg = await msg.channel.createMessage("Disabling slowmode...");
 
   // Disable bot-maintained slowmode
-  let failedUsers = [];
+  let failedUsers: string[] = [];
   if (botSlowmode) {
     const result = await disableBotSlowmodeForChannel(pluginData, args.channel);
     failedUsers = result.failedUsers;

@@ -98,9 +98,9 @@ export type BanResult =
 export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 
 export interface WarnOptions {
-  caseArgs?: Partial<CaseArgs>;
-  contactMethods?: UserNotificationMethod[];
-  retryPromptChannel?: TextChannel;
+  caseArgs?: Partial<CaseArgs> | null;
+  contactMethods?: UserNotificationMethod[] | null;
+  retryPromptChannel?: TextChannel | null;
 }
 
 export interface KickOptions {

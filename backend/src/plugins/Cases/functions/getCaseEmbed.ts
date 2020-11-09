@@ -15,7 +15,9 @@ export async function getCaseEmbed(
   requestMemberId?: string,
 ): Promise<AdvancedMessageContent> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
-  if (!theCase) return null;
+  if (!theCase) {
+    throw new Error("Unknown case");
+  }
 
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 

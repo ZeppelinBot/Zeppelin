@@ -77,7 +77,7 @@ export const ForcebanCmd = modActionsCmd({
       modId: mod.id,
       type: CaseTypes.Ban,
       reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     });
 
     // Confirm the action

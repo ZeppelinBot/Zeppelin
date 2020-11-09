@@ -39,7 +39,7 @@ export class GuildNicknameHistory extends BaseGuildRepository {
     });
   }
 
-  getLastEntry(userId): Promise<NicknameHistoryEntry> {
+  getLastEntry(userId): Promise<NicknameHistoryEntry | undefined> {
     return this.nicknameHistory.findOne({
       where: {
         guild_id: this.guildId,

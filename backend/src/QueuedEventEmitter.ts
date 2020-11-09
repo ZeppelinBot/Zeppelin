@@ -16,7 +16,7 @@ export class QueuedEventEmitter {
       this.listeners.set(eventName, []);
     }
 
-    this.listeners.get(eventName).push(listener);
+    this.listeners.get(eventName)!.push(listener);
     return listener;
   }
 
@@ -25,7 +25,7 @@ export class QueuedEventEmitter {
       return;
     }
 
-    const listeners = this.listeners.get(eventName);
+    const listeners = this.listeners.get(eventName)!;
     listeners.splice(listeners.indexOf(listener), 1);
   }
 

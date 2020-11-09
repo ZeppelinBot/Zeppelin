@@ -34,10 +34,10 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
         return `Invalid options specified for plugin ${pluginName}`;
       }
 
-      const plugin = pluginNameToPlugin.get(pluginName);
+      const plugin = pluginNameToPlugin.get(pluginName)!;
       try {
         const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
-        await plugin.configPreprocessor(mergedOptions as PluginOptions<any>);
+        await plugin.configPreprocessor?.(mergedOptions as PluginOptions<any>);
       } catch (err) {
         if (err instanceof ConfigValidationError || err instanceof StrictValidationError) {
           return `${pluginName}: ${err.message}`;

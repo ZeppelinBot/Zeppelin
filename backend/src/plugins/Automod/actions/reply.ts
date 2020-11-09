@@ -28,14 +28,14 @@ export const ReplyAction = automodAction({
   async apply({ pluginData, contexts, actionConfig }) {
     const contextsWithTextChannels = contexts
       .filter(c => c.message?.channel_id)
-      .filter(c => pluginData.guild.channels.get(c.message.channel_id) instanceof TextChannel);
+      .filter(c => pluginData.guild.channels.get(c.message!.channel_id) instanceof TextChannel);
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
-      if (!map.has(context.message.channel_id)) {
-        map.set(context.message.channel_id, []);
+      if (!map.has(context.message!.channel_id)) {
+        map.set(context.message!.channel_id, []);
       }
 
-      map.get(context.message.channel_id).push(context);
+      map.get(context.message!.channel_id)!.push(context);
       return map;
     }, new Map());
 
@@ -57,7 +57,7 @@ export const ReplyAction = automodAction({
         const replyMsg = await channel.createMessage(formatted);
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
-          const delay = convertDelayStringToMS(String(actionConfig.auto_delete));
+          const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
           setTimeout(() => replyMsg.delete().catch(noop), delay);
         }
       }

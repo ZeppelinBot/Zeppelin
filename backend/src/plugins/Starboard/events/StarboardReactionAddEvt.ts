@@ -41,7 +41,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       .filter(board => board.channel_id !== msg.channel.id)
       // Matching emoji
       .filter(board => {
-        return board.star_emoji.some((boardEmoji: string) => {
+        return board.star_emoji!.some((boardEmoji: string) => {
           if (emoji.id) {
             // Custom emoji
             const customEmojiMatch = boardEmoji.match(/^<?:.+?:(\d+)>?$/);

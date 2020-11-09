@@ -21,7 +21,7 @@ export const ServersCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     const showList = Boolean(args.all || args.initialized || args.uninitialized || args.search);
-    const search = args.search && new RegExp([...args.search].map(s => escapeStringRegexp(s)).join(".*"), "i");
+    const search = args.search ? new RegExp([...args.search].map(s => escapeStringRegexp(s)).join(".*"), "i") : null;
 
     const joinedGuilds = Array.from(pluginData.client.guilds.values());
     const loadedGuilds = pluginData.getKnubInstance().getLoadedGuilds();
@@ -39,7 +39,7 @@ export const ServersCmd = botControlCmd({
       }
 
       if (args.search) {
-        filteredGuilds = filteredGuilds.filter(g => search.test(`${g.id} ${g.name}`));
+        filteredGuilds = filteredGuilds.filter(g => search!.test(`${g.id} ${g.name}`));
       }
 
       if (filteredGuilds.length) {

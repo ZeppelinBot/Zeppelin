@@ -41,7 +41,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
           modId: kickAuditLogEntry.user.id,
           type: CaseTypes.Kick,
           auditLogId: kickAuditLogEntry.id,
-          reason: kickAuditLogEntry.reason,
+          reason: kickAuditLogEntry.reason || undefined,
           automatic: true,
         });
       }

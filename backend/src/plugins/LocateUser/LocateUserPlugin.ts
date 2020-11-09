@@ -10,6 +10,7 @@ import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
 import { ChannelJoinAlertsEvt, ChannelLeaveAlertsEvt, ChannelSwitchAlertsEvt } from "./events/SendAlertsEvts";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 import { trimPluginDescription } from "../../utils";
+import Timeout = NodeJS.Timeout;
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {
@@ -70,7 +71,7 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()("loc
   },
 
   onUnload(pluginData) {
-    clearTimeout(pluginData.state.outdatedAlertsTimeout);
+    clearTimeout(pluginData.state.outdatedAlertsTimeout as Timeout);
     pluginData.state.unloaded = true;
   },
 });

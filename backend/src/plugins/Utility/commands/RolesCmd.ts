@@ -51,8 +51,8 @@ export const RolesCmd = utilityCmd({
 
       if (!sort) sort = "-memberCount";
       roles.sort((a, b) => {
-        if (a._memberCount > b._memberCount) return -1;
-        if (a._memberCount < b._memberCount) return 1;
+        if (a._memberCount! > b._memberCount!) return -1;
+        if (a._memberCount! < b._memberCount!) return 1;
         return 0;
       });
     } else {

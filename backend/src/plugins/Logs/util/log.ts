@@ -109,13 +109,13 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
           if (!pluginData.state.batches.has(channel.id)) {
             pluginData.state.batches.set(channel.id, []);
             setTimeout(async () => {
-              const batchedMessage = pluginData.state.batches.get(channel.id).join("\n");
+              const batchedMessage = pluginData.state.batches.get(channel.id)!.join("\n");
               pluginData.state.batches.delete(channel.id);
               createChunkedMessage(channel, batchedMessage).catch(noop);
             }, batchTime);
           }
 
-          pluginData.state.batches.get(channel.id).push(message);
+          pluginData.state.batches.get(channel.id)!.push(message);
         } else {
           // If we're not batching log messages, just send them immediately
           await createChunkedMessage(channel, message).catch(noop);

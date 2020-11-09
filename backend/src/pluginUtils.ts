@@ -32,26 +32,28 @@ export function hasPermission(pluginData: AnyPluginData<any>, permission: string
   return helpers.hasPermission(config, permission);
 }
 
-const PluginOverrideCriteriaType = t.recursion("PluginOverrideCriteriaType", () =>
-  t.type({
-    channel: tNullable(t.union([t.string, t.array(t.string)])),
-    category: tNullable(t.union([t.string, t.array(t.string)])),
-    level: tNullable(t.union([t.string, t.array(t.string)])),
-    user: tNullable(t.union([t.string, t.array(t.string)])),
-    role: tNullable(t.union([t.string, t.array(t.string)])),
+const PluginOverrideCriteriaType: t.Type<PluginOverrideCriteria<unknown>> = t.recursion(
+  "PluginOverrideCriteriaType",
+  () =>
+    t.partial({
+      channel: tNullable(t.union([t.string, t.array(t.string)])),
+      category: tNullable(t.union([t.string, t.array(t.string)])),
+      level: tNullable(t.union([t.string, t.array(t.string)])),
+      user: tNullable(t.union([t.string, t.array(t.string)])),
+      role: tNullable(t.union([t.string, t.array(t.string)])),
 
-    all: tNullable(t.array(PluginOverrideCriteriaType)),
-    any: tNullable(t.array(PluginOverrideCriteriaType)),
-    not: tNullable(PluginOverrideCriteriaType),
+      all: tNullable(t.array(PluginOverrideCriteriaType)),
+      any: tNullable(t.array(PluginOverrideCriteriaType)),
+      not: tNullable(PluginOverrideCriteriaType),
 
-    extra: t.unknown,
-  }),
+      extra: t.unknown,
+    }),
 );
 
 const BasicPluginStructureType = t.type({
   enabled: tNullable(t.boolean),
   config: tNullable(t.unknown),
-  overrides: tNullable(t.array(PluginOverrideCriteriaType)),
+  overrides: tNullable(t.array(t.union([PluginOverrideCriteriaType, t.type({ config: t.unknown })]))),
   replaceDefaultOverrides: tNullable(t.boolean),
 });
 
@@ -101,7 +103,7 @@ export function getPluginConfigPreprocessor(
 
     // 4. Merge with default options and validate/decode the entire config
     let decodedConfig = {};
-    const decodedOverrides = [];
+    const decodedOverrides: Array<PluginOverrideCriteria<unknown> & { config: any }> = [];
 
     if (options.config) {
       decodedConfig = blueprint.configSchema

@@ -34,7 +34,7 @@ export class Queue {
       return;
     }
 
-    const fn = this.queue.shift();
+    const fn = this.queue.shift()!;
     new Promise(resolve => {
       // Either fn() completes or the timeout is reached
       fn().then(resolve);

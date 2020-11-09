@@ -17,11 +17,11 @@ export async function applyReactionRoleReactionsToMessage(
   channelId: string,
   messageId: string,
   reactionRoles: ReactionRole[],
-): Promise<string[]> {
+): Promise<string[] | undefined> {
   const channel = pluginData.guild.channels.get(channelId) as TextChannel;
   if (!channel) return;
 
-  const errors = [];
+  const errors: string[] = [];
   const logs = pluginData.getPlugin(LogsPlugin);
 
   let targetMessage;

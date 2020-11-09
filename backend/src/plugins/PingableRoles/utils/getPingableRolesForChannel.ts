@@ -10,5 +10,5 @@ export async function getPingableRolesForChannel(
     pluginData.state.cache.set(channelId, await pluginData.state.pingableRoles.getForChannel(channelId));
   }
 
-  return pluginData.state.cache.get(channelId);
+  return pluginData.state.cache.get(channelId)!;
 }

@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { GuildInvite } from "eris";
 import { automodTrigger } from "../helpers";
 import {
   disableCodeBlocks,
   disableInlineCode,
   getInviteCodesInString,
+  GuildInvite,
   isGuildInvite,
   resolveInvite,
   tNullable,

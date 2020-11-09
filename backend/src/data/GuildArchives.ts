@@ -37,7 +37,7 @@ export class GuildArchives extends BaseGuildRepository {
       .execute();
   }
 
-  async find(id: string): Promise<ArchiveEntry> {
+  async find(id: string): Promise<ArchiveEntry | undefined> {
     return this.archives.findOne({
       where: { id },
       relations: this.getRelations(),
@@ -56,7 +56,7 @@ export class GuildArchives extends BaseGuildRepository {
   /**
    * @returns ID of the created entry
    */
-  async create(body: string, expiresAt: moment.Moment = null): Promise<string> {
+  async create(body: string, expiresAt?: moment.Moment): Promise<string> {
     if (!expiresAt) {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
@@ -71,7 +71,7 @@ export class GuildArchives extends BaseGuildRepository {
   }
 
   protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
-    const msgLines = [];
+    const msgLines: string[] = [];
     for (const msg of savedMessages) {
       const channel = guild.channels.get(msg.channel_id);
       const user = { ...msg.data.author, id: msg.user_id };
@@ -88,7 +88,7 @@ export class GuildArchives extends BaseGuildRepository {
     return msgLines;
   }
 
-  async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt = null) {
+  async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt?: moment.Moment) {
     if (expiresAt == null) {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
@@ -105,6 +105,10 @@ export class GuildArchives extends BaseGuildRepository {
     const messagesStr = msgLines.join("\n");
 
     const archive = await this.find(archiveId);
+    if (archive == null) {
+      throw new Error("Archive not found");
+    }
+
     archive.body += "\n" + messagesStr;
 
     await this.archives.update({ id: archiveId }, { body: archive.body });

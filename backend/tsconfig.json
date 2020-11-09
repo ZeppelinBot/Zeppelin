@@ -21,7 +21,10 @@
     },
     "sourceMap": true,
     "alwaysStrict": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/**/*.ts"

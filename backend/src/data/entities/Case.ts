@@ -13,27 +13,27 @@ export class Case {
 
   @Column() user_name: string;
 
-  @Column() mod_id: string;
+  @Column({ nullable: true }) mod_id: string | null;
 
-  @Column() mod_name: string;
+  @Column({ nullable: true }) mod_name: string | null;
 
   @Column() type: number;
 
-  @Column() audit_log_id: string;
+  @Column({ nullable: true }) audit_log_id: string | null;
 
   @Column() created_at: string;
 
   @Column() is_hidden: boolean;
 
-  @Column() pp_id: string;
+  @Column({ nullable: true }) pp_id: string | null;
 
-  @Column() pp_name: string;
+  @Column({ nullable: true }) pp_name: string | null;
 
   /**
    * ID of the channel and message where this case was logged.
    * Format: "channelid-messageid"
    */
-  @Column() log_message_id: string;
+  @Column({ nullable: true }) log_message_id: string | null;
 
   @OneToMany(
     type => CaseNote,

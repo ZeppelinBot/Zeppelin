@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { unique } from "../../../utils";
+import { nonNullish, unique } from "../../../utils";
 import { Constants } from "eris";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -17,8 +17,8 @@ export const AddRolesAction = automodAction({
   defaultConfig: [],
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
-    const members = unique(contexts.map(c => c.member).filter(Boolean));
-    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const members = unique(contexts.map(c => c.member).filter(nonNullish));
+    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
 
     const missingPermissions = getMissingPermissions(me.permission, p.manageRoles);
     if (missingPermissions) {
@@ -29,8 +29,8 @@ export const AddRolesAction = automodAction({
       return;
     }
 
-    const rolesToAssign = [];
-    const rolesWeCannotAssign = [];
+    const rolesToAssign: string[] = [];
+    const rolesWeCannotAssign: string[] = [];
     for (const roleId of actionConfig) {
       if (canAssignRole(pluginData.guild, me, roleId)) {
         rolesToAssign.push(roleId);

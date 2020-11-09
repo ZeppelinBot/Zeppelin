@@ -9,16 +9,16 @@ interface RoleAddedMatchResult {
 export const RoleAddedTrigger = automodTrigger<RoleAddedMatchResult>()({
   configType: t.union([t.string, t.array(t.string)]),
 
-  defaultConfig: null,
+  defaultConfig: [],
 
   async match({ triggerConfig, context, pluginData }) {
-    if (!context.member || !context.rolesChanged || context.rolesChanged.added.length === 0) {
+    if (!context.member || !context.rolesChanged || context.rolesChanged.added!.length === 0) {
       return;
     }
 
     const triggerRoles = Array.isArray(triggerConfig) ? triggerConfig : [triggerConfig];
     for (const roleId of triggerRoles) {
-      if (context.rolesChanged.added.includes(roleId)) {
+      if (context.rolesChanged.added!.includes(roleId)) {
         if (consumeIgnoredRoleChange(pluginData, context.member.id, roleId)) {
           continue;
         }

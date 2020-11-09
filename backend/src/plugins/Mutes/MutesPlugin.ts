@@ -17,6 +17,7 @@ import { CaseArgs } from "../Cases/types";
 import { Member } from "eris";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
+import { mapToPublicFn } from "../../pluginUtils";
 
 const defaultOptions = {
   config: {
@@ -82,19 +83,12 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
   ],
 
   public: {
-    muteUser(pluginData) {
-      return (userId: string, muteTime: number = null, reason: string = null, muteOptions: MuteOptions = {}) => {
-        return muteUser(pluginData, userId, muteTime, reason, muteOptions);
-      };
-    },
-    unmuteUser(pluginData) {
-      return (userId: string, unmuteTime: number = null, args: Partial<CaseArgs>) => {
-        return unmuteUser(pluginData, userId, unmuteTime, args);
-      };
-    },
+    muteUser: mapToPublicFn(muteUser),
+    unmuteUser: mapToPublicFn(unmuteUser),
     hasMutedRole(pluginData) {
       return (member: Member) => {
-        return member.roles.includes(pluginData.config.get().mute_role);
+        const muteRole = pluginData.config.get().mute_role;
+        return muteRole ? member.roles.includes(muteRole) : false;
       };
     },
   },

@@ -7,7 +7,7 @@ export function initStaff(app: express.Express) {
   staffRouter.use(...apiTokenAuthHandlers());
 
   staffRouter.get("/status", (req: Request, res: Response) => {
-    const userIsStaff = isStaff(req.user.userId);
+    const userIsStaff = isStaff(req.user!.userId);
     res.json({ isStaff: userIsStaff });
   });
 

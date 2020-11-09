@@ -26,7 +26,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
     const roleNames = normalizeRoleNames(splitRoleNames(args.roleNames));
     const matchedRoleIds = findMatchingRoles(roleNames, applyingEntries);
 
-    const rolesToRemove = Array.from(matchedRoleIds.values()).map(id => pluginData.guild.roles.get(id));
+    const rolesToRemove = Array.from(matchedRoleIds.values()).map(id => pluginData.guild.roles.get(id)!);
     const roleIdsToRemove = rolesToRemove.map(r => r.id);
 
     // Remove the roles

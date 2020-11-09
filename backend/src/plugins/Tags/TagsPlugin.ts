@@ -130,7 +130,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
           delay = args[0];
         }
 
-        const delayMS = convertDelayStringToMS(delay);
+        const delayMS = convertDelayStringToMS(delay) ?? 0;
         return moment
           .utc(reference, "x")
           .add(delayMS)
@@ -151,7 +151,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
           delay = args[0];
         }
 
-        const delayMS = convertDelayStringToMS(delay);
+        const delayMS = convertDelayStringToMS(delay) ?? 0;
         return moment
           .utc(reference, "x")
           .subtract(delayMS)

@@ -16,7 +16,7 @@ export function getRegExpRunner(key: string) {
     });
   }
 
-  const info = runners.get(key);
+  const info = runners.get(key)!;
   info.users++;
 
   return info.runner;
@@ -27,7 +27,7 @@ export function discardRegExpRunner(key: string) {
     throw new Error(`No runners with key ${key}, cannot discard`);
   }
 
-  const info = runners.get(key);
+  const info = runners.get(key)!;
   info.users--;
 
   if (info.users <= 0) {

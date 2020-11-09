@@ -212,13 +212,13 @@ connect().then(async () => {
 
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
-        const emoji = guildId ? bot.getLoadedGuild(guildId).config.success_emoji : undefined;
+        const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
         channel.createMessage(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
-        const emoji = guildId ? bot.getLoadedGuild(guildId).config.error_emoji : undefined;
+        const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
         channel.createMessage(errorMessage(body, emoji));
       },
     },
