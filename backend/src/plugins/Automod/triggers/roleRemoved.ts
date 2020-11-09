@@ -9,7 +9,7 @@ interface RoleAddedMatchResult {
 export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
   configType: t.union([t.string, t.array(t.string)]),
 
-  defaultConfig: [],
+  defaultConfig: "",
 
   async match({ triggerConfig, context, pluginData }) {
     if (!context.member || !context.rolesChanged || context.rolesChanged.removed!.length === 0) {
