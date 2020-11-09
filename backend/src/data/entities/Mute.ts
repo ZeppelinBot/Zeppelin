@@ -12,7 +12,7 @@ export class Mute {
 
   @Column() created_at: string;
 
-  @Column({ nullable: true }) expires_at: string | null;
+  @Column({ type: String, nullable: true }) expires_at: string | null;
 
   @Column() case_id: number;
 }

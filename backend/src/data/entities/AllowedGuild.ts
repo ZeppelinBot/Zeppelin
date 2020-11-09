@@ -9,7 +9,7 @@ export class AllowedGuild {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: String, nullable: true })
   icon: string | null;
 
   @Column()
