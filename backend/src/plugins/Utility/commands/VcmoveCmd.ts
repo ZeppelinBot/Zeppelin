@@ -10,6 +10,7 @@ import {
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
+import { cons } from "fp-ts/lib/Array";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
@@ -24,8 +25,6 @@ export const VcmoveCmd = utilityCmd({
 
   async run({ message: msg, args, pluginData }) {
     let channel: VoiceChannel;
-
-    const foo = args.member;
 
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
@@ -77,7 +76,7 @@ export const VcmoveCmd = utilityCmd({
         channelID: channel.id,
       });
     } catch (e) {
-      msg.channel.createMessage(errorMessage("Failed to move member"));
+      sendErrorMessage(pluginData, msg.channel, "Failed to move member");
       return;
     }
 

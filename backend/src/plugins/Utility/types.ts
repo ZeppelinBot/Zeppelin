@@ -24,6 +24,7 @@ export const ConfigSchema = t.type({
   can_ping: t.boolean,
   can_source: t.boolean,
   can_vcmove: t.boolean,
+  can_vckick: t.boolean,
   can_help: t.boolean,
   can_about: t.boolean,
   can_context: t.boolean,
