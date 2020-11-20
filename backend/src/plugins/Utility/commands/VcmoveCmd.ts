@@ -11,7 +11,6 @@ import {
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { Member, VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
-import { number } from "io-ts";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
