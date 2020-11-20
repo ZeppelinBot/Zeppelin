@@ -10,7 +10,6 @@ import {
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
-import { cons } from "fp-ts/lib/Array";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
