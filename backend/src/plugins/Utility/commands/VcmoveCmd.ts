@@ -155,23 +155,34 @@ export const VcmoveAllCmd = utilityCmd({
       return;
     }
 
-    let moveAmt = 0;
+    // Cant leave null, otherwise we get an assignment error in the catch
+    let currMember = msg.member;
+    const moveAmt = args.oldChannel.voiceMembers.size;
     try {
       for (const memberWithId of args.oldChannel.voiceMembers) {
-        moveAmt++;
-        memberWithId[1].edit({
+        currMember = memberWithId[1];
+
+        currMember.edit({
           channelID: channel.id,
         });
 
         pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
           mod: stripObjectToScalars(msg.author),
-          member: stripObjectToScalars(memberWithId[1], ["user", "roles"]),
+          member: stripObjectToScalars(currMember, ["user", "roles"]),
           oldChannel: stripObjectToScalars(args.oldChannel),
           newChannel: stripObjectToScalars(channel),
         });
       }
     } catch (e) {
-      msg.channel.createMessage(errorMessage(`Failed to move the ${moveAmt} member we tried to move.`));
+      if (msg.member.id === currMember.id) {
+        sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
+        return;
+      }
+      sendErrorMessage(
+        pluginData,
+        msg.channel,
+        `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id})`,
+      );
       return;
     }
 
