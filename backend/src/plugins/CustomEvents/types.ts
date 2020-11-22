@@ -6,6 +6,7 @@ import { MoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
 import { MessageAction } from "./actions/messageAction";
 import { MakeRoleMentionableAction } from "./actions/makeRoleMentionableAction";
 import { MakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAction";
+import { SetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
 
 // Triggers
 const CommandTrigger = t.type({
@@ -26,6 +27,7 @@ const AnyAction = t.union([
   MessageAction,
   MakeRoleMentionableAction,
   MakeRoleUnmentionableAction,
+  SetChannelPermissionOverridesAction,
 ]);
 type TAnyAction = t.TypeOf<typeof AnyAction>;
 
