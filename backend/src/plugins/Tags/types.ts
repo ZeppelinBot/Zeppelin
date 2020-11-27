@@ -16,6 +16,7 @@ export const TagCategory = t.type({
   user_category_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag category
   global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
   global_category_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per category
+  category_delete_invoke: tNullable(t.boolean), // Any tag, per tag category
 
   tags: t.record(t.string, Tag),
 
@@ -31,6 +32,7 @@ export const ConfigSchema = t.type({
   global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
   user_cooldown: tNullable(t.union([t.string, t.number])), // Per user
   global_cooldown: tNullable(t.union([t.string, t.number])), // Any tag use
+  global_delete_invoke: t.boolean, // Any tag
 
   categories: t.record(t.string, TagCategory),
 
