@@ -31,7 +31,7 @@ export const MuteAction = automodAction({
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
     const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : undefined;
     const reason = actionConfig.reason || "Muted automatically";
-    const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
+    const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
 
     const caseArgs = {
       modId: pluginData.client.user.id,
