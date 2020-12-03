@@ -18,7 +18,7 @@ export const WarnAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Warned automatically";
-    const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
+    const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
 
     const caseArgs = {
       modId: pluginData.client.user.id,
