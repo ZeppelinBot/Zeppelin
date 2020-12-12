@@ -89,7 +89,7 @@ export async function muteUser(
       reason: reason || "None",
       time: timeUntilUnmute,
       moderator: muteOptions.caseArgs?.modId
-        ? stripObjectToScalars(await resolveUser(pluginData.client, muteOptions.caseArgs?.modId))
+        ? stripObjectToScalars(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
         : "",
     }));
 
