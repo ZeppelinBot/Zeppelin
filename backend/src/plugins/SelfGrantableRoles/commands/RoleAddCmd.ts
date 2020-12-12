@@ -30,7 +30,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     const hasUnknownRoles = matchedRoleIds.length !== roleNames.length;
 
     const rolesToAdd: Map<string, Role> = Array.from(matchedRoleIds.values())
-      .map(id => pluginData.guild.roles.get(id))
+      .map(id => pluginData.guild.roles.get(id)!)
       .filter(Boolean)
       .reduce((map, role) => {
         map.set(role.id, role);
@@ -68,9 +68,9 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             rolesToAdd.delete(roleId);
 
             if (msg.member.roles.includes(roleId)) {
-              removed.add(pluginData.guild.roles.get(roleId));
+              removed.add(pluginData.guild.roles.get(roleId)!);
             } else {
-              skipped.add(pluginData.guild.roles.get(roleId));
+              skipped.add(pluginData.guild.roles.get(roleId)!);
             }
           }
         }
@@ -94,7 +94,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     const addedRolesStr = Array.from(rolesToAdd.values()).map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`));
     const addedRolesWord = rolesToAdd.size === 1 ? "role" : "roles";
 
-    const messageParts = [];
+    const messageParts: string[] = [];
     messageParts.push(`Granted you the ${addedRolesStr.join(", ")} ${addedRolesWord}`);
 
     if (skipped.size || removed.size) {

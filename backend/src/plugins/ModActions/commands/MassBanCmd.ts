@@ -62,7 +62,7 @@ export const MassbanCmd = modActionsCmd({
     const loadingMsg = await msg.channel.createMessage("Banning...");
 
     // Ban each user and count failed bans (if any)
-    const failedBans = [];
+    const failedBans: string[] = [];
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     for (const userId of args.userIds) {
       try {

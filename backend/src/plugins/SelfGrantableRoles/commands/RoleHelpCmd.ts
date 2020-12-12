@@ -10,7 +10,7 @@ export const RoleHelpCmd = selfGrantableRolesCmd({
     const applyingEntries = getApplyingEntries(pluginData, msg);
     if (applyingEntries.length === 0) return;
 
-    const allPrimaryAliases = [];
+    const allPrimaryAliases: string[] = [];
     for (const entry of applyingEntries) {
       for (const aliases of Object.values(entry.roles)) {
         if (aliases[0]) {

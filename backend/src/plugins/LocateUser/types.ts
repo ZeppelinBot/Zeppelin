@@ -13,7 +13,7 @@ export interface LocateUserPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
     alerts: GuildVCAlerts;
-    outdatedAlertsTimeout: Timeout;
+    outdatedAlertsTimeout: Timeout | null;
     usersWithAlerts: string[];
     unloaded: boolean;
   };

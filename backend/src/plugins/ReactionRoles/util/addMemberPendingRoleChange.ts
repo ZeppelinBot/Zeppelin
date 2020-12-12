@@ -48,7 +48,7 @@ export async function addMemberPendingRoleChange(
     pluginData.state.pendingRoleChanges.set(memberId, newPendingRoleChangeObj);
   }
 
-  const pendingRoleChangeObj = pluginData.state.pendingRoleChanges.get(memberId);
+  const pendingRoleChangeObj = pluginData.state.pendingRoleChanges.get(memberId)!;
   pendingRoleChangeObj.changes.push({ mode, roleId });
 
   if (pendingRoleChangeObj.timeout) clearTimeout(pendingRoleChangeObj.timeout);

@@ -48,7 +48,9 @@ export const commandTypes = {
   },
 
   async resolvedMember(value, context: CommandContext<any>) {
-    if (!(context.message.channel instanceof GuildChannel)) return null;
+    if (!(context.message.channel instanceof GuildChannel)) {
+      throw new TypeConversionError(`Cannot resolve member for non-guild channels`);
+    }
 
     const result = await resolveMember(context.pluginData.client, context.message.channel.guild, value);
     if (result == null) {
@@ -110,7 +112,7 @@ export const commandTypeHelpers = {
   delay: createTypeHelper<number>(commandTypes.delay),
   resolvedUser: createTypeHelper<Promise<User>>(commandTypes.resolvedUser),
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
-  resolvedMember: createTypeHelper<Promise<Member | null>>(commandTypes.resolvedMember),
+  resolvedMember: createTypeHelper<Promise<Member>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
   anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),

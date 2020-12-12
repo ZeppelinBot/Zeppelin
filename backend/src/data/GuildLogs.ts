@@ -16,7 +16,7 @@ export class GuildLogs extends events.EventEmitter {
   constructor(guildId) {
     if (guildInstances.has(guildId)) {
       // Return existing instance for this guild if one exists
-      return guildInstances.get(guildId);
+      return guildInstances.get(guildId)!;
     }
 
     super();
@@ -27,7 +27,7 @@ export class GuildLogs extends events.EventEmitter {
     guildInstances.set(guildId, this);
   }
 
-  log(type: LogType, data: any, ignoreId = null) {
+  log(type: LogType, data: any, ignoreId?: string) {
     if (ignoreId && this.isLogIgnored(type, ignoreId)) {
       this.clearIgnoredLog(type, ignoreId);
       return;
@@ -36,7 +36,7 @@ export class GuildLogs extends events.EventEmitter {
     this.emit("log", { type, data });
   }
 
-  ignoreLog(type: LogType, ignoreId: any, timeout: number = null) {
+  ignoreLog(type: LogType, ignoreId: any, timeout?: number) {
     this.ignoredLogs.push({ type, ignoreId });
 
     // Clear after expiry (15sec by default)

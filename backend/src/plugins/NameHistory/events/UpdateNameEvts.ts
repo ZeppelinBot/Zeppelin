@@ -13,6 +13,6 @@ export const MessageCreateEvt = nameHistoryEvt({
   event: "messageCreate",
 
   async listener(meta) {
-    meta.pluginData.state.updateQueue.add(() => updateNickname(meta.pluginData, meta.args.message.member));
+    meta.pluginData.state.updateQueue.add(() => updateNickname(meta.pluginData, meta.args.message.member!));
   },
 });

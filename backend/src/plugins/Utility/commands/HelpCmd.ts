@@ -22,7 +22,7 @@ export const HelpCmd = utilityCmd({
       command: PluginCommandDefinition;
     }> = [];
 
-    const guildData = pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id);
+    const guildData = pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!;
     for (const plugin of guildData.loadedPlugins.values()) {
       const registeredCommands = plugin.pluginData.commands.getAll();
       for (const registeredCommand of registeredCommands) {
@@ -55,8 +55,8 @@ export const HelpCmd = utilityCmd({
           : originalTrigger.source
         : "";
 
-      const description = command.config.extra.blueprint.description;
-      const usage = command.config.extra.blueprint.usage;
+      const description = command.config!.extra!.blueprint.description;
+      const usage = command.config!.extra!.blueprint.usage;
       const commandSlug = trigger
         .trim()
         .toLowerCase()

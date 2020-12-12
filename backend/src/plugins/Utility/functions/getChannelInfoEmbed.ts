@@ -3,7 +3,7 @@ import { UtilityPluginType } from "../types";
 import { Constants, EmbedOptions } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { formatNumber, preEmbedPadding, trimLines } from "../../../utils";
+import { EmbedWith, formatNumber, preEmbedPadding, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 const TEXT_CHANNEL_ICON =
@@ -23,7 +23,7 @@ export async function getChannelInfoEmbed(
     return null;
   }
 
-  const embed: EmbedOptions = {
+  const embed: EmbedWith<"fields"> = {
     fields: [],
   };
 

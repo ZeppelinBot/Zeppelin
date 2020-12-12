@@ -7,6 +7,9 @@ import { addRoleAction } from "../actions/addRoleAction";
 import { createCaseAction } from "../actions/createCaseAction";
 import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
 import { messageAction } from "../actions/messageAction";
+import { makeRoleMentionableAction } from "../actions/makeRoleMentionableAction";
+import { makeRoleUnmentionableAction } from "../actions/makeRoleUnmentionableAction";
+import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides";
 
 export async function runEvent(
   pluginData: GuildPluginData<CustomEventsPluginType>,
@@ -24,6 +27,12 @@ export async function runEvent(
         await moveToVoiceChannelAction(pluginData, action, values, event, eventData);
       } else if (action.type === "message") {
         await messageAction(pluginData, action, values);
+      } else if (action.type === "make_role_mentionable") {
+        await makeRoleMentionableAction(pluginData, action, values, event, eventData);
+      } else if (action.type === "make_role_unmentionable") {
+        await makeRoleUnmentionableAction(pluginData, action, values, event, eventData);
+      } else if (action.type === "set_channel_permission_overrides") {
+        await setChannelPermissionOverridesAction(pluginData, action, values, event, eventData);
       }
     }
   } catch (e) {

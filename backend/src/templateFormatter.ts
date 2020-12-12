@@ -11,11 +11,11 @@ interface ITemplateVar {
   args: Array<string | number | ITemplateVar>;
   _state: {
     currentArg: string | ITemplateVar;
-    currentArgType: "string" | "number" | "var";
+    currentArgType: "string" | "number" | "var" | null;
     inArg: boolean;
     inQuote: boolean;
   };
-  _parent: ITemplateVar;
+  _parent: ITemplateVar | null;
 }
 
 function newTemplateVar(): ITemplateVar {
@@ -52,8 +52,8 @@ export function parseTemplate(str: string): ParsedTemplate {
 
   let inVar = false;
   let currentString = "";
-  let currentVar: ITemplateVar;
-  let rootVar: ITemplateVar;
+  let currentVar: ITemplateVar | null = null;
+  let rootVar: ITemplateVar | null = null;
 
   let escapeNext = false;
 
@@ -227,7 +227,7 @@ async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
       return "";
     }
 
-    const args = [];
+    const args: any[] = [];
     for (const arg of theVar.args) {
       if (typeof arg === "object") {
         const argValue = await evaluateTemplateVariable(arg as ITemplateVar, values);
@@ -372,7 +372,7 @@ export async function renderTemplate(template: string, values = {}, includeBaseV
 
   let parseResult: ParsedTemplate;
   if (templateCache.has(template)) {
-    parseResult = templateCache.get(template);
+    parseResult = templateCache.get(template)!;
   } else {
     parseResult = parseTemplate(template);
 

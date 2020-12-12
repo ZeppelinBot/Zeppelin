@@ -9,6 +9,6 @@ export class Supporter {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: String, nullable: true })
   amount: string | null;
 }

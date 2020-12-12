@@ -32,7 +32,7 @@ export const InfoCmd = utilityCmd({
     const channelId = getChannelId(value);
     const channel = channelId && pluginData.guild.channels.get(channelId);
     if (channel) {
-      const embed = await getChannelInfoEmbed(pluginData, channelId, message.author.id);
+      const embed = await getChannelInfoEmbed(pluginData, channelId!, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
         return;

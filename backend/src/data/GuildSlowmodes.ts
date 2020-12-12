@@ -14,7 +14,7 @@ export class GuildSlowmodes extends BaseGuildRepository {
     this.slowmodeUsers = getRepository(SlowmodeUser);
   }
 
-  async getChannelSlowmode(channelId): Promise<SlowmodeChannel> {
+  async getChannelSlowmode(channelId): Promise<SlowmodeChannel | undefined> {
     return this.slowmodeChannels.findOne({
       where: {
         guild_id: this.guildId,
@@ -51,7 +51,7 @@ export class GuildSlowmodes extends BaseGuildRepository {
     });
   }
 
-  async getChannelSlowmodeUser(channelId, userId): Promise<SlowmodeUser> {
+  async getChannelSlowmodeUser(channelId, userId): Promise<SlowmodeUser | undefined> {
     return this.slowmodeUsers.findOne({
       guild_id: this.guildId,
       channel_id: channelId,

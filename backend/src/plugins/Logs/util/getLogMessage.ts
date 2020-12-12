@@ -14,16 +14,17 @@ import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { logger } from "../../../logger";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageContent } from "eris";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,
   type: LogType,
   data: any,
   opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
-): Promise<string> {
+): Promise<MessageContent | null> {
   const config = pluginData.config.get();
   const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
-  if (format === "" || format == null) return;
+  if (format === "" || format == null) return null;
 
   // See comment on FORMAT_NO_TIMESTAMP in types.ts
   const timestampFormat =
@@ -45,7 +46,7 @@ export async function getLogMessage(
 
       const usersOrMembers = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
 
-      const mentions = [];
+      const mentions: string[] = [];
       for (const userOrMember of usersOrMembers) {
         let user;
         let member;
@@ -91,7 +92,7 @@ export async function getLogMessage(
   } catch (e) {
     if (e instanceof TemplateParseError) {
       logger.error(`Error when parsing template:\nError: ${e.message}\nTemplate: ${format}`);
-      return;
+      return null;
     } else {
       throw e;
     }

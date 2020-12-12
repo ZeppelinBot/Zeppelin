@@ -1,7 +1,15 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, convertDelayStringToMS, resolveMember, tDelayString, tNullable, unique } from "../../../utils";
+import {
+  asyncMap,
+  convertDelayStringToMS,
+  nonNullish,
+  resolveMember,
+  tDelayString,
+  tNullable,
+  unique,
+} from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
@@ -21,16 +29,16 @@ export const MuteAction = automodAction({
   },
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
-    const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration) : null;
+    const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : undefined;
     const reason = actionConfig.reason || "Muted automatically";
-    const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
+    const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
 
     const caseArgs = {
       modId: pluginData.client.user.id,
-      extraNotes: [matchResult.fullSummary],
+      extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
     };
 
-    const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(Boolean));
+    const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));
 
     const mutes = pluginData.getPlugin(MutesPlugin);
     for (const userId of userIdsToMute) {

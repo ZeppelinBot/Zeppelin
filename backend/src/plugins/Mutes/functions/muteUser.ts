@@ -9,6 +9,7 @@ import {
   ucfirst,
   UserNotificationResult,
   resolveMember,
+  UserNotificationMethod,
 } from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
 import { TextChannel, User } from "eris";
@@ -20,8 +21,8 @@ import { Case } from "../../../data/entities/Case";
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
   userId: string,
-  muteTime: number = null,
-  reason: string = null,
+  muteTime?: number,
+  reason?: string,
   muteOptions: MuteOptions = {},
 ) {
   const lock = await pluginData.locks.acquire(`mute-${userId}`);
@@ -93,7 +94,7 @@ export async function muteUser(
     }));
 
   if (muteMessage && user instanceof User) {
-    let contactMethods = [];
+    let contactMethods: UserNotificationMethod[] = [];
 
     if (muteOptions?.contactMethods) {
       contactMethods = muteOptions.contactMethods;
@@ -115,18 +116,21 @@ export async function muteUser(
 
   // Create/update a case
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
-  let theCase: Case;
+  let theCase: Case | undefined =
+    existingMute && existingMute.case_id ? await pluginData.state.cases.find(existingMute.case_id) : undefined;
 
-  if (existingMute && existingMute.case_id) {
+  if (theCase) {
     // Update old case
     // Since mutes can often have multiple notes (extraNotes), we won't post each case note individually,
     // but instead we'll post the entire case afterwards
-    theCase = await pluginData.state.cases.find(existingMute.case_id);
     const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
-    const reasons = [reason, ...(muteOptions.caseArgs?.extraNotes || [])];
+    const reasons = reason ? [reason] : [];
+    if (muteOptions.caseArgs?.extraNotes) {
+      reasons.push(...muteOptions.caseArgs.extraNotes);
+    }
     for (const noteReason of reasons) {
       await casesPlugin.createCaseNote({
-        caseId: existingMute.case_id,
+        caseId: existingMute!.case_id,
         modId: muteOptions.caseArgs?.modId,
         body: noteReason,
         noteDetails,
@@ -135,7 +139,7 @@ export async function muteUser(
     }
 
     if (muteOptions.caseArgs?.postInCaseLogOverride !== false) {
-      casesPlugin.postCaseToCaseLogChannel(existingMute.case_id);
+      casesPlugin.postCaseToCaseLogChannel(existingMute!.case_id);
     }
   } else {
     // Create new case

@@ -4,8 +4,9 @@ import { RECENT_ACTION_EXPIRY_TIME, RecentActionType } from "../constants";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
 
 export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
-  const globalIdentifier = context.message.user_id;
-  const perChannelIdentifier = `${context.message.channel_id}-${context.message.user_id}`;
+  const message = context.message!;
+  const globalIdentifier = message.user_id;
+  const perChannelIdentifier = `${message.channel_id}-${message.user_id}`;
   const expiresAt = Date.now() + RECENT_ACTION_EXPIRY_TIME;
 
   pluginData.state.recentActions.push({
@@ -23,8 +24,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
   });
 
   const mentionCount =
-    getUserMentions(context.message.data.content || "").length +
-    getRoleMentions(context.message.data.content || "").length;
+    getUserMentions(message.data.content || "").length + getRoleMentions(message.data.content || "").length;
   if (mentionCount) {
     pluginData.state.recentActions.push({
       context,
@@ -41,7 +41,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
     });
   }
 
-  const linkCount = getUrlsInString(context.message.data.content || "").length;
+  const linkCount = getUrlsInString(message.data.content || "").length;
   if (linkCount) {
     pluginData.state.recentActions.push({
       context,
@@ -58,7 +58,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
     });
   }
 
-  const attachmentCount = context.message.data.attachments && context.message.data.attachments.length;
+  const attachmentCount = message.data.attachments && message.data.attachments.length;
   if (attachmentCount) {
     pluginData.state.recentActions.push({
       context,
@@ -75,7 +75,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
     });
   }
 
-  const emojiCount = getEmojiInString(context.message.data.content || "").length;
+  const emojiCount = getEmojiInString(message.data.content || "").length;
   if (emojiCount) {
     pluginData.state.recentActions.push({
       context,
@@ -93,7 +93,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
   }
 
   // + 1 is for the first line of the message (which doesn't have a line break)
-  const lineCount = context.message.data.content ? (context.message.data.content.match(/\n/g) || []).length + 1 : 0;
+  const lineCount = message.data.content ? (message.data.content.match(/\n/g) || []).length + 1 : 0;
   if (lineCount) {
     pluginData.state.recentActions.push({
       context,
@@ -110,7 +110,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
     });
   }
 
-  const characterCount = [...(context.message.data.content || "")].length;
+  const characterCount = [...(message.data.content || "")].length;
   if (characterCount) {
     pluginData.state.recentActions.push({
       context,
@@ -127,7 +127,7 @@ export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodP
     });
   }
 
-  const stickerCount = (context.message.data.stickers || []).length;
+  const stickerCount = (message.data.stickers || []).length;
   if (stickerCount) {
     pluginData.state.recentActions.push({
       context,

@@ -4,6 +4,9 @@ import { AddRoleAction } from "./actions/addRoleAction";
 import { CreateCaseAction } from "./actions/createCaseAction";
 import { MoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
 import { MessageAction } from "./actions/messageAction";
+import { MakeRoleMentionableAction } from "./actions/makeRoleMentionableAction";
+import { MakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAction";
+import { SetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
 
 // Triggers
 const CommandTrigger = t.type({
@@ -17,7 +20,15 @@ type TCommandTrigger = t.TypeOf<typeof CommandTrigger>;
 const AnyTrigger = CommandTrigger; // TODO: Make into a union once we have more triggers
 type TAnyTrigger = t.TypeOf<typeof AnyTrigger>;
 
-const AnyAction = t.union([AddRoleAction, CreateCaseAction, MoveToVoiceChannelAction, MessageAction]);
+const AnyAction = t.union([
+  AddRoleAction,
+  CreateCaseAction,
+  MoveToVoiceChannelAction,
+  MessageAction,
+  MakeRoleMentionableAction,
+  MakeRoleUnmentionableAction,
+  SetChannelPermissionOverridesAction,
+]);
 type TAnyAction = t.TypeOf<typeof AnyAction>;
 
 export const CustomEvent = t.type({

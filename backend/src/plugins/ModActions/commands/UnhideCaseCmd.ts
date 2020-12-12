@@ -14,7 +14,7 @@ export const UnhideCaseCmd = modActionsCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    const failed = [];
+    const failed: number[] = [];
 
     for (const num of args.caseNum) {
       const theCase = await pluginData.state.cases.findByCaseNumber(num);

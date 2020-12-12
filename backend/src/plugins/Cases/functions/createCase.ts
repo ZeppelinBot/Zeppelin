@@ -12,7 +12,7 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
   const mod = await resolveUser(pluginData.client, args.modId);
   const modName = `${mod.username}#${mod.discriminator}`;
 
-  let ppName = null;
+  let ppName: string | null = null;
   if (args.ppId) {
     const pp = await resolveUser(pluginData.client, args.ppId);
     ppName = `${pp.username}#${pp.discriminator}`;

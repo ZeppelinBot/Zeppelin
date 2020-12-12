@@ -29,7 +29,7 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async find(id: number): Promise<Case> {
+  async find(id: number): Promise<Case | undefined> {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
@@ -39,7 +39,7 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async findByCaseNumber(caseNumber: number): Promise<Case> {
+  async findByCaseNumber(caseNumber: number): Promise<Case | undefined> {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
@@ -49,7 +49,7 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async findLatestByModId(modId: string): Promise<Case> {
+  async findLatestByModId(modId: string): Promise<Case | undefined> {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
@@ -62,7 +62,7 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async findByAuditLogId(auditLogId: string): Promise<Case> {
+  async findByAuditLogId(auditLogId: string): Promise<Case | undefined> {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
@@ -113,7 +113,7 @@ export class GuildCases extends BaseGuildRepository {
       case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
     });
 
-    return this.find(result.identifiers[0].id);
+    return (await this.find(result.identifiers[0].id))!;
   }
 
   update(id, data) {

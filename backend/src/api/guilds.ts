@@ -19,12 +19,12 @@ export function initGuildsAPI(app: express.Express) {
   guildRouter.use(...apiTokenAuthHandlers());
 
   guildRouter.get("/available", async (req: Request, res: Response) => {
-    const guilds = await allowedGuilds.getForApiUser(req.user.userId);
+    const guilds = await allowedGuilds.getForApiUser(req.user!.userId);
     res.json(guilds);
   });
 
   guildRouter.get("/:guildId", async (req: Request, res: Response) => {
-    if (!(await hasGuildPermission(req.user.userId, req.params.guildId, ApiPermissions.ViewGuild))) {
+    if (!(await hasGuildPermission(req.user!.userId, req.params.guildId, ApiPermissions.ViewGuild))) {
       return unauthorized(res);
     }
 
@@ -34,7 +34,7 @@ export function initGuildsAPI(app: express.Express) {
 
   guildRouter.post("/:guildId/check-permission", async (req: Request, res: Response) => {
     const permission = req.body.permission;
-    const hasPermission = await hasGuildPermission(req.user.userId, req.params.guildId, permission);
+    const hasPermission = await hasGuildPermission(req.user!.userId, req.params.guildId, permission);
     res.json({ result: hasPermission });
   });
 
@@ -54,7 +54,7 @@ export function initGuildsAPI(app: express.Express) {
     config = config.trim() + "\n"; // Normalize start/end whitespace in the config
 
     const currentConfig = await configs.getActiveByKey(`guild-${req.params.guildId}`);
-    if (config === currentConfig.config) {
+    if (currentConfig && config === currentConfig.config) {
       return ok(res);
     }
 
@@ -81,7 +81,7 @@ export function initGuildsAPI(app: express.Express) {
       return res.status(422).json({ errors: [error] });
     }
 
-    await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user.userId);
+    await configs.saveNewRevision(`guild-${req.params.guildId}`, config, req.user!.userId);
 
     ok(res);
   });

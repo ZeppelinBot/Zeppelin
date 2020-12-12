@@ -9,10 +9,10 @@ interface RoleAddedMatchResult {
 export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
   configType: t.union([t.string, t.array(t.string)]),
 
-  defaultConfig: null,
+  defaultConfig: "",
 
   async match({ triggerConfig, context, pluginData }) {
-    if (!context.member || !context.rolesChanged || context.rolesChanged.removed.length === 0) {
+    if (!context.member || !context.rolesChanged || context.rolesChanged.removed!.length === 0) {
       return;
     }
 
@@ -22,7 +22,7 @@ export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
         continue;
       }
 
-      if (context.rolesChanged.removed.includes(roleId)) {
+      if (context.rolesChanged.removed!.includes(roleId)) {
         return {
           extra: {
             matchedRoleId: roleId,

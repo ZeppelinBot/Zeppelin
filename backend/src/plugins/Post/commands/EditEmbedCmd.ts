@@ -31,7 +31,7 @@ export const EditEmbedCmd = postCmd({
 
     const content = args.content || args.maincontent;
 
-    let color = null;
+    let color: number | null = null;
     if (args.color) {
       const colorRgb = parseColor(args.color);
       if (colorRgb) {
@@ -42,8 +42,7 @@ export const EditEmbedCmd = postCmd({
       }
     }
 
-    const embed: Embed = savedMessage.data.embeds[0] as Embed;
-    embed.type = "rich";
+    const embed: Embed = savedMessage.data.embeds![0] as Embed;
     if (args.title) embed.title = args.title;
     if (content) embed.description = formatContent(content);
     if (color) embed.color = color;

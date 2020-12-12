@@ -1,12 +1,12 @@
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-import { Constants as ErisConstants } from "eris";
+import { Constants as ErisConstants, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, resolveUser } from "../../../utils";
+import { stripObjectToScalars, resolveUser, UnknownUser } from "../../../utils";
 
 /**
  * Create a BAN case automatically when a user is banned manually.
@@ -29,27 +29,27 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
     let createdCase;
-    let mod = null;
+    let mod: User | UnknownUser | null = null;
     let reason = "";
 
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      mod = resolveUser(pluginData.client, modId);
-      reason = relevantAuditLogEntry.reason;
+      mod = await resolveUser(pluginData.client, modId);
+      reason = relevantAuditLogEntry.reason || "";
       createdCase = await casesPlugin.createCase({
         userId: user.id,
         modId,
         type: CaseTypes.Ban,
         auditLogId,
-        reason,
+        reason: reason || undefined,
         automatic: true,
       });
     } else {
       createdCase = await casesPlugin.createCase({
         userId: user.id,
-        modId: null,
+        modId: "0",
         type: CaseTypes.Ban,
       });
     }

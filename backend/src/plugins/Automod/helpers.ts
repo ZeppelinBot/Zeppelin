@@ -3,9 +3,8 @@ import { Awaitable } from "knub/dist/utils";
 import * as t from "io-ts";
 import { AutomodContext, AutomodPluginType } from "./types";
 
-export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
+interface BaseAutomodTriggerMatchResult {
   extraContexts?: AutomodContext[];
-  extra?: TExtra;
 
   silentClean?: boolean; // TODO: Maybe generalize to a "silent" value in general, which mutes alert/log
 
@@ -13,12 +12,16 @@ export interface AutomodTriggerMatchResult<TExtra extends any = unknown> {
   fullSummary?: string;
 }
 
+export type AutomodTriggerMatchResult<TExtra extends any = unknown> = unknown extends TExtra
+  ? BaseAutomodTriggerMatchResult
+  : BaseAutomodTriggerMatchResult & { extra: TExtra };
+
 type AutomodTriggerMatchFn<TConfigType, TMatchResultExtra> = (meta: {
   ruleName: string;
   pluginData: GuildPluginData<AutomodPluginType>;
   context: AutomodContext;
   triggerConfig: TConfigType;
-}) => Awaitable<null | AutomodTriggerMatchResult<TMatchResultExtra>>;
+}) => Awaitable<null | undefined | AutomodTriggerMatchResult<TMatchResultExtra>>;
 
 type AutomodTriggerRenderMatchInformationFn<TConfigType, TMatchResultExtra> = (meta: {
   ruleName: string;

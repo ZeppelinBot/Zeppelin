@@ -1,4 +1,4 @@
-let activeReload: [string, string] = null;
+let activeReload: [string, string] | null = null;
 
 export function getActiveReload() {
   return activeReload;

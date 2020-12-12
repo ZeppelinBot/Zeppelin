@@ -39,7 +39,7 @@ export const ScheduledPostsListCmd = postCmd({
 
       const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
       const prettyPostAt = timeAndDate
-        .inGuildTz(moment.utc(p.post_at, DBDateFormat))
+        .inGuildTz(moment.utc(p.post_at!, DBDateFormat))
         .format(timeAndDate.getDateFormat("pretty_datetime"));
       const parts = [`\`#${i++}\` \`[${prettyPostAt}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");

@@ -65,7 +65,7 @@ export const AddCaseCmd = modActionsCmd({
       modId: mod.id,
       type: CaseTypes[type],
       reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     });
 
     if (user) {

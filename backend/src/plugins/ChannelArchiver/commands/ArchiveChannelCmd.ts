@@ -46,9 +46,9 @@ export const ArchiveChannelCmd = channelArchiverCmd({
     const maxMessagesToArchive = args.messages ? Math.min(args.messages, MAX_ARCHIVED_MESSAGES) : MAX_ARCHIVED_MESSAGES;
     if (maxMessagesToArchive <= 0) return;
 
-    const archiveLines = [];
+    const archiveLines: string[] = [];
     let archivedMessages = 0;
-    let previousId;
+    let previousId: string | undefined;
 
     const startTime = Date.now();
     const progressMsg = await msg.channel.createMessage("Creating archive...");
@@ -80,7 +80,7 @@ export const ArchiveChannelCmd = channelArchiverCmd({
         }
 
         if (message.reactions && Object.keys(message.reactions).length > 0) {
-          const reactionCounts = [];
+          const reactionCounts: string[] = [];
           for (const [emoji, info] of Object.entries(message.reactions)) {
             reactionCounts.push(`${info.count}x ${emoji}`);
           }

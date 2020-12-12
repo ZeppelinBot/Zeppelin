@@ -10,7 +10,10 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
 
     if (member) {
       try {
-        await member.removeRole(pluginData.config.get().mute_role);
+        const muteRole = pluginData.config.get().mute_role;
+        if (muteRole) {
+          await member.removeRole(muteRole);
+        }
       } catch (e) {
         pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
           body: `Failed to remove mute role from {userMention(member)}`,

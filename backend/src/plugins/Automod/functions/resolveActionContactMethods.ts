@@ -7,10 +7,10 @@ import { AutomodPluginType } from "../types";
 export function resolveActionContactMethods(
   pluginData: GuildPluginData<AutomodPluginType>,
   actionConfig: {
-    notify?: string;
-    notifyChannel?: string;
+    notify?: string | null;
+    notifyChannel?: string | null;
   },
-): UserNotificationMethod[] | null {
+): UserNotificationMethod[] {
   if (actionConfig.notify === "dm") {
     return [{ type: "dm" }];
   } else if (actionConfig.notify === "channel") {
@@ -28,5 +28,5 @@ export function resolveActionContactMethods(
     return [];
   }
 
-  return null;
+  return [];
 }

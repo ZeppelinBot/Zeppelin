@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import { StarboardPluginType, TStarboardOpts } from "../types";
 import { Message, GuildChannel, TextChannel, Embed } from "eris";
 import moment from "moment-timezone";
-import { EMPTY_CHAR, messageLink } from "../../../utils";
+import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
 import path from "path";
 
 export async function saveMessageToStarboard(
@@ -13,7 +13,7 @@ export async function saveMessageToStarboard(
   const channel = pluginData.guild.channels.get(starboard.channel_id);
   if (!channel) return;
 
-  const embed: Embed = {
+  const embed: EmbedWith<"footer" | "author" | "fields" | "timestamp"> = {
     footer: {
       text: `#${(msg.channel as GuildChannel).name}`,
     },
@@ -22,7 +22,6 @@ export async function saveMessageToStarboard(
     },
     fields: [],
     timestamp: new Date(msg.timestamp).toISOString(),
-    type: "rich",
   };
 
   if (msg.author.avatarURL) {

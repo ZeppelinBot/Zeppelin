@@ -6,7 +6,7 @@ export class AddTypeAndPermissionsToApiPermissions1573158035867 implements Migra
       await queryRunner.dropPrimaryKey("api_permissions");
     } catch (e) {} // tslint:disable-line
 
-    const table = await queryRunner.getTable("api_permissions");
+    const table = (await queryRunner.getTable("api_permissions"))!;
     if (table.indices.length) {
       await queryRunner.dropIndex("api_permissions", table.indices[0]);
     }

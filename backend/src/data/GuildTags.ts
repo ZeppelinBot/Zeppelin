@@ -21,7 +21,7 @@ export class GuildTags extends BaseGuildRepository {
     });
   }
 
-  async find(tag): Promise<Tag> {
+  async find(tag): Promise<Tag | undefined> {
     return this.tags.findOne({
       where: {
         guild_id: this.guildId,
@@ -61,7 +61,7 @@ export class GuildTags extends BaseGuildRepository {
     });
   }
 
-  async findResponseByCommandMessageId(messageId: string): Promise<TagResponse> {
+  async findResponseByCommandMessageId(messageId: string): Promise<TagResponse | undefined> {
     return this.tagResponses.findOne({
       where: {
         guild_id: this.guildId,
@@ -70,7 +70,7 @@ export class GuildTags extends BaseGuildRepository {
     });
   }
 
-  async findResponseByResponseMessageId(messageId: string): Promise<TagResponse> {
+  async findResponseByResponseMessageId(messageId: string): Promise<TagResponse | undefined> {
     return this.tagResponses.findOne({
       where: {
         guild_id: this.guildId,

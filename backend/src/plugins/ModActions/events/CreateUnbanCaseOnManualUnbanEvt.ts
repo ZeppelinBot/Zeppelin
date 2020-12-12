@@ -1,11 +1,11 @@
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-import { Constants as ErisConstants } from "eris";
+import { Constants as ErisConstants, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
-import { stripObjectToScalars, resolveUser } from "../../../utils";
+import { stripObjectToScalars, resolveUser, UnknownUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 
 /**
@@ -29,13 +29,13 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
     let createdCase;
-    let mod = null;
+    let mod: User | UnknownUser | null = null;
 
     if (relevantAuditLogEntry) {
       const modId = relevantAuditLogEntry.user.id;
       const auditLogId = relevantAuditLogEntry.id;
 
-      mod = resolveUser(pluginData.client, modId);
+      mod = await resolveUser(pluginData.client, modId);
       createdCase = await casesPlugin.createCase({
         userId: user.id,
         modId,
@@ -46,7 +46,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
     } else {
       createdCase = await casesPlugin.createCase({
         userId: user.id,
-        modId: null,
+        modId: "0",
         type: CaseTypes.Unban,
         automatic: true,
       });

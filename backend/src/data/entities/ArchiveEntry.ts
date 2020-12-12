@@ -17,5 +17,5 @@ export class ArchiveEntry {
 
   @Column() created_at: string;
 
-  @Column() expires_at: string;
+  @Column({ type: String, nullable: true }) expires_at: string | null;
 }

@@ -27,10 +27,10 @@ export const LoadDataEvt = persistEvt({
 
     const toRestore: MemberOptions = {};
     const config = pluginData.config.getForMember(member);
-    const restoredData = [];
+    const restoredData: string[] = [];
 
     // Check permissions
-    const me = pluginData.guild.members.get(pluginData.client.user.id);
+    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
     let requiredPermissions = 0;
     if (config.persist_nicknames) requiredPermissions |= p.manageNicknames;
     if (config.persisted_roles) requiredPermissions |= p.manageRoles;

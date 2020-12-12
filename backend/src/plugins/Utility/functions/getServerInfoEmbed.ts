@@ -1,7 +1,17 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { embedPadding, formatNumber, memoize, MINUTES, preEmbedPadding, resolveUser, trimLines } from "../../../utils";
-import { CategoryChannel, EmbedOptions, Guild, RESTChannelInvite, TextChannel, VoiceChannel } from "eris";
+import {
+  embedPadding,
+  EmbedWith,
+  formatNumber,
+  memoize,
+  MINUTES,
+  preEmbedPadding,
+  resolveInvite,
+  resolveUser,
+  trimLines,
+} from "../../../utils";
+import { CategoryChannel, EmbedOptions, Guild, TextChannel, VoiceChannel } from "eris";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { getGuildPreview } from "./getGuildPreview";
@@ -11,7 +21,7 @@ export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
   requestMemberId?: string,
-): Promise<EmbedOptions> {
+): Promise<EmbedOptions | null> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
@@ -24,23 +34,23 @@ export async function getServerInfoEmbed(
     return null;
   }
 
-  const features = (restGuild || guildPreview).features;
+  const features = (restGuild || guildPreview)!.features;
   if (!thisServer && !features.includes("DISCOVERABLE")) {
     return null;
   }
 
-  const embed: EmbedOptions = {
+  const embed: EmbedWith<"fields"> = {
     fields: [],
   };
 
   embed.author = {
-    name: `Server:  ${(guildPreview || restGuild).name}`,
-    icon_url: (guildPreview || restGuild).iconURL,
+    name: `Server:  ${(guildPreview || restGuild)!.name}`,
+    icon_url: (guildPreview || restGuild)!.iconURL ?? undefined,
   };
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc((guildPreview || restGuild).createdAt, "x");
+  const createdAt = moment.utc((guildPreview || restGuild)!.createdAt, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
@@ -50,7 +60,7 @@ export async function getServerInfoEmbed(
     round: true,
   });
 
-  const basicInformation = [];
+  const basicInformation: string[] = [];
   basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
 
   if (thisServer) {
@@ -79,16 +89,11 @@ export async function getServerInfoEmbed(
     thisServer?.members.size ||
     0;
 
-  let onlineMemberCount = guildPreview?.approximatePresenceCount || restGuild?.approximatePresenceCount;
+  let onlineMemberCount = (guildPreview?.approximatePresenceCount || restGuild?.approximatePresenceCount)!;
 
   if (onlineMemberCount == null && restGuild?.vanityURL) {
     // For servers with a vanity URL, we can also use the numbers from the invite for online count
-    const invite = (await memoize(
-      () => pluginData.client.getInvite(restGuild.vanityURL, true),
-      `getInvite_${restGuild.vanityURL}`,
-      10 * MINUTES,
-    )) as RESTChannelInvite;
-
+    const invite = await resolveInvite(pluginData.client, restGuild.vanityURL!, true);
     if (invite) {
       onlineMemberCount = invite.presenceCount;
     }
@@ -140,7 +145,7 @@ export async function getServerInfoEmbed(
   }
 
   // OTHER STATS
-  const otherStats = [];
+  const otherStats: string[] = [];
 
   if (thisServer) {
     otherStats.push(`Roles: **${thisServer.roles.size}** / 250`);
@@ -156,7 +161,7 @@ export async function getServerInfoEmbed(
       }[restGuild.premiumTier] || 50;
     otherStats.push(`Emojis: **${restGuild.emojis.length}** / ${maxEmojis * 2}`);
   } else {
-    otherStats.push(`Emojis: **${guildPreview.emojis.length}**`);
+    otherStats.push(`Emojis: **${guildPreview!.emojis.length}**`);
   }
 
   if (thisServer) {

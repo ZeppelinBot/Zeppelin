@@ -27,6 +27,15 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         }
       }
 
+      // If we're excluding bots and the logged user is a bot, skip it
+      if (opts.exclude_bots) {
+        for (const prop of excludedUserProps) {
+          if (data && data[prop] && data[prop].bot) {
+            continue logChannelLoop;
+          }
+        }
+      }
+
       // If this entry is from an excluded channel, skip it
       if (opts.excluded_channels) {
         if (
@@ -38,6 +47,22 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
           type === LogType.CLEAN
         ) {
           if (opts.excluded_channels.includes(data.channel.id)) {
+            continue logChannelLoop;
+          }
+        }
+      }
+
+      // If this entry is from an excluded category, skip it
+      if (opts.excluded_categories) {
+        if (
+          type === LogType.MESSAGE_DELETE ||
+          type === LogType.MESSAGE_DELETE_BARE ||
+          type === LogType.MESSAGE_EDIT ||
+          type === LogType.MESSAGE_SPAM_DETECTED ||
+          type === LogType.CENSOR ||
+          type === LogType.CLEAN
+        ) {
+          if (data.channel.parent_id && opts.excluded_categories.includes(data.channel.parent_id)) {
             continue logChannelLoop;
           }
         }
@@ -84,13 +109,13 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
           if (!pluginData.state.batches.has(channel.id)) {
             pluginData.state.batches.set(channel.id, []);
             setTimeout(async () => {
-              const batchedMessage = pluginData.state.batches.get(channel.id).join("\n");
+              const batchedMessage = pluginData.state.batches.get(channel.id)!.join("\n");
               pluginData.state.batches.delete(channel.id);
               createChunkedMessage(channel, batchedMessage).catch(noop);
             }, batchTime);
           }
 
-          pluginData.state.batches.get(channel.id).push(message);
+          pluginData.state.batches.get(channel.id)!.push(message);
         } else {
           // If we're not batching log messages, just send them immediately
           await createChunkedMessage(channel, message).catch(noop);
