@@ -4,7 +4,7 @@ import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { sendErrorMessage } from "../../../pluginUtils";
 
 export const UserInfoCmd = utilityCmd({
-  trigger: ["user", "userinfo"],
+  trigger: ["user", "userinfo", "whois"],
   description: "Show information about a user",
   usage: "!user 106391128718245888",
   permission: "can_userinfo",
