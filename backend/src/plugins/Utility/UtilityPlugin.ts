@@ -16,7 +16,7 @@ import { NicknameCmd } from "./commands/NicknameCmd";
 import { PingCmd } from "./commands/PingCmd";
 import { SourceCmd } from "./commands/SourceCmd";
 import { ContextCmd } from "./commands/ContextCmd";
-import { VcmoveCmd } from "./commands/VcmoveCmd";
+import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
 import { HelpCmd } from "./commands/HelpCmd";
 import { AboutCmd } from "./commands/AboutCmd";
 import { PluginOptions } from "knub";
@@ -124,6 +124,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     ContextCmd,
     VcmoveCmd,
     VcdisconnectCmd,
+    VcmoveAllCmd,
     HelpCmd,
     AboutCmd,
     ReloadGuildCmd,

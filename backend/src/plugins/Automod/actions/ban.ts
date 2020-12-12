@@ -19,7 +19,7 @@ export const BanAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";
-    const contactMethods = resolveActionContactMethods(pluginData, actionConfig);
+    const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
     const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
 
     const caseArgs = {
