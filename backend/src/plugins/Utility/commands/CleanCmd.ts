@@ -61,6 +61,7 @@ export const CleanCmd = utilityCmd({
     user: ct.userId({ option: true, shortcut: "u" }),
     channel: ct.channelId({ option: true, shortcut: "c" }),
     bots: ct.switchOption({ shortcut: "b" }),
+    "delete-pins": ct.switchOption({ shortcut: "p" }),
     "has-invites": ct.switchOption({ shortcut: "i" }),
     match: ct.regex({ option: true, shortcut: "m" }),
   },
@@ -96,6 +97,12 @@ export const CleanCmd = utilityCmd({
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
 
+    const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
+    let pins = [];
+    if (!deletePins) {
+      pins = await msg.channel.getPins();
+    }
+
     while (messagesToClean.length < args.count) {
       const potentialMessagesToClean = await pluginData.state.savedMessages.getLatestByChannelBeforeId(
         targetChannel.id,
@@ -109,6 +116,7 @@ export const CleanCmd = utilityCmd({
         const contentString = message.data.content || "";
         if (args.user && message.user_id !== args.user) continue;
         if (args.bots && !message.is_bot) continue;
+        if (!deletePins && pins.find(x => x.id === message.id) != null) continue;
         if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
         if (moment.utc(message.posted_at).valueOf() < timeCutoff) continue;
         if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
