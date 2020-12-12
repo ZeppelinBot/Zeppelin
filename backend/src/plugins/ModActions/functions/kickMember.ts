@@ -39,6 +39,9 @@ export async function kickMember(
         const kickMessage = await renderTemplate(config.kick_message, {
           guildName: pluginData.guild.name,
           reason,
+          moderator: kickOptions.caseArgs?.modId
+            ? stripObjectToScalars(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+            : {},
         });
 
         notifyResult = await notifyUser(member.user, kickMessage, contactMethods);

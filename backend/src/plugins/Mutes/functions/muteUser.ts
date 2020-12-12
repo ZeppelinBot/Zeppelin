@@ -88,6 +88,9 @@ export async function muteUser(
       guildName: pluginData.guild.name,
       reason: reason || "None",
       time: timeUntilUnmute,
+      moderator: muteOptions.caseArgs?.modId
+        ? stripObjectToScalars(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+        : "",
     }));
 
   if (muteMessage && user instanceof User) {

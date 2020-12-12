@@ -14,6 +14,7 @@ import { waitForReaction } from "knub/dist/helpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { renderTemplate } from "../../../templateFormatter";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -25,7 +26,13 @@ export async function warnMember(
 
   let notifyResult: UserNotificationResult;
   if (config.warn_message) {
-    const warnMessage = config.warn_message.replace("{guildName}", pluginData.guild.name).replace("{reason}", reason);
+    const warnMessage = await renderTemplate(config.warn_message, {
+      guildName: pluginData.guild.name,
+      reason,
+      moderator: warnOptions.caseArgs?.modId
+        ? stripObjectToScalars(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+        : {},
+    });
     const contactMethods = warnOptions?.contactMethods
       ? warnOptions.contactMethods
       : getDefaultContactMethods(pluginData, "warn");
