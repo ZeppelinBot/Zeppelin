@@ -18,7 +18,7 @@
           class="py-1 px-2 rounded hover:bg-gray-700 hidden lg:block">
           Go to dashboard
         </router-link>
-        <button class="link-button text-2xl leading-zero lg:hidden" v-on:click="toggleMobileMenu()">
+        <button class="link-button text-2xl leading-zero lg:hidden" v-on:click="toggleMobileMenu()" aria-hidden="true">
           <Menu />
         </button>
       </div>
@@ -27,21 +27,21 @@
     <!-- Content wrapper -->
     <div class="flex flex-wrap items-start mt-8">
       <!-- Sidebar -->
-      <nav class="docs-sidebar px-4 pt-2 pb-3 mr-8 mb-4 border border-gray-700 rounded bg-gray-800 shadow-md flex-full lg:flex-none lg:block" v-bind:class="{ hidden: !mobileMenuOpen }">
+      <nav class="docs-sidebar px-4 pt-2 pb-3 mr-8 mb-4 border border-gray-700 rounded bg-gray-800 shadow-md flex-full lg:flex-none lg:block" v-bind:class="{ closed: !mobileMenuOpen }">
         <div role="none" v-for="(group, index) in menu">
           <h1 class="font-bold" :aria-owns="'menu-group-' + index" :class="{'mt-4': index !== 0}">{{ group.label }}</h1>
           <ul v-bind:id="'menu-group-' + index" role="group" class="list-none pl-2">
             <li role="none" v-for="item in group.items">
-              <router-link role="menuitem" :to="item.to" class="text-gray-300 hover:text-gray-500" v-on:click.native="mobileMenuOpen = false">{{ item.label }}</router-link>
+              <router-link role="menuitem" :to="item.to" class="text-gray-300 hover:text-gray-500" v-on:click.native="onChooseMenuItem()">{{ item.label }}</router-link>
             </li>
           </ul>
         </div>
       </nav>
 
       <!-- Content -->
-      <div class="docs-content main-content flex-flexible overflow-x-hidden">
+      <main class="docs-content main-content flex-flexible overflow-x-hidden">
         <router-view :key="$route.fullPath"></router-view>
-      </div>
+      </main>
     </div>
   </div>
 </template>
@@ -131,6 +131,14 @@
     methods: {
       toggleMobileMenu() {
         this.mobileMenuOpen = !this.mobileMenuOpen;
+      },
+
+      onChooseMenuItem() {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+
+        this.mobileMenuOpen = false;
       },
     },
 

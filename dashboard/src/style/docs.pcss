@@ -2,4 +2,8 @@
   & .router-link-active {
     @apply underline;
   }
+
+  &.closed:not(:focus-within) {
+    @apply sr-only;
+  }
 }

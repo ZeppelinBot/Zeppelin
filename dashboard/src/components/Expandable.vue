@@ -8,7 +8,7 @@
          v-on:keydown.space="$event.preventDefault()"
          v-on:keyup.space="toggle"
          tabindex="0">
-      <chevron-down class="icon" v-bind:class="{'icon-open': isOpen}" />
+      <chevron-down decorative class="icon" v-bind:class="{'icon-open': isOpen}" />
       <span class="title-text"><slot name="title"></slot></span>
     </div>
     <div class="content border-t border-gray-700" ref="content">
