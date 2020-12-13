@@ -98,7 +98,7 @@ export const CleanCmd = utilityCmd({
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
 
     const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
-    let pins = [];
+    let pins: Message[] = [];
     if (!deletePins) {
       pins = await msg.channel.getPins();
     }
