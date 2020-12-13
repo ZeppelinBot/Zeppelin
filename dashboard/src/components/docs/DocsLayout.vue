@@ -42,7 +42,7 @@
 
       <!-- Content -->
       <main class="docs-content main-content flex-flexible overflow-x-hidden">
-        <a id="main-anchor" ref="main-anchor"></a>
+        <a id="main-anchor" ref="main-anchor" tabindex="-1" class="sr-only"></a>
         <router-view :key="$route.fullPath"></router-view>
       </main>
     </div>
