@@ -2,8 +2,10 @@
   & .router-link-active {
     @apply underline;
   }
+}
 
-  &.closed:not(:focus-within) {
-    @apply sr-only;
+@screen until-sm {
+  .docs-sidebar.closed:not(:focus-within) {
+      @apply sr-only;
   }
 }
