@@ -102,9 +102,7 @@ let config = {
                     },
                   }),
                   require('postcss-nesting')(),
-                  require('tailwindcss')({
-                    important: true,
-                  }),
+                  require('tailwindcss')(),
                 ];
 
                 if (process.env.NODE_ENV === "production") {
