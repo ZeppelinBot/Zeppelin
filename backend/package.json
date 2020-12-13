@@ -86,8 +86,7 @@
     "ava": "^3.10.0",
     "rimraf": "^2.6.2",
     "source-map-support": "^0.5.16",
-    "tsc-watch": "^4.0.0",
-    "typescript": "^3.9.6"
+    "tsc-watch": "^4.0.0"
   },
   "ava": {
     "files": [
