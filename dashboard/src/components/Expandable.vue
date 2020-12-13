@@ -34,12 +34,14 @@
         }
       }
 
-      .icon {
+      & .icon {
         transition: transform var(--animation-time);
-        transform-origin: 50% 60%;
+        transform-origin: 50% 50%;
+        position: relative;
+        top: 0.125rem;
       }
 
-      .icon-open {
+      & .icon-open {
         transform: rotate(179deg);
       }
     }

@@ -5,6 +5,12 @@
       Zeppelin is a private moderation bot for Discord, designed with large servers and reliability in mind.
     </p>
 
+    <!-- WIP bar -->
+    <div class="px-3 py-2 rounded bg-gray-800 shadow-md inline-block">
+      <alert class="inline-icon mr-1 text-yellow-300" />
+      This documentation is a work in progress.
+    </div>
+
     <h2>Getting the bot</h2>
     <p>
       Since the bot is currently private, access to the bot is granted on a case by case basis.<br>
@@ -28,3 +34,11 @@
     </p>
   </div>
 </template>
+
+<script lang="ts">
+  import Alert from 'vue-material-design-icons/Alert.vue';
+
+  export default {
+    components: { Alert },
+  };
+</script>
