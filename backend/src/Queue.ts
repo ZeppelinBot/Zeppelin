@@ -17,7 +17,7 @@ export class Queue {
     const promise = new Promise(resolve => {
       this.queue.push(async () => {
         await fn();
-        resolve();
+        resolve(undefined);
       });
 
       if (!this.running) this.next();
