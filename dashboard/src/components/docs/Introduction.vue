@@ -7,7 +7,7 @@
 
     <!-- WIP bar -->
     <div class="px-3 py-2 rounded bg-gray-800 shadow-md inline-block">
-      <alert class="inline-icon mr-1 text-yellow-300" />
+      <alert class="inline-icon mr-1 text-yellow-300" title="Note!" />
       This documentation is a work in progress.
     </div>
 
