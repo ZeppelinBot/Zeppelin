@@ -24,6 +24,8 @@
       </div>
     </nav>
 
+    <a class="sr-only-when-not-focused text-center block py-2" href="#main-anchor">Skip to main content</a>
+
     <!-- Content wrapper -->
     <div class="flex flex-wrap items-start mt-8">
       <!-- Sidebar -->
@@ -40,6 +42,7 @@
 
       <!-- Content -->
       <main class="docs-content main-content flex-flexible overflow-x-hidden">
+        <a id="main-anchor" ref="main-anchor"></a>
         <router-view :key="$route.fullPath"></router-view>
       </main>
     </div>
@@ -134,11 +137,8 @@
       },
 
       onChooseMenuItem() {
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
-
         this.mobileMenuOpen = false;
+        this.$refs['main-anchor'].focus();
       },
     },
 
