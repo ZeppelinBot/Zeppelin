@@ -82,7 +82,17 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async getRecentByModId(modId: string, count: number): Promise<Case[]> {
+  async getTotalCasesByModId(modId: string): Promise<number> {
+    return this.cases.count({
+      where: {
+        guild_id: this.guildId,
+        mod_id: modId,
+        is_hidden: 0,
+      },
+    });
+  }
+
+  async getRecentByModId(modId: string, count: number, skip = 0): Promise<Case[]> {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
@@ -90,6 +100,7 @@ export class GuildCases extends BaseGuildRepository {
         mod_id: modId,
         is_hidden: 0,
       },
+      skip,
       take: count,
       order: {
         case_number: "DESC",

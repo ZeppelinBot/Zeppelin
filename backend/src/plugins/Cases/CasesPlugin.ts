@@ -14,6 +14,8 @@ import { trimPluginDescription } from "../../utils";
 import { getCaseSummary } from "./functions/getCaseSummary";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { mapToPublicFn } from "../../pluginUtils";
+import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
+import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
 
 const defaultOptions = {
   config: {
@@ -63,6 +65,9 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
         return getCaseTypeAmountForUserId(pluginData, userID, type);
       };
     },
+
+    getTotalCasesByMod: mapToPublicFn(getTotalCasesByMod),
+    getRecentCasesByMod: mapToPublicFn(getRecentCasesByMod),
 
     getCaseEmbed: mapToPublicFn(getCaseEmbed),
     getCaseSummary: mapToPublicFn(getCaseSummary),
