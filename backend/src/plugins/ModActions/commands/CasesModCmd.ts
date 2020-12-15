@@ -10,7 +10,7 @@ import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 
 const opts = {
-  mod: ct.member({ option: true }),
+  mod: ct.resolvedMember({ option: true }),
 };
 
 export const CasesModCmd = modActionsCmd({
