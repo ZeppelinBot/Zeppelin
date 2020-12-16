@@ -90,9 +90,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starb
       ~~~
 
       ### Limit starboard to a specific level (and above)
-      This is identical to the channel-specific starboard above, but only works for a specific level (>=50).
-      It is noteworthy that this only properly works if the starboard requires just one star.
-      Only the new reaction is taken into account when determining valid starboards. 
+      This is identical to the basic starboard above, but only works for a specific level (>=50).
       
       ~~~yml
       starboard:
