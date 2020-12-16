@@ -7,7 +7,7 @@ import {
   simpleClosestStringMatch,
   stripObjectToScalars,
 } from "../../../utils";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
 import { resolveChannel } from "knub/dist/helpers";
@@ -23,6 +23,10 @@ export const VcdisconnectCmd = utilityCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    if (!canActOn(pluginData, msg.member, args.member)) {
+      sendErrorMessage(pluginData, msg.channel, "Cannot move: insufficient permissions");
+    }
+
     if (!args.member.voiceState || !args.member.voiceState.channelID) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
