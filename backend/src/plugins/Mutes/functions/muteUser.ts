@@ -42,7 +42,7 @@ export async function muteUser(
   }
 
   const user = await resolveUser(pluginData.client, userId);
-  if (!user) {
+  if (!user.id) {
     lock.unlock();
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }

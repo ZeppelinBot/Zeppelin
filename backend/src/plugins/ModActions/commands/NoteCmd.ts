@@ -20,7 +20,9 @@ export const NoteCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
-    if (!user) return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    if (!user.id) {
+      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    }
 
     const userName = `${user.username}#${user.discriminator}`;
     const reason = formatReasonWithAttachments(args.note, msg.attachments);

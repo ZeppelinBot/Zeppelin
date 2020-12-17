@@ -33,7 +33,9 @@ export const ForcemuteCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
-    if (!user) return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    if (!user.id) {
+      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    }
 
     const memberToMute = await resolveMember(pluginData.client, pluginData.guild, user.id);
 

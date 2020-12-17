@@ -28,7 +28,9 @@ export const UnbanCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
-    if (!user) return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    if (!user.id) {
+      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    }
 
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
