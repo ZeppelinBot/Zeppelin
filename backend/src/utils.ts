@@ -1088,12 +1088,12 @@ export async function resolveUser<T>(bot, value) {
  * Resolves a guild Member from the passed user id, user mention, or full username (with discriminator).
  * If the member is not found in the cache, it's fetched from the API.
  */
-export async function resolveMember(bot: Client, guild: Guild, value: string): Promise<Member | null> {
+export async function resolveMember(bot: Client, guild: Guild, value: string, fresh = false): Promise<Member | null> {
   const userId = resolveUserId(bot, value);
   if (!userId) return null;
 
   // If we have the member cached, return that directly
-  if (guild.members.has(userId)) {
+  if (guild.members.has(userId) && !fresh) {
     return guild.members.get(userId) || null;
   }
 
