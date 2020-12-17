@@ -13,7 +13,7 @@ import {
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { TextChannel } from "eris";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const AlertAction = automodAction({
@@ -45,16 +45,28 @@ export const AlertAction = automodAction({
         matchSummary: matchResult.summary,
       });
 
-      const rendered = await renderTemplate(actionConfig.text, {
-        rule: ruleName,
-        user: safeUser,
-        users: safeUsers,
-        text,
-        actionsTaken,
-        matchSummary: matchResult.summary,
-        messageLink: theMessageLink,
-        logMessage,
-      });
+      let rendered;
+      try {
+        rendered = await renderTemplate(actionConfig.text, {
+          rule: ruleName,
+          user: safeUser,
+          users: safeUsers,
+          text,
+          actionsTaken,
+          matchSummary: matchResult.summary,
+          messageLink: theMessageLink,
+          logMessage,
+        });
+      } catch (err) {
+        if (err instanceof TemplateParseError) {
+          pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+            body: `Error in alert format of automod rule ${ruleName}: ${err.message}`,
+          });
+          return;
+        }
+
+        throw err;
+      }
 
       await createChunkedMessage(channel, rendered);
     } else {
