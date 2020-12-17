@@ -11,7 +11,7 @@ import { Configs } from "./data/Configs";
 // Always use UTC internally
 // This is also enforced for the database in data/db.ts
 import moment from "moment-timezone";
-import { Client, TextChannel } from "eris";
+import { Client, DiscordHTTPError, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, MINUTES, successMessage } from "./utils";
@@ -74,6 +74,12 @@ if (process.env.NODE_ENV === "production") {
     if (err instanceof PluginLoadError) {
       // tslint:disable:no-console
       console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+      return;
+    }
+
+    if (err instanceof DiscordHTTPError && err.code === 500) {
+      // Don't need stack traces on HTTP 500 errors
+      console.error(err.message);
       return;
     }
 
