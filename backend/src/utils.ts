@@ -1058,7 +1058,7 @@ export async function resolveUser<T>(bot, value) {
 
   const userId = resolveUserId(bot, value);
   if (!userId) {
-    return null;
+    return new UnknownUser();
   }
 
   // If we have the user cached, return that directly
