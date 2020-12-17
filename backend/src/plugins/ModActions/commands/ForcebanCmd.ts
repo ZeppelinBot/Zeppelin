@@ -31,7 +31,9 @@ export const ForcebanCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
-    if (!user) return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    if (!user.id) {
+      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    }
 
     // If the user exists as a guild member, make sure we can act on them first
     const member = await resolveMember(pluginData.client, pluginData.guild, user.id);

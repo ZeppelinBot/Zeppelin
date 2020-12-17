@@ -27,7 +27,7 @@ export async function banUserId(
 ): Promise<BanResult> {
   const config = pluginData.config.get();
   const user = await resolveUser(pluginData.client, userId);
-  if (!user) {
+  if (!user.id) {
     return {
       status: "failed",
       error: "Invalid user",
