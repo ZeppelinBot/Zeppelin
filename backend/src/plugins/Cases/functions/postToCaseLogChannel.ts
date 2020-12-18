@@ -24,9 +24,6 @@ export async function postToCaseLogChannel(
     result = await caseLogChannel.createMessage(content, file);
   } catch (e) {
     if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
-      logger.warn(
-        `Missing permissions to post mod cases in <#${caseLogChannel.id}> in guild ${pluginData.guild.name} (${pluginData.guild.id})`,
-      );
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Missing permissions to post mod cases in <#${caseLogChannel.id}>`,
       });
