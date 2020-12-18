@@ -48,8 +48,8 @@ const RECENT_PLUGIN_ERROR_EXIT_THRESHOLD = 5;
 let recentDiscordErrors = 0;
 const RECENT_DISCORD_ERROR_EXIT_THRESHOLD = 5;
 
-setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 2500);
-setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 2500);
+setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 2000);
+setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 2000);
 
 if (process.env.NODE_ENV === "production") {
   const errorHandler = err => {
