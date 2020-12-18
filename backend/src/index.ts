@@ -90,7 +90,7 @@ function errorHandler(err) {
     }
   }
 
-  if (err instanceof DiscordHTTPError && err.code === 500) {
+  if (err instanceof DiscordHTTPError && err.code >= 500) {
     // Don't need stack traces on HTTP 500 errors
     // These also shouldn't count towards RECENT_DISCORD_ERROR_EXIT_THRESHOLD because they don't indicate an error in our code
     console.error(err.message);
