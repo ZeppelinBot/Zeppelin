@@ -107,6 +107,7 @@ if (process.env.NODE_ENV === "production") {
   };
 
   process.on("uncaughtException", errorHandler);
+  process.on("unhandledRejection", errorHandler);
 }
 
 // Verify required Node.js version
