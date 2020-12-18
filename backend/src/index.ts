@@ -24,6 +24,7 @@ import { LogType } from "./data/LogType";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { logger } from "./logger";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
+import { ErisError } from "./ErisError";
 
 const fsp = fs.promises;
 
@@ -51,61 +52,75 @@ const RECENT_DISCORD_ERROR_EXIT_THRESHOLD = 5;
 setInterval(() => (recentPluginErrors = Math.max(0, recentPluginErrors - 1)), 2000);
 setInterval(() => (recentDiscordErrors = Math.max(0, recentDiscordErrors - 1)), 2000);
 
-if (process.env.NODE_ENV === "production") {
-  const errorHandler = err => {
-    const guildName = err.guild?.name || "Global";
-    const guildId = err.guild?.id || "0";
+// Eris handles these internally, so we don't need to panic if we get one of them
+const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
+  1001, // "CloudFlare WebSocket proxy restarting"
+  1006, // "Connection reset by peer"
+  "ECONNRESET", // Pretty much the same as above
+];
 
-    if (err instanceof RecoverablePluginError) {
-      // Recoverable plugin errors can be, well, recovered from.
-      // Log it in the console as a warning and post a warning to the guild's log.
+function errorHandler(err) {
+  const guildName = err.guild?.name || "Global";
+  const guildId = err.guild?.id || "0";
 
-      // tslint:disable:no-console
-      console.warn(`${guildName}: [${err.code}] ${err.message}`);
-
-      if (err.guild) {
-        const logs = new GuildLogs(err.guild.id);
-        logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
-      }
-
-      return;
-    }
-
-    if (err instanceof PluginLoadError) {
-      // tslint:disable:no-console
-      console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
-      return;
-    }
-
-    if (err instanceof DiscordHTTPError && err.code === 500) {
-      // Don't need stack traces on HTTP 500 errors
-      console.error(err.message);
-      return;
-    }
+  if (err instanceof RecoverablePluginError) {
+    // Recoverable plugin errors can be, well, recovered from.
+    // Log it in the console as a warning and post a warning to the guild's log.
 
     // tslint:disable:no-console
-    console.error(err);
+    console.warn(`${guildName}: [${err.code}] ${err.message}`);
 
-    if (err instanceof PluginError) {
-      // Tolerate a few recent plugin errors before crashing
-      if (++recentPluginErrors >= RECENT_PLUGIN_ERROR_EXIT_THRESHOLD) {
-        console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
-        process.exit(1);
-      }
-    } else if (isDiscordRESTError(err) || isDiscordHTTPError(err)) {
-      // Discord API errors, usually safe to just log instead of crash
-      // We still bail if we get a ton of them in a short amount of time
-      if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
-        console.error(`Exiting after ${RECENT_DISCORD_ERROR_EXIT_THRESHOLD} API errors`);
-        process.exit(1);
-      }
-    } else {
-      // On other errors, crash immediately
+    if (err.guild) {
+      const logs = new GuildLogs(err.guild.id);
+      logs.log(LogType.BOT_ALERT, { body: `\`[${err.code}]\` ${err.message}` });
+    }
+
+    return;
+  }
+
+  if (err instanceof PluginLoadError) {
+    // tslint:disable:no-console
+    console.warn(`${guildName} (${guildId}): Failed to load plugin '${err.pluginName}': ${err.message}`);
+    return;
+  }
+
+  if (err instanceof ErisError) {
+    if (err.code && SAFE_TO_IGNORE_ERIS_ERROR_CODES.includes(err.code)) {
+      return;
+    }
+  }
+
+  if (err instanceof DiscordHTTPError && err.code === 500) {
+    // Don't need stack traces on HTTP 500 errors
+    // These also shouldn't count towards RECENT_DISCORD_ERROR_EXIT_THRESHOLD because they don't indicate an error in our code
+    console.error(err.message);
+    return;
+  }
+
+  // tslint:disable:no-console
+  console.error(err);
+
+  if (err instanceof PluginError) {
+    // Tolerate a few recent plugin errors before crashing
+    if (++recentPluginErrors >= RECENT_PLUGIN_ERROR_EXIT_THRESHOLD) {
+      console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
       process.exit(1);
     }
-    // tslint:enable:no-console
-  };
+  } else if (isDiscordRESTError(err) || isDiscordHTTPError(err)) {
+    // Discord API errors, usually safe to just log instead of crash
+    // We still bail if we get a ton of them in a short amount of time
+    if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
+      console.error(`Exiting after ${RECENT_DISCORD_ERROR_EXIT_THRESHOLD} API errors`);
+      process.exit(1);
+    }
+  } else {
+    // On other errors, crash immediately
+    process.exit(1);
+  }
+  // tslint:enable:no-console
+}
 
+if (process.env.NODE_ENV === "production") {
   process.on("uncaughtException", errorHandler);
   process.on("unhandledRejection", errorHandler);
 }
@@ -154,8 +169,8 @@ connect().then(async () => {
     }
   });
 
-  client.on("error", err => {
-    logger.error(`[ERIS] ${String(err)}`);
+  client.on("error", (err, shardId) => {
+    errorHandler(new ErisError(err.message, (err as any).code, shardId));
   });
 
   const allowedGuilds = new AllowedGuilds();
