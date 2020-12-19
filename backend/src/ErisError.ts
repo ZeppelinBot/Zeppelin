@@ -1,3 +1,5 @@
+import util from "util";
+
 export class ErisError extends Error {
   code: number | string | undefined;
   shardId: number;
@@ -8,7 +10,7 @@ export class ErisError extends Error {
     this.shardId = shardId;
   }
 
-  toString() {
-    return `[ERIS] [CODE ${this.code || "?"}] [SHARD ${this.shardId}] ${this.message}`;
+  [util.inspect.custom]() {
+    return `[ERIS] [ERROR CODE ${this.code || "?"}] [SHARD ${this.shardId}] ${this.message}`;
   }
 }
