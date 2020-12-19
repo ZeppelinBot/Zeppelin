@@ -103,6 +103,12 @@ function errorHandler(err) {
     return;
   }
 
+  if (err.message && err.message.startsWith("Request timed out")) {
+    // These are very noisy, so just print the message without stack. The stack trace doesn't really help here anyway.
+    console.error(err.message);
+    return;
+  }
+
   // tslint:disable:no-console
   console.error(err);
 
