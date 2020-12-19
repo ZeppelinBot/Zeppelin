@@ -128,7 +128,6 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     pluginData.state.savedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
     pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
 
-    pluginData.state.regexRunner.off("timeout", pluginData.state.regexRunnerTimeoutListener);
     pluginData.state.regexRunner.off("repeatedTimeout", pluginData.state.regexRunnerRepeatedTimeoutListener);
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },

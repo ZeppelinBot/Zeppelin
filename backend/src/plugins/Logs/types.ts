@@ -58,7 +58,6 @@ export interface LogsPluginType extends BasePluginType {
     cases: GuildCases;
 
     regexRunner: RegExpRunner;
-    regexRunnerTimeoutListener;
     regexRunnerRepeatedTimeoutListener;
 
     logListener;
