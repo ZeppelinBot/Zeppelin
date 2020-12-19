@@ -106,10 +106,8 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
 
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
-    state.regexRunnerTimeoutListener = (regexSource, timeoutMs) => {
-      logger.warn(`Heavy regex (${timeoutMs}): ${regexSource}`);
-    };
     state.regexRunnerRepeatedTimeoutListener = (regexSource, timeoutMs, failedTimes) => {
+      logger.warn(`Disabled heavy regex temporarily: ${regexSource}`);
       log(pluginData, LogType.BOT_ALERT, {
         body:
           `
@@ -120,7 +118,6 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
           "```",
       });
     };
-    state.regexRunner.on("timeout", state.regexRunnerTimeoutListener);
     state.regexRunner.on("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
   },
 
