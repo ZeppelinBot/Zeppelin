@@ -59,6 +59,8 @@ const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
   "ECONNRESET", // Pretty much the same as above
 ];
 
+const SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES = ["Server didn't acknowledge previous heartbeat, possible lost connection"];
+
 function errorHandler(err) {
   const guildName = err.guild?.name || "Global";
   const guildId = err.guild?.id || "0";
@@ -86,6 +88,10 @@ function errorHandler(err) {
 
   if (err instanceof ErisError) {
     if (err.code && SAFE_TO_IGNORE_ERIS_ERROR_CODES.includes(err.code)) {
+      return;
+    }
+
+    if (err.message && SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES.includes(err.message)) {
       return;
     }
   }
