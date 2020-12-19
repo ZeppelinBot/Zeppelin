@@ -28,11 +28,10 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
     );
 
     if (kickAuditLogEntry) {
-      const existingCaseForThisEntry = await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id);
-      let createdCase;
-      if (existingCaseForThisEntry) {
+      let createdCase = await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id);
+      if (createdCase) {
         logger.warn(
-          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${existingCaseForThisEntry.id}`,
+          `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${createdCase.id}`,
         );
       } else {
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
