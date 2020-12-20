@@ -8,7 +8,7 @@ import {
   simpleClosestStringMatch,
   stripObjectToScalars,
 } from "../../../utils";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { Member, VoiceChannel } from "eris";
 import { LogType } from "../../../data/LogType";
 
@@ -157,38 +157,55 @@ export const VcmoveAllCmd = utilityCmd({
     // Cant leave null, otherwise we get an assignment error in the catch
     let currMember = msg.member;
     const moveAmt = args.oldChannel.voiceMembers.size;
-    try {
-      for (const memberWithId of args.oldChannel.voiceMembers) {
-        currMember = memberWithId[1];
+    let errAmt = 0;
+    for (const memberWithId of args.oldChannel.voiceMembers) {
+      currMember = memberWithId[1];
 
+      // Check for permissions but allow self-moves
+      if (currMember.id !== msg.member.id && !canActOn(pluginData, msg.member, currMember)) {
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id}): You cannot act on this member`,
+        );
+        errAmt++;
+        continue;
+      }
+
+      try {
         currMember.edit({
           channelID: channel.id,
         });
+      } catch (e) {
+        if (msg.member.id === currMember.id) {
+          sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
+          return;
+        }
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id})`,
+        );
+        errAmt++;
+        continue;
+      }
 
-        pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
-          mod: stripObjectToScalars(msg.author),
-          member: stripObjectToScalars(currMember, ["user", "roles"]),
-          oldChannel: stripObjectToScalars(args.oldChannel),
-          newChannel: stripObjectToScalars(channel),
-        });
-      }
-    } catch (e) {
-      if (msg.member.id === currMember.id) {
-        sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
-        return;
-      }
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
-        `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id})`,
-      );
-      return;
+      pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
+        mod: stripObjectToScalars(msg.author),
+        member: stripObjectToScalars(currMember, ["user", "roles"]),
+        oldChannel: stripObjectToScalars(args.oldChannel),
+        newChannel: stripObjectToScalars(channel),
+      });
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `All ${moveAmt} members from **${args.oldChannel.name}** moved to **${channel.name}**`,
-    );
+    if (moveAmt !== errAmt) {
+      sendSuccessMessage(
+        pluginData,
+        msg.channel,
+        `${moveAmt - errAmt} members from **${args.oldChannel.name}** moved to **${channel.name}**`,
+      );
+    } else {
+      sendErrorMessage(pluginData, msg.channel, `Failed to move any members.`);
+    }
   },
 });
