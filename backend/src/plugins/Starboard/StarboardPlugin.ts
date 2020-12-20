@@ -88,6 +88,25 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starb
                 basic:
                   enabled: true
       ~~~
+
+      ### Limit starboard to a specific level (and above)
+      This is identical to the basic starboard above, but only works for a specific level (>=50).
+      
+      ~~~yml
+      starboard:
+        config:
+          boards:
+            levelonly:
+              enabled: false # The starboard starts disabled and is then enabled in a level override below
+              channel_id: "604342689038729226"
+              stars_required: 1
+        overrides:
+          - level: ">=50"
+            config:
+              boards:
+                levelonly:
+                  enabled: true
+      ~~~
     `),
   },
 

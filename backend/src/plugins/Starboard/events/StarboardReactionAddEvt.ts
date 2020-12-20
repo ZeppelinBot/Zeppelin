@@ -58,6 +58,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       });
 
     for (const starboard of applicableStarboards) {
+      const boardLock = await pluginData.locks.acquire(`starboards-channel-${starboard.channel_id}`);
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
@@ -73,6 +74,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       if (reactionsCount >= starboard.stars_required) {
         await saveMessageToStarboard(pluginData, msg, starboard);
       }
+      boardLock.unlock();
     }
   },
 });
