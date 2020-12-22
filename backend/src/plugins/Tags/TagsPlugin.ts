@@ -30,7 +30,7 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
     global_tag_cooldown: null,
     user_cooldown: null,
     global_cooldown: null,
-    global_delete_invoke: false,
+    auto_delete_command: false,
 
     categories: {},
 
@@ -74,7 +74,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
   },
 
   configPreprocessor(options) {
-    if (options.config.delete_with_command && options.config.global_delete_invoke) {
+    if (options.config.delete_with_command && options.config.auto_delete_command) {
       throw new StrictValidationError([
         `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,
       ]);
@@ -84,7 +84,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
     if (options.config?.categories) {
       for (const [name, opts] of Object.entries(options.config.categories)) {
         const cat = options.config.categories[name];
-        if (cat.delete_with_command && cat.category_delete_invoke) {
+        if (cat.delete_with_command && cat.auto_delete_command) {
           throw new StrictValidationError([
             `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
           ]);
