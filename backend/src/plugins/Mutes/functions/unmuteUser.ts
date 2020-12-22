@@ -7,7 +7,7 @@ import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { WithRequiredProps } from "../../../utils/typeUtils";
+import { MemberOptions } from "eris";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -35,6 +35,13 @@ export async function unmuteUser(
       const muteRole = pluginData.config.get().mute_role;
       if (muteRole && member.roles.includes(muteRole)) {
         await member.removeRole(muteRole);
+      }
+      if (existingMute?.roles_to_restore) {
+        const memberOptions: MemberOptions = {};
+        memberOptions.roles = Array.from(
+          new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole)]),
+        );
+        member.edit(memberOptions);
       }
     } else {
       console.warn(

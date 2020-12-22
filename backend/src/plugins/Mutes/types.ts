@@ -23,6 +23,8 @@ export const ConfigSchema = t.type({
   mute_message: tNullable(t.string),
   timed_mute_message: tNullable(t.string),
   update_mute_message: tNullable(t.string),
+  remove_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
+  restore_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
 
   can_view_list: t.boolean,
   can_cleanup: t.boolean,

@@ -82,12 +82,19 @@ export async function logAndDetectMessageSpam(
             (spamConfig.mute_time && convertDelayStringToMS(spamConfig.mute_time.toString())) ?? 120 * 1000;
 
           try {
-            muteResult = await mutesPlugin.muteUser(member.id, muteTime, "Automatic spam detection", {
-              caseArgs: {
-                modId: pluginData.client.user.id,
-                postInCaseLogOverride: false,
+            muteResult = await mutesPlugin.muteUser(
+              member.id,
+              muteTime,
+              "Automatic spam detection",
+              {
+                caseArgs: {
+                  modId: pluginData.client.user.id,
+                  postInCaseLogOverride: false,
+                },
               },
-            });
+              spamConfig.remove_roles_on_mute,
+              spamConfig.restore_roles_on_mute,
+            );
           } catch (e) {
             if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
               logs.log(LogType.BOT_ALERT, {
