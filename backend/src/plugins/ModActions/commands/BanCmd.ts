@@ -98,7 +98,7 @@ export const BanCmd = modActionsCmd({
     });
 
     if (banResult.status === "failed") {
-      sendErrorMessage(pluginData, msg.channel, `Failed to ban member`);
+      sendErrorMessage(pluginData, msg.channel, `Failed to ban member: ${banResult.error}`);
       return;
     }
 

@@ -8,13 +8,14 @@ import {
   ucfirst,
   UserNotificationResult,
 } from "../../../utils";
-import { User } from "eris";
+import { DiscordRESTError, User } from "eris";
 import { renderTemplate } from "../../../templateFormatter";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { LogType } from "../../../data/LogType";
 import { ignoreEvent } from "./ignoreEvent";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { logger } from "../../../logger";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -69,9 +70,17 @@ export async function banUserId(
       reason != null ? encodeURIComponent(reason) : undefined,
     );
   } catch (e) {
+    let errorMessage;
+    if (e instanceof DiscordRESTError) {
+      errorMessage = `API error ${e.code}: ${e.message}`;
+    } else {
+      logger.warn(`Error applying ban to ${userId}: ${e}`);
+      errorMessage = "Unknown error";
+    }
+
     return {
       status: "failed",
-      error: e.message,
+      error: errorMessage,
     };
   }
 
