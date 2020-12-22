@@ -8,7 +8,7 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { banUserId } from "../functions/banUserId";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { LogType } from "../../../data/LogType";
-import { waitForReaction } from "knub/dist/helpers";
+import { getMemberLevel, waitForReaction } from "knub/dist/helpers";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -63,7 +63,13 @@ export const BanCmd = modActionsCmd({
 
     // Make sure we're allowed to ban this member if they are on the server
     if (!forceban && !canActOn(pluginData, msg.member, memberToBan!)) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot ban: insufficient permissions");
+      const ourLevel = getMemberLevel(pluginData, msg.member);
+      const targetLevel = getMemberLevel(pluginData, memberToBan!);
+      sendErrorMessage(
+        pluginData,
+        msg.channel,
+        `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
+      );
       return;
     }
 
