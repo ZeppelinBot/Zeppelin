@@ -25,6 +25,7 @@ export const VcdisconnectCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member)) {
       sendErrorMessage(pluginData, msg.channel, "Cannot move: insufficient permissions");
+      return;
     }
 
     if (!args.member.voiceState || !args.member.voiceState.channelID) {
