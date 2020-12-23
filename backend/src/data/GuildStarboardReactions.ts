@@ -19,10 +19,22 @@ export class GuildStarboardReactions extends BaseGuildRepository {
   }
 
   async createStarboardReaction(messageId: string, reactorId: string) {
+    const existingReaction = await this.allStarboardReactions.findOne({
+      where: {
+        guild_id: this.guildId,
+        message_id: messageId,
+        reactor_id: reactorId,
+      },
+    });
+
+    if (existingReaction) {
+      return;
+    }
+
     await this.allStarboardReactions.insert({
+      guild_id: this.guildId,
       message_id: messageId,
       reactor_id: reactorId,
-      guild_id: this.guildId,
     });
   }
 

@@ -36,6 +36,8 @@ export const StarboardReactionAddEvt = starboardEvt({
       categoryId: (msg.channel as TextChannel).parentID,
     });
 
+    const boardLock = await pluginData.locks.acquire(`starboards`);
+
     const applicableStarboards = Object.values(config.boards)
       .filter(board => board.enabled)
       // Can't star messages in the starboard channel itself
@@ -59,8 +61,6 @@ export const StarboardReactionAddEvt = starboardEvt({
       });
 
     for (const starboard of applicableStarboards) {
-      const boardLock = await pluginData.locks.acquire(`starboards-channel-${starboard.channel_id}`);
-
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
@@ -92,8 +92,8 @@ export const StarboardReactionAddEvt = starboardEvt({
         // Otherwise, if the star count exceeds the required star count, save the message to the starboard
         await saveMessageToStarboard(pluginData, msg, starboard);
       }
-
-      boardLock.unlock();
     }
+
+    boardLock.unlock();
   },
 });
