@@ -2,6 +2,7 @@ import { starboardEvt } from "../types";
 import { Message, TextChannel } from "eris";
 import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
+import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
@@ -59,21 +60,39 @@ export const StarboardReactionAddEvt = starboardEvt({
 
     for (const starboard of applicableStarboards) {
       const boardLock = await pluginData.locks.acquire(`starboards-channel-${starboard.channel_id}`);
+
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
-      // If the message has already been posted to this starboard, we don't need to do anything else
+      const reactions = await pluginData.state.starboardReactions.getAllReactionsForMessageId(msg.id);
+      const reactionsCount = reactions.length;
+
       const starboardMessages = await pluginData.state.starboardMessages.getMatchingStarboardMessages(
         starboard.channel_id,
         msg.id,
       );
-      if (starboardMessages.length > 0) continue;
-
-      const reactions = await pluginData.state.starboardReactions.getAllReactionsForMessageId(msg.id);
-      const reactionsCount = reactions.length;
-      if (reactionsCount >= starboard.stars_required) {
+      if (starboardMessages.length > 0) {
+        // If the message has already been posted to this starboard, update star counts
+        if (starboard.show_star_count) {
+          for (const starboardMessage of starboardMessages) {
+            const realStarboardMessage = await pluginData.client.getMessage(
+              starboardMessage.starboard_channel_id,
+              starboardMessage.starboard_message_id,
+            );
+            await updateStarboardMessageStarCount(
+              starboard,
+              msg,
+              realStarboardMessage,
+              starboard.star_emoji![0]!,
+              reactionsCount,
+            );
+          }
+        }
+      } else if (reactionsCount >= starboard.stars_required) {
+        // Otherwise, if the star count exceeds the required star count, save the message to the starboard
         await saveMessageToStarboard(pluginData, msg, starboard);
       }
+
       boardLock.unlock();
     }
   },
