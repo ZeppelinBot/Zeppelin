@@ -6,6 +6,7 @@ import { validate } from "../../../validatorUtils";
 import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -91,11 +92,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     return;
   }
 
-  if (
-    tagResult.renderedContent.content &&
-    !tagResult.renderedContent.embed &&
-    tagResult.renderedContent.content.trim() === ""
-  ) {
+  if (messageIsEmpty(tagResult.renderedContent)) {
     pluginData.state.logs.log(LogType.BOT_ALERT, {
       body: `Tag \`${tagResult.tagName}\` resulted in an empty message, so it couldn't be sent`,
     });
