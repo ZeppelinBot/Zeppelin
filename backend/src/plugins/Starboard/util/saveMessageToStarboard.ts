@@ -36,7 +36,11 @@ export async function saveMessageToStarboard(
 
   // Merge media and - if copy_full_embed is enabled - fields and title from the first embed in the original message
   if (msg.embeds.length > 0) {
-    if (msg.embeds[0].image) embed.image = msg.embeds[0].image;
+    if (msg.embeds[0].image) {
+      embed.image = msg.embeds[0].image;
+    } else if (msg.embeds[0].thumbnail) {
+      embed.image = { url: msg.embeds[0].thumbnail.url };
+    }
 
     if (starboard.copy_full_embed) {
       if (msg.embeds[0].title) {
