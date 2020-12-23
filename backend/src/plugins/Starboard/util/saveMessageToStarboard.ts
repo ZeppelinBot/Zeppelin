@@ -5,6 +5,10 @@ import moment from "moment-timezone";
 import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
 import path from "path";
 
+const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
+const audioAttachmentExtensions = ["wav", "mp3", "m4a"];
+const videoAttachmentExtensions = ["mp4", "mkv", "mov"];
+
 export async function saveMessageToStarboard(
   pluginData: GuildPluginData<StarboardPluginType>,
   msg: Message,
@@ -48,7 +52,9 @@ export async function saveMessageToStarboard(
         embed.fields.push({ name: EMPTY_CHAR, value: titleText });
       }
 
-      if (msg.embeds[0].fields) embed.fields.push(...msg.embeds[0].fields);
+      if (msg.embeds[0].fields) {
+        embed.fields.push(...msg.embeds[0].fields);
+      }
     }
   }
 
@@ -59,10 +65,21 @@ export async function saveMessageToStarboard(
         .extname(attachment.filename)
         .slice(1)
         .toLowerCase();
-      if (!["jpeg", "jpg", "png", "gif", "webp"].includes(ext)) continue;
 
-      embed.image = { url: attachment.url };
-      break;
+      if (imageAttachmentExtensions.includes(ext)) {
+        embed.image = { url: attachment.url };
+        break;
+      }
+
+      if (audioAttachmentExtensions.includes(ext)) {
+        embed.fields.push({ name: EMPTY_CHAR, value: `*Message contains an audio clip*` });
+        break;
+      }
+
+      if (videoAttachmentExtensions.includes(ext)) {
+        embed.fields.push({ name: EMPTY_CHAR, value: `*Message contains a video*` });
+        break;
+      }
     }
   }
 
