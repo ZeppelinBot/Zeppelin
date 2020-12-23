@@ -1,13 +1,14 @@
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-import { Constants as ErisConstants } from "eris";
+import { Constants as ErisConstants, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { logger } from "../../../logger";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
+import { resolveUser, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
+import { Case } from "../../../data/entities/Case";
 
 /**
  * Create a KICK case automatically when a user is kicked manually.
@@ -27,29 +28,38 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
       member.id,
     );
 
+    let mod: User | UnknownUser | null = null;
+    let createdCase: Case | null = null;
+
     if (kickAuditLogEntry) {
-      let createdCase = await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id);
+      createdCase = (await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id)) || null;
       if (createdCase) {
         logger.warn(
           `Tried to create duplicate case for audit log entry ${kickAuditLogEntry.id}, existing case id ${createdCase.id}`,
         );
       } else {
-        const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        createdCase = await casesPlugin.createCase({
-          userId: member.id,
-          modId: kickAuditLogEntry.user.id,
-          type: CaseTypes.Kick,
-          auditLogId: kickAuditLogEntry.id,
-          reason: kickAuditLogEntry.reason || undefined,
-          automatic: true,
-        });
-      }
+        mod = await resolveUser(pluginData.client, kickAuditLogEntry.user.id);
 
-      pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-        user: stripObjectToScalars(member.user),
-        mod: stripObjectToScalars(kickAuditLogEntry.user),
-        caseNumber: createdCase.case_number,
-      });
+        const config = mod instanceof UnknownUser ? pluginData.config.get() : pluginData.config.getForUser(mod);
+
+        if (config.create_cases_for_manual_actions) {
+          const casesPlugin = pluginData.getPlugin(CasesPlugin);
+          createdCase = await casesPlugin.createCase({
+            userId: member.id,
+            modId: kickAuditLogEntry.user.id,
+            type: CaseTypes.Kick,
+            auditLogId: kickAuditLogEntry.id,
+            reason: kickAuditLogEntry.reason || undefined,
+            automatic: true,
+          });
+        }
+      }
     }
+
+    pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
+      user: stripObjectToScalars(member.user),
+      mod: mod ? stripObjectToScalars(mod) : null,
+      caseNumber: createdCase?.case_number ?? 0,
+    });
   },
 );
