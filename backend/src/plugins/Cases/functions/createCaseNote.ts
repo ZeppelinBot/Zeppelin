@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { resolveCaseId } from "./resolveCaseId";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
-import { resolveUser } from "../../../utils";
+import { resolveUser, UnknownUser } from "../../../utils";
 
 export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType>, args: CaseNoteArgs): Promise<void> {
   const theCase = await pluginData.state.cases.find(resolveCaseId(args.caseId));
@@ -12,7 +12,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
   }
 
   const mod = await resolveUser(pluginData.client, args.modId);
-  if (!mod) {
+  if (mod instanceof UnknownUser) {
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }
 
@@ -46,7 +46,8 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     }
   }
 
-  if ((!args.automatic || pluginData.config.get().log_automatic_actions) && args.postInCaseLogOverride !== false) {
+  const modConfig = pluginData.config.getForUser(mod);
+  if ((!args.automatic || modConfig.log_automatic_actions) && args.postInCaseLogOverride !== false) {
     await postCaseToCaseLogChannel(pluginData, theCase.id);
   }
 }
