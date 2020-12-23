@@ -36,8 +36,8 @@ export class AddTypeAndPermissionsToApiPermissions1573158035867 implements Migra
 
     await queryRunner.query(`
         UPDATE api_permissions
-        SET type="USER",
-            permissions="EDIT_CONFIG"
+        SET type='USER',
+            permissions='EDIT_CONFIG'
       `);
 
     await queryRunner.createIndex(
