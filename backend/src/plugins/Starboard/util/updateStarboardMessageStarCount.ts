@@ -22,7 +22,7 @@ export async function updateStarboardMessageStarCount(
   debouncedUpdates[key] = setTimeout(() => {
     delete debouncedUpdates[key];
     const embed = starboardMessage.embeds[0]!;
-    embed.fields!.shift(); // Remove pseudo footer
+    embed.fields!.pop(); // Remove pseudo footer
     embed.fields!.push(createStarboardPseudoFooterForMessage(starboard, originalMessage, starEmoji, starCount)); // Create new pseudo footer
     starboardMessage.edit({ embed });
   }, DEBOUNCE_DELAY);
