@@ -69,6 +69,7 @@ const defaultOptions = {
     can_hidecase: false,
     can_deletecase: false,
     can_act_as_other: false,
+    create_cases_for_manual_actions: true,
   },
   overrides: [
     {

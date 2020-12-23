@@ -37,6 +37,7 @@ export const ConfigSchema = t.type({
   can_hidecase: t.boolean,
   can_deletecase: t.boolean,
   can_act_as_other: t.boolean,
+  create_cases_for_manual_actions: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

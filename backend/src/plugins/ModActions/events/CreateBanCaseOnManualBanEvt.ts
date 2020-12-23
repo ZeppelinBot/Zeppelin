@@ -7,6 +7,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, resolveUser, UnknownUser } from "../../../utils";
+import { Case } from "../../../data/entities/Case";
 
 /**
  * Create a BAN case automatically when a user is banned manually.
@@ -28,7 +29,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
-    let createdCase;
+    let createdCase: Case | null = null;
     let mod: User | UnknownUser | null = null;
     let reason = "";
 
@@ -37,28 +38,35 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
       const auditLogId = relevantAuditLogEntry.id;
 
       mod = await resolveUser(pluginData.client, modId);
-      reason = relevantAuditLogEntry.reason || "";
-      createdCase = await casesPlugin.createCase({
-        userId: user.id,
-        modId,
-        type: CaseTypes.Ban,
-        auditLogId,
-        reason: reason || undefined,
-        automatic: true,
-      });
+
+      const config = mod instanceof UnknownUser ? pluginData.config.get() : pluginData.config.getForUser(mod);
+
+      if (config.create_cases_for_manual_actions) {
+        reason = relevantAuditLogEntry.reason || "";
+        createdCase = await casesPlugin.createCase({
+          userId: user.id,
+          modId,
+          type: CaseTypes.Ban,
+          auditLogId,
+          reason: reason || undefined,
+          automatic: true,
+        });
+      }
     } else {
-      createdCase = await casesPlugin.createCase({
-        userId: user.id,
-        modId: "0",
-        type: CaseTypes.Ban,
-      });
+      const config = pluginData.config.get();
+      if (config.create_cases_for_manual_actions) {
+        createdCase = await casesPlugin.createCase({
+          userId: user.id,
+          modId: "0",
+          type: CaseTypes.Ban,
+        });
+      }
     }
 
-    mod = await mod;
     pluginData.state.serverLogs.log(LogType.MEMBER_BAN, {
       mod: mod ? stripObjectToScalars(mod, ["user"]) : null,
       user: stripObjectToScalars(user, ["user"]),
-      caseNumber: createdCase.case_number,
+      caseNumber: createdCase?.case_number ?? 0,
       reason,
     });
   },
