@@ -28,7 +28,9 @@ export async function saveMessageToStarboard(
     embed.author.icon_url = msg.author.avatarURL;
   }
 
-  if (msg.content) {
+  // The second condition here checks for messages with only an image link that is then embedded.
+  // The message content in that case is hidden by the Discord client, so we hide it here too.
+  if (msg.content && msg.embeds[0]?.thumbnail?.url !== msg.content) {
     embed.description = msg.content;
   }
 
