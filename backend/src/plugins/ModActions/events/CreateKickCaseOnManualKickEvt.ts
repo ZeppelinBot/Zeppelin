@@ -31,6 +31,8 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
     let mod: User | UnknownUser | null = null;
     let createdCase: Case | null = null;
 
+    // Since a member leaving and a member being kicked are both the same gateway event,
+    // we can only really interpret this event as a kick if there is a matching audit log entry.
     if (kickAuditLogEntry) {
       createdCase = (await pluginData.state.cases.findByAuditLogId(kickAuditLogEntry.id)) || null;
       if (createdCase) {
@@ -54,12 +56,12 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
           });
         }
       }
-    }
 
-    pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-      user: stripObjectToScalars(member.user),
-      mod: mod ? stripObjectToScalars(mod) : null,
-      caseNumber: createdCase?.case_number ?? 0,
-    });
+      pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
+        user: stripObjectToScalars(member.user),
+        mod: mod ? stripObjectToScalars(mod) : null,
+        caseNumber: createdCase?.case_number ?? 0,
+      });
+    }
   },
 );
