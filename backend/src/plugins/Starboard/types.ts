@@ -11,6 +11,7 @@ const StarboardOpts = t.type({
   star_emoji: tNullable(t.array(t.string)),
   copy_full_embed: tNullable(t.boolean),
   enabled: tNullable(t.boolean),
+  show_star_count: t.boolean,
 });
 export type TStarboardOpts = t.TypeOf<typeof StarboardOpts>;
 
@@ -25,6 +26,7 @@ export const PartialConfigSchema = tDeepPartial(ConfigSchema);
 export const defaultStarboardOpts: Partial<TStarboardOpts> = {
   star_emoji: ["⭐"],
   enabled: true,
+  show_star_count: true,
 };
 
 export interface StarboardPluginType extends BasePluginType {
