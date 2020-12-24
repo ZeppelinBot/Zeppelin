@@ -1,14 +1,16 @@
 import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember } from "../../../utils";
+import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { LogType } from "../../../data/LogType";
 import { getMemberLevel, waitForReaction } from "knub/dist/helpers";
+import humanizeDuration from "humanize-duration";
+import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
+import { CaseTypes } from "src/data/CaseTypes";
+import { LogType } from "src/data/LogType";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -25,6 +27,7 @@ export const BanCmd = modActionsCmd({
   signature: [
     {
       user: ct.string(),
+      time: ct.delay({ required: false, option: true, shortcut: "d" }),
       reason: ct.string({ required: false, catchAll: true }),
 
       ...opts,
@@ -37,15 +40,79 @@ export const BanCmd = modActionsCmd({
       return sendErrorMessage(pluginData, msg.channel, `User not found`);
     }
 
+    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
     const memberToBan = await resolveMember(pluginData.client, pluginData.guild, user.id);
-
-    let forceban = false;
-    if (!memberToBan) {
-      const banned = await isBanned(pluginData, user.id);
-
-      if (banned) {
-        sendErrorMessage(pluginData, msg.channel, `User is already banned`);
+    // The moderator who did the action is the message author or, if used, the specified -mod
+    let mod = msg.member;
+    if (args.mod) {
+      if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
+        sendErrorMessage(pluginData, msg.channel, "No permission for -mod");
         return;
+      }
+
+      mod = args.mod;
+    }
+
+    // acquire a lock because of the needed user-inputs below (if banned/not on server)
+    const lock = await pluginData.locks.acquire(`ban-${user.id}`);
+    let forceban = false;
+    const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
+    const banned = await isBanned(pluginData, user.id);
+    if (!memberToBan) {
+      if (banned) {
+        // Abort if trying to ban user indefinitely if they are already banned indefinitely
+        if (!existingTempban && !args.time) {
+          sendErrorMessage(pluginData, msg.channel, `User is already banned indefinitely.`);
+          return;
+        }
+
+        // Ask the mod if we should update the existing ban
+        const alreadyBannedMsg = await msg.channel.createMessage("User is already banned, update ban?");
+        const reply = await waitForReaction(pluginData.client, alreadyBannedMsg, ["✅", "❌"], msg.author.id);
+
+        alreadyBannedMsg.delete();
+        if (!reply || reply.name === "❌") {
+          sendErrorMessage(pluginData, msg.channel, "User already banned, update cancelled by moderator");
+          lock.unlock();
+          return;
+        } else {
+          // Update or add new tempban / remove old tempban
+          if (args.time && args.time > 0) {
+            if (existingTempban) {
+              pluginData.state.tempbans.updateExpiryTime(user.id, args.time, mod.id);
+            } else {
+              pluginData.state.tempbans.addTempban(user.id, args.time, mod.id);
+            }
+          } else if (existingTempban) {
+            pluginData.state.tempbans.clear(user.id);
+          }
+
+          // Create a new case for the updated ban since we never stored the old case id and log the action
+          const casesPlugin = pluginData.getPlugin(CasesPlugin);
+          const createdCase = await casesPlugin.createCase({
+            modId: mod.id,
+            type: CaseTypes.Ban,
+            userId: user.id,
+            reason,
+            noteDetails: [`Ban updated to ${args.time ? humanizeDuration(args.time) : "indefinite"}`],
+          });
+          const logtype = args.time ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
+          pluginData.state.serverLogs.log(logtype, {
+            mod: stripObjectToScalars(mod.user),
+            user: stripObjectToScalars(user),
+            caseNumber: createdCase.case_number,
+            reason,
+            banTime: args.time ? humanizeDuration(args.time) : null,
+          });
+
+          sendSuccessMessage(
+            pluginData,
+            msg.channel,
+            `Ban updated to ${args.time ? "expire in " + humanizeDuration(args.time) + " from now" : "indefinite"}`,
+          );
+          lock.unlock();
+          return;
+        }
       } else {
         // Ask the mod if we should upgrade to a forceban as the user is not on the server
         const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forceban instead?");
@@ -54,6 +121,7 @@ export const BanCmd = modActionsCmd({
         notOnServerMsg.delete();
         if (!reply || reply.name === "❌") {
           sendErrorMessage(pluginData, msg.channel, "User not on server, ban cancelled by moderator");
+          lock.unlock();
           return;
         } else {
           forceban = true;
@@ -70,18 +138,8 @@ export const BanCmd = modActionsCmd({
         msg.channel,
         `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
       );
+      lock.unlock();
       return;
-    }
-
-    // The moderator who did the action is the message author or, if used, the specified -mod
-    let mod = msg.member;
-    if (args.mod) {
-      if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
-        sendErrorMessage(pluginData, msg.channel, "No permission for -mod");
-        return;
-      }
-
-      mod = args.mod;
     }
 
     let contactMethods;
@@ -89,34 +147,53 @@ export const BanCmd = modActionsCmd({
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, e.message);
+      lock.unlock();
       return;
     }
 
     const deleteMessageDays = args["delete-days"] ?? pluginData.config.getForMessage(msg).ban_delete_message_days;
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
-    const banResult = await banUserId(pluginData, user.id, reason, {
-      contactMethods,
-      caseArgs: {
-        modId: mod.id,
-        ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
+    const banResult = await banUserId(
+      pluginData,
+      user.id,
+      reason,
+      {
+        contactMethods,
+        caseArgs: {
+          modId: mod.id,
+          ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
+        },
+        deleteMessageDays,
       },
-      deleteMessageDays,
-    });
+      args.time,
+    );
 
     if (banResult.status === "failed") {
       sendErrorMessage(pluginData, msg.channel, `Failed to ban member: ${banResult.error}`);
+      lock.unlock();
       return;
+    }
+
+    let forTime = "";
+    if (args.time && args.time > 0) {
+      if (existingTempban) {
+        pluginData.state.tempbans.updateExpiryTime(user.id, args.time, mod.id);
+      } else {
+        pluginData.state.tempbans.addTempban(user.id, args.time, mod.id);
+      }
+
+      forTime = `for ${humanizeDuration(args.time)} `;
     }
 
     // Confirm the action to the moderator
     let response = "";
     if (!forceban) {
-      response = `Banned **${user.username}#${user.discriminator}** (Case #${banResult.case.case_number})`;
+      response = `Banned **${user.username}#${user.discriminator}** ${forTime}(Case #${banResult.case.case_number})`;
       if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
     } else {
-      response = `Member forcebanned (Case #${banResult.case.case_number})`;
+      response = `Member forcebanned ${forTime}(Case #${banResult.case.case_number})`;
     }
 
+    lock.unlock();
     sendSuccessMessage(pluginData, msg.channel, response);
   },
 });

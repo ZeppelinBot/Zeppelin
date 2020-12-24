@@ -63,6 +63,8 @@ export const UnbanCmd = modActionsCmd({
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     });
+    // Delete the tempban, if one exists
+    pluginData.state.tempbans.clear(user.id);
 
     // Confirm the action
     sendSuccessMessage(pluginData, msg.channel, `Member unbanned (Case #${createdCase.case_number})`);

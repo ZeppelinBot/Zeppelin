@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf dist && cross-env NODE_ENV=production webpack --config webpack.config.js",
     "build-debug": "rimraf dist && cross-env NODE_ENV=development webpack --config webpack.config.js",
-    "watch": "cross-env NODE_ENV=development webpack-dev-server",
+    "watch": "cross-env NODE_ENV=development webpack-dev-server --disable-host-check",
     "watch-build": "rimraf dist && NODE_ENV=development webpack --config webpack.config.js --watch"
   },
   "devDependencies": {

@@ -36,6 +36,8 @@ import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { trimPluginDescription } from "../../utils";
 import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { GuildTempbans } from "../../data/GuildTempbans";
+import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
 
 const defaultOptions = {
   config: {
@@ -49,6 +51,7 @@ const defaultOptions = {
     warn_message: "You have received a warning on the {guildName} server: {reason}",
     kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",
     ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
+    tempban_message: "You have been banned from the {guildName} server for {banTime}. Reason given: {reason}",
     alert_on_rejoin: false,
     alert_channel: null,
     warn_notify_enabled: false,
@@ -165,8 +168,13 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
 
     state.mutes = GuildMutes.getGuildInstance(guild.id);
     state.cases = GuildCases.getGuildInstance(guild.id);
+    state.tempbans = GuildTempbans.getGuildInstance(guild.id);
     state.serverLogs = new GuildLogs(guild.id);
 
+    state.unloaded = false;
+    state.outdatedTempbansTimeout = null;
     state.ignoredEvents = [];
+
+    outdatedTempbansLoop(pluginData);
   },
 });

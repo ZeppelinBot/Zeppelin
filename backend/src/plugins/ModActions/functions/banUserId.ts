@@ -16,6 +16,7 @@ import { ignoreEvent } from "./ignoreEvent";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { logger } from "../../../logger";
+import humanizeDuration from "humanize-duration";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -25,6 +26,7 @@ export async function banUserId(
   userId: string,
   reason?: string,
   banOptions: BanOptions = {},
+  banTime?: number,
 ): Promise<BanResult> {
   const config = pluginData.config.get();
   const user = await resolveUser(pluginData.client, userId);
@@ -43,7 +45,7 @@ export async function banUserId(
       : getDefaultContactMethods(pluginData, "ban");
 
     if (contactMethods.length) {
-      if (config.ban_message) {
+      if (!banTime && config.ban_message) {
         const banMessage = await renderTemplate(config.ban_message, {
           guildName: pluginData.guild.name,
           reason,
@@ -53,8 +55,19 @@ export async function banUserId(
         });
 
         notifyResult = await notifyUser(user, banMessage, contactMethods);
+      } else if (banTime && config.tempban_message) {
+        const banMessage = await renderTemplate(config.tempban_message, {
+          guildName: pluginData.guild.name,
+          reason,
+          moderator: banOptions.caseArgs?.modId
+            ? stripObjectToScalars(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+            : {},
+          banTime: humanizeDuration(banTime),
+        });
+
+        notifyResult = await notifyUser(user, banMessage, contactMethods);
       } else {
-        notifyResult = createUserNotificationError("No ban message specified in config");
+        notifyResult = createUserNotificationError("No ban/tempban message specified in config");
       }
     }
   }
@@ -87,22 +100,31 @@ export async function banUserId(
   // Create a case for this action
   const modId = banOptions.caseArgs?.modId || pluginData.client.user.id;
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
+
+  const noteDetails: string[] = [];
+  const timeUntilUnban = banTime ? humanizeDuration(banTime) : "indefinite";
+  const timeDetails = `Banned ${banTime ? `for ${timeUntilUnban}` : "indefinitely"}`;
+  if (notifyResult.text) noteDetails.push(notifyResult.text);
+  noteDetails.push(timeDetails);
+
   const createdCase = await casesPlugin.createCase({
     ...(banOptions.caseArgs || {}),
     userId,
     modId,
     type: CaseTypes.Ban,
     reason,
-    noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
+    noteDetails,
   });
 
   // Log the action
   const mod = await resolveUser(pluginData.client, modId);
-  pluginData.state.serverLogs.log(LogType.MEMBER_BAN, {
+  const logtype = banTime ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
+  pluginData.state.serverLogs.log(logtype, {
     mod: stripObjectToScalars(mod),
     user: stripObjectToScalars(user),
     caseNumber: createdCase.case_number,
     reason,
+    banTime: banTime ? humanizeDuration(banTime) : null,
   });
 
   return {
