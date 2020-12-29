@@ -22,7 +22,7 @@ const opts = {
 export const BanCmd = modActionsCmd({
   trigger: "ban",
   permission: "can_ban",
-  description: "Ban the specified member",
+  description: "Ban or Tempban the specified member",
 
   signature: [
     {
