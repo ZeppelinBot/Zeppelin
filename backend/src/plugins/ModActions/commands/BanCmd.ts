@@ -27,7 +27,13 @@ export const BanCmd = modActionsCmd({
   signature: [
     {
       user: ct.string(),
-      time: ct.delay({ required: false, option: true, shortcut: "d" }),
+      time: ct.delay(),
+      reason: ct.string({ required: false, catchAll: true }),
+
+      ...opts,
+    },
+    {
+      user: ct.string(),
       reason: ct.string({ required: false, catchAll: true }),
 
       ...opts,
@@ -39,6 +45,8 @@ export const BanCmd = modActionsCmd({
     if (!user.id) {
       return sendErrorMessage(pluginData, msg.channel, `User not found`);
     }
+    const time = args["time"] ? args["time"] : null;
+    console.log(time);
 
     const reason = formatReasonWithAttachments(args.reason, msg.attachments);
     const memberToBan = await resolveMember(pluginData.client, pluginData.guild, user.id);
@@ -61,7 +69,7 @@ export const BanCmd = modActionsCmd({
     if (!memberToBan) {
       if (banned) {
         // Abort if trying to ban user indefinitely if they are already banned indefinitely
-        if (!existingTempban && !args.time) {
+        if (!existingTempban && !time) {
           sendErrorMessage(pluginData, msg.channel, `User is already banned indefinitely.`);
           return;
         }
@@ -77,11 +85,11 @@ export const BanCmd = modActionsCmd({
           return;
         } else {
           // Update or add new tempban / remove old tempban
-          if (args.time && args.time > 0) {
+          if (time && time > 0) {
             if (existingTempban) {
-              pluginData.state.tempbans.updateExpiryTime(user.id, args.time, mod.id);
+              pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
             } else {
-              pluginData.state.tempbans.addTempban(user.id, args.time, mod.id);
+              pluginData.state.tempbans.addTempban(user.id, time, mod.id);
             }
           } else if (existingTempban) {
             pluginData.state.tempbans.clear(user.id);
@@ -94,21 +102,21 @@ export const BanCmd = modActionsCmd({
             type: CaseTypes.Ban,
             userId: user.id,
             reason,
-            noteDetails: [`Ban updated to ${args.time ? humanizeDuration(args.time) : "indefinite"}`],
+            noteDetails: [`Ban updated to ${time ? humanizeDuration(time) : "indefinite"}`],
           });
-          const logtype = args.time ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
+          const logtype = time ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
           pluginData.state.serverLogs.log(logtype, {
             mod: stripObjectToScalars(mod.user),
             user: stripObjectToScalars(user),
             caseNumber: createdCase.case_number,
             reason,
-            banTime: args.time ? humanizeDuration(args.time) : null,
+            banTime: time ? humanizeDuration(time) : null,
           });
 
           sendSuccessMessage(
             pluginData,
             msg.channel,
-            `Ban updated to ${args.time ? "expire in " + humanizeDuration(args.time) + " from now" : "indefinite"}`,
+            `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
           );
           lock.unlock();
           return;
@@ -164,7 +172,7 @@ export const BanCmd = modActionsCmd({
         },
         deleteMessageDays,
       },
-      args.time,
+      time,
     );
 
     if (banResult.status === "failed") {
@@ -174,14 +182,14 @@ export const BanCmd = modActionsCmd({
     }
 
     let forTime = "";
-    if (args.time && args.time > 0) {
+    if (time && time > 0) {
       if (existingTempban) {
-        pluginData.state.tempbans.updateExpiryTime(user.id, args.time, mod.id);
+        pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
       } else {
-        pluginData.state.tempbans.addTempban(user.id, args.time, mod.id);
+        pluginData.state.tempbans.addTempban(user.id, time, mod.id);
       }
 
-      forTime = `for ${humanizeDuration(args.time)} `;
+      forTime = `for ${humanizeDuration(time)} `;
     }
 
     // Confirm the action to the moderator
