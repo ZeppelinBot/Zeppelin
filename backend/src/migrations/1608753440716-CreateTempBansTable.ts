@@ -1,8 +1,8 @@
-import { MigrationInterface, QueryRunner, Table } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableIndex } from "typeorm";
 
 export class CreateTempBansTable1608753440716 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.createTable(
+    const table = await queryRunner.createTable(
       new Table({
         name: "tempbans",
         columns: [
@@ -29,6 +29,12 @@ export class CreateTempBansTable1608753440716 implements MigrationInterface {
             type: "datetime",
           },
         ],
+      }),
+    );
+    queryRunner.createIndex(
+      "tempbans",
+      new TableIndex({
+        columnNames: ["expires_at"],
       }),
     );
   }
