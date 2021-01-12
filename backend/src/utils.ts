@@ -748,10 +748,14 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
   });
 }
 
-export async function createChunkedMessage(channel: TextableChannel, messageText: string) {
+export async function createChunkedMessage(
+  channel: TextableChannel,
+  messageText: string,
+  allowUserPings: boolean = true,
+) {
   const chunks = chunkMessageLines(messageText);
   for (const chunk of chunks) {
-    await channel.createMessage(chunk);
+    await channel.createMessage({ content: chunk, allowedMentions: { users: allowUserPings } });
   }
 }
 
