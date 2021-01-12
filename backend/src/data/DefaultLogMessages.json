@@ -49,6 +49,7 @@
   "CASE_CREATE": "✏ {userMention(mod)} manually created new **{caseType}** case (#{caseNum})",
   "CASE_DELETE": "✂️ **Case #{case.case_number}** was deleted by {userMention(mod)}",
 
+  "MASSUNBAN": "⚒ {userMention(mod)} mass-unbanned {count} users",
   "MASSBAN": "⚒ {userMention(mod)} massbanned {count} users",
   "MASSMUTE": "📢🚫 {userMention(mod)} massmuted {count} users",
 
