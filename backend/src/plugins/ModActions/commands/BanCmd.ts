@@ -1,7 +1,7 @@
 import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
+import { resolveUser, resolveMember, stripObjectToScalars, noop } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
@@ -46,7 +46,6 @@ export const BanCmd = modActionsCmd({
       return sendErrorMessage(pluginData, msg.channel, `User not found`);
     }
     const time = args["time"] ? args["time"] : null;
-    console.log(time);
 
     const reason = formatReasonWithAttachments(args.reason, msg.attachments);
     const memberToBan = await resolveMember(pluginData.client, pluginData.guild, user.id);
@@ -78,7 +77,7 @@ export const BanCmd = modActionsCmd({
         const alreadyBannedMsg = await msg.channel.createMessage("User is already banned, update ban?");
         const reply = await waitForReaction(pluginData.client, alreadyBannedMsg, ["✅", "❌"], msg.author.id);
 
-        alreadyBannedMsg.delete();
+        alreadyBannedMsg.delete().catch(noop);
         if (!reply || reply.name === "❌") {
           sendErrorMessage(pluginData, msg.channel, "User already banned, update cancelled by moderator");
           lock.unlock();
@@ -126,7 +125,7 @@ export const BanCmd = modActionsCmd({
         const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forceban instead?");
         const reply = await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id);
 
-        notOnServerMsg.delete();
+        notOnServerMsg.delete().catch(noop);
         if (!reply || reply.name === "❌") {
           sendErrorMessage(pluginData, msg.channel, "User not on server, ban cancelled by moderator");
           lock.unlock();

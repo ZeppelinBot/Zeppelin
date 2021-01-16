@@ -104,7 +104,7 @@ export async function banUserId(
   const noteDetails: string[] = [];
   const timeUntilUnban = banTime ? humanizeDuration(banTime) : "indefinite";
   const timeDetails = `Banned ${banTime ? `for ${timeUntilUnban}` : "indefinitely"}`;
-  if (notifyResult.text) noteDetails.push(notifyResult.text);
+  if (notifyResult.text) noteDetails.push(ucfirst(notifyResult.text));
   noteDetails.push(timeDetails);
 
   const createdCase = await casesPlugin.createCase({

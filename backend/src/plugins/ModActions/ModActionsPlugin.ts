@@ -177,4 +177,8 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
 
     outdatedTempbansLoop(pluginData);
   },
+
+  onUnload(pluginData) {
+    pluginData.state.unloaded = true;
+  },
 });
