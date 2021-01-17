@@ -148,7 +148,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     state.lastReload = Date.now();
 
     if (activeReloads.has(guild.id)) {
-      sendSuccessMessage(pluginData, activeReloads.get(guild.id), "Reloaded!");
+      sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
       activeReloads.delete(guild.id);
     }
   },
