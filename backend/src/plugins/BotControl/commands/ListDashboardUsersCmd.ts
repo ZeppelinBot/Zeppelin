@@ -32,6 +32,7 @@ export const ListDashboardUsersCmd = botControlCmd({
       pluginData,
       msg.channel,
       `The following users have dashboard access for **${guild.name}**:\n\n${userNameList}`,
+      {},
     );
   },
 });
