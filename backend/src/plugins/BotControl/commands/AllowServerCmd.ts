@@ -2,6 +2,7 @@ import { botControlCmd } from "../types";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isSnowflake } from "../../../utils";
+import { ApiPermissions } from "@shared/apiPermissions";
 
 export const AllowServerCmd = botControlCmd({
   trigger: ["allow_server", "allowserver", "add_server", "addserver"],
@@ -12,6 +13,7 @@ export const AllowServerCmd = botControlCmd({
 
   signature: {
     guildId: ct.string(),
+    userId: ct.string({ required: false }),
   },
 
   async run({ pluginData, message: msg, args }) {
@@ -26,8 +28,18 @@ export const AllowServerCmd = botControlCmd({
       return;
     }
 
+    if (args.userId && !isSnowflake(args.userId)) {
+      sendErrorMessage(pluginData, msg.channel, "Invalid user ID!");
+      return;
+    }
+
     await pluginData.state.allowedGuilds.add(args.guildId);
     await pluginData.state.configs.saveNewRevision(`guild-${args.guildId}`, "plugins: {}", msg.author.id);
+
+    if (args.userId) {
+      await pluginData.state.apiPermissionAssignments.addUser(args.guildId, args.userId, [ApiPermissions.EditConfig]);
+    }
+
     sendSuccessMessage(pluginData, msg.channel, "Server is now allowed to use Zeppelin!");
   },
 });
