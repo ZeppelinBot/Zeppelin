@@ -15,13 +15,18 @@ export const NoteCmd = modActionsCmd({
 
   signature: {
     user: ct.string(),
-    note: ct.string({ catchAll: true }),
+    note: ct.string({ required: false, catchAll: true }),
   },
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
       return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    }
+
+    if (!args.note && msg.attachments.length === 0) {
+      sendErrorMessage(pluginData, msg.channel, "Text or attachment required");
+      return;
     }
 
     const userName = `${user.username}#${user.discriminator}`;
