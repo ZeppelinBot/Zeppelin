@@ -2,7 +2,7 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { GuildTextableChannel, Member, Message, TextableChannel } from "eris";
+import { AdvancedMessageContent, AllowedMentions, GuildTextableChannel, Member, Message, TextableChannel } from "eris";
 import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
@@ -141,10 +141,15 @@ export function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
   channel: TextableChannel,
   body: string,
+  allowedMentions?: AllowedMentions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
+  const formattedBody = successMessage(body, emoji);
+  const content: AdvancedMessageContent = allowedMentions
+    ? { content: formattedBody, allowedMentions }
+    : { content: formattedBody };
   return channel
-    .createMessage(successMessage(body, emoji)) // Force line break
+    .createMessage(content) // Force line break
     .catch(err => {
       const channelInfo = (channel as GuildTextableChannel).guild
         ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
@@ -158,10 +163,15 @@ export function sendErrorMessage(
   pluginData: AnyPluginData<any>,
   channel: TextableChannel,
   body: string,
+  allowedMentions?: AllowedMentions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
+  const formattedBody = errorMessage(body, emoji);
+  const content: AdvancedMessageContent = allowedMentions
+    ? { content: formattedBody, allowedMentions }
+    : { content: formattedBody };
   return channel
-    .createMessage(errorMessage(body, emoji)) // Force line break
+    .createMessage(content) // Force line break
     .catch(err => {
       const channelInfo = (channel as GuildTextableChannel).guild
         ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
