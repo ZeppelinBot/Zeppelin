@@ -18,7 +18,8 @@ export const ScheduledPostsShowCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      return sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      return;
     }
 
     postMessage(pluginData, msg.channel as TextChannel, post.content, post.attachments, post.enable_mentions);

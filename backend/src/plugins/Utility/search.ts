@@ -83,18 +83,21 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        return sendErrorMessage(pluginData, msg.channel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
+        return;
       }
 
       if (e instanceof InvalidRegexError) {
-        return sendErrorMessage(pluginData, msg.channel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
+        return;
       }
 
       throw e;
     }
 
     if (searchResult.totalResults === 0) {
-      return sendErrorMessage(pluginData, msg.channel, "No results found");
+      sendErrorMessage(pluginData, msg.channel, "No results found");
+      return;
     }
 
     const resultWord = searchResult.totalResults === 1 ? "matching member" : "matching members";
@@ -203,18 +206,21 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      return sendErrorMessage(pluginData, msg.channel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
+      return;
     }
 
     if (e instanceof InvalidRegexError) {
-      return sendErrorMessage(pluginData, msg.channel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
+      return;
     }
 
     throw e;
   }
 
   if (results.totalResults === 0) {
-    return sendErrorMessage(pluginData, msg.channel, "No results found");
+    sendErrorMessage(pluginData, msg.channel, "No results found");
+    return;
   }
 
   const resultList = args.ids ? formatSearchResultIdList(results.results) : formatSearchResultList(results.results);

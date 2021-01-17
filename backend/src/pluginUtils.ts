@@ -143,25 +143,32 @@ export function sendSuccessMessage(
   body: string,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
-  return channel.createMessage(successMessage(body, emoji)).catch(err => {
-    logger.warn(
-      `Failed to send success message to ${channel.id} (${(channel as GuildTextableChannel).guild?.id}): ${err.code} ${
-        err.message
-      }`,
-    );
-    return undefined;
-  });
+  return channel
+    .createMessage(successMessage(body, emoji)) // Force line break
+    .catch(err => {
+      const channelInfo = (channel as GuildTextableChannel).guild
+        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
+        : `${channel.id}`;
+      logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
+      return undefined;
+    });
 }
 
-export function sendErrorMessage(pluginData: AnyPluginData<any>, channel, body) {
+export function sendErrorMessage(
+  pluginData: AnyPluginData<any>,
+  channel: TextableChannel,
+  body: string,
+): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
-  return channel.createMessage(errorMessage(body, emoji)).catch(err => {
-    logger.warn(
-      `Failed to send error message to ${channel.id} (${(channel as GuildTextableChannel).guild?.id}): ${err.code} ${
-        err.message
-      }`,
-    );
-  });
+  return channel
+    .createMessage(errorMessage(body, emoji)) // Force line break
+    .catch(err => {
+      const channelInfo = (channel as GuildTextableChannel).guild
+        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
+        : `${channel.id}`;
+      logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
+      return undefined;
+    });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

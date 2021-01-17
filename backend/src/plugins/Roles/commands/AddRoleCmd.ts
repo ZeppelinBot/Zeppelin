@@ -17,17 +17,20 @@ export const AddRoleCmd = rolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member, true)) {
-      return sendErrorMessage(pluginData, msg.channel, "Cannot add roles to this user: insufficient permissions");
+      sendErrorMessage(pluginData, msg.channel, "Cannot add roles to this user: insufficient permissions");
+      return;
     }
 
     const roleId = await resolveRoleId(pluginData.client, pluginData.guild.id, args.role);
     if (!roleId) {
-      return sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      return;
     }
 
     const config = pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
-      return sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      return;
     }
 
     // Sanity check: make sure the role is configured properly
@@ -36,11 +39,13 @@ export const AddRoleCmd = rolesCmd({
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
-      return sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      return;
     }
 
     if (args.member.roles.includes(roleId)) {
-      return sendErrorMessage(pluginData, msg.channel, "Member already has that role");
+      sendErrorMessage(pluginData, msg.channel, "Member already has that role");
+      return;
     }
 
     pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
