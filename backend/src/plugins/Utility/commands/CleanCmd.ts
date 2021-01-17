@@ -136,7 +136,7 @@ export const CleanCmd = utilityCmd({
       }
     }
 
-    let responseMsg: Message;
+    let responseMsg: Message | undefined;
     if (messagesToClean.length > 0) {
       const cleanResult = await cleanMessages(pluginData, targetChannel, messagesToClean, msg.author);
 
@@ -157,7 +157,7 @@ export const CleanCmd = utilityCmd({
       // (so as not to spam the cleaned channel with the command itself)
       setTimeout(() => {
         msg.delete().catch(noop);
-        responseMsg.delete().catch(noop);
+        responseMsg?.delete().catch(noop);
       }, CLEAN_COMMAND_DELETE_DELAY);
     }
   },
