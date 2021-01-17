@@ -126,11 +126,8 @@ export const SlowmodeSetCmd = slowmodeCmd({
           rateLimitPerUser: rateLimitSeconds,
         });
       } catch (e) {
-        return sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Failed to set native slowmode: ${disableInlineCode(e.message)}`,
-        );
+        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${disableInlineCode(e.message)}`);
+        return;
       }
     } else {
       // If there is an existing native slowmode, disable that first

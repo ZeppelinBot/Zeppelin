@@ -20,7 +20,8 @@ export const NamesCmd = nameHistoryCmd({
     const usernames = await pluginData.state.usernameHistory.getByUserId(args.userId);
 
     if (nicknames.length === 0 && usernames.length === 0) {
-      return sendErrorMessage(pluginData, msg.channel, "No name history found");
+      sendErrorMessage(pluginData, msg.channel, "No name history found");
+      return;
     }
 
     const nicknameRows = nicknames.map(

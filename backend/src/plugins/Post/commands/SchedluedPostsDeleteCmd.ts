@@ -16,7 +16,8 @@ export const ScheduledPostsDeleteCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      return sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      return;
     }
 
     await pluginData.state.scheduledPosts.delete(post.id);
