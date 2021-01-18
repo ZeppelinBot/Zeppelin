@@ -1,0 +1,21 @@
+{
+  "name": "zeppelin-presetup-configurator",
+  "private": true,
+  "scripts": {
+    "watch": "snowpack dev",
+    "build": "snowpack build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@snowpack/plugin-typescript": "^1.2.1",
+    "@types/node": "^14.14.21",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "snowpack": "^3.0.11"
+  },
+  "dependencies": {
+    "js-yaml": "^4.0.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}
