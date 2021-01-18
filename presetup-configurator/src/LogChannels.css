@@ -1,0 +1,12 @@
+.LogChannels .log-channel {
+  margin: 16px 0;
+}
+
+.LogChannels .log-types {
+  height: 200px;
+  overflow-y: scroll;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 4px;
+  margin-top: 8px;
+}
