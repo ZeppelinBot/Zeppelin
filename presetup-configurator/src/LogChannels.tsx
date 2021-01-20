@@ -164,6 +164,7 @@ export function LogChannels({ logChannels, setLogChannels }: Props) {
               </label>
             ))}
           </div>
+          <button onClick={() => deleteLogChannel(index)}>Delete</button>
         </div>
       ))}
       <button onClick={() => addLogChannel()}>Add</button>
