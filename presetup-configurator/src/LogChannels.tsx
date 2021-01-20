@@ -85,12 +85,13 @@ interface Props {
 }
 
 export function LogChannels({ logChannels, setLogChannels }: Props) {
-  function addLogChannel() {
+  function addLogChannel(props: Partial<LogChannel> = {}) {
     setLogChannels(_logChannels => {
       return [..._logChannels, {
         id: "",
         includeExclude: "include",
         logTypes: new Set(),
+        ...props,
       }];
     });
   }
@@ -100,6 +101,14 @@ export function LogChannels({ logChannels, setLogChannels }: Props) {
       const newArr = [..._logChannels];
       newArr.splice(index, 1);
       return newArr;
+    });
+  }
+
+  function addReverseLogChannel() {
+    const includedLogTypesInOtherLogChannels = new Set(logChannels.map(l => Array.from(l.logTypes)).flat());
+    addLogChannel({
+      includeExclude: "exclude",
+      logTypes: includedLogTypesInOtherLogChannels,
     });
   }
 
@@ -157,7 +166,8 @@ export function LogChannels({ logChannels, setLogChannels }: Props) {
           </div>
         </div>
       ))}
-      <button onClick={addLogChannel}>Add</button>
+      <button onClick={() => addLogChannel()}>Add</button>
+      <button onClick={() => addReverseLogChannel()}>Add "everything else"</button>
     </div>
   );
 }
