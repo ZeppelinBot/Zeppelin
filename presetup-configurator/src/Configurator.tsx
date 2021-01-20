@@ -85,8 +85,42 @@ export function Configurator() {
 
   const [formattedResult, setFormattedResult] = useState("");
   useEffect(() => {
-    setFormattedResult(yaml.dump(result));
+    let _formattedResult = yaml.dump(result);
+
+    // Add line break before each unquoted top-level or second-level property
+    _formattedResult = _formattedResult.replace(/^ {0,2}[a-z_]+:/gm, "\n$&").trim();
+
+    // Add additional line break at the end
+    _formattedResult += "\n";
+
+    // Explain "exclude: []"
+    _formattedResult = _formattedResult.replace(/exclude: \[]/, "$& # Exclude nothing = include everything");
+
+    setFormattedResult(_formattedResult);
   }, [result]);
+
+  const resultRows = formattedResult.split("\n").length || 1;
+
+  const [copied, setCopied] = useState(false);
+  function copyResultText(textarea: HTMLTextAreaElement) {
+    textarea.select();
+    document.execCommand("copy");
+    setCopied(true);
+  }
+
+  const [copyResetTimeout, setCopyResetTimeout] = useState<number|null>(null);
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+
+    if (copyResetTimeout != null) {
+      window.clearTimeout(copyResetTimeout);
+    }
+
+    const timeout = window.setTimeout(() => setCopied(false), 3000);
+    setCopyResetTimeout(timeout);
+  }, [copied]);
 
   return (
     <div className="Configurator">
@@ -146,7 +180,10 @@ export function Configurator() {
       </div>
 
       {/* Result */}
-      <pre className="result">{formattedResult}</pre>
+      <textarea className="result" rows={resultRows} readOnly={true} value={formattedResult} onClick={e => copyResultText(e.target as HTMLTextAreaElement)} />
+      {copied
+        ? <em>Copied!</em>
+        : <em>Click textarea to copy</em>}
     </div>
   );
 }
