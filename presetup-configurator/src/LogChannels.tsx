@@ -2,21 +2,21 @@ import React, { SetStateAction, useState } from "react";
 import "./LogChannels.css";
 
 const LOG_TYPES = {
-  "MEMBER_WARN": "Warned",
-  "MEMBER_MUTE": "Muted",
-  "MEMBER_UNMUTE": "Unmuted",
+  "MEMBER_WARN": "Member warned",
+  "MEMBER_MUTE": "Member muted",
+  "MEMBER_UNMUTE": "Member unmuted",
   "MEMBER_MUTE_EXPIRED": "Mute expired",
-  "MEMBER_KICK": "Kicked",
-  "MEMBER_BAN": "Banned",
-  "MEMBER_UNBAN": "Unbanned",
-  "MEMBER_FORCEBAN": "Forcebanned",
-  "MEMBER_SOFTBAN": "Softbanned",
+  "MEMBER_KICK": "Member kicked",
+  "MEMBER_BAN": "Member banned",
+  "MEMBER_UNBAN": "Member unbanned",
+  "MEMBER_FORCEBAN": "Member forcebanned",
+  "MEMBER_SOFTBAN": "Member softbanned",
   "MEMBER_JOIN": "Member joined",
   "MEMBER_LEAVE": "Member left",
-  "MEMBER_ROLE_ADD": "Role added to member",
-  "MEMBER_ROLE_REMOVE": "Role removed from member",
-  "MEMBER_NICK_CHANGE": "Nickname changed",
-  "MEMBER_USERNAME_CHANGE": "Username changed",
+  "MEMBER_ROLE_ADD": "Member, role added",
+  "MEMBER_ROLE_REMOVE": "Member, role removed",
+  "MEMBER_NICK_CHANGE": "Member nickname changed",
+  "MEMBER_USERNAME_CHANGE": "Member username changed",
   "MEMBER_RESTORE": "Member roles restored",
   "CHANNEL_CREATE": "Channel created",
   "CHANNEL_DELETE": "Channel deleted",
@@ -36,8 +36,8 @@ const LOG_TYPES = {
   "CASE_CREATE": "Case created",
   "MASSBAN": "Massbanned",
   "MASSMUTE": "Massmuted",
-  "MEMBER_TIMED_MUTE": "Temporarily muted",
-  "MEMBER_TIMED_UNMUTE": "Scheduled unmute",
+  "MEMBER_TIMED_MUTE": "Member temporarily muted",
+  "MEMBER_TIMED_UNMUTE": "Member, scheduled unmute",
   "MEMBER_JOIN_WITH_PRIOR_RECORDS": "Member joined with prior records",
   "OTHER_SPAM_DETECTED": "Non-message spam detected",
   "MEMBER_ROLE_CHANGES": "Member roles changed",
@@ -55,10 +55,21 @@ const LOG_TYPES = {
   "SET_ANTIRAID_AUTO": "Set antiraid (auto)",
   "MASS_ASSIGN_ROLES": "Mass-assigned roles",
   "MASS_UNASSIGN_ROLES": "Mass-unassigned roles",
-  "MEMBER_NOTE": "Added note on member",
+  "MEMBER_NOTE": "Member noted",
   "CASE_DELETE": "Case deleted",
   "DM_FAILED": "Failed to DM member",
 };
+
+const sortedLogTypes = Object.fromEntries(
+  Object.entries(LOG_TYPES)
+    .sort((a, b) => {
+      if (a[1].toLowerCase() > b[1].toLowerCase()) return 1;
+      if (a[1].toLowerCase() < b[1].toLowerCase()) return -1;
+      if (a[0].toLowerCase() > b[0].toLowerCase()) return 1;
+      if (a[0].toLowerCase() < b[0].toLowerCase()) return -1;
+      return 0;
+    })
+) as typeof LOG_TYPES;
 
 type LOG_TYPE = keyof typeof LOG_TYPES;
 
@@ -133,7 +144,7 @@ export function LogChannels({ logChannels, setLogChannels }: Props) {
             </select>
           </label>
           <div className="log-types">
-            {Object.entries(LOG_TYPES).map(([logType, description]) => (
+            {Object.entries(sortedLogTypes).map(([logType, description]) => (
               <label>
                 <input
                   type="checkbox"
