@@ -138,7 +138,7 @@ export function LogChannels({ logChannels, setLogChannels }: Props) {
           </label>
           <label>
             Mode:
-            <select value={logChannel.includeExclude}>
+            <select value={logChannel.includeExclude} onChange={e => setIncludeExclude(index, e.target.value as LogChannel["includeExclude"])}>
               <option value={"include"}>Include</option>
               <option value={"exclude"}>Exclude</option>
             </select>
