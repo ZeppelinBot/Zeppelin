@@ -40,6 +40,7 @@
   "VOICE_CHANNEL_MOVE": "🎙 ↔ {userMention(member)} moved from **{oldChannel.name}** to **{newChannel.name}**",
   "VOICE_CHANNEL_LEAVE": "🎙 🔴 {userMention(member)} left **{channel.name}**",
   "VOICE_CHANNEL_FORCE_MOVE": "\uD83C\uDF99 ✍ {userMention(member)} was moved from **{oldChannel.name}** to **{newChannel.name}** by {userMention(mod)}",
+  "VOICE_CHANNEL_FORCE_DISCONNECT": "\uD83C\uDF99 🚫 {userMention(member)} was forcefully disconnected from **{oldChannel.name}** by {userMention(mod)}",
 
   "COMMAND": "🤖 {userMention(member)} used command in {channelMention(channel)}:\n`{command}`",
 

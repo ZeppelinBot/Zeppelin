@@ -26,8 +26,6 @@ export const VcmoveCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     let channel: VoiceChannel;
 
-    const foo = args.member;
-
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
       const potentialChannel = pluginData.guild.channels.get(args.channel);
@@ -78,7 +76,7 @@ export const VcmoveCmd = utilityCmd({
         channelID: channel.id,
       });
     } catch (e) {
-      msg.channel.createMessage(errorMessage("Failed to move member"));
+      sendErrorMessage(pluginData, msg.channel, "Failed to move member");
       return;
     }
 
