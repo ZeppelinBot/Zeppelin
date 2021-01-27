@@ -38,7 +38,8 @@ export const ConfigSchema = t.type({
       timestamp: t.string, // Legacy/deprecated
     }),
   ]),
-  ping_user: t.boolean,
+  ping_user: t.boolean, // Legacy/deprecated, if below is false mentions wont actually ping
+  allow_user_mentions: t.boolean,
   timestamp_format: t.string,
   include_embed_timestamp: t.boolean,
 });

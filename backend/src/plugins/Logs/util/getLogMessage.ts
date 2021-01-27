@@ -61,7 +61,12 @@ export async function getLogMessage(
 
         const memberConfig = pluginData.config.getMatchingConfig({ member, userId: user.id }) || ({} as any);
 
-        mentions.push(memberConfig.ping_user ? verboseUserMention(user) : verboseUserName(user));
+        // Revert to old behavior (verbose name w/o ping if allow_user_mentions is enabled (for whatever reason))
+        if (config.allow_user_mentions) {
+          mentions.push(memberConfig.ping_user ? verboseUserMention(user) : verboseUserName(user));
+        } else {
+          mentions.push(verboseUserMention(user));
+        }
       }
 
       return mentions.join(", ");
