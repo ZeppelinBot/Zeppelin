@@ -31,7 +31,8 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
       timestamp: FORMAT_NO_TIMESTAMP, // Legacy/deprecated, use timestamp_format below instead
       ...DefaultLogMessages,
     },
-    ping_user: true,
+    ping_user: true, // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
+    allow_user_mentions: false,
     timestamp_format: "YYYY-MM-DD HH:mm:ss z",
     include_embed_timestamp: true,
   },
@@ -40,7 +41,7 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
     {
       level: ">=50",
       config: {
-        ping_user: false,
+        ping_user: false, // Legacy/deprecated, read comment on global ping_user option
       },
     },
   ],

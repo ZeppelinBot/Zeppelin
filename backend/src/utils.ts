@@ -1,4 +1,5 @@
 import {
+  AllowedMentions,
   Attachment,
   Client,
   Constants,
@@ -748,10 +749,14 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
   });
 }
 
-export async function createChunkedMessage(channel: TextableChannel, messageText: string) {
+export async function createChunkedMessage(
+  channel: TextableChannel,
+  messageText: string,
+  allowedMentions?: AllowedMentions,
+) {
   const chunks = chunkMessageLines(messageText);
   for (const chunk of chunks) {
-    await channel.createMessage(chunk);
+    await channel.createMessage({ content: chunk, allowedMentions });
   }
 }
 
