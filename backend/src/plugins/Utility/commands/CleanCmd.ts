@@ -64,6 +64,7 @@ export const CleanCmd = utilityCmd({
     "delete-pins": ct.switchOption({ shortcut: "p" }),
     "has-invites": ct.switchOption({ shortcut: "i" }),
     match: ct.regex({ option: true, shortcut: "m" }),
+    "to-id": ct.anyId({ option: true, shortcut: "id" }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -96,6 +97,8 @@ export const CleanCmd = utilityCmd({
     const messagesToClean: SavedMessage[] = [];
     let beforeId = msg.id;
     const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
+    const upToMsgId = args["to-id"];
+    let foundId = false;
 
     const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
     let pins: Message[] = [];
@@ -118,6 +121,10 @@ export const CleanCmd = utilityCmd({
         if (args.bots && !message.is_bot) continue;
         if (!deletePins && pins.find(x => x.id === message.id) != null) continue;
         if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
+        if (upToMsgId != null && message.id < upToMsgId) {
+          foundId = true;
+          break;
+        }
         if (moment.utc(message.posted_at).valueOf() < timeCutoff) continue;
         if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
           continue;
@@ -131,7 +138,10 @@ export const CleanCmd = utilityCmd({
 
       beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
 
-      if (moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff) {
+      if (
+        foundId ||
+        moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff
+      ) {
         break;
       }
     }
