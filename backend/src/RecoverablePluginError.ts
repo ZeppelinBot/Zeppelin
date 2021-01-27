@@ -7,6 +7,8 @@ export enum ERRORS {
   NO_USER_NOTIFICATION_CHANNEL,
   INVALID_USER_NOTIFICATION_CHANNEL,
   INVALID_USER,
+  INVALID_MUTE_ROLE_ID,
+  MUTE_ROLE_ABOVE_ZEP,
 }
 
 export const RECOVERABLE_PLUGIN_ERROR_MESSAGES = {
@@ -16,6 +18,8 @@ export const RECOVERABLE_PLUGIN_ERROR_MESSAGES = {
   [ERRORS.NO_USER_NOTIFICATION_CHANNEL]: "No user notify channel specified",
   [ERRORS.INVALID_USER_NOTIFICATION_CHANNEL]: "Invalid user notify channel specified",
   [ERRORS.INVALID_USER]: "Invalid user",
+  [ERRORS.INVALID_MUTE_ROLE_ID]: "Specified mute role is not invalid",
+  [ERRORS.MUTE_ROLE_ABOVE_ZEP]: "Specified mute role is above Zeppelin in the role hierarchy",
 };
 
 export class RecoverablePluginError extends Error {
