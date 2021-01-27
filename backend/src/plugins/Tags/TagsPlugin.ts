@@ -19,6 +19,7 @@ import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { mapToPublicFn } from "../../pluginUtils";
 import { renderTagBody } from "./util/renderTagBody";
 import { findTagByName } from "./util/findTagByName";
+import { StrictValidationError } from "src/validatorUtils";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -29,6 +30,7 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
     global_tag_cooldown: null,
     user_cooldown: null,
     global_cooldown: null,
+    auto_delete_command: false,
 
     categories: {},
 
@@ -69,6 +71,28 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
   public: {
     renderTagBody: mapToPublicFn(renderTagBody),
     findTagByName: mapToPublicFn(findTagByName),
+  },
+
+  configPreprocessor(options) {
+    if (options.config.delete_with_command && options.config.auto_delete_command) {
+      throw new StrictValidationError([
+        `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,
+      ]);
+    }
+
+    // Check each category for conflicting options
+    if (options.config?.categories) {
+      for (const [name, opts] of Object.entries(options.config.categories)) {
+        const cat = options.config.categories[name];
+        if (cat.delete_with_command && cat.auto_delete_command) {
+          throw new StrictValidationError([
+            `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
+          ]);
+        }
+      }
+    }
+
+    return options;
   },
 
   onLoad(pluginData) {

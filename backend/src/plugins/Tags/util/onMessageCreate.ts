@@ -1,7 +1,7 @@
 import { TagsPluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { GuildPluginData } from "knub";
-import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
+import { convertDelayStringToMS, noop, resolveMember, tStrictMessageContent } from "../../../utils";
 import { validate } from "../../../validatorUtils";
 import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
@@ -107,5 +107,11 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     pluginData.state.savedMessages.onceMessageAvailable(responseMsg.id, async () => {
       await pluginData.state.tags.addResponse(msg.id, responseMsg.id);
     });
+  }
+
+  const deleteInvoke = tagResult.category?.category_delete_invoke ?? config.global_delete_invoke;
+  if (!deleteWithCommand && deleteInvoke) {
+    // Try deleting the invoking message, ignore errors silently
+    pluginData.client.deleteMessage(msg.channel_id, msg.id).catch(noop);
   }
 }
