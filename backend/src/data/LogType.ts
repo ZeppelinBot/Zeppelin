@@ -39,6 +39,7 @@ export enum LogType {
 
   CASE_CREATE,
 
+  MASSUNBAN,
   MASSBAN,
   MASSMUTE,
 
