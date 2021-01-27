@@ -7,6 +7,8 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { Case } from "../../data/entities/Case";
 import { CaseArgs } from "../Cases/types";
 import { TextChannel } from "eris";
+import { GuildTempbans } from "../../data/GuildTempbans";
+import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -19,6 +21,7 @@ export const ConfigSchema = t.type({
   warn_message: tNullable(t.string),
   kick_message: tNullable(t.string),
   ban_message: tNullable(t.string),
+  tempban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
   warn_notify_enabled: t.boolean,
@@ -46,8 +49,11 @@ export interface ModActionsPluginType extends BasePluginType {
   state: {
     mutes: GuildMutes;
     cases: GuildCases;
+    tempbans: GuildTempbans;
     serverLogs: GuildLogs;
 
+    unloaded: boolean;
+    outdatedTempbansTimeout: Timeout | null;
     ignoredEvents: IIgnoredEvent[];
   };
 }
