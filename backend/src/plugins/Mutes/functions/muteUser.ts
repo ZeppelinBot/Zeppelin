@@ -17,6 +17,8 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
+import { sendErrorMessage } from "src/pluginUtils";
+import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -51,9 +53,39 @@ export async function muteUser(
   const config = pluginData.config.getMatchingConfig({ member, userId });
 
   if (member) {
+    const logs = pluginData.getPlugin(LogsPlugin);
     // Apply mute role if it's missing
     if (!member.roles.includes(muteRole)) {
-      await member.addRole(muteRole);
+      try {
+        await member.addRole(muteRole);
+      } catch (e) {
+        const actualMuteRole = pluginData.guild.roles.find(x => x.id === muteRole);
+        if (!actualMuteRole) {
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute users, specified mute role Id is invalid`,
+          });
+          throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
+        }
+
+        const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
+        const zepRoles = pluginData.guild.roles.filter(x => zep!.roles.includes(x.id));
+        // If we have roles and one of them is above the muted role, throw generic error
+        if (zepRoles.length >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute user ${member.id}: ${e}`,
+          });
+          throw e;
+        } else {
+          // Otherwise, throw error that mute role is above zeps roles
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
+          });
+          throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP);
+        }
+      }
     }
 
     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
