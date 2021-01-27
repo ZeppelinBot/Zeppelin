@@ -34,6 +34,7 @@ import { InfoCmd } from "./commands/InfoCmd";
 import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -53,6 +54,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_ping: false,
     can_source: false,
     can_vcmove: false,
+    can_vckick: false,
     can_help: false,
     can_about: false,
     can_context: false,
@@ -78,6 +80,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_snowflake: true,
         can_nickname: true,
         can_vcmove: true,
+        can_vckick: true,
         can_help: true,
         can_context: true,
         can_jumbo: true,
@@ -120,6 +123,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     SourceCmd,
     ContextCmd,
     VcmoveCmd,
+    VcdisconnectCmd,
     VcmoveAllCmd,
     HelpCmd,
     AboutCmd,
