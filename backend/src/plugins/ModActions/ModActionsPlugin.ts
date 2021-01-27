@@ -17,6 +17,7 @@ import { SoftbanCmd } from "./commands/SoftbanCommand";
 import { BanCmd } from "./commands/BanCmd";
 import { UnbanCmd } from "./commands/UnbanCmd";
 import { ForcebanCmd } from "./commands/ForcebanCmd";
+import { MassunbanCmd } from "./commands/MassUnbanCmd";
 import { MassbanCmd } from "./commands/MassBanCmd";
 import { AddCaseCmd } from "./commands/AddCaseCmd";
 import { CaseCmd } from "./commands/CaseCmd";
@@ -67,6 +68,7 @@ const defaultOptions = {
     can_ban: false,
     can_view: false,
     can_addcase: false,
+    can_massunban: false,
     can_massban: false,
     can_massmute: false,
     can_hidecase: false,
@@ -90,6 +92,7 @@ const defaultOptions = {
     {
       level: ">=100",
       config: {
+        can_massunban: true,
         can_massban: true,
         can_massmute: true,
         can_hidecase: true,
@@ -134,6 +137,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     ForcebanCmd,
     MassbanCmd,
     MassmuteCmd,
+    MassunbanCmd,
     AddCaseCmd,
     CaseCmd,
     CasesUserCmd,
