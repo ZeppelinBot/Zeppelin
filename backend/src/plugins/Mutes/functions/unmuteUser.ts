@@ -38,8 +38,9 @@ export async function unmuteUser(
       }
       if (existingMute?.roles_to_restore) {
         const memberOptions: MemberOptions = {};
+        const guildRoles = pluginData.guild.roles;
         memberOptions.roles = Array.from(
-          new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole)]),
+          new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
         );
         member.edit(memberOptions);
       }

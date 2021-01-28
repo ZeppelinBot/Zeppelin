@@ -17,8 +17,9 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
         }
         if (mute.roles_to_restore) {
           const memberOptions: MemberOptions = {};
+          const guildRoles = pluginData.guild.roles;
           memberOptions.roles = Array.from(
-            new Set([...mute.roles_to_restore, ...member.roles.filter(x => x !== muteRole)]),
+            new Set([...mute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
           );
           member.edit(memberOptions);
         }
