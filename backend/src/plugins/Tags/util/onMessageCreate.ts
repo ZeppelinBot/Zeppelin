@@ -109,7 +109,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     });
   }
 
-  const deleteInvoke = tagResult.category?.category_delete_invoke ?? config.global_delete_invoke;
+  const deleteInvoke = tagResult.category?.auto_delete_command ?? config.auto_delete_command;
   if (!deleteWithCommand && deleteInvoke) {
     // Try deleting the invoking message, ignore errors silently
     pluginData.client.deleteMessage(msg.channel_id, msg.id).catch(noop);
