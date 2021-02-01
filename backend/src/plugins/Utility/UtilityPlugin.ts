@@ -5,7 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
 import { Supporters } from "../../data/Supporters";
-import { ServerCmd } from "./commands/ServerCmd";
+import { ServerInfoCmd } from "./commands/ServerInfoCmd";
 import { RolesCmd } from "./commands/RolesCmd";
 import { LevelCmd } from "./commands/LevelCmd";
 import { SearchCmd } from "./commands/SearchCmd";
@@ -116,7 +116,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     UserInfoCmd,
     LevelCmd,
     RolesCmd,
-    ServerCmd,
+    ServerInfoCmd,
     NicknameResetCmd,
     NicknameCmd,
     PingCmd,

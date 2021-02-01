@@ -7,7 +7,7 @@ export const ChannelInfoCmd = utilityCmd({
   trigger: ["channel", "channelinfo"],
   description: "Show information about a channel",
   usage: "!channel 534722016549404673",
-  permission: "can_channel",
+  permission: "can_channelinfo",
 
   signature: {
     channel: ct.channelId({ required: false }),
