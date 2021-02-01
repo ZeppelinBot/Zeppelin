@@ -77,7 +77,7 @@ export const InfoCmd = utilityCmd({
     }
 
     // 5. Invite
-    const inviteCode = await parseInviteCodeInput(value);
+    const inviteCode = parseInviteCodeInput(value) ?? value;
     if (inviteCode) {
       const invite = await resolveInvite(pluginData.client, inviteCode, true);
       if (invite) {
