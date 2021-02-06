@@ -202,7 +202,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
           return "";
         }
 
-        if (input.match(/^<(@#)(!&)\d+>$/)) {
+        if (input.match(/^<(?:@(?:!|&)?|#)\d+>$/)) {
           return input;
         }
 
