@@ -26,8 +26,11 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
     let formatted;
 
     try {
+      const strippedMember = stripObjectToScalars(member, ["user", "guild"]);
       formatted = await renderTemplate(config.message, {
-        member: stripObjectToScalars(member, ["user"]),
+        member: strippedMember,
+        user: strippedMember["user"],
+        guild: strippedMember["guild"],
       });
     } catch (e) {
       if (e instanceof TemplateParseError) {
