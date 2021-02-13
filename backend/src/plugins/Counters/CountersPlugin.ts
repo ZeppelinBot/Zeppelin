@@ -16,6 +16,7 @@ import { validateCondition } from "./functions/validateCondition";
 import { StrictValidationError } from "../../validatorUtils";
 
 const MAX_COUNTERS = 5;
+const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
 const defaultOptions = {
   config: {
@@ -99,7 +100,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
       pluginData.state.decayTimers.push(
         setInterval(() => {
           decayCounter(pluginData, counterName, decayPeriodMs, decay.amount);
-        }, 10 * SECONDS),
+        }, DECAY_APPLY_INTERVAL),
       );
     }
 
