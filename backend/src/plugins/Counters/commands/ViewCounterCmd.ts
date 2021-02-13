@@ -7,30 +7,30 @@ import { TextChannel, User } from "eris";
 import { resolveUser, UnknownUser } from "../../../utils";
 
 export const ViewCounterCmd = guildCommand<CountersPluginType>()({
-  trigger: ["counters view", "counter view", "viewcounter"],
+  trigger: ["counters view", "counter view", "viewcounter", "counter"],
   permission: "can_view",
 
   signature: [
     {
       counterName: ct.string(),
-      user: ct.resolvedUserLoose(),
+    },
+    {
+      counterName: ct.string(),
+      user: ct.resolvedUser(),
+    },
+    {
+      counterName: ct.string(),
       channel: ct.textChannel(),
     },
     {
       counterName: ct.string(),
-      user: ct.resolvedUserLoose(),
-    },
-    {
-      counterName: ct.string(),
       channel: ct.textChannel(),
+      user: ct.resolvedUser(),
     },
     {
       counterName: ct.string(),
-      user: ct.resolvedUserLoose(),
+      user: ct.resolvedUser(),
       channel: ct.textChannel(),
-    },
-    {
-      counterName: ct.string(),
     },
   ],
 
@@ -44,7 +44,7 @@ export const ViewCounterCmd = guildCommand<CountersPluginType>()({
     }
 
     if (counter.can_view === false) {
-      sendErrorMessage(pluginData, message.channel, `Missing permissions to view this counter's values`);
+      sendErrorMessage(pluginData, message.channel, `Missing permissions to view this counter's value`);
       return;
     }
 
@@ -86,7 +86,7 @@ export const ViewCounterCmd = guildCommand<CountersPluginType>()({
       }
 
       const potentialUser = await resolveUser(pluginData.client, reply.content);
-      if (!potentialUser) {
+      if (!potentialUser || potentialUser instanceof UnknownUser) {
         sendErrorMessage(pluginData, message.channel, "Unknown user, cancelling");
         return;
       }
@@ -99,13 +99,13 @@ export const ViewCounterCmd = guildCommand<CountersPluginType>()({
     const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.createMessage(`${counterName} for <@!${user.id}> in <#${channel.id}> is ${finalValue}`);
+      message.channel.createMessage(`**${counterName}** for <@!${user.id}> in <#${channel.id}> is ${finalValue}`);
     } else if (channel) {
-      message.channel.createMessage(`${counterName} in <#${channel.id}> is ${finalValue}`);
+      message.channel.createMessage(`**${counterName}** in <#${channel.id}> is ${finalValue}`);
     } else if (user) {
-      message.channel.createMessage(`${counterName} for <@!${user.id}> is ${finalValue}`);
+      message.channel.createMessage(`**${counterName}** for <@!${user.id}> is ${finalValue}`);
     } else {
-      message.channel.createMessage(`${counterName} is ${finalValue}`);
+      message.channel.createMessage(`**${counterName}** is ${finalValue}`);
     }
   },
 });
