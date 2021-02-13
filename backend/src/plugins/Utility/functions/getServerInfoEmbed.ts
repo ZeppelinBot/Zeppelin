@@ -80,6 +80,32 @@ export async function getServerInfoEmbed(
     value: basicInformation.join("\n"),
   });
 
+  // IMAGE LINKS
+  const iconUrl = `[URL](${(restGuild || guildPreview)!.iconURL})`;
+  const bannerUrl = restGuild?.bannerURL ?? "Unavailable";
+  const splashUrl =
+    (restGuild || guildPreview)!.splashURL != null
+      ? `[URL](${(restGuild || guildPreview)!.splashURL?.replace("size=128", "size=2048")})`
+      : "None";
+
+  embed.fields.push(
+    {
+      name: "Server icon",
+      value: iconUrl,
+      inline: true,
+    },
+    {
+      name: "Invite splash",
+      value: splashUrl,
+      inline: true,
+    },
+    {
+      name: "Server banner",
+      value: bannerUrl,
+      inline: true,
+    },
+  );
+
   // MEMBER COUNTS
   const totalMembers =
     guildPreview?.approximateMemberCount ||
