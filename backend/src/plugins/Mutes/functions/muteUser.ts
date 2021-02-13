@@ -89,12 +89,12 @@ export async function muteUser(
     }
 
     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
-    let moveToVoiceChannelId = pluginData.config.get().move_to_voice_channel;
-    if (moveToVoiceChannelId) {
+    const cfg = pluginData.config.get();
+    const moveToVoiceChannel = cfg.kick_from_voice_channel ? null : cfg.move_to_voice_channel;
+    if (moveToVoiceChannel || cfg.kick_from_voice_channel) {
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
-      if (moveToVoiceChannelId.match(".*[^0-9].*")) moveToVoiceChannelId = null;
       try {
-        await member.edit({ channelID: moveToVoiceChannelId });
+        await member.edit({ channelID: moveToVoiceChannel });
       } catch (e) {} // tslint:disable-line
     }
   }

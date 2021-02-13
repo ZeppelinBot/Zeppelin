@@ -14,6 +14,7 @@ import Timeout = NodeJS.Timeout;
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
   move_to_voice_channel: tNullable(t.string),
+  kick_from_voice_channel: t.boolean,
 
   dm_on_mute: t.boolean,
   dm_on_update: t.boolean,
