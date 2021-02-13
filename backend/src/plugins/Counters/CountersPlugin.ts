@@ -16,6 +16,8 @@ import { validateCondition } from "./functions/validateCondition";
 import { StrictValidationError } from "../../validatorUtils";
 import { PluginOptions } from "knub";
 import { ViewCounterCmd } from "./commands/ViewCounterCmd";
+import { AddCounterCmd } from "./commands/AddCounterCmd";
+import { SetCounterCmd } from "./commands/SetCounterCmd";
 
 const MAX_COUNTERS = 5;
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
@@ -87,7 +89,12 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
     offCounterEvent: mapToPublicFn(offCounterEvent),
   },
 
-  commands: [ViewCounterCmd],
+  // prettier-ignore
+  commands: [
+    ViewCounterCmd,
+    AddCounterCmd,
+    SetCounterCmd,
+  ],
 
   async onLoad(pluginData) {
     pluginData.state.counters = new GuildCounters(pluginData.guild.id);
