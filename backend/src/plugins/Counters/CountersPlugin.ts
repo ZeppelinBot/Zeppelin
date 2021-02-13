@@ -14,14 +14,32 @@ import { initCounterTrigger } from "./functions/initCounterTrigger";
 import { decayCounter } from "./functions/decayCounter";
 import { validateCondition } from "./functions/validateCondition";
 import { StrictValidationError } from "../../validatorUtils";
+import { PluginOptions } from "knub";
+import { ViewCounterCmd } from "./commands/ViewCounterCmd";
 
 const MAX_COUNTERS = 5;
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
-const defaultOptions = {
+const defaultOptions: PluginOptions<CountersPluginType> = {
   config: {
     counters: {},
+    can_view: false,
+    can_edit: false,
   },
+  overrides: [
+    {
+      level: ">=50",
+      config: {
+        can_view: true,
+      },
+    },
+    {
+      level: ">=100",
+      config: {
+        can_edit: true,
+      },
+    },
+  ],
 };
 
 const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => {
@@ -68,6 +86,8 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
     onCounterEvent: mapToPublicFn(onCounterEvent),
     offCounterEvent: mapToPublicFn(offCounterEvent),
   },
+
+  commands: [ViewCounterCmd],
 
   async onLoad(pluginData) {
     pluginData.state.counters = new GuildCounters(pluginData.guild.id);
