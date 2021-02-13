@@ -7,6 +7,7 @@ import { CounterTrigger } from "../../data/entities/CounterTrigger";
 import Timeout = NodeJS.Timeout;
 
 export const Counter = t.type({
+  name: tNullable(t.string),
   per_channel: t.boolean,
   per_user: t.boolean,
   initial_value: t.number,
@@ -16,11 +17,15 @@ export const Counter = t.type({
       every: tDelayString,
     }),
   ),
+  can_view: tNullable(t.boolean),
+  can_edit: tNullable(t.boolean),
 });
 export type TCounter = t.TypeOf<typeof Counter>;
 
 export const ConfigSchema = t.type({
   counters: t.record(t.string, Counter),
+  can_view: t.boolean,
+  can_edit: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

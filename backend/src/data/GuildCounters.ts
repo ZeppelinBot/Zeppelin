@@ -477,4 +477,20 @@ export class GuildCounters extends BaseGuildRepository {
       }));
     });
   }
+
+  async getCurrentValue(
+    counterId: number,
+    channelId: string | null,
+    userId: string | null,
+  ): Promise<number | undefined> {
+    const value = await this.counterValues.findOne({
+      where: {
+        counter_id: counterId,
+        channel_id: channelId || "0",
+        user_id: userId || "0",
+      },
+    });
+
+    return value?.value;
+  }
 }
