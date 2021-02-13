@@ -184,8 +184,6 @@ export class GuildCounters extends BaseGuildRepository {
   }
 
   async decay(id: number, decayPeriodMs: number, decayAmount: number) {
-    const now = moment.utc().format(DBDateFormat);
-
     const counter = (await this.counters.findOne({
       where: {
         id,
@@ -198,6 +196,15 @@ export class GuildCounters extends BaseGuildRepository {
     }
 
     const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
+    if (decayAmountToApply === 0) {
+      return;
+    }
+
+    // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
+    const newLastDecayDate = moment
+      .utc(counter.last_decay_at)
+      .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
+      .format(DBDateFormat);
 
     const rawUpdate =
       decayAmountToApply >= 0
@@ -218,7 +225,7 @@ export class GuildCounters extends BaseGuildRepository {
         id,
       },
       {
-        last_decay_at: now,
+        last_decay_at: newLastDecayDate,
       },
     );
   }
