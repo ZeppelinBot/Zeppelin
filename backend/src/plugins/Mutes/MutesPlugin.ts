@@ -13,7 +13,6 @@ import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { muteUser } from "./functions/muteUser";
 import { unmuteUser } from "./functions/unmuteUser";
-import { CaseArgs } from "../Cases/types";
 import { Member } from "eris";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
@@ -32,6 +31,8 @@ const defaultOptions = {
     mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
     timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
     update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
+    remove_roles_on_mute: false,
+    restore_roles_on_mute: false,
 
     can_view_list: false,
     can_cleanup: false,

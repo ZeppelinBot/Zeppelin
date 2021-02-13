@@ -2,6 +2,7 @@ import { GuildPluginData } from "knub";
 import { MutesPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { MemberOptions } from "eris";
 
 export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginType>) {
   const expiredMutes = await pluginData.state.mutes.getExpiredMutes();
@@ -13,6 +14,14 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
         const muteRole = pluginData.config.get().mute_role;
         if (muteRole) {
           await member.removeRole(muteRole);
+        }
+        if (mute.roles_to_restore) {
+          const memberOptions: MemberOptions = {};
+          const guildRoles = pluginData.guild.roles;
+          memberOptions.roles = Array.from(
+            new Set([...mute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
+          );
+          member.edit(memberOptions);
         }
       } catch (e) {
         pluginData.state.serverLogs.log(LogType.BOT_ALERT, {

@@ -11,6 +11,8 @@ const BaseSingleSpamConfig = t.type({
   count: t.number,
   mute: tNullable(t.boolean),
   mute_time: tNullable(t.number),
+  remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
+  restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
   clean: tNullable(t.boolean),
 });
 export type TBaseSingleSpamConfig = t.TypeOf<typeof BaseSingleSpamConfig>;
