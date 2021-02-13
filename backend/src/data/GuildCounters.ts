@@ -8,7 +8,7 @@ import moment from "moment-timezone";
 import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
 import { connection } from "./db";
 
-const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})([1-9]\d*)$`);
+const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})([1-9]\\d*)$`);
 
 /**
  * @return Parsed comparison op and value, or null if the comparison string was invalid
