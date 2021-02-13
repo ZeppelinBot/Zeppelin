@@ -27,8 +27,8 @@ export const ContextCmd = utilityCmd({
       return;
     }
 
-    const channel = args.channel || args.message.channel;
-    const messageId = args.messageId || args.message.messageId;
+    const channel = args.channel ?? args.message.channel;
+    const messageId = args.messageId ?? args.message.messageId;
 
     if (!canReadChannel(channel, msg.member)) {
       sendErrorMessage(pluginData, msg.channel, "Message context not found");
