@@ -17,6 +17,7 @@ import { MemberJoinTrigger } from "./memberJoin";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
+import { CounterTrigger } from "./counter";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   match_words: MatchWordsTrigger,
@@ -37,6 +38,8 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   character_spam: CharacterSpamTrigger,
   member_join_spam: MemberJoinSpamTrigger,
   sticker_spam: StickerSpamTrigger,
+
+  counter: CounterTrigger,
 };
 
 export const AvailableTriggers = t.type({
@@ -58,4 +61,6 @@ export const AvailableTriggers = t.type({
   character_spam: CharacterSpamTrigger.configType,
   member_join_spam: MemberJoinSpamTrigger.configType,
   sticker_spam: StickerSpamTrigger.configType,
+
+  counter: CounterTrigger.configType,
 });

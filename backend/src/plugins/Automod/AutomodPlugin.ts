@@ -28,6 +28,9 @@ import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
+import { CountersPlugin } from "../Counters/CountersPlugin";
+import { parseCondition } from "../../data/GuildCounters";
+import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 
 const defaultOptions = {
   config: {
@@ -53,7 +56,7 @@ const defaultOptions = {
 };
 
 /**
- * Config preprocessor to set default values for triggers
+ * Config preprocessor to set default values for triggers and perform extra validation
  */
 const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
   if (options.config?.rules) {
@@ -108,6 +111,15 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
                 ]);
               }
             }
+
+            if (triggerName === "counter") {
+              const parsedCondition = parseCondition(triggerObj[triggerName]!.condition);
+              if (parsedCondition == null) {
+                throw new StrictValidationError([
+                  `Invalid counter condition '${triggerObj[triggerName]!.condition}' in rule <${rule.name}>`,
+                ]);
+              }
+            }
           }
         }
       }
@@ -151,7 +163,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
   showInDocs: true,
   info: pluginInfo,
 
-  dependencies: [LogsPlugin, ModActionsPlugin, MutesPlugin],
+  dependencies: [LogsPlugin, ModActionsPlugin, MutesPlugin, CountersPlugin],
 
   configSchema: ConfigSchema,
   defaultOptions,
@@ -202,6 +214,39 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
 
     pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
+  },
+
+  async onAfterLoad(pluginData) {
+    const countersPlugin = pluginData.getPlugin(CountersPlugin);
+
+    pluginData.state.onCounterTrigger = (name, condition, channelId, userId) => {
+      console.log("trigger", name, condition, channelId, userId);
+      runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, false);
+    };
+
+    pluginData.state.onCounterReverseTrigger = (name, condition, channelId, userId) => {
+      console.log("reverseTrigger", name, condition, channelId, userId);
+      runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, true);
+    };
+
+    const config = pluginData.config.get();
+    for (const rule of Object.values(config.rules)) {
+      for (const trigger of rule.triggers) {
+        if (trigger.counter) {
+          await countersPlugin.initCounterTrigger(trigger.counter.name, trigger.counter.condition);
+        }
+      }
+    }
+
+    countersPlugin.onCounterEvent("trigger", pluginData.state.onCounterTrigger);
+    countersPlugin.onCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+  },
+
+  async onBeforeUnload(pluginData) {
+    const countersPlugin = pluginData.getPlugin(CountersPlugin);
+
+    countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
+    countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
   },
 
   async onUnload(pluginData) {

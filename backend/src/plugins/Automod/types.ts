@@ -13,6 +13,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { RecentActionType } from "./constants";
 import Timeout = NodeJS.Timeout;
 import { RegExpRunner } from "../../RegExpRunner";
+import { CounterEvents } from "../Counters/types";
 
 export const Rule = t.type({
   enabled: t.boolean,
@@ -86,6 +87,9 @@ export interface AutomodPluginType extends BasePluginType {
 
     onMessageCreateFn: any;
     onMessageUpdateFn: any;
+
+    onCounterTrigger: CounterEvents["trigger"];
+    onCounterReverseTrigger: CounterEvents["reverseTrigger"];
   };
 }
 
@@ -93,6 +97,13 @@ export interface AutomodContext {
   timestamp: number;
   actioned?: boolean;
 
+  counterTrigger?: {
+    name: string;
+    condition: string;
+    channelId: string | null;
+    userId: string | null;
+    reverse: boolean;
+  };
   user?: User;
   message?: SavedMessage;
   member?: Member;
