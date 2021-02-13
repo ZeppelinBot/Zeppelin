@@ -8,7 +8,7 @@ export const InviteInfoCmd = utilityCmd({
   trigger: ["invite", "inviteinfo"],
   description: "Show information about an invite",
   usage: "!invite overwatch",
-  permission: "can_invite",
+  permission: "can_inviteinfo",
 
   signature: {
     inviteCode: ct.string({ required: false }),
