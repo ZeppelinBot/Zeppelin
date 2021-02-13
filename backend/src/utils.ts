@@ -1183,7 +1183,7 @@ export async function confirm(bot: Client, channel: TextableChannel, userId: str
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
   const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
