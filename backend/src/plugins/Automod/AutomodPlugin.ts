@@ -220,12 +220,10 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
     pluginData.state.onCounterTrigger = (name, condition, channelId, userId) => {
-      console.log("trigger", name, condition, channelId, userId);
       runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, false);
     };
 
     pluginData.state.onCounterReverseTrigger = (name, condition, channelId, userId) => {
-      console.log("reverseTrigger", name, condition, channelId, userId);
       runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, true);
     };
 
