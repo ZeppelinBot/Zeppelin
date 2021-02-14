@@ -37,7 +37,7 @@ export const AlertAction = automodAction({
       const safeUser = safeUsers[0];
       const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 
-      const logMessage = logs.getLogMessage(LogType.AUTOMOD_ACTION, {
+      const logMessage = await logs.getLogMessage(LogType.AUTOMOD_ACTION, {
         rule: ruleName,
         user: safeUser,
         users: safeUsers,
