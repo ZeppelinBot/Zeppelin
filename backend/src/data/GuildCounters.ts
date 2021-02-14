@@ -328,6 +328,7 @@ export class GuildCounters extends BaseGuildRepository {
           { triggerId: counterTrigger.id },
         )
         .where(`cv.value ${counterTrigger.comparison_op} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
         .andWhere("cv.channel_id = :channelId AND cv.user_id = :userId", { channelId, userId })
         .andWhere("triggerStates.id IS NULL")
         .getOne();
@@ -365,6 +366,7 @@ export class GuildCounters extends BaseGuildRepository {
           { triggerId: counterTrigger.id },
         )
         .where(`cv.value ${counterTrigger.comparison_op} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
         .andWhere("triggerStates.id IS NULL")
         .getMany();
 
@@ -416,6 +418,8 @@ export class GuildCounters extends BaseGuildRepository {
           { triggerId: counterTrigger.id },
         )
         .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
+        .andWhere(`cv.channel_id = :channelId AND cv.user_id = :userId`, { channelId, userId })
         .getOne();
 
       if (matchingValue) {
@@ -457,6 +461,7 @@ export class GuildCounters extends BaseGuildRepository {
           { triggerId: counterTrigger.id },
         )
         .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
         .select([
           "cv.id AS id",
           "cv.user_id AS user_id",

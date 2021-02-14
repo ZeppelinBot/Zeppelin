@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("counter_trigger_states")
 export class CounterTriggerState {
-  @Column()
+  @Column({ type: "bigint", generated: "increment" })
   @PrimaryColumn()
   id: string;
 
