@@ -38,5 +38,7 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
         ? stripObjectToScalars(member, ["user", "roles"])
         : { id: mute.user_id, user: new UnknownUser({ id: mute.user_id }) },
     });
+
+    pluginData.state.events.emit("unmute", mute.user_id);
   }
 }

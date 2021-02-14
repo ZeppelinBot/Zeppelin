@@ -39,6 +39,10 @@ import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
+import { EventEmitter } from "events";
+import { mapToPublicFn } from "../../pluginUtils";
+import { onModActionsEvent } from "./functions/onModActionsEvent";
+import { offModActionsEvent } from "./functions/offModActionsEvent";
 
 const defaultOptions = {
   config: {
@@ -165,6 +169,12 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
         banUserId(pluginData, userId, reason, banOptions);
       };
     },
+
+    on: mapToPublicFn(onModActionsEvent),
+    off: mapToPublicFn(offModActionsEvent),
+    getEventEmitter(pluginData) {
+      return () => pluginData.state.events;
+    },
   },
 
   onLoad(pluginData) {
@@ -179,10 +189,13 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     state.outdatedTempbansTimeout = null;
     state.ignoredEvents = [];
 
+    state.events = new EventEmitter();
+
     outdatedTempbansLoop(pluginData);
   },
 
   onUnload(pluginData) {
     pluginData.state.unloaded = true;
+    pluginData.state.events.removeAllListeners();
   },
 });

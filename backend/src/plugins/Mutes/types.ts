@@ -10,6 +10,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildMutes } from "../../data/GuildMutes";
 import { CaseArgs } from "../Cases/types";
 import Timeout = NodeJS.Timeout;
+import { EventEmitter } from "events";
 
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -31,6 +32,16 @@ export const ConfigSchema = t.type({
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
+export interface MutesEvents {
+  mute: (userId: string, reason?: string) => void;
+  unmute: (userId: string, reason?: string) => void;
+}
+
+export interface MutesEventEmitter extends EventEmitter {
+  on<U extends keyof MutesEvents>(event: U, listener: MutesEvents[U]): this;
+  emit<U extends keyof MutesEvents>(event: U, ...args: Parameters<MutesEvents[U]>): boolean;
+}
+
 export interface MutesPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
@@ -40,6 +51,8 @@ export interface MutesPluginType extends BasePluginType {
     archives: GuildArchives;
 
     muteClearIntervalId: Timeout;
+
+    events: MutesEventEmitter;
   };
 }
 

@@ -14,6 +14,8 @@ import { RecentActionType } from "./constants";
 import Timeout = NodeJS.Timeout;
 import { RegExpRunner } from "../../RegExpRunner";
 import { CounterEvents } from "../Counters/types";
+import { ModActionsEvents, ModActionType } from "../ModActions/types";
+import { MutesEvents } from "../Mutes/types";
 
 export const Rule = t.type({
   enabled: t.boolean,
@@ -90,6 +92,9 @@ export interface AutomodPluginType extends BasePluginType {
 
     onCounterTrigger: CounterEvents["trigger"];
     onCounterReverseTrigger: CounterEvents["reverseTrigger"];
+
+    modActionsListeners: Map<keyof ModActionsEvents, any>;
+    mutesListeners: Map<keyof MutesEvents, any>;
   };
 }
 
@@ -111,6 +116,10 @@ export interface AutomodContext {
   rolesChanged?: {
     added?: string[];
     removed?: string[];
+  };
+  modAction?: {
+    type: ModActionType;
+    reason?: string;
   };
 }
 
