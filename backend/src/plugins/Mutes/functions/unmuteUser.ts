@@ -45,6 +45,7 @@ export async function unmuteUser(
         member.edit(memberOptions);
       }
     } else {
+      // tslint:disable-next-line:no-console
       console.warn(
         `Member ${userId} not found in guild ${pluginData.guild.name} (${pluginData.guild.id}) when attempting to unmute`,
       );
@@ -93,6 +94,12 @@ export async function unmuteUser(
       caseNumber: createdCase.case_number,
       reason: caseArgs.reason,
     });
+  }
+
+  if (!unmuteTime) {
+    // If the member was unmuted, not just scheduled to be unmuted, fire the unmute event as well
+    // Scheduled unmutes have their event fired in clearExpiredMutes()
+    pluginData.state.events.emit("unmute", user.id, caseArgs.reason);
   }
 
   return {

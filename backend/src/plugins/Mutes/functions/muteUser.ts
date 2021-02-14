@@ -246,6 +246,8 @@ export async function muteUser(
 
   lock.unlock();
 
+  pluginData.state.events.emit("mute", user.id, reason);
+
   return {
     case: theCase,
     notifyResult,

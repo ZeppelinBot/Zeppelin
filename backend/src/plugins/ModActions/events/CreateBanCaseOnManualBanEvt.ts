@@ -69,5 +69,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
       caseNumber: createdCase?.case_number ?? 0,
       reason,
     });
+
+    pluginData.state.events.emit("ban", user.id, reason);
   },
 );

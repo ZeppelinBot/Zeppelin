@@ -18,6 +18,13 @@ import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
 import { CounterTrigger } from "./counter";
+import { NoteTrigger } from "./note";
+import { WarnTrigger } from "./warn";
+import { MuteTrigger } from "./mute";
+import { UnmuteTrigger } from "./unmute";
+import { KickTrigger } from "./kick";
+import { BanTrigger } from "./ban";
+import { UnbanTrigger } from "./unban";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   match_words: MatchWordsTrigger,
@@ -40,6 +47,14 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   sticker_spam: StickerSpamTrigger,
 
   counter: CounterTrigger,
+
+  note: NoteTrigger,
+  warn: WarnTrigger,
+  mute: MuteTrigger,
+  unmute: UnmuteTrigger,
+  kick: KickTrigger,
+  ban: BanTrigger,
+  unban: UnbanTrigger,
 };
 
 export const AvailableTriggers = t.type({
@@ -63,4 +78,12 @@ export const AvailableTriggers = t.type({
   sticker_spam: StickerSpamTrigger.configType,
 
   counter: CounterTrigger.configType,
+
+  note: NoteTrigger.configType,
+  warn: WarnTrigger.configType,
+  mute: MuteTrigger.configType,
+  unmute: UnmuteTrigger.configType,
+  kick: KickTrigger.configType,
+  ban: BanTrigger.configType,
+  unban: UnbanTrigger.configType,
 });

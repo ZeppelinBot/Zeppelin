@@ -127,6 +127,8 @@ export async function banUserId(
     banTime: banTime ? humanizeDuration(banTime) : null,
   });
 
+  pluginData.state.events.emit("ban", user.id, reason);
+
   return {
     status: "success",
     case: createdCase,

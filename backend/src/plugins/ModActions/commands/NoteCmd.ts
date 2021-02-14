@@ -49,5 +49,7 @@ export const NoteCmd = modActionsCmd({
     });
 
     sendSuccessMessage(pluginData, msg.channel, `Note added on **${userName}** (Case #${createdCase.case_number})`);
+
+    pluginData.state.events.emit("note", user.id, reason);
   },
 });

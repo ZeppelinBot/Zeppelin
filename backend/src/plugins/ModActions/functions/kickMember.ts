@@ -85,6 +85,8 @@ export async function kickMember(
     reason,
   });
 
+  pluginData.state.events.emit("kick", member.id, reason);
+
   return {
     status: "success",
     case: createdCase,

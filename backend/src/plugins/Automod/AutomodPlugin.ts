@@ -31,6 +31,9 @@ import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 import { CountersPlugin } from "../Counters/CountersPlugin";
 import { parseCondition } from "../../data/GuildCounters";
 import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
+import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
+import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
+import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
 
 const defaultOptions = {
   config: {
@@ -163,7 +166,13 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
   showInDocs: true,
   info: pluginInfo,
 
-  dependencies: [LogsPlugin, ModActionsPlugin, MutesPlugin, CountersPlugin],
+  // prettier-ignore
+  dependencies: [
+    LogsPlugin,
+    ModActionsPlugin,
+    MutesPlugin,
+    CountersPlugin,
+  ],
 
   configSchema: ConfigSchema,
   defaultOptions,
@@ -173,6 +182,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     return criteria?.antiraid_level ? criteria.antiraid_level === pluginData.state.cachedAntiraidLevel : false;
   },
 
+  // prettier-ignore
   events: [
     RunAutomodOnJoinEvt,
     RunAutomodOnMemberUpdate,
@@ -238,13 +248,45 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
     countersPlugin.onCounterEvent("trigger", pluginData.state.onCounterTrigger);
     countersPlugin.onCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+
+    const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
+    pluginData.state.modActionsListeners = new Map();
+    pluginData.state.modActionsListeners.set("note", (userId: string) =>
+      runAutomodOnModAction(pluginData, "note", userId),
+    );
+    pluginData.state.modActionsListeners.set("warn", (userId: string) =>
+      runAutomodOnModAction(pluginData, "warn", userId),
+    );
+    pluginData.state.modActionsListeners.set("kick", (userId: string) =>
+      runAutomodOnModAction(pluginData, "kick", userId),
+    );
+    pluginData.state.modActionsListeners.set("ban", (userId: string) =>
+      runAutomodOnModAction(pluginData, "ban", userId),
+    );
+    pluginData.state.modActionsListeners.set("unban", (userId: string) =>
+      runAutomodOnModAction(pluginData, "unban", userId),
+    );
+    registerEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+
+    const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
+    pluginData.state.mutesListeners = new Map();
+    pluginData.state.mutesListeners.set("mute", (userId: string) => runAutomodOnModAction(pluginData, "mute", userId));
+    pluginData.state.mutesListeners.set("unmute", (userId: string) =>
+      runAutomodOnModAction(pluginData, "unmute", userId),
+    );
+    registerEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
   },
 
   async onBeforeUnload(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
-
     countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
     countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+
+    const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
+    unregisterEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+
+    const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
+    unregisterEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
   },
 
   async onUnload(pluginData) {

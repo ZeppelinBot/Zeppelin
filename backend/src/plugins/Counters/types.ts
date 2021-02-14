@@ -36,7 +36,6 @@ export interface CounterEvents {
 
 export interface CounterEventEmitter extends EventEmitter {
   on<U extends keyof CounterEvents>(event: U, listener: CounterEvents[U]): this;
-
   emit<U extends keyof CounterEvents>(event: U, ...args: Parameters<CounterEvents[U]>): boolean;
 }
 
