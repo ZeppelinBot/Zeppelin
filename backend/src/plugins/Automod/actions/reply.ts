@@ -20,6 +20,8 @@ export const ReplyAction = automodAction({
     t.type({
       text: tMessageContent,
       auto_delete: tNullable(t.union([tDelayString, t.number])),
+      as_dm: tNullable(t.boolean),
+      channel_text_on_dm: tNullable(tMessageContent),
     }),
   ]),
 
@@ -53,8 +55,27 @@ export const ReplyAction = automodAction({
           : await renderRecursively(actionConfig.text, renderReplyText);
 
       if (formatted) {
-        const channel = pluginData.guild.channels.get(channelId) as TextChannel;
-        const replyMsg = await channel.createMessage(formatted);
+        let replyMsg;
+        const serverChannel = pluginData.guild.channels.get(channelId) as TextChannel;
+
+        if (typeof actionConfig !== "string" && actionConfig.as_dm) {
+          let fallback = false;
+          try {
+            const dmChannel = await user!.getDMChannel();
+            await dmChannel.createMessage(formatted); // Don't store in replyMsg as to not delete a DM
+          } catch (e) {
+            // Fallback to in-server reply
+            replyMsg = await serverChannel.createMessage(formatted);
+            fallback = true;
+          }
+
+          if (actionConfig.channel_text_on_dm && !fallback) {
+            const channelFormatted = await renderReplyText(actionConfig.channel_text_on_dm);
+            replyMsg = await serverChannel.createMessage(channelFormatted);
+          }
+        } else {
+          replyMsg = await serverChannel.createMessage(formatted);
+        }
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
