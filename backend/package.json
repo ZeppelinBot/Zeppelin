@@ -65,7 +65,7 @@
     "tmp": "0.0.33",
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
-    "typeorm": "^0.2.14",
+    "typeorm": "^0.2.31",
     "uuid": "^3.3.2",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
     "zlib-sync": "^0.1.7"
