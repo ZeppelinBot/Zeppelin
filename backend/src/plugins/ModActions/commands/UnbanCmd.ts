@@ -29,7 +29,8 @@ export const UnbanCmd = modActionsCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      return;
     }
 
     // The moderator who did the action is the message author or, if used, the specified -mod
@@ -63,6 +64,8 @@ export const UnbanCmd = modActionsCmd({
       reason,
       ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     });
+    // Delete the tempban, if one exists
+    pluginData.state.tempbans.clear(user.id);
 
     // Confirm the action
     sendSuccessMessage(pluginData, msg.channel, `Member unbanned (Case #${createdCase.case_number})`);

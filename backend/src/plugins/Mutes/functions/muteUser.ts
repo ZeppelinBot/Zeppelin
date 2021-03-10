@@ -12,11 +12,13 @@ import {
   UserNotificationMethod,
 } from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
-import { TextChannel, User } from "eris";
+import { MemberOptions, TextChannel, User } from "eris";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
+import { sendErrorMessage } from "src/pluginUtils";
+import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -24,6 +26,8 @@ export async function muteUser(
   muteTime?: number,
   reason?: string,
   muteOptions: MuteOptions = {},
+  removeRolesOnMuteOverride: boolean | string[] | null = null,
+  restoreRolesOnMuteOverride: boolean | string[] | null = null,
 ) {
   const lock = await pluginData.locks.acquire(`mute-${userId}`);
 
@@ -50,10 +54,69 @@ export async function muteUser(
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id, true); // Grab the fresh member so we don't have stale role info
   const config = pluginData.config.getMatchingConfig({ member, userId });
 
+  let rolesToRestore: string[] = [];
   if (member) {
+    const logs = pluginData.getPlugin(LogsPlugin);
+    // remove and store any roles to be removed/restored
+    const currentUserRoles = member.roles;
+    const memberOptions: MemberOptions = {};
+    const removeRoles = removeRolesOnMuteOverride ?? config.remove_roles_on_mute;
+    const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_mute;
+
+    // remove roles
+    if (!Array.isArray(removeRoles)) {
+      if (removeRoles) {
+        // exclude managed roles from being removed
+        const managedRoles = pluginData.guild.roles.filter(x => x.managed).map(y => y.id);
+        memberOptions.roles = managedRoles.filter(x => member.roles.includes(x));
+        await member.edit(memberOptions);
+      }
+    } else {
+      memberOptions.roles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
+      await member.edit(memberOptions);
+    }
+
+    // set roles to be restored
+    if (!Array.isArray(restoreRoles)) {
+      if (restoreRoles) {
+        rolesToRestore = currentUserRoles;
+      }
+    } else {
+      rolesToRestore = currentUserRoles.filter(x => (<string[]>restoreRoles).includes(x));
+    }
+
     // Apply mute role if it's missing
     if (!member.roles.includes(muteRole)) {
-      await member.addRole(muteRole);
+      try {
+        await member.addRole(muteRole);
+      } catch (e) {
+        const actualMuteRole = pluginData.guild.roles.find(x => x.id === muteRole);
+        if (!actualMuteRole) {
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute users, specified mute role Id is invalid`,
+          });
+          throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
+        }
+
+        const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
+        const zepRoles = pluginData.guild.roles.filter(x => zep!.roles.includes(x.id));
+        // If we have roles and one of them is above the muted role, throw generic error
+        if (zepRoles.length >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute user ${member.id}: ${e}`,
+          });
+          throw e;
+        } else {
+          // Otherwise, throw error that mute role is above zeps roles
+          lock.unlock();
+          logs.log(LogType.BOT_ALERT, {
+            body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
+          });
+          throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP);
+        }
+      }
     }
 
     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
@@ -71,9 +134,12 @@ export async function muteUser(
   let notifyResult: UserNotificationResult = { method: null, success: true };
 
   if (existingMute) {
-    await pluginData.state.mutes.updateExpiryTime(user.id, muteTime);
+    if (existingMute.roles_to_restore?.length || rolesToRestore?.length) {
+      rolesToRestore = Array.from(new Set([...existingMute.roles_to_restore, ...rolesToRestore]));
+    }
+    await pluginData.state.mutes.updateExpiryTime(user.id, muteTime, rolesToRestore);
   } else {
-    await pluginData.state.mutes.addMute(user.id, muteTime);
+    await pluginData.state.mutes.addMute(user.id, muteTime, rolesToRestore);
   }
 
   const template = existingMute
@@ -179,6 +245,8 @@ export async function muteUser(
   }
 
   lock.unlock();
+
+  pluginData.state.events.emit("mute", user.id, reason);
 
   return {
     case: theCase,

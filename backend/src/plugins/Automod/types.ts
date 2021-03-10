@@ -13,6 +13,9 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { RecentActionType } from "./constants";
 import Timeout = NodeJS.Timeout;
 import { RegExpRunner } from "../../RegExpRunner";
+import { CounterEvents } from "../Counters/types";
+import { ModActionsEvents, ModActionType } from "../ModActions/types";
+import { MutesEvents } from "../Mutes/types";
 
 export const Rule = t.type({
   enabled: t.boolean,
@@ -86,6 +89,12 @@ export interface AutomodPluginType extends BasePluginType {
 
     onMessageCreateFn: any;
     onMessageUpdateFn: any;
+
+    onCounterTrigger: CounterEvents["trigger"];
+    onCounterReverseTrigger: CounterEvents["reverseTrigger"];
+
+    modActionsListeners: Map<keyof ModActionsEvents, any>;
+    mutesListeners: Map<keyof MutesEvents, any>;
   };
 }
 
@@ -93,6 +102,13 @@ export interface AutomodContext {
   timestamp: number;
   actioned?: boolean;
 
+  counterTrigger?: {
+    name: string;
+    condition: string;
+    channelId: string | null;
+    userId: string | null;
+    reverse: boolean;
+  };
   user?: User;
   message?: SavedMessage;
   member?: Member;
@@ -100,6 +116,10 @@ export interface AutomodContext {
   rolesChanged?: {
     added?: string[];
     removed?: string[];
+  };
+  modAction?: {
+    type: ModActionType;
+    reason?: string;
   };
 }
 

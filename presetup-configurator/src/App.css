@@ -1,0 +1,8 @@
+.App {
+  display: flex;
+  justify-content: center;
+}
+
+.App .wrapper {
+  flex: 0 1 800px;
+}

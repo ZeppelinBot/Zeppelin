@@ -13,11 +13,13 @@ import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { muteUser } from "./functions/muteUser";
 import { unmuteUser } from "./functions/unmuteUser";
-import { CaseArgs } from "../Cases/types";
 import { Member } from "eris";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
 import { mapToPublicFn } from "../../pluginUtils";
+import { EventEmitter } from "events";
+import { onMutesEvent } from "./functions/onMutesEvent";
+import { offMutesEvent } from "./functions/offMutesEvent";
 
 const defaultOptions = {
   config: {
@@ -32,6 +34,8 @@ const defaultOptions = {
     mute_message: "You have been muted on the {guildName} server. Reason given: {reason}",
     timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
     update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
+    remove_roles_on_mute: false,
+    restore_roles_on_mute: false,
 
     can_view_list: false,
     can_cleanup: false,
@@ -91,6 +95,12 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
         return muteRole ? member.roles.includes(muteRole) : false;
       };
     },
+
+    on: mapToPublicFn(onMutesEvent),
+    off: mapToPublicFn(offMutesEvent),
+    getEventEmitter(pluginData) {
+      return () => pluginData.state.events;
+    },
   },
 
   onLoad(pluginData) {
@@ -98,6 +108,8 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
     pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
+
+    pluginData.state.events = new EventEmitter();
 
     // Check for expired mutes every 5s
     const firstCheckTime = Math.max(Date.now(), FIRST_CHECK_TIME) + FIRST_CHECK_INCREMENT;
@@ -114,5 +126,6 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
 
   onUnload(pluginData) {
     clearInterval(pluginData.state.muteClearIntervalId);
+    pluginData.state.events.removeAllListeners();
   },
 });

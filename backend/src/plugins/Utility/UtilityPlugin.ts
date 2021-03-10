@@ -5,7 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
 import { Supporters } from "../../data/Supporters";
-import { ServerCmd } from "./commands/ServerCmd";
+import { ServerInfoCmd } from "./commands/ServerInfoCmd";
 import { RolesCmd } from "./commands/RolesCmd";
 import { LevelCmd } from "./commands/LevelCmd";
 import { SearchCmd } from "./commands/SearchCmd";
@@ -34,6 +34,7 @@ import { InfoCmd } from "./commands/InfoCmd";
 import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -53,6 +54,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_ping: false,
     can_source: false,
     can_vcmove: false,
+    can_vckick: false,
     can_help: false,
     can_about: false,
     can_context: false,
@@ -78,6 +80,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_snowflake: true,
         can_nickname: true,
         can_vcmove: true,
+        can_vckick: true,
         can_help: true,
         can_context: true,
         can_jumbo: true,
@@ -113,13 +116,14 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     UserInfoCmd,
     LevelCmd,
     RolesCmd,
-    ServerCmd,
+    ServerInfoCmd,
     NicknameResetCmd,
     NicknameCmd,
     PingCmd,
     SourceCmd,
     ContextCmd,
     VcmoveCmd,
+    VcdisconnectCmd,
     VcmoveAllCmd,
     HelpCmd,
     AboutCmd,
@@ -148,7 +152,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     state.lastReload = Date.now();
 
     if (activeReloads.has(guild.id)) {
-      sendSuccessMessage(pluginData, activeReloads.get(guild.id), "Reloaded!");
+      sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
       activeReloads.delete(guild.id);
     }
   },

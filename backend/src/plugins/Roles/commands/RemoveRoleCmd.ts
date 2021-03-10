@@ -17,17 +17,20 @@ export const RemoveRoleCmd = rolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member, true)) {
-      return sendErrorMessage(pluginData, msg.channel, "Cannot remove roles from this user: insufficient permissions");
+      sendErrorMessage(pluginData, msg.channel, "Cannot remove roles from this user: insufficient permissions");
+      return;
     }
 
     const roleId = await resolveRoleId(pluginData.client, pluginData.guild.id, args.role);
     if (!roleId) {
-      return sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      return;
     }
 
     const config = pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
-      return sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      return;
     }
 
     // Sanity check: make sure the role is configured properly
@@ -36,11 +39,13 @@ export const RemoveRoleCmd = rolesCmd({
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
-      return sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      return;
     }
 
     if (!args.member.roles.includes(roleId)) {
-      return sendErrorMessage(pluginData, msg.channel, "Member doesn't have that role");
+      sendErrorMessage(pluginData, msg.channel, "Member doesn't have that role");
+      return;
     }
 
     pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);

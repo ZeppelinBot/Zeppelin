@@ -39,14 +39,12 @@ export async function actualPostCmd(
 
   if (opts.repeat) {
     if (opts.repeat < MIN_REPEAT_TIME) {
-      return sendErrorMessage(
-        pluginData,
-        msg.channel,
-        `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`,
-      );
+      sendErrorMessage(pluginData, msg.channel, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
+      return;
     }
     if (opts.repeat > MAX_REPEAT_TIME) {
-      return sendErrorMessage(pluginData, msg.channel, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
+      sendErrorMessage(pluginData, msg.channel, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
+      return;
     }
   }
 
@@ -56,7 +54,8 @@ export async function actualPostCmd(
     // Schedule the post to be posted later
     postAt = await parseScheduleTime(pluginData, msg.author.id, opts.schedule);
     if (!postAt) {
-      return sendErrorMessage(pluginData, msg.channel, "Invalid schedule time");
+      sendErrorMessage(pluginData, msg.channel, "Invalid schedule time");
+      return;
     }
   } else if (opts.repeat) {
     postAt = moment.utc().add(opts.repeat, "ms");
@@ -72,35 +71,37 @@ export async function actualPostCmd(
 
     // Invalid time
     if (!repeatUntil) {
-      return sendErrorMessage(pluginData, msg.channel, "Invalid time specified for -repeat-until");
+      sendErrorMessage(pluginData, msg.channel, "Invalid time specified for -repeat-until");
+      return;
     }
     if (repeatUntil.isBefore(moment.utc())) {
-      return sendErrorMessage(pluginData, msg.channel, "You can't set -repeat-until in the past");
+      sendErrorMessage(pluginData, msg.channel, "You can't set -repeat-until in the past");
+      return;
     }
     if (repeatUntil.isAfter(MAX_REPEAT_UNTIL)) {
-      return sendErrorMessage(
+      sendErrorMessage(
         pluginData,
         msg.channel,
         "Unfortunately, -repeat-until can only be at most 100 years into the future. Maybe 99 years would be enough?",
       );
+      return;
     }
   } else if (opts["repeat-times"]) {
     repeatTimes = opts["repeat-times"];
     if (repeatTimes <= 0) {
-      return sendErrorMessage(pluginData, msg.channel, "-repeat-times must be 1 or more");
+      sendErrorMessage(pluginData, msg.channel, "-repeat-times must be 1 or more");
+      return;
     }
   }
 
   if (repeatUntil && repeatTimes) {
-    return sendErrorMessage(pluginData, msg.channel, "You can only use one of -repeat-until or -repeat-times at once");
+    sendErrorMessage(pluginData, msg.channel, "You can only use one of -repeat-until or -repeat-times at once");
+    return;
   }
 
   if (opts.repeat && !repeatUntil && !repeatTimes) {
-    return sendErrorMessage(
-      pluginData,
-      msg.channel,
-      "You must specify -repeat-until or -repeat-times for repeated messages",
-    );
+    sendErrorMessage(pluginData, msg.channel, "You must specify -repeat-until or -repeat-times for repeated messages");
+    return;
   }
 
   if (opts.repeat) {
@@ -114,7 +115,8 @@ export async function actualPostCmd(
   // Save schedule/repeat information in DB
   if (postAt) {
     if (postAt < moment.utc()) {
-      return sendErrorMessage(pluginData, msg.channel, "Post can't be scheduled to be posted in the past");
+      sendErrorMessage(pluginData, msg.channel, "Post can't be scheduled to be posted in the past");
+      return;
     }
 
     await pluginData.state.scheduledPosts.create({

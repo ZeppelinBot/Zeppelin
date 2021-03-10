@@ -17,6 +17,7 @@ import { SoftbanCmd } from "./commands/SoftbanCommand";
 import { BanCmd } from "./commands/BanCmd";
 import { UnbanCmd } from "./commands/UnbanCmd";
 import { ForcebanCmd } from "./commands/ForcebanCmd";
+import { MassunbanCmd } from "./commands/MassUnbanCmd";
 import { MassbanCmd } from "./commands/MassBanCmd";
 import { AddCaseCmd } from "./commands/AddCaseCmd";
 import { CaseCmd } from "./commands/CaseCmd";
@@ -36,6 +37,12 @@ import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { trimPluginDescription } from "../../utils";
 import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { GuildTempbans } from "../../data/GuildTempbans";
+import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
+import { EventEmitter } from "events";
+import { mapToPublicFn } from "../../pluginUtils";
+import { onModActionsEvent } from "./functions/onModActionsEvent";
+import { offModActionsEvent } from "./functions/offModActionsEvent";
 
 const defaultOptions = {
   config: {
@@ -49,6 +56,7 @@ const defaultOptions = {
     warn_message: "You have received a warning on the {guildName} server: {reason}",
     kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",
     ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
+    tempban_message: "You have been banned from the {guildName} server for {banTime}. Reason given: {reason}",
     alert_on_rejoin: false,
     alert_channel: null,
     warn_notify_enabled: false,
@@ -64,6 +72,7 @@ const defaultOptions = {
     can_ban: false,
     can_view: false,
     can_addcase: false,
+    can_massunban: false,
     can_massban: false,
     can_massmute: false,
     can_hidecase: false,
@@ -87,6 +96,7 @@ const defaultOptions = {
     {
       level: ">=100",
       config: {
+        can_massunban: true,
         can_massban: true,
         can_massmute: true,
         can_hidecase: true,
@@ -131,6 +141,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     ForcebanCmd,
     MassbanCmd,
     MassmuteCmd,
+    MassunbanCmd,
     AddCaseCmd,
     CaseCmd,
     CasesUserCmd,
@@ -158,6 +169,12 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
         banUserId(pluginData, userId, reason, banOptions);
       };
     },
+
+    on: mapToPublicFn(onModActionsEvent),
+    off: mapToPublicFn(offModActionsEvent),
+    getEventEmitter(pluginData) {
+      return () => pluginData.state.events;
+    },
   },
 
   onLoad(pluginData) {
@@ -165,8 +182,20 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
 
     state.mutes = GuildMutes.getGuildInstance(guild.id);
     state.cases = GuildCases.getGuildInstance(guild.id);
+    state.tempbans = GuildTempbans.getGuildInstance(guild.id);
     state.serverLogs = new GuildLogs(guild.id);
 
+    state.unloaded = false;
+    state.outdatedTempbansTimeout = null;
     state.ignoredEvents = [];
+
+    state.events = new EventEmitter();
+
+    outdatedTempbansLoop(pluginData);
+  },
+
+  onUnload(pluginData) {
+    pluginData.state.unloaded = true;
+    pluginData.state.events.removeAllListeners();
   },
 });

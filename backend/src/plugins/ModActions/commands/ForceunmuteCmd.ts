@@ -32,7 +32,8 @@ export const ForceUnmuteCmd = modActionsCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      return;
     }
 
     // Check if they're muted in the first place

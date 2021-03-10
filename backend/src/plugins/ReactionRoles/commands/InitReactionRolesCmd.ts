@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { TextChannel } from "eris";
 import { RecoverablePluginError, ERRORS } from "../../../RecoverablePluginError";
-import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop } from "../../../utils";
+import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 import { canReadChannel } from "../../../utils/canReadChannel";
 
@@ -12,6 +12,19 @@ const CLEAR_ROLES_EMOJI = "❌";
 export const InitReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles",
   permission: "can_manage",
+  description: trimPluginDescription(`
+  This command allows you to add reaction roles to a given message.  
+  The basic usage is as follows:  
+    
+  !reaction_roles 800865377520582687  
+  👍 = 556110793058287637  
+  👎 = 558037973581430785  
+    
+  A reactionRolePair is any emoji the bot can use, an equal sign and the role id it should correspond to.  
+  Every pair needs to be in its own line for the command to work properly.  
+  If the message you specify is not found, use \`!save_messages_to_db <channelId> <messageId>\`  
+  to manually add it to the stored messages database permanently.
+  `),
 
   signature: {
     message: ct.messageTarget(),

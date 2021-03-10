@@ -30,7 +30,8 @@ export const WarnCmd = modActionsCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      return;
     }
 
     const memberToWarn = await resolveMember(pluginData.client, pluginData.guild, user.id);
@@ -111,5 +112,7 @@ export const WarnCmd = modActionsCmd({
       msg.channel,
       `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );
+
+    pluginData.state.events.emit("warn", user.id, reason);
   },
 });

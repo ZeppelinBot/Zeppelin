@@ -2,7 +2,7 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { Member } from "eris";
+import { AdvancedMessageContent, AllowedMentions, GuildTextableChannel, Member, Message, TextableChannel } from "eris";
 import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
@@ -137,18 +137,48 @@ export function getPluginConfigPreprocessor(
   };
 }
 
-export function sendSuccessMessage(pluginData: AnyPluginData<any>, channel, body) {
+export function sendSuccessMessage(
+  pluginData: AnyPluginData<any>,
+  channel: TextableChannel,
+  body: string,
+  allowedMentions?: AllowedMentions,
+): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
-  return channel.createMessage(successMessage(body, emoji)).catch(err => {
-    logger.warn(`Failed to send success message to ${channel.id} (${channel.guild?.id}): ${err.code} ${err.message}`);
-  });
+  const formattedBody = successMessage(body, emoji);
+  const content: AdvancedMessageContent = allowedMentions
+    ? { content: formattedBody, allowedMentions }
+    : { content: formattedBody };
+  return channel
+    .createMessage(content) // Force line break
+    .catch(err => {
+      const channelInfo = (channel as GuildTextableChannel).guild
+        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
+        : `${channel.id}`;
+      logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
+      return undefined;
+    });
 }
 
-export function sendErrorMessage(pluginData: AnyPluginData<any>, channel, body) {
+export function sendErrorMessage(
+  pluginData: AnyPluginData<any>,
+  channel: TextableChannel,
+  body: string,
+  allowedMentions?: AllowedMentions,
+): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
-  return channel.createMessage(errorMessage(body, emoji)).catch(err => {
-    logger.warn(`Failed to send error message to ${channel.id} (${channel.guild?.id}): ${err.code} ${err.message}`);
-  });
+  const formattedBody = errorMessage(body, emoji);
+  const content: AdvancedMessageContent = allowedMentions
+    ? { content: formattedBody, allowedMentions }
+    : { content: formattedBody };
+  return channel
+    .createMessage(content) // Force line break
+    .catch(err => {
+      const channelInfo = (channel as GuildTextableChannel).guild
+        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
+        : `${channel.id}`;
+      logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
+      return undefined;
+    });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

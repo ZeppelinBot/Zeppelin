@@ -7,7 +7,7 @@ import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { WithRequiredProps } from "../../../utils/typeUtils";
+import { MemberOptions } from "eris";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -36,7 +36,16 @@ export async function unmuteUser(
       if (muteRole && member.roles.includes(muteRole)) {
         await member.removeRole(muteRole);
       }
+      if (existingMute?.roles_to_restore) {
+        const memberOptions: MemberOptions = {};
+        const guildRoles = pluginData.guild.roles;
+        memberOptions.roles = Array.from(
+          new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
+        );
+        member.edit(memberOptions);
+      }
     } else {
+      // tslint:disable-next-line:no-console
       console.warn(
         `Member ${userId} not found in guild ${pluginData.guild.name} (${pluginData.guild.id}) when attempting to unmute`,
       );
@@ -85,6 +94,12 @@ export async function unmuteUser(
       caseNumber: createdCase.case_number,
       reason: caseArgs.reason,
     });
+  }
+
+  if (!unmuteTime) {
+    // If the member was unmuted, not just scheduled to be unmuted, fire the unmute event as well
+    // Scheduled unmutes have their event fired in clearExpiredMutes()
+    pluginData.state.events.emit("unmute", user.id, caseArgs.reason);
   }
 
   return {

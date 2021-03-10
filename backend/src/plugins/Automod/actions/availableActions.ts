@@ -12,6 +12,7 @@ import { AddRolesAction } from "./addRoles";
 import { RemoveRolesAction } from "./removeRoles";
 import { SetAntiraidLevelAction } from "./setAntiraidLevel";
 import { ReplyAction } from "./reply";
+import { ChangeCounterAction } from "./changeCounter";
 
 export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   clean: CleanAction,
@@ -26,6 +27,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   remove_roles: RemoveRolesAction,
   set_antiraid_level: SetAntiraidLevelAction,
   reply: ReplyAction,
+  change_counter: ChangeCounterAction,
 };
 
 export const AvailableActions = t.type({
@@ -41,4 +43,5 @@ export const AvailableActions = t.type({
   remove_roles: RemoveRolesAction.configType,
   set_antiraid_level: SetAntiraidLevelAction.configType,
   reply: ReplyAction.configType,
+  change_counter: ChangeCounterAction.configType,
 });

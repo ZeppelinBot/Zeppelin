@@ -7,6 +7,9 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { Case } from "../../data/entities/Case";
 import { CaseArgs } from "../Cases/types";
 import { TextChannel } from "eris";
+import { GuildTempbans } from "../../data/GuildTempbans";
+import Timeout = NodeJS.Timeout;
+import { EventEmitter } from "events";
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -19,6 +22,7 @@ export const ConfigSchema = t.type({
   warn_message: tNullable(t.string),
   kick_message: tNullable(t.string),
   ban_message: tNullable(t.string),
+  tempban_message: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
   warn_notify_enabled: t.boolean,
@@ -32,6 +36,7 @@ export const ConfigSchema = t.type({
   can_ban: t.boolean,
   can_view: t.boolean,
   can_addcase: t.boolean,
+  can_massunban: t.boolean,
   can_massban: t.boolean,
   can_massmute: t.boolean,
   can_hidecase: t.boolean,
@@ -41,14 +46,33 @@ export const ConfigSchema = t.type({
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
+export interface ModActionsEvents {
+  note: (userId: string, reason?: string) => void;
+  warn: (userId: string, reason?: string) => void;
+  kick: (userId: string, reason?: string) => void;
+  ban: (userId: string, reason?: string) => void;
+  unban: (userId: string, reason?: string) => void;
+  // mute/unmute are in the Mutes plugin
+}
+
+export interface ModActionsEventEmitter extends EventEmitter {
+  on<U extends keyof ModActionsEvents>(event: U, listener: ModActionsEvents[U]): this;
+  emit<U extends keyof ModActionsEvents>(event: U, ...args: Parameters<ModActionsEvents[U]>): boolean;
+}
+
 export interface ModActionsPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
     mutes: GuildMutes;
     cases: GuildCases;
+    tempbans: GuildTempbans;
     serverLogs: GuildLogs;
 
+    unloaded: boolean;
+    outdatedTempbansTimeout: Timeout | null;
     ignoredEvents: IIgnoredEvent[];
+
+    events: ModActionsEventEmitter;
   };
 }
 
@@ -114,6 +138,8 @@ export interface BanOptions {
   contactMethods?: UserNotificationMethod[];
   deleteMessageDays?: number;
 }
+
+export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
 
 export const modActionsCmd = guildCommand<ModActionsPluginType>();
 export const modActionsEvt = guildEventListener<ModActionsPluginType>();

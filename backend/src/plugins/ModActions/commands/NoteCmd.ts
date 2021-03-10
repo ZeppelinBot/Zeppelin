@@ -15,13 +15,19 @@ export const NoteCmd = modActionsCmd({
 
   signature: {
     user: ct.string(),
-    note: ct.string({ catchAll: true }),
+    note: ct.string({ required: false, catchAll: true }),
   },
 
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      return sendErrorMessage(pluginData, msg.channel, `User not found`);
+      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      return;
+    }
+
+    if (!args.note && msg.attachments.length === 0) {
+      sendErrorMessage(pluginData, msg.channel, "Text or attachment required");
+      return;
     }
 
     const userName = `${user.username}#${user.discriminator}`;
@@ -43,5 +49,7 @@ export const NoteCmd = modActionsCmd({
     });
 
     sendSuccessMessage(pluginData, msg.channel, `Note added on **${userName}** (Case #${createdCase.case_number})`);
+
+    pluginData.state.events.emit("note", user.id, reason);
   },
 });

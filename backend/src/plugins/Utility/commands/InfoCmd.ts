@@ -27,11 +27,16 @@ export const InfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     const value = args.value || message.author.id;
+    const userCfg = pluginData.config.getMatchingConfig({
+      member: message.member,
+      channelId: message.channel.id,
+      message,
+    });
 
     // 1. Channel
     const channelId = getChannelId(value);
     const channel = channelId && pluginData.guild.channels.get(channelId);
-    if (channel) {
+    if (channel && userCfg.can_channelinfo) {
       const embed = await getChannelInfoEmbed(pluginData, channelId!, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
@@ -41,7 +46,7 @@ export const InfoCmd = utilityCmd({
 
     // 2. Server
     const guild = pluginData.client.guilds.get(value);
-    if (guild) {
+    if (guild && userCfg.can_server) {
       const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
@@ -51,7 +56,7 @@ export const InfoCmd = utilityCmd({
 
     // 3. User
     const user = await resolveUser(pluginData.client, value);
-    if (user) {
+    if (user && userCfg.can_userinfo) {
       const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact), message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
@@ -61,7 +66,7 @@ export const InfoCmd = utilityCmd({
 
     // 4. Message
     const messageTarget = await resolveMessageTarget(pluginData, value);
-    if (messageTarget) {
+    if (messageTarget && userCfg.can_messageinfo) {
       if (canReadChannel(messageTarget.channel, message.member)) {
         const embed = await getMessageInfoEmbed(
           pluginData,
@@ -77,10 +82,10 @@ export const InfoCmd = utilityCmd({
     }
 
     // 5. Invite
-    const inviteCode = await parseInviteCodeInput(value);
+    const inviteCode = parseInviteCodeInput(value) ?? value;
     if (inviteCode) {
       const invite = await resolveInvite(pluginData.client, inviteCode, true);
-      if (invite) {
+      if (invite && userCfg.can_inviteinfo) {
         const embed = await getInviteInfoEmbed(pluginData, inviteCode);
         if (embed) {
           message.channel.createMessage({ embed });
@@ -91,7 +96,7 @@ export const InfoCmd = utilityCmd({
 
     // 6. Server again (fallback for discovery servers)
     const serverPreview = getGuildPreview(pluginData.client, value).catch(() => null);
-    if (serverPreview) {
+    if (serverPreview && userCfg.can_server) {
       const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
       if (embed) {
         message.channel.createMessage({ embed });
@@ -100,13 +105,17 @@ export const InfoCmd = utilityCmd({
     }
 
     // 7. Arbitrary ID
-    if (isValidSnowflake(value)) {
+    if (isValidSnowflake(value) && userCfg.can_snowflake) {
       const embed = await getSnowflakeInfoEmbed(pluginData, value, true, message.author.id);
       message.channel.createMessage({ embed });
       return;
     }
 
     // 7. No can do
-    sendErrorMessage(pluginData, message.channel, "Could not find anything with that value");
+    sendErrorMessage(
+      pluginData,
+      message.channel,
+      "Could not find anything with that value or you are lacking permission for the snowflake type",
+    );
   },
 });

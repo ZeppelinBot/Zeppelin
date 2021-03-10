@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
 
-export const ServerCmd = utilityCmd({
+export const ServerInfoCmd = utilityCmd({
   trigger: ["server", "serverinfo"],
   description: "Show server information",
   usage: "!server",

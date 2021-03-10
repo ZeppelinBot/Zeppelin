@@ -25,7 +25,8 @@ export async function actualKickMemberCmd(
 ) {
   const user = await resolveUser(pluginData.client, args.user);
   if (!user.id) {
-    return sendErrorMessage(pluginData, msg.channel, `User not found`);
+    sendErrorMessage(pluginData, msg.channel, `User not found`);
+    return;
   }
 
   const memberToKick = await resolveMember(pluginData.client, pluginData.guild, user.id);

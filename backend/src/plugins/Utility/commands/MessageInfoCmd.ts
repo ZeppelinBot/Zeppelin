@@ -8,7 +8,7 @@ export const MessageInfoCmd = utilityCmd({
   trigger: ["message", "messageinfo"],
   description: "Show information about a message",
   usage: "!message 534722016549404673-534722219696455701",
-  permission: "can_message",
+  permission: "can_messageinfo",
 
   signature: {
     message: ct.messageTarget(),

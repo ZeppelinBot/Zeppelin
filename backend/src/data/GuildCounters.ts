@@ -1,0 +1,501 @@
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { getRepository, In, IsNull, LessThan, Not, Repository } from "typeorm";
+import { Counter } from "./entities/Counter";
+import { CounterValue } from "./entities/CounterValue";
+import { CounterTrigger, TRIGGER_COMPARISON_OPS, TriggerComparisonOp } from "./entities/CounterTrigger";
+import { CounterTriggerState } from "./entities/CounterTriggerState";
+import moment from "moment-timezone";
+import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
+import { connection } from "./db";
+
+const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})([1-9]\\d*)$`);
+
+/**
+ * @return Parsed comparison op and value, or null if the comparison string was invalid
+ */
+export function parseCondition(str: string): [TriggerComparisonOp, number] | null {
+  const matches = str.match(comparisonStringRegex);
+  return matches ? [matches[1] as TriggerComparisonOp, parseInt(matches[2], 10)] : null;
+}
+
+export function buildConditionString(comparisonOp: TriggerComparisonOp, comparisonValue: number): string {
+  return `${comparisonOp}${comparisonValue}`;
+}
+
+function isValidComparisonOp(op: string): boolean {
+  return TRIGGER_COMPARISON_OPS.includes(op as any);
+}
+
+const REVERSE_OPS: Record<TriggerComparisonOp, TriggerComparisonOp> = {
+  "=": "!=",
+  "!=": "=",
+  ">": "<=",
+  "<": ">=",
+  ">=": "<",
+  "<=": ">",
+};
+
+function getReverseComparisonOp(op: TriggerComparisonOp): TriggerComparisonOp {
+  return REVERSE_OPS[op];
+}
+
+const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
+const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;
+
+const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
+
+async function deleteCountersMarkedToBeDeleted(): Promise<void> {
+  await getRepository(Counter)
+    .createQueryBuilder()
+    .where("delete_at <= NOW()")
+    .delete()
+    .execute();
+}
+
+async function deleteTriggersMarkedToBeDeleted(): Promise<void> {
+  await getRepository(CounterTrigger)
+    .createQueryBuilder()
+    .where("delete_at <= NOW()")
+    .delete()
+    .execute();
+}
+
+setInterval(deleteCountersMarkedToBeDeleted, 1 * HOURS);
+setInterval(deleteTriggersMarkedToBeDeleted, 1 * HOURS);
+
+setTimeout(deleteCountersMarkedToBeDeleted, 1 * MINUTES);
+setTimeout(deleteTriggersMarkedToBeDeleted, 1 * MINUTES);
+
+export class GuildCounters extends BaseGuildRepository {
+  private counters: Repository<Counter>;
+  private counterValues: Repository<CounterValue>;
+  private counterTriggers: Repository<CounterTrigger>;
+  private counterTriggerStates: Repository<CounterTriggerState>;
+
+  constructor(guildId) {
+    super(guildId);
+    this.counters = getRepository(Counter);
+    this.counterValues = getRepository(CounterValue);
+    this.counterTriggers = getRepository(CounterTrigger);
+    this.counterTriggerStates = getRepository(CounterTriggerState);
+  }
+
+  async findOrCreateCounter(name: string, perChannel: boolean, perUser: boolean): Promise<Counter> {
+    const existing = await this.counters.findOne({
+      where: {
+        guild_id: this.guildId,
+        name,
+      },
+    });
+
+    if (existing) {
+      // If the existing counter's properties match the ones we're looking for, return it.
+      // Otherwise, delete the existing counter and re-create it with the proper properties.
+      if (existing.per_channel === perChannel && existing.per_user === perUser) {
+        return existing;
+      }
+
+      await this.counters.delete({ id: existing.id });
+    }
+
+    const insertResult = await this.counters.insert({
+      guild_id: this.guildId,
+      name,
+      per_channel: perChannel,
+      per_user: perUser,
+      last_decay_at: moment.utc().format(DBDateFormat),
+    });
+
+    return (await this.counters.findOne({
+      where: {
+        id: insertResult.identifiers[0].id,
+      },
+    }))!;
+  }
+
+  async markUnusedCountersToBeDeleted(idsToKeep: number[]): Promise<void> {
+    if (idsToKeep.length === 0) {
+      return;
+    }
+
+    const deleteAt = moment
+      .utc()
+      .add(DELETE_UNUSED_COUNTERS_AFTER, "ms")
+      .format(DBDateFormat);
+    await this.counters.update(
+      {
+        guild_id: this.guildId,
+        id: Not(In(idsToKeep)),
+        delete_at: IsNull(),
+      },
+      {
+        delete_at: deleteAt,
+      },
+    );
+  }
+
+  async deleteCountersMarkedToBeDeleted(): Promise<void> {
+    await this.counters
+      .createQueryBuilder()
+      .where("delete_at <= NOW()")
+      .delete()
+      .execute();
+  }
+
+  async changeCounterValue(id: number, channelId: string | null, userId: string | null, change: number): Promise<void> {
+    if (typeof change !== "number" || Number.isNaN(change) || !Number.isFinite(change)) {
+      throw new Error(`changeCounterValue() change argument must be a number`);
+    }
+
+    channelId = channelId || "0";
+    userId = userId || "0";
+
+    const rawUpdate =
+      change >= 0 ? `value = LEAST(value + ${change}, ${MAX_COUNTER_VALUE})` : `value = GREATEST(value ${change}, 0)`;
+
+    await this.counterValues.query(
+      `
+      INSERT INTO counter_values (counter_id, channel_id, user_id, value)
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE ${rawUpdate}
+    `,
+      [id, channelId, userId, Math.max(change, 0)],
+    );
+  }
+
+  async setCounterValue(id: number, channelId: string | null, userId: string | null, value: number): Promise<void> {
+    if (typeof value !== "number" || Number.isNaN(value) || !Number.isFinite(value)) {
+      throw new Error(`setCounterValue() value argument must be a number`);
+    }
+
+    channelId = channelId || "0";
+    userId = userId || "0";
+
+    value = Math.max(value, 0);
+
+    await this.counterValues.query(
+      `
+      INSERT INTO counter_values (counter_id, channel_id, user_id, value)
+      VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE value = ?
+    `,
+      [id, channelId, userId, value, value],
+    );
+  }
+
+  async decay(id: number, decayPeriodMs: number, decayAmount: number) {
+    const counter = (await this.counters.findOne({
+      where: {
+        id,
+      },
+    }))!;
+
+    const diffFromLastDecayMs = moment.utc().diff(moment.utc(counter.last_decay_at!), "ms");
+    if (diffFromLastDecayMs < decayPeriodMs) {
+      return;
+    }
+
+    const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
+    if (decayAmountToApply === 0) {
+      return;
+    }
+
+    // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
+    const newLastDecayDate = moment
+      .utc(counter.last_decay_at)
+      .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
+      .format(DBDateFormat);
+
+    const rawUpdate =
+      decayAmountToApply >= 0
+        ? `GREATEST(value - ${decayAmountToApply}, 0)`
+        : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
+
+    await this.counterValues.update(
+      {
+        counter_id: id,
+      },
+      {
+        value: () => rawUpdate,
+      },
+    );
+
+    await this.counters.update(
+      {
+        id,
+      },
+      {
+        last_decay_at: newLastDecayDate,
+      },
+    );
+  }
+
+  async markAllTriggersTobeDeleted() {
+    const deleteAt = moment
+      .utc()
+      .add(DELETE_UNUSED_COUNTER_TRIGGERS_AFTER, "ms")
+      .format(DBDateFormat);
+    await this.counterTriggers.update(
+      {},
+      {
+        delete_at: deleteAt,
+      },
+    );
+  }
+
+  async deleteTriggersMarkedToBeDeleted(): Promise<void> {
+    await this.counterTriggers
+      .createQueryBuilder()
+      .where("delete_at <= NOW()")
+      .delete()
+      .execute();
+  }
+
+  async initCounterTrigger(
+    counterId: number,
+    comparisonOp: TriggerComparisonOp,
+    comparisonValue: number,
+  ): Promise<CounterTrigger> {
+    if (!isValidComparisonOp(comparisonOp)) {
+      throw new Error(`Invalid comparison op: ${comparisonOp}`);
+    }
+
+    if (typeof comparisonValue !== "number") {
+      throw new Error(`Invalid comparison value: ${comparisonValue}`);
+    }
+
+    return connection.transaction(async entityManager => {
+      const existing = await entityManager.findOne(CounterTrigger, {
+        counter_id: counterId,
+        comparison_op: comparisonOp,
+        comparison_value: comparisonValue,
+      });
+
+      if (existing) {
+        // Since all existing triggers are marked as to-be-deleted before they are re-initialized, this needs to be reset
+        await entityManager.update(CounterTrigger, existing.id, { delete_at: null });
+        return existing;
+      }
+
+      const insertResult = await entityManager.insert(CounterTrigger, {
+        counter_id: counterId,
+        comparison_op: comparisonOp,
+        comparison_value: comparisonValue,
+      });
+
+      return (await entityManager.findOne(CounterTrigger, insertResult.identifiers[0].id))!;
+    });
+  }
+
+  /**
+   * Checks if a counter value with the given parameters triggers the specified comparison for the specified counter.
+   * If it does, mark this comparison for these parameters as triggered.
+   * Note that if this comparison for these parameters was already triggered previously, this function will return false.
+   * This means that a specific comparison for the specific parameters specified will only trigger *once* until the reverse trigger is triggered.
+   *
+   * @param counterId
+   * @param comparisonOp
+   * @param comparisonValue
+   * @param userId
+   * @param channelId
+   * @return Whether the given parameters newly triggered the given comparison
+   */
+  async checkForTrigger(
+    counterTrigger: CounterTrigger,
+    channelId: string | null,
+    userId: string | null,
+  ): Promise<boolean> {
+    channelId = channelId || "0";
+    userId = userId || "0";
+
+    return connection.transaction(async entityManager => {
+      const previouslyTriggered = await entityManager.findOne(CounterTriggerState, {
+        trigger_id: counterTrigger.id,
+        user_id: userId!,
+        channel_id: channelId!,
+      });
+
+      if (previouslyTriggered) {
+        return false;
+      }
+
+      const matchingValue = await entityManager
+        .createQueryBuilder(CounterValue, "cv")
+        .leftJoin(
+          CounterTriggerState,
+          "triggerStates",
+          "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
+          { triggerId: counterTrigger.id },
+        )
+        .where(`cv.value ${counterTrigger.comparison_op} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
+        .andWhere("cv.channel_id = :channelId AND cv.user_id = :userId", { channelId, userId })
+        .andWhere("triggerStates.id IS NULL")
+        .getOne();
+
+      if (matchingValue) {
+        await entityManager.insert(CounterTriggerState, {
+          trigger_id: counterTrigger.id,
+          user_id: userId!,
+          channel_id: channelId!,
+        });
+
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  /**
+   * Checks if any counter values of the specified counter match the specified comparison.
+   * Like checkForTrigger(), this can only happen *once* per unique counter value parameters until the reverse trigger is triggered for those values.
+   *
+   * @return Counter value parameters that triggered the condition
+   */
+  async checkAllValuesForTrigger(
+    counterTrigger: CounterTrigger,
+  ): Promise<Array<{ channelId: string; userId: string }>> {
+    return connection.transaction(async entityManager => {
+      const matchingValues = await entityManager
+        .createQueryBuilder(CounterValue, "cv")
+        .leftJoin(
+          CounterTriggerState,
+          "triggerStates",
+          "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
+          { triggerId: counterTrigger.id },
+        )
+        .where(`cv.value ${counterTrigger.comparison_op} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
+        .andWhere("triggerStates.id IS NULL")
+        .getMany();
+
+      if (matchingValues.length) {
+        await entityManager.insert(
+          CounterTriggerState,
+          matchingValues.map(row => ({
+            trigger_id: counterTrigger.id,
+            channelId: row.channel_id,
+            userId: row.user_id,
+          })),
+        );
+      }
+
+      return matchingValues.map(row => ({
+        channelId: row.channel_id,
+        userId: row.user_id,
+      }));
+    });
+  }
+
+  /**
+   * Checks if a counter value with the given parameters *no longer* matches the specified comparison, and thus triggers a "reverse trigger".
+   * Like checkForTrigger(), this can only happen *once* until the comparison is triggered normally again.
+   *
+   * @param counterId
+   * @param comparisonOp
+   * @param comparisonValue
+   * @param userId
+   * @param channelId
+   * @return Whether the given parameters triggered a reverse trigger for the given comparison
+   */
+  async checkForReverseTrigger(
+    counterTrigger: CounterTrigger,
+    channelId: string | null,
+    userId: string | null,
+  ): Promise<boolean> {
+    channelId = channelId || "0";
+    userId = userId || "0";
+
+    return connection.transaction(async entityManager => {
+      const reverseOp = getReverseComparisonOp(counterTrigger.comparison_op);
+      const matchingValue = await entityManager
+        .createQueryBuilder(CounterValue, "cv")
+        .innerJoin(
+          CounterTriggerState,
+          "triggerStates",
+          "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
+          { triggerId: counterTrigger.id },
+        )
+        .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
+        .andWhere(`cv.channel_id = :channelId AND cv.user_id = :userId`, { channelId, userId })
+        .getOne();
+
+      if (matchingValue) {
+        await entityManager.delete(CounterTriggerState, {
+          trigger_id: counterTrigger.id,
+          user_id: userId!,
+          channel_id: channelId!,
+        });
+
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  /**
+   * Checks if any counter values of the specified counter *no longer* match the specified comparison, and thus triggers a "reverse trigger" for those values.
+   * Like checkForTrigger(), this can only happen *once* per unique counter value parameters until the comparison is triggered normally again.
+   *
+   * @return Counter value parameters that triggered a reverse trigger
+   */
+  async checkAllValuesForReverseTrigger(
+    counterTrigger: CounterTrigger,
+  ): Promise<Array<{ channelId: string; userId: string }>> {
+    return connection.transaction(async entityManager => {
+      const reverseOp = getReverseComparisonOp(counterTrigger.comparison_op);
+      const matchingValues: Array<{
+        id: string;
+        triggerStateId: string;
+        user_id: string;
+        channel_id: string;
+      }> = await entityManager
+        .createQueryBuilder(CounterValue, "cv")
+        .innerJoin(
+          CounterTriggerState,
+          "triggerStates",
+          "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
+          { triggerId: counterTrigger.id },
+        )
+        .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
+        .select([
+          "cv.id AS id",
+          "cv.user_id AS user_id",
+          "cv.channel_id AS channel_id",
+          "triggerStates.id AS triggerStateId",
+        ])
+        .getRawMany();
+
+      if (matchingValues.length) {
+        await entityManager.delete(CounterTriggerState, {
+          id: In(matchingValues.map(v => v.triggerStateId)),
+        });
+      }
+
+      return matchingValues.map(row => ({
+        channelId: row.channel_id,
+        userId: row.user_id,
+      }));
+    });
+  }
+
+  async getCurrentValue(
+    counterId: number,
+    channelId: string | null,
+    userId: string | null,
+  ): Promise<number | undefined> {
+    const value = await this.counterValues.findOne({
+      where: {
+        counter_id: counterId,
+        channel_id: channelId || "0",
+        user_id: userId || "0",
+      },
+    });
+
+    return value?.value;
+  }
+}

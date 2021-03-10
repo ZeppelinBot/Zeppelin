@@ -16,6 +16,7 @@ import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { caseAbbreviations } from "../caseAbbreviations";
 import { getCaseIcon } from "./getCaseIcon";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { splitIntoCleanChunks, splitMessageIntoChunks } from "knub/dist/helpers";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;
@@ -49,9 +50,8 @@ export async function getCaseSummary(
   if (reason.length > CASE_SUMMARY_REASON_MAX_LENGTH) {
     const match = reason.slice(CASE_SUMMARY_REASON_MAX_LENGTH, 100).match(/(?:[.,!?\s]|$)/);
     const nextWhitespaceIndex = match ? CASE_SUMMARY_REASON_MAX_LENGTH + match.index! : CASE_SUMMARY_REASON_MAX_LENGTH;
-    if (nextWhitespaceIndex < reason.length) {
-      reason = reason.slice(0, nextWhitespaceIndex - 1) + "...";
-    }
+    const reasonChunks = splitMessageIntoChunks(reason, nextWhitespaceIndex);
+    reason = reasonChunks[0] + "...";
   }
 
   reason = disableLinkPreviews(reason);

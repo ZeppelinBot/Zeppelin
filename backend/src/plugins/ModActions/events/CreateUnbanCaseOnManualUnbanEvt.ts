@@ -66,5 +66,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
       userId: user.id,
       caseNumber: createdCase?.case_number ?? 0,
     });
+
+    pluginData.state.events.emit("unban", user.id);
   },
 );

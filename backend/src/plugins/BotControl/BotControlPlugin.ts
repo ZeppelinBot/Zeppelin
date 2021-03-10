@@ -15,6 +15,8 @@ import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { Configs } from "../../data/Configs";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
+import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
+import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
 
 const defaultOptions = {
   config: {
@@ -37,6 +39,8 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bo
     DisallowServerCmd,
     AddDashboardUserCmd,
     RemoveDashboardUserCmd,
+    ListDashboardUsersCmd,
+    ListDashboardPermsCmd,
   ],
 
   onLoad(pluginData) {
