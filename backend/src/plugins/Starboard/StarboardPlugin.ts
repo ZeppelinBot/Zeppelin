@@ -57,6 +57,19 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starb
               stars_required: 5
       ~~~
       
+      ### Basic starboard with custom color
+      Any message on the server that gets 5 star reactions will be posted into the starboard channel (604342689038729226), with the given color (0x87CEEB).
+      
+      ~~~yml
+      starboard:
+        config:
+          boards:
+            basic:
+              channel_id: "604342689038729226"
+              stars_required: 5
+              color: 0x87CEEB
+      ~~~
+      
       ### Custom star emoji
       This is identical to the basic starboard above, but accepts two emoji: the regular star and a custom :mrvnSmile: emoji
       
