@@ -77,6 +77,13 @@ export async function actualKickMemberCmd(
     },
   });
 
+  if (pluginData.config.getForMember(msg.member).delete_invites_on_kick) {
+    const userInvites = (await pluginData.guild.getInvites()).filter(inv => inv.inviter?.id === user.id);
+    userInvites.forEach(invite => {
+      invite.delete("User kicked from server");
+    });
+  }
+
   if (args.clean) {
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, memberToKick.id);
     ignoreEvent(pluginData, IgnoredEventType.Ban, memberToKick.id);

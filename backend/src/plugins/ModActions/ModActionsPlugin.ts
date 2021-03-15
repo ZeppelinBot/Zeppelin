@@ -52,6 +52,8 @@ const defaultOptions = {
     message_on_warn: false,
     message_on_kick: false,
     message_on_ban: false,
+    delete_invites_on_kick: false,
+    delete_invites_on_ban: false,
     message_channel: null,
     warn_message: "You have received a warning on the {guildName} server: {reason}",
     kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",

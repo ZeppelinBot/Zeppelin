@@ -18,6 +18,8 @@ export const ConfigSchema = t.type({
   message_on_warn: t.boolean,
   message_on_kick: t.boolean,
   message_on_ban: t.boolean,
+  delete_invites_on_kick: t.boolean,
+  delete_invites_on_ban: t.boolean,
   message_channel: tNullable(t.string),
   warn_message: tNullable(t.string),
   kick_message: tNullable(t.string),
