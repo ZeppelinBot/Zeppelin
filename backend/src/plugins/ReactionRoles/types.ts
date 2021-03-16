@@ -8,6 +8,8 @@ export const ConfigSchema = t.type({
   auto_refresh_interval: t.number,
   remove_user_reactions: t.boolean,
   can_manage: t.boolean,
+  dm_on_change: t.boolean,
+  change_message: t.string,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

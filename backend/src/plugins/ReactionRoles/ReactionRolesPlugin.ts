@@ -17,6 +17,8 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   config: {
     auto_refresh_interval: MIN_AUTO_REFRESH,
     remove_user_reactions: true,
+    dm_on_change: true,
+    change_message: "Your roles have been modified on {guildName}:\nRemoved: {removedRoles}\nAdded: {addedRoles}",
 
     can_manage: false,
   },
