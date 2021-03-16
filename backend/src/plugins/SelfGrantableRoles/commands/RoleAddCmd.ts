@@ -6,6 +6,7 @@ import { splitRoleNames } from "../util/splitRoleNames";
 import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { findMatchingRoles } from "../util/findMatchingRoles";
 import { Role } from "eris";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],
@@ -16,7 +17,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const lock = await pluginData.locks.acquire(`grantableRoles:${msg.author.id}`);
+    const lock = await pluginData.locks.acquire(memberRolesLock(msg.author));
 
     const applyingEntries = getApplyingEntries(pluginData, msg);
     if (applyingEntries.length === 0) {

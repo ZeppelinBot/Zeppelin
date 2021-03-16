@@ -1,4 +1,5 @@
 import { GuildPluginData } from "knub";
+import { counterIdLock } from "../../../utils/lockNameHelpers";
 import { CountersPluginType } from "../types";
 import { checkCounterTrigger } from "./checkCounterTrigger";
 import { checkReverseCounterTrigger } from "./checkReverseCounterTrigger";
@@ -28,7 +29,7 @@ export async function changeCounterValue(
   userId = counter.per_user ? userId : null;
 
   const counterId = pluginData.state.counterIds[counterName];
-  const lock = await pluginData.locks.acquire(counterId.toString());
+  const lock = await pluginData.locks.acquire(counterIdLock(counterId));
 
   await pluginData.state.counters.changeCounterValue(counterId, channelId, userId, change);
 
