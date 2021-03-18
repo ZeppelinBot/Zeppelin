@@ -1,0 +1,42 @@
+import * as t from "io-ts";
+import { automodAction } from "../helpers";
+import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
+import { LogType } from "../../../data/LogType";
+
+export const SetSlowmodeAction = automodAction({
+  configType: t.type({
+    channels: t.array(t.string),
+    duration: tNullable(tDelayString),
+  }),
+
+  defaultConfig: {
+    duration: "10s",
+  },
+
+  async apply({ pluginData, actionConfig }) {
+    const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0;
+
+    for (const channelId of actionConfig.channels) {
+      const channel = pluginData.guild.channels.get(channelId);
+      // 2 = Guild Voice, 5 = Guild News - Both dont allow slowmode
+      if (!channel || channel.type === 2 || channel.type === 5) continue;
+
+      try {
+        await channel.edit({
+          rateLimitPerUser: duration / 1000, // ms -> seconds
+        });
+      } catch (e) {
+        let errorMessage = e;
+
+        // Check for invalid form body -> indicates duration was too large
+        if (isDiscordRESTError(e) && e.code === 50035) {
+          errorMessage = `Duration is greater than maximum native slowmode duration`;
+        }
+
+        pluginData.state.logs.log(LogType.BOT_ALERT, {
+          body: `Unable to set slowmode for channel ${channel.id} to ${duration / 1000} seconds: ${errorMessage}`,
+        });
+      }
+    }
+  },
+});
