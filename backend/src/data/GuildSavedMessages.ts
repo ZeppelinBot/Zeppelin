@@ -96,6 +96,17 @@ export class GuildSavedMessages extends BaseGuildRepository {
       .getMany();
   }
 
+  getLatestByUser(userId, limit = 20) {
+    return this.messages
+      .createQueryBuilder()
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("user_id = :user_id", { user_id: userId })
+      .andWhere("deleted_at IS NULL")
+      .orderBy("id", "DESC")
+      .limit(limit)
+      .getMany();
+  }
+
   getUserMessagesByChannelAfterId(userId, channelId, afterId, limit?: number) {
     let query = this.messages
       .createQueryBuilder()

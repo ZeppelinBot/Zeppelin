@@ -18,6 +18,7 @@ export const ConfigSchema = t.type({
   can_channelinfo: t.boolean,
   can_messageinfo: t.boolean,
   can_userinfo: t.boolean,
+  can_showmessage: t.boolean,
   can_snowflake: t.boolean,
   can_reload_guild: t.boolean,
   can_nickname: t.boolean,
