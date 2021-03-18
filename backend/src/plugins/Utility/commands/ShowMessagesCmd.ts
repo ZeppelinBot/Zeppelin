@@ -1,14 +1,23 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { chunkMessageLines, convertMSToDelayString, EmbedWith } from "../../../utils";
+import {
+  chunkMessageLines,
+  convertMSToDelayString,
+  disableCodeBlocks,
+  disableInlineCode,
+  EmbedWith,
+} from "../../../utils";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import moment from "moment";
+import { canReadChannel } from "../../../utils/canReadChannel";
+import { GuildChannel } from "eris";
 
 export const ShowMessagesCmd = utilityCmd({
   trigger: ["show_messages", "messages", "recent_messages", "showmessages"],
   description: "Shows recent messages of a user",
   usage: "!show_messages 108552944961454080",
   permission: "can_showmessage",
+  source: "guild",
 
   signature: {
     user: ct.resolvedUser(),
@@ -35,15 +44,16 @@ export const ShowMessagesCmd = utilityCmd({
     let description = "";
     for (const channel in messagesToChannelMap) {
       const messages: SavedMessage[] = messagesToChannelMap[channel];
+      if (!canReadChannel(pluginData.guild.channels.get(channel) as GuildChannel, message.member)) continue;
       description += `**Messages in <#${channel}>:**`;
 
       for (const msg of messages) {
         // Trim preview down to 50 (47 with ...) characters as to not overflow chat (unless -f switch is set)
         const formattedContent =
-          msg.data.content.length > 47 && !args.fullMessage
+          msg.data.content.length > 50 && !args.fullMessage
             ? msg.data.content.substring(0, 47) + "..."
             : msg.data.content;
-        // We remove milliseconds here as to not show 3 decimal points (which appears on convertMSToDelayString and humanizeDurationShort both)
+        // We remove milliseconds here as to not show 3 decimal points (which appears on both convertMSToDelayString and humanizeDurationShort)
         const timeAgo = convertMSToDelayString(
           moment()
             .milliseconds(0)
@@ -53,7 +63,9 @@ export const ShowMessagesCmd = utilityCmd({
               .valueOf(),
         );
 
-        description += `\n\`${formattedContent}\`, ${timeAgo} ago \[[Link](https://discord.com/channels/${msg.guild_id}/${msg.channel_id}/${msg.id})\]`;
+        description += `\n\`${disableCodeBlocks(
+          disableInlineCode(formattedContent),
+        )}\`, ${timeAgo} ago \[[Link](https://discord.com/channels/${msg.guild_id}/${msg.channel_id}/${msg.id})\]`;
       }
       description += `\n\n`;
     }
