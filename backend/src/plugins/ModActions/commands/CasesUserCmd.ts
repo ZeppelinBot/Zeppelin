@@ -20,6 +20,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
+  reverseFilters: ct.switchOption({ shortcut: "r" }),
   onlyNotes: ct.switchOption({ shortcut: "n" }),
   onlyWarns: ct.switchOption({ shortcut: "w" }),
   onlyMutes: ct.switchOption({ shortcut: "m" }),
@@ -57,7 +58,12 @@ export const CasesUserCmd = modActionsCmd({
     if (args.onyUnmutes) typesToShow.push(CaseTypes.Unmute);
     if (args.onlyBans) typesToShow.push(CaseTypes.Ban);
     if (args.onyUnbans) typesToShow.push(CaseTypes.Unban);
-    if (typesToShow.length > 0) cases = cases.filter(c => typesToShow.includes(c.type));
+
+    if (typesToShow.length > 0) {
+      if (args.reverseFilters) cases = cases.filter(c => !typesToShow.includes(c.type));
+      // Reversed: Hide specified types
+      else cases = cases.filter(c => typesToShow.includes(c.type)); // Normal: Show only specified types
+    }
 
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
