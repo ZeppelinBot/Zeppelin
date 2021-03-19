@@ -1,4 +1,4 @@
-![alt text](https://cdn.discordapp.com/attachments/387632118613671936/822453280981909524/3rt4e.png)
+![Zeppelin Banner](https://cdn.discordapp.com/attachments/387632118613671936/822453280981909524/3rt4e.png)
 # Zeppelin
 Zeppelin is a moderation bot for Discord, designed with large servers and reliability in mind.
 
