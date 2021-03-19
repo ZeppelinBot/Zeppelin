@@ -18,7 +18,7 @@ export function createStarboardEmbedFromMessage(msg: Message, copyFullEmbed: boo
     },
     fields: [],
     timestamp: new Date(msg.timestamp).toISOString(),
-    color: color,
+    color,
   };
 
   if (msg.author.avatarURL) {
