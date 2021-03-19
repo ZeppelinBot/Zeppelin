@@ -30,7 +30,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
 import { warnMember } from "./functions/warnMember";
-import { Member } from "eris";
+import { Member, Message } from "eris";
 import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
@@ -43,6 +43,7 @@ import { EventEmitter } from "events";
 import { mapToPublicFn } from "../../pluginUtils";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
+import { updateCase } from "./functions/updateCase";
 
 const defaultOptions = {
   config: {
@@ -167,6 +168,12 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     banUserId(pluginData) {
       return (userId: string, reason?: string, banOptions?: BanOptions) => {
         banUserId(pluginData, userId, reason, banOptions);
+      };
+    },
+
+    updateCase(pluginData) {
+      return (msg: Message, caseNumber: number | null, note: string) => {
+        updateCase(pluginData, msg, { caseNumber, note });
       };
     },
 
