@@ -15,10 +15,17 @@ import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { EmbedOptions, User } from "eris";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { asyncMap } from "../../../utils/async";
+import { CaseTypes } from "../../../data/CaseTypes";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
+  onlyNotes: ct.switchOption({ shortcut: "n" }),
+  onlyWarns: ct.switchOption({ shortcut: "w" }),
+  onlyMutes: ct.switchOption({ shortcut: "m" }),
+  onyUnmutes: ct.switchOption({ shortcut: "um" }),
+  onlyBans: ct.switchOption({ shortcut: "b" }),
+  onyUnbans: ct.switchOption({ shortcut: "ub" }),
 };
 
 export const CasesUserCmd = modActionsCmd({
@@ -41,7 +48,17 @@ export const CasesUserCmd = modActionsCmd({
       return;
     }
 
-    const cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
+    let cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
+
+    const typesToShow: CaseTypes[] = [];
+    if (args.onlyNotes) typesToShow.push(CaseTypes.Note);
+    if (args.onlyWarns) typesToShow.push(CaseTypes.Warn);
+    if (args.onlyMutes) typesToShow.push(CaseTypes.Mute);
+    if (args.onyUnmutes) typesToShow.push(CaseTypes.Unmute);
+    if (args.onlyBans) typesToShow.push(CaseTypes.Ban);
+    if (args.onyUnbans) typesToShow.push(CaseTypes.Unban);
+    if (typesToShow.length > 0) cases = cases.filter(c => typesToShow.includes(c.type));
+
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
