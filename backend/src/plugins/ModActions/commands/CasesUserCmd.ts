@@ -60,9 +60,10 @@ export const CasesUserCmd = modActionsCmd({
     if (args.onyUnbans) typesToShow.push(CaseTypes.Unban);
 
     if (typesToShow.length > 0) {
-      if (args.reverseFilters) cases = cases.filter(c => !typesToShow.includes(c.type));
       // Reversed: Hide specified types
-      else cases = cases.filter(c => typesToShow.includes(c.type)); // Normal: Show only specified types
+      if (args.reverseFilters) cases = cases.filter(c => !typesToShow.includes(c.type));
+      // Normal: Show only specified types
+      else cases = cases.filter(c => typesToShow.includes(c.type));
     }
 
     const normalCases = cases.filter(c => !c.is_hidden);
