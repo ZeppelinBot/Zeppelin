@@ -25,6 +25,7 @@ const defaultOptions = {
   config: {
     mute_role: null,
     move_to_voice_channel: null,
+    kick_from_voice_channel: false,
 
     dm_on_mute: false,
     dm_on_update: false,

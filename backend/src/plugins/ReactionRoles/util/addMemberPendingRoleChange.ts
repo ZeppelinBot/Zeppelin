@@ -2,6 +2,7 @@ import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType, RoleChangeMode, PendingMemberRoleChanges } from "../types";
 import { resolveMember } from "../../../utils";
 import { logger } from "../../../logger";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 1500;
 
@@ -18,7 +19,7 @@ export async function addMemberPendingRoleChange(
       applyFn: async () => {
         pluginData.state.pendingRoleChanges.delete(memberId);
 
-        const lock = await pluginData.locks.acquire(`member-roles-${memberId}`);
+        const lock = await pluginData.locks.acquire(memberRolesLock({ id: memberId }));
 
         const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
         if (member) {

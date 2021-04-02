@@ -10,6 +10,7 @@ import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { messageLock } from "../../../utils/lockNameHelpers";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -18,7 +19,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   if (!channel) return;
 
   // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
-  const thisMsgLock = await pluginData.locks.acquire(`message-${msg.id}`);
+  const thisMsgLock = await pluginData.locks.acquire(messageLock(msg));
   if (thisMsgLock.interrupted) return;
 
   // Check if this channel even *has* a bot-maintained slowmode
