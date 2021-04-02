@@ -23,6 +23,7 @@
       <template v-slot:content>
         <CodeBlock>
           plugins:
+
             counters:
               config:
                 counters:
@@ -90,6 +91,7 @@
       <template v-slot:content>
         <CodeBlock code-lang="yaml">
           plugins:
+
             counters:
               config:
                 counters:
@@ -150,6 +152,7 @@
       <template v-slot:content>
         <CodeBlock>
           plugins:
+
             counters:
               config:
                 counters:
@@ -230,6 +233,7 @@
       <template v-slot:content>
         <CodeBlock code-lang="yaml">
           plugins:
+
             counters:
               config:
                 counters:
@@ -279,6 +283,62 @@
 
                     actions:
                       remove_roles: ["123456789123456789"] # Role ID for activity role
+        </CodeBlock>
+      </template>
+    </Expandable>
+
+    <h3>Auto-disable antiraid</h3>
+    <p>
+      This example disables antiraid after a specific delay.
+    </p>
+
+    <Expandable class="wide">
+      <template v-slot:title>Click to view example</template>
+      <template v-slot:content>
+        <CodeBlock code-lang="yaml">
+          plugins:
+
+            counters:
+              config:
+                counters:
+
+                  antiraid_decay:
+                    triggers:
+                      disable:
+                        condition: "=0"
+                    decay:
+                      amount: 1
+                      every: 1m
+
+            automod:
+              config:
+                rules:
+
+                  start_antiraid_timer_low:
+                    triggers:
+                      - antiraid_level:
+                          level: "low"
+                    actions:
+                      set_counter:
+                        counter: "antiraid_decay"
+                        amount: 10 # "Disable after 10min"
+
+                  start_antiraid_timer_high:
+                    triggers:
+                      - antiraid_level:
+                          level: "high"
+                    actions:
+                      set_counter:
+                        counter: "antiraid_decay"
+                        amount: 20 # "Disable after 20min"
+
+                  disable_antiraid_after_timer:
+                    triggers:
+                      - counter_trigger:
+                          counter: "antiraid_decay"
+                          trigger: "disable"
+                    actions:
+                      set_antiraid_level: null
         </CodeBlock>
       </template>
     </Expandable>
