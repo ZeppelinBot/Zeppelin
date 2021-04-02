@@ -21,7 +21,7 @@
     <Expandable class="wide">
       <template v-slot:title>Click to view example</template>
       <template v-slot:content>
-        <CodeBlock>
+        <CodeBlock code-lang="yaml">
           plugins:
 
             counters:
@@ -150,7 +150,7 @@
     <Expandable class="wide">
       <template v-slot:title>Click to view example</template>
       <template v-slot:content>
-        <CodeBlock>
+        <CodeBlock code-lang="yaml">
           plugins:
 
             counters:
