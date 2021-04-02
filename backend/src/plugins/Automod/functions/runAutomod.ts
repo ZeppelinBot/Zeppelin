@@ -27,7 +27,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
-      return;
+      continue;
     }
 
     let matchResult: AutomodTriggerMatchResult<any> | null | undefined;
