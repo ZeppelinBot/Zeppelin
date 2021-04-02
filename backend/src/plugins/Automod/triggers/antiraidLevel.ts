@@ -27,6 +27,7 @@ export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()
   },
 
   renderMatchInformation({ matchResult, pluginData, contexts, triggerConfig }) {
-    return `Antiraid level was set to ...`;
+    const newLevel = contexts[0].antiraid!.level;
+    return newLevel ? `Antiraid level was set to ${newLevel}` : `Antiraid was turned off`;
   },
 });
