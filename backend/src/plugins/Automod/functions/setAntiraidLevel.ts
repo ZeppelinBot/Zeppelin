@@ -14,7 +14,7 @@ export async function setAntiraidLevel(
   pluginData.state.cachedAntiraidLevel = newLevel;
   await pluginData.state.antiraidLevels.set(newLevel);
 
-  runAutomodOnAntiraidLevel(pluginData, newLevel);
+  runAutomodOnAntiraidLevel(pluginData, newLevel, user);
 
   const logs = pluginData.getPlugin(LogsPlugin);
 
