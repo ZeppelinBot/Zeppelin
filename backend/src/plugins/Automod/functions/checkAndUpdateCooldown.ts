@@ -8,7 +8,7 @@ export function checkAndUpdateCooldown(
   rule: TRule,
   context: AutomodContext,
 ) {
-  const cooldownKey = context.user?.id;
+  const cooldownKey = `${rule.name}-${context.user?.id}`;
 
   if (cooldownKey) {
     if (pluginData.state.cooldownManager.isOnCooldown(cooldownKey)) {
