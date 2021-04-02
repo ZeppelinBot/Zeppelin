@@ -17,7 +17,7 @@ import { MemberJoinTrigger } from "./memberJoin";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
-import { CounterTrigger } from "./counter";
+import { CounterTrigger } from "./counterTrigger";
 import { NoteTrigger } from "./note";
 import { WarnTrigger } from "./warn";
 import { MuteTrigger } from "./mute";
@@ -46,7 +46,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   member_join_spam: MemberJoinSpamTrigger,
   sticker_spam: StickerSpamTrigger,
 
-  counter: CounterTrigger,
+  counter_trigger: CounterTrigger,
 
   note: NoteTrigger,
   warn: WarnTrigger,
@@ -77,7 +77,7 @@ export const AvailableTriggers = t.type({
   member_join_spam: MemberJoinSpamTrigger.configType,
   sticker_spam: StickerSpamTrigger.configType,
 
-  counter: CounterTrigger.configType,
+  counter_trigger: CounterTrigger.configType,
 
   note: NoteTrigger.configType,
   warn: WarnTrigger.configType,

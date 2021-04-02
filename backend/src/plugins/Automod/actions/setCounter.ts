@@ -2,26 +2,21 @@ import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { CountersPlugin } from "../../Counters/CountersPlugin";
 
-export const ChangeCounterAction = automodAction({
+export const SetCounterAction = automodAction({
   configType: t.type({
-    name: t.string,
-    change: t.string,
+    counter: t.string,
+    value: t.number,
   }),
 
   defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
-    const change = parseInt(actionConfig.change, 10);
-    if (Number.isNaN(change)) {
-      throw new Error("Invalid change number");
-    }
-
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
-    countersPlugin.changeCounterValue(
-      actionConfig.name,
+    countersPlugin.setCounterValue(
+      actionConfig.counter,
       contexts[0].message?.channel_id || null,
       contexts[0].user?.id || null,
-      change,
+      actionConfig.value,
     );
   },
 });
