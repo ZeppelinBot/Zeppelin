@@ -83,7 +83,7 @@ export async function getServerInfoEmbed(
 
   // IMAGE LINKS
   const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL})`;
-  const bannerUrl = restGuild?.bannerURL ? `[Link](${restGuild?.bannerURL})` : "None";
+  const bannerUrl = restGuild?.bannerURL ? `[Link](${restGuild.bannerURL})` : "None";
   const splashUrl =
     (restGuild || guildPreview)!.splashURL != null
       ? `[Link](${(restGuild || guildPreview)!.splashURL?.replace("size=128", "size=2048")})`
