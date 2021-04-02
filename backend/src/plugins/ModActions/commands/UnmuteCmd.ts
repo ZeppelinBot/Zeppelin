@@ -1,10 +1,11 @@
 import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember } from "../../../utils";
+import { resolveUser, resolveMember, noop } from "../../../utils";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
 import { isBanned } from "../functions/isBanned";
+import { waitForReaction } from "knub/dist/helpers";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -57,15 +58,18 @@ export const UnmuteCmd = modActionsCmd({
           msg.channel,
           `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`,
         );
+        return;
       } else {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `User is not on the server. Use \`${prefix}forceunmute\` to unmute them anyway.`,
-        );
-      }
+        // Ask the mod if we should upgrade to a forceunmute as the user is not on the server
+        const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forceunmute instead?");
+        const reply = await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id);
 
-      return;
+        notOnServerMsg.delete().catch(noop);
+        if (!reply || reply.name === "❌") {
+          sendErrorMessage(pluginData, msg.channel, "User not on server, unmute cancelled by moderator");
+          return;
+        }
+      }
     }
 
     // Make sure we're allowed to unmute this member
