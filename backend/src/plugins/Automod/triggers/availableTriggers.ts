@@ -25,8 +25,11 @@ import { UnmuteTrigger } from "./unmute";
 import { KickTrigger } from "./kick";
 import { BanTrigger } from "./ban";
 import { UnbanTrigger } from "./unban";
+import { AnyMessageTrigger } from "./anyMessage";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
+  any_message: AnyMessageTrigger,
+
   match_words: MatchWordsTrigger,
   match_regex: MatchRegexTrigger,
   match_invites: MatchInvitesTrigger,
@@ -58,6 +61,8 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
 };
 
 export const AvailableTriggers = t.type({
+  any_message: AnyMessageTrigger.configType,
+
   match_words: MatchWordsTrigger.configType,
   match_regex: MatchRegexTrigger.configType,
   match_invites: MatchInvitesTrigger.configType,
