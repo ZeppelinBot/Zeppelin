@@ -5,7 +5,7 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import { EmbedOptions } from "eris";
 
 export const AvatarCmd = utilityCmd({
-  trigger: "avatar",
+  trigger: ["avatar", "av"],
   description: "Retrieves a user's profile picture",
   permission: "can_avatar",
 
