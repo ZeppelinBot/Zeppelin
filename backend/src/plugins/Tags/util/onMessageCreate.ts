@@ -99,7 +99,11 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     return;
   }
 
-  const responseMsg = await channel.createMessage(tagResult.renderedContent);
+  const allowMentions = tagResult.category?.allow_mentions ?? config.allow_mentions;
+  const responseMsg = await channel.createMessage({
+    ...tagResult.renderedContent,
+    allowedMentions: { roles: allowMentions, users: allowMentions },
+  });
 
   // Save the command-response message pair once the message is in our database
   const deleteWithCommand = tagResult.category?.delete_with_command ?? config.delete_with_command;
