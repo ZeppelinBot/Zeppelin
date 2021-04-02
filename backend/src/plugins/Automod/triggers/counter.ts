@@ -9,8 +9,8 @@ interface CounterTriggerResult {}
 
 export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
   configType: t.type({
-    name: t.string,
-    condition: t.string,
+    counter: t.string,
+    trigger: t.string,
     reverse: tNullable(t.boolean),
   }),
 
@@ -21,11 +21,11 @@ export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
       return;
     }
 
-    if (context.counterTrigger.name !== triggerConfig.name) {
+    if (context.counterTrigger.counter !== triggerConfig.counter) {
       return;
     }
 
-    if (context.counterTrigger.condition !== triggerConfig.condition) {
+    if (context.counterTrigger.trigger !== triggerConfig.trigger) {
       return;
     }
 
@@ -40,7 +40,13 @@ export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
   },
 
   renderMatchInformation({ matchResult, pluginData, contexts, triggerConfig }) {
-    // TODO: Show user, channel, reverse
-    return `Matched counter \`${triggerConfig.name} ${triggerConfig.condition}\``;
+    let str = `Matched counter trigger \`${contexts[0].counterTrigger!.prettyCounter} / ${
+      contexts[0].counterTrigger!.prettyTrigger
+    }\``;
+    if (contexts[0].counterTrigger!.reverse) {
+      str += " (reverse)";
+    }
+
+    return str;
   },
 });

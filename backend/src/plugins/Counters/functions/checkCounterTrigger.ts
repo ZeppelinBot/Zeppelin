@@ -1,6 +1,5 @@
 import { GuildPluginData } from "knub";
 import { CountersPluginType } from "../types";
-import { buildConditionString } from "../../../data/GuildCounters";
 import { CounterTrigger } from "../../../data/entities/CounterTrigger";
 import { emitCounterEvent } from "./emitCounterEvent";
 
@@ -13,13 +12,6 @@ export async function checkCounterTrigger(
 ) {
   const triggered = await pluginData.state.counters.checkForTrigger(counterTrigger, channelId, userId);
   if (triggered) {
-    await emitCounterEvent(
-      pluginData,
-      "trigger",
-      counterName,
-      buildConditionString(counterTrigger.comparison_op, counterTrigger.comparison_value),
-      channelId,
-      userId,
-    );
+    await emitCounterEvent(pluginData, "trigger", counterName, counterTrigger.name, channelId, userId);
   }
 }

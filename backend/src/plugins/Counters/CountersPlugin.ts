@@ -1,5 +1,5 @@
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, CountersPluginType } from "./types";
+import { ConfigSchema, CountersPluginType, TTrigger } from "./types";
 import { GuildCounters } from "../../data/GuildCounters";
 import { mapToPublicFn } from "../../pluginUtils";
 import { changeCounterValue } from "./functions/changeCounterValue";
@@ -10,16 +10,23 @@ import { onCounterEvent } from "./functions/onCounterEvent";
 import { offCounterEvent } from "./functions/offCounterEvent";
 import { emitCounterEvent } from "./functions/emitCounterEvent";
 import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
-import { initCounterTrigger } from "./functions/initCounterTrigger";
 import { decayCounter } from "./functions/decayCounter";
-import { validateCondition } from "./functions/validateCondition";
 import { StrictValidationError } from "../../validatorUtils";
 import { PluginOptions } from "knub";
 import { ViewCounterCmd } from "./commands/ViewCounterCmd";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { SetCounterCmd } from "./commands/SetCounterCmd";
+import {
+  buildCounterConditionString,
+  CounterTrigger,
+  getReverseCounterComparisonOp,
+  parseCounterConditionString,
+} from "../../data/entities/CounterTrigger";
+import { getPrettyNameForCounter } from "./functions/getPrettyNameForCounter";
+import { getPrettyNameForCounterTrigger } from "./functions/getPrettyNameForCounterTrigger";
 
 const MAX_COUNTERS = 5;
+const MAX_TRIGGERS_PER_COUNTER = 5;
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
 const defaultOptions: PluginOptions<CountersPluginType> = {
@@ -45,14 +52,40 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
 };
 
 const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => {
-  for (const counter of Object.values(options.config?.counters || {})) {
+  for (const [counterName, counter] of Object.entries(options.config?.counters || {})) {
+    counter.name = counterName;
     counter.per_user = counter.per_user ?? false;
     counter.per_channel = counter.per_channel ?? false;
     counter.initial_value = counter.initial_value ?? 0;
+    counter.triggers = counter.triggers || [];
+
+    if (Object.values(counter.triggers).length > MAX_TRIGGERS_PER_COUNTER) {
+      throw new StrictValidationError([`You can only have at most ${MAX_TRIGGERS_PER_COUNTER} triggers per counter`]);
+    }
+
+    // Normalize triggers
+    for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
+      const triggerObj: Partial<TTrigger> = typeof trigger === "string" ? { condition: trigger } : trigger;
+
+      triggerObj.name = triggerName;
+      const parsedCondition = parseCounterConditionString(triggerObj.condition || "");
+      if (!parsedCondition) {
+        throw new StrictValidationError([
+          `Invalid comparison in counter trigger ${counterName}/${triggerName}: "${triggerObj.condition}"`,
+        ]);
+      }
+
+      triggerObj.condition = buildCounterConditionString(parsedCondition[0], parsedCondition[1]);
+      triggerObj.reverse_condition =
+        triggerObj.reverse_condition ||
+        buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
+
+      counter.triggers[triggerName] = triggerObj as TTrigger;
+    }
   }
 
   if (Object.values(options.config?.counters || {}).length > MAX_COUNTERS) {
-    throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} active counters`]);
+    throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
   }
 
   return options;
@@ -76,14 +109,12 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
   public: {
     // Change a counter's value by a relative amount, e.g. +5
     changeCounterValue: mapToPublicFn(changeCounterValue),
+
     // Set a counter's value to an absolute value
     setCounterValue: mapToPublicFn(setCounterValue),
 
-    // Initialize a trigger. Once initialized, events will be fired when this trigger is triggered.
-    initCounterTrigger: mapToPublicFn(initCounterTrigger),
-
-    // Validate a trigger's condition string
-    validateCondition: mapToPublicFn(validateCondition),
+    getPrettyNameForCounter: mapToPublicFn(getPrettyNameForCounter),
+    getPrettyNameForCounterTrigger: mapToPublicFn(getPrettyNameForCounterTrigger),
 
     onCounterEvent: mapToPublicFn(onCounterEvent),
     offCounterEvent: mapToPublicFn(offCounterEvent),
@@ -99,21 +130,47 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
   async onLoad(pluginData) {
     pluginData.state.counters = new GuildCounters(pluginData.guild.id);
     pluginData.state.events = new EventEmitter();
+    pluginData.state.counterTriggersByCounterId = new Map();
+
+    const activeTriggerIds: number[] = [];
 
     // Initialize and store the IDs of each of the counters internally
     pluginData.state.counterIds = {};
     const config = pluginData.config.get();
-    for (const [counterName, counter] of Object.entries(config.counters)) {
+    for (const counter of Object.values(config.counters)) {
       const dbCounter = await pluginData.state.counters.findOrCreateCounter(
-        counterName,
+        counter.name,
         counter.per_channel,
         counter.per_user,
       );
-      pluginData.state.counterIds[counterName] = dbCounter.id;
+      pluginData.state.counterIds[counter.name] = dbCounter.id;
+
+      const thisCounterTriggers: CounterTrigger[] = [];
+      pluginData.state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
+
+      // Initialize triggers
+      for (const trigger of Object.values(counter.triggers)) {
+        const theTrigger = trigger as TTrigger;
+        const parsedCondition = parseCounterConditionString(theTrigger.condition)!;
+        const parsedReverseCondition = parseCounterConditionString(theTrigger.reverse_condition)!;
+        const counterTrigger = await pluginData.state.counters.initCounterTrigger(
+          dbCounter.id,
+          theTrigger.name,
+          parsedCondition[0],
+          parsedCondition[1],
+          parsedReverseCondition[0],
+          parsedReverseCondition[1],
+        );
+        activeTriggerIds.push(counterTrigger.id);
+        thisCounterTriggers.push(counterTrigger);
+      }
     }
 
     // Mark old/unused counters to be deleted later
     await pluginData.state.counters.markUnusedCountersToBeDeleted([...Object.values(pluginData.state.counterIds)]);
+
+    // Mark old/unused triggers to be deleted later
+    await pluginData.state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
 
     // Start decay timers
     pluginData.state.decayTimers = [];
@@ -130,13 +187,6 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
         }, DECAY_APPLY_INTERVAL),
       );
     }
-
-    // Initially set the counter trigger map to just an empty map
-    // The actual triggers are added by other plugins via initCounterTrigger()
-    pluginData.state.counterTriggersByCounterId = new Map();
-
-    // Mark all triggers to be deleted later. This is cancelled/reset when a plugin adds the trigger again via initCounterTrigger().
-    await pluginData.state.counters.markAllTriggersTobeDeleted();
   },
 
   onUnload(pluginData) {
