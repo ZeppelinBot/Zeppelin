@@ -7,6 +7,7 @@ import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 const p = Constants.Permissions;
 
@@ -17,11 +18,11 @@ export const LoadDataEvt = persistEvt({
     const member = meta.args.member;
     const pluginData = meta.pluginData;
 
-    const memberRolesLock = await pluginData.locks.acquire(`member-roles-${member.id}`);
+    const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
 
     const persistedData = await pluginData.state.persistedData.find(member.id);
     if (!persistedData) {
-      memberRolesLock.unlock();
+      memberRoleLock.unlock();
       return;
     }
 
@@ -79,6 +80,6 @@ export const LoadDataEvt = persistEvt({
       });
     }
 
-    memberRolesLock.unlock();
+    memberRoleLock.unlock();
   },
 });

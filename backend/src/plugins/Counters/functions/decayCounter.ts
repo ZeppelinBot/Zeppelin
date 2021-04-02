@@ -2,6 +2,7 @@ import { GuildPluginData } from "knub";
 import { CountersPluginType } from "../types";
 import { checkAllValuesForTrigger } from "./checkAllValuesForTrigger";
 import { checkAllValuesForReverseTrigger } from "./checkAllValuesForReverseTrigger";
+import { counterIdLock } from "../../../utils/lockNameHelpers";
 
 export async function decayCounter(
   pluginData: GuildPluginData<CountersPluginType>,
@@ -16,7 +17,7 @@ export async function decayCounter(
   }
 
   const counterId = pluginData.state.counterIds[counterName];
-  const lock = await pluginData.locks.acquire(counterId.toString());
+  const lock = await pluginData.locks.acquire(counterIdLock(counterId));
 
   await pluginData.state.counters.decay(counterId, decayPeriodMS, decayAmount);
 

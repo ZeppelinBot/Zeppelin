@@ -17,8 +17,8 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage } from "src/pluginUtils";
-import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
+import { muteLock } from "../../../utils/lockNameHelpers";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -29,7 +29,7 @@ export async function muteUser(
   removeRolesOnMuteOverride: boolean | string[] | null = null,
   restoreRolesOnMuteOverride: boolean | string[] | null = null,
 ) {
-  const lock = await pluginData.locks.acquire(`mute-${userId}`);
+  const lock = await pluginData.locks.acquire(muteLock({ id: userId }));
 
   const muteRole = pluginData.config.get().mute_role;
   if (!muteRole) {
