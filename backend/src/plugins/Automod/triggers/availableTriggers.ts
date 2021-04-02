@@ -26,6 +26,7 @@ import { KickTrigger } from "./kick";
 import { BanTrigger } from "./ban";
 import { UnbanTrigger } from "./unban";
 import { AnyMessageTrigger } from "./anyMessage";
+import { AntiraidLevelTrigger } from "./antiraidLevel";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   any_message: AnyMessageTrigger,
@@ -58,6 +59,8 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   kick: KickTrigger,
   ban: BanTrigger,
   unban: UnbanTrigger,
+
+  antiraid_level: AntiraidLevelTrigger,
 };
 
 export const AvailableTriggers = t.type({
@@ -91,4 +94,6 @@ export const AvailableTriggers = t.type({
   kick: KickTrigger.configType,
   ban: BanTrigger.configType,
   unban: UnbanTrigger.configType,
+
+  antiraid_level: AntiraidLevelTrigger.configType,
 });

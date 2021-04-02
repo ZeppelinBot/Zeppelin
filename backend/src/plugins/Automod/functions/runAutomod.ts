@@ -24,7 +24,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
-    if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger) continue;
+    if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger && !context.antiraid) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
       continue;
