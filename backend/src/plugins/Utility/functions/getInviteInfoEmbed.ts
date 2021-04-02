@@ -9,6 +9,7 @@ import {
   EmbedWith,
   emptyEmbedValue,
   formatNumber,
+  inviteHasCounts,
   isGroupDMInvite,
   isGuildInvite,
   preEmbedPadding,
@@ -50,13 +51,17 @@ export async function getInviteInfoEmbed(
       round: true,
     });
 
+    const memberCount = inviteHasCounts(invite) ? invite.memberCount : 0;
+
+    const presenceCount = inviteHasCounts(invite) ? invite.presenceCount : 0;
+
     embed.fields.push({
       name: preEmbedPadding + "Server information",
       value: trimLines(`
         Name: **${invite.guild.name}**
         ID: \`${invite.guild.id}\`
         Created: **${serverAge} ago**
-        Members: **${formatNumber(invite.memberCount)}** (${formatNumber(invite.presenceCount)} online)
+        Members: **${formatNumber(memberCount)}** (${formatNumber(presenceCount)} online)
       `),
       inline: true,
     });

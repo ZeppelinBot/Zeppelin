@@ -12,7 +12,6 @@ import {
   GuildChannel,
   Invite,
   InvitePartialChannel,
-  InviteWithMetadata,
   Member,
   Message,
   MessageContent,
@@ -181,11 +180,11 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
   return v != null;
 }
 
-export type GuildInvite = Invite & { guild: Guild };
-export type GroupDMInvite = Invite & { channel: InvitePartialChannel; type: typeof Constants.ChannelTypes.GROUP_DM };
-export type WithInviteCounts = {
-  memberCount: number;
-  presenceCount: number;
+export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
+export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & { guild: Guild };
+export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & {
+  channel: InvitePartialChannel;
+  type: typeof Constants.ChannelTypes.GROUP_DM;
 };
 
 /**
@@ -1153,9 +1152,11 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
-const inviteCache = new SimpleCache<Promise<(Invite | (Invite & InviteWithMetadata)) | null>>(10 * MINUTES, 200);
+const inviteCache = new SimpleCache<Promise<Invite<any> | null>>(10 * MINUTES, 200);
 
-type ResolveInviteReturnType<T extends boolean> = Promise<(T extends true ? Invite & WithInviteCounts : Invite) | null>;
+type ResolveInviteReturnType<T extends boolean> = Promise<
+  (T extends true ? Invite<"withCount" | "withMetadata"> : Invite<"withMetadata">) | null
+>;
 export async function resolveInvite<T extends boolean>(
   client: Client,
   code: string,
@@ -1330,12 +1331,16 @@ export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite(invite: Invite): invite is GuildInvite {
+export function isGuildInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GuildInvite<CT> {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
+export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GroupDMInvite<CT> {
   return invite.guild == null && invite.channel?.type === Constants.ChannelTypes.GROUP_DM;
+}
+
+export function inviteHasCounts(invite: Invite<any>): invite is Invite<"withCount"> {
+  return invite.memberCount != null;
 }
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {

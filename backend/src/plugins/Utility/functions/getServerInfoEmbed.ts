@@ -4,6 +4,7 @@ import {
   embedPadding,
   EmbedWith,
   formatNumber,
+  inviteHasCounts,
   memoize,
   MINUTES,
   preEmbedPadding,
@@ -120,7 +121,7 @@ export async function getServerInfoEmbed(
   if (onlineMemberCount == null && restGuild?.vanityURL) {
     // For servers with a vanity URL, we can also use the numbers from the invite for online count
     const invite = await resolveInvite(pluginData.client, restGuild.vanityURL!, true);
-    if (invite) {
+    if (invite && inviteHasCounts(invite)) {
       onlineMemberCount = invite.presenceCount;
     }
   }
