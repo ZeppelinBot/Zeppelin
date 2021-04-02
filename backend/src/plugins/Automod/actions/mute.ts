@@ -15,6 +15,7 @@ import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { CaseArgs } from "../../Cases/types";
 
 export const MuteAction = automodAction({
   configType: t.type({
@@ -37,9 +38,10 @@ export const MuteAction = automodAction({
     const rolesToRemove = actionConfig.remove_roles_on_mute;
     const rolesToRestore = actionConfig.restore_roles_on_mute;
 
-    const caseArgs = {
+    const caseArgs: Partial<CaseArgs> = {
       modId: pluginData.client.user.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
+      automatic: true,
     };
 
     const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));
