@@ -31,7 +31,7 @@
     "deep-diff": "^1.0.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
-    "eris": "https://github.com/Dragory/eris/archive/custom.tar.gz",
+    "eris": "github:abalabahaha/eris#dev",
     "erlpack": "github:abalabahaha/erlpack",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
