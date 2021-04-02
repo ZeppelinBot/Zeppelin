@@ -102,6 +102,14 @@ const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => 
  * After being triggered, a trigger is "reset" if the counter value no longer matches the trigger (e.g. drops to 100 or below in the above example). After this, that trigger can be triggered again.
  */
 export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counters", {
+  showInDocs: true,
+  info: {
+    prettyName: "Counters",
+    description:
+      "Keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number",
+    configurationGuide: "See <a href='/docs/setup-guides/counters'>Counters setup guide</a>",
+  },
+
   configSchema: ConfigSchema,
   defaultOptions,
   configPreprocessor,
