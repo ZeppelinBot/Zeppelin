@@ -8,9 +8,10 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { banUserId } from "../functions/banUserId";
 import { getMemberLevel, waitForReaction } from "knub/dist/helpers";
 import humanizeDuration from "humanize-duration";
-import { CasesPlugin } from "src/plugins/Cases/CasesPlugin";
-import { CaseTypes } from "src/data/CaseTypes";
-import { LogType } from "src/data/LogType";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
+import { banLock } from "../../../utils/lockNameHelpers";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -54,7 +55,7 @@ export const BanCmd = modActionsCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
-        sendErrorMessage(pluginData, msg.channel, "No permission for -mod");
+        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
         return;
       }
 
@@ -62,7 +63,7 @@ export const BanCmd = modActionsCmd({
     }
 
     // acquire a lock because of the needed user-inputs below (if banned/not on server)
-    const lock = await pluginData.locks.acquire(`ban-${user.id}`);
+    const lock = await pluginData.locks.acquire(banLock(user));
     let forceban = false;
     const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
     const banned = await isBanned(pluginData, user.id);

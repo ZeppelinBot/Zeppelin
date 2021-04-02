@@ -29,6 +29,7 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
     user_tag_cooldown: null,
     global_tag_cooldown: null,
     user_cooldown: null,
+    allow_mentions: false,
     global_cooldown: null,
     auto_delete_command: false,
 

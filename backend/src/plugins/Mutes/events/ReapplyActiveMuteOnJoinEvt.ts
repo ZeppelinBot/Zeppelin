@@ -1,6 +1,7 @@
 import { mutesEvt } from "../types";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 /**
  * Reapply active mutes on join
@@ -11,9 +12,9 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt("guildMemberAdd", async ({ pl
     const muteRole = pluginData.config.get().mute_role;
 
     if (muteRole) {
-      const memberRolesLock = await pluginData.locks.acquire(`member-roles-${member.id}`);
+      const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
       await member.addRole(muteRole);
-      memberRolesLock.unlock();
+      memberRoleLock.unlock();
     }
 
     pluginData.state.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {

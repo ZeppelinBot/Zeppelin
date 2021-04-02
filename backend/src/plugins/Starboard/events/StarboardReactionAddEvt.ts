@@ -3,6 +3,7 @@ import { Message, TextChannel } from "eris";
 import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
+import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
@@ -36,7 +37,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       categoryId: (msg.channel as TextChannel).parentID,
     });
 
-    const boardLock = await pluginData.locks.acquire(`starboards`);
+    const boardLock = await pluginData.locks.acquire(allStarboardsLock());
 
     const applicableStarboards = Object.values(config.boards)
       .filter(board => board.enabled)

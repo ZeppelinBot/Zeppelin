@@ -57,7 +57,7 @@ export const WarnCmd = modActionsCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!hasPermission(pluginData, "can_act_as_other", { message: msg })) {
-        msg.channel.createMessage(errorMessage("No permission for -mod"));
+        msg.channel.createMessage(errorMessage("You don't have permission to use -mod"));
         return;
       }
 
