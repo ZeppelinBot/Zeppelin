@@ -6,11 +6,21 @@ import { EventEmitter } from "events";
 import { CounterTrigger } from "../../data/entities/CounterTrigger";
 import Timeout = NodeJS.Timeout;
 
+export const Trigger = t.type({
+  name: t.string,
+  pretty_name: tNullable(t.string),
+  condition: t.string,
+  reverse_condition: t.string,
+});
+export type TTrigger = t.TypeOf<typeof Trigger>;
+
 export const Counter = t.type({
-  name: tNullable(t.string),
+  name: t.string,
+  pretty_name: tNullable(t.string),
   per_channel: t.boolean,
   per_user: t.boolean,
   initial_value: t.number,
+  triggers: t.record(t.string, t.union([t.string, Trigger])),
   decay: tNullable(
     t.type({
       amount: t.number,
@@ -30,8 +40,8 @@ export const ConfigSchema = t.type({
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface CounterEvents {
-  trigger: (name: string, condition: string, channelId: string | null, userId: string | null) => void;
-  reverseTrigger: (name: string, condition: string, channelId: string | null, userId: string | null) => void;
+  trigger: (counterName: string, triggerName: string, channelId: string | null, userId: string | null) => void;
+  reverseTrigger: (counterName: string, triggerName: string, channelId: string | null, userId: string | null) => void;
 }
 
 export interface CounterEventEmitter extends EventEmitter {
@@ -46,6 +56,6 @@ export interface CountersPluginType extends BasePluginType {
     counterIds: Record<string, number>;
     decayTimers: Timeout[];
     events: CounterEventEmitter;
-    counterTriggersByCounterId: Map<number, Map<number, CounterTrigger>>;
+    counterTriggersByCounterId: Map<number, CounterTrigger[]>;
   };
 }
