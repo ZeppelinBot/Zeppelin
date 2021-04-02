@@ -123,6 +123,9 @@ export interface AutomodContext {
     type: ModActionType;
     reason?: string;
   };
+  antiraid?: {
+    level: string | null;
+  };
 }
 
 export interface RecentAction {
