@@ -6,7 +6,7 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { errorMessage, resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
+import { errorMessage, noop, resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { waitForReaction } from "knub/dist/helpers";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
@@ -59,15 +59,18 @@ export const MuteCmd = modActionsCmd({
           msg.channel,
           `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
         );
+        return;
       } else {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `User is not on the server. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
-        );
-      }
+        // Ask the mod if we should upgrade to a forcemute as the user is not on the server
+        const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forcemute instead?");
+        const reply = await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id);
 
-      return;
+        notOnServerMsg.delete().catch(noop);
+        if (!reply || reply.name === "❌") {
+          sendErrorMessage(pluginData, msg.channel, "User not on server, mute cancelled by moderator");
+          return;
+        }
+      }
     }
 
     // Make sure we're allowed to mute this member
