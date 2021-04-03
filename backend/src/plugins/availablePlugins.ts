@@ -33,6 +33,7 @@ import { BotControlPlugin } from "./BotControl/BotControlPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 import { TimeAndDatePlugin } from "./TimeAndDate/TimeAndDatePlugin";
 import { CountersPlugin } from "./Counters/CountersPlugin";
+import { AFKPlugin } from './AFK/AFKPlugin';
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
@@ -67,6 +68,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   CustomEventsPlugin,
   TimeAndDatePlugin,
   CountersPlugin,
+  AFKPlugin,
 ];
 
 // prettier-ignore
