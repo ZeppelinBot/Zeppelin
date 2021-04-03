@@ -34,8 +34,8 @@ export const ConfigSchema = t.type({
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface MutesEvents {
-  mute: (userId: string, reason?: string, manual?: boolean) => void;
-  unmute: (userId: string, reason?: string, manual?: boolean) => void;
+  mute: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
+  unmute: (userId: string, reason?: string) => void;
 }
 
 export interface MutesEventEmitter extends EventEmitter {

@@ -33,7 +33,12 @@ export const BanAction = automodAction({
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const userId of userIdsToBan) {
-      await modActions.banUserId(userId, reason, { contactMethods, caseArgs, deleteMessageDays });
+      await modActions.banUserId(userId, reason, {
+        contactMethods,
+        caseArgs,
+        deleteMessageDays,
+        isAutomodAction: true,
+      });
     }
   },
 });
