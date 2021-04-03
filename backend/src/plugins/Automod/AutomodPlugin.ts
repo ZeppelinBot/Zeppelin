@@ -251,7 +251,9 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
     pluginData.state.mutesListeners = new Map();
-    pluginData.state.mutesListeners.set("mute", (userId: string) => runAutomodOnModAction(pluginData, "mute", userId));
+    pluginData.state.mutesListeners.set("mute", (userId: string, reason: string, isAutomodAction: boolean) =>
+      runAutomodOnModAction(pluginData, "mute", userId, reason, isAutomodAction),
+    );
     pluginData.state.mutesListeners.set("unmute", (userId: string) =>
       runAutomodOnModAction(pluginData, "unmute", userId),
     );
