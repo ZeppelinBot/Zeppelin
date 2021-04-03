@@ -4,7 +4,7 @@ import { hasPermission } from "src/pluginUtils";
 import { AFKPluginType } from "../types";
 
 // https://github.com/sapphire-project/utilities/blob/main/packages/discord-utilities/src/lib/regexes.ts#L58
-const HttpUrlRegex = /^https?:\/\//;
+const HttpUrlRegex = /^(https?):\/\/[^\s$.?#].[^\s]*$/;
 
 // https://github.com/sapphire-project/utilities/blob/main/packages/discord-utilities/src/lib/regexes.ts#L25
 const DiscordInviteLinkRegex = /^(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)?(?<code>[\w\d-]{2,})$/i;
