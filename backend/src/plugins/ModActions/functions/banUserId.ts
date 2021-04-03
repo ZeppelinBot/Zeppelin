@@ -100,7 +100,11 @@ export async function banUserId(
   if (pluginData.config.get().delete_invites_on_ban) {
     const userInvites = (await pluginData.guild.getInvites()).filter(inv => inv.inviter?.id === user.id);
     userInvites.forEach(invite => {
-      invite.delete("User banned from server");
+      try {
+        invite.delete("User banned from server");
+      } catch (e) {
+        pluginData.state.serverLogs.log(LogType.BOT_ALERT, `Error deleting invite \`${invite.code}\`: ${e}`);
+      }
     });
   }
 

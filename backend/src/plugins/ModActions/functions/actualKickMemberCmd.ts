@@ -1,7 +1,7 @@
 import { Member, TextChannel } from "eris";
 import { LogType } from "../../../data/LogType";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { errorMessage, resolveUser, resolveMember } from "../../../utils";
+import { errorMessage, resolveUser, resolveMember, noop } from "../../../utils";
 import { GuildPluginData } from "knub";
 import { sendErrorMessage, canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { hasPermission } from "knub/dist/helpers";
@@ -80,7 +80,11 @@ export async function actualKickMemberCmd(
   if (pluginData.config.getForMember(msg.member).delete_invites_on_kick) {
     const userInvites = (await pluginData.guild.getInvites()).filter(inv => inv.inviter?.id === user.id);
     userInvites.forEach(invite => {
-      invite.delete("User kicked from server");
+      try {
+        invite.delete("User kicked from server");
+      } catch (e) {
+        pluginData.state.serverLogs.log(LogType.BOT_ALERT, `Error deleting invite \`${invite.code}\`: ${e}`);
+      }
     });
   }
 
