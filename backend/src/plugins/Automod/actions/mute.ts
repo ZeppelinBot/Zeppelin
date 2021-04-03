@@ -42,7 +42,7 @@ export const MuteAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
     };
 
-    const userIdsToMute = unique(contexts.map((c) => c.user?.id).filter(nonNullish));
+    const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));
 
     const mutes = pluginData.getPlugin(MutesPlugin);
     for (const userId of userIdsToMute) {

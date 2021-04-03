@@ -11,7 +11,10 @@ export async function cleanupNicknames(): Promise<number> {
   let cleaned = 0;
 
   const nicknameHistoryRepository = getRepository(NicknameHistoryEntry);
-  const dateThreshold = moment.utc().subtract(NICKNAME_RETENTION_PERIOD, "ms").format(DBDateFormat);
+  const dateThreshold = moment
+    .utc()
+    .subtract(NICKNAME_RETENTION_PERIOD, "ms")
+    .format(DBDateFormat);
 
   // Clean old nicknames (NICKNAME_RETENTION_PERIOD)
   let rows;
@@ -28,7 +31,7 @@ export async function cleanupNicknames(): Promise<number> {
 
     if (rows.length > 0) {
       await nicknameHistoryRepository.delete({
-        id: In(rows.map((r) => r.id)),
+        id: In(rows.map(r => r.id)),
       });
     }
 

@@ -26,19 +26,19 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
     const roleNames = normalizeRoleNames(splitRoleNames(args.roleNames));
     const matchedRoleIds = findMatchingRoles(roleNames, applyingEntries);
 
-    const rolesToRemove = Array.from(matchedRoleIds.values()).map((id) => pluginData.guild.roles.get(id)!);
-    const roleIdsToRemove = rolesToRemove.map((r) => r.id);
+    const rolesToRemove = Array.from(matchedRoleIds.values()).map(id => pluginData.guild.roles.get(id)!);
+    const roleIdsToRemove = rolesToRemove.map(r => r.id);
 
     // Remove the roles
     if (rolesToRemove.length) {
-      const newRoleIds = msg.member.roles.filter((roleId) => !roleIdsToRemove.includes(roleId));
+      const newRoleIds = msg.member.roles.filter(roleId => !roleIdsToRemove.includes(roleId));
 
       try {
         await msg.member.edit({
           roles: newRoleIds,
         });
 
-        const removedRolesStr = rolesToRemove.map((r) => `**${r.name}**`);
+        const removedRolesStr = rolesToRemove.map(r => `**${r.name}**`);
         const removedRolesWord = rolesToRemove.length === 1 ? "role" : "roles";
 
         if (rolesToRemove.length !== roleNames.length) {

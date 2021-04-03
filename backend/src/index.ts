@@ -139,8 +139,8 @@ if (process.env.NODE_ENV === "production") {
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "14.0.0";
-const requiredParts = REQUIRED_NODE_VERSION.split(".").map((v) => parseInt(v, 10));
-const actualVersionParts = process.versions.node.split(".").map((v) => parseInt(v, 10));
+const requiredParts = REQUIRED_NODE_VERSION.split(".").map(v => parseInt(v, 10));
+const actualVersionParts = process.versions.node.split(".").map(v => parseInt(v, 10));
 for (const [i, part] of actualVersionParts.entries()) {
   if (part > requiredParts[i]) break;
   if (part === requiredParts[i]) continue;
@@ -175,7 +175,7 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
-  client.on("debug", (message) => {
+  client.on("debug", message => {
     if (message.includes(" 429 ")) {
       logger.info(`[429] ${message}`);
     }
@@ -209,9 +209,9 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const basePluginNames = baseGuildPlugins.map((p) => p.name);
+        const basePluginNames = baseGuildPlugins.map(p => p.name);
 
-        return Array.from(plugins.keys()).filter((pluginName) => {
+        return Array.from(plugins.keys()).filter(pluginName => {
           if (basePluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });

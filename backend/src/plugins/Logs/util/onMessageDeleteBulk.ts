@@ -8,7 +8,7 @@ export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPlugin
   const channel = pluginData.guild.channels.get(savedMessages[0].channel_id);
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
   const archiveUrl = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
-  const authorIds = Array.from(new Set(savedMessages.map((item) => `\`${item.user_id}\``))).join(", ");
+  const authorIds = Array.from(new Set(savedMessages.map(item => `\`${item.user_id}\``))).join(", ");
 
   pluginData.state.guildLogs.log(
     LogType.MESSAGE_DELETE_BULK,

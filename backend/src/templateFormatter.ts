@@ -35,7 +35,7 @@ function newTemplateVar(): ITemplateVar {
 type ParsedTemplate = Array<string | ITemplateVar>;
 
 function cleanUpParseResult(arr) {
-  arr.forEach((item) => {
+  arr.forEach(item => {
     if (typeof item === "object") {
       delete item._state;
       delete item._parent;

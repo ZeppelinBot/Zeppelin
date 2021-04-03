@@ -37,10 +37,13 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     const attachments: any[] = context.message.data.attachments;
 
     for (const attachment of attachments) {
-      const attachmentType = attachment.filename.split(".").pop().toLowerCase();
+      const attachmentType = attachment.filename
+        .split(".")
+        .pop()
+        .toLowerCase();
 
       const blacklist = trigger.blacklist_enabled
-        ? (trigger.filetype_blacklist || []).map((_t) => _t.toLowerCase())
+        ? (trigger.filetype_blacklist || []).map(_t => _t.toLowerCase())
         : null;
 
       if (blacklist && blacklist.includes(attachmentType)) {
@@ -53,7 +56,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
       }
 
       const whitelist = trigger.whitelist_enabled
-        ? (trigger.filetype_whitelist || []).map((_t) => _t.toLowerCase())
+        ? (trigger.filetype_whitelist || []).map(_t => _t.toLowerCase())
         : null;
 
       if (whitelist && !whitelist.includes(attachmentType)) {

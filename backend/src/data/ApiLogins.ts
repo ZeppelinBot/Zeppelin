@@ -66,7 +66,10 @@ export class ApiLogins extends BaseRepository {
       token: hashedToken,
       user_id: userId,
       logged_in_at: moment.utc().format(DBDateFormat),
-      expires_at: moment.utc().add(1, "day").format(DBDateFormat),
+      expires_at: moment
+        .utc()
+        .add(1, "day")
+        .format(DBDateFormat),
     });
 
     return `${loginId}.${token}`;

@@ -20,21 +20,21 @@ function formatConfigSchema(schema) {
     if (schema.name.startsWith("Nullable<")) {
       return `Nullable<${formatConfigSchema(schema.types[0])}>`;
     } else {
-      return schema.types.map((t) => formatConfigSchema(t)).join(" | ");
+      return schema.types.map(t => formatConfigSchema(t)).join(" | ");
     }
   } else if (schema._tag === "IntersectionType") {
-    return schema.types.map((t) => formatConfigSchema(t)).join(" & ");
+    return schema.types.map(t => formatConfigSchema(t)).join(" & ");
   } else {
     return schema.name;
   }
 }
 
 export function initDocs(app: express.Express) {
-  const docsPlugins = guildPlugins.filter((plugin) => plugin.showInDocs);
+  const docsPlugins = guildPlugins.filter(plugin => plugin.showInDocs);
 
   app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
-      docsPlugins.map((plugin) => {
+      docsPlugins.map(plugin => {
         const thinInfo = plugin.info ? { prettyName: plugin.info.prettyName } : {};
         return {
           name: plugin.name,
@@ -54,7 +54,7 @@ export function initDocs(app: express.Express) {
     const name = plugin.name;
     const info = plugin.info || {};
 
-    const commands = (plugin.commands || []).map((cmd) => ({
+    const commands = (plugin.commands || []).map(cmd => ({
       trigger: cmd.trigger,
       permission: cmd.permission,
       signature: cmd.signature,

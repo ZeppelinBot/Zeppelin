@@ -33,7 +33,7 @@ export const AlertAction = automodAction({
       const theMessageLink =
         contexts[0].message && messageLink(pluginData.guild.id, contexts[0].message.channel_id, contexts[0].message.id);
 
-      const safeUsers = contexts.map((c) => c.user && stripObjectToScalars(c.user)).filter(Boolean);
+      const safeUsers = contexts.map(c => c.user && stripObjectToScalars(c.user)).filter(Boolean);
       const safeUser = safeUsers[0];
       const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 

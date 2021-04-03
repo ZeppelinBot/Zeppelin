@@ -1,10 +1,10 @@
 import { Constants } from "eris";
 
-const camelCaseToTitleCase = (str) =>
+const camelCaseToTitleCase = str =>
   str
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .split(" ")
-    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .map(w => w[0].toUpperCase() + w.slice(1))
     .join(" ");
 
 const permissionNumberToName: Map<bigint, string> = new Map();

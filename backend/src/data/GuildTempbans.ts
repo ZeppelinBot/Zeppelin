@@ -31,7 +31,10 @@ export class GuildTempbans extends BaseGuildRepository {
   }
 
   async addTempban(userId, expiryTime, modId): Promise<Tempban> {
-    const expiresAt = moment.utc().add(expiryTime, "ms").format("YYYY-MM-DD HH:mm:ss");
+    const expiresAt = moment
+      .utc()
+      .add(expiryTime, "ms")
+      .format("YYYY-MM-DD HH:mm:ss");
 
     const result = await this.tempbans.insert({
       guild_id: this.guildId,
@@ -45,7 +48,10 @@ export class GuildTempbans extends BaseGuildRepository {
   }
 
   async updateExpiryTime(userId, newExpiryTime, modId) {
-    const expiresAt = moment.utc().add(newExpiryTime, "ms").format("YYYY-MM-DD HH:mm:ss");
+    const expiresAt = moment
+      .utc()
+      .add(newExpiryTime, "ms")
+      .format("YYYY-MM-DD HH:mm:ss");
 
     return this.tempbans.update(
       {

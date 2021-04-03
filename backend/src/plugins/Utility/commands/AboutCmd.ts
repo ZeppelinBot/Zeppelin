@@ -57,7 +57,10 @@ export const AboutCmd = utilityCmd({
     ];
 
     const loadedPlugins = Array.from(
-      pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
+      pluginData
+        .getKnubInstance()
+        .getLoadedGuild(pluginData.guild.id)!
+        .loadedPlugins.keys(),
     );
     loadedPlugins.sort();
 
@@ -84,23 +87,23 @@ export const AboutCmd = utilityCmd({
     const supporters = await pluginData.state.supporters.getAll();
     supporters.sort(
       multiSorter([
-        [(r) => r.amount, "DESC"],
-        [(r) => r.name.toLowerCase(), "ASC"],
+        [r => r.amount, "DESC"],
+        [r => r.name.toLowerCase(), "ASC"],
       ]),
     );
 
     if (supporters.length) {
       aboutContent.embed.fields.push({
         name: "Zeppelin supporters 🎉",
-        value: supporters.map((s) => `**${s.name}** ${s.amount ? `${s.amount}€/mo` : ""}`.trim()).join("\n"),
+        value: supporters.map(s => `**${s.name}** ${s.amount ? `${s.amount}€/mo` : ""}`.trim()).join("\n"),
       });
     }
 
     // For the embed color, find the highest colored role the bot has - this is their color on the server as well
     const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
-    let botRoles = botMember?.roles.map((r) => (msg.channel as GuildChannel).guild.roles.get(r)!) || [];
-    botRoles = botRoles.filter((r) => !!r); // Drop any unknown roles
-    botRoles = botRoles.filter((r) => r.color); // Filter to those with a color
+    let botRoles = botMember?.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r)!) || [];
+    botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
+    botRoles = botRoles.filter(r => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
     if (botRoles.length) {
       aboutContent.embed.color = botRoles[0].color;

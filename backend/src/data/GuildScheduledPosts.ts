@@ -11,7 +11,10 @@ export class GuildScheduledPosts extends BaseGuildRepository {
   }
 
   all(): Promise<ScheduledPost[]> {
-    return this.scheduledPosts.createQueryBuilder().where("guild_id = :guildId", { guildId: this.guildId }).getMany();
+    return this.scheduledPosts
+      .createQueryBuilder()
+      .where("guild_id = :guildId", { guildId: this.guildId })
+      .getMany();
   }
 
   getDueScheduledPosts(): Promise<ScheduledPost[]> {

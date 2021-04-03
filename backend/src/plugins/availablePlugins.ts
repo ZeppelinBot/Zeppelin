@@ -33,7 +33,7 @@ import { BotControlPlugin } from "./BotControl/BotControlPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 import { TimeAndDatePlugin } from "./TimeAndDate/TimeAndDatePlugin";
 import { CountersPlugin } from "./Counters/CountersPlugin";
-import { AFKPlugin } from "./AFK/AFKPlugin";
+import { AFKPlugin } from './AFK/AFKPlugin';
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [

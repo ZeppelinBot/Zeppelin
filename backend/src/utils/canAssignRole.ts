@@ -16,7 +16,7 @@ export function canAssignRole(guild: Guild, member: Member, roleId: string) {
     return false;
   }
 
-  const memberRoles = member.roles.map((_roleId) => guild.roles.get(_roleId)!);
+  const memberRoles = member.roles.map(_roleId => guild.roles.get(_roleId)!);
   const highestRoleWithManageRoles = memberRoles.reduce<Role | null>((highest, role) => {
     if (!hasDiscordPermissions(role.permissions, Constants.Permissions.manageRoles)) return highest;
     if (highest == null) return role;

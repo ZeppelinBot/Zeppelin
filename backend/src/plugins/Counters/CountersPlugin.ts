@@ -44,7 +44,7 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
   ],
 };
 
-const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = (options) => {
+const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => {
   for (const counter of Object.values(options.config?.counters || {})) {
     counter.per_user = counter.per_user ?? false;
     counter.per_channel = counter.per_channel ?? false;

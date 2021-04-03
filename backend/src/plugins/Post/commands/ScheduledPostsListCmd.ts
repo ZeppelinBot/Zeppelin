@@ -27,7 +27,7 @@ export const ScheduledPostsListCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
 
     let i = 1;
-    const postLines = scheduledPosts.map((p) => {
+    const postLines = scheduledPosts.map(p => {
       let previewText =
         p.content.content || (p.content.embed && (p.content.embed.description || p.content.embed.title)) || "";
 

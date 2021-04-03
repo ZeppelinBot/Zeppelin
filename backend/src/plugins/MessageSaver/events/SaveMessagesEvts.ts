@@ -51,7 +51,7 @@ export const MessageDeleteBulkEvt = messageSaverEvt({
   allowSelf: true,
 
   async listener(meta) {
-    const ids = meta.args.messages.map((m) => m.id);
+    const ids = meta.args.messages.map(m => m.id);
     await meta.pluginData.state.savedMessages.markBulkAsDeleted(ids);
   },
 });

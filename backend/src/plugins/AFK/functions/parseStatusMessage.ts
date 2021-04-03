@@ -10,9 +10,9 @@ const HttpUrlRegex = /^(https?):\/\/[^\s$.?#].[^\s]*$/;
 const DiscordInviteLinkRegex = /^(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)?(?<code>[\w\d-]{2,})$/i;
 
 export function parseStatusMessage(pluginData: GuildPluginData<AFKPluginType>, member: Member, status: string) {
-  const allow_links = hasPermission(pluginData, "allow_links", { member });
-  const allow_invites = hasPermission(pluginData, "allow_invites", { member });
+    const allow_links = hasPermission(pluginData, "allow_links", { member });
+    const allow_invites = hasPermission(pluginData, "allow_invites", { member });
 
-  if (!allow_links && HttpUrlRegex.test(status)) return "Links are not allowed in an AFK status!";
-  if (!allow_invites && DiscordInviteLinkRegex.test(status)) return "Invites are not allowed in an AFK status!";
+    if (!allow_links && HttpUrlRegex.test(status)) return "Links are not allowed in an AFK status!";
+    if (!allow_invites && DiscordInviteLinkRegex.test(status)) return "Invites are not allowed in an AFK status!";
 }

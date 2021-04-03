@@ -9,23 +9,23 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
 
     const migratedUsernames = new Set();
 
-    await new Promise(async (resolve) => {
+    await new Promise(async resolve => {
       const stream = await queryRunner.stream("SELECT CONCAT(user_id, '-', username) AS `key` FROM username_history");
-      stream.on("result", (row) => {
+      stream.on("result", row => {
         migratedUsernames.add(row.key);
       });
       stream.on("end", resolve);
     });
 
     const migrateNextBatch = (): Promise<{ finished: boolean; migrated?: number }> => {
-      return new Promise(async (resolve) => {
+      return new Promise(async resolve => {
         const toInsert: any[][] = [];
         const toDelete: number[] = [];
 
         const stream = await queryRunner.stream(
           `SELECT * FROM name_history WHERE type=1 ORDER BY timestamp ASC LIMIT ${BATCH_SIZE}`,
         );
-        stream.on("result", (row) => {
+        stream.on("result", row => {
           const key = `${row.user_id}-${row.value}`;
 
           if (!migratedUsernames.has(key)) {

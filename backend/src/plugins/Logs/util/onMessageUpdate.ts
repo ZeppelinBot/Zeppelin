@@ -15,12 +15,12 @@ export async function onMessageUpdate(
   let logUpdate = false;
 
   const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as Embed[])
-    .map((e) => cloneDeep(e))
-    .filter((e) => (e as Embed).type === "rich");
+    .map(e => cloneDeep(e))
+    .filter(e => (e as Embed).type === "rich");
 
   const newEmbedsToCompare = ((savedMessage.data.embeds || []) as Embed[])
-    .map((e) => cloneDeep(e))
-    .filter((e) => (e as Embed).type === "rich");
+    .map(e => cloneDeep(e))
+    .filter(e => (e as Embed).type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {

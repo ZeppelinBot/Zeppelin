@@ -53,7 +53,10 @@ export const RemindCmd = remindersCmd({
     await pluginData.state.reminders.add(
       msg.author.id,
       msg.channel.id,
-      reminderTime.clone().tz("Etc/UTC").format("YYYY-MM-DD HH:mm:ss"),
+      reminderTime
+        .clone()
+        .tz("Etc/UTC")
+        .format("YYYY-MM-DD HH:mm:ss"),
       reminderBody,
       moment.utc().format("YYYY-MM-DD HH:mm:ss"),
     );

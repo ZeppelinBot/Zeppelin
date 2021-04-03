@@ -46,7 +46,7 @@ export const PingCmd = utilityCmd({
     pluginData.client
       .deleteMessages(
         messages[0].channel.id,
-        messages.map((m) => m.id),
+        messages.map(m => m.id),
       )
       .catch(noop);
   },

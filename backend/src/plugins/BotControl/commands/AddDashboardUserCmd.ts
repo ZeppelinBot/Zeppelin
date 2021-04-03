@@ -35,7 +35,7 @@ export const AddDashboardUserCmd = botControlCmd({
     }
 
     const userNameList = args.users.map(
-      (user) => `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`,
+      user => `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`,
     );
     sendSuccessMessage(
       pluginData,

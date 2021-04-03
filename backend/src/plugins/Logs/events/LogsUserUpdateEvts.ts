@@ -61,12 +61,12 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               addedRoles: addedRoles
-                .map((roleId) => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-                .map((r) => r.name)
+                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
                 .join(", "),
               removedRoles: removedRoles
-                .map((roleId) => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-                .map((r) => r.name)
+                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),
             },
@@ -79,8 +79,8 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: addedRoles
-                .map((roleId) => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-                .map((r) => r.name)
+                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),
             },
@@ -93,8 +93,8 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: removedRoles
-                .map((roleId) => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
-                .map((r) => r.name)
+                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),
             },

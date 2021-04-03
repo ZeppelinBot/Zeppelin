@@ -132,7 +132,7 @@ export class GuildCases extends BaseGuildRepository {
   }
 
   async softDelete(id: number, deletedById: string, deletedByName: string, deletedByText: string) {
-    return connection.transaction(async (entityManager) => {
+    return connection.transaction(async entityManager => {
       const cases = entityManager.getRepository(Case);
       const caseNotes = entityManager.getRepository(CaseNote);
 

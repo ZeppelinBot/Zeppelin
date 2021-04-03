@@ -97,10 +97,10 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
 
     state.batches = new Map();
 
-    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
-    state.onMessageDeleteBulkFn = (msg) => onMessageDeleteBulk(pluginData, msg);
+    state.onMessageDeleteBulkFn = msg => onMessageDeleteBulk(pluginData, msg);
     state.savedMessages.events.on("deleteBulk", state.onMessageDeleteBulkFn);
 
     state.onMessageUpdateFn = (newMsg, oldMsg) => onMessageUpdate(pluginData, newMsg, oldMsg);

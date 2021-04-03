@@ -52,7 +52,7 @@ export const MassbanCmd = modActionsCmd({
 
     // Ignore automatic ban cases and logs for these users
     // We'll create our own cases below and post a single "mass banned" log instead
-    args.userIds.forEach((userId) => {
+    args.userIds.forEach(userId => {
       // Use longer timeouts since this can take a while
       ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
       pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);

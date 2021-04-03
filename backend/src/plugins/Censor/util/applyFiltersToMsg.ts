@@ -20,7 +20,7 @@ export async function applyFiltersToMsg(
   let messageContent = savedMessage.data.content || "";
   if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
   if (savedMessage.data.embeds) {
-    const embeds = (savedMessage.data.embeds as Embed[]).map((e) => cloneDeep(e));
+    const embeds = (savedMessage.data.embeds as Embed[]).map(e => cloneDeep(e));
     for (const embed of embeds) {
       if (embed.type === "video") {
         // Ignore video descriptions as they're not actually shown on the embed
@@ -53,7 +53,7 @@ export async function applyFiltersToMsg(
     const inviteCodes = getInviteCodesInString(messageContent);
 
     const invites: Array<Invite | null> = await Promise.all(
-      inviteCodes.map((code) => resolveInvite(pluginData.client, code)),
+      inviteCodes.map(code => resolveInvite(pluginData.client, code)),
     );
 
     for (const invite of invites) {
