@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
 import { LogType } from "../../../data/LogType";
+import { AnyGuildChannel } from "eris";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({
@@ -21,10 +22,19 @@ export const SetSlowmodeAction = automodAction({
       // 2 = Guild Voice, 5 = Guild News - Both dont allow slowmode
       if (!channel || channel.type === 2 || channel.type === 5) continue;
 
+      let channelsToSlowmode: AnyGuildChannel[] = [];
+      if (channel.type === 4) {
+        channelsToSlowmode = pluginData.guild.channels.filter(ch => ch.parentID === channel.id && ch.type === 0);
+      } else {
+        channelsToSlowmode.push(channel);
+      }
+
       try {
-        await channel.edit({
-          rateLimitPerUser: duration / 1000, // ms -> seconds
-        });
+        for (const chan of channelsToSlowmode) {
+          await chan.edit({
+            rateLimitPerUser: duration / 1000, // ms -> seconds
+          });
+        }
       } catch (e) {
         let errorMessage = e;
 
