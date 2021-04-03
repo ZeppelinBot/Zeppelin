@@ -9,9 +9,9 @@ export const LogAction = automodAction({
   defaultConfig: true,
 
   async apply({ pluginData, contexts, ruleName, matchResult }) {
-    const safeUsers = unique(contexts.map(c => c.user))
+    const safeUsers = unique(contexts.map((c) => c.user))
       .filter(Boolean)
-      .map(user => stripObjectToScalars(user));
+      .map((user) => stripObjectToScalars(user));
     const safeUser = safeUsers[0];
     const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 

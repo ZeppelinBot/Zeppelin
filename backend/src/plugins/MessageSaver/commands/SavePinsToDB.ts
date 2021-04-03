@@ -19,7 +19,7 @@ export const SavePinsToDBCmd = messageSaverCmd({
     const { savedCount, failed } = await saveMessagesToDB(
       pluginData,
       args.channel,
-      pins.map(m => m.id),
+      pins.map((m) => m.id),
     );
 
     if (failed.length) {

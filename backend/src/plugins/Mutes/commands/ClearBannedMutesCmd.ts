@@ -14,7 +14,7 @@ export const ClearBannedMutesCmd = mutesCmd({
 
     // Mismatch in Eris docs and actual result here, based on Eris's code comments anyway
     const bans: Array<{ reason: string; user: User }> = (await pluginData.guild.getBans()) as any;
-    const bannedIds = bans.map(b => b.user.id);
+    const bannedIds = bans.map((b) => b.user.id);
 
     await msg.channel.createMessage(
       `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`,

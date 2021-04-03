@@ -41,7 +41,7 @@ export async function getLogMessage(
   const values = {
     ...data,
     timestamp,
-    userMention: async inputUserOrMember => {
+    userMention: async (inputUserOrMember) => {
       if (!inputUserOrMember) return "";
 
       const usersOrMembers = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
@@ -71,7 +71,7 @@ export async function getLogMessage(
 
       return mentions.join(", ");
     },
-    channelMention: channel => {
+    channelMention: (channel) => {
       if (!channel) return "";
       return verboseChannelMention(channel);
     },
@@ -83,12 +83,12 @@ export async function getLogMessage(
 
   if (type === LogType.BOT_ALERT) {
     const valuesWithoutTmplEval = { ...values };
-    values.tmplEval = str => {
+    values.tmplEval = (str) => {
       return renderTemplate(str, valuesWithoutTmplEval);
     };
   }
 
-  const renderLogString = str => renderTemplate(str, values);
+  const renderLogString = (str) => renderTemplate(str, values);
 
   let formatted;
   try {

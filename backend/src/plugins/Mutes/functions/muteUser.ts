@@ -67,12 +67,12 @@ export async function muteUser(
     if (!Array.isArray(removeRoles)) {
       if (removeRoles) {
         // exclude managed roles from being removed
-        const managedRoles = pluginData.guild.roles.filter(x => x.managed).map(y => y.id);
-        memberOptions.roles = managedRoles.filter(x => member.roles.includes(x));
+        const managedRoles = pluginData.guild.roles.filter((x) => x.managed).map((y) => y.id);
+        memberOptions.roles = managedRoles.filter((x) => member.roles.includes(x));
         await member.edit(memberOptions);
       }
     } else {
-      memberOptions.roles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
+      memberOptions.roles = currentUserRoles.filter((x) => !(<string[]>removeRoles).includes(x));
       await member.edit(memberOptions);
     }
 
@@ -82,7 +82,7 @@ export async function muteUser(
         rolesToRestore = currentUserRoles;
       }
     } else {
-      rolesToRestore = currentUserRoles.filter(x => (<string[]>restoreRoles).includes(x));
+      rolesToRestore = currentUserRoles.filter((x) => (<string[]>restoreRoles).includes(x));
     }
 
     // Apply mute role if it's missing
@@ -90,7 +90,7 @@ export async function muteUser(
       try {
         await member.addRole(muteRole);
       } catch (e) {
-        const actualMuteRole = pluginData.guild.roles.find(x => x.id === muteRole);
+        const actualMuteRole = pluginData.guild.roles.find((x) => x.id === muteRole);
         if (!actualMuteRole) {
           lock.unlock();
           logs.log(LogType.BOT_ALERT, {
@@ -100,9 +100,9 @@ export async function muteUser(
         }
 
         const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
-        const zepRoles = pluginData.guild.roles.filter(x => zep!.roles.includes(x.id));
+        const zepRoles = pluginData.guild.roles.filter((x) => zep!.roles.includes(x.id));
         // If we have roles and one of them is above the muted role, throw generic error
-        if (zepRoles.length >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
+        if (zepRoles.length >= 0 && zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
           lock.unlock();
           logs.log(LogType.BOT_ALERT, {
             body: `Cannot mute user ${member.id}: ${e}`,

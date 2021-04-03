@@ -41,11 +41,7 @@ export class Configs extends BaseRepository {
   }
 
   getActiveLargerThanId(id) {
-    return this.configs
-      .createQueryBuilder()
-      .where("id > :id", { id })
-      .andWhere("is_active = 1")
-      .getMany();
+    return this.configs.createQueryBuilder().where("id > :id", { id }).andWhere("is_active = 1").getMany();
   }
 
   async hasConfig(key) {
@@ -65,7 +61,7 @@ export class Configs extends BaseRepository {
   }
 
   async saveNewRevision(key, config, editedBy) {
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const repo = entityManager.getRepository(Config);
       // Mark all old revisions inactive
       await repo.update({ key }, { is_active: false });

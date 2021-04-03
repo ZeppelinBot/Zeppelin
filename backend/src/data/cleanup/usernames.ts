@@ -11,10 +11,7 @@ export async function cleanupUsernames(): Promise<number> {
   let cleaned = 0;
 
   const usernameHistoryRepository = getRepository(UsernameHistoryEntry);
-  const dateThreshold = moment
-    .utc()
-    .subtract(USERNAME_RETENTION_PERIOD, "ms")
-    .format(DBDateFormat);
+  const dateThreshold = moment.utc().subtract(USERNAME_RETENTION_PERIOD, "ms").format(DBDateFormat);
 
   // Clean old usernames (USERNAME_RETENTION_PERIOD)
   let rows;
@@ -31,7 +28,7 @@ export async function cleanupUsernames(): Promise<number> {
 
     if (rows.length > 0) {
       await usernameHistoryRepository.delete({
-        id: In(rows.map(r => r.id)),
+        id: In(rows.map((r) => r.id)),
       });
     }
 

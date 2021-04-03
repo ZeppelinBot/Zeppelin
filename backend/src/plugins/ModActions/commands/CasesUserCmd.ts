@@ -42,8 +42,8 @@ export const CasesUserCmd = modActionsCmd({
     }
 
     const cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
-    const normalCases = cases.filter(c => !c.is_hidden);
-    const hiddenCases = cases.filter(c => c.is_hidden);
+    const normalCases = cases.filter((c) => !c.is_hidden);
+    const hiddenCases = cases.filter((c) => c.is_hidden);
 
     const userName =
       user instanceof UnknownUser && cases.length
@@ -70,7 +70,7 @@ export const CasesUserCmd = modActionsCmd({
       } else {
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
+        const lines = await asyncMap(casesToDisplay, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
         const prefix = getGuildPrefix(pluginData);
         const linesPerChunk = 10;

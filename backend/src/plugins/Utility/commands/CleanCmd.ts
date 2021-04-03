@@ -24,10 +24,10 @@ async function cleanMessages(
 
   // Delete & archive in ID order
   savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-  const idsToDelete = savedMessages.map(m => m.id);
+  const idsToDelete = savedMessages.map((m) => m.id);
 
   // Make sure the deletions aren't double logged
-  idsToDelete.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+  idsToDelete.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
   // Actually delete the messages
@@ -119,7 +119,7 @@ export const CleanCmd = utilityCmd({
         const contentString = message.data.content || "";
         if (args.user && message.user_id !== args.user) continue;
         if (args.bots && !message.is_bot) continue;
-        if (!deletePins && pins.find(x => x.id === message.id) != null) continue;
+        if (!deletePins && pins.find((x) => x.id === message.id) != null) continue;
         if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
         if (upToMsgId != null && message.id < upToMsgId) {
           foundId = true;

@@ -84,8 +84,8 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === Constants.ChannelTypes.GUILD_VOICE) {
     const voiceMembers = Array.from(channel.voiceMembers.values());
-    const muted = voiceMembers.filter(vm => vm.voiceState.mute || vm.voiceState.selfMute);
-    const deafened = voiceMembers.filter(vm => vm.voiceState.deaf || vm.voiceState.selfDeaf);
+    const muted = voiceMembers.filter((vm) => vm.voiceState.mute || vm.voiceState.selfMute);
+    const deafened = voiceMembers.filter((vm) => vm.voiceState.deaf || vm.voiceState.selfDeaf);
 
     embed.fields.push({
       name: preEmbedPadding + "Voice information",
@@ -99,10 +99,10 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === Constants.ChannelTypes.GUILD_CATEGORY) {
     const textChannels = pluginData.guild.channels.filter(
-      ch => ch.parentID === channel.id && ch.type !== Constants.ChannelTypes.GUILD_VOICE,
+      (ch) => ch.parentID === channel.id && ch.type !== Constants.ChannelTypes.GUILD_VOICE,
     );
     const voiceChannels = pluginData.guild.channels.filter(
-      ch => ch.parentID === channel.id && ch.type === Constants.ChannelTypes.GUILD_VOICE,
+      (ch) => ch.parentID === channel.id && ch.type === Constants.ChannelTypes.GUILD_VOICE,
     );
 
     embed.fields.push({

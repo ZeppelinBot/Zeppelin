@@ -19,7 +19,7 @@ export async function renderTagFromString(
   member: Member,
 ): Promise<StrictMessageContent | null> {
   const variableStr = str.slice(prefix.length + tagName.length).trim();
-  const tagArgs = parseArguments(variableStr).map(v => v.value);
+  const tagArgs = parseArguments(variableStr).map((v) => v.value);
 
   // Format the string
   try {

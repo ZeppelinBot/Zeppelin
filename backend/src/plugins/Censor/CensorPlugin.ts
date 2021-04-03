@@ -65,10 +65,10 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()("censor", {
 
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
 
-    state.onMessageUpdateFn = msg => onMessageUpdate(pluginData, msg);
+    state.onMessageUpdateFn = (msg) => onMessageUpdate(pluginData, msg);
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
   },
 

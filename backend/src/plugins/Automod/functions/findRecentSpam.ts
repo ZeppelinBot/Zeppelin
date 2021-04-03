@@ -7,7 +7,7 @@ export function findRecentSpam(
   type: RecentActionType,
   identifier?: string,
 ) {
-  return pluginData.state.recentSpam.find(spam => {
+  return pluginData.state.recentSpam.find((spam) => {
     return spam.type === type && (!identifier || spam.identifiers.includes(identifier));
   });
 }

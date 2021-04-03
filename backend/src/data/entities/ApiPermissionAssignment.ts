@@ -18,10 +18,7 @@ export class ApiPermissionAssignment {
   @Column("simple-array")
   permissions: string[];
 
-  @ManyToOne(
-    type => ApiUserInfo,
-    userInfo => userInfo.permissionAssignments,
-  )
+  @ManyToOne((type) => ApiUserInfo, (userInfo) => userInfo.permissionAssignments)
   @JoinColumn({ name: "target_id" })
   userInfo: ApiUserInfo;
 }

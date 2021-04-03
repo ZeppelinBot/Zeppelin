@@ -25,9 +25,9 @@ export const NamesCmd = nameHistoryCmd({
     }
 
     const nicknameRows = nicknames.map(
-      r => `\`[${r.timestamp}]\` ${r.nickname ? `**${disableCodeBlocks(r.nickname)}**` : "*None*"}`,
+      (r) => `\`[${r.timestamp}]\` ${r.nickname ? `**${disableCodeBlocks(r.nickname)}**` : "*None*"}`,
     );
-    const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
+    const usernameRows = usernames.map((r) => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
     const user = pluginData.client.users.get(args.userId);
     const currentUsername = user ? `${user.username}#${user.discriminator}` : args.userId;

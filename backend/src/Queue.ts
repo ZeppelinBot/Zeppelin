@@ -14,7 +14,7 @@ export class Queue {
   }
 
   public add(fn) {
-    const promise = new Promise(resolve => {
+    const promise = new Promise((resolve) => {
       this.queue.push(async () => {
         await fn();
         resolve(undefined);
@@ -35,7 +35,7 @@ export class Queue {
     }
 
     const fn = this.queue.shift()!;
-    new Promise(resolve => {
+    new Promise((resolve) => {
       // Either fn() completes or the timeout is reached
       fn().then(resolve);
       setTimeout(resolve, this.timeout);

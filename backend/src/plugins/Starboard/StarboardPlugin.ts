@@ -139,7 +139,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starb
     state.starboardMessages = GuildStarboardMessages.getGuildInstance(guild.id);
     state.starboardReactions = GuildStarboardReactions.getGuildInstance(guild.id);
 
-    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
   },
 

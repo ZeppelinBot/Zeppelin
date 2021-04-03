@@ -19,10 +19,7 @@ export class GuildVCAlerts extends BaseGuildRepository {
   }
 
   async getAllGuildAlerts(): Promise<VCAlert[]> {
-    return this.allAlerts
-      .createQueryBuilder()
-      .where("guild_id = :guildId", { guildId: this.guildId })
-      .getMany();
+    return this.allAlerts.createQueryBuilder().where("guild_id = :guildId", { guildId: this.guildId }).getMany();
   }
 
   async getAlertsByUserId(userId: string): Promise<VCAlert[]> {

@@ -35,12 +35,7 @@ export class GuildMutes extends BaseGuildRepository {
   }
 
   async addMute(userId, expiryTime, rolesToRestore?: string[]): Promise<Mute> {
-    const expiresAt = expiryTime
-      ? moment
-          .utc()
-          .add(expiryTime, "ms")
-          .format("YYYY-MM-DD HH:mm:ss")
-      : null;
+    const expiresAt = expiryTime ? moment.utc().add(expiryTime, "ms").format("YYYY-MM-DD HH:mm:ss") : null;
 
     const result = await this.mutes.insert({
       guild_id: this.guildId,
@@ -53,12 +48,7 @@ export class GuildMutes extends BaseGuildRepository {
   }
 
   async updateExpiryTime(userId, newExpiryTime, rolesToRestore?: string[]) {
-    const expiresAt = newExpiryTime
-      ? moment
-          .utc()
-          .add(newExpiryTime, "ms")
-          .format("YYYY-MM-DD HH:mm:ss")
-      : null;
+    const expiresAt = newExpiryTime ? moment.utc().add(newExpiryTime, "ms").format("YYYY-MM-DD HH:mm:ss") : null;
 
     if (rolesToRestore && rolesToRestore.length) {
       return this.mutes.update(
@@ -89,7 +79,7 @@ export class GuildMutes extends BaseGuildRepository {
       .createQueryBuilder("mutes")
       .where("guild_id = :guild_id", { guild_id: this.guildId })
       .andWhere(
-        new Brackets(qb => {
+        new Brackets((qb) => {
           qb.where("expires_at > NOW()").orWhere("expires_at IS NULL");
         }),
       )

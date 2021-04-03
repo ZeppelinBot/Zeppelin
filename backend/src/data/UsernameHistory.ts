@@ -67,7 +67,7 @@ export class UsernameHistory extends BaseRepository {
 
     if (toDelete.length > 0) {
       await this.usernameHistory.delete({
-        id: In(toDelete.map(v => v.id)),
+        id: In(toDelete.map((v) => v.id)),
       });
     }
   }

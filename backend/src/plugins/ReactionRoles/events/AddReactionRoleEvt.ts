@@ -29,7 +29,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
 
     if (emoji.name === CLEAR_ROLES_EMOJI) {
       // User reacted with "clear roles" emoji -> clear their roles
-      const reactionRoleRoleIds = reactionRoles.map(rr => rr.role_id);
+      const reactionRoleRoleIds = reactionRoles.map((rr) => rr.role_id);
       for (const roleId of reactionRoleRoleIds) {
         addMemberPendingRoleChange(pluginData, userId, "-", roleId);
       }

@@ -25,8 +25,8 @@ export const WarnAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
     };
 
-    const userIdsToWarn = unique(contexts.map(c => c.user?.id).filter(nonNullish));
-    const membersToWarn = await asyncMap(userIdsToWarn, id => resolveMember(pluginData.client, pluginData.guild, id));
+    const userIdsToWarn = unique(contexts.map((c) => c.user?.id).filter(nonNullish));
+    const membersToWarn = await asyncMap(userIdsToWarn, (id) => resolveMember(pluginData.client, pluginData.guild, id));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const member of membersToWarn) {

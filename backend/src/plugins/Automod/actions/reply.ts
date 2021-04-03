@@ -27,8 +27,8 @@ export const ReplyAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig }) {
     const contextsWithTextChannels = contexts
-      .filter(c => c.message?.channel_id)
-      .filter(c => pluginData.guild.channels.get(c.message!.channel_id) instanceof TextChannel);
+      .filter((c) => c.message?.channel_id)
+      .filter((c) => pluginData.guild.channels.get(c.message!.channel_id) instanceof TextChannel);
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
       if (!map.has(context.message!.channel_id)) {
@@ -40,10 +40,10 @@ export const ReplyAction = automodAction({
     }, new Map());
 
     for (const [channelId, _contexts] of contextsByChannelId.entries()) {
-      const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean))));
+      const users = unique(Array.from(new Set(_contexts.map((c) => c.user).filter(Boolean))));
       const user = users[0];
 
-      const renderReplyText = async str =>
+      const renderReplyText = async (str) =>
         renderTemplate(str, {
           user: stripObjectToScalars(user),
         });

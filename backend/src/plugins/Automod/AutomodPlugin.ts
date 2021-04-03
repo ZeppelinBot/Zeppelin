@@ -61,7 +61,7 @@ const defaultOptions = {
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
  */
-const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
@@ -217,10 +217,10 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     pluginData.state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
 
-    pluginData.state.onMessageCreateFn = message => runAutomodOnMessage(pluginData, message, false);
+    pluginData.state.onMessageCreateFn = (message) => runAutomodOnMessage(pluginData, message, false);
     pluginData.state.savedMessages.events.on("create", pluginData.state.onMessageCreateFn);
 
-    pluginData.state.onMessageUpdateFn = message => runAutomodOnMessage(pluginData, message, true);
+    pluginData.state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
 
     pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();

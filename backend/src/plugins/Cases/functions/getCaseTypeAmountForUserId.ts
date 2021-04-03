@@ -7,11 +7,11 @@ export async function getCaseTypeAmountForUserId(
   userID: string,
   type: CaseTypes,
 ): Promise<number> {
-  const cases = (await pluginData.state.cases.getByUserId(userID)).filter(c => !c.is_hidden);
+  const cases = (await pluginData.state.cases.getByUserId(userID)).filter((c) => !c.is_hidden);
   let typeAmount = 0;
 
   if (cases.length > 0) {
-    cases.forEach(singleCase => {
+    cases.forEach((singleCase) => {
       if (singleCase.type === type.valueOf()) {
         typeAmount++;
       }

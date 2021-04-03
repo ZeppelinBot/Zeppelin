@@ -24,7 +24,7 @@ export const LogsGuildMemberAddEvt = logsEvt({
       account_age: accountAge,
     });
 
-    const cases = (await pluginData.state.cases.with("notes").getByUserId(member.id)).filter(c => !c.is_hidden);
+    const cases = (await pluginData.state.cases.with("notes").getByUserId(member.id)).filter((c) => !c.is_hidden);
     cases.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
     if (cases.length) {

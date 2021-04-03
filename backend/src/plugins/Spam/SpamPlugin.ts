@@ -77,7 +77,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()("spam", {
 
     state.spamDetectionQueue = Promise.resolve();
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
   },
 

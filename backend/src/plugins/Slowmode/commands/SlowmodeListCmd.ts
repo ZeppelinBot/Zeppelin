@@ -30,7 +30,7 @@ export const SlowmodeListCmd = slowmodeCmd({
     }
 
     if (slowmodes.length) {
-      const lines = slowmodes.map(slowmode => {
+      const lines = slowmodes.map((slowmode) => {
         const humanized = humanizeDuration(slowmode.seconds * 1000);
 
         const type = slowmode.native ? "native slowmode" : "bot slowmode";

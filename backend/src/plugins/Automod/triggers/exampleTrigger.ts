@@ -15,7 +15,7 @@ export const ExampleTrigger = automodTrigger<ExampleMatchResultType>()({
   },
 
   async match({ triggerConfig, context }) {
-    const foundFruit = triggerConfig.allowedFruits.find(fruit => context.message?.data.content === fruit);
+    const foundFruit = triggerConfig.allowedFruits.find((fruit) => context.message?.data.content === fruit);
     if (foundFruit) {
       return {
         extra: {

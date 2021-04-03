@@ -19,7 +19,7 @@ export class GuildMemberTimezones extends BaseGuildRepository {
   }
 
   async set(memberId, timezone: string) {
-    await connection.transaction(async entityManager => {
+    await connection.transaction(async (entityManager) => {
       const repo = entityManager.getRepository(MemberTimezone);
       const existingRow = await repo.findOne({
         guild_id: this.guildId,
