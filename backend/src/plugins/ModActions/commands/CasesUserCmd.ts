@@ -21,12 +21,12 @@ const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
   reverseFilters: ct.switchOption({ shortcut: "r" }),
-  onlyNotes: ct.switchOption({ shortcut: "n" }),
-  onlyWarns: ct.switchOption({ shortcut: "w" }),
-  onlyMutes: ct.switchOption({ shortcut: "m" }),
-  onyUnmutes: ct.switchOption({ shortcut: "um" }),
-  onlyBans: ct.switchOption({ shortcut: "b" }),
-  onyUnbans: ct.switchOption({ shortcut: "ub" }),
+  notes: ct.switchOption({ shortcut: "n" }),
+  warns: ct.switchOption({ shortcut: "w" }),
+  mutes: ct.switchOption({ shortcut: "m" }),
+  unmutes: ct.switchOption({ shortcut: "um" }),
+  bans: ct.switchOption({ shortcut: "b" }),
+  unbans: ct.switchOption({ shortcut: "ub" }),
 };
 
 export const CasesUserCmd = modActionsCmd({
@@ -52,12 +52,12 @@ export const CasesUserCmd = modActionsCmd({
     let cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
 
     const typesToShow: CaseTypes[] = [];
-    if (args.onlyNotes) typesToShow.push(CaseTypes.Note);
-    if (args.onlyWarns) typesToShow.push(CaseTypes.Warn);
-    if (args.onlyMutes) typesToShow.push(CaseTypes.Mute);
-    if (args.onyUnmutes) typesToShow.push(CaseTypes.Unmute);
-    if (args.onlyBans) typesToShow.push(CaseTypes.Ban);
-    if (args.onyUnbans) typesToShow.push(CaseTypes.Unban);
+    if (args.notes) typesToShow.push(CaseTypes.Note);
+    if (args.warns) typesToShow.push(CaseTypes.Warn);
+    if (args.mutes) typesToShow.push(CaseTypes.Mute);
+    if (args.unmutes) typesToShow.push(CaseTypes.Unmute);
+    if (args.bans) typesToShow.push(CaseTypes.Ban);
+    if (args.unbans) typesToShow.push(CaseTypes.Unban);
 
     if (typesToShow.length > 0) {
       // Reversed: Hide specified types
