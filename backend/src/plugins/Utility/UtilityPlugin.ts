@@ -35,6 +35,7 @@ import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
+import { refreshMembersIfNeeded } from "./refreshMembers";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -154,6 +155,21 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     if (activeReloads.has(guild.id)) {
       sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
       activeReloads.delete(guild.id);
+    }
+
+    // FIXME: Temp fix for role change detection for specific servers, load all guild members in the background on bot start
+    const roleChangeDetectionFixServers = [
+      "786212572285763605",
+      "653681924384096287",
+      "493351982887862283",
+      "513338222810497041",
+      "523043978178723840",
+      "718076393295970376",
+      "803251072877199400",
+      "750492934343753798",
+    ];
+    if (roleChangeDetectionFixServers.includes(pluginData.guild.id)) {
+      refreshMembersIfNeeded(pluginData.guild);
     }
   },
 
