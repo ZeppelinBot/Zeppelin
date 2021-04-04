@@ -9,6 +9,7 @@ import {
   resolveMember,
   stripObjectToScalars,
   tNullable,
+  verboseChannelMention,
 } from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
@@ -68,7 +69,23 @@ export const AlertAction = automodAction({
         throw err;
       }
 
-      await createChunkedMessage(channel, rendered);
+      try {
+        await createChunkedMessage(channel, rendered);
+      } catch (err) {
+        if (err.code === 50001) {
+          logs.log(LogType.BOT_ALERT, {
+            body: `Missing access to send alert to channel ${verboseChannelMention(
+              channel,
+            )} in automod rule **${ruleName}**`,
+          });
+        } else {
+          logs.log(LogType.BOT_ALERT, {
+            body: `Error ${err.code || "UNKNOWN"} when sending alert to channel ${verboseChannelMention(
+              channel,
+            )} in automod rule **${ruleName}**`,
+          });
+        }
+      }
     } else {
       logs.log(LogType.BOT_ALERT, {
         body: `Invalid channel id \`${actionConfig.channel}\` for alert action in automod rule **${ruleName}**`,
