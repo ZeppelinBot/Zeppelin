@@ -13,7 +13,7 @@ const defaultOptions: PluginOptions<AFKPluginType> = {
         can_afk: false,
         allow_links: false,
         allow_invites: false,
-        max_status_limit: 12
+        max_status_limit: 32
     },
     overrides: [
         {
@@ -22,7 +22,7 @@ const defaultOptions: PluginOptions<AFKPluginType> = {
                 can_afk: true,
                 allow_links: true,
                 allow_invites: true,
-                max_status_limit: 12,
+                max_status_limit: 32,
             }
         }
     ]
@@ -31,8 +31,8 @@ const defaultOptions: PluginOptions<AFKPluginType> = {
 const configPreprocessor: ConfigPreprocessorFn<AFKPluginType> = options => {
   if (options.config.max_status_limit) {
     const max_limit = options.config.max_status_limit;
-    if (max_limit > 24) throw new StrictValidationError([
-      `max_status_limit needs to be under 24 characters.`
+    if (max_limit > 32) throw new StrictValidationError([
+      `max_status_limit needs to be under 32 characters.`
     ]);
   }
   return options;

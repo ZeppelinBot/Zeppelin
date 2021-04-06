@@ -19,7 +19,7 @@ export const AfkSetCmd = afkCmd({
         const status = args.status.join(" ");
 
         // Check status length
-        const maxStatusLength = pluginData.config.getForMember(msg.member).max_status_limit ?? 12;
+        const maxStatusLength = pluginData.config.getForMember(msg.member).max_status_limit ?? 32;
         if (status.length > maxStatusLength) {
             sendErrorMessage(pluginData, msg.channel, `Status length is above **${maxStatusLength}** characters.`);
             return;
