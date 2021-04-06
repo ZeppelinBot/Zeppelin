@@ -6,6 +6,7 @@ export const ConfigSchema = t.type({
     can_afk: t.boolean,
     allow_links: t.boolean,
     allow_invites: t.boolean,
+    max_status_limit: t.number,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -13,7 +14,7 @@ export interface AFKPluginType extends BasePluginType {
     config: TConfigSchema;
     state: {
         afkUsers: AFK;
-    }  
+    }
 }
 
 export const afkCmd = guildCommand<AFKPluginType>();

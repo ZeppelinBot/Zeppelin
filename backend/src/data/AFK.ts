@@ -28,4 +28,9 @@ export class AFK extends BaseRepository {
 
     return await this.afk.delete({ user_id });
   }
+
+  async isAfk(user_id: string) {
+    const afk = await this.afk.findOne({ user_id });
+    return !!afk?.status;
+  }
 }

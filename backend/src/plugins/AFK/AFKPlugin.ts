@@ -5,12 +5,15 @@ import { AFK } from "src/data/AFK";
 
 import { AfkSetCmd } from "./commands/AFKCmd";
 import { AFKNotificationEvt } from "./events/AFKNotificationEvt";
+import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
+import { StrictValidationError } from "../../validatorUtils";
 
 const defaultOptions: PluginOptions<AFKPluginType> = {
     config: {
         can_afk: false,
         allow_links: false,
         allow_invites: false,
+        max_status_limit: 12
     },
     overrides: [
         {
@@ -19,9 +22,20 @@ const defaultOptions: PluginOptions<AFKPluginType> = {
                 can_afk: true,
                 allow_links: true,
                 allow_invites: true,
+                max_status_limit: 12,
             }
         }
     ]
+}
+
+const configPreprocessor: ConfigPreprocessorFn<AFKPluginType> = options => {
+  if (options.config.max_status_limit) {
+    const max_limit = options.config.max_status_limit;
+    if (max_limit > 24) throw new StrictValidationError([
+      `max_status_limit needs to be under 24 characters.`
+    ]);
+  }
+  return options;
 }
 
 export const AFKPlugin = zeppelinGuildPlugin<AFKPluginType>()("afk", {
@@ -33,6 +47,7 @@ export const AFKPlugin = zeppelinGuildPlugin<AFKPluginType>()("afk", {
 
     configSchema: ConfigSchema,
     defaultOptions,
+    configPreprocessor,
 
     commands: [AfkSetCmd],
     events: [AFKNotificationEvt],

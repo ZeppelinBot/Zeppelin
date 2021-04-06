@@ -7,22 +7,34 @@ export const AFKNotificationEvt = afkEvt({
     listener: async ({ pluginData, args: { message } }) => {
         // Mention Check (if someone mentions the AFK user)
         if (message.mentions.length) {
-            const afk = await pluginData.state.afkUsers.getUserAFKStatus(message.mentions[0].id);
-            if (!afk) return;
-        
-            sendUserMentionMessage(message, afk.status);
+            const mentionedMembers: Array<{ id: string, status: string }> = [];
+            for (const user of message.mentions) {
+              const isAfk = await pluginData.state.afkUsers.isAfk(user.id);
+              if (isAfk) {
+                const afk = (await pluginData.state.afkUsers.getUserAFKStatus(user.id))!;
+                mentionedMembers.push({
+                  id: afk.user_id,
+                  status: afk.status,
+                });
+              }
+            }
+
+            const user = mentionedMembers.length > 1
+              ? mentionedMembers.map((u) => `<@!${u.id}>: **${u.status}**`)
+              : mentionedMembers[0];
+            await sendUserMentionMessage(message, user);
 
             return;
         }
 
         // Self AFK Check (if user is the one that's AFK)
-        const afk = await pluginData.state.afkUsers.getUserAFKStatus(message.author.id);
-        if (!afk) return;
+        const user = await pluginData.state.afkUsers.getUserAFKStatus(message.author.id);
+        if (!user) return;
 
         try {
             await pluginData.state.afkUsers.clearAFKStatus(message.author.id);
         } catch (err) {}
 
-        sendWelcomeBackMessage(message);
+        await sendWelcomeBackMessage(message);
     }
 });

@@ -15,12 +15,13 @@ export const AfkSetCmd = afkCmd({
         // Checks if the user is AFK, if so, return.
         const isAfk = await pluginData.state.afkUsers.getUserAFKStatus(msg.author.id);
         if (isAfk) return;
-    
+
         const status = args.status.join(" ");
 
         // Check status length
-        if (status.length > 124) {
-            sendErrorMessage(pluginData, msg.channel, "Status length is above **124** characters.");
+        const maxStatusLength = pluginData.config.getForMember(msg.member).max_status_limit ?? 12;
+        if (status.length > maxStatusLength) {
+            sendErrorMessage(pluginData, msg.channel, `Status length is above **${maxStatusLength}** characters.`);
             return;
         }
 
