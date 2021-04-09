@@ -19,7 +19,6 @@ export const WarnTrigger = automodTrigger<WarnTriggerResultType>()({
     if (context.modAction?.type !== "warn") {
       return;
     }
-    console.log(context);
     // If automatic && automatic turned off -> return
     if (context.modAction.isAutomodAction && !triggerConfig.automatic) return;
     // If manual && manual turned off -> return
