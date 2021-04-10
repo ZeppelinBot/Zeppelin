@@ -102,14 +102,19 @@
           tabSize: 2
         });
 
+        const isMac = /mac/i.test(navigator.platform);
+        const modKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.metaKey : ev.ctrlKey);
+        const nonModKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.ctrlKey : ev.metaKey);
+        const shortcutModifierPressed = (ev: KeyboardEvent) => modKeyPressed(ev) && !nonModKeyPressed(ev) && !ev.altKey;
+
         this.shortcutKeydownListener = (ev: KeyboardEvent) => {
-          if (ev.ctrlKey && !ev.altKey && ev.key === "s") {
+          if (shortcutModifierPressed(ev) && ev.key === "s") {
             ev.preventDefault();
             this.save();
             return;
           }
 
-          if (ev.ctrlKey && !ev.altKey && ev.key === "f") {
+          if (shortcutModifierPressed(ev) && ev.key === "f") {
             ev.preventDefault();
             this.$refs.aceEditor.editor.execCommand("find");
             return;
