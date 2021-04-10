@@ -8,8 +8,8 @@
       <div v-for="error in errors">{{ error }}</div>
     </div>
 
-    <div class="flex items-center">
-      <h1 class="flex-auto">Config for {{ guild.name }}</h1>
+    <div class="flex items-center flex-wrap">
+      <h1 class="flex-full md:flex-auto">Config for {{ guild.name }}</h1>
       <button v-if="!saving" class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700" v-on:click="save">
         <span v-if="saved">Saved!</span>
         <span v-else>Save</span>
@@ -125,10 +125,13 @@
         this.fitEditorToWindow();
       },
       fitEditorToWindow() {
+        const mainContainer = document.querySelector('.dashboard');
+        const mainContainerStyles = window.getComputedStyle(mainContainer);
+
         const editorElem = this.$refs.aceEditor.$el;
         const newWidth = editorElem.parentNode.clientWidth;
         const rect = editorElem.getBoundingClientRect();
-        const newHeight = Math.round(window.innerHeight - rect.top - 48);
+        const newHeight = Math.round(window.innerHeight - rect.top - parseInt(mainContainerStyles.paddingLeft, 10));
         this.resizeEditor(newWidth, newHeight);
       },
       resizeEditor(newWidth, newHeight) {
