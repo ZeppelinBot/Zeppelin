@@ -4,9 +4,9 @@ const apiUrl = process.env.API_URL;
 type QueryParamObject = { [key: string]: string | null };
 
 export class ApiError extends Error {
-  protected body: object;
-  protected status: number;
-  protected res: Response;
+  public body: any;
+  public status: number;
+  public res: Response;
 
   constructor(message: string, body: object, status: number, res: Response) {
     super(message);
