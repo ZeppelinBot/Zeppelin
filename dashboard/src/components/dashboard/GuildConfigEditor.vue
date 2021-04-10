@@ -62,6 +62,11 @@
       this.editableConfig = this.config || "";
       this.loading = false;
     },
+    beforeUnmount() {
+      if (this.shortcutKeydownListener) {
+        window.removeEventListener("keydown", this.shortcutKeydownListener);
+      }
+    },
     data() {
       return {
         loading: true,
@@ -71,7 +76,8 @@
         errors: [],
         editorWidth: 900,
         editorHeight: 600,
-        savedTimeout: null
+        savedTimeout: null,
+        shortcutKeydownListener: null,
       };
     },
     computed: {
@@ -96,16 +102,20 @@
           tabSize: 2
         });
 
-        this.$refs.aceEditor.editor.commands.addCommand({
-          name: 'save',
-          bindKey: {
-            win: "Ctrl-S",
-            mac: "Cmd-S"
-          },
-          exec: editor => {
+        this.shortcutKeydownListener = (ev: KeyboardEvent) => {
+          if (ev.ctrlKey && !ev.altKey && ev.key === "s") {
+            ev.preventDefault();
             this.save();
-          },
-        });
+            return;
+          }
+
+          if (ev.ctrlKey && !ev.altKey && ev.key === "f") {
+            ev.preventDefault();
+            this.$refs.aceEditor.editor.execCommand("find");
+            return;
+          }
+        };
+        window.addEventListener("keydown", this.shortcutKeydownListener);
 
         this.fitEditorToWindow();
       },
