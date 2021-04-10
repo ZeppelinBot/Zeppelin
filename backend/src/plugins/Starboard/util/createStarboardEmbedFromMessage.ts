@@ -8,7 +8,11 @@ const videoAttachmentExtensions = ["mp4", "mkv", "mov"];
 
 type StarboardEmbed = EmbedWith<"footer" | "author" | "fields" | "timestamp">;
 
-export function createStarboardEmbedFromMessage(msg: Message, copyFullEmbed: boolean, color: number): StarboardEmbed {
+export function createStarboardEmbedFromMessage(
+  msg: Message,
+  copyFullEmbed: boolean,
+  color?: number | null,
+): StarboardEmbed {
   const embed: StarboardEmbed = {
     footer: {
       text: `#${(msg.channel as GuildChannel).name}`,
@@ -18,8 +22,11 @@ export function createStarboardEmbedFromMessage(msg: Message, copyFullEmbed: boo
     },
     fields: [],
     timestamp: new Date(msg.timestamp).toISOString(),
-    color,
   };
+
+  if (color != null) {
+    embed.color = color;
+  }
 
   if (msg.author.avatarURL) {
     embed.author.icon_url = msg.author.avatarURL;
