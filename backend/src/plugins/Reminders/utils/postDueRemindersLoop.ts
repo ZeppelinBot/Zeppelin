@@ -20,13 +20,21 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
           const target = moment.utc();
           const diff = target.diff(moment.utc(reminder.created_at, "YYYY-MM-DD HH:mm:ss"));
           const result = humanizeDuration(diff, { largest: 2, round: true });
-          await channel.createMessage(
-            disableLinkPreviews(
+          await channel.createMessage({
+            content: disableLinkPreviews(
               `Reminder for <@!${reminder.user_id}>: ${reminder.body} \n\`Set at ${reminder.created_at} (${result} ago)\``,
             ),
-          );
+            allowedMentions: {
+              users: [reminder.user_id],
+            },
+          });
         } else {
-          await channel.createMessage(disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`));
+          await channel.createMessage({
+            content: disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`),
+            allowedMentions: {
+              users: [reminder.user_id],
+            },
+          });
         }
       } catch (e) {
         // Probably random Discord internal server error or missing permissions or somesuch
