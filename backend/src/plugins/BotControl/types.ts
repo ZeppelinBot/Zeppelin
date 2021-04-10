@@ -8,6 +8,7 @@ import { Configs } from "../../data/Configs";
 
 export const ConfigSchema = t.type({
   can_use: t.boolean,
+  can_eligible: t.boolean,
   update_cmd: tNullable(t.string),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
