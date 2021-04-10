@@ -30,9 +30,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
   import {mapState} from "vuex";
   import {ApiError} from "../../api";
+  import { GuildState } from "../../store/types";
 
   import AceEditor from "vue2-ace-editor";
 
@@ -75,10 +76,10 @@
     },
     computed: {
       ...mapState("guilds", {
-        guild(guilds) {
+        guild(guilds: GuildState) {
           return guilds.available.get(this.$route.params.guildId);
         },
-        config(guilds) {
+        config(guilds: GuildState) {
           return guilds.configs[this.$route.params.guildId];
         },
       }),
