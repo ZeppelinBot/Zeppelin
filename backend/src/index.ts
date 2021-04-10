@@ -156,6 +156,13 @@ connect().then(async () => {
     restMode: true,
     compress: false,
     guildCreateTimeout: 0,
+    // Disable mentions by default
+    allowedMentions: {
+      everyone: false,
+      users: false,
+      roles: false,
+      repliedUser: false,
+    },
     intents: [
       // Privileged
       "guildMembers",
