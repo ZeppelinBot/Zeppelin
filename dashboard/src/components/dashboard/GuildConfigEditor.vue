@@ -41,21 +41,21 @@
       AceEditor,
     },
     async mounted() {
-        try {
-          await this.$store.dispatch("guilds/loadGuild", this.$route.params.guildId);
-        } catch (err) {
-          if (err instanceof ApiError) {
-            this.$router.push('/dashboard');
-            return;
-          }
-
-          throw err;
-        }
-
-        if (this.guild == null) {
+      try {
+        await this.$store.dispatch("guilds/loadGuild", this.$route.params.guildId);
+      } catch (err) {
+        if (err instanceof ApiError) {
           this.$router.push('/dashboard');
           return;
         }
+
+        throw err;
+      }
+
+      if (this.guild == null) {
+        this.$router.push('/dashboard');
+        return;
+      }
 
       await this.$store.dispatch("guilds/loadConfig", this.$route.params.guildId);
       this.editableConfig = this.config || "";
@@ -86,6 +86,7 @@
     methods: {
       editorInit() {
         require("brace/ext/language_tools");
+        require('brace/ext/searchbox');
         require("brace/mode/yaml");
         require("brace/theme/tomorrow_night");
 
