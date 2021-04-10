@@ -1216,7 +1216,11 @@ export function verboseUserName(user: User | UnknownUser): string {
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {
-  return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+  const plainTextName =
+    channel.type === Constants.ChannelTypes.GUILD_VOICE || channel.type === Constants.ChannelTypes.GUILD_STAGE
+      ? channel.name
+      : `#${channel.name}`;
+  return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
 }
 
 export function messageLink(message: Message): string;
