@@ -44,7 +44,14 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   pluginData.state.guildLogs.ignoreLog(LogType.MESSAGE_DELETE, itemToDelete.message.id);
-  pluginData.client.deleteMessage(itemToDelete.message.channel_id, itemToDelete.message.id).catch(logger.warn);
+  pluginData.client.deleteMessage(itemToDelete.message.channel_id, itemToDelete.message.id).catch(err => {
+    if (err.code === 10008) {
+      // "Unknown Message", probably already deleted by automod or another bot, ignore
+      return;
+    }
+
+    logger.warn(err);
+  });
 
   const user = await resolveUser(pluginData.client, itemToDelete.message.user_id);
   const messageDate = timeAndDate
