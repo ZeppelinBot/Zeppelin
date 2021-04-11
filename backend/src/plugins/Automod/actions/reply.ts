@@ -9,10 +9,13 @@ import {
   tMessageContent,
   tNullable,
   unique,
+  verboseChannelMention,
 } from "../../../utils";
-import { TextChannel } from "eris";
+import { AdvancedMessageContent, Constants, MessageContent, TextChannel, User } from "eris";
 import { AutomodContext } from "../types";
 import { renderTemplate } from "../../../templateFormatter";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { LogType } from "../../../data/LogType";
 
 export const ReplyAction = automodAction({
   configType: t.union([
@@ -25,7 +28,7 @@ export const ReplyAction = automodAction({
 
   defaultConfig: {},
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const contextsWithTextChannels = contexts
       .filter(c => c.message?.channel_id)
       .filter(c => pluginData.guild.channels.get(c.message!.channel_id) instanceof TextChannel);
@@ -40,7 +43,7 @@ export const ReplyAction = automodAction({
     }, new Map());
 
     for (const [channelId, _contexts] of contextsByChannelId.entries()) {
-      const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean))));
+      const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean)))) as User[];
       const user = users[0];
 
       const renderReplyText = async str =>
@@ -50,10 +53,37 @@ export const ReplyAction = automodAction({
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)
-          : await renderRecursively(actionConfig.text, renderReplyText);
+          : ((await renderRecursively(actionConfig.text, renderReplyText)) as AdvancedMessageContent);
 
       if (formatted) {
         const channel = pluginData.guild.channels.get(channelId) as TextChannel;
+
+        // Check for basic Send Messages and View Channel permissions
+        if (
+          !hasDiscordPermissions(
+            channel.permissionsOf(pluginData.client.user.id),
+            Constants.Permissions.sendMessages | Constants.Permissions.readMessages,
+          )
+        ) {
+          pluginData.state.logs.log(LogType.BOT_ALERT, {
+            body: `Missing permissions to reply in ${verboseChannelMention(channel)} in Automod rule \`${ruleName}\``,
+          });
+          continue;
+        }
+
+        // If the message is an embed, check for embed permissions
+        if (
+          typeof formatted !== "string" &&
+          !hasDiscordPermissions(channel.permissionsOf(pluginData.client.user.id), Constants.Permissions.embedLinks)
+        ) {
+          pluginData.state.logs.log(LogType.BOT_ALERT, {
+            body: `Missing permissions to reply **with an embed** in ${verboseChannelMention(
+              channel,
+            )} in Automod rule \`${ruleName}\``,
+          });
+          continue;
+        }
+
         const replyMsg = await channel.createMessage(formatted);
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
