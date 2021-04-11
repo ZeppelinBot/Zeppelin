@@ -11,7 +11,7 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
 
     await new Promise(async resolve => {
       const stream = await queryRunner.stream("SELECT CONCAT(user_id, '-', username) AS `key` FROM username_history");
-      stream.on("result", row => {
+      stream.on("data", (row: any) => {
         migratedUsernames.add(row.key);
       });
       stream.on("end", resolve);
@@ -25,7 +25,7 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
         const stream = await queryRunner.stream(
           `SELECT * FROM name_history WHERE type=1 ORDER BY timestamp ASC LIMIT ${BATCH_SIZE}`,
         );
-        stream.on("result", row => {
+        stream.on("data", (row: any) => {
           const key = `${row.user_id}-${row.value}`;
 
           if (!migratedUsernames.has(key)) {
