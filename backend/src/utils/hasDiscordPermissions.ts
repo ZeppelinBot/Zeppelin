@@ -12,5 +12,5 @@ export function hasDiscordPermissions(resolvedPermissions: Permission, requiredP
     return true;
   }
 
-  return Boolean(allowedPermissions & nRequiredPermissions);
+  return Boolean((allowedPermissions & nRequiredPermissions) === nRequiredPermissions);
 }
