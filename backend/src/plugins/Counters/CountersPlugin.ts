@@ -24,6 +24,7 @@ import {
 } from "../../data/entities/CounterTrigger";
 import { getPrettyNameForCounter } from "./functions/getPrettyNameForCounter";
 import { getPrettyNameForCounterTrigger } from "./functions/getPrettyNameForCounterTrigger";
+import { counterExists } from "./functions/counterExists";
 
 const MAX_COUNTERS = 5;
 const MAX_TRIGGERS_PER_COUNTER = 5;
@@ -115,6 +116,8 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
   configPreprocessor,
 
   public: {
+    counterExists: mapToPublicFn(counterExists),
+
     // Change a counter's value by a relative amount, e.g. +5
     changeCounterValue: mapToPublicFn(changeCounterValue),
 
