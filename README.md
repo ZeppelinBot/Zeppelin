@@ -23,6 +23,11 @@ These instructions are intended for bot development only.
 
 👉 **No support is offered for self-hosting the bot!** 👈
 
+### Requirements
+* Node `v14.0.0` and above.
+* [MariaDB](https://mariadb.org/), a drop-in replacement for [MySQL](https://www.mysql.com/).
+  * Note: MySQL will **not** work.
+
 ### Running the bot
 1. `cd backend`
 2. `npm ci`
