@@ -9,9 +9,8 @@ export const AFKNotificationEvt = afkEvt({
         if (message.mentions.length) {
             const mentionedMembers: Array<{ id: string, status: string }> = [];
             for (const user of message.mentions) {
-              const isAfk = await pluginData.state.afkUsers.isAfk(user.id);
-              if (isAfk) {
-                const afk = (await pluginData.state.afkUsers.getUserAFKStatus(user.id))!;
+              const afk = (await pluginData.state.afkUsers.getUserAFKStatus(user.id))!;
+              if (afk) {
                 mentionedMembers.push({
                   id: afk.user_id,
                   status: afk.status,
