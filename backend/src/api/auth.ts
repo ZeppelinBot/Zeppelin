@@ -39,7 +39,11 @@ function simpleDiscordAPIRequest(bearerToken, path): Promise<any> {
           return;
         }
 
-        res.on("data", data => resolve(JSON.parse(data)));
+        let rawData = "";
+        res.on("data", data => (rawData += data));
+        res.on("end", () => {
+          resolve(JSON.parse(rawData));
+        });
       },
     );
 
