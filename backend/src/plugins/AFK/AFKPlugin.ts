@@ -52,9 +52,7 @@ export const AFKPlugin = zeppelinGuildPlugin<AFKPluginType>()("afk", {
     commands: [AfkSetCmd],
     events: [AFKNotificationEvt],
 
-    onLoad(pluginData) {
-        const { state } = pluginData;
-
+    onLoad({ state }) {
         state.afkUsers = new AFK();
     }
 })
