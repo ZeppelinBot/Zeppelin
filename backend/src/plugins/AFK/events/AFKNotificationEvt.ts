@@ -27,7 +27,7 @@ export const AFKNotificationEvt = afkEvt({
         }
 
         // Self AFK Check (if user is the one that's AFK)
-        const user = await pluginData.state.afkUsers.getUserAFKStatus(message.author.id);
+        const user = await pluginData.state.afkUsers.isAfk(message.author.id);
         if (!user) return;
 
         try {
