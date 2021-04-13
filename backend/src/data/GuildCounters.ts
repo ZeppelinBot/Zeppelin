@@ -186,14 +186,16 @@ export class GuildCounters extends BaseGuildRepository {
         ? `GREATEST(value - ${decayAmountToApply}, 0)`
         : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
 
-    await this.counterValues.update(
-      {
-        counter_id: id,
-      },
-      {
+    // Using an UPDATE with ORDER BY in an attempt to avoid deadlocks from simultaneous decays
+    // Also see https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html
+    await this.counterValues
+      .createQueryBuilder("CounterValue")
+      .where("counter_id = :id", { id })
+      .orderBy("id")
+      .update({
         value: () => rawUpdate,
-      },
-    );
+      })
+      .execute();
 
     await this.counters.update(
       {
