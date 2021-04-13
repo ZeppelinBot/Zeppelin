@@ -12,11 +12,14 @@ import { CounterTriggerState } from "./entities/CounterTriggerState";
 import moment from "moment-timezone";
 import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
 import { connection } from "./db";
+import { Queue } from "../Queue";
 
 const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
 const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;
 
 const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
+
+const decayQueue = new Queue();
 
 async function deleteCountersMarkedToBeDeleted(): Promise<void> {
   await getRepository(Counter)
@@ -158,53 +161,55 @@ export class GuildCounters extends BaseGuildRepository {
     );
   }
 
-  async decay(id: number, decayPeriodMs: number, decayAmount: number) {
-    const counter = (await this.counters.findOne({
-      where: {
-        id,
-      },
-    }))!;
+  decay(id: number, decayPeriodMs: number, decayAmount: number) {
+    return decayQueue.add(async () => {
+      const counter = (await this.counters.findOne({
+        where: {
+          id,
+        },
+      }))!;
 
-    const diffFromLastDecayMs = moment.utc().diff(moment.utc(counter.last_decay_at!), "ms");
-    if (diffFromLastDecayMs < decayPeriodMs) {
-      return;
-    }
+      const diffFromLastDecayMs = moment.utc().diff(moment.utc(counter.last_decay_at!), "ms");
+      if (diffFromLastDecayMs < decayPeriodMs) {
+        return;
+      }
 
-    const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
-    if (decayAmountToApply === 0) {
-      return;
-    }
+      const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
+      if (decayAmountToApply === 0) {
+        return;
+      }
 
-    // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
-    const newLastDecayDate = moment
-      .utc(counter.last_decay_at)
-      .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
-      .format(DBDateFormat);
+      // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
+      const newLastDecayDate = moment
+        .utc(counter.last_decay_at)
+        .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
+        .format(DBDateFormat);
 
-    const rawUpdate =
-      decayAmountToApply >= 0
-        ? `GREATEST(value - ${decayAmountToApply}, 0)`
-        : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
+      const rawUpdate =
+        decayAmountToApply >= 0
+          ? `GREATEST(value - ${decayAmountToApply}, 0)`
+          : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
 
-    // Using an UPDATE with ORDER BY in an attempt to avoid deadlocks from simultaneous decays
-    // Also see https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html
-    await this.counterValues
-      .createQueryBuilder("CounterValue")
-      .where("counter_id = :id", { id })
-      .orderBy("id")
-      .update({
-        value: () => rawUpdate,
-      })
-      .execute();
+      // Using an UPDATE with ORDER BY in an attempt to avoid deadlocks from simultaneous decays
+      // Also see https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html
+      await this.counterValues
+        .createQueryBuilder("CounterValue")
+        .where("counter_id = :id", { id })
+        .orderBy("id")
+        .update({
+          value: () => rawUpdate,
+        })
+        .execute();
 
-    await this.counters.update(
-      {
-        id,
-      },
-      {
-        last_decay_at: newLastDecayDate,
-      },
-    );
+      await this.counters.update(
+        {
+          id,
+        },
+        {
+          last_decay_at: newLastDecayDate,
+        },
+      );
+    });
   }
 
   async markUnusedTriggersToBeDeleted(triggerIdsToKeep: number[]) {
