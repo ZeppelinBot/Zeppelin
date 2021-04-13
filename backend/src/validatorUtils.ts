@@ -27,7 +27,15 @@ export const TRegex = new t.Type<RegExp, string>(
   (s): s is RegExp => s instanceof RegExp,
   (from, to) =>
     either.chain(t.string.validate(from, to), s => {
-      return t.success(inputPatternToRegExp(s));
+      try {
+        return t.success(inputPatternToRegExp(s));
+      } catch (err) {
+        if (err instanceof InvalidRegexError) {
+          return t.failure(s, [], err.message);
+        }
+
+        throw err;
+      }
     }),
   s => `/${s.source}/${s.flags}`,
 );
