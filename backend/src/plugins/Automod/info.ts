@@ -64,7 +64,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
                   reason: 'Auto-muted for spam'
             my_second_filter:
               triggers:
-              - message_spam:
+              - emoji_spam:
                   amount: 5
                   within: 10s
               actions:
