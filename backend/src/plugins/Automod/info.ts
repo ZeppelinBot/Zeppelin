@@ -65,8 +65,8 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
             my_second_filter:
               triggers:
               - emoji_spam:
-                  amount: 5
-                  within: 10s
+                  amount: 2
+                  within: 5s
               actions:
                 clean: true
         overrides:
