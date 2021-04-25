@@ -103,7 +103,7 @@ export const SetCounterCmd = guildCommand<CountersPluginType>()({
 
     let value = args.value;
     if (!value) {
-      message.channel.createMessage("What would you like to set to the counter's value to?");
+      message.channel.createMessage("What would you like to set the counter's value to?");
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
