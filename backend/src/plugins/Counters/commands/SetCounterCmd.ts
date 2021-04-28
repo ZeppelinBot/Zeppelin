@@ -111,7 +111,7 @@ export const SetCounterCmd = guildCommand<CountersPluginType>()({
       }
 
       const potentialValue = parseInt(reply.content, 10);
-      if (!potentialValue) {
+      if (Number.isNaN(potentialValue)) {
         sendErrorMessage(pluginData, message.channel, "Not a number, cancelling");
         return;
       }
