@@ -15,10 +15,18 @@ import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { EmbedOptions, User } from "eris";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { asyncMap } from "../../../utils/async";
+import { CaseTypes } from "../../../data/CaseTypes";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
+  reverseFilters: ct.switchOption({ shortcut: "r" }),
+  notes: ct.switchOption({ shortcut: "n" }),
+  warns: ct.switchOption({ shortcut: "w" }),
+  mutes: ct.switchOption({ shortcut: "m" }),
+  unmutes: ct.switchOption({ shortcut: "um" }),
+  bans: ct.switchOption({ shortcut: "b" }),
+  unbans: ct.switchOption({ shortcut: "ub" }),
 };
 
 export const CasesUserCmd = modActionsCmd({
@@ -41,7 +49,23 @@ export const CasesUserCmd = modActionsCmd({
       return;
     }
 
-    const cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
+    let cases = await pluginData.state.cases.with("notes").getByUserId(user.id);
+
+    const typesToShow: CaseTypes[] = [];
+    if (args.notes) typesToShow.push(CaseTypes.Note);
+    if (args.warns) typesToShow.push(CaseTypes.Warn);
+    if (args.mutes) typesToShow.push(CaseTypes.Mute);
+    if (args.unmutes) typesToShow.push(CaseTypes.Unmute);
+    if (args.bans) typesToShow.push(CaseTypes.Ban);
+    if (args.unbans) typesToShow.push(CaseTypes.Unban);
+
+    if (typesToShow.length > 0) {
+      // Reversed: Hide specified types
+      if (args.reverseFilters) cases = cases.filter(c => !typesToShow.includes(c.type));
+      // Normal: Show only specified types
+      else cases = cases.filter(c => typesToShow.includes(c.type));
+    }
+
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
