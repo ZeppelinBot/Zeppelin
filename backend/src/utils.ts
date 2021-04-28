@@ -282,6 +282,16 @@ export const tStrictMessageContent = t.type({
 
 export const tMessageContent = t.union([t.string, tStrictMessageContent]);
 
+/**
+ * Mirrors AllowedMentions from Eris
+ */
+export const tAllowedMentions = t.type({
+  everyone: tNormalizedNullOptional(t.boolean),
+  users: tNormalizedNullOptional(t.union([t.boolean, t.array(t.string)])),
+  roles: tNormalizedNullOptional(t.union([t.boolean, t.array(t.string)])),
+  repliedUser: tNormalizedNullOptional(t.boolean),
+});
+
 export function dropPropertiesByName(obj, propName) {
   if (obj.hasOwnProperty(propName)) delete obj[propName];
   for (const value of Object.values(obj)) {
