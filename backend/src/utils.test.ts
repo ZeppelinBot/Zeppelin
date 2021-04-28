@@ -1,6 +1,10 @@
-import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString } from "./utils";
+import * as ioTs from "io-ts";
+import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, tAllowedMentions } from "./utils";
 
 import test from "ava";
+import { AllowedMentions as ErisAllowedMentions } from "eris";
+
+type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
 
 test("getUrlsInString(): detects full links", t => {
   const urls = getUrlsInString("foo https://google.com/ bar");
@@ -44,4 +48,10 @@ test("delay strings: reverse conversion (conservative)", t => {
   const ms = 1_209_600_000;
   const expected = "2w";
   t.is(convertMSToDelayString(ms), expected);
+});
+
+test("tAllowedMentions matches Eris's AllowedMentions", t => {
+  type TAllowedMentions = ioTs.TypeOf<typeof tAllowedMentions>;
+  const typeTest: AssertEquals<TAllowedMentions, ErisAllowedMentions> = true;
+  t.pass();
 });
