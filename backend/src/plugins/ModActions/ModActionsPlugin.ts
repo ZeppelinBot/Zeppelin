@@ -166,8 +166,8 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     },
 
     banUserId(pluginData) {
-      return (userId: string, reason?: string, banOptions?: BanOptions) => {
-        banUserId(pluginData, userId, reason, banOptions);
+      return (userId: string, reason?: string, banOptions?: BanOptions, banTime?: number) => {
+        banUserId(pluginData, userId, reason, banOptions, banTime);
       };
     },
 

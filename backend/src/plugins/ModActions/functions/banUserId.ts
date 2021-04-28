@@ -97,6 +97,16 @@ export async function banUserId(
     };
   }
 
+  const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
+  if (banTime && banTime > 0) {
+    const selfId = pluginData.client.user.id;
+    if (existingTempban) {
+      pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
+    } else {
+      pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
+    }
+  }
+
   // Create a case for this action
   const modId = banOptions.caseArgs?.modId || pluginData.client.user.id;
   const casesPlugin = pluginData.getPlugin(CasesPlugin);

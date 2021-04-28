@@ -172,6 +172,7 @@ export const BanCmd = modActionsCmd({
           ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
         },
         deleteMessageDays,
+        modId: mod.id,
       },
       time,
     );
@@ -184,12 +185,6 @@ export const BanCmd = modActionsCmd({
 
     let forTime = "";
     if (time && time > 0) {
-      if (existingTempban) {
-        pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
-      } else {
-        pluginData.state.tempbans.addTempban(user.id, time, mod.id);
-      }
-
       forTime = `for ${humanizeDuration(time)} `;
     }
 
