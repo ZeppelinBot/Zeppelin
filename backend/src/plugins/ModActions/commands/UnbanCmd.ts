@@ -77,5 +77,7 @@ export const UnbanCmd = modActionsCmd({
       caseNumber: createdCase.case_number,
       reason,
     });
+
+    pluginData.state.events.emit("unban", user.id);
   },
 });
