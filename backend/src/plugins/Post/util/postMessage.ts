@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import { PostPluginType } from "../types";
-import { TextChannel, MessageContent, Attachment, Message, Role } from "eris";
-import { downloadFile, getRoleMentions } from "../../../utils";
+import { Attachment, Message, MessageContent, TextChannel } from "eris";
+import { downloadFile } from "../../../utils";
 import fs from "fs";
 import { formatContent } from "./formatContent";
 
@@ -32,33 +32,16 @@ export async function postMessage(
     };
   }
 
-  const rolesMadeMentionable: Role[] = [];
-  if (enableMentions && content.content) {
-    const mentionedRoleIds = getRoleMentions(content.content);
-    if (mentionedRoleIds != null) {
-      for (const roleId of mentionedRoleIds) {
-        const role = pluginData.guild.roles.get(roleId);
-        if (role && !role.mentionable) {
-          await role.edit({
-            mentionable: true,
-          });
-          rolesMadeMentionable.push(role);
-        }
-      }
-    }
-
-    content.allowedMentions = content.allowedMentions || {};
-    content.allowedMentions.everyone = false;
+  if (enableMentions) {
+    content.allowedMentions = {
+      everyone: true,
+      users: true,
+      roles: true,
+    };
   }
 
   const createdMsg = await channel.createMessage(content, file);
   pluginData.state.savedMessages.setPermanent(createdMsg.id);
-
-  for (const role of rolesMadeMentionable) {
-    role.edit({
-      mentionable: false,
-    });
-  }
 
   if (downloadedAttachment) {
     downloadedAttachment.deleteFn();
