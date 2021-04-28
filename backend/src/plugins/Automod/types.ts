@@ -122,6 +122,7 @@ export interface AutomodContext {
   modAction?: {
     type: ModActionType;
     reason?: string;
+    isAutomodAction: boolean;
   };
   antiraid?: {
     level: string | null;

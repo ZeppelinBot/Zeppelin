@@ -49,7 +49,14 @@ export const MuteAction = automodAction({
     const mutes = pluginData.getPlugin(MutesPlugin);
     for (const userId of userIdsToMute) {
       try {
-        await mutes.muteUser(userId, duration, reason, { contactMethods, caseArgs }, rolesToRemove, rolesToRestore);
+        await mutes.muteUser(
+          userId,
+          duration,
+          reason,
+          { contactMethods, caseArgs, isAutomodAction: true },
+          rolesToRemove,
+          rolesToRestore,
+        );
       } catch (e) {
         if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
           pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {

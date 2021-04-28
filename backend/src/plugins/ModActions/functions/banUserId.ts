@@ -127,7 +127,7 @@ export async function banUserId(
     banTime: banTime ? humanizeDuration(banTime) : null,
   });
 
-  pluginData.state.events.emit("ban", user.id, reason);
+  pluginData.state.events.emit("ban", user.id, reason, banOptions.isAutomodAction);
 
   return {
     status: "success",

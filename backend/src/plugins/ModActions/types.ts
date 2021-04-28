@@ -48,9 +48,9 @@ export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface ModActionsEvents {
   note: (userId: string, reason?: string) => void;
-  warn: (userId: string, reason?: string) => void;
-  kick: (userId: string, reason?: string) => void;
-  ban: (userId: string, reason?: string) => void;
+  warn: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
+  kick: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
+  ban: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
   unban: (userId: string, reason?: string) => void;
   // mute/unmute are in the Mutes plugin
 }
@@ -126,17 +126,20 @@ export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
   retryPromptChannel?: TextChannel | null;
+  isAutomodAction?: boolean;
 }
 
 export interface KickOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
+  isAutomodAction?: boolean;
 }
 
 export interface BanOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
   deleteMessageDays?: number;
+  isAutomodAction?: boolean;
 }
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";

@@ -82,6 +82,8 @@ export async function warnMember(
     reason,
   });
 
+  pluginData.state.events.emit("warn", member.id, reason, warnOptions.isAutomodAction);
+
   return {
     status: "success",
     case: createdCase,

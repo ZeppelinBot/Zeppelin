@@ -5,13 +5,24 @@ import { automodTrigger } from "../helpers";
 interface MuteTriggerResultType {}
 
 export const MuteTrigger = automodTrigger<MuteTriggerResultType>()({
-  configType: t.type({}),
-  defaultConfig: {},
+  configType: t.type({
+    manual: t.boolean,
+    automatic: t.boolean,
+  }),
 
-  async match({ context }) {
+  defaultConfig: {
+    manual: true,
+    automatic: true,
+  },
+
+  async match({ context, triggerConfig }) {
     if (context.modAction?.type !== "mute") {
       return;
     }
+    // If automatic && automatic turned off -> return
+    if (context.modAction.isAutomodAction && !triggerConfig.automatic) return;
+    // If manual && manual turned off -> return
+    if (!context.modAction.isAutomodAction && !triggerConfig.manual) return;
 
     return {
       extra: {},
