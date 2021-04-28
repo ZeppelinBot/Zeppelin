@@ -12,6 +12,7 @@ export const BanAction = automodAction({
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
     deleteMessageDays: tNullable(t.number),
+    postInCaseLog: tNullable(t.boolean),
   }),
 
   defaultConfig: {
@@ -27,6 +28,7 @@ export const BanAction = automodAction({
       modId: pluginData.client.user.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
+      postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
     };
 
     const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(nonNullish));

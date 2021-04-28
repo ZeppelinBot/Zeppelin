@@ -47,7 +47,10 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
   }
 
   const modConfig = pluginData.config.getForUser(mod);
-  if ((!args.automatic || modConfig.log_automatic_actions) && args.postInCaseLogOverride !== false) {
+  if (
+    args.postInCaseLogOverride === true ||
+    ((!args.automatic || modConfig.log_automatic_actions) && args.postInCaseLogOverride !== false)
+  ) {
     await postCaseToCaseLogChannel(pluginData, theCase.id);
   }
 }

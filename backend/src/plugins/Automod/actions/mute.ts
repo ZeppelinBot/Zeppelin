@@ -25,6 +25,7 @@ export const MuteAction = automodAction({
     notifyChannel: tNullable(t.string),
     remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
     restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
+    postInCaseLog: tNullable(t.boolean),
   }),
 
   defaultConfig: {
@@ -42,6 +43,7 @@ export const MuteAction = automodAction({
       modId: pluginData.client.user.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
+      postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
     };
 
     const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));
