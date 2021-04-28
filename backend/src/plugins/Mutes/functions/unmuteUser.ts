@@ -8,6 +8,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { MemberOptions } from "eris";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -32,9 +33,12 @@ export async function unmuteUser(
   } else {
     // Unmute immediately
     if (member) {
+      const lock = await pluginData.locks.acquire(memberRolesLock(member));
+
       const muteRole = pluginData.config.get().mute_role;
       if (muteRole && member.roles.includes(muteRole)) {
         await member.removeRole(muteRole);
+        member.roles = member.roles.filter(r => r !== muteRole);
       }
       if (existingMute?.roles_to_restore) {
         const memberOptions: MemberOptions = {};
@@ -42,8 +46,11 @@ export async function unmuteUser(
         memberOptions.roles = Array.from(
           new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
         );
-        member.edit(memberOptions);
+        await member.edit(memberOptions);
+        member.roles = memberOptions.roles;
       }
+
+      lock.unlock();
     } else {
       // tslint:disable-next-line:no-console
       console.warn(
