@@ -188,8 +188,6 @@ export async function muteUser(
 
   if (theCase) {
     // Update old case
-    // Since mutes can often have multiple notes (extraNotes), we won't post each case note individually,
-    // but instead we'll post the entire case afterwards
     const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmute : "indefinite"}`];
     const reasons = reason ? [reason] : [];
     if (muteOptions.caseArgs?.extraNotes) {
@@ -201,12 +199,8 @@ export async function muteUser(
         modId: muteOptions.caseArgs?.modId,
         body: noteReason,
         noteDetails,
-        postInCaseLogOverride: false,
+        postInCaseLogOverride: muteOptions.caseArgs?.postInCaseLogOverride,
       });
-    }
-
-    if (muteOptions.caseArgs?.postInCaseLogOverride !== false) {
-      casesPlugin.postCaseToCaseLogChannel(existingMute!.case_id);
     }
   } else {
     // Create new case

@@ -62,11 +62,11 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
 
   const config = pluginData.config.get();
 
-  if (
-    config.case_log_channel &&
-    (!args.automatic || config.log_automatic_actions) &&
-    args.postInCaseLogOverride !== false
-  ) {
+  const shouldPostToCaseLogChannel =
+    args.postInCaseLogOverride === true ||
+    ((!args.automatic || config.log_automatic_actions) && args.postInCaseLogOverride !== false);
+
+  if (config.case_log_channel && shouldPostToCaseLogChannel) {
     await postCaseToCaseLogChannel(pluginData, createdCase);
   }
 

@@ -11,6 +11,7 @@ export const KickAction = automodAction({
     reason: tNullable(t.string),
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
+    postInCaseLog: tNullable(t.boolean),
   }),
 
   defaultConfig: {
@@ -25,6 +26,7 @@ export const KickAction = automodAction({
       modId: pluginData.client.user.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
+      postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
     };
 
     const userIdsToKick = unique(contexts.map(c => c.user?.id).filter(nonNullish));
