@@ -19,6 +19,8 @@ function formatConfigSchema(schema) {
   } else if (schema._tag === "UnionType") {
     if (schema.name.startsWith("Nullable<")) {
       return `Nullable<${formatConfigSchema(schema.types[0])}>`;
+    } else if (schema.name.startsWith("Optional<")) {
+      return `Optional<${formatConfigSchema(schema.types[0])}>`;
     } else {
       return schema.types.map(t => formatConfigSchema(t)).join(" | ");
     }
