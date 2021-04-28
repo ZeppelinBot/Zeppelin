@@ -25,8 +25,8 @@ These instructions are intended for bot development only.
 
 ### Requirements
 * Node `v14.0.0` and above.
-* [MariaDB](https://mariadb.org/), a drop-in replacement for [MySQL](https://www.mysql.com/).
-  * Note: MySQL will **not** work.
+* [MariaDB](https://mariadb.org/)
+  * MySQL will **not** work.
 
 ### Running the bot
 1. `cd backend`
