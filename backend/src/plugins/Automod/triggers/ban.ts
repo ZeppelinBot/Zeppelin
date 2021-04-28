@@ -19,7 +19,7 @@ export const BanTrigger = automodTrigger<BanTriggerResultType>()({
     if (context.modAction?.type !== "ban") {
       return;
     }
-    console.log(context);
+
     // If automatic && automatic turned off -> return
     if (context.modAction.isAutomodAction && !triggerConfig.automatic) return;
     // If manual && manual turned off -> return
