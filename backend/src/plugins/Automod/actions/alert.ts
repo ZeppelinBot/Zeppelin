@@ -8,6 +8,8 @@ import {
   messageLink,
   resolveMember,
   stripObjectToScalars,
+  tAllowedMentions,
+  tNormalizedNullOptional,
   tNullable,
   verboseChannelMention,
 } from "../../../utils";
@@ -21,6 +23,7 @@ export const AlertAction = automodAction({
   configType: t.type({
     channel: t.string,
     text: t.string,
+    allowed_mentions: tNormalizedNullOptional(tAllowedMentions),
   }),
 
   defaultConfig: {},
@@ -70,7 +73,7 @@ export const AlertAction = automodAction({
       }
 
       try {
-        await createChunkedMessage(channel, rendered);
+        await createChunkedMessage(channel, rendered, actionConfig.allowed_mentions);
       } catch (err) {
         if (err.code === 50001) {
           logs.log(LogType.BOT_ALERT, {
