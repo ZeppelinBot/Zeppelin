@@ -67,7 +67,7 @@ export const SetCounterCmd = guildCommand<CountersPluginType>()({
 
     let channel = args.channel;
     if (!channel && counter.per_channel) {
-      message.channel.createMessage(`Which channel's counter value would you like to add to?`);
+      message.channel.createMessage(`Which channel's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -85,7 +85,7 @@ export const SetCounterCmd = guildCommand<CountersPluginType>()({
 
     let user = args.user;
     if (!user && counter.per_user) {
-      message.channel.createMessage(`Which user's counter value would you like to add to?`);
+      message.channel.createMessage(`Which user's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -103,7 +103,7 @@ export const SetCounterCmd = guildCommand<CountersPluginType>()({
 
     let value = args.value;
     if (!value) {
-      message.channel.createMessage("How much would you like to add to the counter's value?");
+      message.channel.createMessage("What would you like to set the counter's value to?");
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
