@@ -1,4 +1,4 @@
-import { Member, Message, User } from "eris";
+import { Constants, Member, Message, User } from "eris";
 import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
@@ -14,6 +14,7 @@ import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
 import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
 import { asyncFilter } from "../../utils/async";
 import Timeout = NodeJS.Timeout;
+import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -395,6 +396,11 @@ async function performBanSearch(
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+  const member = pluginData.guild.members.get(pluginData.client.user.id);
+  if (member && !hasDiscordPermissions(member.permissions, Constants.Permissions.banMembers)) {
+    throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
+  }
+
   let matchingBans = (await pluginData.guild.getBans()).map(x => x.user);
 
   if (args.query) {
