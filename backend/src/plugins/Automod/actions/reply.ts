@@ -4,6 +4,7 @@ import {
   convertDelayStringToMS,
   noop,
   renderRecursively,
+  StrictMessageContent,
   stripObjectToScalars,
   tDelayString,
   tMessageContent,
@@ -84,7 +85,13 @@ export const ReplyAction = automodAction({
           continue;
         }
 
-        const replyMsg = await channel.createMessage(formatted);
+        const messageContent: StrictMessageContent = typeof formatted === "string" ? { content: formatted } : formatted;
+        const replyMsg = await channel.createMessage({
+          ...messageContent,
+          allowedMentions: {
+            users: [user.id],
+          },
+        });
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
