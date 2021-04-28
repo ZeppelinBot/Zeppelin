@@ -25,8 +25,9 @@ export async function sendWhere(
       sendErrorMessage(pluginData, channel, "Cannot create an invite to that channel!");
       return;
     }
-    channel.createMessage(
-      prepend + `${member.mention} is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
-    );
+    channel.createMessage({
+      content: prepend + `${member.mention} is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
+      allowedMentions: { users: true },
+    });
   }
 }
