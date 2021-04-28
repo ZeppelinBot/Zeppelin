@@ -139,6 +139,7 @@ export interface BanOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
   deleteMessageDays?: number;
+  modId?: string;
   isAutomodAction?: boolean;
 }
 

@@ -1,7 +1,15 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { asyncMap, nonNullish, resolveMember, tNullable, unique } from "../../../utils";
+import {
+  asyncMap,
+  convertDelayStringToMS,
+  nonNullish,
+  resolveMember,
+  tDelayString,
+  tNullable,
+  unique,
+} from "../../../utils";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { CaseArgs } from "../../Cases/types";
@@ -9,6 +17,7 @@ import { CaseArgs } from "../../Cases/types";
 export const BanAction = automodAction({
   configType: t.type({
     reason: tNullable(t.string),
+    duration: tNullable(tDelayString),
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
     deleteMessageDays: tNullable(t.number),
@@ -21,6 +30,7 @@ export const BanAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";
+    const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : undefined;
     const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
     const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
 
@@ -35,12 +45,17 @@ export const BanAction = automodAction({
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const userId of userIdsToBan) {
-      await modActions.banUserId(userId, reason, {
-        contactMethods,
-        caseArgs,
-        deleteMessageDays,
-        isAutomodAction: true,
-      });
+      await modActions.banUserId(
+        userId,
+        reason,
+        {
+          contactMethods,
+          caseArgs,
+          deleteMessageDays,
+          isAutomodAction: true,
+        },
+        duration,
+      );
     }
   },
 });
