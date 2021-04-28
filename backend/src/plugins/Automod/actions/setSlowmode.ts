@@ -19,8 +19,9 @@ export const SetSlowmodeAction = automodAction({
 
     for (const channelId of actionConfig.channels) {
       const channel = pluginData.guild.channels.get(channelId);
-      // 2 = Guild Voice, 5 = Guild News - Both dont allow slowmode
-      if (!channel || channel.type === 2 || channel.type === 5) continue;
+      // 0 = Guild Text, 4 = Guild Category - Both dont allow slowmode
+      if (!channel) continue;
+      if (channel.type === 0 || channel.type === 4) continue;
 
       let channelsToSlowmode: AnyGuildChannel[] = [];
       if (channel.type === 4) {
