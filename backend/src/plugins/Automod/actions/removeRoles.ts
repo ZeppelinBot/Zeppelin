@@ -10,6 +10,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { Constants } from "eris";
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 const p = Constants.Permissions;
 
@@ -66,7 +67,7 @@ export const RemoveRolesAction = automodAction({
           return;
         }
 
-        const memberRolesLock = await pluginData.locks.acquire(`member-roles-${member.id}`);
+        const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
 
         const rolesArr = Array.from(memberRoles.values());
         await member.edit({
@@ -74,7 +75,7 @@ export const RemoveRolesAction = automodAction({
         });
         member.roles = rolesArr; // Make sure we know of the new roles internally as well
 
-        memberRolesLock.unlock();
+        memberRoleLock.unlock();
       }),
     );
   },

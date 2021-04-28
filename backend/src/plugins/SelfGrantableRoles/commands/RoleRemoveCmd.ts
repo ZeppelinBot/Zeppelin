@@ -5,6 +5,7 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { splitRoleNames } from "../util/splitRoleNames";
 import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { findMatchingRoles } from "../util/findMatchingRoles";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export const RoleRemoveCmd = selfGrantableRolesCmd({
   trigger: "role remove",
@@ -15,7 +16,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const lock = await pluginData.locks.acquire(`grantableRoles:${msg.author.id}`);
+    const lock = await pluginData.locks.acquire(memberRolesLock(msg.author));
 
     const applyingEntries = getApplyingEntries(pluginData, msg);
     if (applyingEntries.length === 0) {

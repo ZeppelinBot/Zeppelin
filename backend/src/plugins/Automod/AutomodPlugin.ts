@@ -29,7 +29,6 @@ import { logger } from "../../logger";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 import { CountersPlugin } from "../Counters/CountersPlugin";
-import { parseCondition } from "../../data/GuildCounters";
 import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
@@ -111,15 +110,6 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
               } else if (!white && !black) {
                 throw new StrictValidationError([
                   `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_attachment_type>`,
-                ]);
-              }
-            }
-
-            if (triggerName === "counter") {
-              const parsedCondition = parseCondition(triggerObj[triggerName]!.condition);
-              if (parsedCondition == null) {
-                throw new StrictValidationError([
-                  `Invalid counter condition '${triggerObj[triggerName]!.condition}' in rule <${rule.name}>`,
                 ]);
               }
             }
@@ -229,22 +219,13 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
   async onAfterLoad(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
-    pluginData.state.onCounterTrigger = (name, condition, channelId, userId) => {
-      runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, false);
+    pluginData.state.onCounterTrigger = (name, triggerName, channelId, userId) => {
+      runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, false);
     };
 
-    pluginData.state.onCounterReverseTrigger = (name, condition, channelId, userId) => {
-      runAutomodOnCounterTrigger(pluginData, name, condition, channelId, userId, true);
+    pluginData.state.onCounterReverseTrigger = (name, triggerName, channelId, userId) => {
+      runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, true);
     };
-
-    const config = pluginData.config.get();
-    for (const rule of Object.values(config.rules)) {
-      for (const trigger of rule.triggers) {
-        if (trigger.counter) {
-          await countersPlugin.initCounterTrigger(trigger.counter.name, trigger.counter.condition);
-        }
-      }
-    }
 
     countersPlugin.onCounterEvent("trigger", pluginData.state.onCounterTrigger);
     countersPlugin.onCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
@@ -254,14 +235,20 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     pluginData.state.modActionsListeners.set("note", (userId: string) =>
       runAutomodOnModAction(pluginData, "note", userId),
     );
-    pluginData.state.modActionsListeners.set("warn", (userId: string) =>
-      runAutomodOnModAction(pluginData, "warn", userId),
+    pluginData.state.modActionsListeners.set(
+      "warn",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "warn", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set("kick", (userId: string) =>
-      runAutomodOnModAction(pluginData, "kick", userId),
+    pluginData.state.modActionsListeners.set(
+      "kick",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "kick", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set("ban", (userId: string) =>
-      runAutomodOnModAction(pluginData, "ban", userId),
+    pluginData.state.modActionsListeners.set(
+      "ban",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "ban", userId, reason, isAutomodAction),
     );
     pluginData.state.modActionsListeners.set("unban", (userId: string) =>
       runAutomodOnModAction(pluginData, "unban", userId),
@@ -270,7 +257,11 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
     pluginData.state.mutesListeners = new Map();
-    pluginData.state.mutesListeners.set("mute", (userId: string) => runAutomodOnModAction(pluginData, "mute", userId));
+    pluginData.state.mutesListeners.set(
+      "mute",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "mute", userId, reason, isAutomodAction),
+    );
     pluginData.state.mutesListeners.set("unmute", (userId: string) =>
       runAutomodOnModAction(pluginData, "unmute", userId),
     );

@@ -4,6 +4,7 @@ import {
   embedPadding,
   EmbedWith,
   formatNumber,
+  inviteHasCounts,
   memoize,
   MINUTES,
   preEmbedPadding,
@@ -81,11 +82,11 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[URL](${(restGuild || guildPreview)!.iconURL})`;
-  const bannerUrl = restGuild?.bannerURL ?? "Unavailable";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL})`;
+  const bannerUrl = restGuild?.bannerURL ? `[Link](${restGuild.bannerURL})` : "None";
   const splashUrl =
     (restGuild || guildPreview)!.splashURL != null
-      ? `[URL](${(restGuild || guildPreview)!.splashURL?.replace("size=128", "size=2048")})`
+      ? `[Link](${(restGuild || guildPreview)!.splashURL?.replace("size=128", "size=2048")})`
       : "None";
 
   embed.fields.push(
@@ -120,7 +121,7 @@ export async function getServerInfoEmbed(
   if (onlineMemberCount == null && restGuild?.vanityURL) {
     // For servers with a vanity URL, we can also use the numbers from the invite for online count
     const invite = await resolveInvite(pluginData.client, restGuild.vanityURL!, true);
-    if (invite) {
+    if (invite && inviteHasCounts(invite)) {
       onlineMemberCount = invite.presenceCount;
     }
   }

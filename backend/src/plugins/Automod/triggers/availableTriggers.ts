@@ -17,7 +17,7 @@ import { MemberJoinTrigger } from "./memberJoin";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
-import { CounterTrigger } from "./counter";
+import { CounterTrigger } from "./counterTrigger";
 import { NoteTrigger } from "./note";
 import { WarnTrigger } from "./warn";
 import { MuteTrigger } from "./mute";
@@ -25,8 +25,12 @@ import { UnmuteTrigger } from "./unmute";
 import { KickTrigger } from "./kick";
 import { BanTrigger } from "./ban";
 import { UnbanTrigger } from "./unban";
+import { AnyMessageTrigger } from "./anyMessage";
+import { AntiraidLevelTrigger } from "./antiraidLevel";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
+  any_message: AnyMessageTrigger,
+
   match_words: MatchWordsTrigger,
   match_regex: MatchRegexTrigger,
   match_invites: MatchInvitesTrigger,
@@ -46,7 +50,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   member_join_spam: MemberJoinSpamTrigger,
   sticker_spam: StickerSpamTrigger,
 
-  counter: CounterTrigger,
+  counter_trigger: CounterTrigger,
 
   note: NoteTrigger,
   warn: WarnTrigger,
@@ -55,9 +59,13 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   kick: KickTrigger,
   ban: BanTrigger,
   unban: UnbanTrigger,
+
+  antiraid_level: AntiraidLevelTrigger,
 };
 
 export const AvailableTriggers = t.type({
+  any_message: AnyMessageTrigger.configType,
+
   match_words: MatchWordsTrigger.configType,
   match_regex: MatchRegexTrigger.configType,
   match_invites: MatchInvitesTrigger.configType,
@@ -77,7 +85,7 @@ export const AvailableTriggers = t.type({
   member_join_spam: MemberJoinSpamTrigger.configType,
   sticker_spam: StickerSpamTrigger.configType,
 
-  counter: CounterTrigger.configType,
+  counter_trigger: CounterTrigger.configType,
 
   note: NoteTrigger.configType,
   warn: WarnTrigger.configType,
@@ -86,4 +94,6 @@ export const AvailableTriggers = t.type({
   kick: KickTrigger.configType,
   ban: BanTrigger.configType,
   unban: UnbanTrigger.configType,
+
+  antiraid_level: AntiraidLevelTrigger.configType,
 });

@@ -12,7 +12,6 @@ import {
   GuildChannel,
   Invite,
   InvitePartialChannel,
-  InviteWithMetadata,
   Member,
   Message,
   MessageContent,
@@ -21,7 +20,7 @@ import {
   TextChannel,
   User,
 } from "eris";
-import url from "url";
+import { URL } from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
 import * as t from "io-ts";
@@ -181,11 +180,11 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
   return v != null;
 }
 
-export type GuildInvite = Invite & { guild: Guild };
-export type GroupDMInvite = Invite & { channel: InvitePartialChannel; type: typeof Constants.ChannelTypes.GROUP_DM };
-export type WithInviteCounts = {
-  memberCount: number;
-  presenceCount: number;
+export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
+export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & { guild: Guild };
+export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & {
+  channel: InvitePartialChannel;
+  type: typeof Constants.ChannelTypes.GROUP_DM;
 };
 
 /**
@@ -482,7 +481,7 @@ const plainLinkRegex = /((?!https?:\/\/)\S)+\.\S+/; // anything.anything, withou
 const urlRegex = new RegExp(`(${realLinkRegex.source}|${plainLinkRegex.source})`, "g");
 const protocolRegex = /^[a-z]+:\/\//;
 
-interface MatchedURL extends url.URL {
+interface MatchedURL extends URL {
   input: string;
 }
 
@@ -497,7 +496,7 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
 
     let matchUrl: MatchedURL;
     try {
-      matchUrl = new url.URL(withProtocol) as MatchedURL;
+      matchUrl = new URL(withProtocol) as MatchedURL;
       matchUrl.input = match;
     } catch (e) {
       return urls;
@@ -521,9 +520,61 @@ export function parseInviteCodeInput(str: string): string {
   return getInviteCodesInString(str)[0];
 }
 
+export function isNotNull(value): value is Exclude<typeof value, null> {
+  return value != null;
+}
+
+// discord.com/invite/<code>
+// discordapp.com/invite/<code>
+// discord.gg/invite/<code>
+// discord.gg/<code>
+const quickInviteDetection = /(?:discord.com|discordapp.com)\/invite\/([^\s\/#?]+)|discord.gg\/(?:\S+\/)?([^\s\/#?]+)/gi;
+
+const isInviteHostRegex = /(?:^|\.)(?:discord.gg|discord.com|discordapp.com)$/;
+const longInvitePathRegex = /^\/invite\/([^\s\/]+)$/;
+
 export function getInviteCodesInString(str: string): string[] {
-  const inviteCodeRegex = /(?:discord.gg|discordapp.com\/invite|discord.com\/invite)\/([a-z0-9\-]+)/gi;
-  return Array.from(str.matchAll(inviteCodeRegex)).map(m => m[1]);
+  const inviteCodes: string[] = [];
+
+  // Clean up markdown
+  str = str.replace(/[|*_~]/g, "");
+
+  // Quick detection
+  const quickDetectionMatch = str.matchAll(quickInviteDetection);
+  if (quickDetectionMatch) {
+    inviteCodes.push(...[...quickDetectionMatch].map(m => m[1] || m[2]));
+  }
+
+  // Deep detection via URL parsing
+  const linksInString = getUrlsInString(str, true);
+  const potentialInviteLinks = linksInString.filter(url => isInviteHostRegex.test(url.hostname));
+  const withNormalizedPaths = potentialInviteLinks.map(url => {
+    url.pathname = url.pathname.replace(/\/{2,}/g, "/").replace(/\/+$/g, "");
+    return url;
+  });
+
+  const codesFromInviteLinks = withNormalizedPaths
+    .map(url => {
+      // discord.gg/[anything/]<code>
+      if (url.hostname === "discord.gg") {
+        const parts = url.pathname.split("/").filter(Boolean);
+        return parts[parts.length - 1];
+      }
+
+      // discord.com/invite/<code>[/anything]
+      // discordapp.com/invite/<code>[/anything]
+      const longInviteMatch = url.pathname.match(longInvitePathRegex);
+      if (longInviteMatch) {
+        return longInviteMatch[1];
+      }
+
+      return null;
+    })
+    .filter(Boolean) as string[];
+
+  inviteCodes.push(...codesFromInviteLinks);
+
+  return unique(inviteCodes);
 }
 
 export const unicodeEmojiRegex = emojiRegex();
@@ -1153,9 +1204,11 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
-const inviteCache = new SimpleCache<Promise<(Invite | (Invite & InviteWithMetadata)) | null>>(10 * MINUTES, 200);
+const inviteCache = new SimpleCache<Promise<Invite<any> | null>>(10 * MINUTES, 200);
 
-type ResolveInviteReturnType<T extends boolean> = Promise<(T extends true ? Invite & WithInviteCounts : Invite) | null>;
+type ResolveInviteReturnType<T extends boolean> = Promise<
+  (T extends true ? Invite<"withCount" | "withMetadata"> : Invite<"withMetadata">) | null
+>;
 export async function resolveInvite<T extends boolean>(
   client: Client,
   code: string,
@@ -1215,7 +1268,11 @@ export function verboseUserName(user: User | UnknownUser): string {
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {
-  return `<#${channel.id}> (**#${channel.name}**, \`${channel.id}\`)`;
+  const plainTextName =
+    channel.type === Constants.ChannelTypes.GUILD_VOICE || channel.type === Constants.ChannelTypes.GUILD_STAGE
+      ? channel.name
+      : `#${channel.name}`;
+  return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
 }
 
 export function messageLink(message: Message): string;
@@ -1330,12 +1387,16 @@ export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite(invite: Invite): invite is GuildInvite {
+export function isGuildInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GuildInvite<CT> {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
+export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GroupDMInvite<CT> {
   return invite.guild == null && invite.channel?.type === Constants.ChannelTypes.GROUP_DM;
+}
+
+export function inviteHasCounts(invite: Invite<any>): invite is Invite<"withCount"> {
+  return invite.memberCount != null;
 }
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {

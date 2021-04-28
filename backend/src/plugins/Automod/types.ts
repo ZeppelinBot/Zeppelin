@@ -103,8 +103,10 @@ export interface AutomodContext {
   actioned?: boolean;
 
   counterTrigger?: {
-    name: string;
-    condition: string;
+    counter: string;
+    trigger: string;
+    prettyCounter: string;
+    prettyTrigger: string;
     channelId: string | null;
     userId: string | null;
     reverse: boolean;
@@ -120,6 +122,10 @@ export interface AutomodContext {
   modAction?: {
     type: ModActionType;
     reason?: string;
+    isAutomodAction: boolean;
+  };
+  antiraid?: {
+    level: string | null;
   };
 }
 

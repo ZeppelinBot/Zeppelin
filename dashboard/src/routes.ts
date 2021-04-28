@@ -54,6 +54,10 @@ export const router = new VueRouter({
           component: () => import("./components/docs/WorkInProgress.vue"),
         },
         {
+          path: "setup-guides/counters",
+          component: () => import("./components/docs/Counters.vue"),
+        },
+        {
           path: "plugins/:pluginName/:tab?",
           component: () => import("./components/docs/Plugin.vue"),
         },

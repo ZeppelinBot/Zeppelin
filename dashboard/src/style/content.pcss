@@ -1,6 +1,6 @@
 .main-content {
   & h1 {
-    @apply text-5xl;
+    @apply text-3xl;
     @apply font-semibold;
     @apply leading-none;
     @apply mb-4;
@@ -52,6 +52,14 @@
 
   & .expandable:not(.wide) {
     max-width: 600px;
+  }
+}
+
+@screen lg {
+  .main-content {
+    & h1 {
+      @apply text-5xl;
+    }
   }
 }
 

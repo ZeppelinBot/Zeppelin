@@ -17,8 +17,8 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage } from "src/pluginUtils";
-import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
+import { muteLock } from "../../../utils/lockNameHelpers";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -29,7 +29,7 @@ export async function muteUser(
   removeRolesOnMuteOverride: boolean | string[] | null = null,
   restoreRolesOnMuteOverride: boolean | string[] | null = null,
 ) {
-  const lock = await pluginData.locks.acquire(`mute-${userId}`);
+  const lock = await pluginData.locks.acquire(muteLock({ id: userId }));
 
   const muteRole = pluginData.config.get().mute_role;
   if (!muteRole) {
@@ -120,11 +120,12 @@ export async function muteUser(
     }
 
     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
-    const moveToVoiceChannelId = pluginData.config.get().move_to_voice_channel;
-    if (moveToVoiceChannelId) {
+    const cfg = pluginData.config.get();
+    const moveToVoiceChannel = cfg.kick_from_voice_channel ? null : cfg.move_to_voice_channel;
+    if (moveToVoiceChannel || cfg.kick_from_voice_channel) {
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
       try {
-        await member.edit({ channelID: moveToVoiceChannelId });
+        await member.edit({ channelID: moveToVoiceChannel });
       } catch (e) {} // tslint:disable-line
     }
   }
@@ -246,7 +247,7 @@ export async function muteUser(
 
   lock.unlock();
 
-  pluginData.state.events.emit("mute", user.id, reason);
+  pluginData.state.events.emit("mute", user.id, reason, muteOptions.isAutomodAction);
 
   return {
     case: theCase,

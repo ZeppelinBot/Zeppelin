@@ -1,48 +1,25 @@
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { getRepository, In, IsNull, LessThan, Not, Repository } from "typeorm";
+import { FindConditions, getRepository, In, IsNull, LessThan, Not, Repository } from "typeorm";
 import { Counter } from "./entities/Counter";
 import { CounterValue } from "./entities/CounterValue";
-import { CounterTrigger, TRIGGER_COMPARISON_OPS, TriggerComparisonOp } from "./entities/CounterTrigger";
+import {
+  CounterTrigger,
+  isValidCounterComparisonOp,
+  TRIGGER_COMPARISON_OPS,
+  TriggerComparisonOp,
+} from "./entities/CounterTrigger";
 import { CounterTriggerState } from "./entities/CounterTriggerState";
 import moment from "moment-timezone";
 import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
 import { connection } from "./db";
-
-const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})([1-9]\\d*)$`);
-
-/**
- * @return Parsed comparison op and value, or null if the comparison string was invalid
- */
-export function parseCondition(str: string): [TriggerComparisonOp, number] | null {
-  const matches = str.match(comparisonStringRegex);
-  return matches ? [matches[1] as TriggerComparisonOp, parseInt(matches[2], 10)] : null;
-}
-
-export function buildConditionString(comparisonOp: TriggerComparisonOp, comparisonValue: number): string {
-  return `${comparisonOp}${comparisonValue}`;
-}
-
-function isValidComparisonOp(op: string): boolean {
-  return TRIGGER_COMPARISON_OPS.includes(op as any);
-}
-
-const REVERSE_OPS: Record<TriggerComparisonOp, TriggerComparisonOp> = {
-  "=": "!=",
-  "!=": "=",
-  ">": "<=",
-  "<": ">=",
-  ">=": "<",
-  "<=": ">",
-};
-
-function getReverseComparisonOp(op: TriggerComparisonOp): TriggerComparisonOp {
-  return REVERSE_OPS[op];
-}
+import { Queue } from "../Queue";
 
 const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
 const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;
 
 const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
+
+const decayQueue = new Queue();
 
 async function deleteCountersMarkedToBeDeleted(): Promise<void> {
   await getRepository(Counter)
@@ -92,6 +69,8 @@ export class GuildCounters extends BaseGuildRepository {
       // If the existing counter's properties match the ones we're looking for, return it.
       // Otherwise, delete the existing counter and re-create it with the proper properties.
       if (existing.per_channel === perChannel && existing.per_user === perUser) {
+        await this.counters.update({ id: existing.id }, { delete_at: null });
+
         return existing;
       }
 
@@ -114,24 +93,23 @@ export class GuildCounters extends BaseGuildRepository {
   }
 
   async markUnusedCountersToBeDeleted(idsToKeep: number[]): Promise<void> {
-    if (idsToKeep.length === 0) {
-      return;
+    const criteria: FindConditions<Counter> = {
+      guild_id: this.guildId,
+      delete_at: IsNull(),
+    };
+
+    if (idsToKeep.length) {
+      criteria.id = Not(In(idsToKeep));
     }
 
     const deleteAt = moment
       .utc()
       .add(DELETE_UNUSED_COUNTERS_AFTER, "ms")
       .format(DBDateFormat);
-    await this.counters.update(
-      {
-        guild_id: this.guildId,
-        id: Not(In(idsToKeep)),
-        delete_at: IsNull(),
-      },
-      {
-        delete_at: deleteAt,
-      },
-    );
+
+    await this.counters.update(criteria, {
+      delete_at: deleteAt,
+    });
   }
 
   async deleteCountersMarkedToBeDeleted(): Promise<void> {
@@ -183,64 +161,88 @@ export class GuildCounters extends BaseGuildRepository {
     );
   }
 
-  async decay(id: number, decayPeriodMs: number, decayAmount: number) {
-    const counter = (await this.counters.findOne({
-      where: {
-        id,
-      },
-    }))!;
+  decay(id: number, decayPeriodMs: number, decayAmount: number) {
+    return decayQueue.add(async () => {
+      const counter = (await this.counters.findOne({
+        where: {
+          id,
+        },
+      }))!;
 
-    const diffFromLastDecayMs = moment.utc().diff(moment.utc(counter.last_decay_at!), "ms");
-    if (diffFromLastDecayMs < decayPeriodMs) {
-      return;
-    }
+      const diffFromLastDecayMs = moment.utc().diff(moment.utc(counter.last_decay_at!), "ms");
+      if (diffFromLastDecayMs < decayPeriodMs) {
+        return;
+      }
 
-    const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
-    if (decayAmountToApply === 0) {
-      return;
-    }
+      const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
+      if (decayAmountToApply === 0) {
+        return;
+      }
 
-    // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
-    const newLastDecayDate = moment
-      .utc(counter.last_decay_at)
-      .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
-      .format(DBDateFormat);
+      // Calculate new last_decay_at based on the rounded decay amount we applied. This makes it so that over time, the decayed amount will stay accurate, even if we round some here.
+      const newLastDecayDate = moment
+        .utc(counter.last_decay_at)
+        .add((decayAmountToApply / decayAmount) * decayPeriodMs, "ms")
+        .format(DBDateFormat);
 
-    const rawUpdate =
-      decayAmountToApply >= 0
-        ? `GREATEST(value - ${decayAmountToApply}, 0)`
-        : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
+      const rawUpdate =
+        decayAmountToApply >= 0
+          ? `GREATEST(value - ${decayAmountToApply}, 0)`
+          : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
 
-    await this.counterValues.update(
-      {
-        counter_id: id,
-      },
-      {
-        value: () => rawUpdate,
-      },
-    );
+      // Using an UPDATE with ORDER BY in an attempt to avoid deadlocks from simultaneous decays
+      // Also see https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html
+      await this.counterValues
+        .createQueryBuilder("CounterValue")
+        .where("counter_id = :id", { id })
+        .orderBy("id")
+        .update({
+          value: () => rawUpdate,
+        })
+        .execute();
 
-    await this.counters.update(
-      {
-        id,
-      },
-      {
-        last_decay_at: newLastDecayDate,
-      },
-    );
+      await this.counters.update(
+        {
+          id,
+        },
+        {
+          last_decay_at: newLastDecayDate,
+        },
+      );
+    });
   }
 
-  async markAllTriggersTobeDeleted() {
-    const deleteAt = moment
-      .utc()
-      .add(DELETE_UNUSED_COUNTER_TRIGGERS_AFTER, "ms")
-      .format(DBDateFormat);
-    await this.counterTriggers.update(
-      {},
-      {
-        delete_at: deleteAt,
-      },
-    );
+  async markUnusedTriggersToBeDeleted(triggerIdsToKeep: number[]) {
+    let triggersToMarkQuery = this.counterTriggers
+      .createQueryBuilder("counterTriggers")
+      .innerJoin(Counter, "counters", "counters.id = counterTriggers.counter_id")
+      .where("counters.guild_id = :guildId", { guildId: this.guildId });
+
+    // If there are no active triggers, we just mark all triggers from the guild to be deleted.
+    // Otherwise, we mark all but the active triggers in the guild.
+    if (triggerIdsToKeep.length) {
+      triggersToMarkQuery = triggersToMarkQuery.andWhere("counterTriggers.id NOT IN (:...triggerIds)", {
+        triggerIds: triggerIdsToKeep,
+      });
+    }
+
+    const triggersToMark = await triggersToMarkQuery.getMany();
+
+    if (triggersToMark.length) {
+      const deleteAt = moment
+        .utc()
+        .add(DELETE_UNUSED_COUNTER_TRIGGERS_AFTER, "ms")
+        .format(DBDateFormat);
+
+      await this.counterTriggers.update(
+        {
+          id: In(triggersToMark.map(t => t.id)),
+        },
+        {
+          delete_at: deleteAt,
+        },
+      );
+    }
   }
 
   async deleteTriggersMarkedToBeDeleted(): Promise<void> {
@@ -253,34 +255,53 @@ export class GuildCounters extends BaseGuildRepository {
 
   async initCounterTrigger(
     counterId: number,
+    triggerName: string,
     comparisonOp: TriggerComparisonOp,
     comparisonValue: number,
+    reverseComparisonOp: TriggerComparisonOp,
+    reverseComparisonValue: number,
   ): Promise<CounterTrigger> {
-    if (!isValidComparisonOp(comparisonOp)) {
+    if (!isValidCounterComparisonOp(comparisonOp)) {
       throw new Error(`Invalid comparison op: ${comparisonOp}`);
+    }
+
+    if (!isValidCounterComparisonOp(reverseComparisonOp)) {
+      throw new Error(`Invalid comparison op: ${reverseComparisonOp}`);
     }
 
     if (typeof comparisonValue !== "number") {
       throw new Error(`Invalid comparison value: ${comparisonValue}`);
     }
 
+    if (typeof reverseComparisonValue !== "number") {
+      throw new Error(`Invalid comparison value: ${reverseComparisonValue}`);
+    }
+
     return connection.transaction(async entityManager => {
       const existing = await entityManager.findOne(CounterTrigger, {
         counter_id: counterId,
-        comparison_op: comparisonOp,
-        comparison_value: comparisonValue,
+        name: triggerName,
       });
 
       if (existing) {
         // Since all existing triggers are marked as to-be-deleted before they are re-initialized, this needs to be reset
-        await entityManager.update(CounterTrigger, existing.id, { delete_at: null });
+        await entityManager.update(CounterTrigger, existing.id, {
+          comparison_op: comparisonOp,
+          comparison_value: comparisonValue,
+          reverse_comparison_op: reverseComparisonOp,
+          reverse_comparison_value: reverseComparisonValue,
+          delete_at: null,
+        });
         return existing;
       }
 
       const insertResult = await entityManager.insert(CounterTrigger, {
         counter_id: counterId,
+        name: triggerName,
         comparison_op: comparisonOp,
         comparison_value: comparisonValue,
+        reverse_comparison_op: reverseComparisonOp,
+        reverse_comparison_value: reverseComparisonValue,
       });
 
       return (await entityManager.findOne(CounterTrigger, insertResult.identifiers[0].id))!;
@@ -375,8 +396,8 @@ export class GuildCounters extends BaseGuildRepository {
           CounterTriggerState,
           matchingValues.map(row => ({
             trigger_id: counterTrigger.id,
-            channelId: row.channel_id,
-            userId: row.user_id,
+            channel_id: row.channel_id,
+            user_id: row.user_id,
           })),
         );
       }
@@ -408,7 +429,6 @@ export class GuildCounters extends BaseGuildRepository {
     userId = userId || "0";
 
     return connection.transaction(async entityManager => {
-      const reverseOp = getReverseComparisonOp(counterTrigger.comparison_op);
       const matchingValue = await entityManager
         .createQueryBuilder(CounterValue, "cv")
         .innerJoin(
@@ -417,7 +437,9 @@ export class GuildCounters extends BaseGuildRepository {
           "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
           { triggerId: counterTrigger.id },
         )
-        .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .where(`cv.value ${counterTrigger.reverse_comparison_op} :value`, {
+          value: counterTrigger.reverse_comparison_value,
+        })
         .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
         .andWhere(`cv.channel_id = :channelId AND cv.user_id = :userId`, { channelId, userId })
         .getOne();
@@ -446,7 +468,6 @@ export class GuildCounters extends BaseGuildRepository {
     counterTrigger: CounterTrigger,
   ): Promise<Array<{ channelId: string; userId: string }>> {
     return connection.transaction(async entityManager => {
-      const reverseOp = getReverseComparisonOp(counterTrigger.comparison_op);
       const matchingValues: Array<{
         id: string;
         triggerStateId: string;
@@ -460,7 +481,9 @@ export class GuildCounters extends BaseGuildRepository {
           "triggerStates.trigger_id = :triggerId AND triggerStates.user_id = cv.user_id AND triggerStates.channel_id = cv.channel_id",
           { triggerId: counterTrigger.id },
         )
-        .where(`cv.value ${reverseOp} :value`, { value: counterTrigger.comparison_value })
+        .where(`cv.value ${counterTrigger.reverse_comparison_op} :value`, {
+          value: counterTrigger.reverse_comparison_value,
+        })
         .andWhere(`cv.counter_id = :counterId`, { counterId: counterTrigger.counter_id })
         .select([
           "cv.id AS id",

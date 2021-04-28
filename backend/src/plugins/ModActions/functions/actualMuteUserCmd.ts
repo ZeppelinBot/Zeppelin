@@ -28,7 +28,7 @@ export async function actualMuteUserCmd(
 
   if (args.mod) {
     if (!hasPermission(pluginData, "can_act_as_other", { message: msg })) {
-      sendErrorMessage(pluginData, msg.channel, "No permission for -mod");
+      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
       return;
     }
 

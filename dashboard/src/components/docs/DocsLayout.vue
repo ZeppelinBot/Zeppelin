@@ -115,6 +115,10 @@
           to: '/docs/setup-guides/moderation',
           label: 'Moderation',
         },
+        {
+          to: '/docs/setup-guides/counters',
+          label: 'Counters',
+        },
       ],
     },
   ];

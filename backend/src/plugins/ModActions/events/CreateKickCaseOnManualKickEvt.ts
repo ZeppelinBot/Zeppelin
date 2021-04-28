@@ -61,6 +61,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
         user: stripObjectToScalars(member.user),
         mod: mod ? stripObjectToScalars(mod) : null,
         caseNumber: createdCase?.case_number ?? 0,
+        reason: kickAuditLogEntry.reason || "",
       });
 
       pluginData.state.events.emit("kick", member.id, kickAuditLogEntry.reason || undefined);

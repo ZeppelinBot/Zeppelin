@@ -9,6 +9,7 @@ export async function runAutomodOnModAction(
   modAction: ModActionType,
   userId: string,
   reason?: string,
+  isAutomodAction: boolean = false,
 ) {
   const user = await resolveUser(pluginData.client, userId);
 
@@ -18,6 +19,7 @@ export async function runAutomodOnModAction(
     modAction: {
       type: modAction,
       reason,
+      isAutomodAction,
     },
   };
 

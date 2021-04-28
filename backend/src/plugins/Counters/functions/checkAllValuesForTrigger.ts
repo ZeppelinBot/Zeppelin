@@ -1,6 +1,5 @@
 import { GuildPluginData } from "knub";
 import { CountersPluginType } from "../types";
-import { buildConditionString } from "../../../data/GuildCounters";
 import { CounterTrigger } from "../../../data/entities/CounterTrigger";
 import { emitCounterEvent } from "./emitCounterEvent";
 
@@ -11,13 +10,6 @@ export async function checkAllValuesForTrigger(
 ) {
   const triggeredContexts = await pluginData.state.counters.checkAllValuesForTrigger(counterTrigger);
   for (const context of triggeredContexts) {
-    emitCounterEvent(
-      pluginData,
-      "trigger",
-      counterName,
-      buildConditionString(counterTrigger.comparison_op, counterTrigger.comparison_value),
-      context.channelId,
-      context.userId,
-    );
+    emitCounterEvent(pluginData, "trigger", counterName, counterTrigger.name, context.channelId, context.userId);
   }
 }
