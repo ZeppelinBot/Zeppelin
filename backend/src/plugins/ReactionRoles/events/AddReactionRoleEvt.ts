@@ -1,7 +1,9 @@
 import { reactionRolesEvt } from "../types";
-import { resolveMember, noop, sleep } from "../../../utils";
+import { noop, resolveMember, sleep } from "../../../utils";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
-import { Message } from "eris";
+import { DiscordRESTError, Message } from "eris";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -33,10 +35,6 @@ export const AddReactionRoleEvt = reactionRolesEvt({
       for (const roleId of reactionRoleRoleIds) {
         addMemberPendingRoleChange(pluginData, userId, "-", roleId);
       }
-
-      pluginData.state.reactionRemoveQueue.add(async () => {
-        await msg.channel.removeMessageReaction(msg.id, CLEAR_ROLES_EMOJI, userId);
-      });
     } else {
       // User reacted with a reaction role emoji -> add the role
       const matchingReactionRole = await pluginData.state.reactionRoles.getByMessageAndEmoji(
