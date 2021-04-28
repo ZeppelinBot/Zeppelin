@@ -35,6 +35,7 @@ import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
@@ -106,7 +107,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     prettyName: "Utility",
   },
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: [TimeAndDatePlugin, ModActionsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

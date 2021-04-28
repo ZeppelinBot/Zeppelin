@@ -235,14 +235,20 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     pluginData.state.modActionsListeners.set("note", (userId: string) =>
       runAutomodOnModAction(pluginData, "note", userId),
     );
-    pluginData.state.modActionsListeners.set("warn", (userId: string) =>
-      runAutomodOnModAction(pluginData, "warn", userId),
+    pluginData.state.modActionsListeners.set(
+      "warn",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "warn", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set("kick", (userId: string) =>
-      runAutomodOnModAction(pluginData, "kick", userId),
+    pluginData.state.modActionsListeners.set(
+      "kick",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "kick", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set("ban", (userId: string) =>
-      runAutomodOnModAction(pluginData, "ban", userId),
+    pluginData.state.modActionsListeners.set(
+      "ban",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "ban", userId, reason, isAutomodAction),
     );
     pluginData.state.modActionsListeners.set("unban", (userId: string) =>
       runAutomodOnModAction(pluginData, "unban", userId),
@@ -251,7 +257,11 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
     pluginData.state.mutesListeners = new Map();
-    pluginData.state.mutesListeners.set("mute", (userId: string) => runAutomodOnModAction(pluginData, "mute", userId));
+    pluginData.state.mutesListeners.set(
+      "mute",
+      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+        runAutomodOnModAction(pluginData, "mute", userId, reason, isAutomodAction),
+    );
     pluginData.state.mutesListeners.set("unmute", (userId: string) =>
       runAutomodOnModAction(pluginData, "unmute", userId),
     );

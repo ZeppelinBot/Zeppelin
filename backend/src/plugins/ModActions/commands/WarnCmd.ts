@@ -112,7 +112,5 @@ export const WarnCmd = modActionsCmd({
       msg.channel,
       `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );
-
-    pluginData.state.events.emit("warn", user.id, reason);
   },
 });

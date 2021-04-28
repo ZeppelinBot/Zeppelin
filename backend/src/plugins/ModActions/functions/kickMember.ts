@@ -85,7 +85,7 @@ export async function kickMember(
     reason,
   });
 
-  pluginData.state.events.emit("kick", member.id, reason);
+  pluginData.state.events.emit("kick", member.id, reason, kickOptions.isAutomodAction);
 
   return {
     status: "success",
