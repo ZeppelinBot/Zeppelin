@@ -1,7 +1,9 @@
 import { modActionsEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
+import { Constants, TextChannel } from "eris";
+import { resolveMember } from "../../../utils";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 
 /**
  * Show an alert if a member with prior notes joins the server
@@ -35,7 +37,16 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt(
         return;
       }
 
-      alertChannel.createMessage(
+      const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
+      const botPerms = alertChannel.permissionsOf(botMember ?? pluginData.client.user.id);
+      if (!hasDiscordPermissions(botPerms, Constants.Permissions.sendMessages)) {
+        logs.log(LogType.BOT_ALERT, {
+          body: `Missing "Send Messages" permissions for the \`alert_channel\` configured in \`mod_actions\`: \`${alertChannelId}\``,
+        });
+        return;
+      }
+
+      await alertChannel.createMessage(
         `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
       );
     }
