@@ -1,4 +1,4 @@
-import { Member, Message, User } from "eris";
+import { Constants, Member, Message, User } from "eris";
 import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
@@ -10,10 +10,11 @@ import { banSearchSignature } from "./commands/BanSearchCmd";
 import { UtilityPluginType } from "./types";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
-import { allowTimeout } from "../../RegExpRunner";
+import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
 import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
 import { asyncFilter } from "../../utils/async";
 import Timeout = NodeJS.Timeout;
+import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -28,6 +29,29 @@ class SearchError extends Error {}
 
 type MemberSearchParams = ArgsFromSignatureOrArray<typeof searchCmdSignature>;
 type BanSearchParams = ArgsFromSignatureOrArray<typeof banSearchSignature>;
+
+type RegexRunner = InstanceType<typeof RegExpRunner>["exec"];
+function getOptimizedRegExpRunner(pluginData: GuildPluginData<UtilityPluginType>, isSafeRegex: boolean): RegexRunner {
+  if (isSafeRegex) {
+    return async (regex: RegExp, str: string) => {
+      if (!regex.global) {
+        const singleMatch = regex.exec(str);
+        return singleMatch ? [singleMatch] : null;
+      }
+
+      const matches: RegExpExecArray[] = [];
+      let match: RegExpExecArray | null;
+      // tslint:disable-next-line:no-conditional-assignment
+      while ((match = regex.exec(str)) != null) {
+        matches.push(match);
+      }
+
+      return matches.length ? matches : null;
+    };
+  }
+
+  return pluginData.state.regexRunner.exec.bind(pluginData.state.regexRunner);
+}
 
 export async function displaySearch(
   pluginData: GuildPluginData<UtilityPluginType>,
@@ -270,59 +294,51 @@ async function performMemberSearch(
   }
 
   if (args.query) {
+    let isSafeRegex = true;
     let queryRegex: RegExp;
     if (args.regex) {
       const flags = args["case-sensitive"] ? "" : "i";
       queryRegex = inputPatternToRegExp(args.query.trimStart());
       queryRegex = new RegExp(queryRegex.source, flags);
+      isSafeRegex = false;
     } else {
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
+    const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
+
     if (args["status-search"]) {
       matchingMembers = await asyncFilter(matchingMembers, async member => {
         if (member.game) {
-          if (
-            member.game.name &&
-            (await pluginData.state.regexRunner.exec(queryRegex, member.game.name).catch(allowTimeout))
-          ) {
+          if (member.game.name && (await execRegExp(queryRegex, member.game.name).catch(allowTimeout))) {
             return true;
           }
 
-          if (
-            member.game.state &&
-            (await pluginData.state.regexRunner.exec(queryRegex, member.game.state).catch(allowTimeout))
-          ) {
+          if (member.game.state && (await execRegExp(queryRegex, member.game.state).catch(allowTimeout))) {
             return true;
           }
 
-          if (
-            member.game.details &&
-            (await pluginData.state.regexRunner.exec(queryRegex, member.game.details).catch(allowTimeout))
-          ) {
+          if (member.game.details && (await execRegExp(queryRegex, member.game.details).catch(allowTimeout))) {
             return true;
           }
 
           if (member.game.assets) {
             if (
               member.game.assets.small_text &&
-              (await pluginData.state.regexRunner.exec(queryRegex, member.game.assets.small_text).catch(allowTimeout))
+              (await execRegExp(queryRegex, member.game.assets.small_text).catch(allowTimeout))
             ) {
               return true;
             }
 
             if (
               member.game.assets.large_text &&
-              (await pluginData.state.regexRunner.exec(queryRegex, member.game.assets.large_text).catch(allowTimeout))
+              (await execRegExp(queryRegex, member.game.assets.large_text).catch(allowTimeout))
             ) {
               return true;
             }
           }
 
-          if (
-            member.game.emoji &&
-            (await pluginData.state.regexRunner.exec(queryRegex, member.game.emoji.name).catch(allowTimeout))
-          ) {
+          if (member.game.emoji && (await execRegExp(queryRegex, member.game.emoji.name).catch(allowTimeout))) {
             return true;
           }
         }
@@ -330,12 +346,12 @@ async function performMemberSearch(
       });
     } else {
       matchingMembers = await asyncFilter(matchingMembers, async member => {
-        if (member.nick && (await pluginData.state.regexRunner.exec(queryRegex, member.nick).catch(allowTimeout))) {
+        if (member.nick && (await execRegExp(queryRegex, member.nick).catch(allowTimeout))) {
           return true;
         }
 
         const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (await pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
+        if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
         return false;
       });
@@ -380,21 +396,29 @@ async function performBanSearch(
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+  const member = pluginData.guild.members.get(pluginData.client.user.id);
+  if (member && !hasDiscordPermissions(member.permissions, Constants.Permissions.banMembers)) {
+    throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
+  }
+
   let matchingBans = (await pluginData.guild.getBans()).map(x => x.user);
 
   if (args.query) {
+    let isSafeRegex = true;
     let queryRegex: RegExp;
     if (args.regex) {
       const flags = args["case-sensitive"] ? "" : "i";
       queryRegex = inputPatternToRegExp(args.query.trimStart());
       queryRegex = new RegExp(queryRegex.source, flags);
+      isSafeRegex = false;
     } else {
       queryRegex = new RegExp(escapeStringRegexp(args.query.trimStart()), args["case-sensitive"] ? "" : "i");
     }
 
+    const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async user => {
       const fullUsername = `${user.username}#${user.discriminator}`;
-      if (await pluginData.state.regexRunner.exec(queryRegex, fullUsername).catch(allowTimeout)) return true;
+      if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });
   }

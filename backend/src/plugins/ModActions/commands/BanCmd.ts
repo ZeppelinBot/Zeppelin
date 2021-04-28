@@ -66,8 +66,8 @@ export const BanCmd = modActionsCmd({
     const lock = await pluginData.locks.acquire(banLock(user));
     let forceban = false;
     const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
-    const banned = await isBanned(pluginData, user.id);
     if (!memberToBan) {
+      const banned = await isBanned(pluginData, user.id);
       if (banned) {
         // Abort if trying to ban user indefinitely if they are already banned indefinitely
         if (!existingTempban && !time) {

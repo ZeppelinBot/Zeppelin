@@ -8,6 +8,7 @@ import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
+import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -49,23 +50,36 @@ async function cleanMessages(
   return { archiveUrl };
 }
 
+const opts = {
+  user: ct.userId({ option: true, shortcut: "u" }),
+  channel: ct.channelId({ option: true, shortcut: "c" }),
+  bots: ct.switchOption({ shortcut: "b" }),
+  "delete-pins": ct.switchOption({ shortcut: "p" }),
+  "has-invites": ct.switchOption({ shortcut: "i" }),
+  match: ct.regex({ option: true, shortcut: "m" }),
+  "to-id": ct.anyId({ option: true, shortcut: "id" }),
+};
+
 export const CleanCmd = utilityCmd({
   trigger: ["clean", "clear"],
   description: "Remove a number of recent messages",
   usage: "!clean 20",
   permission: "can_clean",
 
-  signature: {
-    count: ct.number(),
+  signature: [
+    {
+      count: ct.number(),
+      update: ct.number({ option: true, shortcut: "up" }),
 
-    user: ct.userId({ option: true, shortcut: "u" }),
-    channel: ct.channelId({ option: true, shortcut: "c" }),
-    bots: ct.switchOption({ shortcut: "b" }),
-    "delete-pins": ct.switchOption({ shortcut: "p" }),
-    "has-invites": ct.switchOption({ shortcut: "i" }),
-    match: ct.regex({ option: true, shortcut: "m" }),
-    "to-id": ct.anyId({ option: true, shortcut: "id" }),
-  },
+      ...opts,
+    },
+    {
+      count: ct.number(),
+      update: ct.switchOption({ shortcut: "up" }),
+
+      ...opts,
+    },
+  ],
 
   async run({ message: msg, args, pluginData }) {
     if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
@@ -153,6 +167,19 @@ export const CleanCmd = utilityCmd({
       let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
       if (targetChannel.id !== msg.channel.id) {
         responseText += ` in <#${targetChannel.id}>\n${cleanResult.archiveUrl}`;
+      }
+
+      if (args.update) {
+        const modActions = pluginData.getPlugin(ModActionsPlugin);
+        const channelId = targetChannel.id !== msg.channel.id ? targetChannel.id : msg.channel.id;
+        const updateMessage = `Cleaned ${messagesToClean.length} ${
+          messagesToClean.length === 1 ? "message" : "messages"
+        } in <#${channelId}>: ${cleanResult.archiveUrl}`;
+        if (typeof args.update === "number") {
+          modActions.updateCase(msg, args.update, updateMessage);
+        } else {
+          modActions.updateCase(msg, null, updateMessage);
+        }
       }
 
       responseMsg = await sendSuccessMessage(pluginData, msg.channel, responseText);

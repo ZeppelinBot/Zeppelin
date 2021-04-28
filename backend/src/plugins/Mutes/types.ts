@@ -34,7 +34,7 @@ export const ConfigSchema = t.type({
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface MutesEvents {
-  mute: (userId: string, reason?: string) => void;
+  mute: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
   unmute: (userId: string, reason?: string) => void;
 }
 
@@ -75,6 +75,7 @@ export type UnmuteResult = {
 export interface MuteOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
+  isAutomodAction?: boolean;
 }
 
 export const mutesCmd = guildCommand<MutesPluginType>();
