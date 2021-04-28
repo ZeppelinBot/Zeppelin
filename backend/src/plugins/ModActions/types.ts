@@ -137,6 +137,7 @@ export interface BanOptions {
   caseArgs?: Partial<CaseArgs>;
   contactMethods?: UserNotificationMethod[];
   deleteMessageDays?: number;
+  modId?: string;
 }
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
