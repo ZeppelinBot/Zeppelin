@@ -95,6 +95,24 @@ function typeIsArray(type: any): type is t.ArrayC<any> {
   return type._tag === "ArrayType";
 }
 
+export const tNormalizedNullOrUndefined = new t.Type<undefined, null | undefined>(
+  "tNormalizedNullOrUndefined",
+  (v): v is undefined => typeof v === "undefined",
+  (v, c) => (v == null ? t.success(undefined) : t.failure(v, c, "Value must be null or undefined")),
+  s => undefined,
+);
+
+/**
+ * Similar to `tNullable`, but normalizes both `null` and `undefined` to `undefined`.
+ * This allows adding optional config options that can be "removed" by setting the value to `null`.
+ */
+export function tNormalizedNullOptional<T extends t.Type<any, any>>(type: T) {
+  return t.union(
+    [type, tNormalizedNullOrUndefined],
+    `Optional<${type.name}>`, // Simplified name for errors and config schema views
+  );
+}
+
 export type TDeepPartial<T> = T extends t.InterfaceType<any>
   ? TDeepPartialProps<T["props"]>
   : T extends t.DictionaryType<any, any>
