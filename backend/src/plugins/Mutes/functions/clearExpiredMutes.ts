@@ -3,6 +3,7 @@ import { MutesPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { MemberOptions } from "eris";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginType>) {
   const expiredMutes = await pluginData.state.mutes.getExpiredMutes();
@@ -11,9 +12,12 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
 
     if (member) {
       try {
+        const lock = await pluginData.locks.acquire(memberRolesLock(member));
+
         const muteRole = pluginData.config.get().mute_role;
         if (muteRole) {
           await member.removeRole(muteRole);
+          member.roles = member.roles.filter(r => r !== muteRole);
         }
         if (mute.roles_to_restore) {
           const memberOptions: MemberOptions = {};
@@ -21,8 +25,11 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
           memberOptions.roles = Array.from(
             new Set([...mute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
           );
-          member.edit(memberOptions);
+          await member.edit(memberOptions);
+          member.roles = memberOptions.roles;
         }
+
+        lock.unlock();
       } catch (e) {
         pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
           body: `Failed to remove mute role from {userMention(member)}`,
