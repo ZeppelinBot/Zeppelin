@@ -2,7 +2,7 @@ import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-import { AnyGuildChannel } from "eris";
+import { Constants, TextChannel } from "eris";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({
@@ -15,37 +15,46 @@ export const SetSlowmodeAction = automodAction({
   },
 
   async apply({ pluginData, actionConfig }) {
-    const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0;
+    const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);
 
     for (const channelId of actionConfig.channels) {
       const channel = pluginData.guild.channels.get(channelId);
-      // 0 = Guild Text, 4 = Guild Category - Both dont allow slowmode
-      if (!channel) continue;
-      if (!(channel.type === 0 || channel.type === 4)) continue;
 
-      let channelsToSlowmode: AnyGuildChannel[] = [];
-      if (channel.type === 4) {
-        channelsToSlowmode = pluginData.guild.channels.filter(ch => ch.parentID === channel.id && ch.type === 0);
+      // Only text channels and text channels within categories support slowmodes
+      if (
+        !channel ||
+        !(channel.type === Constants.ChannelTypes.GUILD_TEXT || channel.type === Constants.ChannelTypes.GUILD_CATEGORY)
+      ) {
+        continue;
+      }
+
+      let channelsToSlowmode: TextChannel[] = [];
+      if (channel.type === Constants.ChannelTypes.GUILD_CATEGORY) {
+        // Find all text channels within the category
+        channelsToSlowmode = pluginData.guild.channels.filter(
+          ch => ch.parentID === channel.id && ch.type === Constants.ChannelTypes.GUILD_TEXT,
+        ) as TextChannel[];
       } else {
         channelsToSlowmode.push(channel);
       }
 
+      const slowmodeSeconds = Math.ceil(slowmodeMs / 1000);
+
       try {
         for (const chan of channelsToSlowmode) {
           await chan.edit({
-            rateLimitPerUser: duration / 1000, // ms -> seconds
+            rateLimitPerUser: slowmodeSeconds,
           });
         }
       } catch (e) {
-        let errorMessage = e;
-
         // Check for invalid form body -> indicates duration was too large
-        if (isDiscordRESTError(e) && e.code === 50035) {
-          errorMessage = `Duration is greater than maximum native slowmode duration`;
-        }
+        const errorMessage =
+          isDiscordRESTError(e) && e.code === 50035
+            ? `Duration is greater than maximum native slowmode duration`
+            : e.message;
 
         pluginData.state.logs.log(LogType.BOT_ALERT, {
-          body: `Unable to set slowmode for channel ${channel.id} to ${duration / 1000} seconds: ${errorMessage}`,
+          body: `Unable to set slowmode for channel ${channel.id} to ${slowmodeSeconds} seconds: ${errorMessage}`,
         });
       }
     }
