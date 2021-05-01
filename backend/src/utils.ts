@@ -526,7 +526,7 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
     try {
       matchUrl = new URL(withProtocol) as MatchedURL;
       matchUrl.input = match;
-    } catch (e) {
+    } catch {
       return urls;
     }
 

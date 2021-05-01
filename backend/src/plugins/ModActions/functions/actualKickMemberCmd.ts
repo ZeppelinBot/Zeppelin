@@ -83,7 +83,7 @@ export async function actualKickMemberCmd(
 
     try {
       await memberToKick.ban(1, encodeURIComponent("kick -clean"));
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
     }
 
@@ -92,7 +92,7 @@ export async function actualKickMemberCmd(
 
     try {
       await pluginData.guild.unbanMember(memberToKick.id, encodeURIComponent("kick -clean"));
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
     }
   }

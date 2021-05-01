@@ -36,7 +36,7 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
             },
           });
         }
-      } catch (e) {
+      } catch {
         // Probably random Discord internal server error or missing permissions or somesuch
         // Try again next round unless we've already tried to post this a bunch of times
         const tries = pluginData.state.tries.get(reminder.id) || 0;

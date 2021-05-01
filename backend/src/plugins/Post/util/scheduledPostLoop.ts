@@ -34,7 +34,7 @@ export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginTy
           channel: stripObjectToScalars(channel),
           messageId: postedMessage.id,
         });
-      } catch (e) {
+      } catch {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed to post scheduled message by {userMention(author)} to {channelMention(channel)}`,
           channel: stripObjectToScalars(channel),

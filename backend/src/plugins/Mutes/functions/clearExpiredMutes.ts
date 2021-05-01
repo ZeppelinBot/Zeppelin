@@ -30,7 +30,7 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
         }
 
         lock.unlock();
-      } catch (e) {
+      } catch {
         pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
           body: `Failed to remove mute role from {userMention(member)}`,
           member: stripObjectToScalars(member),

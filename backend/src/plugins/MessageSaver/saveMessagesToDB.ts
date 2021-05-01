@@ -23,7 +23,7 @@ export async function saveMessagesToDB(
       }
 
       await pluginData.state.savedMessages.createFromMsg(thisMsg, { is_permanent: true });
-    } catch (e) {
+    } catch {
       failed.push(id);
     }
   }

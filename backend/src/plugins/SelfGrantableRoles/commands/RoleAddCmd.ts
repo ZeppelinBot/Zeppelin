@@ -82,7 +82,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       await msg.member.edit({
         roles: Array.from(newRoleIds),
       });
-    } catch (e) {
+    } catch {
       sendErrorMessage(
         pluginData,
         msg.channel,
