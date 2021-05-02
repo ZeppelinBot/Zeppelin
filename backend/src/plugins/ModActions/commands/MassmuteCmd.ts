@@ -42,7 +42,8 @@ export const MassmuteCmd = modActionsCmd({
     const muteReason = formatReasonWithAttachments(muteReasonReceived.content, msg.attachments);
 
     // Verify we can act upon all users
-    for (const userId of args.userIds) {
+    for (let i = 0; i < args.userIds.length; ++i) {
+      const userId = args.userIds[i];
       const member = pluginData.guild.members.get(userId);
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massmute one or more users: insufficient permissions");
@@ -52,10 +53,10 @@ export const MassmuteCmd = modActionsCmd({
 
     // Ignore automatic mute cases and logs for these users
     // We'll create our own cases below and post a single "mass muted" log instead
-    args.userIds.forEach(userId => {
+    for (let i = 0; i < args.userIds.length; ++i) {
       // Use longer timeouts since this can take a while
-      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_MUTE, userId, 120 * 1000);
-    });
+      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_MUTE, args.userIds[i], 120 * 1000);
+    }
 
     // Show loading indicator
     const loadingMsg = await msg.channel.createMessage("Muting...");
@@ -64,7 +65,8 @@ export const MassmuteCmd = modActionsCmd({
     const modId = msg.author.id;
     const failedMutes: string[] = [];
     const mutesPlugin = pluginData.getPlugin(MutesPlugin);
-    for (const userId of args.userIds) {
+    for (let i = 0; i < args.userIds.length; ++i) {
+      const userId = args.userIds[i];
       try {
         await mutesPlugin.muteUser(userId, 0, `Mass mute: ${muteReason}`, {
           caseArgs: {

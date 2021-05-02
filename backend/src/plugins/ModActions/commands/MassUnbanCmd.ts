@@ -41,11 +41,11 @@ export const MassunbanCmd = modActionsCmd({
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
-    args.userIds.forEach(userId => {
+    for (let i = 0; i < args.userIds.length; ++i) {
       // Use longer timeouts since this can take a while
-      ignoreEvent(pluginData, IgnoredEventType.Unban, userId, 120 * 1000);
-      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, userId, 120 * 1000);
-    });
+      ignoreEvent(pluginData, IgnoredEventType.Unban, args.userIds[i], 120 * 1000);
+      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, args.userIds[i], 120 * 1000);
+    }
 
     // Show a loading indicator since this can take a while
     const loadingMsg = await msg.channel.createMessage("Unbanning...");
@@ -53,7 +53,8 @@ export const MassunbanCmd = modActionsCmd({
     // Unban each user and count failed unbans (if any)
     const failedUnbans: Array<{ userId: string; reason: UnbanFailReasons }> = [];
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    for (const userId of args.userIds) {
+    for (let i = 0; i < args.userIds.length; ++i) {
+      const userId = args.userIds[i];
       if (!(await isBanned(pluginData, userId))) {
         failedUnbans.push({ userId, reason: UnbanFailReasons.NOT_BANNED });
         continue;

@@ -52,10 +52,10 @@ export const MutesCmd = mutesCmd({
       const muteRole = pluginData.config.get().mute_role;
 
       if (muteRole) {
-        pluginData.guild.members.forEach(member => {
+        for (const member of pluginData.guild.members.values()) {
           if (muteUserIds.has(member.id)) return;
           if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
-        });
+        }
       }
 
       totalMutes = manuallyMutedMembers.length;

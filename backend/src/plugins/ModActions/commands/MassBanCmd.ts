@@ -42,7 +42,8 @@ export const MassbanCmd = modActionsCmd({
     const banReason = formatReasonWithAttachments(banReasonReply.content, msg.attachments);
 
     // Verify we can act on each of the users specified
-    for (const userId of args.userIds) {
+    for (let i = 0; i < args.userIds.length; ++i) {
+      const userId = args.userIds[i];
       const member = pluginData.guild.members.get(userId); // TODO: Get members on demand?
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massban one or more users: insufficient permissions");
@@ -52,11 +53,11 @@ export const MassbanCmd = modActionsCmd({
 
     // Ignore automatic ban cases and logs for these users
     // We'll create our own cases below and post a single "mass banned" log instead
-    args.userIds.forEach(userId => {
+    for (let i = 0; i < args.userIds.length; ++i) {
       // Use longer timeouts since this can take a while
-      ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
-      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
-    });
+      ignoreEvent(pluginData, IgnoredEventType.Ban, args.userIds[i], 120 * 1000);
+      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, args.userIds[i], 120 * 1000);
+    }
 
     // Show a loading indicator since this can take a while
     const loadingMsg = await msg.channel.createMessage("Banning...");

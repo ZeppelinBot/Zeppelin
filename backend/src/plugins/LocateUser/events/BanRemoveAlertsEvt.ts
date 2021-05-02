@@ -5,8 +5,8 @@ export const GuildBanRemoveAlertsEvt = locateUserEvt({
 
   async listener(meta) {
     const alerts = await meta.pluginData.state.alerts.getAlertsByUserId(meta.args.user.id);
-    alerts.forEach(alert => {
-      meta.pluginData.state.alerts.delete(alert.id);
-    });
+    for (let i = 0; i < alerts.length; ++i) {
+      meta.pluginData.state.alerts.delete(alerts[i].id);
+    }
   },
 });

@@ -29,11 +29,12 @@ export const ChannelLeaveAlertsEvt = locateUserEvt({
     const triggeredAlerts = await meta.pluginData.state.alerts.getAlertsByUserId(meta.args.member.id);
     const voiceChannel = meta.args.oldChannel as VoiceChannel;
 
-    triggeredAlerts.forEach(alert => {
+    for (let i = 0; i < triggeredAlerts.length; ++i) {
+      const alert = triggeredAlerts[i];
       const txtChannel = meta.pluginData.client.getChannel(alert.channel_id) as TextableChannel;
       txtChannel.createMessage(
         `🔴 <@!${alert.requestor_id}> the user <@!${alert.user_id}> disconnected out of \`${voiceChannel.name}\``,
       );
-    });
+    }
   },
 });

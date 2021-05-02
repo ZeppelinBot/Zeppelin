@@ -42,9 +42,9 @@ export class QueuedEventEmitter {
     const listeners = [...(this.listeners.get(eventName) || []), ...(this.listeners.get("*") || [])];
 
     let promise: Promise<any> = Promise.resolve();
-    listeners.forEach(listener => {
-      promise = this.queue.add(listener.bind(null, ...args));
-    });
+    for (let i = 0; i < listeners.length; ++i) {
+      promise = this.queue.add(listeners[i].bind(null, ...args));
+    }
 
     return promise;
   }

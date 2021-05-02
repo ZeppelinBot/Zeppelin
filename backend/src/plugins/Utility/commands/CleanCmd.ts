@@ -129,7 +129,8 @@ export const CleanCmd = utilityCmd({
       if (potentialMessagesToClean.length === 0) break;
 
       const filtered: SavedMessage[] = [];
-      for (const message of potentialMessagesToClean) {
+      for (let i = 0; i < potentialMessagesToClean.length; ++i) {
+        const message = potentialMessagesToClean[i];
         const contentString = message.data.content || "";
         if (args.user && message.user_id !== args.user) continue;
         if (args.bots && !message.is_bot) continue;

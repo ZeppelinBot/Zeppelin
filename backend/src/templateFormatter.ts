@@ -35,7 +35,8 @@ function newTemplateVar(): ITemplateVar {
 type ParsedTemplate = Array<string | ITemplateVar>;
 
 function cleanUpParseResult(arr) {
-  arr.forEach(item => {
+  for (let i = 0; i < arr.length; ++i) {
+    const item = arr[i];
     if (typeof item === "object") {
       delete item._state;
       delete item._parent;
@@ -43,7 +44,7 @@ function cleanUpParseResult(arr) {
         cleanUpParseResult(item.args);
       }
     }
-  });
+  }
 }
 
 export function parseTemplate(str: string): ParsedTemplate {

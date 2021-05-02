@@ -11,11 +11,11 @@ export async function getCaseTypeAmountForUserId(
   let typeAmount = 0;
 
   if (cases.length > 0) {
-    cases.forEach(singleCase => {
-      if (singleCase.type === type.valueOf()) {
+    for (let i = 0; i < cases.length; ++i) {
+      if (cases[i].type === type.valueOf()) {
         typeAmount++;
       }
-    });
+    }
   }
 
   return typeAmount;
