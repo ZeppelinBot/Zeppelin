@@ -25,6 +25,11 @@ export async function renderTagBody(
       if (typeof name !== "string") return;
       dynamicVars[name] = val;
     },
+    setr(name, val) {
+      if (typeof name !== "string") return "";
+      dynamicVars[name] = val;
+      return val;
+    },
     get(name) {
       return dynamicVars[name] == null ? "" : dynamicVars[name];
     },
