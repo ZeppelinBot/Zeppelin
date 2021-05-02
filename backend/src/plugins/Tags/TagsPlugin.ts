@@ -217,6 +217,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
 
         return "";
       },
+
+      isMention: input => {
+        if (typeof input !== "string") {
+          return "";
+        }
+
+        return input.match(/^<(?:@[!&]?|#)\d+>$/);
+      },
     };
 
     for (const [name, fn] of Object.entries(state.tagFunctions)) {
