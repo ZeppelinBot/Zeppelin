@@ -220,10 +220,10 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
 
       isMention: input => {
         if (typeof input !== "string") {
-          return "";
+          return false;
         }
 
-        return input.match(/^<(?:@[!&]?|#)\d+>$/);
+        return /^<(?:@[!&]?|#)\d+>$/.test(input);
       },
     };
 
