@@ -312,6 +312,10 @@ const baseValues = {
     if (typeof arg !== "string") return arg;
     return arg.toLowerCase();
   },
+  upper(arg) {
+    if (typeof arg !== "string") return arg;
+    return arg.toUpperCase();
+  },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
