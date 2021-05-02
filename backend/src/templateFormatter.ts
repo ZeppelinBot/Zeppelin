@@ -308,6 +308,10 @@ const baseValues = {
     if (end != null && isNaN(end)) return "";
     return arg1.slice(parseInt(start, 10), end && parseInt(end, 10));
   },
+  lower(arg) {
+    if (typeof arg !== "string") return arg;
+    return arg.toLowerCase();
+  },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
