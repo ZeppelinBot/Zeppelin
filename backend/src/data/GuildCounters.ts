@@ -532,5 +532,9 @@ export class GuildCounters extends BaseGuildRepository {
     await this.counterValues.delete({
       counter_id: counterId,
     });
+
+    await this.counterTriggers.delete({
+      counter_id: counterId,
+    });
   }
 }

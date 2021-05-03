@@ -8,6 +8,7 @@ import { confirm, resolveUser, trimMultilineString, UnknownUser } from "../../..
 import { changeCounterValue } from "../functions/changeCounterValue";
 import { setCounterValue } from "../functions/setCounterValue";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
+import { counterIdLock } from "../../../utils/lockNameHelpers";
 
 export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],
@@ -47,7 +48,9 @@ export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
       return;
     }
 
+    const lock = await pluginData.locks.acquire(counterIdLock(counterId));
     await resetAllCounterValues(pluginData, args.counterName);
+    lock.unlock();
 
     sendSuccessMessage(pluginData, message.channel, `All counter values for **${counterName}** have been reset`);
   },
