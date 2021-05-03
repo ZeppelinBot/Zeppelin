@@ -120,7 +120,13 @@ export class GuildCounters extends BaseGuildRepository {
       .execute();
   }
 
-  async changeCounterValue(id: number, channelId: string | null, userId: string | null, change: number): Promise<void> {
+  async changeCounterValue(
+    id: number,
+    channelId: string | null,
+    userId: string | null,
+    change: number,
+    initialValue: number,
+  ): Promise<void> {
     if (typeof change !== "number" || Number.isNaN(change) || !Number.isFinite(change)) {
       throw new Error(`changeCounterValue() change argument must be a number`);
     }
@@ -137,7 +143,7 @@ export class GuildCounters extends BaseGuildRepository {
       VALUES (?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE ${rawUpdate}
     `,
-      [id, channelId, userId, Math.max(change, 0)],
+      [id, channelId, userId, Math.max(initialValue + change, 0)],
     );
   }
 
