@@ -667,9 +667,10 @@ export function trimEmptyStartEndLines(str: string) {
 }
 
 export function trimIndents(str: string, indentLength: number) {
+  const regex = new RegExp(`^\\s{0,${indentLength}}`, "g");
   return str
     .split("\n")
-    .map(line => line.slice(indentLength))
+    .map(line => line.replace(regex, ""))
     .join("\n");
 }
 
@@ -1404,12 +1405,17 @@ export function canUseEmoji(client: Client, emoji: string): boolean {
   return false;
 }
 
-export function trimPluginDescription(str) {
+/**
+ * Trims any empty lines from the beginning and end of the given string
+ * and indents matching the first line's indent
+ */
+export function trimMultilineString(str) {
   const emptyLinesTrimmed = trimEmptyStartEndLines(str);
   const lines = emptyLinesTrimmed.split("\n");
   const firstLineIndentation = (lines[0].match(/^ +/g) || [""])[0].length;
   return trimIndents(emptyLinesTrimmed, firstLineIndentation);
 }
+export const trimPluginDescription = trimMultilineString;
 
 export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
   return (msg as Message).createdAt != null;

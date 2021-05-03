@@ -29,6 +29,7 @@ export const Counter = t.type({
   ),
   can_view: tNullable(t.boolean),
   can_edit: tNullable(t.boolean),
+  can_reset_all: tNullable(t.boolean),
 });
 export type TCounter = t.TypeOf<typeof Counter>;
 
@@ -36,6 +37,7 @@ export const ConfigSchema = t.type({
   counters: t.record(t.string, Counter),
   can_view: t.boolean,
   can_edit: t.boolean,
+  can_reset_all: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

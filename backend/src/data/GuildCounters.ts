@@ -527,4 +527,10 @@ export class GuildCounters extends BaseGuildRepository {
 
     return value?.value;
   }
+
+  async resetAllCounterValues(counterId: number): Promise<void> {
+    await this.counterValues.delete({
+      counter_id: counterId,
+    });
+  }
 }

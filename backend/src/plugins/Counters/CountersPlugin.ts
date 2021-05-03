@@ -25,6 +25,9 @@ import {
 import { getPrettyNameForCounter } from "./functions/getPrettyNameForCounter";
 import { getPrettyNameForCounterTrigger } from "./functions/getPrettyNameForCounterTrigger";
 import { counterExists } from "./functions/counterExists";
+import { ResetAllCounterValuesCmd } from "./commands/ResetAllCounterValuesCmd";
+import { CountersListCmd } from "./commands/CountersListCmd";
+import { ResetCounterCmd } from "./commands/ResetCounterCmd";
 
 const MAX_COUNTERS = 5;
 const MAX_TRIGGERS_PER_COUNTER = 5;
@@ -35,6 +38,7 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
     counters: {},
     can_view: false,
     can_edit: false,
+    can_reset_all: false,
   },
   overrides: [
     {
@@ -133,9 +137,12 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
 
   // prettier-ignore
   commands: [
+    CountersListCmd,
     ViewCounterCmd,
     AddCounterCmd,
     SetCounterCmd,
+    ResetCounterCmd,
+    ResetAllCounterValuesCmd,
   ],
 
   async onLoad(pluginData) {
