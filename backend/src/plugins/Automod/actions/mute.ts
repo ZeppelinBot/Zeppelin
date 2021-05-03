@@ -26,10 +26,12 @@ export const MuteAction = automodAction({
     remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
     restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
     postInCaseLog: tNullable(t.boolean),
+    hide_case: t.boolean,
   }),
 
   defaultConfig: {
     notify: null, // Use defaults from ModActions
+    hide_case: false,
   },
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
@@ -44,6 +46,7 @@ export const MuteAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
+      hide: actionConfig.hide_case,
     };
 
     const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));

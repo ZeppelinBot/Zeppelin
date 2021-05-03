@@ -40,6 +40,7 @@ export type CaseArgs = {
   postInCaseLogOverride?: boolean;
   noteDetails?: string[];
   extraNotes?: string[];
+  hide?: boolean;
 };
 
 export type CaseNoteArgs = {
