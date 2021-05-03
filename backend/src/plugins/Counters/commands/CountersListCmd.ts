@@ -5,7 +5,7 @@ import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 
 export const CountersListCmd = guildCommand<CountersPluginType>()({
-  trigger: ["counters", "counters list", "counter list"],
+  trigger: ["counters list", "counter list", "counters"],
   permission: "can_view",
 
   signature: {},
