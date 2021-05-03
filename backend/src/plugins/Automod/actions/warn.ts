@@ -12,10 +12,12 @@ export const WarnAction = automodAction({
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
     postInCaseLog: tNullable(t.boolean),
+    hide_case: t.boolean,
   }),
 
   defaultConfig: {
     notify: null, // Use defaults from ModActions
+    hide_case: false,
   },
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
@@ -27,6 +29,7 @@ export const WarnAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
+      hide: actionConfig.hide_case,
     };
 
     const userIdsToWarn = unique(contexts.map(c => c.user?.id).filter(nonNullish));

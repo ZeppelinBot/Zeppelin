@@ -22,10 +22,12 @@ export const BanAction = automodAction({
     notifyChannel: tNullable(t.string),
     deleteMessageDays: tNullable(t.number),
     postInCaseLog: tNullable(t.boolean),
+    hide_case: t.boolean,
   }),
 
   defaultConfig: {
     notify: null, // Use defaults from ModActions
+    hide_case: false,
   },
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
@@ -39,6 +41,7 @@ export const BanAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
+      hide: actionConfig.hide_case,
     };
 
     const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(nonNullish));

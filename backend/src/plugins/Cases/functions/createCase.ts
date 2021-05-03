@@ -35,6 +35,7 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
     audit_log_id: args.auditLogId,
     pp_id: args.ppId,
     pp_name: ppName,
+    is_hidden: Boolean(args.hide),
   });
 
   if (args.reason || (args.noteDetails && args.noteDetails.length)) {
