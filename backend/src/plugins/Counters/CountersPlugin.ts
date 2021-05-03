@@ -62,7 +62,7 @@ const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => 
     counter.per_user = counter.per_user ?? false;
     counter.per_channel = counter.per_channel ?? false;
     counter.initial_value = counter.initial_value ?? 0;
-    counter.triggers = counter.triggers || [];
+    counter.triggers = counter.triggers || {};
 
     if (Object.values(counter.triggers).length > MAX_TRIGGERS_PER_COUNTER) {
       throw new StrictValidationError([`You can only have at most ${MAX_TRIGGERS_PER_COUNTER} triggers per counter`]);
