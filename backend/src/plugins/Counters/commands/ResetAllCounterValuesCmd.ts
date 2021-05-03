@@ -50,8 +50,10 @@ export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
 
     const lock = await pluginData.locks.acquire(counterIdLock(counterId));
     await resetAllCounterValues(pluginData, args.counterName);
-    lock.unlock();
+    lock.interrupt();
 
     sendSuccessMessage(pluginData, message.channel, `All counter values for **${counterName}** have been reset`);
+
+    pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);
   },
 });
