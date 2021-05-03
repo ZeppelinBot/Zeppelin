@@ -529,12 +529,9 @@ export class GuildCounters extends BaseGuildRepository {
   }
 
   async resetAllCounterValues(counterId: number): Promise<void> {
-    await this.counterValues.delete({
-      counter_id: counterId,
-    });
-
-    await this.counterTriggers.delete({
-      counter_id: counterId,
+    // Foreign keys will remove any related triggers and counter values
+    await this.counters.delete({
+      id: counterId,
     });
   }
 }
