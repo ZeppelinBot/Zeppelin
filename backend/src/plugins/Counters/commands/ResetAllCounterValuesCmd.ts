@@ -4,7 +4,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveChannel, waitForReply } from "knub/dist/helpers";
 import { TextChannel, User } from "eris";
-import { confirm, noop, resolveUser, trimMultilineString, UnknownUser } from "../../../utils";
+import { confirm, MINUTES, noop, resolveUser, trimMultilineString, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
 import { setCounterValue } from "../functions/setCounterValue";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
@@ -52,7 +52,7 @@ export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
       .createMessage(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
       .catch(() => null);
 
-    const lock = await pluginData.locks.acquire(counterIdLock(counterId));
+    const lock = await pluginData.locks.acquire(counterIdLock(counterId), 10 * MINUTES);
     await resetAllCounterValues(pluginData, args.counterName);
     lock.interrupt();
 
