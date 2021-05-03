@@ -12,7 +12,7 @@ export const KickAction = automodAction({
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
     postInCaseLog: tNullable(t.boolean),
-    hide_case: t.boolean,
+    hide_case: tNullable(t.boolean),
   }),
 
   defaultConfig: {
@@ -29,7 +29,7 @@ export const KickAction = automodAction({
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,
-      hide: actionConfig.hide_case,
+      hide: Boolean(actionConfig.hide_case),
     };
 
     const userIdsToKick = unique(contexts.map(c => c.user?.id).filter(nonNullish));
