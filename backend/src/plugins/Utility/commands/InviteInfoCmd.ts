@@ -11,7 +11,7 @@ export const InviteInfoCmd = utilityCmd({
   permission: "can_inviteinfo",
 
   signature: {
-    inviteCode: ct.string({ required: false }),
+    inviteCode: ct.string(),
   },
 
   async run({ message, args, pluginData }) {
