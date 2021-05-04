@@ -37,6 +37,7 @@ import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { refreshMembersIfNeeded } from "./refreshMembers";
+import { RoleInfoCmd } from "./commands/RoleInfoCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -50,6 +51,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_channelinfo: false,
     can_messageinfo: false,
     can_userinfo: false,
+    can_roleinfo: false,
     can_snowflake: false,
     can_reload_guild: false,
     can_nickname: false,
@@ -79,6 +81,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_channelinfo: true,
         can_messageinfo: true,
         can_userinfo: true,
+        can_roleinfo: true,
         can_snowflake: true,
         can_nickname: true,
         can_vcmove: true,
@@ -138,6 +141,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     MessageInfoCmd,
     InfoCmd,
     SnowflakeInfoCmd,
+    RoleInfoCmd,
   ],
 
   onLoad(pluginData) {

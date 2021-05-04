@@ -9,9 +9,10 @@ import { canReadChannel } from "../../../utils/canReadChannel";
 import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
 import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
 import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
-import { getChannelId } from "knub/dist/utils";
+import { getChannelId, getRoleId } from "knub/dist/utils";
 import { getGuildPreview } from "../functions/getGuildPreview";
 import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
+import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",
@@ -104,14 +105,25 @@ export const InfoCmd = utilityCmd({
       }
     }
 
-    // 7. Arbitrary ID
+    // 7. Role ID
+    const roleId = getRoleId(value);
+    const role = roleId && pluginData.guild.roles.get(roleId);
+    if (role && userCfg.can_roleinfo) {
+      const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
+      message.channel.createMessage({ embed });
+      return;
+    }
+
+    // TODO: 8. Emoji ID
+
+    // 9. Arbitrary ID
     if (isValidSnowflake(value) && userCfg.can_snowflake) {
       const embed = await getSnowflakeInfoEmbed(pluginData, value, true, message.author.id);
       message.channel.createMessage({ embed });
       return;
     }
 
-    // 7. No can do
+    // 10. No can do
     sendErrorMessage(
       pluginData,
       message.channel,

@@ -1,0 +1,28 @@
+import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
+
+export const RoleInfoCmd = utilityCmd({
+  trigger: ["role", "roleinfo"],
+  description: "Show information about a role",
+  usage: "!role 106391128718245888",
+  permission: "can_roleinfo",
+
+  signature: {
+    role: ct.role({ required: false }),
+  },
+
+  async run({ message, args, pluginData }) {
+    const roleId = args.role?.id;
+    const role = roleId && pluginData.guild.roles.get(roleId);
+    if (!role) {
+      sendErrorMessage(pluginData, message.channel, "Role not found");
+      return;
+    }
+
+    const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
+
+    message.channel.createMessage({ embed });
+  },
+});
