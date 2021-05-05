@@ -11,7 +11,7 @@ export const NicknameCmd = utilityCmd({
 
   signature: {
     member: ct.resolvedMember(),
-    nickname: ct.string({ catchAll: true }),
+    nickname: ct.string({ catchAll: true, required: false }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -20,8 +20,13 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    const nicknameLength = [...args.nickname].length;
-    if (nicknameLength < 2 || nicknameLength > 32) {
+    if (!args.nickname && !args.member.nickname) {
+      msg.channel.send(errorMessage("User does not have a nickname"));
+      return;
+    }
+
+    const nicknameLength = args.nickname && [...args.nickname].length;
+    if (typeof nicknameLength === "number" && (nicknameLength < 2 || nicknameLength > 32)) {
       msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
       return;
     }
@@ -29,18 +34,20 @@ export const NicknameCmd = utilityCmd({
     const oldNickname = args.member.nickname || "<none>";
 
     try {
-      await args.member.edit({
-        nick: args.nickname,
-      });
+      await args.member.setNickname(args.nickname ?? null);
     } catch {
       msg.channel.send(errorMessage("Failed to change nickname"));
       return;
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
-    );
+    if (args.nickname) {
+      sendSuccessMessage(
+        pluginData,
+        msg.channel,
+        `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
+      );
+    } else {
+      sendSuccessMessage(pluginData, msg.channel, `The nickname of <@!${args.member.id}> has been reset`);
+    }
   },
 });

@@ -19,10 +19,13 @@ export const NicknameResetCmd = utilityCmd({
       return;
     }
 
+    if (!args.member.nickname) {
+      msg.channel.send(errorMessage("User does not have a nickname"));
+      return;
+    }
+
     try {
-      await args.member.edit({
-        nick: "",
-      });
+      await args.member.setNickname("");
     } catch {
       msg.channel.send(errorMessage("Failed to reset nickname"));
       return;
