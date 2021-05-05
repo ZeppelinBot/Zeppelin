@@ -10,17 +10,11 @@ export const RoleInfoCmd = utilityCmd({
   permission: "can_roleinfo",
 
   signature: {
-    role: ct.role({ required: false }),
+    role: ct.role({ required: true }),
   },
 
   async run({ message, args, pluginData }) {
-    if (!args.role) {
-      sendErrorMessage(pluginData, message.channel, "Role not found");
-      return;
-    }
-
     const embed = await getRoleInfoEmbed(pluginData, args.role, message.author.id);
-
     message.channel.createMessage({ embed });
   },
 });
