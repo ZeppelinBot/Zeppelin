@@ -2,7 +2,7 @@ import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
-import { isValidSnowflake, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
+import { customEmojiRegex, isValidSnowflake, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
 import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
 import { canReadChannel } from "../../../utils/canReadChannel";
@@ -13,6 +13,7 @@ import { getChannelId, getRoleId } from "knub/dist/utils";
 import { getGuildPreview } from "../functions/getGuildPreview";
 import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
 import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
+import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",
@@ -114,7 +115,15 @@ export const InfoCmd = utilityCmd({
       return;
     }
 
-    // TODO: 8. Emoji ID
+    // 8. Emoji
+    const emojiIdMatch = value.match(customEmojiRegex);
+    if (emojiIdMatch?.[2] && userCfg.can_emojiinfo) {
+      const embed = await getEmojiInfoEmbed(pluginData, emojiIdMatch[2]);
+      if (embed) {
+        message.channel.createMessage({ embed });
+        return;
+      }
+    }
 
     // 9. Arbitrary ID
     if (isValidSnowflake(value) && userCfg.can_snowflake) {

@@ -19,6 +19,7 @@ export const ConfigSchema = t.type({
   can_messageinfo: t.boolean,
   can_userinfo: t.boolean,
   can_roleinfo: t.boolean,
+  can_emojiinfo: t.boolean,
   can_snowflake: t.boolean,
   can_reload_guild: t.boolean,
   can_nickname: t.boolean,
