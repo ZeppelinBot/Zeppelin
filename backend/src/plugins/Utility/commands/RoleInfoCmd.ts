@@ -14,14 +14,12 @@ export const RoleInfoCmd = utilityCmd({
   },
 
   async run({ message, args, pluginData }) {
-    const roleId = args.role?.id;
-    const role = roleId && pluginData.guild.roles.get(roleId);
-    if (!role) {
+    if (!args.role) {
       sendErrorMessage(pluginData, message.channel, "Role not found");
       return;
     }
 
-    const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
+    const embed = await getRoleInfoEmbed(pluginData, args.role, message.author.id);
 
     message.channel.createMessage({ embed });
   },
