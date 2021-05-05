@@ -106,7 +106,7 @@ export const InfoCmd = utilityCmd({
       }
     }
 
-    // 7. Role ID
+    // 7. Role
     const roleId = getRoleId(value);
     const role = roleId && pluginData.guild.roles.get(roleId);
     if (role && userCfg.can_roleinfo) {
