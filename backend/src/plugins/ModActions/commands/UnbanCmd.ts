@@ -14,7 +14,7 @@ const opts = {
 
 export const UnbanCmd = modActionsCmd({
   trigger: "unban",
-  permission: "can_ban",
+  permission: "can_unban",
   description: "Unban the specified member",
 
   signature: [
