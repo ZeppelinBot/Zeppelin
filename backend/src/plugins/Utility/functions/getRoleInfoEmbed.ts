@@ -6,7 +6,7 @@ import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
-const MENTION = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
+const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
 
 export async function getRoleInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
@@ -19,7 +19,7 @@ export async function getRoleInfoEmbed(
 
   embed.author = {
     name: `Role:  ${role.name}`,
-    icon_url: MENTION,
+    icon_url: MENTION_ICON,
   };
 
   embed.color = role.color;
@@ -38,6 +38,7 @@ export async function getRoleInfoEmbed(
   const rolePerms = Object.keys(role.permissions.json)
     .map(p =>
       p
+        // Voice channel related permission names start with 'voice'
         .replace(/^voice/i, "")
         .replace(/([a-z])([A-Z])/g, "$1 $2")
         .toLowerCase()
