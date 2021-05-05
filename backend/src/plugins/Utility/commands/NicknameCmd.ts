@@ -25,10 +25,12 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    const nicknameLength = args.nickname && [...args.nickname].length;
-    if (typeof nicknameLength === "number" && (nicknameLength < 2 || nicknameLength > 32)) {
-      msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
-      return;
+    if (args.nickname) {
+      const nicknameLength = [...args.nickname].length;
+      if (nicknameLength < 2 || nicknameLength > 32) {
+        msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
+        return;
+      }
     }
 
     const oldNickname = args.member.nickname || "<none>";
