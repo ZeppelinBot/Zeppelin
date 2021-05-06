@@ -308,6 +308,18 @@ const baseValues = {
     if (end != null && isNaN(end)) return "";
     return arg1.slice(parseInt(start, 10), end && parseInt(end, 10));
   },
+  lower(arg) {
+    if (typeof arg !== "string") return arg;
+    return arg.toLowerCase();
+  },
+  upper(arg) {
+    if (typeof arg !== "string") return arg;
+    return arg.toUpperCase();
+  },
+  upperFirst(arg) {
+    if (typeof arg !== "string") return arg;
+    return arg.charAt(0).toUpperCase() + arg.slice(1);
+  },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
