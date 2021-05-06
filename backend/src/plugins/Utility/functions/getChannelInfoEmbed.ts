@@ -13,7 +13,7 @@ const VOICE_CHANNEL_ICON =
 const ANNOUNCEMENT_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/740656841687564348/announcement-channel.png";
 const STAGE_CHANNEL_ICON =
-  "https://cdn.discordapp.com/attachments/705009450855039042/839292597859516446/stage-channel.png";
+  "https://cdn.discordapp.com/attachments/740650744830623756/839930647711186995/stage-channel.png";
 
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
