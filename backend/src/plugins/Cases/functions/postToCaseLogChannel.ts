@@ -52,7 +52,7 @@ export async function postCaseToCaseLogChannel(
     try {
       await pluginData.client.editMessage(channelId, messageId, caseEmbed);
       return null;
-    } catch (e) {} // tslint:disable-line:no-empty
+    } catch {} // tslint:disable-line:no-empty
   }
 
   try {
@@ -63,7 +63,7 @@ export async function postCaseToCaseLogChannel(
       });
     }
     return postedMessage;
-  } catch (e) {
+  } catch {
     pluginData.state.logs.log(LogType.BOT_ALERT, {
       body: `Failed to post case #${theCase.case_number} to the case log channel`,
     });

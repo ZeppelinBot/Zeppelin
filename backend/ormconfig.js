@@ -4,11 +4,11 @@ const path = require('path');
 try {
   fs.accessSync(path.resolve(__dirname, 'bot.env'));
   require('dotenv').config({ path: path.resolve(__dirname, 'bot.env') });
-} catch (e) {
+} catch {
   try {
     fs.accessSync(path.resolve(__dirname, 'api.env'));
     require('dotenv').config({ path: path.resolve(__dirname, 'api.env') });
-  } catch (e) {
+  } catch {
     throw new Error("bot.env or api.env required");
   }
 }

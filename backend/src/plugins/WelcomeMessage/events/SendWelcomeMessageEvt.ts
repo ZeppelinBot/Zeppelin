@@ -46,7 +46,7 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
     if (config.send_dm) {
       try {
         await sendDM(member.user, formatted, "welcome message");
-      } catch (e) {
+      } catch {
         pluginData.state.logs.log(LogType.DM_FAILED, {
           source: "welcome message",
           user: stripObjectToScalars(member.user),
@@ -60,7 +60,7 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
 
       try {
         await createChunkedMessage(channel, formatted);
-      } catch (e) {
+      } catch {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome message for {userMention(member)} to {channelMention(channel)}`,
           member: stripObjectToScalars(member),

@@ -69,7 +69,7 @@ export const ForcebanCmd = modActionsCmd({
     try {
       // FIXME: Use banUserId()?
       await pluginData.guild.banMember(user.id, 1, reason != null ? encodeURIComponent(reason) : undefined);
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to forceban member");
       return;
     }

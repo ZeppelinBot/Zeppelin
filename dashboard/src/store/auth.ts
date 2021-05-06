@@ -22,7 +22,7 @@ export const AuthStore: Module<AuthState, RootState> = {
             await dispatch("setApiKey", storedKey);
             return;
           }
-        } catch (e) {} // tslint:disable-line
+        } catch {} // tslint:disable-line
 
         console.log("Unable to validate key, removing from localStorage"); // tslint:disable-line
         localStorage.removeItem("apiKey");

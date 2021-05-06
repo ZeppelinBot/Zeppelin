@@ -69,7 +69,7 @@ export const MassunbanCmd = modActionsCmd({
           reason: `Mass unban: ${unbanReason}`,
           postInCaseLogOverride: false,
         });
-      } catch (e) {
+      } catch {
         failedUnbans.push({ userId, reason: UnbanFailReasons.UNBAN_FAILED });
       }
     }

@@ -14,7 +14,7 @@ export async function censorMessage(
 
   try {
     await pluginData.client.deleteMessage(savedMessage.channel_id, savedMessage.id, "Censored");
-  } catch (e) {
+  } catch {
     return;
   }
 
