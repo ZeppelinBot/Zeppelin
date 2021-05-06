@@ -34,6 +34,7 @@ export const ConfigSchema = t.type({
   can_mute: t.boolean,
   can_kick: t.boolean,
   can_ban: t.boolean,
+  can_unban: t.boolean,
   can_view: t.boolean,
   can_addcase: t.boolean,
   can_massunban: t.boolean,
