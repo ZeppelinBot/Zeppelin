@@ -13,7 +13,7 @@ export async function rehostAttachment(attachment: Attachment, targetChannel: Te
   let downloaded;
   try {
     downloaded = await downloadFile(attachment.url, 3);
-  } catch (e) {
+  } catch {
     return "Failed to download attachment after 3 tries";
   }
 
@@ -23,7 +23,7 @@ export async function rehostAttachment(attachment: Attachment, targetChannel: Te
       file: await fsp.readFile(downloaded.path),
     });
     return rehostMessage.attachments[0].url;
-  } catch (e) {
+  } catch {
     return "Failed to rehost attachment";
   }
 }

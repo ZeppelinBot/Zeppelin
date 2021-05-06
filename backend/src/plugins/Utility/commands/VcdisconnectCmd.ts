@@ -38,7 +38,7 @@ export const VcdisconnectCmd = utilityCmd({
       await args.member.edit({
         channelID: null,
       });
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to disconnect member");
       return;
     }

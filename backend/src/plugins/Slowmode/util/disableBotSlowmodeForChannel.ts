@@ -17,7 +17,7 @@ export async function disableBotSlowmodeForChannel(
   for (const slowmodeUser of users) {
     try {
       await clearBotSlowmodeFromUserId(pluginData, channel, slowmodeUser.user_id);
-    } catch (e) {
+    } catch {
       // Removing the slowmode failed. Record this so the permissions can be changed manually, and remove the database entry.
       failedUsers.push(slowmodeUser.user_id);
       await pluginData.state.slowmodes.clearSlowmodeUser(channel.id, slowmodeUser.user_id);

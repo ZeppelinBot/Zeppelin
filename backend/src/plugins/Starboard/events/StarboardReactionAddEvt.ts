@@ -19,7 +19,7 @@ export const StarboardReactionAddEvt = starboardEvt({
       // Message is not cached, fetch it
       try {
         msg = await msg.channel.getMessage(msg.id);
-      } catch (e) {
+      } catch {
         // Sometimes we get this event for messages we can't fetch with getMessage; ignore silently
         return;
       }

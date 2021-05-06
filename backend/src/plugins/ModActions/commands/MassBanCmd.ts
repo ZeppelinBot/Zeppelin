@@ -77,7 +77,7 @@ export const MassbanCmd = modActionsCmd({
         });
 
         pluginData.state.events.emit("ban", userId, banReason);
-      } catch (e) {
+      } catch {
         failedBans.push(userId);
       }
     }

@@ -56,7 +56,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`,
           );
         }
-      } catch (e) {
+      } catch {
         sendSuccessMessage(
           pluginData,
           msg.channel,

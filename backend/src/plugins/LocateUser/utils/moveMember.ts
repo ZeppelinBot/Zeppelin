@@ -15,7 +15,7 @@ export async function moveMember(
       await modMember.edit({
         channelID: target.voiceState.channelID,
       });
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");
       return;
     }

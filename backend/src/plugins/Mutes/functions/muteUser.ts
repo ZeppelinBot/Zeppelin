@@ -126,7 +126,7 @@ export async function muteUser(
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
       try {
         await member.edit({ channelID: moveToVoiceChannel });
-      } catch (e) {} // tslint:disable-line
+      } catch {} // tslint:disable-line
     }
   }
 

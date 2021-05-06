@@ -75,7 +75,7 @@ export const VcmoveCmd = utilityCmd({
       await args.member.edit({
         channelID: channel.id,
       });
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to move member");
       return;
     }
@@ -174,7 +174,7 @@ export const VcmoveAllCmd = utilityCmd({
         currMember.edit({
           channelID: channel.id,
         });
-      } catch (e) {
+      } catch {
         if (msg.member.id === currMember.id) {
           sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
           return;

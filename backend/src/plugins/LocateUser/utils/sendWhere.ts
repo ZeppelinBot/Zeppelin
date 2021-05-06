@@ -21,7 +21,7 @@ export async function sendWhere(
     let invite: Invite;
     try {
       invite = await createOrReuseInvite(voice);
-    } catch (e) {
+    } catch {
       sendErrorMessage(pluginData, channel, "Cannot create an invite to that channel!");
       return;
     }
