@@ -83,6 +83,9 @@
         Durations:
         <ul>
           <li>
+            <code>w</code> Week
+          </li>
+          <li>
             <code>d</code> Day
           </li>
           <li>
