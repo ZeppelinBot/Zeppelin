@@ -203,7 +203,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
           return "";
         }
 
-        if (input.match(/^<(?:@(?:!|&)?|#)\d+>$/)) {
+        if (input.match(/^<(?:@[!&]?|#)\d+>$/)) {
           return input;
         }
 
@@ -216,6 +216,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
         }
 
         return "";
+      },
+
+      isMention: input => {
+        if (typeof input !== "string") {
+          return false;
+        }
+
+        return /^<(?:@[!&]?|#)\d+>$/.test(input);
       },
     };
 
