@@ -320,6 +320,9 @@ const baseValues = {
     if (typeof arg !== "string") return arg;
     return arg.charAt(0).toUpperCase() + arg.slice(1);
   },
+  ucfirst(arg) {
+    return baseValues.upperFirst(arg);
+  },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
