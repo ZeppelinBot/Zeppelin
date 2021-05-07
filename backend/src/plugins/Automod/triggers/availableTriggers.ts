@@ -7,7 +7,9 @@ import { BanTrigger } from "./ban";
 import { CharacterSpamTrigger } from "./characterSpam";
 import { CounterTrigger } from "./counterTrigger";
 import { EmojiSpamTrigger } from "./emojiSpam";
+import { JoinVoiceChannelTrigger } from "./joinVoiceChannel";
 import { KickTrigger } from "./kick";
+import { LeaveVoiceChannelTrigger } from "./leaveVoiceChannel";
 import { LineSpamTrigger } from "./lineSpam";
 import { LinkSpamTrigger } from "./linkSpam";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
@@ -21,6 +23,7 @@ import { MemberJoinSpamTrigger } from "./memberJoinSpam";
 import { MemberLeaveTrigger } from "./memberLeave";
 import { MentionSpamTrigger } from "./mentionSpam";
 import { MessageSpamTrigger } from "./messageSpam";
+import { MoveVoiceChannelTrigger } from "./moveVoiceChannel";
 import { MuteTrigger } from "./mute";
 import { NoteTrigger } from "./note";
 import { RoleAddedTrigger } from "./roleAdded";
@@ -69,6 +72,10 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   ban: BanTrigger,
   unban: UnbanTrigger,
 
+  join_voice_channel: JoinVoiceChannelTrigger,
+  leave_voice_channel: LeaveVoiceChannelTrigger,
+  move_voice_channel: MoveVoiceChannelTrigger,
+
   antiraid_level: AntiraidLevelTrigger,
 
   thread_create: ThreadCreateTrigger,
@@ -111,6 +118,10 @@ export const AvailableTriggers = t.type({
   kick: KickTrigger.configType,
   ban: BanTrigger.configType,
   unban: UnbanTrigger.configType,
+
+  join_voice_channel: JoinVoiceChannelTrigger.configType,
+  leave_voice_channel: LeaveVoiceChannelTrigger.configType,
+  move_voice_channel: MoveVoiceChannelTrigger.configType,
 
   antiraid_level: AntiraidLevelTrigger.configType,
 

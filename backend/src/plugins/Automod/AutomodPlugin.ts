@@ -29,6 +29,7 @@ import {
   RunAutomodOnThreadDelete,
   RunAutomodOnThreadUpdate,
 } from "./events/runAutomodOnThreadEvents";
+import { RunAutomodOnVoiceStateUpdate } from "./events/runAutomodOnVoiceStateUpdate";
 import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges";
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
@@ -207,7 +208,6 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     },
   },
 
-  // prettier-ignore
   events: [
     RunAutomodOnJoinEvt,
     RunAutomodOnMemberUpdate,
@@ -215,6 +215,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     RunAutomodOnThreadCreate,
     RunAutomodOnThreadDelete,
     RunAutomodOnThreadUpdate
+    RunAutomodOnVoiceStateUpdate,
     // Messages use message events from SavedMessages, see onLoad below
   ],
 

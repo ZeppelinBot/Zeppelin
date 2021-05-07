@@ -140,6 +140,10 @@ export interface AutomodContext {
     unlocked?: ThreadChannel;
   };
   channel?: TextChannel | ThreadChannel;
+  voiceChannel?: {
+    joined?: VoiceChannel | StageChannel;
+    left?: VoiceChannel | StageChannel;
+  };
 }
 
 export interface RecentAction {
