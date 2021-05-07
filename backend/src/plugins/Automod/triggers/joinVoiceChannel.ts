@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { automodTrigger } from "../helpers";
+import { Constants } from "eris";
 
 interface JoinVoiceChannelResult {
   matchedChannelId: string;
@@ -11,18 +12,19 @@ export const JoinVoiceChannelTrigger = automodTrigger<JoinVoiceChannelResult>()(
   defaultConfig: "",
 
   async match({ triggerConfig, context }) {
-    if (!context.member || !context.voiceChannel) {
+    const matchedChannelId = context.voiceChannel?.joined?.id;
+    if (!context.member || !matchedChannelId) {
       return;
     }
 
     const triggerChannels = Array.isArray(triggerConfig) ? triggerConfig : [triggerConfig];
-    if (!triggerChannels.includes(context.voiceChannel.id)) {
+    if (!triggerChannels.includes(matchedChannelId)) {
       return;
     }
 
     return {
       extra: {
-        matchedChannelId: context.voiceChannel.id,
+        matchedChannelId,
       },
     };
   },
@@ -32,6 +34,7 @@ export const JoinVoiceChannelTrigger = automodTrigger<JoinVoiceChannelResult>()(
     const channelName = channel?.name || "Unknown";
     const member = contexts[0].member!;
     const memberName = `**${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
-    return `${memberName} has joined the ${channelName} (\`${matchResult.extra.matchedChannelId}\`) voice channel`;
+    const voiceOrStage = channel?.type === Constants.ChannelTypes.GUILD_STAGE ? "stage" : "voice";
+    return `${memberName} has joined the ${channelName} (\`${matchResult.extra.matchedChannelId}\`) ${voiceOrStage} channel`;
   },
 });

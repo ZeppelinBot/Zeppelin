@@ -1,3 +1,4 @@
+import { Constants } from "eris";
 import * as t from "io-ts";
 import { automodTrigger } from "../helpers";
 
@@ -11,18 +12,19 @@ export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>(
   defaultConfig: "",
 
   async match({ triggerConfig, context }) {
-    if (!context.member || !context.voiceChannel) {
+    const matchedChannelId = context.voiceChannel?.left?.id;
+    if (!context.member || !matchedChannelId) {
       return;
     }
 
     const triggerChannels = Array.isArray(triggerConfig) ? triggerConfig : [triggerConfig];
-    if (!triggerChannels.includes(context.voiceChannel.id)) {
+    if (!triggerChannels.includes(matchedChannelId)) {
       return;
     }
 
     return {
       extra: {
-        matchedChannelId: context.voiceChannel.id,
+        matchedChannelId,
       },
     };
   },
@@ -32,6 +34,7 @@ export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>(
     const channelName = channel?.name || "Unknown";
     const member = contexts[0].member!;
     const memberName = `**${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;
-    return `${memberName} has left the ${channelName} (\`${matchResult.extra.matchedChannelId}\`) voice channel`;
+    const voiceOrStage = channel?.type === Constants.ChannelTypes.GUILD_STAGE ? "stage" : "voice";
+    return `${memberName} has left the ${channelName} (\`${matchResult.extra.matchedChannelId}\`) ${voiceOrStage} channel`;
   },
 });
