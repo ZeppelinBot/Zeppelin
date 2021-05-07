@@ -4,7 +4,7 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
 
 export const RoleInfoCmd = utilityCmd({
-  trigger: ["role", "roleinfo"],
+  trigger: ["roleinfo"],
   description: "Show information about a role",
   usage: "!role 106391128718245888",
   permission: "can_roleinfo",
