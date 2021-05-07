@@ -11,6 +11,10 @@ import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
 import { IgnoredEventType, modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { LogType } from "../../../data/LogType";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { banLock } from "../../../utils/lockNameHelpers";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -63,18 +67,30 @@ export const ForcebanCmd = modActionsCmd({
     }
 
     const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    const lock = await pluginData.locks.acquire(banLock(user));
 
     ignoreEvent(pluginData, IgnoredEventType.Ban, user.id);
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
     try {
-      // FIXME: Use banUserId()?
-      await pluginData.guild.bans.create(user.id as Snowflake, {
-        days: 1,
-        reason: reason ?? undefined,
+      const deleteMessageDays = args["delete-days"] ?? pluginData.config.getForMessage(msg).ban_delete_message_days;
+      const banResult = await banUserId(pluginData, user.id, reason, {
+        contactMethods: [],
+        caseArgs: {
+          modId: mod.id,
+          ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
+        },
+        deleteMessageDays,
+        modId: mod.id,
       });
+      if (banResult.status === "failed") {
+        sendErrorMessage(pluginData, msg.channel, `Failed to ban member: ${banResult.error}`);
+        lock.unlock();
+        return;
+      }
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to forceban member");
+      lock.unlock();
       return;
     }
 
@@ -90,6 +106,7 @@ export const ForcebanCmd = modActionsCmd({
 
     // Confirm the action
     sendSuccessMessage(pluginData, msg.channel, `Member forcebanned (Case #${createdCase.case_number})`);
+    lock.unlock();
 
     // Log the action
     pluginData.getPlugin(LogsPlugin).logMemberForceban({
