@@ -786,6 +786,35 @@ export function deactivateMentions(content: string): string {
   return content.replace(/@/g, "@\u200b");
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Disable inline code in the given string by replacing backticks/grave accents with acute accents
+ * FIXME: Find a better way that keeps the grave accents? Can't use the code block approach here since it's just 1 character.
+ */
+export function disableInlineCode(content: string): string {
+  return content.replace(/`/g, "\u00b4");
+}
+
+/**
+ * Disable code blocks in the given string by adding invisible unicode characters between backticks
+ */
+export function disableCodeBlocks(content: string): string {
+  return content.replace(/`/g, "`\u200b");
+}
+
+/**
+ * Disable bold in the given string by escaping the asterisks
+ */
+export function disableBold(content: string): string {
+  let i = 0;
+  return content.replace(/\*\*(\*)?/g, (_, match) => {
+    if (match) return ++i % 2 ? `${match}\\*\\*` : `\\*\\*${match}`;
+    return "\\*\\*";
+  });
+}
+
+>>>>>>> 67f0227a (the commmand now sends the nickname of the member when a nickname isnt provided)
 export function useMediaUrls(content: string): string {
   return content.replace(/cdn\.discord(app)?\.com/g, "media.discordapp.net");
 }

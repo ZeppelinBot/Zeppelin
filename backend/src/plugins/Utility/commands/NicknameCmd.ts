@@ -1,6 +1,7 @@
+import { Util } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { errorMessage } from "../../../utils";
+import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { utilityCmd } from "../types";
 
 export const NicknameCmd = utilityCmd({
@@ -15,22 +16,24 @@ export const NicknameCmd = utilityCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    if (!args.nickname) {
+      if (!args.member.nickname) {
+        msg.channel.send(`<@!${args.member.id}> does not have a nickname`);
+      } else {
+        msg.channel.send(`The nickname of <@!${args.member.id}> is **${Util.escapeBold(args.nickname)}**`);
+      }
+      return;
+    }
+
     if (msg.member.id !== args.member.id && !canActOn(pluginData, msg.member, args.member)) {
       msg.channel.send(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
 
-    if (!args.nickname && !args.member.nickname) {
-      msg.channel.send(errorMessage("User does not have a nickname"));
+    const nicknameLength = [...args.nickname].length;
+    if (nicknameLength < 2 || nicknameLength > 32) {
+      msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
       return;
-    }
-
-    if (args.nickname) {
-      const nicknameLength = [...args.nickname].length;
-      if (nicknameLength < 2 || nicknameLength > 32) {
-        msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
-        return;
-      }
     }
 
     const oldNickname = args.member.nickname || "<none>";
@@ -42,14 +45,10 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    if (args.nickname) {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
-        `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
-      );
-    } else {
-      sendSuccessMessage(pluginData, msg.channel, `The nickname of <@!${args.member.id}> has been reset`);
-    }
+    sendSuccessMessage(
+      pluginData,
+      msg.channel,
+      `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
+    );
   },
 });
