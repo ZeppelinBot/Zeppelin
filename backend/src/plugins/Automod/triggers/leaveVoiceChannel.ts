@@ -7,17 +7,23 @@ interface LeaveVoiceChannelResult {
 }
 
 export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>()({
-  configType: t.union([t.string, t.array(t.string)]),
+  configType: t.type({
+    channels: t.union([t.string, t.array(t.string)]),
+    include_moves: t.boolean,
+  }),
 
-  defaultConfig: "",
+  defaultConfig: {},
 
   async match({ triggerConfig, context }) {
     const matchedChannelId = context.voiceChannel?.left?.id;
-    if (!context.member || !matchedChannelId || context.voiceChannel?.joined) {
+    const includeMoves =
+      typeof triggerConfig === "object" && !Array.isArray(triggerConfig) && triggerConfig.include_moves;
+
+    if (!context.member || !matchedChannelId || (context.voiceChannel?.joined && !includeMoves)) {
       return;
     }
 
-    const triggerChannels = Array.isArray(triggerConfig) ? triggerConfig : [triggerConfig];
+    const triggerChannels = Array.isArray(triggerConfig.channels) ? triggerConfig.channels : [triggerConfig.channels];
     if (!triggerChannels.includes(matchedChannelId)) {
       return;
     }

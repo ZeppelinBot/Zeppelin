@@ -7,17 +7,23 @@ interface JoinVoiceChannelResult {
 }
 
 export const JoinVoiceChannelTrigger = automodTrigger<JoinVoiceChannelResult>()({
-  configType: t.union([t.string, t.array(t.string)]),
+  configType: t.type({
+    channels: t.union([t.string, t.array(t.string)]),
+    include_moves: t.boolean,
+  }),
 
-  defaultConfig: "",
+  defaultConfig: {},
 
   async match({ triggerConfig, context }) {
     const matchedChannelId = context.voiceChannel?.joined?.id;
-    if (!context.member || !matchedChannelId || context.voiceChannel?.left) {
+    const includeMoves =
+      typeof triggerConfig === "object" && !Array.isArray(triggerConfig) && triggerConfig.include_moves;
+
+    if (!context.member || !matchedChannelId || (context.voiceChannel?.left && !includeMoves)) {
       return;
     }
 
-    const triggerChannels = Array.isArray(triggerConfig) ? triggerConfig : [triggerConfig];
+    const triggerChannels = Array.isArray(triggerConfig.channels) ? triggerConfig.channels : [triggerConfig.channels];
     if (!triggerChannels.includes(matchedChannelId)) {
       return;
     }
