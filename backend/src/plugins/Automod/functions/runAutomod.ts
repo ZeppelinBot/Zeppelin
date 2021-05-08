@@ -78,7 +78,6 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     }
 
     if (matchResult) {
-      console.log("matchResult exists");
       for (const [actionName, actionConfig] of Object.entries(rule.actions)) {
         if (actionConfig == null || actionConfig === false) {
           continue;
