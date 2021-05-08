@@ -13,7 +13,7 @@ export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>(
 
   async match({ triggerConfig, context }) {
     const matchedChannelId = context.voiceChannel?.left?.id;
-    if (!context.member || !matchedChannelId) {
+    if (!context.member || !matchedChannelId || context.voiceChannel?.joined) {
       return;
     }
 

@@ -13,7 +13,7 @@ export const JoinVoiceChannelTrigger = automodTrigger<JoinVoiceChannelResult>()(
 
   async match({ triggerConfig, context }) {
     const matchedChannelId = context.voiceChannel?.joined?.id;
-    if (!context.member || !matchedChannelId) {
+    if (!context.member || !matchedChannelId || context.voiceChannel?.left) {
       return;
     }
 
