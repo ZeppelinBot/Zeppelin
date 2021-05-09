@@ -5,7 +5,7 @@ import { Message } from "eris";
 const { performance } = require("perf_hooks");
 
 export const PingCmd = utilityCmd({
-  trigger: "ping",
+  trigger: ["ping", "pong"],
   description: "Test the bot's ping to the Discord API",
   permission: "can_ping",
 
