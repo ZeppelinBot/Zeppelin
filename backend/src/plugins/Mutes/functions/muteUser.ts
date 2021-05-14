@@ -10,6 +10,7 @@ import {
   UserNotificationResult,
   resolveMember,
   UserNotificationMethod,
+  convertDelayStringToMS,
 } from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
 import { MemberOptions, TextChannel, User } from "eris";
@@ -37,8 +38,6 @@ export async function muteUser(
     throw new RecoverablePluginError(ERRORS.NO_MUTE_ROLE_IN_CONFIG);
   }
 
-  const timeUntilUnmute = muteTime ? humanizeDuration(muteTime) : "indefinite";
-
   // No mod specified -> mark Zeppelin as the mod
   if (!muteOptions.caseArgs?.modId) {
     muteOptions.caseArgs = muteOptions.caseArgs ?? {};
@@ -53,6 +52,13 @@ export async function muteUser(
 
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id, true); // Grab the fresh member so we don't have stale role info
   const config = pluginData.config.getMatchingConfig({ member, userId });
+
+  muteTime = muteTime !== undefined
+    ? muteTime
+    : config.default_duration
+    ? convertDelayStringToMS(config.default_duration)!
+    : undefined;
+  const timeUntilUnmute = muteTime ? humanizeDuration(muteTime) : "indefinite";
 
   let rolesToRestore: string[] = [];
   if (member) {
@@ -245,6 +251,7 @@ export async function muteUser(
 
   return {
     case: theCase,
+    timeUntilUnmute: timeUntilUnmute,
     notifyResult,
     updatedExistingMute: !!existingMute,
   };

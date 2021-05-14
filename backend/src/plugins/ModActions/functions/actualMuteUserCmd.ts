@@ -36,7 +36,6 @@ export async function actualMuteUserCmd(
     pp = msg.author;
   }
 
-  const timeUntilUnmute = args.time && humanizeDuration(args.time);
   const reason = args.reason ? formatReasonWithAttachments(args.reason, msg.attachments) : undefined;
 
   let muteResult: MuteResult;
@@ -77,16 +76,16 @@ export async function actualMuteUserCmd(
 
   // Confirm the action to the moderator
   let response;
-  if (args.time) {
+  if (muteResult.timeUntilUnmute) {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
         Updated **${user.username}#${user.discriminator}**'s
-        mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
+        mute to ${muteResult.timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
         Muted **${user.username}#${user.discriminator}**
-        for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
+        for ${muteResult.timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     }
   } else {
