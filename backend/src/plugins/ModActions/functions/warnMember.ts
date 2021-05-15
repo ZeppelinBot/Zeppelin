@@ -46,7 +46,7 @@ export async function warnMember(
       const failedMsg = await warnOptions.retryPromptChannel.createMessage(
         "Failed to message the user. Log the warning anyway?",
       );
-      const reply = await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]);
+      const reply = await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"], warnOptions.caseArgs?.modId);
       failedMsg.delete();
       if (!reply || reply.name === "❌") {
         return {
