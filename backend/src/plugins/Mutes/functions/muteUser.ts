@@ -251,7 +251,7 @@ export async function muteUser(
 
   return {
     case: theCase,
-    timeUntilUnmute: timeUntilUnmute,
+    timeUntilUnmute,
     notifyResult,
     updatedExistingMute: !!existingMute,
   };
