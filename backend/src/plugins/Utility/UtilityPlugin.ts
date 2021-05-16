@@ -38,6 +38,7 @@ import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { RoleInfoCmd } from "./commands/RoleInfoCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
+import { MemberCountCmd } from "./commands/MemberCountCmd";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -67,6 +68,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     jumbo_size: 128,
     can_avatar: false,
     info_on_single_result: true,
+    can_membercount: false,
   },
   overrides: [
     {
@@ -93,6 +95,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
         can_jumbo: true,
         can_avatar: true,
         can_source: true,
+        can_membercount: true,
       },
     },
     {
@@ -145,6 +148,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     SnowflakeInfoCmd,
     RoleInfoCmd,
     EmojiInfoCmd,
+    MemberCountCmd,
   ],
 
   onLoad(pluginData) {
