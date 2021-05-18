@@ -5,7 +5,7 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
 export const SetAntiraidCmd = guildCommand<AutomodPluginType>()({
-  trigger: "antiraid",
+  trigger: ["antiraid", "ar"],
   permission: "can_set_antiraid",
 
   signature: {
