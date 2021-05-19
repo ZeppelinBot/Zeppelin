@@ -1011,7 +1011,10 @@ export async function notifyUser(
       }
     } else if (method.type === "channel") {
       try {
-        await method.channel.createMessage(`<@!${user.id}> ${body}`);
+        await method.channel.createMessage({
+          content: `<@!${user.id}> ${body}`,
+          allowedMentions: { users: [user.id] },
+        });
         return {
           method,
           success: true,
