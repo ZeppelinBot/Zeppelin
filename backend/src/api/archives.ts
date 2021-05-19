@@ -30,6 +30,7 @@ export function initArchives(app: express.Express) {
     }
 
     res.setHeader("Content-Type", "text/plain; charset=UTF-8");
+    res.setHeader("X-Content-Type-Options", "nosniff");
     res.end(body);
   });
 }
