@@ -5,7 +5,7 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 
 export const ViewAntiraidCmd = guildCommand<AutomodPluginType>()({
-  trigger: "antiraid",
+  trigger: ["antiraid", "ar"],
   permission: "can_view_antiraid",
 
   async run({ pluginData, message }) {
