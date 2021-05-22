@@ -167,7 +167,7 @@ export function apiTokenAuthHandlers() {
   return [
     passport.authenticate("api-token", { failWithError: true }),
     (err, req: Request, res: Response, next) => {
-      return res.json({ error: err.message });
+      return res.status(401).json({ error: err.message });
     },
   ];
 }

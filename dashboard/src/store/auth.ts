@@ -71,6 +71,11 @@ export const AuthStore: Module<AuthState, RootState> = {
       await post("auth/logout");
       await dispatch("clearApiKey");
     },
+
+    async expiredLogin({ dispatch }) {
+      await dispatch("clearApiKey");
+      window.location.assign("/?error=expiredLogin");
+    },
   },
 
   mutations: {
