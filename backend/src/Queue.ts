@@ -8,10 +8,14 @@ const DEFAULT_TIMEOUT = 10 * SECONDS;
 export class Queue<TQueueFunction extends AnyFn = AnyFn> {
   protected running = false;
   protected queue: InternalQueueFn[] = [];
-  protected timeout: number;
+  protected _timeout: number;
 
   constructor(timeout = DEFAULT_TIMEOUT) {
-    this.timeout = timeout;
+    this._timeout = timeout;
+  }
+
+  get timeout(): number {
+    return this._timeout;
   }
 
   /**
@@ -49,7 +53,7 @@ export class Queue<TQueueFunction extends AnyFn = AnyFn> {
     new Promise(resolve => {
       // Either fn() completes or the timeout is reached
       void fn().then(resolve);
-      setTimeout(resolve, this.timeout);
+      setTimeout(resolve, this._timeout);
     }).then(() => this.next());
   }
 
