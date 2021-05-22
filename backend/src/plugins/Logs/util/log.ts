@@ -2,11 +2,16 @@ import { GuildPluginData } from "knub";
 import { LogsPluginType, TLogChannelMap } from "../types";
 import { LogType } from "../../../data/LogType";
 import { TextChannel } from "eris";
-import { createChunkedMessage, noop } from "../../../utils";
+import { createChunkedMessage, get, noop } from "../../../utils";
 import { getLogMessage } from "./getLogMessage";
 import { allowTimeout } from "../../../RegExpRunner";
 
 const excludedUserProps = ["user", "member", "mod"];
+const excludedRoleProps = ["message.member.roles", "member.roles"];
+
+function isRoleArray(value: any): value is string[] {
+  return Array.isArray(value);
+}
 
 export async function log(pluginData: GuildPluginData<LogsPluginType>, type: LogType, data: any) {
   const logChannels: TLogChannelMap = pluginData.config.get().channels;
@@ -32,6 +37,21 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         for (const prop of excludedUserProps) {
           if (data && data[prop] && data[prop].bot) {
             continue logChannelLoop;
+          }
+        }
+      }
+
+      if (opts.excluded_roles) {
+        for (const prop of excludedRoleProps) {
+          const roles = get(data, prop);
+          if (!isRoleArray(roles)) {
+            continue;
+          }
+
+          for (const role of roles) {
+            if (opts.excluded_roles.includes(role)) {
+              continue logChannelLoop;
+            }
           }
         }
       }
