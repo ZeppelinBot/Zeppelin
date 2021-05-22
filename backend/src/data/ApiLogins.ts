@@ -5,7 +5,9 @@ import crypto from "crypto";
 import moment from "moment-timezone";
 // tslint:disable-next-line:no-submodule-imports
 import uuidv4 from "uuid/v4";
-import { DBDateFormat } from "../utils";
+import { DAYS, DBDateFormat } from "../utils";
+
+const LOGIN_EXPIRY_TIME = 1 * DAYS;
 
 export class ApiLogins extends BaseRepository {
   private apiLogins: Repository<ApiLogin>;
@@ -68,7 +70,7 @@ export class ApiLogins extends BaseRepository {
       logged_in_at: moment.utc().format(DBDateFormat),
       expires_at: moment
         .utc()
-        .add(1, "day")
+        .add(LOGIN_EXPIRY_TIME, "ms")
         .format(DBDateFormat),
     });
 
@@ -83,6 +85,21 @@ export class ApiLogins extends BaseRepository {
       { id: loginId },
       {
         expires_at: moment.utc().format(DBDateFormat),
+      },
+    );
+  }
+
+  async refreshApiKeyExpiryTime(apiKey) {
+    const [loginId, token] = apiKey.split(".");
+    if (!loginId || !token) return;
+
+    await this.apiLogins.update(
+      { id: loginId },
+      {
+        expires_at: moment()
+          .utc()
+          .add(LOGIN_EXPIRY_TIME, "ms")
+          .format(DBDateFormat),
       },
     );
   }
