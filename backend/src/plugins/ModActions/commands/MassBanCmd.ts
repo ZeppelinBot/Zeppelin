@@ -54,10 +54,12 @@ export const MassbanCmd = modActionsCmd({
     }
 
     // Show a loading indicator since this can take a while
+    const maxWaitTime = pluginData.state.massbanQueue.timeout * pluginData.state.massbanQueue.length;
+    const maxWaitTimeFormatted = humanizeDurationShort(maxWaitTime);
     const initialLoadingText =
       pluginData.state.massbanQueue.length === 0
         ? "Banning..."
-        : "Massban queued. Waiting for previous massban to finish.";
+        : `Massban queued. Waiting for previous massban to finish (max wait ${maxWaitTimeFormatted}).`;
     const loadingMsg = await msg.channel.createMessage(initialLoadingText);
 
     const waitTimeStart = performance.now();
