@@ -45,26 +45,36 @@ export const ListDashboardPermsCmd = botControlCmd({
 
     // If we have user, always display which guilds they have permissions in (or only specified guild permissions)
     if (args.user) {
+      const userInfo = `**${args.user.username}#${args.user.discriminator}** (\`${args.user.id}\`)`;
+
       for (const assignment of existingUserAssignment!) {
         if (guild != null && assignment.guild_id !== args.guildId) continue;
-        finalMessage += `The user has the following permissions on server \`${
-          assignment.guild_id
-        }\`:\n${assignment.permissions.join("\n")}\n\n`;
+        const assignmentGuild = await pluginData.state.allowedGuilds.find(assignment.guild_id);
+        const guildName = assignmentGuild?.name ?? "Unknown";
+        const guildInfo = `**${guildName}** (\`${assignment.guild_id}\`)`;
+        finalMessage += `The user ${userInfo} has the following permissions on server ${guildInfo}:`;
+        finalMessage += `\n${assignment.permissions.join("\n")}\n\n`;
       }
 
       if (finalMessage === "") {
-        sendErrorMessage(pluginData, msg.channel, "The user has no assigned permissions on the specified server.");
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          `The user ${userInfo} has no assigned permissions on the specified server.`,
+        );
         return;
       }
       // Else display all users that have permissions on the specified guild
     } else if (guild) {
+      const guildInfo = `**${guild.name}** (\`${guild.id}\`)`;
+
       const existingGuildAssignment = await pluginData.state.apiPermissionAssignments.getByGuildId(guild.id);
       if (existingGuildAssignment.length === 0) {
-        sendErrorMessage(pluginData, msg.channel, "The server has no assigned permissions.");
+        sendErrorMessage(pluginData, msg.channel, `The server ${guildInfo} has no assigned permissions.`);
         return;
       }
 
-      finalMessage += `The server \`${guild.id}\` has the following assigned permissions:\n`; // Double \n for consistency with AddDashboardUserCmd
+      finalMessage += `The server ${guildInfo} has the following assigned permissions:\n`; // Double \n for consistency with AddDashboardUserCmd
       for (const assignment of existingGuildAssignment) {
         const user = await resolveUser(pluginData.client, assignment.target_id);
         finalMessage += `\n**${user.username}#${user.discriminator}**, \`${
