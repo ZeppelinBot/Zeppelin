@@ -34,7 +34,7 @@ import { Member, Message } from "eris";
 import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
-import { trimPluginDescription } from "../../utils";
+import { MINUTES, trimPluginDescription } from "../../utils";
 import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { GuildTempbans } from "../../data/GuildTempbans";
@@ -44,6 +44,7 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { updateCase } from "./functions/updateCase";
+import { Queue } from "../../Queue";
 
 const defaultOptions = {
   config: {
@@ -197,6 +198,9 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     state.unloaded = false;
     state.outdatedTempbansTimeout = null;
     state.ignoredEvents = [];
+    // Massbans can take a while depending on rate limits,
+    // so we're giving each massban 15 minutes to complete before launching the next massban
+    state.massbanQueue = new Queue(15 * MINUTES);
 
     state.events = new EventEmitter();
 
