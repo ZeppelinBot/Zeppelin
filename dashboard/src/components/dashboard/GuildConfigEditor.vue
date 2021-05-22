@@ -37,6 +37,8 @@
 
   import AceEditor from "vue2-ace-editor";
 
+  let editorKeybindListener;
+
   export default {
     components: {
       AceEditor,
@@ -62,10 +64,12 @@
       this.editableConfig = this.config || "";
       this.loading = false;
     },
-    beforeUnmount() {
-      if (this.shortcutKeydownListener) {
-        window.removeEventListener("keydown", this.shortcutKeydownListener);
+    beforeRouteLeave(to, from, next) {
+      if (editorKeybindListener) {
+        window.removeEventListener("keydown", editorKeybindListener);
+        editorKeybindListener = null;
       }
+      next();
     },
     data() {
       return {
@@ -77,7 +81,6 @@
         editorWidth: 900,
         editorHeight: 600,
         savedTimeout: null,
-        shortcutKeydownListener: null,
       };
     },
     computed: {
@@ -107,7 +110,12 @@
         const nonModKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.ctrlKey : ev.metaKey);
         const shortcutModifierPressed = (ev: KeyboardEvent) => modKeyPressed(ev) && !nonModKeyPressed(ev) && !ev.altKey;
 
-        this.shortcutKeydownListener = (ev: KeyboardEvent) => {
+        if (editorKeybindListener) {
+          // Make sure we clean up any potentially leftover event listeners
+          window.removeEventListener("keydown", editorKeybindListener);
+        }
+
+        editorKeybindListener = (ev: KeyboardEvent) => {
           if (shortcutModifierPressed(ev) && ev.key === "s") {
             ev.preventDefault();
             this.save();
@@ -120,7 +128,7 @@
             return;
           }
         };
-        window.addEventListener("keydown", this.shortcutKeydownListener);
+        window.addEventListener("keydown", editorKeybindListener);
 
         this.fitEditorToWindow();
       },
