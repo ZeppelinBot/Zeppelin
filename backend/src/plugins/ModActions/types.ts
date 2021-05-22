@@ -10,6 +10,7 @@ import { TextChannel } from "eris";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import Timeout = NodeJS.Timeout;
 import { EventEmitter } from "events";
+import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -72,6 +73,7 @@ export interface ModActionsPluginType extends BasePluginType {
     unloaded: boolean;
     outdatedTempbansTimeout: Timeout | null;
     ignoredEvents: IIgnoredEvent[];
+    massbanQueue: Queue;
 
     events: ModActionsEventEmitter;
   };
