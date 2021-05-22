@@ -30,6 +30,11 @@ function buildQueryString(params: QueryParamObject) {
 export function request(resource, fetchOpts: RequestInit = {}) {
   return fetch(`${apiUrl}/${resource}`, fetchOpts).then(async res => {
     if (!res.ok) {
+      if (res.status === 401) {
+        RootStore.dispatch("auth/expiredLogin");
+        return;
+      }
+
       const body = await res.json();
       throw new ApiError(res.statusText, body, res.status, res);
     }

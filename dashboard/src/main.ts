@@ -22,6 +22,7 @@ if (window.location.pathname !== "/") {
 
     const errorMessages = {
       noAccess: "No dashboard access. If you think this is a mistake, please contact your server owner.",
+      expiredLogin: "Dashboard login expired. Please log in again.",
     };
 
     const errorMessageElem = document.createElement("div");
