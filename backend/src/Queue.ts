@@ -14,6 +14,16 @@ export class Queue<TQueueFunction extends AnyFn = AnyFn> {
     this.timeout = timeout;
   }
 
+  /**
+   * The number of operations that are currently queued up or running.
+   * I.e. backlog (queue) + current running process, if any.
+   *
+   * If this is 0, queueing a function will run it as soon as possible.
+   */
+  get length(): number {
+    return this.queue.length + (this.running ? 1 : 0);
+  }
+
   public add(fn: TQueueFunction): Promise<void> {
     const promise = new Promise<void>(resolve => {
       this.queue.push(async () => {
