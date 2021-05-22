@@ -21,6 +21,7 @@ const LogChannel = t.partial({
   excluded_channels: t.array(t.string),
   excluded_categories: t.array(t.string),
   exclude_bots: t.boolean,
+  excluded_roles: t.array(t.string),
   format: tNullable(tLogFormats),
   timestamp_format: t.string,
   include_embed_timestamp: t.boolean,
