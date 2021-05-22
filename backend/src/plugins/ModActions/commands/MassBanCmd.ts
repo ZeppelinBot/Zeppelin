@@ -55,7 +55,7 @@ export const MassbanCmd = modActionsCmd({
 
     // Show a loading indicator since this can take a while
     const maxWaitTime = pluginData.state.massbanQueue.timeout * pluginData.state.massbanQueue.length;
-    const maxWaitTimeFormatted = humanizeDurationShort(maxWaitTime);
+    const maxWaitTimeFormatted = humanizeDurationShort(maxWaitTime, { round: true });
     const initialLoadingText =
       pluginData.state.massbanQueue.length === 0
         ? "Banning..."
@@ -64,7 +64,7 @@ export const MassbanCmd = modActionsCmd({
 
     const waitTimeStart = performance.now();
     const waitingInterval = setInterval(() => {
-      const waitTime = humanizeDurationShort(performance.now() - waitTimeStart);
+      const waitTime = humanizeDurationShort(performance.now() - waitTimeStart, { round: true });
       loadingMsg
         .edit(`Massban queued. Still waiting for previous massban to finish (waited ${waitTime}).`)
         .catch(() => clearInterval(waitingInterval));
@@ -117,7 +117,7 @@ export const MassbanCmd = modActionsCmd({
       }
 
       const totalTime = performance.now() - startTime;
-      const formattedTimeTaken = humanizeDurationShort(totalTime);
+      const formattedTimeTaken = humanizeDurationShort(totalTime, { round: true });
 
       // Clear loading indicator
       loadingMsg.delete().catch(noop);
