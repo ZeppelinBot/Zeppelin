@@ -1,7 +1,7 @@
 import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
+import { resolveUser, resolveMember, stripObjectToScalars, noop } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
@@ -50,22 +50,19 @@ export const MassbanCmd = modActionsCmd({
       }
     }
 
-    // Ignore automatic ban cases and logs for these users
-    // We'll create our own cases below and post a single "mass banned" log instead
-    args.userIds.forEach(userId => {
-      // Use longer timeouts since this can take a while
-      ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
-      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
-    });
-
     // Show a loading indicator since this can take a while
     const loadingMsg = await msg.channel.createMessage("Banning...");
 
     // Ban each user and count failed bans (if any)
     const failedBans: string[] = [];
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    for (const userId of args.userIds) {
+    for (const [i, userId] of args.userIds.entries()) {
       try {
+        // Ignore automatic ban cases and logs
+        // We create our own cases below and post a single "mass banned" log instead
+        ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
+        pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
+
         await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
 
         await casesPlugin.createCase({
@@ -80,10 +77,15 @@ export const MassbanCmd = modActionsCmd({
       } catch {
         failedBans.push(userId);
       }
+
+      // Send a status update every 10 bans
+      if ((i + 1) % 10 === 0) {
+        loadingMsg.edit(`Banning... ${i + 1}/${args.userIds.length}`).catch(noop);
+      }
     }
 
     // Clear loading indicator
-    loadingMsg.delete();
+    loadingMsg.delete().catch(noop);
 
     const successfulBanCount = args.userIds.length - failedBans.length;
     if (successfulBanCount === 0) {
