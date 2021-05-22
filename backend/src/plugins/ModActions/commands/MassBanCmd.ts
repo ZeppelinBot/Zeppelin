@@ -12,6 +12,8 @@ import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
+import { performance } from "perf_hooks";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
@@ -54,6 +56,7 @@ export const MassbanCmd = modActionsCmd({
     const loadingMsg = await msg.channel.createMessage("Banning...");
 
     // Ban each user and count failed bans (if any)
+    const startTime = performance.now();
     const failedBans: string[] = [];
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     for (const [i, userId] of args.userIds.entries()) {
@@ -84,6 +87,9 @@ export const MassbanCmd = modActionsCmd({
       }
     }
 
+    const totalTime = performance.now() - startTime;
+    const formattedTimeTaken = humanizeDurationShort(totalTime);
+
     // Clear loading indicator
     loadingMsg.delete().catch(noop);
 
@@ -103,10 +109,16 @@ export const MassbanCmd = modActionsCmd({
         sendSuccessMessage(
           pluginData,
           msg.channel,
-          `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`,
+          `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${failedBans.length} failed: ${failedBans.join(
+            " ",
+          )}`,
         );
       } else {
-        sendSuccessMessage(pluginData, msg.channel, `Banned ${successfulBanCount} users successfully`);
+        sendSuccessMessage(
+          pluginData,
+          msg.channel,
+          `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`,
+        );
       }
     }
   },
