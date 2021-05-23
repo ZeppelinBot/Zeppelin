@@ -169,8 +169,10 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   defaultOptions,
   configPreprocessor,
 
-  customOverrideMatcher(pluginData, criteria, matchParams) {
-    return criteria?.antiraid_level ? criteria.antiraid_level === pluginData.state.cachedAntiraidLevel : false;
+  customOverrideCriteriaFunctions: {
+    antiraid_level: (pluginData, matchParams, value) => {
+      return value ? value === pluginData.state.cachedAntiraidLevel : false;
+    },
   },
 
   // prettier-ignore
