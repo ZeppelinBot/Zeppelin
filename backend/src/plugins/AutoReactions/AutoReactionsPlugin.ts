@@ -48,10 +48,8 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
     AddReactionsEvt,
   ],
 
-  afterLoad(pluginData) {
-    const { state, guild } = pluginData;
-
-    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
-    state.autoReactions = GuildAutoReactions.getGuildInstance(guild.id);
+  beforeLoad(pluginData) {
+    pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
+    pluginData.state.autoReactions = GuildAutoReactions.getGuildInstance(pluginData.guild.id);
   },
 });
