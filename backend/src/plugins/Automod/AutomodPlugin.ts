@@ -152,7 +152,8 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
   return options;
 };
 
-export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod", {
+export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
+  name: "automod",
   showInDocs: true,
   info: pluginInfo,
 
@@ -181,22 +182,16 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
   commands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
 
-  async onLoad(pluginData) {
+  async beforeLoad(pluginData) {
     pluginData.state.queue = new Queue();
 
     pluginData.state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
 
     pluginData.state.recentActions = [];
-    pluginData.state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
 
     pluginData.state.recentSpam = [];
-    pluginData.state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
 
     pluginData.state.recentNicknameChanges = new Map();
-    pluginData.state.clearRecentNicknameChangesInterval = setInterval(
-      () => clearOldRecentNicknameChanges(pluginData),
-      30 * SECONDS,
-    );
 
     pluginData.state.ignoredRoleChanges = new Set();
 
@@ -207,16 +202,23 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     pluginData.state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
 
+    pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
+  },
+
+  async afterLoad(pluginData) {
+    pluginData.state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
+    pluginData.state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
+    pluginData.state.clearRecentNicknameChangesInterval = setInterval(
+      () => clearOldRecentNicknameChanges(pluginData),
+      30 * SECONDS,
+    );
+
     pluginData.state.onMessageCreateFn = message => runAutomodOnMessage(pluginData, message, false);
     pluginData.state.savedMessages.events.on("create", pluginData.state.onMessageCreateFn);
 
     pluginData.state.onMessageUpdateFn = message => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
 
-    pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
-  },
-
-  async onAfterLoad(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
     pluginData.state.onCounterTrigger = (name, triggerName, channelId, userId) => {
@@ -268,7 +270,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
     registerEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
   },
 
-  async onBeforeUnload(pluginData) {
+  async beforeUnload(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
     countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
@@ -278,9 +280,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()("automod",
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
     unregisterEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
-  },
 
-  async onUnload(pluginData) {
     pluginData.state.queue.clear();
 
     discardRegExpRunner(`guild-${pluginData.guild.id}`);

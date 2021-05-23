@@ -2,7 +2,8 @@ import { botControlCmd } from "../types";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { ApiPermissions } from "@shared/apiPermissions";
-import { resolveUser } from "../../../utils";
+import { resolveUser, UnknownUser } from "../../../utils";
+import { User } from "eris";
 
 export const ListDashboardUsersCmd = botControlCmd({
   trigger: ["list_dashboard_users"],

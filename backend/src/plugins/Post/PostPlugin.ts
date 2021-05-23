@@ -28,7 +28,8 @@ const defaultOptions: PluginOptions<PostPluginType> = {
   ],
 };
 
-export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()("post", {
+export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
+  name: "post",
   showInDocs: true,
   info: {
     prettyName: "Post",
@@ -49,7 +50,7 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()("post", {
       ScheduledPostsDeleteCmd,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
@@ -59,7 +60,7 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()("post", {
     scheduledPostLoop(pluginData);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     clearTimeout(pluginData.state.scheduledPostLoopTimeout);
   },
 });

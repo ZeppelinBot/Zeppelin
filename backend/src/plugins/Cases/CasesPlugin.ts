@@ -28,7 +28,8 @@ const defaultOptions = {
   },
 };
 
-export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
+export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
+  name: "cases",
   showInDocs: true,
   info: {
     prettyName: "Cases",
@@ -73,7 +74,7 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()("cases", {
     getCaseSummary: mapToPublicFn(getCaseSummary),
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     pluginData.state.logs = new GuildLogs(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);

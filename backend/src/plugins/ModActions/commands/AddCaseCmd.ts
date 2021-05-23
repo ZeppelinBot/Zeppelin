@@ -44,7 +44,7 @@ export const AddCaseCmd = modActionsCmd({
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
-      if (!hasPermission(pluginData, "can_act_as_other", { message: msg })) {
+      if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
         sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
         return;
       }

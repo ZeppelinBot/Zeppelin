@@ -32,7 +32,8 @@ const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   ],
 };
 
-export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()("time_and_date", {
+export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()({
+  name: "time_and_date",
   showInDocs: true,
   info: {
     prettyName: "Time and date",
@@ -59,7 +60,7 @@ export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()("t
     getDateFormat: mapToPublicFn(getDateFormat),
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     pluginData.state.memberTimezones = GuildMemberTimezones.getGuildInstance(pluginData.guild.id);
   },
 });

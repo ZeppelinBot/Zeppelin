@@ -12,7 +12,7 @@ import {
   UnknownUser,
 } from "./utils";
 import { GuildChannel, Member, TextChannel, User } from "eris";
-import { baseTypeConverters, baseTypeHelpers, CommandContext, TypeConversionError } from "knub";
+import { baseTypeConverters, baseCommandParameterTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import { getChannelIdFromMessageId } from "./data/getChannelIdFromMessageId";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
@@ -107,7 +107,7 @@ export const commandTypes = {
 };
 
 export const commandTypeHelpers = {
-  ...baseTypeHelpers,
+  ...baseCommandParameterTypeHelpers,
 
   delay: createTypeHelper<number>(commandTypes.delay),
   resolvedUser: createTypeHelper<Promise<User>>(commandTypes.resolvedUser),

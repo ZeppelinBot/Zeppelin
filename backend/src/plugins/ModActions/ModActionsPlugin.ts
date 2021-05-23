@@ -110,7 +110,8 @@ const defaultOptions = {
   ],
 };
 
-export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod_actions", {
+export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
+  name: "mod_actions",
   showInDocs: true,
   info: {
     prettyName: "Mod actions",
@@ -187,7 +188,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     },
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.mutes = GuildMutes.getGuildInstance(guild.id);
@@ -207,7 +208,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()("mod
     outdatedTempbansLoop(pluginData);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.unloaded = true;
     pluginData.state.events.removeAllListeners();
   },

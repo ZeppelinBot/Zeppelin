@@ -12,7 +12,8 @@ const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   },
 };
 
-export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType>()("welcome_message", {
+export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType>()({
+  name: "welcome_message",
   showInDocs: true,
   info: {
     prettyName: "Welcome message",
@@ -26,7 +27,7 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
     SendWelcomeMessageEvt,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);

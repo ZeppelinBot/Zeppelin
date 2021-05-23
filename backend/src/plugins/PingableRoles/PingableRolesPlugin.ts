@@ -20,7 +20,8 @@ const defaultOptions: PluginOptions<PingableRolesPluginType> = {
   ],
 };
 
-export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>()("pingable_roles", {
+export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>()({
+  name: "pingable_roles",
   showInDocs: true,
   info: {
     prettyName: "Pingable roles",
@@ -41,7 +42,7 @@ export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>(
     MessageCreateDisablePingableEvt,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.pingableRoles = GuildPingableRoles.getGuildInstance(guild.id);

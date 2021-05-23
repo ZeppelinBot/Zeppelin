@@ -1,5 +1,5 @@
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
-import { BasePluginType, globalEventListener, GlobalPluginData } from "knub";
+import { BasePluginType, typedGlobalEventListener, GlobalPluginData } from "knub";
 import * as t from "io-ts";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { Guild } from "eris";
@@ -21,16 +21,20 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
 /**
  * Global plugin to monitor if Zeppelin is invited to a non-whitelisted server, and leave it
  */
-export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorPluginType>()("guild_access_monitor", {
+export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorPluginType>()({
+  name: "guild_access_monitor",
   configSchema: t.type({}),
 
   events: [
-    globalEventListener<GuildAccessMonitorPluginType>()("guildAvailable", ({ pluginData, args: { guild } }) => {
-      checkGuild(pluginData, guild);
+    typedGlobalEventListener<GuildAccessMonitorPluginType>()({
+      event: "guildAvailable",
+      listener({ pluginData, args: { guild } }) {
+        checkGuild(pluginData, guild);
+      },
     }),
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     pluginData.state.allowedGuilds = new AllowedGuilds();
 
     for (const guild of pluginData.client.guilds.values()) {

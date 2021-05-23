@@ -1,7 +1,7 @@
-import { BasePluginType, guildCommand } from "knub";
+import { BasePluginType, typedGuildCommand } from "knub";
 
 export interface ChannelArchiverPluginType extends BasePluginType {
   state: {};
 }
 
-export const channelArchiverCmd = guildCommand<ChannelArchiverPluginType>();
+export const channelArchiverCmd = typedGuildCommand<ChannelArchiverPluginType>();

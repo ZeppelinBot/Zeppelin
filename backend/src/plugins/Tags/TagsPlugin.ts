@@ -51,7 +51,8 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
   ],
 };
 
-export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
+export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
+  name: "tags",
   showInDocs: true,
   info: {
     prettyName: "Tags",
@@ -96,7 +97,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
     return options;
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.archives = GuildArchives.getGuildInstance(guild.id);
@@ -232,7 +233,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()("tags", {
     }
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
     pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
   },

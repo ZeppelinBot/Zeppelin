@@ -1,4 +1,4 @@
-import { Member, Message, TextChannel, User } from "eris";
+import { GuildTextableChannel, Member, Message, TextChannel, User } from "eris";
 import { asSingleLine, isDiscordRESTError, UnknownUser } from "../../../utils";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { GuildPluginData } from "knub";
@@ -10,7 +10,6 @@ import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
-import { GuildMessage } from "knub/dist/helpers";
 
 /**
  * The actual function run by both !mute and !forcemute.
@@ -19,7 +18,7 @@ import { GuildMessage } from "knub/dist/helpers";
 export async function actualMuteUserCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
-  msg: GuildMessage,
+  msg: Message<GuildTextableChannel>,
   args: { time?: number; reason?: string; mod: Member; notify?: string; "notify-channel"?: TextChannel },
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
@@ -27,7 +26,7 @@ export async function actualMuteUserCmd(
   let pp: User | null = null;
 
   if (args.mod) {
-    if (!hasPermission(pluginData, "can_act_as_other", { message: msg })) {
+    if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
       sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
       return;
     }

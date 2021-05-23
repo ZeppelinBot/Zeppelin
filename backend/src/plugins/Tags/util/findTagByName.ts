@@ -8,7 +8,7 @@ export async function findTagByName(
   name: string,
   matchParams: ExtendedMatchParams = {},
 ): Promise<t.TypeOf<typeof Tag> | null> {
-  const config = pluginData.config.getMatchingConfig(matchParams);
+  const config = await pluginData.config.getMatchingConfig(matchParams);
 
   // Tag from a hardcoded category
   // Format: "category.tag"

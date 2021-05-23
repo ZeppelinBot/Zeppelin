@@ -54,7 +54,7 @@ export const BanCmd = modActionsCmd({
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
     if (args.mod) {
-      if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
+      if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id }))) {
         sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
         return;
       }
@@ -160,7 +160,8 @@ export const BanCmd = modActionsCmd({
       return;
     }
 
-    const deleteMessageDays = args["delete-days"] ?? pluginData.config.getForMessage(msg).ban_delete_message_days;
+    const deleteMessageDays =
+      args["delete-days"] ?? (await pluginData.config.getForMessage(msg)).ban_delete_message_days;
     const banResult = await banUserId(
       pluginData,
       user.id,

@@ -16,7 +16,8 @@ const defaultOptions: PluginOptions<AutoDeletePluginType> = {
   },
 };
 
-export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()("auto_delete", {
+export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
+  name: "auto_delete",
   showInDocs: true,
   info: {
     prettyName: "Auto-delete",
@@ -28,7 +29,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()("aut
   configSchema: ConfigSchema,
   defaultOptions,
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.guildSavedMessages = GuildSavedMessages.getGuildInstance(guild.id);
@@ -50,7 +51,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()("aut
     state.guildSavedMessages.events.on("deleteBulk", state.onMessageDeleteBulkFn);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.guildSavedMessages.events.off("create", pluginData.state.onMessageCreateFn);
     pluginData.state.guildSavedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
     pluginData.state.guildSavedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);

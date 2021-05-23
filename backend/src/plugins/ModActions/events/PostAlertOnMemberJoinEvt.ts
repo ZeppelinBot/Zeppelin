@@ -8,9 +8,9 @@ import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 /**
  * Show an alert if a member with prior notes joins the server
  */
-export const PostAlertOnMemberJoinEvt = modActionsEvt(
-  "guildMemberAdd",
-  async ({ pluginData, args: { guild, member } }) => {
+export const PostAlertOnMemberJoinEvt = modActionsEvt({
+  event: "guildMemberAdd",
+  async listener({ pluginData, args: { guild, member } }) {
     const config = pluginData.config.get();
 
     if (!config.alert_on_rejoin) return;
@@ -51,4 +51,4 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt(
       );
     }
   },
-);
+});

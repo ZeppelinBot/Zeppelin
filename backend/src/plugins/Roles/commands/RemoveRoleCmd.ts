@@ -27,7 +27,7 @@ export const RemoveRoleCmd = rolesCmd({
       return;
     }
 
-    const config = pluginData.config.getForMessage(msg);
+    const config = await pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
       sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
       return;

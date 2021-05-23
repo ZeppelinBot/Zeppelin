@@ -47,7 +47,8 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   ],
 };
 
-export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
+export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
+  name: "logs",
   showInDocs: true,
   info: {
     prettyName: "Logs",
@@ -84,7 +85,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     },
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.guildLogs = new GuildLogs(guild.id);
@@ -122,7 +123,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     state.regexRunner.on("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.guildLogs.removeListener("log", pluginData.state.logListener);
 
     pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);

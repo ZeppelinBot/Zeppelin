@@ -5,12 +5,13 @@ import { GuildInfoSaverPluginType } from "./types";
 import { MINUTES } from "../../utils";
 import * as t from "io-ts";
 
-export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()("guild_info_saver", {
+export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
+  name: "guild_info_saver",
   showInDocs: false,
 
   configSchema: t.type({}),
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.allowedGuilds = new AllowedGuilds();

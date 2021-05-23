@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { tNullable, tEmbed } from "../../utils";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildTags } from "../../data/GuildTags";
@@ -59,5 +59,5 @@ export interface TagsPluginType extends BasePluginType {
   };
 }
 
-export const tagsCmd = guildCommand<TagsPluginType>();
-export const tagsEvt = guildEventListener<TagsPluginType>();
+export const tagsCmd = typedGuildCommand<TagsPluginType>();
+export const tagsEvt = typedGuildEventListener<TagsPluginType>();

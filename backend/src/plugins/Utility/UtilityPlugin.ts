@@ -106,7 +106,8 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility", {
+export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
+  name: "utility",
   showInDocs: true,
   info: {
     prettyName: "Utility",
@@ -147,7 +148,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     EmojiInfoCmd,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
@@ -181,7 +182,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     }
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
 });

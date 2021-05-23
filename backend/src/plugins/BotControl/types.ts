@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable } from "../../utils";
-import { BasePluginType, globalCommand, globalEventListener } from "knub";
+import { BasePluginType, typedGlobalCommand, typedGlobalEventListener } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
@@ -23,5 +23,5 @@ export interface BotControlPluginType extends BasePluginType {
   };
 }
 
-export const botControlCmd = globalCommand<BotControlPluginType>();
-export const botControlEvt = globalEventListener<BotControlPluginType>();
+export const botControlCmd = typedGlobalCommand<BotControlPluginType>();
+export const botControlEvt = typedGlobalEventListener<BotControlPluginType>();

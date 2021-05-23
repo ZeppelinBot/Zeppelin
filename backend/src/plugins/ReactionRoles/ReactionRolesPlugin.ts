@@ -31,7 +31,8 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   ],
 };
 
-export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>()("reaction_roles", {
+export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>()({
+  name: "reaction_roles",
   showInDocs: true,
   info: {
     prettyName: "Reaction roles",
@@ -53,7 +54,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     AddReactionRoleEvt,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.reactionRoles = GuildReactionRoles.getGuildInstance(guild.id);
@@ -70,7 +71,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     }
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     if (pluginData.state.autoRefreshTimeout) {
       clearTimeout(pluginData.state.autoRefreshTimeout);
     }

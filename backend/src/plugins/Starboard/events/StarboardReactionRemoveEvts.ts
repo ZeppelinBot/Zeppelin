@@ -6,7 +6,7 @@ export const StarboardReactionRemoveEvt = starboardEvt({
 
   async listener(meta) {
     const boardLock = await meta.pluginData.locks.acquire(allStarboardsLock());
-    await meta.pluginData.state.starboardReactions.deleteStarboardReaction(meta.args.message.id, meta.args.member.id);
+    await meta.pluginData.state.starboardReactions.deleteStarboardReaction(meta.args.message.id, meta.args.userID);
     boardLock.unlock();
   },
 });

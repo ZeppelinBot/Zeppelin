@@ -5,7 +5,7 @@ import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function logCensor(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
   const member = pluginData.guild.members.get(savedMessage.user_id);
-  const config = pluginData.config.getMatchingConfig({
+  const config = await pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,
     member,

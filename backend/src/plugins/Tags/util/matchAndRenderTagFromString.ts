@@ -29,7 +29,7 @@ export async function matchAndRenderTagFromString(
   member: Member,
   extraMatchParams: ExtendedMatchParams = {},
 ): Promise<Result | null> {
-  const config = pluginData.config.getMatchingConfig({
+  const config = await pluginData.config.getMatchingConfig({
     ...extraMatchParams,
     member,
   });
