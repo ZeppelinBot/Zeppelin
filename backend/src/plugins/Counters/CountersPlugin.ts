@@ -146,7 +146,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
     ResetAllCounterValuesCmd,
   ],
 
-  async afterLoad(pluginData) {
+  async beforeLoad(pluginData) {
     pluginData.state.counters = new GuildCounters(pluginData.guild.id);
     pluginData.state.events = new EventEmitter();
     pluginData.state.counterTriggersByCounterId = new Map();
@@ -190,6 +190,10 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
 
     // Mark old/unused triggers to be deleted later
     await pluginData.state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
+  },
+
+  async afterLoad(pluginData) {
+    const config = pluginData.config.get();
 
     // Start decay timers
     pluginData.state.decayTimers = [];

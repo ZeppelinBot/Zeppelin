@@ -94,7 +94,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
     RoleAddCmd,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.cooldowns = new CooldownManager();
   },
 });

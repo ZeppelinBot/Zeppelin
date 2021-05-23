@@ -37,7 +37,7 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
     LoadDataEvt,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.persistedData = GuildPersistedData.getGuildInstance(guild.id);

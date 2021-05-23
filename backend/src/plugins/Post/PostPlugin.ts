@@ -50,13 +50,15 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
       ScheduledPostsDeleteCmd,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.scheduledPosts = GuildScheduledPosts.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+  },
 
+  afterLoad(pluginData) {
     scheduledPostLoop(pluginData);
   },
 

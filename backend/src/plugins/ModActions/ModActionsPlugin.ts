@@ -188,7 +188,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     },
   },
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.mutes = GuildMutes.getGuildInstance(guild.id);
@@ -204,7 +204,9 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     state.massbanQueue = new Queue(15 * MINUTES);
 
     state.events = new EventEmitter();
+  },
 
+  afterLoad(pluginData) {
     outdatedTempbansLoop(pluginData);
   },
 

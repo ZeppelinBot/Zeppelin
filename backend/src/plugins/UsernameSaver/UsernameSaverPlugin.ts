@@ -17,7 +17,7 @@ export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>(
     VoiceChannelJoinUpdateUsernameEvt,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.usernameHistory = new UsernameHistory();

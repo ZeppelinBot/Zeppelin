@@ -60,7 +60,7 @@ export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()({
     getDateFormat: mapToPublicFn(getDateFormat),
   },
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.memberTimezones = GuildMemberTimezones.getGuildInstance(pluginData.guild.id);
   },
 });

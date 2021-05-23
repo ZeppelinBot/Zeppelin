@@ -31,7 +31,7 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
 
   events: [VoiceChannelJoinEvt, VoiceChannelSwitchEvt, VoiceChannelLeaveEvt],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.errorCooldownManager = new CooldownManager();
   },
 });

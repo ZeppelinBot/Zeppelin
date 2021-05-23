@@ -27,7 +27,7 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
     SendWelcomeMessageEvt,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
