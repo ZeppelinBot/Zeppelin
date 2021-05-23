@@ -29,7 +29,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   configSchema: ConfigSchema,
   defaultOptions,
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.guildSavedMessages = GuildSavedMessages.getGuildInstance(guild.id);
@@ -40,6 +40,10 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
     state.nextDeletionTimeout = null;
 
     state.maxDelayWarningSent = false;
+  },
+
+  afterLoad(pluginData) {
+    const { state, guild } = pluginData;
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
     state.guildSavedMessages.events.on("create", state.onMessageCreateFn);
