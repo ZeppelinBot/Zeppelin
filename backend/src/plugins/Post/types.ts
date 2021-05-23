@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildCommand } from "knub";
+import { BasePluginType, typedGuildCommand } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -20,4 +20,4 @@ export interface PostPluginType extends BasePluginType {
   };
 }
 
-export const postCmd = guildCommand<PostPluginType>();
+export const postCmd = typedGuildCommand<PostPluginType>();

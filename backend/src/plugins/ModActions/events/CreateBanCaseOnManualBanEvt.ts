@@ -13,9 +13,9 @@ import { Case } from "../../../data/entities/Case";
  * Create a BAN case automatically when a user is banned manually.
  * Attempts to find the ban's details in the audit log.
  */
-export const CreateBanCaseOnManualBanEvt = modActionsEvt(
-  "guildBanAdd",
-  async ({ pluginData, args: { guild, user } }) => {
+export const CreateBanCaseOnManualBanEvt = modActionsEvt({
+  event: "guildBanAdd",
+  async listener({ pluginData, args: { guild, user } }) {
     if (isEventIgnored(pluginData, IgnoredEventType.Ban, user.id)) {
       clearIgnoredEvents(pluginData, IgnoredEventType.Ban, user.id);
       return;
@@ -39,7 +39,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
 
       mod = await resolveUser(pluginData.client, modId);
 
-      const config = mod instanceof UnknownUser ? pluginData.config.get() : pluginData.config.getForUser(mod);
+      const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
       if (config.create_cases_for_manual_actions) {
         reason = relevantAuditLogEntry.reason || "";
@@ -72,4 +72,4 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt(
 
     pluginData.state.events.emit("ban", user.id, reason);
   },
-);
+});

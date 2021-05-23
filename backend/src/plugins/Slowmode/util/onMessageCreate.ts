@@ -28,7 +28,11 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
 
   // Make sure this user is affected by the slowmode
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
-  const isAffected = hasPermission(pluginData, "is_affected", { channelId: channel.id, userId: msg.user_id, member });
+  const isAffected = await hasPermission(pluginData, "is_affected", {
+    channelId: channel.id,
+    userId: msg.user_id,
+    member,
+  });
   if (!isAffected) return thisMsgLock.unlock();
 
   // Make sure we have the appropriate permissions to manage this slowmode

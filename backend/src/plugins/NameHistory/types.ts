@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
 import { Queue } from "../../Queue";
@@ -18,5 +18,5 @@ export interface NameHistoryPluginType extends BasePluginType {
   };
 }
 
-export const nameHistoryCmd = guildCommand<NameHistoryPluginType>();
-export const nameHistoryEvt = guildEventListener<NameHistoryPluginType>();
+export const nameHistoryCmd = typedGuildCommand<NameHistoryPluginType>();
+export const nameHistoryEvt = typedGuildEventListener<NameHistoryPluginType>();

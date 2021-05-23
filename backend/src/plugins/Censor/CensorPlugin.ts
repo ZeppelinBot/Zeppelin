@@ -43,7 +43,8 @@ const defaultOptions: PluginOptions<CensorPluginType> = {
   ],
 };
 
-export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()("censor", {
+export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
+  name: "censor",
   showInDocs: true,
   info: {
     prettyName: "Censor",
@@ -57,7 +58,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()("censor", {
   configSchema: ConfigSchema,
   defaultOptions,
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.serverLogs = new GuildLogs(guild.id);
@@ -72,7 +73,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()("censor", {
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
 
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);

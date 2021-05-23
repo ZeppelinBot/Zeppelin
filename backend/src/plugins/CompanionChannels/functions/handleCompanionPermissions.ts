@@ -36,10 +36,10 @@ export async function handleCompanionPermissions(
   const permsToSet: Map<string, number> = new Map(); // channelId => permissions
 
   const oldChannelOptsArr: TCompanionChannelOpts[] = oldChannel
-    ? getCompanionChannelOptsForVoiceChannelId(pluginData, userId, oldChannel)
+    ? await getCompanionChannelOptsForVoiceChannelId(pluginData, userId, oldChannel)
     : [];
   const newChannelOptsArr: TCompanionChannelOpts[] = voiceChannel
-    ? getCompanionChannelOptsForVoiceChannelId(pluginData, userId, voiceChannel)
+    ? await getCompanionChannelOptsForVoiceChannelId(pluginData, userId, voiceChannel)
     : [];
 
   for (const oldChannelOpts of oldChannelOptsArr) {

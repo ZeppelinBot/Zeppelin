@@ -16,6 +16,6 @@ export const ReloadGlobalPluginsCmd = botControlCmd({
     setActiveReload((message.channel as TextChannel).guild?.id, message.channel.id);
     await message.channel.createMessage("Reloading global plugins...");
 
-    pluginData.getKnubInstance().reloadAllGlobalPlugins();
+    pluginData.getKnubInstance().reloadGlobalContext();
   },
 });

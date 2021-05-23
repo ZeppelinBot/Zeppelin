@@ -1,4 +1,4 @@
-import { guildCommand } from "knub";
+import { typedGuildCommand } from "knub";
 import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -10,7 +10,7 @@ import { setCounterValue } from "../functions/setCounterValue";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
 import { counterIdLock } from "../../../utils/lockNameHelpers";
 
-export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
+export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],
   permission: "can_reset_all",
 
@@ -19,7 +19,7 @@ export const ResetAllCounterValuesCmd = guildCommand<CountersPluginType>()({
   },
 
   async run({ pluginData, message, args }) {
-    const config = pluginData.config.getForMessage(message);
+    const config = await pluginData.config.getForMessage(message);
     const counter = config.counters[args.counterName];
     const counterId = pluginData.state.counterIds[args.counterName];
     if (!counter || !counterId) {

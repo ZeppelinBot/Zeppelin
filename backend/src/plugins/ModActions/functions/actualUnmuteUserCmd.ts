@@ -18,7 +18,7 @@ export async function actualUnmuteCmd(
   let pp: User | null = null;
 
   if (args.mod) {
-    if (!hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id })) {
+    if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id }))) {
       sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
       return;
     }

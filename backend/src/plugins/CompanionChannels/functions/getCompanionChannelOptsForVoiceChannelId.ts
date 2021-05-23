@@ -6,12 +6,12 @@ const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
   enabled: true,
 };
 
-export function getCompanionChannelOptsForVoiceChannelId(
+export async function getCompanionChannelOptsForVoiceChannelId(
   pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
   voiceChannel: VoiceChannel,
-): TCompanionChannelOpts[] {
-  const config = pluginData.config.getMatchingConfig({ userId, channelId: voiceChannel.id });
+): Promise<TCompanionChannelOpts[]> {
+  const config = await pluginData.config.getMatchingConfig({ userId, channelId: voiceChannel.id });
   return Object.values(config.entries)
     .filter(
       opts =>

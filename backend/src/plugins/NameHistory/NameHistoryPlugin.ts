@@ -21,7 +21,8 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
   ],
 };
 
-export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()("name_history", {
+export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
+  name: "name_history",
   showInDocs: false,
 
   configSchema: ConfigSchema,
@@ -38,7 +39,7 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()("n
     MessageCreateEvt,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.nicknameHistory = GuildNicknameHistory.getGuildInstance(guild.id);

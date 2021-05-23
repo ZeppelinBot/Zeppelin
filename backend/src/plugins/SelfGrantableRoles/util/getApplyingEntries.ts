@@ -1,11 +1,11 @@
 import { TSelfGrantableRoleEntry, SelfGrantableRolesPluginType } from "../types";
 import { GuildPluginData } from "knub";
 
-export function getApplyingEntries(
+export async function getApplyingEntries(
   pluginData: GuildPluginData<SelfGrantableRolesPluginType>,
   msg,
-): TSelfGrantableRoleEntry[] {
-  const config = pluginData.config.getForMessage(msg);
+): Promise<TSelfGrantableRoleEntry[]> {
+  const config = await pluginData.config.getForMessage(msg);
   return Object.entries(config.entries)
     .filter(
       ([k, e]) =>

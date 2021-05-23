@@ -1,17 +1,17 @@
-import { guildCommand } from "knub";
+import { typedGuildCommand } from "knub";
 import { CountersPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 
-export const CountersListCmd = guildCommand<CountersPluginType>()({
+export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters list", "counter list", "counters"],
   permission: "can_view",
 
   signature: {},
 
   async run({ pluginData, message, args }) {
-    const config = pluginData.config.getForMessage(message);
+    const config = await pluginData.config.getForMessage(message);
 
     const countersToShow = Array.from(Object.values(config.counters)).filter(c => c.can_view !== false);
     if (!countersToShow.length) {

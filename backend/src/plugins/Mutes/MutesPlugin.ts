@@ -61,7 +61,8 @@ const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
 let FIRST_CHECK_TIME = Date.now();
 const FIRST_CHECK_INCREMENT = 5 * 1000;
 
-export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
+export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
+  name: "mutes",
   showInDocs: true,
   info: {
     prettyName: "Mutes",
@@ -104,7 +105,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
     },
   },
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     pluginData.state.mutes = GuildMutes.getGuildInstance(pluginData.guild.id);
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
     pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
@@ -125,7 +126,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()("mutes", {
     }, firstCheckTime - Date.now());
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     clearInterval(pluginData.state.muteClearIntervalId);
     pluginData.state.events.removeAllListeners();
   },

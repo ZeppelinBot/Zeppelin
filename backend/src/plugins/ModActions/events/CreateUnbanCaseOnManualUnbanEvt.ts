@@ -13,9 +13,9 @@ import { Case } from "../../../data/entities/Case";
  * Create an UNBAN case automatically when a user is unbanned manually.
  * Attempts to find the unban's details in the audit log.
  */
-export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
-  "guildBanRemove",
-  async ({ pluginData, args: { guild, user } }) => {
+export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt({
+  event: "guildBanRemove",
+  async listener({ pluginData, args: { guild, user } }) {
     if (isEventIgnored(pluginData, IgnoredEventType.Unban, user.id)) {
       clearIgnoredEvents(pluginData, IgnoredEventType.Unban, user.id);
       return;
@@ -38,7 +38,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
 
       mod = await resolveUser(pluginData.client, modId);
 
-      const config = mod instanceof UnknownUser ? pluginData.config.get() : pluginData.config.getForUser(mod);
+      const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
       if (config.create_cases_for_manual_actions) {
         createdCase = await casesPlugin.createCase({
@@ -69,4 +69,4 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt(
 
     pluginData.state.events.emit("unban", user.id);
   },
-);
+});

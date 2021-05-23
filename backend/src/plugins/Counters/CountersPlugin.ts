@@ -106,7 +106,8 @@ const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => 
  * A single trigger can only trigger once per user/channel/in general, depending on how specific the counter is (e.g. a per-user trigger can only trigger once per user).
  * After being triggered, a trigger is "reset" if the counter value no longer matches the trigger (e.g. drops to 100 or below in the above example). After this, that trigger can be triggered again.
  */
-export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counters", {
+export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
+  name: "counters",
   showInDocs: true,
   info: {
     prettyName: "Counters",
@@ -145,7 +146,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
     ResetAllCounterValuesCmd,
   ],
 
-  async onLoad(pluginData) {
+  async afterLoad(pluginData) {
     pluginData.state.counters = new GuildCounters(pluginData.guild.id);
     pluginData.state.events = new EventEmitter();
     pluginData.state.counterTriggersByCounterId = new Map();
@@ -207,7 +208,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()("counter
     }
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     for (const interval of pluginData.state.decayTimers) {
       clearInterval(interval);
     }

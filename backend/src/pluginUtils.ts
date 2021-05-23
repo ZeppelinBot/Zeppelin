@@ -27,8 +27,12 @@ export function canActOn(pluginData: GuildPluginData<any>, member1: Member, memb
   return allowSameLevel ? ourLevel >= memberLevel : ourLevel > memberLevel;
 }
 
-export function hasPermission(pluginData: AnyPluginData<any>, permission: string, matchParams: ExtendedMatchParams) {
-  const config = pluginData.config.getMatchingConfig(matchParams);
+export async function hasPermission(
+  pluginData: AnyPluginData<any>,
+  permission: string,
+  matchParams: ExtendedMatchParams,
+) {
+  const config = await pluginData.config.getMatchingConfig(matchParams);
   return helpers.hasPermission(config, permission);
 }
 

@@ -7,7 +7,7 @@ import { addMessageToDeletionQueue } from "./addMessageToDeletionQueue";
 
 export async function onMessageCreate(pluginData: GuildPluginData<AutoDeletePluginType>, msg: SavedMessage) {
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
-  const config = pluginData.config.getMatchingConfig({ member, channelId: msg.channel_id });
+  const config = await pluginData.config.getMatchingConfig({ member, channelId: msg.channel_id });
   if (config.enabled) {
     let delay = convertDelayStringToMS(config.delay)!;
 

@@ -15,7 +15,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const channel = channelId ? (pluginData.guild.channels.get(channelId) as TextChannel) : null;
   const categoryId = channel?.parentID;
 
-  const config = pluginData.config.getMatchingConfig({
+  const config = await pluginData.config.getMatchingConfig({
     channelId,
     categoryId,
     userId,

@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildEventListener } from "knub";
+import { BasePluginType, typedGuildEventListener } from "knub";
 import { tNullable } from "../../utils";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -77,4 +77,4 @@ export interface SpamPluginType extends BasePluginType {
   };
 }
 
-export const spamEvt = guildEventListener<SpamPluginType>();
+export const spamEvt = typedGuildEventListener<SpamPluginType>();

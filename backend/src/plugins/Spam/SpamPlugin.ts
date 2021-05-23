@@ -42,7 +42,8 @@ const defaultOptions: PluginOptions<SpamPluginType> = {
   ],
 };
 
-export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()("spam", {
+export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
+  name: "spam",
   showInDocs: true,
   info: {
     prettyName: "Spam protection",
@@ -63,7 +64,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()("spam", {
     SpamVoiceSwitchEvt,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
@@ -81,7 +82,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()("spam", {
     state.savedMessages.events.on("create", state.onMessageCreateFn);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
   },
 });

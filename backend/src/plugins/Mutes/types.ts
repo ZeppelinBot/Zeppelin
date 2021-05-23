@@ -3,7 +3,7 @@ import { tNullable, UserNotificationMethod, UserNotificationResult } from "../..
 import { Mute } from "../../data/entities/Mute";
 import { Member } from "eris";
 import { Case } from "../../data/entities/Case";
-import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -78,5 +78,5 @@ export interface MuteOptions {
   isAutomodAction?: boolean;
 }
 
-export const mutesCmd = guildCommand<MutesPluginType>();
-export const mutesEvt = guildEventListener<MutesPluginType>();
+export const mutesCmd = typedGuildCommand<MutesPluginType>();
+export const mutesEvt = typedGuildEventListener<MutesPluginType>();
