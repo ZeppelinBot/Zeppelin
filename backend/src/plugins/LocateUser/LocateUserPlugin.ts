@@ -59,14 +59,16 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
     GuildBanRemoveAlertsEvt
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.alerts = GuildVCAlerts.getGuildInstance(guild.id);
     state.outdatedAlertsTimeout = null;
     state.usersWithAlerts = [];
     state.unloaded = false;
+  },
 
+  afterLoad(pluginData) {
     outdatedAlertsLoop(pluginData);
     fillActiveAlertsList(pluginData);
   },

@@ -40,7 +40,7 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     RemindersDeleteCmd,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.reminders = GuildReminders.getGuildInstance(guild.id);
@@ -48,6 +48,9 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     state.unloaded = false;
 
     state.postRemindersTimeout = null;
+  },
+
+  afterLoad(pluginData) {
     postDueRemindersLoop(pluginData);
   },
 

@@ -39,7 +39,7 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
     MessageCreateEvt,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.nicknameHistory = GuildNicknameHistory.getGuildInstance(guild.id);

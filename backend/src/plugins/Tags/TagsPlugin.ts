@@ -97,13 +97,19 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
     return options;
   },
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.tags = GuildTags.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+
+    state.tagFunctions = {};
+  },
+
+  afterLoad(pluginData) {
+    const { state, guild } = pluginData;
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);

@@ -58,13 +58,17 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
   configSchema: ConfigSchema,
   defaultOptions,
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.serverLogs = new GuildLogs(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
 
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+  },
+
+  afterLoad(pluginData) {
+    const { state, guild } = pluginData;
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);

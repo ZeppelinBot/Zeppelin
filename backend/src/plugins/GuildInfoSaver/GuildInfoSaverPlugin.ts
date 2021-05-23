@@ -11,13 +11,17 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
 
   configSchema: t.type({}),
 
+  beforeLoad(pluginData) {
+    pluginData.state.allowedGuilds = new AllowedGuilds();
+  },
+
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
-
-    state.allowedGuilds = new AllowedGuilds();
-
     updateGuildInfo(pluginData);
-    state.updateInterval = setInterval(() => updateGuildInfo(pluginData), 60 * MINUTES);
+    pluginData.state.updateInterval = setInterval(() => updateGuildInfo(pluginData), 60 * MINUTES);
+  },
+
+  beforeUnload(pluginData) {
+    clearInterval(pluginData.state.updateInterval);
   },
 });
 

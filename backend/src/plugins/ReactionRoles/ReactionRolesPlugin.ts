@@ -54,7 +54,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     AddReactionRoleEvt,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.reactionRoles = GuildReactionRoles.getGuildInstance(guild.id);
@@ -63,7 +63,9 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     state.roleChangeQueue = new Queue();
     state.pendingRoleChanges = new Map();
     state.pendingRefreshes = new Set();
+  },
 
+  afterLoad(pluginData) {
     let autoRefreshInterval = pluginData.config.get().auto_refresh_interval;
     if (autoRefreshInterval != null) {
       autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);

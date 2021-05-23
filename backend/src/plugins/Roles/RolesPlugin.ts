@@ -51,7 +51,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
     MassRemoveRoleCmd,
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);

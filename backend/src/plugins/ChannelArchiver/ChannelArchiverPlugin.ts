@@ -14,9 +14,5 @@ export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginTy
   // prettier-ignore
   commands: [
       ArchiveChannelCmd,
-  ],
-
-  afterLoad(pluginData) {
-    const { state, guild } = pluginData;
-  },
+  ]
 });

@@ -10,10 +10,12 @@ export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloade
 
   configSchema: t.type({}),
 
-  async afterLoad(pluginData) {
+  async beforeLoad(pluginData) {
     pluginData.state.guildConfigs = new Configs();
     pluginData.state.highestConfigId = await pluginData.state.guildConfigs.getHighestId();
+  },
 
+  afterLoad(pluginData) {
     reloadChangedGuilds(pluginData);
   },
 

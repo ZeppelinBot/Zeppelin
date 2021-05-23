@@ -35,9 +35,11 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
     }),
   ],
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.allowedGuilds = new AllowedGuilds();
+  },
 
+  afterLoad(pluginData) {
     for (const guild of pluginData.client.guilds.values()) {
       checkGuild(pluginData, guild);
     }
