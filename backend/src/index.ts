@@ -156,6 +156,7 @@ connect().then(async () => {
     restMode: true,
     compress: false,
     guildCreateTimeout: 0,
+    ratelimiterOffset: 150,
     // Disable mentions by default
     allowedMentions: {
       everyone: false,
