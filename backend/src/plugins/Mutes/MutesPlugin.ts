@@ -105,14 +105,16 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     },
   },
 
-  afterLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.mutes = GuildMutes.getGuildInstance(pluginData.guild.id);
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
     pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
 
     pluginData.state.events = new EventEmitter();
+  },
 
+  afterLoad(pluginData) {
     // Check for expired mutes every 5s
     const firstCheckTime = Math.max(Date.now(), FIRST_CHECK_TIME) + FIRST_CHECK_INCREMENT;
     FIRST_CHECK_TIME = firstCheckTime;
