@@ -54,6 +54,19 @@ const PluginOverrideCriteriaType: t.Type<PluginOverrideCriteria<unknown>> = t.re
     }),
 );
 
+const validTopLevelOverrideKeys = [
+  "channel",
+  "category",
+  "level",
+  "user",
+  "role",
+  "all",
+  "any",
+  "not",
+  "extra",
+  "config",
+];
+
 const BasicPluginStructureType = t.type({
   enabled: tNullable(t.boolean),
   config: tNullable(t.unknown),
@@ -74,7 +87,7 @@ export function getPluginConfigPreprocessor(
   blueprint: ZeppelinPlugin,
   customPreprocessor?: ZeppelinPlugin["configPreprocessor"],
 ) {
-  return async (options: PluginOptions<any>) => {
+  return async (options: PluginOptions<any>, strict?: boolean) => {
     // 1. Validate the basic structure of plugin config
     const basicOptionsValidation = validate(BasicPluginStructureType, options);
     if (basicOptionsValidation instanceof StrictValidationError) {
@@ -93,8 +106,32 @@ export function getPluginConfigPreprocessor(
 
     if (options.overrides) {
       for (const override of options.overrides) {
-        const partialOverrideConfigValidation = validate(partialConfigSchema, override.config || {});
-        if (partialOverrideConfigValidation) {
+        // Validate criteria and extra criteria
+        // FIXME: This is ugly
+        for (const key of Object.keys(override)) {
+          if (!validTopLevelOverrideKeys.includes(key)) {
+            if (strict) {
+              throw new ConfigValidationError(`Unknown override criterion '${key}'`);
+            }
+
+            delete override[key];
+          }
+        }
+        if (override.extra != null) {
+          for (const extraCriterion of Object.keys(override.extra)) {
+            if (!blueprint.customOverrideCriteriaFunctions?.[extraCriterion]) {
+              if (strict) {
+                throw new ConfigValidationError(`Unknown override extra criterion '${extraCriterion}'`);
+              }
+
+              delete override.extra[extraCriterion];
+            }
+          }
+        }
+
+        // Validate override config
+        const partialOverrideConfigValidation = decodeAndValidateStrict(partialConfigSchema, override.config || {});
+        if (partialOverrideConfigValidation instanceof StrictValidationError) {
           throw strictValidationErrorToConfigValidationError(partialOverrideConfigValidation);
         }
       }

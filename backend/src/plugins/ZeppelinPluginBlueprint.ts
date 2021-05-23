@@ -10,6 +10,8 @@ import {
 import * as t from "io-ts";
 import { getPluginConfigPreprocessor } from "../pluginUtils";
 import { TMarkdown } from "../types";
+import { Awaitable } from "knub/dist/utils";
+import { PluginOptions } from "knub/dist/config/configTypes";
 
 /**
  * GUILD PLUGINS
@@ -26,6 +28,11 @@ export interface ZeppelinGuildPluginBlueprint<TPluginData extends GuildPluginDat
     usageGuide?: TMarkdown;
     configurationGuide?: TMarkdown;
   };
+
+  configPreprocessor?: (
+    options: PluginOptions<TPluginData["_pluginType"]>,
+    strict?: boolean,
+  ) => Awaitable<PluginOptions<TPluginData["_pluginType"]>>;
 }
 
 export function zeppelinGuildPlugin<TBlueprint extends ZeppelinGuildPluginBlueprint>(
@@ -59,6 +66,7 @@ export function zeppelinGuildPlugin(...args) {
 export interface ZeppelinGlobalPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends GlobalPluginBlueprint<GlobalPluginData<TPluginType>> {
   configSchema: t.TypeC<any>;
+  configPreprocessor?: (options: PluginOptions<TPluginType>, strict?: boolean) => Awaitable<PluginOptions<TPluginType>>;
 }
 
 export function zeppelinGlobalPlugin<TBlueprint extends ZeppelinGlobalPluginBlueprint>(
