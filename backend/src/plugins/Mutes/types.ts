@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
+import { tDelayString, tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { Mute } from "../../data/entities/Mute";
 import { Member } from "eris";
 import { Case } from "../../data/entities/Case";
@@ -16,6 +16,7 @@ export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
   move_to_voice_channel: tNullable(t.string),
   kick_from_voice_channel: t.boolean,
+  default_duration: tNullable(tDelayString),
 
   dm_on_mute: t.boolean,
   dm_on_update: t.boolean,
@@ -64,6 +65,7 @@ export interface IMuteWithDetails extends Mute {
 
 export type MuteResult = {
   case: Case;
+  timeUntilUnmute: string;
   notifyResult: UserNotificationResult;
   updatedExistingMute: boolean;
 };
