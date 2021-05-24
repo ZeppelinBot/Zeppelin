@@ -5,6 +5,7 @@ import { TextChannel } from "eris";
 import { createChunkedMessage, get, noop } from "../../../utils";
 import { getLogMessage } from "./getLogMessage";
 import { allowTimeout } from "../../../RegExpRunner";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
@@ -42,6 +43,15 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       }
 
       if (opts.excluded_roles) {
+        if (data?.message instanceof SavedMessage) {
+          const member = pluginData.guild.members.get(data.message.user_id);
+          for (const role of member?.roles || []) {
+            if (opts.excluded_roles.includes(role)) {
+              continue logChannelLoop;
+            }
+          }
+        }
+
         for (const prop of excludedRoleProps) {
           const roles = get(data, prop);
           if (!isRoleArray(roles)) {
