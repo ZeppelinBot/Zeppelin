@@ -45,7 +45,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (opts.excluded_roles) {
         for (const value of Object.values(data || {})) {
           if (value instanceof SavedMessage) {
-            const member = pluginData.guild.members.get(data.message.user_id);
+            const member = pluginData.guild.members.get(value.user_id);
             for (const role of member?.roles || []) {
               if (opts.excluded_roles.includes(role)) {
                 continue logChannelLoop;
