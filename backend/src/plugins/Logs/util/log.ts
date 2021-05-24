@@ -43,11 +43,13 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       }
 
       if (opts.excluded_roles) {
-        if (data?.message instanceof SavedMessage) {
-          const member = pluginData.guild.members.get(data.message.user_id);
-          for (const role of member?.roles || []) {
-            if (opts.excluded_roles.includes(role)) {
-              continue logChannelLoop;
+        for (const value of Object.values(data || {})) {
+          if (value instanceof SavedMessage) {
+            const member = pluginData.guild.members.get(data.message.user_id);
+            for (const role of member?.roles || []) {
+              if (opts.excluded_roles.includes(role)) {
+                continue logChannelLoop;
+              }
             }
           }
         }
