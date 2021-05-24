@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildEventListener } from "knub";
+import { BasePluginType, typedGuildEventListener } from "knub";
 import { GuildPersistedData } from "../../data/GuildPersistedData";
 import { GuildLogs } from "../../data/GuildLogs";
 
@@ -19,4 +19,4 @@ export interface PersistPluginType extends BasePluginType {
   };
 }
 
-export const persistEvt = guildEventListener<PersistPluginType>();
+export const persistEvt = typedGuildEventListener<PersistPluginType>();

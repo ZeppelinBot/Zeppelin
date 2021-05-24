@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -51,5 +51,5 @@ export interface UtilityPluginType extends BasePluginType {
   };
 }
 
-export const utilityCmd = guildCommand<UtilityPluginType>();
-export const utilityEvt = guildEventListener<UtilityPluginType>();
+export const utilityCmd = typedGuildCommand<UtilityPluginType>();
+export const utilityEvt = typedGuildEventListener<UtilityPluginType>();

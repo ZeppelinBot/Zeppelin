@@ -59,7 +59,7 @@ export async function getLogMessage(
           member = await resolveMember(pluginData.client, pluginData.guild, user.id);
         }
 
-        const memberConfig = pluginData.config.getMatchingConfig({ member, userId: user.id }) || ({} as any);
+        const memberConfig = (await pluginData.config.getMatchingConfig({ member, userId: user.id })) || ({} as any);
 
         // Revert to old behavior (verbose name w/o ping if allow_user_mentions is enabled (for whatever reason))
         if (config.allow_user_mentions) {

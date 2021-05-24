@@ -13,7 +13,8 @@ const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   },
 };
 
-export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPluginType>()("self_grantable_roles", {
+export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPluginType>()({
+  name: "self_grantable_roles",
   showInDocs: true,
 
   configSchema: ConfigSchema,
@@ -93,7 +94,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
     RoleAddCmd,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.cooldowns = new CooldownManager();
   },
 });

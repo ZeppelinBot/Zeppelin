@@ -12,8 +12,8 @@ export async function applyBotSlowmodeToUserId(
 ) {
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
   const existingOverride = channel.permissionOverwrites.get(userId);
-  const newDeniedPermissions = (existingOverride ? existingOverride.deny : 0) | Constants.Permissions.sendMessages;
-  const newAllowedPermissions = (existingOverride ? existingOverride.allow : 0) & ~Constants.Permissions.sendMessages;
+  const newDeniedPermissions = (existingOverride ? existingOverride.deny : 0n) | Constants.Permissions.sendMessages;
+  const newAllowedPermissions = (existingOverride ? existingOverride.allow : 0n) & ~Constants.Permissions.sendMessages;
 
   try {
     await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");

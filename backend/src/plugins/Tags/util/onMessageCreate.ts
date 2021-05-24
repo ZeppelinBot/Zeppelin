@@ -18,7 +18,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
   if (!channel) return;
 
-  const config = pluginData.config.getMatchingConfig({
+  const config = await pluginData.config.getMatchingConfig({
     member,
     channelId: msg.channel_id,
     categoryId: channel.parentID,

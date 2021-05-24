@@ -26,7 +26,8 @@ const defaultOptions: PluginOptions<StarboardPluginType> = {
   ],
 };
 
-export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starboard", {
+export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
+  name: "starboard",
   showInDocs: true,
 
   configSchema: ConfigSchema,
@@ -145,18 +146,22 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()("starb
       StarboardReactionRemoveAllEvt,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.starboardMessages = GuildStarboardMessages.getGuildInstance(guild.id);
     state.starboardReactions = GuildStarboardReactions.getGuildInstance(guild.id);
+  },
+
+  afterLoad(pluginData) {
+    const { state } = pluginData;
 
     state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
   },
 });

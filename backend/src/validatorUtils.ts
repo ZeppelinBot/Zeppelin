@@ -111,7 +111,11 @@ export function validate(schema: t.Type<any>, value: any): StrictValidationError
  * Decodes and validates the given value against the given schema while also disallowing extra properties
  * See: https://github.com/gcanti/io-ts/issues/322
  */
-export function decodeAndValidateStrict<T extends t.HasProps>(schema: T, value: any): StrictValidationError | any {
+export function decodeAndValidateStrict<T extends t.HasProps>(
+  schema: T,
+  value: any,
+  debug = false,
+): StrictValidationError | any {
   const validationResult = t.exact(schema).decode(value);
   return pipe(
     validationResult,
@@ -119,6 +123,14 @@ export function decodeAndValidateStrict<T extends t.HasProps>(schema: T, value: 
       err => report(validationResult),
       result => {
         // Make sure there are no extra properties
+        if (debug)
+          console.log(
+            "JSON.stringify() check:",
+            JSON.stringify(value) === JSON.stringify(result)
+              ? "they are the same, no excess"
+              : "they are not the same, might have excess",
+            result,
+          );
         if (JSON.stringify(value) !== JSON.stringify(result)) {
           const diff = deepDiff(result, value);
           const errors = diff.filter(d => d.kind === "N").map(d => `Unknown property <${d.path.join(".")}>`);

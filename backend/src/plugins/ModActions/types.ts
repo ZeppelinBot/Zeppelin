@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
-import { BasePluginType, guildCommand, guildEventListener } from "knub";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -10,6 +10,7 @@ import { TextChannel } from "eris";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import Timeout = NodeJS.Timeout;
 import { EventEmitter } from "events";
+import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -72,6 +73,7 @@ export interface ModActionsPluginType extends BasePluginType {
     unloaded: boolean;
     outdatedTempbansTimeout: Timeout | null;
     ignoredEvents: IIgnoredEvent[];
+    massbanQueue: Queue;
 
     events: ModActionsEventEmitter;
   };
@@ -146,5 +148,5 @@ export interface BanOptions {
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
 
-export const modActionsCmd = guildCommand<ModActionsPluginType>();
-export const modActionsEvt = guildEventListener<ModActionsPluginType>();
+export const modActionsCmd = typedGuildCommand<ModActionsPluginType>();
+export const modActionsEvt = typedGuildEventListener<ModActionsPluginType>();

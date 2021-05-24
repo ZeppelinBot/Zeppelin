@@ -4,23 +4,23 @@ import { Configs } from "../../data/Configs";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds";
 import * as t from "io-ts";
 
-export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloaderPluginType>()(
-  "guild_config_reloader",
-  {
-    showInDocs: false,
+export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloaderPluginType>()({
+  name: "guild_config_reloader",
+  showInDocs: false,
 
-    configSchema: t.type({}),
+  configSchema: t.type({}),
 
-    async onLoad(pluginData) {
-      pluginData.state.guildConfigs = new Configs();
-      pluginData.state.highestConfigId = await pluginData.state.guildConfigs.getHighestId();
-
-      reloadChangedGuilds(pluginData);
-    },
-
-    onUnload(pluginData) {
-      clearTimeout(pluginData.state.nextCheckTimeout);
-      pluginData.state.unloaded = true;
-    },
+  async beforeLoad(pluginData) {
+    pluginData.state.guildConfigs = new Configs();
+    pluginData.state.highestConfigId = await pluginData.state.guildConfigs.getHighestId();
   },
-);
+
+  afterLoad(pluginData) {
+    reloadChangedGuilds(pluginData);
+  },
+
+  beforeUnload(pluginData) {
+    clearTimeout(pluginData.state.nextCheckTimeout);
+    pluginData.state.unloaded = true;
+  },
+});

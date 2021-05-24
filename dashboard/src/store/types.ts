@@ -7,9 +7,13 @@ export enum LoadStatus {
   Done,
 }
 
+export type TimeoutType = ReturnType<typeof setTimeout>;
+export type IntervalType = ReturnType<typeof setInterval>;
+
 export interface AuthState {
   apiKey: string | null;
   loadedInitialAuth: boolean;
+  authRefreshInterval: IntervalType | null;
 }
 
 export interface GuildState {

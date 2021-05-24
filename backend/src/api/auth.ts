@@ -86,6 +86,7 @@ export function initAuth(app: express.Express) {
 
       const userId = await apiLogins.getUserIdByApiKey(apiKey);
       if (userId) {
+        void apiLogins.refreshApiKeyExpiryTime(apiKey); // Refresh expiry time in the background
         return cb(null, { apiKey, userId });
       }
 
@@ -154,13 +155,19 @@ export function initAuth(app: express.Express) {
     await apiLogins.expireApiKey(req.user!.apiKey);
     return ok(res);
   });
+
+  // API route to refresh the given API token's expiry time
+  // The actual refreshing happens in the api-token passport strategy above, so we just return 200 OK here
+  app.post("/auth/refresh", ...apiTokenAuthHandlers(), (req, res) => {
+    return ok(res);
+  });
 }
 
 export function apiTokenAuthHandlers() {
   return [
     passport.authenticate("api-token", { failWithError: true }),
     (err, req: Request, res: Response, next) => {
-      return res.json({ error: err.message });
+      return res.status(401).json({ error: err.message });
     },
   ];
 }

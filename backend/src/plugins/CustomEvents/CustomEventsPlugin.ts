@@ -1,6 +1,6 @@
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, CustomEventsPluginType } from "./types";
-import { guildCommand, parseSignature } from "knub";
+import { typedGuildCommand, parseSignature } from "knub";
 import { commandTypes } from "../../commandTypes";
 import { stripObjectToScalars } from "../../utils";
 import { runEvent } from "./functions/runEvent";
@@ -11,18 +11,19 @@ const defaultOptions = {
   },
 };
 
-export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()("custom_events", {
+export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()({
+  name: "custom_events",
   showInDocs: false,
 
   configSchema: ConfigSchema,
   defaultOptions,
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     const config = pluginData.config.get();
     for (const [key, event] of Object.entries(config.events)) {
       if (event.trigger.type === "command") {
         const signature = event.trigger.params ? parseSignature(event.trigger.params, commandTypes) : {};
-        const eventCommand = guildCommand({
+        const eventCommand = typedGuildCommand({
           trigger: event.trigger.name,
           permission: `events.${key}.trigger.can_use`,
           signature,
@@ -36,7 +37,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
     }
   },
 
-  onUnload() {
+  beforeUnload() {
     // TODO: Run clearTriggers() once we actually have something there
   },
 });

@@ -55,7 +55,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
     }
 
     // Remove the reaction after a small delay
-    const config = pluginData.config.getForMember(member);
+    const config = await pluginData.config.getForMember(member);
     if (config.remove_user_reactions) {
       setTimeout(() => {
         pluginData.state.reactionRemoveQueue.add(async () => {

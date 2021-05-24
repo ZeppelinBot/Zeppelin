@@ -23,7 +23,8 @@ const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   ],
 };
 
-export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>()("auto_reactions", {
+export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>()({
+  name: "auto_reactions",
   showInDocs: true,
   info: {
     prettyName: "Auto-reactions",
@@ -47,10 +48,8 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
     AddReactionsEvt,
   ],
 
-  onLoad(pluginData) {
-    const { state, guild } = pluginData;
-
-    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
-    state.autoReactions = GuildAutoReactions.getGuildInstance(guild.id);
+  beforeLoad(pluginData) {
+    pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
+    pluginData.state.autoReactions = GuildAutoReactions.getGuildInstance(pluginData.guild.id);
   },
 });

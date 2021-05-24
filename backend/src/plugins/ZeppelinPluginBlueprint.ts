@@ -1,15 +1,17 @@
 import {
   BasePluginType,
-  globalPlugin,
+  typedGlobalPlugin,
   GlobalPluginBlueprint,
   GlobalPluginData,
-  guildPlugin,
+  typedGuildPlugin,
   GuildPluginBlueprint,
   GuildPluginData,
 } from "knub";
 import * as t from "io-ts";
 import { getPluginConfigPreprocessor } from "../pluginUtils";
 import { TMarkdown } from "../types";
+import { Awaitable } from "knub/dist/utils";
+import { PluginOptions } from "knub/dist/config/configTypes";
 
 /**
  * GUILD PLUGINS
@@ -26,27 +28,29 @@ export interface ZeppelinGuildPluginBlueprint<TPluginData extends GuildPluginDat
     usageGuide?: TMarkdown;
     configurationGuide?: TMarkdown;
   };
+
+  configPreprocessor?: (
+    options: PluginOptions<TPluginData["_pluginType"]>,
+    strict?: boolean,
+  ) => Awaitable<PluginOptions<TPluginData["_pluginType"]>>;
 }
 
-export function zeppelinGuildPlugin<TPartialBlueprint extends Omit<ZeppelinGuildPluginBlueprint, "name">>(
-  name: string,
-  blueprint: TPartialBlueprint,
-): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinGuildPluginBlueprint["configPreprocessor"] };
+export function zeppelinGuildPlugin<TBlueprint extends ZeppelinGuildPluginBlueprint>(
+  blueprint: TBlueprint,
+): TBlueprint & { configPreprocessor: ZeppelinGuildPluginBlueprint["configPreprocessor"] };
 
 export function zeppelinGuildPlugin<TPluginType extends BasePluginType>(): <
-  TPartialBlueprint extends Omit<ZeppelinGuildPluginBlueprint<GuildPluginData<TPluginType>>, "name">
+  TBlueprint extends ZeppelinGuildPluginBlueprint<GuildPluginData<TPluginType>>
 >(
-  name: string,
-  blueprint: TPartialBlueprint,
-) => TPartialBlueprint & {
-  name: string;
+  blueprint: TBlueprint,
+) => TBlueprint & {
   configPreprocessor: ZeppelinGuildPluginBlueprint<GuildPluginData<TPluginType>>["configPreprocessor"];
 };
 
 export function zeppelinGuildPlugin(...args) {
   if (args.length) {
-    const blueprint = (guildPlugin(
-      ...(args as Parameters<typeof guildPlugin>),
+    const blueprint = (typedGuildPlugin(
+      ...(args as Parameters<typeof typedGuildPlugin>),
     ) as unknown) as ZeppelinGuildPluginBlueprint;
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
@@ -62,28 +66,27 @@ export function zeppelinGuildPlugin(...args) {
 export interface ZeppelinGlobalPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends GlobalPluginBlueprint<GlobalPluginData<TPluginType>> {
   configSchema: t.TypeC<any>;
+  configPreprocessor?: (options: PluginOptions<TPluginType>, strict?: boolean) => Awaitable<PluginOptions<TPluginType>>;
 }
 
-export function zeppelinGlobalPlugin<TPartialBlueprint extends Omit<ZeppelinGlobalPluginBlueprint, "name">>(
-  name: string,
-  blueprint: TPartialBlueprint,
-): TPartialBlueprint & { name: string; configPreprocessor: ZeppelinGlobalPluginBlueprint["configPreprocessor"] };
+export function zeppelinGlobalPlugin<TBlueprint extends ZeppelinGlobalPluginBlueprint>(
+  blueprint: TBlueprint,
+): TBlueprint & { configPreprocessor: ZeppelinGlobalPluginBlueprint["configPreprocessor"] };
 
 export function zeppelinGlobalPlugin<TPluginType extends BasePluginType>(): <
-  TPartialBlueprint extends Omit<ZeppelinGlobalPluginBlueprint<TPluginType>, "name">
+  TBlueprint extends ZeppelinGlobalPluginBlueprint<TPluginType>
 >(
-  name: string,
-  blueprint: TPartialBlueprint,
-) => TPartialBlueprint & {
-  name: string;
+  blueprint: TBlueprint,
+) => TBlueprint & {
   configPreprocessor: ZeppelinGlobalPluginBlueprint<TPluginType>["configPreprocessor"];
 };
 
 export function zeppelinGlobalPlugin(...args) {
   if (args.length) {
-    const blueprint = (globalPlugin(
-      ...(args as Parameters<typeof globalPlugin>),
+    const blueprint = (typedGlobalPlugin(
+      ...(args as Parameters<typeof typedGlobalPlugin>),
     ) as unknown) as ZeppelinGlobalPluginBlueprint;
+    // @ts-ignore FIXME: Check the types here
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
   } else {

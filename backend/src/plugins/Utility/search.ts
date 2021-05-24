@@ -145,7 +145,7 @@ export async function displaySearch(
 
     const searchMsg = await searchMsgPromise;
 
-    const cfg = pluginData.config.getForUser(msg.author);
+    const cfg = await pluginData.config.getForUser(msg.author);
     if (cfg.info_on_single_result && searchResult.totalResults === 1) {
       const embed = await getUserInfoEmbed(pluginData, searchResult.results[0].id, false);
       if (embed) {

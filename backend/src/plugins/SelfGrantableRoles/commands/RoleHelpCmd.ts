@@ -7,7 +7,7 @@ export const RoleHelpCmd = selfGrantableRolesCmd({
   permission: null,
 
   async run({ message: msg, pluginData }) {
-    const applyingEntries = getApplyingEntries(pluginData, msg);
+    const applyingEntries = await getApplyingEntries(pluginData, msg);
     if (applyingEntries.length === 0) return;
 
     const allPrimaryAliases: string[] = [];

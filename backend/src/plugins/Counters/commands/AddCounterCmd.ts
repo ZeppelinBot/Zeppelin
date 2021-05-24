@@ -1,4 +1,4 @@
-import { guildCommand } from "knub";
+import { typedGuildCommand } from "knub";
 import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
@@ -7,7 +7,7 @@ import { TextChannel, User } from "eris";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
 
-export const AddCounterCmd = guildCommand<CountersPluginType>()({
+export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters add", "counter add", "addcounter"],
   permission: "can_edit",
 
@@ -41,7 +41,7 @@ export const AddCounterCmd = guildCommand<CountersPluginType>()({
   ],
 
   async run({ pluginData, message, args }) {
-    const config = pluginData.config.getForMessage(message);
+    const config = await pluginData.config.getForMessage(message);
     const counter = config.counters[args.counterName];
     const counterId = pluginData.state.counterIds[args.counterName];
     if (!counter || !counterId) {

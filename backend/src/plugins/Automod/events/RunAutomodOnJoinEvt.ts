@@ -1,11 +1,11 @@
-import { guildEventListener } from "knub";
+import { typedGuildEventListener } from "knub";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { runAutomod } from "../functions/runAutomod";
 import { RecentActionType } from "../constants";
 
-export const RunAutomodOnJoinEvt = guildEventListener<AutomodPluginType>()(
-  "guildMemberAdd",
-  ({ pluginData, args: { member } }) => {
+export const RunAutomodOnJoinEvt = typedGuildEventListener<AutomodPluginType>()({
+  event: "guildMemberAdd",
+  listener({ pluginData, args: { member } }) {
     const context: AutomodContext = {
       timestamp: Date.now(),
       user: member.user,
@@ -24,4 +24,4 @@ export const RunAutomodOnJoinEvt = guildEventListener<AutomodPluginType>()(
       runAutomod(pluginData, context);
     });
   },
-);
+});

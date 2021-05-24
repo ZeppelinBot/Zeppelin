@@ -14,9 +14,9 @@ import { Case } from "../../../data/entities/Case";
  * Create a KICK case automatically when a user is kicked manually.
  * Attempts to find the kick's details in the audit log.
  */
-export const CreateKickCaseOnManualKickEvt = modActionsEvt(
-  "guildMemberRemove",
-  async ({ pluginData, args: { member } }) => {
+export const CreateKickCaseOnManualKickEvt = modActionsEvt({
+  event: "guildMemberRemove",
+  async listener({ pluginData, args: { member } }) {
     if (isEventIgnored(pluginData, IgnoredEventType.Kick, member.id)) {
       clearIgnoredEvents(pluginData, IgnoredEventType.Kick, member.id);
       return;
@@ -42,7 +42,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
       } else {
         mod = await resolveUser(pluginData.client, kickAuditLogEntry.user.id);
 
-        const config = mod instanceof UnknownUser ? pluginData.config.get() : pluginData.config.getForUser(mod);
+        const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
         if (config.create_cases_for_manual_actions) {
           const casesPlugin = pluginData.getPlugin(CasesPlugin);
@@ -67,4 +67,4 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt(
       pluginData.state.events.emit("kick", member.id, kickAuditLogEntry.reason || undefined);
     }
   },
-);
+});

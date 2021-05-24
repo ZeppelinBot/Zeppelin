@@ -13,6 +13,7 @@ export async function getCaseEmbed(
   pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
   requestMemberId?: string,
+  noOriginalCaseLink?: boolean,
 ): Promise<AdvancedMessageContent> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) {
@@ -98,7 +99,7 @@ export async function getCaseEmbed(
     });
   }
 
-  if (theCase.log_message_id) {
+  if (theCase.log_message_id && noOriginalCaseLink !== false) {
     const [channelId, messageId] = theCase.log_message_id.split("-");
     const link = messageLink(pluginData.guild.id, channelId, messageId);
     embed.fields.push({

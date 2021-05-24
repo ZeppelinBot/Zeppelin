@@ -29,7 +29,7 @@ export const InfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     const value = args.value || message.author.id;
-    const userCfg = pluginData.config.getMatchingConfig({
+    const userCfg = await pluginData.config.getMatchingConfig({
       member: message.member,
       channelId: message.channel.id,
       message,

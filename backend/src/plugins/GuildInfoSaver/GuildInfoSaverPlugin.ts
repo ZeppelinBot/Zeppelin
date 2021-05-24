@@ -5,18 +5,23 @@ import { GuildInfoSaverPluginType } from "./types";
 import { MINUTES } from "../../utils";
 import * as t from "io-ts";
 
-export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()("guild_info_saver", {
+export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
+  name: "guild_info_saver",
   showInDocs: false,
 
   configSchema: t.type({}),
 
-  onLoad(pluginData) {
-    const { state, guild } = pluginData;
+  beforeLoad(pluginData) {
+    pluginData.state.allowedGuilds = new AllowedGuilds();
+  },
 
-    state.allowedGuilds = new AllowedGuilds();
-
+  afterLoad(pluginData) {
     updateGuildInfo(pluginData);
-    state.updateInterval = setInterval(() => updateGuildInfo(pluginData), 60 * MINUTES);
+    pluginData.state.updateInterval = setInterval(() => updateGuildInfo(pluginData), 60 * MINUTES);
+  },
+
+  beforeUnload(pluginData) {
+    clearInterval(pluginData.state.updateInterval);
   },
 });
 

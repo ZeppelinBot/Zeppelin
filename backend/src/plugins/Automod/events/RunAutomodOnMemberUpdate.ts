@@ -1,13 +1,13 @@
-import { guildEventListener } from "knub";
+import { typedGuildEventListener } from "knub";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { RecentActionType } from "../constants";
 import { runAutomod } from "../functions/runAutomod";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 
-export const RunAutomodOnMemberUpdate = guildEventListener<AutomodPluginType>()(
-  "guildMemberUpdate",
-  ({ pluginData, args: { member, oldMember } }) => {
+export const RunAutomodOnMemberUpdate = typedGuildEventListener<AutomodPluginType>()({
+  event: "guildMemberUpdate",
+  listener({ pluginData, args: { member, oldMember } }) {
     if (!oldMember) return;
 
     if (isEqual(oldMember.roles, member.roles)) return;
@@ -31,4 +31,4 @@ export const RunAutomodOnMemberUpdate = guildEventListener<AutomodPluginType>()(
       });
     }
   },
-);
+});

@@ -43,7 +43,7 @@ export async function postCaseToCaseLogChannel(
   const theCase = await pluginData.state.cases.find(resolveCaseId(caseOrCaseId));
   if (!theCase) return null;
 
-  const caseEmbed = await getCaseEmbed(pluginData, caseOrCaseId);
+  const caseEmbed = await getCaseEmbed(pluginData, caseOrCaseId, undefined, true);
   if (!caseEmbed) return null;
 
   if (theCase.log_message_id) {

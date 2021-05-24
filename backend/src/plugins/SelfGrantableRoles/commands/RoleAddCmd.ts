@@ -19,7 +19,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
   async run({ message: msg, args, pluginData }) {
     const lock = await pluginData.locks.acquire(memberRolesLock(msg.author));
 
-    const applyingEntries = getApplyingEntries(pluginData, msg);
+    const applyingEntries = await getApplyingEntries(pluginData, msg);
     if (applyingEntries.length === 0) {
       lock.unlock();
       return;

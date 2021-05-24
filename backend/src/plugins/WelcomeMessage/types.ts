@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildEventListener } from "knub";
+import { BasePluginType, typedGuildEventListener } from "knub";
 import { tNullable } from "../../utils";
 import { GuildLogs } from "../../data/GuildLogs";
 
@@ -18,4 +18,4 @@ export interface WelcomeMessagePluginType extends BasePluginType {
   };
 }
 
-export const welcomeMessageEvt = guildEventListener<WelcomeMessagePluginType>();
+export const welcomeMessageEvt = typedGuildEventListener<WelcomeMessagePluginType>();

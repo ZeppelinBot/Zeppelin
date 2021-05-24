@@ -16,7 +16,8 @@ const defaultOptions: PluginOptions<PersistPluginType> = {
   },
 };
 
-export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()("persist", {
+export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
+  name: "persist",
   showInDocs: true,
   info: {
     prettyName: "Persist",
@@ -36,7 +37,7 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()("persist",
     LoadDataEvt,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.persistedData = GuildPersistedData.getGuildInstance(guild.id);

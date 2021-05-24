@@ -106,7 +106,8 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility", {
+export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
+  name: "utility",
   showInDocs: true,
   info: {
     prettyName: "Utility",
@@ -147,7 +148,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     EmojiInfoCmd,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
@@ -159,11 +160,6 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
 
     state.lastReload = Date.now();
-
-    if (activeReloads.has(guild.id)) {
-      sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
-      activeReloads.delete(guild.id);
-    }
 
     // FIXME: Temp fix for role change detection for specific servers, load all guild members in the background on bot start
     const roleChangeDetectionFixServers = [
@@ -181,7 +177,16 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()("utility",
     }
   },
 
-  onUnload(pluginData) {
+  afterLoad(pluginData) {
+    const { guild } = pluginData;
+
+    if (activeReloads.has(guild.id)) {
+      sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
+      activeReloads.delete(guild.id);
+    }
+  },
+
+  beforeUnload(pluginData) {
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
 });

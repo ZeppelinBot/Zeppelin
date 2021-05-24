@@ -30,7 +30,8 @@ const defaultOptions: PluginOptions<RolesPluginType> = {
   ],
 };
 
-export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()("roles", {
+export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
+  name: "roles",
   showInDocs: true,
   info: {
     prettyName: "Roles",
@@ -50,7 +51,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()("roles", {
     MassRemoveRoleCmd,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);

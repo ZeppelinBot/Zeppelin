@@ -4,7 +4,8 @@ import { ArchiveChannelCmd } from "./commands/ArchiveChannelCmd";
 import * as t from "io-ts";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 
-export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginType>()("channel_archiver", {
+export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginType>()({
+  name: "channel_archiver",
   showInDocs: false,
 
   dependencies: [TimeAndDatePlugin],
@@ -13,9 +14,5 @@ export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginTy
   // prettier-ignore
   commands: [
       ArchiveChannelCmd,
-  ],
-
-  onLoad(pluginData) {
-    const { state, guild } = pluginData;
-  },
+  ]
 });

@@ -46,7 +46,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     const defaultMode: TMode =
-      pluginData.config.getForChannel(channel).use_native_slowmode && args.time <= MAX_NATIVE_SLOWMODE
+      (await pluginData.config.getForChannel(channel)).use_native_slowmode && args.time <= MAX_NATIVE_SLOWMODE
         ? "native"
         : "bot";
 

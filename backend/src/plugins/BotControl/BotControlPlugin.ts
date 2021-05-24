@@ -27,7 +27,8 @@ const defaultOptions = {
   },
 };
 
-export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bot_control", {
+export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
+  name: "bot_control",
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -46,7 +47,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()("bo
     EligibleCmd,
   ],
 
-  onLoad(pluginData) {
+  afterLoad(pluginData) {
     pluginData.state.archives = new GuildArchives(0);
     pluginData.state.allowedGuilds = new AllowedGuilds();
     pluginData.state.configs = new Configs();

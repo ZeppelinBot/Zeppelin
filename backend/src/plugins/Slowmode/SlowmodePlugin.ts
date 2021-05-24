@@ -35,7 +35,8 @@ const defaultOptions: PluginOptions<SlowmodePluginType> = {
   ],
 };
 
-export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()("slowmode", {
+export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
+  name: "slowmode",
   showInDocs: true,
   info: {
     prettyName: "Slowmode",
@@ -54,19 +55,25 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()("slowmod
     SlowmodeSetCmd,
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.slowmodes = GuildSlowmodes.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+  },
+
+  afterLoad(pluginData) {
+    const { state } = pluginData;
+
     state.clearInterval = setInterval(() => clearExpiredSlowmodes(pluginData), BOT_SLOWMODE_CLEAR_INTERVAL);
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
+    clearInterval(pluginData.state.clearInterval);
   },
 });

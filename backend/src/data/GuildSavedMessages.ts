@@ -2,7 +2,7 @@ import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { GuildChannel, Message } from "eris";
+import { GuildChannel, Message, PossiblyUncachedTextableChannel } from "eris";
 import moment from "moment-timezone";
 import { MINUTES, SECONDS } from "../utils";
 import { isAPI } from "../globals";
@@ -34,7 +34,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.toBePermanent = new Set();
   }
 
-  public msgToSavedMessageData(msg: Message): ISavedMessageData {
+  public msgToSavedMessageData(msg: Message<PossiblyUncachedTextableChannel>): ISavedMessageData {
     const data: ISavedMessageData = {
       author: {
         username: msg.author.username,
@@ -139,7 +139,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.events.emit(`create:${data.id}`, [inserted]);
   }
 
-  async createFromMsg(msg: Message, overrides = {}) {
+  async createFromMsg(msg: Message<PossiblyUncachedTextableChannel>, overrides = {}) {
     const existingSavedMsg = await this.find(msg.id);
     if (existingSavedMsg) return;
 
@@ -222,7 +222,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.events.emit(`update:${id}`, [newMessage, oldMessage]);
   }
 
-  async saveEditFromMsg(msg: Message) {
+  async saveEditFromMsg(msg: Message<PossiblyUncachedTextableChannel>) {
     const newData = this.msgToSavedMessageData(msg);
     return this.saveEdit(msg.id, newData);
   }

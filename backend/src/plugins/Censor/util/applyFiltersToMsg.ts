@@ -15,7 +15,7 @@ export async function applyFiltersToMsg(
   savedMessage: SavedMessage,
 ): Promise<boolean> {
   const member = await resolveMember(pluginData.client, pluginData.guild, savedMessage.user_id);
-  const config = pluginData.config.getMatchingConfig({ member, channelId: savedMessage.channel_id });
+  const config = await pluginData.config.getMatchingConfig({ member, channelId: savedMessage.channel_id });
 
   let messageContent = savedMessage.data.content || "";
   if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);

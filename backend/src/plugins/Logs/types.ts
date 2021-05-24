@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildEventListener } from "knub";
+import { BasePluginType, typedGuildEventListener } from "knub";
 import { TRegex } from "../../validatorUtils";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -21,6 +21,7 @@ const LogChannel = t.partial({
   excluded_channels: t.array(t.string),
   excluded_categories: t.array(t.string),
   exclude_bots: t.boolean,
+  excluded_roles: t.array(t.string),
   format: tNullable(tLogFormats),
   timestamp_format: t.string,
   include_embed_timestamp: t.boolean,
@@ -71,4 +72,4 @@ export interface LogsPluginType extends BasePluginType {
   };
 }
 
-export const logsEvt = guildEventListener<LogsPluginType>();
+export const logsEvt = typedGuildEventListener<LogsPluginType>();

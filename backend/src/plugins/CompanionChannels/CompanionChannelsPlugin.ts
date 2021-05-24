@@ -13,7 +13,8 @@ const defaultOptions = {
   },
 };
 
-export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPluginType>()("companion_channels", {
+export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPluginType>()({
+  name: "companion_channels",
   showInDocs: true,
   info: {
     prettyName: "Companion channels",
@@ -30,7 +31,7 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
 
   events: [VoiceChannelJoinEvt, VoiceChannelSwitchEvt, VoiceChannelLeaveEvt],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     pluginData.state.errorCooldownManager = new CooldownManager();
   },
 });

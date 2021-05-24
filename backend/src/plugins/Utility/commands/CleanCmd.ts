@@ -94,7 +94,7 @@ export const CleanCmd = utilityCmd({
     }
 
     if (targetChannel.id !== msg.channel.id) {
-      const configForTargetChannel = pluginData.config.getMatchingConfig({
+      const configForTargetChannel = await pluginData.config.getMatchingConfig({
         userId: msg.author.id,
         member: msg.member,
         channelId: targetChannel.id,

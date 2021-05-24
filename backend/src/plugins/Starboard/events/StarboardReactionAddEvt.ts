@@ -31,7 +31,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
     if (!member || member.bot) return;
 
-    const config = pluginData.config.getMatchingConfig({
+    const config = await pluginData.config.getMatchingConfig({
       member,
       channelId: msg.channel.id,
       categoryId: (msg.channel as TextChannel).parentID,

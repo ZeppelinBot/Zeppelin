@@ -8,7 +8,7 @@ export const SpamVoiceJoinEvt = spamEvt({
     const member = meta.args.member;
     const channel = meta.args.newChannel;
 
-    const config = meta.pluginData.config.getMatchingConfig({ member, channelId: channel.id });
+    const config = await meta.pluginData.config.getMatchingConfig({ member, channelId: channel.id });
     const maxVoiceMoves = config.max_voice_moves;
     if (maxVoiceMoves) {
       logAndDetectOtherSpam(
@@ -33,7 +33,7 @@ export const SpamVoiceSwitchEvt = spamEvt({
     const member = meta.args.member;
     const channel = meta.args.newChannel;
 
-    const config = meta.pluginData.config.getMatchingConfig({ member, channelId: channel.id });
+    const config = await meta.pluginData.config.getMatchingConfig({ member, channelId: channel.id });
     const maxVoiceMoves = config.max_voice_moves;
     if (maxVoiceMoves) {
       logAndDetectOtherSpam(

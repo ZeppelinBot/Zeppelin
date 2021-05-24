@@ -1,6 +1,9 @@
 import { get, post } from "../api";
 import { ActionTree, Module } from "vuex";
-import { AuthState, RootState } from "./types";
+import { AuthState, IntervalType, RootState } from "./types";
+
+// Refresh auth every 15 minutes
+const AUTH_REFRESH_INTERVAL = 1000 * 60 * 15;
 
 export const AuthStore: Module<AuthState, RootState> = {
   namespaced: true,
@@ -8,6 +11,7 @@ export const AuthStore: Module<AuthState, RootState> = {
   state: {
     apiKey: null,
     loadedInitialAuth: false,
+    authRefreshInterval: null,
   },
 
   actions: {
@@ -31,12 +35,34 @@ export const AuthStore: Module<AuthState, RootState> = {
       commit("markInitialAuthLoaded");
     },
 
-    setApiKey({ commit, state }, newKey: string) {
+    setApiKey({ commit, state, dispatch }, newKey: string) {
       localStorage.setItem("apiKey", newKey);
       commit("setApiKey", newKey);
+
+      dispatch("startAuthAutoRefresh");
     },
 
-    clearApiKey({ commit }) {
+    async startAuthAutoRefresh({ commit, state, dispatch }) {
+      // End a previously active auto-refresh, if any
+      await dispatch("endAuthAutoRefresh");
+
+      // Start new auto-refresh
+      const refreshInterval = setInterval(async () => {
+        await post("auth/refresh", { key: state.apiKey });
+      }, AUTH_REFRESH_INTERVAL);
+      commit("setAuthRefreshInterval", refreshInterval);
+    },
+
+    endAuthAutoRefresh({ commit, state }) {
+      if (state.authRefreshInterval) {
+        window.clearInterval(state.authRefreshInterval);
+      }
+      commit("setAuthRefreshInterval", null);
+    },
+
+    async clearApiKey({ commit, dispatch }) {
+      await dispatch("endAuthAutoRefresh");
+
       localStorage.removeItem("apiKey");
       commit("setApiKey", null);
     },
@@ -45,11 +71,20 @@ export const AuthStore: Module<AuthState, RootState> = {
       await post("auth/logout");
       await dispatch("clearApiKey");
     },
+
+    async expiredLogin({ dispatch }) {
+      await dispatch("clearApiKey");
+      window.location.assign("/?error=expiredLogin");
+    },
   },
 
   mutations: {
     setApiKey(state: AuthState, key) {
       state.apiKey = key;
+    },
+
+    setAuthRefreshInterval(state: AuthState, interval: IntervalType | null) {
+      state.authRefreshInterval = interval;
     },
 
     markInitialAuthLoaded(state: AuthState) {

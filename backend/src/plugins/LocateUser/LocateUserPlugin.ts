@@ -28,7 +28,8 @@ const defaultOptions: PluginOptions<LocateUserPluginType> = {
   ],
 };
 
-export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()("locate_user", {
+export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
+  name: "locate_user",
   showInDocs: true,
   info: {
     prettyName: "Locate user",
@@ -58,19 +59,21 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()("loc
     GuildBanRemoveAlertsEvt
   ],
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.alerts = GuildVCAlerts.getGuildInstance(guild.id);
     state.outdatedAlertsTimeout = null;
     state.usersWithAlerts = [];
     state.unloaded = false;
+  },
 
+  afterLoad(pluginData) {
     outdatedAlertsLoop(pluginData);
     fillActiveAlertsList(pluginData);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     clearTimeout(pluginData.state.outdatedAlertsTimeout as Timeout);
     pluginData.state.unloaded = true;
   },

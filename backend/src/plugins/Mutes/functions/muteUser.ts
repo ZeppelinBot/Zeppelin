@@ -51,7 +51,7 @@ export async function muteUser(
   }
 
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id, true); // Grab the fresh member so we don't have stale role info
-  const config = pluginData.config.getMatchingConfig({ member, userId });
+  const config = await pluginData.config.getMatchingConfig({ member, userId });
 
   muteTime = muteTime !== undefined
     ? muteTime

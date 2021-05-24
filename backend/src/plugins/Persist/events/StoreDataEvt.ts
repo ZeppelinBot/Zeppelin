@@ -12,7 +12,7 @@ export const StoreDataEvt = persistEvt({
 
     let persist = false;
     const persistData: IPartialPersistData = {};
-    const config = pluginData.config.getForUser(member.user);
+    const config = await pluginData.config.getForUser(member.user);
 
     const persistedRoles = config.persisted_roles;
     if (persistedRoles.length && member.roles) {

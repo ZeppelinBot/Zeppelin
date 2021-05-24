@@ -1,7 +1,7 @@
 import { modActionsCmd, IgnoredEventType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars } from "../../../utils";
+import { resolveUser, resolveMember, stripObjectToScalars, noop, MINUTES } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
@@ -12,6 +12,9 @@ import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
+import { performance } from "perf_hooks";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { load } from "js-yaml";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
@@ -50,62 +53,103 @@ export const MassbanCmd = modActionsCmd({
       }
     }
 
-    // Ignore automatic ban cases and logs for these users
-    // We'll create our own cases below and post a single "mass banned" log instead
-    args.userIds.forEach(userId => {
-      // Use longer timeouts since this can take a while
-      ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
-      pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
-    });
-
     // Show a loading indicator since this can take a while
-    const loadingMsg = await msg.channel.createMessage("Banning...");
+    const maxWaitTime = pluginData.state.massbanQueue.timeout * pluginData.state.massbanQueue.length;
+    const maxWaitTimeFormatted = humanizeDurationShort(maxWaitTime, { round: true });
+    const initialLoadingText =
+      pluginData.state.massbanQueue.length === 0
+        ? "Banning..."
+        : `Massban queued. Waiting for previous massban to finish (max wait ${maxWaitTimeFormatted}).`;
+    const loadingMsg = await msg.channel.createMessage(initialLoadingText);
 
-    // Ban each user and count failed bans (if any)
-    const failedBans: string[] = [];
-    const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    for (const userId of args.userIds) {
-      try {
-        await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
+    const waitTimeStart = performance.now();
+    const waitingInterval = setInterval(() => {
+      const waitTime = humanizeDurationShort(performance.now() - waitTimeStart, { round: true });
+      loadingMsg
+        .edit(`Massban queued. Still waiting for previous massban to finish (waited ${waitTime}).`)
+        .catch(() => clearInterval(waitingInterval));
+    }, 1 * MINUTES);
 
-        await casesPlugin.createCase({
-          userId,
-          modId: msg.author.id,
-          type: CaseTypes.Ban,
-          reason: `Mass ban: ${banReason}`,
-          postInCaseLogOverride: false,
+    pluginData.state.massbanQueue.add(async () => {
+      clearInterval(waitingInterval);
+
+      if (pluginData.state.unloaded) {
+        void loadingMsg.delete().catch(noop);
+        return;
+      }
+
+      void loadingMsg.edit("Banning...").catch(noop);
+
+      // Ban each user and count failed bans (if any)
+      const startTime = performance.now();
+      const failedBans: string[] = [];
+      const casesPlugin = pluginData.getPlugin(CasesPlugin);
+      for (const [i, userId] of args.userIds.entries()) {
+        if (pluginData.state.unloaded) {
+          break;
+        }
+
+        try {
+          // Ignore automatic ban cases and logs
+          // We create our own cases below and post a single "mass banned" log instead
+          ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
+          pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
+
+          await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
+
+          await casesPlugin.createCase({
+            userId,
+            modId: msg.author.id,
+            type: CaseTypes.Ban,
+            reason: `Mass ban: ${banReason}`,
+            postInCaseLogOverride: false,
+          });
+
+          pluginData.state.events.emit("ban", userId, banReason);
+        } catch {
+          failedBans.push(userId);
+        }
+
+        // Send a status update every 10 bans
+        if ((i + 1) % 10 === 0) {
+          loadingMsg.edit(`Banning... ${i + 1}/${args.userIds.length}`).catch(noop);
+        }
+      }
+
+      const totalTime = performance.now() - startTime;
+      const formattedTimeTaken = humanizeDurationShort(totalTime, { round: true });
+
+      // Clear loading indicator
+      loadingMsg.delete().catch(noop);
+
+      const successfulBanCount = args.userIds.length - failedBans.length;
+      if (successfulBanCount === 0) {
+        // All bans failed - don't create a log entry and notify the user
+        sendErrorMessage(pluginData, msg.channel, "All bans failed. Make sure the IDs are valid.");
+      } else {
+        // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
+        pluginData.state.serverLogs.log(LogType.MASSBAN, {
+          mod: stripObjectToScalars(msg.author),
+          count: successfulBanCount,
+          reason: banReason,
         });
 
-        pluginData.state.events.emit("ban", userId, banReason);
-      } catch {
-        failedBans.push(userId);
+        if (failedBans.length) {
+          sendSuccessMessage(
+            pluginData,
+            msg.channel,
+            `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${
+              failedBans.length
+            } failed: ${failedBans.join(" ")}`,
+          );
+        } else {
+          sendSuccessMessage(
+            pluginData,
+            msg.channel,
+            `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`,
+          );
+        }
       }
-    }
-
-    // Clear loading indicator
-    loadingMsg.delete();
-
-    const successfulBanCount = args.userIds.length - failedBans.length;
-    if (successfulBanCount === 0) {
-      // All bans failed - don't create a log entry and notify the user
-      sendErrorMessage(pluginData, msg.channel, "All bans failed. Make sure the IDs are valid.");
-    } else {
-      // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
-      pluginData.state.serverLogs.log(LogType.MASSBAN, {
-        mod: stripObjectToScalars(msg.author),
-        count: successfulBanCount,
-        reason: banReason,
-      });
-
-      if (failedBans.length) {
-        sendSuccessMessage(
-          pluginData,
-          msg.channel,
-          `Banned ${successfulBanCount} users, ${failedBans.length} failed: ${failedBans.join(" ")}`,
-        );
-      } else {
-        sendSuccessMessage(pluginData, msg.channel, `Banned ${successfulBanCount} users successfully`);
-      }
-    }
+    });
   },
 });

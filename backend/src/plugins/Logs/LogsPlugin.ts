@@ -47,7 +47,8 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   ],
 };
 
-export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
+export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
+  name: "logs",
   showInDocs: true,
   info: {
     prettyName: "Logs",
@@ -84,7 +85,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     },
   },
 
-  onLoad(pluginData) {
+  beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
     state.guildLogs = new GuildLogs(guild.id);
@@ -92,10 +93,16 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.cases = GuildCases.getGuildInstance(guild.id);
 
+    state.batches = new Map();
+
+    state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+  },
+
+  afterLoad(pluginData) {
+    const { state, guild } = pluginData;
+
     state.logListener = ({ type, data }) => log(pluginData, type, data);
     state.guildLogs.on("log", state.logListener);
-
-    state.batches = new Map();
 
     state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
@@ -106,7 +113,6 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     state.onMessageUpdateFn = (newMsg, oldMsg) => onMessageUpdate(pluginData, newMsg, oldMsg);
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
 
-    state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
     state.regexRunnerRepeatedTimeoutListener = (regexSource, timeoutMs, failedTimes) => {
       logger.warn(`Disabled heavy regex temporarily: ${regexSource}`);
       log(pluginData, LogType.BOT_ALERT, {
@@ -122,7 +128,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()("logs", {
     state.regexRunner.on("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
   },
 
-  onUnload(pluginData) {
+  beforeUnload(pluginData) {
     pluginData.state.guildLogs.removeListener("log", pluginData.state.logListener);
 
     pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
