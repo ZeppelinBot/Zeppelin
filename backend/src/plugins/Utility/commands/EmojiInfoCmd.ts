@@ -15,7 +15,7 @@ export const EmojiInfoCmd = utilityCmd({
   },
 
   async run({ message, args, pluginData }) {
-    const emojiIdMatch = args.emoji.match(customEmojiRegex);
+    const emojiIdMatch = args.emoji?.match(customEmojiRegex);
     if (!emojiIdMatch?.[2]) {
       sendErrorMessage(pluginData, message.channel, "Emoji not found");
       return;
