@@ -16,7 +16,7 @@ export const ColorCmd = utilityCmd({
     },
 
     async run({ message, args, pluginData }) {
-        const hexcodeMatch = args.color?.match(hexColorRegex);
+        const hexcodeMatch = args.color.match(hexColorRegex);
         if (!hexcodeMatch?.[1]) {
             sendErrorMessage(pluginData, message.channel, "Invalid hex code");
             return;
