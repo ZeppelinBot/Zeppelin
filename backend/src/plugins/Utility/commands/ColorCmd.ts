@@ -12,7 +12,7 @@ export const ColorCmd = utilityCmd({
     permission: "can_color",
 
     signature: {
-        color: ct.string({ required: false })
+        color: ct.string({ required: true })
     },
 
     async run({ message, args, pluginData }) {
