@@ -11,11 +11,11 @@ export const EmojiInfoCmd = utilityCmd({
   permission: "can_emojiinfo",
 
   signature: {
-    emoji: ct.string({ required: false }),
+    emoji: ct.string({ required: true }),
   },
 
   async run({ message, args, pluginData }) {
-    const emojiIdMatch = args.emoji?.match(customEmojiRegex);
+    const emojiIdMatch = args.emoji.match(customEmojiRegex);
     if (!emojiIdMatch?.[2]) {
       sendErrorMessage(pluginData, message.channel, "Emoji not found");
       return;
