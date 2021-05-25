@@ -1445,3 +1445,5 @@ export function unique<T>(arr: T[]): T[] {
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
+
+export const hexColorRegex = /^#?([a-fA-F0-9]{3}(?:[a-fA-F0-9]{3})?)$/;
