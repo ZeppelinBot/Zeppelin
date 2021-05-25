@@ -26,6 +26,7 @@
     "@types/sharp": "^0.23.1",
     "@types/twemoji": "^12.1.0",
     "bufferutil": "^4.0.1",
+    "canvas": "^2.8.0",
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
