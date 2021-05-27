@@ -36,7 +36,7 @@ const defaultOptions = {
     timed_mute_message: "You have been muted on the {guildName} server for {time}. Reason given: {reason}",
     update_mute_message: "Your mute on the {guildName} server has been updated to {time}.",
     remove_roles_on_mute: false,
-    restore_roles_on_mute: false,
+    restore_roles_on_unmute: false,
 
     can_view_list: false,
     can_cleanup: false,
