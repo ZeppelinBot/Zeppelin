@@ -61,7 +61,7 @@ export async function muteUser(
     const currentUserRoles = member.roles;
     const memberOptions: MemberOptions = {};
     const removeRoles = removeRolesOnMuteOverride ?? config.remove_roles_on_mute;
-    const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_mute;
+    const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_unmute;
 
     // remove roles
     if (!Array.isArray(removeRoles)) {
