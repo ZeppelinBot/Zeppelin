@@ -24,7 +24,7 @@ export const MuteAction = automodAction({
     notify: tNullable(t.string),
     notifyChannel: tNullable(t.string),
     remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
-    restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
+    restore_roles_on_unmute: tNullable(t.union([t.boolean, t.array(t.string)])),
     postInCaseLog: tNullable(t.boolean),
     hide_case: tNullable(t.boolean),
   }),
@@ -39,7 +39,7 @@ export const MuteAction = automodAction({
     const reason = actionConfig.reason || "Muted automatically";
     const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
     const rolesToRemove = actionConfig.remove_roles_on_mute;
-    const rolesToRestore = actionConfig.restore_roles_on_mute;
+    const rolesToRestore = actionConfig.restore_roles_on_unmute;
 
     const caseArgs: Partial<CaseArgs> = {
       modId: pluginData.client.user.id,
