@@ -52,7 +52,7 @@ export async function logAndDetectOtherSpam(
               },
             },
             spamConfig.remove_roles_on_mute,
-            spamConfig.restore_roles_on_mute,
+            spamConfig.restore_roles_on_unmute,
           );
         } catch (e) {
           if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
