@@ -1,9 +1,18 @@
-import { APIMessage, Client, Message, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import {
+  APIMessage,
+  Client,
+  Message,
+  MessageOptions,
+  MessageReaction,
+  PartialUser,
+  TextChannel,
+  User,
+} from "discord.js";
 import { Awaitable } from "knub/dist/utils";
 import { MINUTES, noop } from "../utils";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageContent>;
+export type LoadPageFn = (page: number) => Awaitable<MessageOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;
@@ -24,7 +33,7 @@ export async function createPaginatedMessage(
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
   const firstPageContent = await loadPageFn(1);
-  const message = await channel.send(firstPageContent);
+  const message = await channel.send({ content: firstPageContent });
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages

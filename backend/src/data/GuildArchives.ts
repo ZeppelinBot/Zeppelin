@@ -4,8 +4,8 @@ import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { trimLines } from "../utils";
 import { SavedMessage } from "./entities/SavedMessage";
-import { Guild } from "eris";
 import { renderTemplate } from "../templateFormatter";
+import { Guild } from "discord.js";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
@@ -73,7 +73,7 @@ export class GuildArchives extends BaseGuildRepository {
   protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
     const msgLines: string[] = [];
     for (const msg of savedMessages) {
-      const channel = guild.channels.get(msg.channel_id);
+      const channel = guild.channels.cache.get(msg.channel_id);
       const user = { ...msg.data.author, id: msg.user_id };
 
       const line = await renderTemplate(MESSAGE_ARCHIVE_MESSAGE_FORMAT, {

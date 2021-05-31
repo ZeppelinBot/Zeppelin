@@ -3,7 +3,6 @@ import {
   convertDelayStringToMS,
   disableCodeBlocks,
   disableInlineCode,
-  isSnowflake,
   isValidSnowflake,
   resolveMember,
   resolveUser,
@@ -11,13 +10,12 @@ import {
   roleMentionRegex,
   UnknownUser,
 } from "./utils";
-import { GuildChannel, Member, TextChannel, User } from "eris";
 import { baseTypeConverters, baseCommandParameterTypeHelpers, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
-import { getChannelIdFromMessageId } from "./data/getChannelIdFromMessageId";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
 import { inputPatternToRegExp } from "./validatorUtils";
 import { isValidTimezone } from "./utils/isValidTimezone";
+import { GuildChannel, GuildMember, User } from "discord.js";
 
 export const commandTypes = {
   ...baseTypeConverters,
@@ -112,7 +110,7 @@ export const commandTypeHelpers = {
   delay: createTypeHelper<number>(commandTypes.delay),
   resolvedUser: createTypeHelper<Promise<User>>(commandTypes.resolvedUser),
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
-  resolvedMember: createTypeHelper<Promise<Member>>(commandTypes.resolvedMember),
+  resolvedMember: createTypeHelper<Promise<GuildMember>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
   anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),
