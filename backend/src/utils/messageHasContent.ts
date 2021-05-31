@@ -1,4 +1,4 @@
-import { APIMessage, MessageOptions } from "discord.js";
+import { MessageOptions } from "discord.js";
 
 function embedHasContent(embed: any) {
   for (const [key, value] of Object.entries(embed)) {

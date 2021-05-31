@@ -1,6 +1,5 @@
 import { BaseConfig, Knub } from "knub";
 import * as t from "io-ts";
-import { Message } from "eris";
 
 export interface ZeppelinGuildConfig extends BaseConfig<any> {
   success_emoji?: string;

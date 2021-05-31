@@ -1,9 +1,9 @@
+import { MessageAttachment, Sticker } from "discord.js";
 import { Column, Entity, PrimaryColumn } from "typeorm";
 import { createEncryptedJsonTransformer } from "../encryptedJsonTransformer";
-import { Attachment, Sticker } from "eris";
 
 export interface ISavedMessageData {
-  attachments?: Attachment[];
+  attachments?: MessageAttachment[];
   author: {
     username: string;
     discriminator: string;
