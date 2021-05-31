@@ -1,4 +1,4 @@
-import { Constants } from "eris";
+import { Permissions } from "discord.js";
 
 const camelCaseToTitleCase = str =>
   str
@@ -10,9 +10,9 @@ const camelCaseToTitleCase = str =>
 const permissionNumberToName: Map<bigint, string> = new Map();
 const ignoredPermissionConstants = ["all", "allGuild", "allText", "allVoice"];
 
-for (const key in Constants.Permissions) {
+for (const key in Permissions.FLAGS) {
   if (ignoredPermissionConstants.includes(key)) continue;
-  permissionNumberToName.set(BigInt(Constants.Permissions[key]), camelCaseToTitleCase(key));
+  permissionNumberToName.set(BigInt(Permissions.FLAGS[key]), camelCaseToTitleCase(key));
 }
 
 /**

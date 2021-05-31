@@ -11,7 +11,6 @@ import { Configs } from "./data/Configs";
 // Always use UTC internally
 // This is also enforced for the database in data/db.ts
 import moment from "moment-timezone";
-import { Client, DiscordHTTPError, TextChannel } from "eris";
 import { connect } from "./data/db";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, MINUTES, successMessage } from "./utils";
@@ -21,10 +20,10 @@ import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { logger } from "./logger";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 import { ErisError } from "./ErisError";
+import { Client, Intents, TextChannel } from "discord.js";
 
 const fsp = fs.promises;
 
@@ -96,7 +95,7 @@ function errorHandler(err) {
     }
   }
 
-  if (err instanceof DiscordHTTPError && err.code >= 500) {
+  if (isDiscordHTTPError(err) && err.code >= 500) {
     // Don't need stack traces on HTTP 500 errors
     // These also shouldn't count towards RECENT_DISCORD_ERROR_EXIT_THRESHOLD because they don't indicate an error in our code
     console.error(err.message);
@@ -151,36 +150,32 @@ moment.tz.setDefault("UTC");
 
 logger.info("Connecting to database");
 connect().then(async () => {
-  const client = new Client(`Bot ${process.env.TOKEN}`, {
-    getAllUsers: false,
-    restMode: true,
-    compress: false,
-    guildCreateTimeout: 0,
-    rest: {
-      ratelimiterOffset: 150,
-    },
+  const client = new Client({
+    partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
+    restTimeOffset: 150,
+    restGlobalRateLimit: 50,
     // Disable mentions by default
     allowedMentions: {
-      everyone: false,
-      users: false,
-      roles: false,
+      parse: [],
+      users: [],
+      roles: [],
       repliedUser: false,
     },
     intents: [
       // Privileged
-      "guildMembers",
+      Intents.FLAGS.GUILD_MEMBERS,
       // "guildPresences",
-      "guildMessageTyping",
+      Intents.FLAGS.GUILD_MESSAGE_TYPING,
 
       // Regular
-      "directMessages",
-      "guildBans",
-      "guildEmojis",
-      "guildInvites",
-      "guildMessageReactions",
-      "guildMessages",
-      "guilds",
-      "guildVoiceStates",
+      Intents.FLAGS.DIRECT_MESSAGES,
+      Intents.FLAGS.GUILD_BANS,
+      Intents.FLAGS.GUILD_EMOJIS,
+      Intents.FLAGS.GUILD_INVITES,
+      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      Intents.FLAGS.GUILD_MESSAGES,
+      Intents.FLAGS.GUILDS,
+      Intents.FLAGS.GUILD_VOICE_STATES,
     ],
   });
   client.setMaxListeners(200);
@@ -191,8 +186,8 @@ connect().then(async () => {
     }
   });
 
-  client.on("error", (err, shardId) => {
-    errorHandler(new ErisError(err.message, (err as any).code, shardId));
+  client.on("error", err => {
+    errorHandler(new ErisError(err.message, (err as any).code, 0));
   });
 
   const allowedGuilds = new AllowedGuilds();
@@ -257,13 +252,13 @@ connect().then(async () => {
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
-        channel.createMessage(successMessage(body, emoji));
+        channel.send(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
-        channel.createMessage(errorMessage(body, emoji));
+        channel.send(errorMessage(body, emoji));
       },
     },
   });
@@ -273,5 +268,5 @@ connect().then(async () => {
   });
 
   logger.info("Starting the bot");
-  bot.run();
+  bot.initialize();
 });

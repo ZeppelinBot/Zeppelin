@@ -1,4 +1,4 @@
-import { Constants, GuildChannel, Member, Permission } from "eris";
+import { GuildMember, GuildChannel } from "discord.js";
 import { getMissingPermissions } from "./getMissingPermissions";
 
 /**
@@ -6,10 +6,11 @@ import { getMissingPermissions } from "./getMissingPermissions";
  * @return Bitmask of missing permissions
  */
 export function getMissingChannelPermissions(
-  member: Member,
+  member: GuildMember,
   channel: GuildChannel,
   requiredPermissions: number | bigint,
 ): bigint {
-  const memberChannelPermissions = channel.permissionsOf(member.id);
+  const memberChannelPermissions = channel.permissionsFor(member.id);
+  if (!memberChannelPermissions) return BigInt(requiredPermissions);
   return getMissingPermissions(memberChannelPermissions, requiredPermissions);
 }

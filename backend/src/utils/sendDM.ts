@@ -1,7 +1,7 @@
-import { MessageContent, MessageFile, User } from "eris";
 import { createChunkedMessage, HOURS, isDiscordRESTError } from "../utils";
 import { logger } from "../logger";
 import Timeout = NodeJS.Timeout;
+import { APIMessage, User } from "discord.js";
 
 let dmsDisabled = false;
 let dmsDisabledTimeout: Timeout;
@@ -16,7 +16,7 @@ export class DMError extends Error {}
 
 const error20026 = "The bot cannot currently send DMs";
 
-export async function sendDM(user: User, content: MessageContent, source: string) {
+export async function sendDM(user: User, content: string | APIMessage, source: string) {
   if (dmsDisabled) {
     throw new DMError(error20026);
   }
@@ -24,15 +24,10 @@ export async function sendDM(user: User, content: MessageContent, source: string
   logger.debug(`Sending ${source} DM to ${user.id}`);
 
   try {
-    const dmChannel = await user.getDMChannel();
-    if (!dmChannel) {
-      throw new DMError("Unable to open DM channel");
-    }
-
     if (typeof content === "string") {
-      await createChunkedMessage(dmChannel, content);
+      await createChunkedMessage(user, content);
     } else {
-      await dmChannel.createMessage(content);
+      await user.send(content);
     }
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 20026) {
