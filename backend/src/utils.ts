@@ -1,25 +1,3 @@
-import {
-  AllowedMentions,
-  Attachment,
-  Client,
-  Constants,
-  Embed,
-  EmbedOptions,
-  Emoji,
-  Guild,
-  GuildAuditLog,
-  GuildAuditLogEntry,
-  GuildChannel,
-  Invite,
-  InvitePartialChannel,
-  Member,
-  Message,
-  MessageContent,
-  PossiblyUncachedMessage,
-  TextableChannel,
-  TextChannel,
-  User,
-} from "eris";
 import { URL } from "url";
 import tlds from "tlds";
 import emojiRegex from "emoji-regex";
@@ -38,6 +16,29 @@ import { logger } from "./logger";
 import { unsafeCoerce } from "fp-ts/lib/function";
 import { sendDM } from "./utils/sendDM";
 import { LogType } from "./data/LogType";
+import {
+  APIMessage,
+  Channel,
+  Client,
+  Constants,
+  Emoji,
+  Guild,
+  GuildAuditLogs,
+  GuildAuditLogsEntry,
+  GuildChannel,
+  GuildMember,
+  Invite,
+  Message,
+  MessageAttachment,
+  MessageEmbed,
+  MessageEmbedOptions,
+  MessageMentionOptions,
+  MessageOptions,
+  StringResolvable,
+  TextChannel,
+  User,
+} from "discord.js";
+import { ChannelTypeStrings } from "./types";
 
 const fsp = fs.promises;
 
@@ -202,7 +203,7 @@ export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
 export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & { guild: Guild };
 export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & {
   channel: InvitePartialChannel;
-  type: typeof Constants.ChannelTypes.GROUP_DM;
+  type: typeof Constants.ChannelTypes.GROUP;
 };
 
 /**
@@ -269,9 +270,15 @@ export const tEmbed = t.type({
   ),
 });
 
-export type EmbedWith<T extends keyof EmbedOptions> = EmbedOptions & Pick<Required<EmbedOptions>, T>;
+export type EmbedWith<T extends keyof MessageEmbedOptions> = MessageEmbedOptions &
+  Pick<Required<MessageEmbedOptions>, T>;
 
-export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
+export type StrictMessageContent = {
+  content?: string;
+  tts?: boolean;
+  disableEveryone?: boolean;
+  embed?: MessageEmbedOptions;
+};
 
 export const tStrictMessageContent = t.type({
   content: tNullable(t.string),
@@ -458,14 +465,14 @@ export async function findRelevantAuditLogEntry(
   userId: string,
   attempts: number = 3,
   attemptDelay: number = 3000,
-): Promise<GuildAuditLogEntry | null> {
+): Promise<GuildAuditLogsEntry | null> {
   if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id)! > Date.now()) {
     return null;
   }
 
-  let auditLogs: GuildAuditLog | null = null;
+  let auditLogs: GuildAuditLogs | null = null;
   try {
-    auditLogs = await guild.getAuditLogs(5, undefined, actionType);
+    auditLogs = await guild.fetchAuditLogs({ limit: 5, type: actionType });
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 50013) {
       // If we don't have permission to read audit log, set audit log requests on cooldown
@@ -830,13 +837,13 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextableChannel,
+  channel: TextChannel | User,
   messageText: string,
-  allowedMentions?: AllowedMentions,
+  allowedMentions?: MessageMentionOptions,
 ) {
   const chunks = chunkMessageLines(messageText);
   for (const chunk of chunks) {
-    await channel.createMessage({ content: chunk, allowedMentions });
+    await channel.send({ content: chunk, allowedMentions });
   }
 }
 
@@ -1011,7 +1018,7 @@ export async function notifyUser(
       }
     } else if (method.type === "channel") {
       try {
-        await method.channel.createMessage({
+        await method.channel.send({
           content: `<@!${user.id}> ${body}`,
           allowedMentions: { users: [user.id] },
         });
@@ -1130,7 +1137,7 @@ export function resolveUserId(bot: Client, value: string) {
  */
 export function getUser(client: Client, userResolvable: string): User | UnknownUser {
   const id = resolveUserId(client, userResolvable);
-  return id ? client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+  return id ? client.users.resolve(id) || new UnknownUser({ id }) : new UnknownUser();
 }
 
 /**
@@ -1176,13 +1183,18 @@ export async function resolveUser<T>(bot, value) {
  * Resolves a guild Member from the passed user id, user mention, or full username (with discriminator).
  * If the member is not found in the cache, it's fetched from the API.
  */
-export async function resolveMember(bot: Client, guild: Guild, value: string, fresh = false): Promise<Member | null> {
+export async function resolveMember(
+  bot: Client,
+  guild: Guild,
+  value: string,
+  fresh = false,
+): Promise<GuildMember | null> {
   const userId = resolveUserId(bot, value);
   if (!userId) return null;
 
   // If we have the member cached, return that directly
-  if (guild.members.has(userId) && !fresh) {
-    return guild.members.get(userId) || null;
+  if (guild.members.cache.has(userId) && !fresh) {
+    return guild.members.cache.get(userId) || null;
   }
 
   // We don't want to spam the API by trying to fetch unknown members again and again,
@@ -1192,9 +1204,9 @@ export async function resolveMember(bot: Client, guild: Guild, value: string, fr
     return null;
   }
 
-  const freshMember = await bot.getRESTGuildMember(guild.id, userId).catch(noop);
+  const freshMember = await guild.members.fetch({ user: userId, force: true }).catch(noop);
   if (freshMember) {
-    freshMember.id = userId;
+    // freshMember.id = userId; // I dont even know why this is here -Dark
     return freshMember;
   }
 
@@ -1222,7 +1234,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
 
   // Role name
-  const roleList = await bot.getRESTGuildRoles(guildId);
+  const roleList = await (await bot.guilds.fetch(guildId)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role[0]) {
     return role[0].id;
@@ -1236,7 +1248,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
-const inviteCache = new SimpleCache<Promise<Invite<any> | null>>(10 * MINUTES, 200);
+const inviteCache = new SimpleCache<Promise<Invite | null>>(10 * MINUTES, 200);
 
 type ResolveInviteReturnType<T extends boolean> = Promise<
   (T extends true ? Invite<"withCount" | "withMetadata"> : Invite<"withMetadata">) | null
@@ -1259,8 +1271,13 @@ export async function resolveInvite<T extends boolean>(
   return promise as ResolveInviteReturnType<T>;
 }
 
-export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
-  const msg = await channel.createMessage(content);
+export async function confirm(
+  bot: Client,
+  channel: TextChannel,
+  userId: string,
+  content: StringResolvable | MessageOptions,
+) {
+  const msg = await channel.send(content);
   const reply = await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId);
   msg.delete().catch(noop);
   return reply && reply.name === "✅";
@@ -1271,13 +1288,15 @@ export function messageSummary(msg: SavedMessage) {
   let result = "```\n" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
+  const richEmbed = (msg.data.embeds || []).find(e => (e as MessageEmbed).type === "rich");
   if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments) {
     result +=
-      "Attachments:\n" + msg.data.attachments.map((a: Attachment) => disableLinkPreviews(a.url)).join("\n") + "\n";
+      "Attachments:\n" +
+      msg.data.attachments.map((a: MessageAttachment) => disableLinkPreviews(a.url)).join("\n") +
+      "\n";
   }
 
   return result;
@@ -1300,10 +1319,7 @@ export function verboseUserName(user: User | UnknownUser): string {
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {
-  const plainTextName =
-    channel.type === Constants.ChannelTypes.GUILD_VOICE || channel.type === Constants.ChannelTypes.GUILD_STAGE
-      ? channel.name
-      : `#${channel.name}`;
+  const plainTextName = channel.type === "voice" || channel.type === "stage" ? channel.name : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
 }
 
@@ -1396,8 +1412,8 @@ export function canUseEmoji(client: Client, emoji: string): boolean {
   if (isUnicodeEmoji(emoji)) {
     return true;
   } else if (isSnowflake(emoji)) {
-    for (const guild of client.guilds.values()) {
-      if (guild.emojis.some(e => (e as any).id === emoji)) {
+    for (const guild of client.guilds.cache) {
+      if (guild[1].emojis.cache.some(e => (e as any).id === emoji)) {
         return true;
       }
     }
@@ -1429,10 +1445,10 @@ export function isGuildInvite<CT extends InviteOpts>(invite: Invite<CT>): invite
 }
 
 export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GroupDMInvite<CT> {
-  return invite.guild == null && invite.channel?.type === Constants.ChannelTypes.GROUP_DM;
+  return invite.guild == null && invite.channel?.type === "group";
 }
 
-export function inviteHasCounts(invite: Invite<any>): invite is Invite<"withCount"> {
+export function inviteHasCounts(invite: Invite): invite is Invite<"withCount"> {
   return invite.memberCount != null;
 }
 

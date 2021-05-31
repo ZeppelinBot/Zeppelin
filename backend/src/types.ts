@@ -64,3 +64,15 @@ export interface CommandInfo {
     [key: string]: TMarkdown;
   };
 }
+
+export enum ChannelTypeStrings {
+  TEXT = "text",
+  DM = "dm",
+  VOICE = "voice",
+  GROUP = "group",
+  CATEGORY = "category",
+  NEWS = "news",
+  STORE = "store",
+  STAGE = "stage",
+  UNKNOWN = "unknown",
+}

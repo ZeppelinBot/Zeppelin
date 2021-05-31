@@ -1,4 +1,4 @@
-import { EmbedField } from "eris";
+import { EmbedField } from "discord.js";
 import { chunkMessageLines, emptyEmbedValue } from "../utils";
 
 export function getChunkedEmbedFields(name: string, value: string, inline?: boolean): EmbedField[] {
@@ -10,11 +10,13 @@ export function getChunkedEmbedFields(name: string, value: string, inline?: bool
       fields.push({
         name,
         value: chunks[i],
+        inline: false,
       });
     } else {
       fields.push({
         name: emptyEmbedValue,
         value: chunks[i],
+        inline: false,
       });
     }
   }
