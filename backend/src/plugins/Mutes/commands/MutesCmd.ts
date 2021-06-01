@@ -4,7 +4,6 @@ import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../..
 import moment from "moment-timezone";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
-import { Member } from "eris";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",
@@ -112,7 +111,7 @@ export const MutesCmd = mutesCmd({
       const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
       lines = filteredMutes.map(mute => {
-        const user = pluginData.client.users.get(mute.user_id);
+        const user = pluginData.client.user!.get(mute.user_id);
         const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";

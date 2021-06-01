@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { Mute } from "../../data/entities/Mute";
-import { Member } from "eris";
+
 import { Case } from "../../data/entities/Case";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";

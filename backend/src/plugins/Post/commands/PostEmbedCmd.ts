@@ -2,7 +2,7 @@ import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { actualPostCmd } from "../util/actualPostCmd";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { Embed } from "eris";
+
 import { isValidEmbed, trimLines } from "../../../utils";
 import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";

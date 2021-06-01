@@ -1,5 +1,5 @@
 import { Tag, TagsPluginType } from "../types";
-import { Member } from "eris";
+
 import * as t from "io-ts";
 import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "../../../utils";
 import { parseArguments } from "knub-command-manager";

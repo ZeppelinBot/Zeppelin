@@ -1,4 +1,3 @@
-import { Guild } from "eris";
 import { HOURS, noop } from "../../utils";
 
 const MEMBER_REFRESH_FREQUENCY = 1 * HOURS; // How often to do a full member refresh when using commands that need it

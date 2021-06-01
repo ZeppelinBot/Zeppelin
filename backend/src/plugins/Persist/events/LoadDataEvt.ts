@@ -1,5 +1,5 @@
 import { persistEvt } from "../types";
-import { Constants, MemberOptions } from "eris";
+
 import intersection from "lodash.intersection";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
@@ -31,7 +31,7 @@ export const LoadDataEvt = persistEvt({
     const restoredData: string[] = [];
 
     // Check permissions
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     let requiredPermissions = 0n;
     if (config.persist_nicknames) requiredPermissions |= p.manageNicknames;
     if (config.persisted_roles) requiredPermissions |= p.manageRoles;

@@ -1,6 +1,7 @@
 import { utilityCmd } from "../types";
 import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
-import { GuildChannel, MessageContent, Role } from "eris";
+
+
 import { getCurrentUptime } from "../../../uptime";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
@@ -66,7 +67,7 @@ export const AboutCmd = utilityCmd({
 
     const aboutContent: MessageContent & { embed: EmbedWith<"title" | "fields"> } = {
       embed: {
-        title: `About ${pluginData.client.user.username}`,
+        title: `About ${pluginData.client.user!.username}`,
         fields: [
           {
             name: "Status",
@@ -100,7 +101,7 @@ export const AboutCmd = utilityCmd({
     }
 
     // For the embed color, find the highest colored role the bot has - this is their color on the server as well
-    const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
+    const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
     let botRoles = botMember?.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r)!) || [];
     botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
     botRoles = botRoles.filter(r => r.color); // Filter to those with a color
@@ -110,8 +111,8 @@ export const AboutCmd = utilityCmd({
     }
 
     // Use the bot avatar as the embed image
-    if (pluginData.client.user.avatarURL) {
-      aboutContent.embed.thumbnail = { url: pluginData.client.user.avatarURL };
+    if (pluginData.client.user!avatarURL) {
+      aboutContent.embed.thumbnail = { url: pluginData.client.user!.avatarURL };
     }
 
     msg.channel.createMessage(aboutContent);

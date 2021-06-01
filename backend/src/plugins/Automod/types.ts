@@ -4,7 +4,7 @@ import { BasePluginType, CooldownManager } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
 import { SavedMessage } from "../../data/entities/SavedMessage";
-import { Member, User } from "eris";
+
 import { AvailableTriggers } from "./triggers/availableTriggers";
 import { AvailableActions } from "./actions/availableActions";
 import { Queue } from "../../Queue";
@@ -16,6 +16,7 @@ import { RegExpRunner } from "../../RegExpRunner";
 import { CounterEvents } from "../Counters/types";
 import { ModActionsEvents, ModActionType } from "../ModActions/types";
 import { MutesEvents } from "../Mutes/types";
+import { GuildMember, User } from "discord.js";
 
 export const Rule = t.type({
   enabled: t.boolean,
@@ -113,7 +114,7 @@ export interface AutomodContext {
   };
   user?: User;
   message?: SavedMessage;
-  member?: Member;
+  member?: GuildMember;
   joined?: boolean;
   rolesChanged?: {
     added?: string[];

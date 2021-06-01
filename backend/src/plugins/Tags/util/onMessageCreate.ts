@@ -4,7 +4,7 @@ import { GuildPluginData } from "knub";
 import { convertDelayStringToMS, noop, resolveMember, tStrictMessageContent } from "../../../utils";
 import { validate } from "../../../validatorUtils";
 import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
+
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
@@ -15,7 +15,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id) as TextChannel;
   if (!channel) return;
 
   const config = await pluginData.config.getMatchingConfig({

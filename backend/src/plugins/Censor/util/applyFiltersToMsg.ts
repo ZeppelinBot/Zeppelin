@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import { CensorPluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { Embed, Invite } from "eris";
+
 import { ZalgoRegex } from "../../../data/Zalgo";
 import { getInviteCodesInString, getUrlsInString, resolveMember, resolveInvite, isGuildInvite } from "../../../utils";
 import cloneDeep from "lodash.clonedeep";

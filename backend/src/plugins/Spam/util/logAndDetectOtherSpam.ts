@@ -47,7 +47,7 @@ export async function logAndDetectOtherSpam(
             "Automatic spam detection",
             {
               caseArgs: {
-                modId: pluginData.client.user.id,
+                modId: pluginData.client.user!.id,
                 extraNotes: [`Details: ${details}`],
               },
             },
@@ -68,7 +68,7 @@ export async function logAndDetectOtherSpam(
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
         await casesPlugin.createCase({
           userId,
-          modId: pluginData.client.user.id,
+          modId: pluginData.client.user!.id,
           type: CaseTypes.Note,
           reason: `Automatic spam detection: ${details}`,
         });

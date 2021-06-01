@@ -29,7 +29,7 @@ export const NamesCmd = nameHistoryCmd({
     );
     const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
-    const user = pluginData.client.users.get(args.userId);
+    const user = pluginData.client.user!.get(args.userId);
     const currentUsername = user ? `${user.username}#${user.discriminator}` : args.userId;
 
     const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);

@@ -1,6 +1,5 @@
 import { utilityCmd } from "../types";
 import { noop, trimLines } from "../../../utils";
-import { Message } from "eris";
 
 const { performance } = require("perf_hooks");
 

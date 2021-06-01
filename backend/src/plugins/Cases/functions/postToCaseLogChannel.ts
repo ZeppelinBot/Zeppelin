@@ -1,27 +1,30 @@
 import { GuildPluginData } from "knub";
 import { CasesPluginType } from "../types";
-import { Message, MessageContent, MessageFile, TextChannel } from "eris";
+
 import { isDiscordRESTError } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
-import { logger } from "../../../logger";
+import { FileOptions, Message, MessageOptions, TextChannel } from "discord.js";
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
-  content: MessageContent,
-  file?: MessageFile,
+  content: MessageOptions,
+  file?: FileOptions[],
 ): Promise<Message | null> {
   const caseLogChannelId = pluginData.config.get().case_log_channel;
   if (!caseLogChannelId) return null;
 
-  const caseLogChannel = pluginData.guild.channels.get(caseLogChannelId);
+  const caseLogChannel = pluginData.guild.channels.cache.get(caseLogChannelId);
   if (!caseLogChannel || !(caseLogChannel instanceof TextChannel)) return null;
 
   let result;
   try {
-    result = await caseLogChannel.createMessage(content, file);
+    if (file != undefined) {
+      content.files = file;
+    }
+    result = await caseLogChannel.send({ ...content, split: false });
   } catch (e) {
     if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
@@ -50,7 +53,8 @@ export async function postCaseToCaseLogChannel(
     const [channelId, messageId] = theCase.log_message_id.split("-");
 
     try {
-      await pluginData.client.editMessage(channelId, messageId, caseEmbed);
+      const channel = pluginData.guild.channels.resolve(channelId) as TextChannel;
+      await channel.messages.edit(messageId, caseEmbed);
       return null;
     } catch {} // tslint:disable-line:no-empty
   }

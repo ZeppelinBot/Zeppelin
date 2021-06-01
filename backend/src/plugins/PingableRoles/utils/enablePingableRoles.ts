@@ -7,7 +7,7 @@ export function enablePingableRoles(
   pingableRoles: PingableRole[],
 ) {
   for (const pingableRole of pingableRoles) {
-    const role = pluginData.guild.roles.get(pingableRole.role_id);
+    const role = pluginData.guild.roles.cache.get(pingableRole.role_id);
     if (!role) continue;
 
     role.edit(

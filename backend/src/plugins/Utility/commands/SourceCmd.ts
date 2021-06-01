@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { errorMessage } from "../../../utils";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
-import { Constants, TextChannel } from "eris";
+
 import { canReadChannel } from "../../../utils/canReadChannel";
 
 export const SourceCmd = utilityCmd({

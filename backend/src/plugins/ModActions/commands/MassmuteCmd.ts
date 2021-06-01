@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { TextChannel } from "eris";
+
 import { waitForReply } from "knub/dist/helpers";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -43,7 +43,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.get(userId);
+      const member = pluginData.guild.members.cache.get(userId);
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massmute one or more users: insufficient permissions");
         return;

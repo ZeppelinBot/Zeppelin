@@ -9,7 +9,7 @@ import {
   stripObjectToScalars,
 } from "../../../utils";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { Member, VoiceChannel } from "eris";
+
 import { LogType } from "../../../data/LogType";
 
 export const VcmoveCmd = utilityCmd({
@@ -28,7 +28,7 @@ export const VcmoveCmd = utilityCmd({
 
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
-      const potentialChannel = pluginData.guild.channels.get(args.channel);
+      const potentialChannel = pluginData.guild.channels.cache.get(args.channel);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -38,7 +38,7 @@ export const VcmoveCmd = utilityCmd({
     } else if (channelMentionRegex.test(args.channel)) {
       // Channel mention -> parse channel id and resolve channel from that
       const channelId = args.channel.match(channelMentionRegex)![1];
-      const potentialChannel = pluginData.guild.channels.get(channelId);
+      const potentialChannel = pluginData.guild.channels.cache.get(channelId);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -69,7 +69,7 @@ export const VcmoveCmd = utilityCmd({
       return;
     }
 
-    const oldVoiceChannel = pluginData.guild.channels.get(args.member.voiceState.channelID);
+    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voiceState.channelID);
 
     try {
       await args.member.edit({
@@ -111,7 +111,7 @@ export const VcmoveAllCmd = utilityCmd({
 
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
-      const potentialChannel = pluginData.guild.channels.get(args.channel);
+      const potentialChannel = pluginData.guild.channels.cache.get(args.channel);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -121,7 +121,7 @@ export const VcmoveAllCmd = utilityCmd({
     } else if (channelMentionRegex.test(args.channel)) {
       // Channel mention -> parse channel id and resolve channel from that
       const channelId = args.channel.match(channelMentionRegex)![1];
-      const potentialChannel = pluginData.guild.channels.get(channelId);
+      const potentialChannel = pluginData.guild.channels.cache.get(channelId);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;

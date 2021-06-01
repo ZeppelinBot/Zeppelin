@@ -1,7 +1,7 @@
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { BotControlPluginType, ConfigSchema } from "./types";
 import { GuildArchives } from "../../data/GuildArchives";
-import { TextChannel } from "eris";
+
 import { sendSuccessMessage } from "../../pluginUtils";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
@@ -18,6 +18,7 @@ import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
 import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
 import { EligibleCmd } from "./commands/EligibleCmd";
+import { TextChannel } from "discord.js";
 
 const defaultOptions = {
   config: {
@@ -47,7 +48,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
     EligibleCmd,
   ],
 
-  afterLoad(pluginData) {
+  async afterLoad(pluginData) {
     pluginData.state.archives = new GuildArchives(0);
     pluginData.state.allowedGuilds = new AllowedGuilds();
     pluginData.state.configs = new Configs();
@@ -58,9 +59,9 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       const [guildId, channelId] = activeReload;
       resetActiveReload();
 
-      const guild = pluginData.client.guilds.get(guildId);
+      const guild = await pluginData.client.guilds.fetch(guildId);
       if (guild) {
-        const channel = guild.channels.get(channelId);
+        const channel = guild.channels.cache.get(channelId);
         if (channel instanceof TextChannel) {
           sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
         }

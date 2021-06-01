@@ -1,4 +1,3 @@
-import { TextChannel } from "eris";
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
 
 export function readContactMethodsFromArgs(args: {

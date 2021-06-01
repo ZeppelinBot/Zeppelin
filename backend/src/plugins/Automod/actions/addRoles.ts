@@ -1,17 +1,16 @@
+import { Permissions } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
-import { Constants } from "eris";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { canAssignRole } from "../../../utils/canAssignRole";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
+import { automodAction } from "../helpers";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
 export const AddRolesAction = automodAction({
   configType: t.array(t.string),
@@ -19,9 +18,9 @@ export const AddRolesAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const members = unique(contexts.map(c => c.member).filter(nonNullish));
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
-    const missingPermissions = getMissingPermissions(me.permission, p.manageRoles);
+    const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
@@ -42,7 +41,7 @@ export const AddRolesAction = automodAction({
 
     if (rolesWeCannotAssign.length) {
       const roleNamesWeCannotAssign = rolesWeCannotAssign.map(
-        roleId => pluginData.guild.roles.get(roleId)?.name || roleId,
+        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {

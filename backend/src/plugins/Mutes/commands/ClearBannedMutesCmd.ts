@@ -1,5 +1,5 @@
 import { mutesCmd } from "../types";
-import { User } from "eris";
+
 import { sendSuccessMessage } from "../../../pluginUtils";
 
 export const ClearBannedMutesCmd = mutesCmd({

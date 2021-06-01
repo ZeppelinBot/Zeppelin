@@ -1,4 +1,3 @@
-import { Client, GuildPreview } from "eris";
 import { memoize, MINUTES } from "../../../utils";
 
 /**

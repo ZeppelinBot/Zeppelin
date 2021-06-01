@@ -38,7 +38,7 @@ export const InfoCmd = utilityCmd({
     // 1. Channel
     if (userCfg.can_channelinfo) {
       const channelId = getChannelId(value);
-      const channel = channelId && pluginData.guild.channels.get(channelId);
+      const channel = channelId && pluginData.guild.channels.cache.get(channelId);
       if (channel) {
         const embed = await getChannelInfoEmbed(pluginData, channelId!, message.author.id);
         if (embed) {
@@ -121,7 +121,7 @@ export const InfoCmd = utilityCmd({
     // 7. Role
     if (userCfg.can_roleinfo) {
       const roleId = getRoleId(value);
-      const role = roleId && pluginData.guild.roles.get(roleId);
+      const role = roleId && pluginData.guild.roles.cache.get(roleId);
       if (role) {
         const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
         message.channel.createMessage({ embed });

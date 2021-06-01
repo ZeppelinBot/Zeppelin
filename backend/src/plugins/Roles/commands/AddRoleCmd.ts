@@ -3,7 +3,6 @@ import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginU
 import { rolesCmd } from "../types";
 import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-import { GuildChannel } from "eris";
 
 export const AddRoleCmd = rolesCmd({
   trigger: "addrole",

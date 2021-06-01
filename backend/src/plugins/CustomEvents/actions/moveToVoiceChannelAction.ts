@@ -5,7 +5,6 @@ import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { canActOn } from "../../../pluginUtils";
-import { Message, VoiceChannel } from "eris";
 
 export const MoveToVoiceChannelAction = t.type({
   type: t.literal("move_to_vc"),
@@ -30,7 +29,7 @@ export async function moveToVoiceChannelAction(
   }
 
   const targetChannelId = await renderTemplate(action.channel, values, false);
-  const targetChannel = pluginData.guild.channels.get(targetChannelId);
+  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId);
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof VoiceChannel)) throw new ActionError("Target channel is not a voice channel");
 

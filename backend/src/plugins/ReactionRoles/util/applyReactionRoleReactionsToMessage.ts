@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType } from "../types";
 import { ReactionRole } from "../../../data/entities/ReactionRole";
-import { TextChannel } from "eris";
+
 import { isDiscordRESTError, sleep, isSnowflake } from "../../../utils";
 import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -18,7 +18,7 @@ export async function applyReactionRoleReactionsToMessage(
   messageId: string,
   reactionRoles: ReactionRole[],
 ): Promise<string[] | undefined> {
-  const channel = pluginData.guild.channels.get(channelId) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(channelId) as TextChannel;
   if (!channel) return;
 
   const errors: string[] = [];

@@ -1,4 +1,3 @@
-import { Message, GuildTextableChannel, EmbedOptions, Role } from "eris";
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import {
@@ -102,7 +101,7 @@ export async function getUserInfoEmbed(
       largest: 2,
       round: true,
     });
-    const roles = member.roles.map(id => pluginData.guild.roles.get(id)).filter(r => r != null) as Role[];
+    const roles = member.roles.map(id => pluginData.guild.roles.cache.get(id)).filter(r => r != null) as Role[];
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
@@ -114,7 +113,7 @@ export async function getUserInfoEmbed(
     });
 
     const voiceChannel = member.voiceState.channelID
-      ? pluginData.guild.channels.get(member.voiceState.channelID)
+      ? pluginData.guild.channels.cache.get(member.voiceState.channelID)
       : null;
     if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
       embed.fields.push({

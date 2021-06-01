@@ -1,4 +1,3 @@
-import { Message, GuildTextableChannel, EmbedOptions } from "eris";
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import {

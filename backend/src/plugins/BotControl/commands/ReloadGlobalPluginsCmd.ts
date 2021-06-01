@@ -1,7 +1,6 @@
 import { botControlCmd } from "../types";
 import { isOwnerPreFilter } from "../../../pluginUtils";
 import { getActiveReload, setActiveReload } from "../activeReload";
-import { TextChannel } from "eris";
 
 export const ReloadGlobalPluginsCmd = botControlCmd({
   trigger: "bot_reload_global_plugins",

@@ -1,5 +1,5 @@
 import { utilityCmd } from "../types";
-import { TextChannel } from "eris";
+
 import { activeReloads } from "../guildReloads";
 
 export const ReloadGuildCmd = utilityCmd({

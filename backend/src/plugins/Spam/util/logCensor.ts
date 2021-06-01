@@ -4,7 +4,7 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function logCensor(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
-  const member = pluginData.guild.members.get(savedMessage.user_id);
+  const member = pluginData.guild.members.cache.get(savedMessage.user_id);
   const config = await pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,

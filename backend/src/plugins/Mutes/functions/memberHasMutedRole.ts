@@ -1,4 +1,3 @@
-import { Member } from "eris";
 import { GuildPluginData } from "knub";
 import { MutesPluginType } from "../types";
 

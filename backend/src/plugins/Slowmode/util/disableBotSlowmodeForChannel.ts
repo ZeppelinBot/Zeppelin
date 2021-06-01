@@ -1,4 +1,3 @@
-import { GuildChannel, TextChannel } from "eris";
 import { GuildPluginData } from "knub";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";

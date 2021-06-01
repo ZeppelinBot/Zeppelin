@@ -1,6 +1,6 @@
 import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Role, TextChannel } from "eris";
+
 import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
 import { sendErrorMessage } from "../../../pluginUtils";

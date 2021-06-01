@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { starboardCmd } from "../types";
 import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
+
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
 export const MigratePinsCmd = starboardCmd({
@@ -23,7 +23,7 @@ export const MigratePinsCmd = starboardCmd({
       return;
     }
 
-    const starboardChannel = pluginData.guild.channels.get(starboard.channel_id);
+    const starboardChannel = pluginData.guild.channels.cache.get(starboard.channel_id);
     if (!starboardChannel || !(starboardChannel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, "Starboard has an unknown/invalid channel id");
       return;

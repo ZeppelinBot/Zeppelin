@@ -1,4 +1,3 @@
-import { Member, TextChannel } from "eris";
 import { LogType } from "../../../data/LogType";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { errorMessage, resolveUser, resolveMember } from "../../../utils";

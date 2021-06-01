@@ -1,7 +1,7 @@
 import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { Embed } from "eris";
+
 import { trimLines } from "../../../utils";
 import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";

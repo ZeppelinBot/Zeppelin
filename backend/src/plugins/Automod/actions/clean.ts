@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
 import { noop } from "../../../utils";
+import { TextChannel } from "discord.js";
 
 export const CleanAction = automodAction({
   configType: t.boolean,
@@ -29,7 +30,8 @@ export const CleanAction = automodAction({
         pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id);
       }
 
-      await pluginData.client.deleteMessages(channelId, messageIds).catch(noop);
+      const channel = pluginData.guild.channels.cache.get(channelId) as TextChannel;
+      await channel.bulkDelete(messageIds).catch(noop);
     }
   },
 });

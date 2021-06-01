@@ -1,4 +1,3 @@
-import { VoiceChannel } from "eris";
 import { GuildPluginData } from "knub";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 

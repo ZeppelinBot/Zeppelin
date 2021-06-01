@@ -8,7 +8,7 @@ import {
   ucfirst,
   UserNotificationResult,
 } from "../../../utils";
-import { DiscordRESTError, User } from "eris";
+
 import { renderTemplate } from "../../../templateFormatter";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { LogType } from "../../../data/LogType";
@@ -99,7 +99,7 @@ export async function banUserId(
 
   const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
   if (banTime && banTime > 0) {
-    const selfId = pluginData.client.user.id;
+    const selfId = pluginData.client.user!.id;
     if (existingTempban) {
       pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
     } else {
@@ -108,7 +108,7 @@ export async function banUserId(
   }
 
   // Create a case for this action
-  const modId = banOptions.caseArgs?.modId || pluginData.client.user.id;
+  const modId = banOptions.caseArgs?.modId || pluginData.client.user!.id;
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
   const noteDetails: string[] = [];

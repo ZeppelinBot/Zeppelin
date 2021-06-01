@@ -3,7 +3,7 @@ import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { resolveChannel, waitForReply } from "knub/dist/helpers";
-import { TextChannel, User } from "eris";
+
 import { resolveUser, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
 import { setCounterValue } from "../functions/setCounterValue";

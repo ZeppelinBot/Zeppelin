@@ -42,7 +42,7 @@ export const MuteAction = automodAction({
     const rolesToRestore = actionConfig.restore_roles_on_mute;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

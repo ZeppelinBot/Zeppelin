@@ -1,4 +1,3 @@
-import { Message } from "eris";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";

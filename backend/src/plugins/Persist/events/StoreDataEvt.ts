@@ -1,6 +1,6 @@
 import { persistEvt } from "../types";
 import { IPartialPersistData } from "../../../data/GuildPersistedData";
-import { Member } from "eris";
+
 import intersection from "lodash.intersection";
 
 export const StoreDataEvt = persistEvt({

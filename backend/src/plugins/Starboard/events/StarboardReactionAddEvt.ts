@@ -1,5 +1,5 @@
 import { starboardEvt } from "../types";
-import { Message, TextChannel } from "eris";
+
 import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";

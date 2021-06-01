@@ -5,7 +5,7 @@ import { stripObjectToScalars } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { TextChannel } from "eris";
+
 import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../Cases/CasesPlugin";

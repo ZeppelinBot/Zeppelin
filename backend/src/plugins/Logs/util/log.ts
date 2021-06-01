@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import { LogsPluginType, TLogChannelMap } from "../types";
 import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
+
 import { createChunkedMessage, get, noop } from "../../../utils";
 import { getLogMessage } from "./getLogMessage";
 import { allowTimeout } from "../../../RegExpRunner";
@@ -19,7 +19,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
   const typeStr = LogType[type];
 
   logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
-    const channel = pluginData.guild.channels.get(channelId);
+    const channel = pluginData.guild.channels.cache.get(channelId);
     if (!channel || !(channel instanceof TextChannel)) continue;
 
     if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
@@ -45,7 +45,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (opts.excluded_roles) {
         for (const value of Object.values(data || {})) {
           if (value instanceof SavedMessage) {
-            const member = pluginData.guild.members.get(value.user_id);
+            const member = pluginData.guild.members.cache.get(value.user_id);
             for (const role of member?.roles || []) {
               if (opts.excluded_roles.includes(role)) {
                 continue logChannelLoop;

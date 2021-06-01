@@ -1,4 +1,3 @@
-import { EmbedOptions } from "eris";
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { trimLines, preEmbedPadding, EmbedWith } from "../../../utils";

@@ -10,9 +10,9 @@ export const ViewAntiraidCmd = typedGuildCommand<AutomodPluginType>()({
 
   async run({ pluginData, message }) {
     if (pluginData.state.cachedAntiraidLevel) {
-      message.channel.createMessage(`Anti-raid is set to **${pluginData.state.cachedAntiraidLevel}**`);
+      message.channel.send(`Anti-raid is set to **${pluginData.state.cachedAntiraidLevel}**`);
     } else {
-      message.channel.createMessage(`Anti-raid is **off**`);
+      message.channel.send(`Anti-raid is **off**`);
     }
   },
 });

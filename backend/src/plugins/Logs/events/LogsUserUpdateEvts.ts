@@ -1,6 +1,6 @@
 import { logsEvt } from "../types";
 import { stripObjectToScalars, UnknownUser } from "../../../utils";
-import { Constants as ErisConstants } from "eris";
+
 import { LogType } from "../../../data/LogType";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
@@ -61,11 +61,11 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               addedRoles: addedRoles
-                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               removedRoles: removedRoles
-                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),
@@ -79,7 +79,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: addedRoles
-                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),
@@ -93,7 +93,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: removedRoles
-                .map(roleId => pluginData.guild.roles.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: stripObjectToScalars(mod),

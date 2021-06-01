@@ -5,7 +5,7 @@ import { LogType } from "../../../data/LogType";
 import { getBaseUrl } from "../../../pluginUtils";
 
 export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPluginType>, savedMessages: SavedMessage[]) {
-  const channel = pluginData.guild.channels.get(savedMessages[0].channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessages[0].channel_id);
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
   const archiveUrl = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
   const authorIds = Array.from(new Set(savedMessages.map(item => `\`${item.user_id}\``))).join(", ");

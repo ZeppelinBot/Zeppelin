@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
-import { User, Message, Member } from "eris";
+
 import { UnknownUser, asSingleLine } from "../../../utils";
 import { sendErrorMessage, sendSuccessMessage, hasPermission } from "../../../pluginUtils";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";

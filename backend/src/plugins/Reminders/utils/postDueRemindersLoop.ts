@@ -1,4 +1,3 @@
-import { TextChannel } from "eris";
 import { GuildPluginData } from "knub";
 import { RemindersPluginType } from "../types";
 import moment from "moment-timezone";
@@ -12,7 +11,7 @@ const MAX_TRIES = 3;
 export async function postDueRemindersLoop(pluginData: GuildPluginData<RemindersPluginType>) {
   const pendingReminders = await pluginData.state.reminders.getDueReminders();
   for (const reminder of pendingReminders) {
-    const channel = pluginData.guild.channels.get(reminder.channel_id);
+    const channel = pluginData.guild.channels.cache.get(reminder.channel_id);
     if (channel && channel instanceof TextChannel) {
       try {
         // Only show created at date if one exists

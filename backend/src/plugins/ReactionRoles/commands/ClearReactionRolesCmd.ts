@@ -1,7 +1,7 @@
 import { reactionRolesCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { Message, TextChannel } from "eris";
+
 import { isDiscordRESTError } from "../../../utils";
 
 export const ClearReactionRolesCmd = reactionRolesCmd({

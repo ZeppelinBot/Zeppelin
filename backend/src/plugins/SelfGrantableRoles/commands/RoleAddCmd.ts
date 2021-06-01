@@ -5,7 +5,7 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { splitRoleNames } from "../util/splitRoleNames";
 import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { findMatchingRoles } from "../util/findMatchingRoles";
-import { Role } from "eris";
+
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export const RoleAddCmd = selfGrantableRolesCmd({
@@ -31,7 +31,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     const hasUnknownRoles = matchedRoleIds.length !== roleNames.length;
 
     const rolesToAdd: Map<string, Role> = Array.from(matchedRoleIds.values())
-      .map(id => pluginData.guild.roles.get(id)!)
+      .map(id => pluginData.guild.roles.cache.get(id)!)
       .filter(Boolean)
       .reduce((map, role) => {
         map.set(role.id, role);
@@ -69,9 +69,9 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             rolesToAdd.delete(roleId);
 
             if (msg.member.roles.includes(roleId)) {
-              removed.add(pluginData.guild.roles.get(roleId)!);
+              removed.add(pluginData.guild.roles.cache.get(roleId)!);
             } else {
-              skipped.add(pluginData.guild.roles.get(roleId)!);
+              skipped.add(pluginData.guild.roles.cache.get(roleId)!);
             }
           }
         }

@@ -1,8 +1,7 @@
 import { messageSaverEvt } from "../types";
-import { Message } from "eris";
 
 export const MessageCreateEvt = messageSaverEvt({
-  event: "messageCreate",
+  event: "message",
   allowBots: true,
   allowSelf: true,
 

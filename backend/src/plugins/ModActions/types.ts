@@ -6,7 +6,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { Case } from "../../data/entities/Case";
 import { CaseArgs } from "../Cases/types";
-import { TextChannel } from "eris";
+
 import { GuildTempbans } from "../../data/GuildTempbans";
 import Timeout = NodeJS.Timeout;
 import { EventEmitter } from "events";

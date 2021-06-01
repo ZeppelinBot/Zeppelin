@@ -1,7 +1,7 @@
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-import { Constants as ErisConstants, User } from "eris";
+
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { logger } from "../../../logger";
