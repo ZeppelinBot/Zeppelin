@@ -1,7 +1,7 @@
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
 import { GuildPluginData } from "knub";
-import { TextChannel, VoiceChannel } from "eris";
+
 import { isDiscordRESTError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
@@ -63,13 +63,13 @@ export async function handleCompanionPermissions(
 
   try {
     for (const channelId of permsToDelete) {
-      const channel = pluginData.guild.channels.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
       await channel.deletePermission(userId, `Companion Channel for ${oldChannel!.id} | User Left`);
     }
 
     for (const [channelId, permissions] of permsToSet) {
-      const channel = pluginData.guild.channels.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
       await channel.editPermission(
         userId,

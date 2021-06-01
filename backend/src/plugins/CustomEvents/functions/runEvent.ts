@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { ActionError } from "../ActionError";
-import { Message } from "eris";
+
 import { addRoleAction } from "../actions/addRoleAction";
 import { createCaseAction } from "../actions/createCaseAction";
 import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";

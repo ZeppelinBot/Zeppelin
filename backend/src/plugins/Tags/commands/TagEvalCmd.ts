@@ -1,6 +1,6 @@
 import { tagsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { MessageContent } from "eris";
+
 import { TemplateParseError } from "../../../templateFormatter";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { renderTagBody } from "../util/renderTagBody";

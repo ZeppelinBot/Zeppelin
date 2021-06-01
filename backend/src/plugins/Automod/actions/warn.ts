@@ -25,7 +25,7 @@ export const WarnAction = automodAction({
     const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

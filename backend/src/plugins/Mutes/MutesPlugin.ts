@@ -13,7 +13,7 @@ import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { muteUser } from "./functions/muteUser";
 import { unmuteUser } from "./functions/unmuteUser";
-import { Member } from "eris";
+
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
 import { mapToPublicFn } from "../../pluginUtils";

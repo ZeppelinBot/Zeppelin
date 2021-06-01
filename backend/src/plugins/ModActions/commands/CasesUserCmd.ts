@@ -12,7 +12,7 @@ import {
   chunkArray,
 } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { EmbedOptions, User } from "eris";
+
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { asyncMap } from "../../../utils/async";
 import { CaseTypes } from "../../../data/CaseTypes";

@@ -1,4 +1,3 @@
-import { EmbedField, EmojiOptions, GuildChannel, Message } from "eris";
 import { EMPTY_CHAR, messageLink } from "../../../utils";
 import { TStarboardOpts } from "../types";
 

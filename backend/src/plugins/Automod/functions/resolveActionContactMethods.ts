@@ -1,8 +1,9 @@
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { TextChannel } from "eris";
+
 import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
+import { TextChannel } from "discord.js";
 
 export function resolveActionContactMethods(
   pluginData: GuildPluginData<AutomodPluginType>,
@@ -18,7 +19,7 @@ export function resolveActionContactMethods(
       throw new RecoverablePluginError(ERRORS.NO_USER_NOTIFICATION_CHANNEL);
     }
 
-    const channel = pluginData.guild.channels.get(actionConfig.notifyChannel);
+    const channel = pluginData.guild.channels.cache.get(actionConfig.notifyChannel);
     if (!(channel instanceof TextChannel)) {
       throw new RecoverablePluginError(ERRORS.INVALID_USER_NOTIFICATION_CHANNEL);
     }

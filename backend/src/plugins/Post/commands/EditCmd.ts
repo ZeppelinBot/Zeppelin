@@ -19,7 +19,7 @@ export const EditCmd = postCmd({
       return;
     }
 
-    if (savedMessage.user_id !== pluginData.client.user.id) {
+    if (savedMessage.user_id !== pluginData.client.user!.id) {
       sendErrorMessage(pluginData, msg.channel, "Message wasn't posted by me");
       return;
     }

@@ -1,7 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
 import { UserNotificationMethod } from "../../../utils";
-import { TextChannel } from "eris";
 
 export function getDefaultContactMethods(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -15,7 +14,7 @@ export function getDefaultContactMethods(
   }
 
   if (config[`message_on_${type}`] && config.message_channel) {
-    const channel = pluginData.guild.channels.get(config.message_channel);
+    const channel = pluginData.guild.channels.cache.get(config.message_channel);
     if (channel instanceof TextChannel) {
       methods.push({
         type: "channel",

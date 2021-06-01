@@ -7,7 +7,7 @@ import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromA
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { TextChannel } from "eris";
+
 import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
@@ -46,7 +46,7 @@ export const MassbanCmd = modActionsCmd({
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.get(userId); // TODO: Get members on demand?
+      const member = pluginData.guild.members.cache.get(userId); // TODO: Get members on demand?
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massban one or more users: insufficient permissions");
         return;

@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
-import { Member } from "eris";
+
 import {
   createUserNotificationError,
   notifyUser,
@@ -63,7 +63,7 @@ export async function kickMember(
     };
   }
 
-  const modId = kickOptions.caseArgs?.modId || pluginData.client.user.id;
+  const modId = kickOptions.caseArgs?.modId || pluginData.client.user!.id;
 
   // Create a case for this action
   const casesPlugin = pluginData.getPlugin(CasesPlugin);

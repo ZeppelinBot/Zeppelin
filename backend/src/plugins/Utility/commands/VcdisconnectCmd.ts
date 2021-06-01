@@ -8,7 +8,7 @@ import {
   stripObjectToScalars,
 } from "../../../utils";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { VoiceChannel } from "eris";
+
 import { LogType } from "../../../data/LogType";
 import { resolveChannel } from "knub/dist/helpers";
 

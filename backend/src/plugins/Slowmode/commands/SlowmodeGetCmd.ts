@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
-import { TextChannel } from "eris";
+
 import humanizeDuration from "humanize-duration";
 
 export const SlowmodeGetCmd = slowmodeCmd({

@@ -1,4 +1,3 @@
-import { Member, TextableChannel } from "eris";
 import { GuildPluginData } from "knub";
 import { LocateUserPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";

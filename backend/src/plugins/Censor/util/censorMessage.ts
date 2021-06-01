@@ -19,7 +19,7 @@ export async function censorMessage(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.get(savedMessage.channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
 
   pluginData.state.serverLogs.log(LogType.CENSOR, {
     user: stripObjectToScalars(user),

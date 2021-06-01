@@ -14,7 +14,6 @@ import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannelModifyEvts";
 import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
-import { LogsVoiceJoinEvt, LogsVoiceLeaveEvt, LogsVoiceSwitchEvt } from "./events/LogsVoiceChannelEvts";
 import { log } from "./util/log";
 import { LogType } from "../../data/LogType";
 import { getLogMessage } from "./util/getLogMessage";
@@ -23,6 +22,7 @@ import { disableCodeBlocks } from "../../utils";
 import { logger } from "../../logger";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -66,9 +66,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsChannelDeleteEvt,
     LogsRoleCreateEvt,
     LogsRoleDeleteEvt,
-    LogsVoiceJoinEvt,
-    LogsVoiceLeaveEvt,
-    LogsVoiceSwitchEvt,
+    LogsVoiceStateUpdateEvt,
   ],
 
   public: {

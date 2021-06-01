@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { StarboardPluginType, TStarboardOpts } from "../types";
-import { Message, GuildChannel, TextChannel, Embed } from "eris";
+
 import moment from "moment-timezone";
 import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
 import path from "path";
@@ -12,7 +12,7 @@ export async function saveMessageToStarboard(
   msg: Message,
   starboard: TStarboardOpts,
 ) {
-  const channel = pluginData.guild.channels.get(starboard.channel_id);
+  const channel = pluginData.guild.channels.cache.get(starboard.channel_id);
   if (!channel) return;
 
   const starCount = (await pluginData.state.starboardReactions.getAllReactionsForMessageId(msg.id)).length;

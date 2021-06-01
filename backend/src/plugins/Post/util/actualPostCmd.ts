@@ -1,4 +1,3 @@
-import { Message, Channel, TextChannel } from "eris";
 import { StrictMessageContent, errorMessage, stripObjectToScalars, MINUTES, DBDateFormat } from "../../../utils";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType";

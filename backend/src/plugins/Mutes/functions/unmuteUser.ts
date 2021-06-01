@@ -7,7 +7,7 @@ import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { MemberOptions } from "eris";
+
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export async function unmuteUser(
@@ -19,7 +19,7 @@ export async function unmuteUser(
   const existingMute = await pluginData.state.mutes.findExistingMuteForUserId(userId);
   const user = await resolveUser(pluginData.client, userId);
   const member = await resolveMember(pluginData.client, pluginData.guild, userId); // Grab the fresh member so we don't have stale role info
-  const modId = caseArgs.modId || pluginData.client.user.id;
+  const modId = caseArgs.modId || pluginData.client.user!.id;
 
   if (!existingMute && member && !memberHasMutedRole(pluginData, member)) return null;
 
@@ -85,7 +85,7 @@ export async function unmuteUser(
   });
 
   // Log the action
-  const mod = pluginData.client.users.get(modId);
+  const mod = pluginData.client.user!.get(modId);
   if (unmuteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
       mod: stripObjectToScalars(mod),

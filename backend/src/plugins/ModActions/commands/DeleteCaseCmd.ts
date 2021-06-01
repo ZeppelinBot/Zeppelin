@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { helpers } from "knub";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { TextChannel } from "eris";
+
 import { SECONDS, stripObjectToScalars, trimLines } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";

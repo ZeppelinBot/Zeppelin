@@ -2,7 +2,6 @@ import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { BasePluginType, typedGlobalEventListener, GlobalPluginData } from "knub";
 import * as t from "io-ts";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { Guild } from "eris";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   config: {};

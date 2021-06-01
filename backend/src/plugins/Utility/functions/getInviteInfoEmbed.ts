@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { Constants, EmbedOptions } from "eris";
+
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";

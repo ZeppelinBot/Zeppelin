@@ -2,7 +2,7 @@ import { utilityCmd, UtilityPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { DAYS, getInviteCodesInString, noop, SECONDS, stripObjectToScalars } from "../../../utils";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { Message, TextChannel, User } from "eris";
+
 import moment from "moment-timezone";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -87,7 +87,7 @@ export const CleanCmd = utilityCmd({
       return;
     }
 
-    const targetChannel = args.channel ? pluginData.guild.channels.get(args.channel) : msg.channel;
+    const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel) : msg.channel;
     if (!targetChannel || !(targetChannel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`);
       return;

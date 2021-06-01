@@ -11,7 +11,7 @@ import { isBanned } from "../functions/isBanned";
 import { waitForReaction } from "knub/dist/helpers";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
-import { TextChannel } from "eris";
+
 import { actualMuteUserCmd } from "../functions/actualMuteUserCmd";
 
 const opts = {

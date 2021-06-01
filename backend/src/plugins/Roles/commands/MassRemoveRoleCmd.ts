@@ -4,7 +4,6 @@ import { rolesCmd } from "../types";
 import { resolveMember, stripObjectToScalars, successMessage, resolveRoleId } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { Member } from "eris";
 
 export const MassRemoveRoleCmd = rolesCmd({
   trigger: "massremoverole",
@@ -49,7 +48,7 @@ export const MassRemoveRoleCmd = rolesCmd({
       return;
     }
 
-    const role = pluginData.guild.roles.get(roleId);
+    const role = pluginData.guild.roles.cache.get(roleId);
     if (!role) {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,

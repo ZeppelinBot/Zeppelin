@@ -1,7 +1,7 @@
 import { logsEvt } from "../types";
 import { stripObjectToScalars } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-
+/** Merge into single event
 export const LogsVoiceJoinEvt = logsEvt({
   event: "voiceChannelJoin",
 
@@ -33,5 +33,14 @@ export const LogsVoiceSwitchEvt = logsEvt({
       oldChannel: stripObjectToScalars(meta.args.oldChannel),
       newChannel: stripObjectToScalars(meta.args.newChannel),
     });
+  },
+});
+**/
+
+export const LogsVoiceStateUpdateEvt = logsEvt({
+  event: "voiceStateUpdate",
+
+  async listener(meta) {
+    console.error(`Fixme @LogsVoiceChannelEvts.ts`);
   },
 });

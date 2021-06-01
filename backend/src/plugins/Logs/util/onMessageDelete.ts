@@ -1,5 +1,5 @@
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { Attachment } from "eris";
+
 import { useMediaUrls, stripObjectToScalars, resolveUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
@@ -9,7 +9,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.get(savedMessage.channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
 
   if (user) {
     // Replace attachment URLs with media URLs

@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
-import { TextChannel } from "eris";
+
 import humanizeDuration from "humanize-duration";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine, DAYS, disableInlineCode, HOURS, MINUTES } from "../../../utils";
@@ -84,7 +84,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     // Verify permissions
-    const channelPermissions = channel.permissionsOf(pluginData.client.user.id);
+    const channelPermissions = channel.permissionsOf(pluginData.client.user!.id);
 
     if (mode === "native") {
       const missingPermissions = getMissingPermissions(channelPermissions, NATIVE_SLOWMODE_PERMISSIONS);

@@ -1,7 +1,7 @@
 import { modActionsEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
-import { Constants, TextChannel } from "eris";
+
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 
@@ -22,7 +22,7 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
     const logs = pluginData.getPlugin(LogsPlugin);
 
     if (actions.length) {
-      const alertChannel = pluginData.guild.channels.get(alertChannelId);
+      const alertChannel = pluginData.guild.channels.cache.get(alertChannelId);
       if (!alertChannel) {
         logs.log(LogType.BOT_ALERT, {
           body: `Unknown \`alert_channel\` configured for \`mod_actions\`: \`${alertChannelId}\``,
@@ -37,8 +37,8 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
         return;
       }
 
-      const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
-      const botPerms = alertChannel.permissionsOf(botMember ?? pluginData.client.user.id);
+      const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
+      const botPerms = alertChannel.permissionsOf(botMember ?? pluginData.client.user!.id);
       if (!hasDiscordPermissions(botPerms, Constants.Permissions.sendMessages)) {
         logs.log(LogType.BOT_ALERT, {
           body: `Missing "Send Messages" permissions for the \`alert_channel\` configured in \`mod_actions\`: \`${alertChannelId}\``,

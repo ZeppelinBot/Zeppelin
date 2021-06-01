@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { PostPluginType } from "../types";
-import { Attachment, Message, MessageContent, TextChannel } from "eris";
+
 import { downloadFile } from "../../../utils";
 import fs from "fs";
 import { formatContent } from "./formatContent";

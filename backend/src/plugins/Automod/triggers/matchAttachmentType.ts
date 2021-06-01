@@ -73,7 +73,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.get(contexts[0].message!.channel_id)!;
+    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id)!;
     const prettyChannel = verboseChannelMention(channel);
 
     return (

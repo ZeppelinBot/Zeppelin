@@ -37,7 +37,7 @@ export const BanAction = automodAction({
     const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

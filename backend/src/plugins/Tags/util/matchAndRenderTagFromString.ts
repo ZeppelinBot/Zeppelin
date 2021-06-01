@@ -4,7 +4,6 @@ import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
 import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
 import escapeStringRegexp from "escape-string-regexp";
-import { Member } from "eris";
 
 interface BaseResult {
   renderedContent: StrictMessageContent;

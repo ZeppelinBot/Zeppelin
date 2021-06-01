@@ -3,11 +3,12 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { Constants, GuildChannel } from "eris";
+
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { GuildChannel, Permissions } from "discord.js";
 
-const requiredPermissions = readChannelPermissions | Constants.Permissions.addReactions;
+const requiredPermissions = readChannelPermissions | Permissions.FLAGS.ADD_REACTIONS;
 
 export const NewAutoReactionsCmd = autoReactionsCmd({
   trigger: "auto_reactions",
@@ -22,7 +23,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
   async run({ message: msg, args, pluginData }) {
     const finalReactions: string[] = [];
 
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     const missingPermissions = getMissingChannelPermissions(me, args.channel as GuildChannel, requiredPermissions);
     if (missingPermissions) {
       sendErrorMessage(

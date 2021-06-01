@@ -4,7 +4,7 @@ import { logger } from "../../../logger";
 import { stripObjectToScalars, SECONDS, DBDateFormat } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
-import { TextChannel, User } from "eris";
+
 import { postMessage } from "./postMessage";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
@@ -12,10 +12,10 @@ const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginType>) {
   const duePosts = await pluginData.state.scheduledPosts.getDueScheduledPosts();
   for (const post of duePosts) {
-    const channel = pluginData.guild.channels.get(post.channel_id);
+    const channel = pluginData.guild.channels.cache.get(post.channel_id);
     if (channel instanceof TextChannel) {
       const [username, discriminator] = post.author_name.split("#");
-      const author: Partial<User> = pluginData.client.users.get(post.author_id) || {
+      const author: Partial<User> = pluginData.client.user!.get(post.author_id) || {
         id: post.author_id,
         username,
         discriminator,

@@ -1,4 +1,3 @@
-import { User } from "eris";
 import { GuildPluginData } from "knub";
 import { UsernameSaverPluginType } from "./types";
 

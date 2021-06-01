@@ -33,7 +33,7 @@ export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
   },
 
   renderMatchInformation({ matchResult, pluginData, contexts }) {
-    const role = pluginData.guild.roles.get(matchResult.extra.matchedRoleId);
+    const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId);
     const roleName = role?.name || "Unknown";
     const member = contexts[0].member!;
     const memberName = `**${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;

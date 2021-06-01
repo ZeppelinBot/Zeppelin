@@ -18,7 +18,7 @@ export async function makeRoleMentionableAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const role = pluginData.guild.roles.get(action.role);
+  const role = pluginData.guild.roles.cache.get(action.role);
   if (!role) {
     throw new ActionError(`Unknown role: ${role}`);
   }

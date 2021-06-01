@@ -24,7 +24,7 @@ export async function setChannelPermissionOverridesAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const channel = pluginData.guild.channels.get(action.channel);
+  const channel = pluginData.guild.channels.cache.get(action.channel);
   if (!channel) {
     throw new ActionError(`Unknown channel: ${action.channel}`);
   }

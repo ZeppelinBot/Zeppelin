@@ -14,7 +14,6 @@ import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { logger } from "../../../logger";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { MessageContent } from "eris";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,

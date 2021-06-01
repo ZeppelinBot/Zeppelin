@@ -1,4 +1,3 @@
-import { Constants, Member, Message, User } from "eris";
 import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
 import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
@@ -396,7 +395,7 @@ async function performBanSearch(
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
-  const member = pluginData.guild.members.get(pluginData.client.user.id);
+  const member = pluginData.guild.members.cache.get(pluginData.client.user!.id);
   if (member && !hasDiscordPermissions(member.permissions, Constants.Permissions.banMembers)) {
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
   }

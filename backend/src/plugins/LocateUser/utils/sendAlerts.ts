@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import { LocateUserPluginType } from "../types";
 import { resolveMember } from "../../../utils";
 import { sendWhere } from "./sendWhere";
-import { TextableChannel } from "eris";
+
 import { moveMember } from "./moveMember";
 
 export async function sendAlerts(pluginData: GuildPluginData<LocateUserPluginType>, userId: string) {

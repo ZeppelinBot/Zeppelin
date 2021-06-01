@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { Constants, EmbedOptions } from "eris";
+
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";

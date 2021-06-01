@@ -29,7 +29,7 @@ export const TypingEnablePingableEvt = pingableRolesEvt({
 });
 
 export const MessageCreateDisablePingableEvt = pingableRolesEvt({
-  event: "messageCreate",
+  event: "message",
 
   async listener(meta) {
     const pluginData = meta.pluginData;

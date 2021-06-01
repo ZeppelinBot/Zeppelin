@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginUtils";
 import { rolesCmd } from "../types";
-import { GuildChannel } from "eris";
+
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, verboseUserMention, resolveRoleId } from "../../../utils";
 

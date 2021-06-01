@@ -1,17 +1,17 @@
 import { autoReactionsEvt } from "../types";
 import { isDiscordRESTError } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Constants, GuildChannel } from "eris";
+
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { GuildChannel, Permissions } from "discord.js";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
 export const AddReactionsEvt = autoReactionsEvt({
-  event: "messageCreate",
+  event: "message",
   allowBots: true,
   allowSelf: true,
 
@@ -19,11 +19,11 @@ export const AddReactionsEvt = autoReactionsEvt({
     const autoReaction = await pluginData.state.autoReactions.getForChannel(message.channel.id);
     if (!autoReaction) return;
 
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     const missingPermissions = getMissingChannelPermissions(
       me,
       message.channel as GuildChannel,
-      readChannelPermissions | p.addReactions,
+      readChannelPermissions | p.ADD_REACTIONS,
     );
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
@@ -35,7 +35,7 @@ export const AddReactionsEvt = autoReactionsEvt({
 
     for (const reaction of autoReaction.reactions) {
       try {
-        await message.addReaction(reaction);
+        await message.react(reaction);
       } catch (e) {
         if (isDiscordRESTError(e)) {
           const logs = pluginData.getPlugin(LogsPlugin);

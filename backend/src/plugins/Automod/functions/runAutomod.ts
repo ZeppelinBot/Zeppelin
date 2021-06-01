@@ -5,14 +5,14 @@ import { availableActions } from "../actions/availableActions";
 import { AutomodTriggerMatchResult } from "../helpers";
 import { CleanAction } from "../actions/clean";
 import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
-import { TextChannel } from "eris";
+import { TextChannel } from "discord.js";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
-  const user = context.user || (userId && pluginData.client.users.get(userId));
-  const member = context.member || (userId && pluginData.guild.members.get(userId)) || null;
+  const user = context.user || (userId && pluginData.client.users!.cache.get(userId));
+  const member = context.member || (userId && pluginData.guild.members.cache.get(userId)) || null;
   const channelId = context.message?.channel_id;
-  const channel = channelId ? (pluginData.guild.channels.get(channelId) as TextChannel) : null;
+  const channel = channelId ? (pluginData.guild.channels.cache.get(channelId) as TextChannel) : null;
   const categoryId = channel?.parentID;
 
   const config = await pluginData.config.getMatchingConfig({

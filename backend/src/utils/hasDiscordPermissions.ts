@@ -5,7 +5,7 @@ import { Permissions } from "discord.js";
  * @param requiredPermissions Bitmask of required permissions
  */
 export function hasDiscordPermissions(
-  resolvedPermissions: Permissions | Readonly<Permissions>,
+  resolvedPermissions: Permissions | Readonly<Permissions> | null,
   requiredPermissions: number | bigint,
 ) {
   const allowedPermissions = BigInt(resolvedPermissions);

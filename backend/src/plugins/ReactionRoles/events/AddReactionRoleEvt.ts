@@ -1,7 +1,7 @@
 import { reactionRolesEvt } from "../types";
 import { noop, resolveMember, sleep } from "../../../utils";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
-import { DiscordRESTError, Message } from "eris";
+
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 
@@ -16,7 +16,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
     const emoji = meta.args.emoji;
     const userId = meta.args.member.id;
 
-    if (userId === pluginData.client.user.id) {
+    if (userId === pluginData.client.user!.id) {
       // Don't act on own reactions
       // FIXME: This may not be needed? Knub currently requires the *member* to be found for the user to be resolved as well. Need to look into it more.
       return;

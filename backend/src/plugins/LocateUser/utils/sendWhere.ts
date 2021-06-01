@@ -1,4 +1,3 @@
-import { Invite, Member, TextableChannel, VoiceChannel } from "eris";
 import { getInviteLink } from "knub/dist/helpers";
 import { createOrReuseInvite } from "./createOrReuseInvite";
 import { GuildPluginData } from "knub";
@@ -12,7 +11,7 @@ export async function sendWhere(
   prepend: string,
 ) {
   const voice = member.voiceState.channelID
-    ? (pluginData.guild.channels.get(member.voiceState.channelID) as VoiceChannel)
+    ? (pluginData.guild.channels.cache.get(member.voiceState.channelID) as VoiceChannel)
     : null;
 
   if (voice == null) {

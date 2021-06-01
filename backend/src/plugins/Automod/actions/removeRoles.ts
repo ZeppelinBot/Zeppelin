@@ -8,11 +8,12 @@ import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
-import { Constants } from "eris";
+
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { Permissions } from "discord.js";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
 export const RemoveRolesAction = automodAction({
   configType: t.array(t.string),
@@ -21,9 +22,9 @@ export const RemoveRolesAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const members = unique(contexts.map(c => c.member).filter(nonNullish));
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
-    const missingPermissions = getMissingPermissions(me.permission, p.manageRoles);
+    const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
@@ -44,7 +45,7 @@ export const RemoveRolesAction = automodAction({
 
     if (rolesWeCannotRemove.length) {
       const roleNamesWeCannotRemove = rolesWeCannotRemove.map(
-        roleId => pluginData.guild.roles.get(roleId)?.name || roleId,
+        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {

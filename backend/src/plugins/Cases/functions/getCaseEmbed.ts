@@ -1,5 +1,5 @@
 import { Case } from "../../../data/entities/Case";
-import { AdvancedMessageContent, MessageContent } from "eris";
+
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { GuildPluginData, helpers } from "knub";
@@ -8,13 +8,14 @@ import { resolveCaseId } from "./resolveCaseId";
 import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
 import { getCaseColor } from "./getCaseColor";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageOptions } from "discord.js";
 
 export async function getCaseEmbed(
   pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
   requestMemberId?: string,
   noOriginalCaseLink?: boolean,
-): Promise<AdvancedMessageContent> {
+): Promise<MessageOptions> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) {
     throw new Error("Unknown case");

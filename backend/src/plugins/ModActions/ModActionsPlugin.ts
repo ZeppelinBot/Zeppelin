@@ -30,7 +30,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
 import { warnMember } from "./functions/warnMember";
-import { Member, Message } from "eris";
+
 import { kickMember } from "./functions/kickMember";
 import { banUserId } from "./functions/banUserId";
 import { MassmuteCmd } from "./commands/MassmuteCmd";

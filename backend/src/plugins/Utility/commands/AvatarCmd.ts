@@ -2,7 +2,6 @@ import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { UnknownUser } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { EmbedOptions } from "eris";
 
 export const AvatarCmd = utilityCmd({
   trigger: ["avatar", "av"],

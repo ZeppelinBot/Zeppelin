@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
-import { Constants, EmbedOptions } from "eris";
+
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { EmbedWith, formatNumber, preEmbedPadding, trimLines } from "../../../utils";
@@ -20,7 +20,7 @@ export async function getChannelInfoEmbed(
   channelId: string,
   requestMemberId?: string,
 ): Promise<EmbedOptions | null> {
-  const channel = pluginData.guild.channels.get(channelId);
+  const channel = pluginData.guild.channels.cache.get(channelId);
   if (!channel) {
     return null;
   }

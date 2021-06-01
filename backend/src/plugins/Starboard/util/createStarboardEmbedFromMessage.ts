@@ -1,5 +1,5 @@
 import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
-import { EmbedOptions, GuildChannel, Message } from "eris";
+
 import path from "path";
 
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];

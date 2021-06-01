@@ -1,6 +1,6 @@
 import { SlowmodePluginType } from "../types";
 import { GuildPluginData } from "knub";
-import { Constants, GuildChannel, TextChannel } from "eris";
+
 import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -18,7 +18,7 @@ export async function applyBotSlowmodeToUserId(
   try {
     await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
   } catch (e) {
-    const user = pluginData.client.users.get(userId) || new UnknownUser({ id: userId });
+    const user = pluginData.client.user!.get(userId) || new UnknownUser({ id: userId });
 
     if (isDiscordRESTError(e) && e.code === 50013) {
       logger.warn(

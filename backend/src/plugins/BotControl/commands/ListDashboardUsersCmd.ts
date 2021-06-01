@@ -3,7 +3,6 @@ import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../..
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { ApiPermissions } from "@shared/apiPermissions";
 import { resolveUser, UnknownUser } from "../../../utils";
-import { User } from "eris";
 
 export const ListDashboardUsersCmd = botControlCmd({
   trigger: ["list_dashboard_users"],

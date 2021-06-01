@@ -1,7 +1,7 @@
 import { logsEvt } from "../types";
 import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-import { Constants as ErisConstants } from "eris";
+
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 
 export const LogsGuildBanAddEvt = logsEvt({

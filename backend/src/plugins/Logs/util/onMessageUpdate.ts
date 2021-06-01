@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import { LogsPluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { Embed } from "eris";
+
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, resolveUser } from "../../../utils";
 import cloneDeep from "lodash.clonedeep";
@@ -47,7 +47,7 @@ export async function onMessageUpdate(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.get(savedMessage.channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
 
   pluginData.state.guildLogs.log(LogType.MESSAGE_EDIT, {
     user: stripObjectToScalars(user),

@@ -3,7 +3,6 @@ import { sorter } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { postMessage } from "../util/postMessage";
-import { TextChannel } from "eris";
 
 export const ScheduledPostsShowCmd = postCmd({
   trigger: ["scheduled_posts", "scheduled_posts show"],

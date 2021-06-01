@@ -12,7 +12,7 @@ import {
   UserNotificationMethod,
 } from "../../../utils";
 import { renderTemplate } from "../../../templateFormatter";
-import { MemberOptions, TextChannel, User } from "eris";
+
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -42,7 +42,7 @@ export async function muteUser(
   // No mod specified -> mark Zeppelin as the mod
   if (!muteOptions.caseArgs?.modId) {
     muteOptions.caseArgs = muteOptions.caseArgs ?? {};
-    muteOptions.caseArgs.modId = pluginData.client.user.id;
+    muteOptions.caseArgs.modId = pluginData.client.user!.id;
   }
 
   const user = await resolveUser(pluginData.client, userId);
@@ -99,7 +99,7 @@ export async function muteUser(
           throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
         }
 
-        const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id);
+        const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
         const zepRoles = pluginData.guild.roles.filter(x => zep!.roles.includes(x.id));
         // If we have roles and one of them is above the muted role, throw generic error
         if (zepRoles.length >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
@@ -172,7 +172,7 @@ export async function muteUser(
       }
 
       const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
-      const channel = config.message_channel && pluginData.guild.channels.get(config.message_channel);
+      const channel = config.message_channel && pluginData.guild.channels.cache.get(config.message_channel);
       if (useChannel && channel instanceof TextChannel) {
         contactMethods.push({ type: "channel", channel });
       }

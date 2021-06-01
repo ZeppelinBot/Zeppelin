@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import { MutesPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
-import { MemberOptions } from "eris";
+
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 
 export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginType>) {

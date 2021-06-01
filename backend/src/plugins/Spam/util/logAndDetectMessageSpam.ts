@@ -88,7 +88,7 @@ export async function logAndDetectMessageSpam(
               "Automatic spam detection",
               {
                 caseArgs: {
-                  modId: pluginData.client.user.id,
+                  modId: pluginData.client.user!.id,
                   postInCaseLogOverride: false,
                 },
               },
@@ -145,7 +145,7 @@ export async function logAndDetectMessageSpam(
         clearRecentUserActions(pluginData, type, savedMessage.user_id, savedMessage.channel_id);
 
         // Generate a log from the detected messages
-        const channel = pluginData.guild.channels.get(savedMessage.channel_id);
+        const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
         const archiveUrl = await saveSpamArchives(pluginData, uniqueMessages);
 
         // Create a case
@@ -173,7 +173,7 @@ export async function logAndDetectMessageSpam(
 
           casesPlugin.createCase({
             userId: savedMessage.user_id,
-            modId: pluginData.client.user.id,
+            modId: pluginData.client.user!.id,
             type: CaseTypes.Note,
             reason: caseText,
             automatic: true,

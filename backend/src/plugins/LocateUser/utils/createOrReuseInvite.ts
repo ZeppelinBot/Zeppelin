@@ -1,5 +1,3 @@
-import { VoiceChannel } from "eris";
-
 export async function createOrReuseInvite(vc: VoiceChannel) {
   const existingInvites = await vc.getInvites();
 

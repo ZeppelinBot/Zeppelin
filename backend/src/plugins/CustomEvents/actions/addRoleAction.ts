@@ -5,7 +5,6 @@ import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { canActOn } from "../../../pluginUtils";
-import { Message } from "eris";
 
 export const AddRoleAction = t.type({
   type: t.literal("add_role"),

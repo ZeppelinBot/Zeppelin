@@ -214,7 +214,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
           return input;
         }
 
-        if (pluginData.guild.members.has(input) || pluginData.client.users.has(input)) {
+        if (pluginData.guild.members.has(input) || pluginData.client.user!.has(input)) {
           return `<@!${input}>`;
         }
 

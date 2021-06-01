@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
-import { Member } from "eris";
+
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import {
   createUserNotificationError,
@@ -62,7 +62,7 @@ export async function warnMember(
     }
   }
 
-  const modId = warnOptions.caseArgs?.modId ?? pluginData.client.user.id;
+  const modId = warnOptions.caseArgs?.modId ?? pluginData.client.user!.id;
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const createdCase = await casesPlugin.createCase({

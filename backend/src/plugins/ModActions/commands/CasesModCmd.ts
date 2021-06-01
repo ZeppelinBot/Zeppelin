@@ -4,7 +4,7 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import { trimLines, createChunkedMessage, emptyEmbedValue, sorter, resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { asyncMap } from "../../../utils/async";
-import { EmbedOptions, User } from "eris";
+
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";

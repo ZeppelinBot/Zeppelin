@@ -2,7 +2,7 @@ import { welcomeMessageEvt } from "../types";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
 import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
+
 import { sendDM } from "../../../utils/sendDM";
 
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
@@ -55,7 +55,7 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
     }
 
     if (config.send_to_channel) {
-      const channel = meta.args.guild.channels.get(config.send_to_channel);
+      const channel = meta.args.guild.channels.cache.get(config.send_to_channel);
       if (!channel || !(channel instanceof TextChannel)) return;
 
       try {

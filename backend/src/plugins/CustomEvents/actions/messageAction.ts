@@ -3,7 +3,6 @@ import { CustomEventsPluginType } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
-import { TextChannel } from "eris";
 
 export const MessageAction = t.type({
   type: t.literal("message"),
@@ -18,7 +17,7 @@ export async function messageAction(
   values: any,
 ) {
   const targetChannelId = await renderTemplate(action.channel, values, false);
-  const targetChannel = pluginData.guild.channels.get(targetChannelId);
+  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId);
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof TextChannel)) throw new ActionError("Target channel is not a text channel");
 

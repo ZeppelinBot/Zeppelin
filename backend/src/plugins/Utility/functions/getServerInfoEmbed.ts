@@ -12,7 +12,7 @@ import {
   resolveUser,
   trimLines,
 } from "../../../utils";
-import { CategoryChannel, EmbedOptions, Guild, TextChannel, VoiceChannel } from "eris";
+
 import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { getGuildPreview } from "./getGuildPreview";
