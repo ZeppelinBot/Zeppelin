@@ -14,7 +14,7 @@ export const SaveMessagesToDBCmd = messageSaverCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    await msg.channel.createMessage("Saving specified messages...");
+    await msg.channel.send("Saving specified messages...");
     const { savedCount, failed } = await saveMessagesToDB(pluginData, args.channel, args.ids.trim().split(" "));
 
     if (failed.length) {

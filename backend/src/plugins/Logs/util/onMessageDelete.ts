@@ -6,6 +6,7 @@ import moment from "moment-timezone";
 import { GuildPluginData } from "knub";
 import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageAttachment } from "discord.js";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
@@ -14,7 +15,7 @@ export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType
   if (user) {
     // Replace attachment URLs with media URLs
     if (savedMessage.data.attachments) {
-      for (const attachment of savedMessage.data.attachments as Attachment[]) {
+      for (const attachment of savedMessage.data.attachments as MessageAttachment[]) {
         attachment.url = useMediaUrls(attachment.url);
       }
     }

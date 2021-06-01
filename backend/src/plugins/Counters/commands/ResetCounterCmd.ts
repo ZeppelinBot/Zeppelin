@@ -2,10 +2,11 @@ import { typedGuildCommand } from "knub";
 import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { resolveChannel, waitForReply } from "knub/dist/helpers";
+import { waitForReply } from "knub/dist/helpers";
 
 import { resolveUser, UnknownUser } from "../../../utils";
 import { setCounterValue } from "../functions/setCounterValue";
+import { TextChannel } from "discord.js";
 
 export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters reset", "counter reset", "resetcounter"],
@@ -61,14 +62,14 @@ export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let channel = args.channel;
     if (!channel && counter.per_channel) {
-      message.channel.createMessage(`Which channel's counter value would you like to reset?`);
+      message.channel.send(`Which channel's counter value would you like to reset?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
         return;
       }
 
-      const potentialChannel = resolveChannel(pluginData.guild, reply.content);
+      const potentialChannel = pluginData.guild.channels.resolve(reply.content);
       if (!potentialChannel || !(potentialChannel instanceof TextChannel)) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;
@@ -79,7 +80,7 @@ export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let user = args.user;
     if (!user && counter.per_user) {
-      message.channel.createMessage(`Which user's counter value would you like to reset?`);
+      message.channel.send(`Which user's counter value would you like to reset?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -99,13 +100,13 @@ export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
     const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.createMessage(`Reset **${counterName}** for <@!${user.id}> in <#${channel.id}>`);
+      message.channel.send(`Reset **${counterName}** for <@!${user.id}> in <#${channel.id}>`);
     } else if (channel) {
-      message.channel.createMessage(`Reset **${counterName}** in <#${channel.id}>`);
+      message.channel.send(`Reset **${counterName}** in <#${channel.id}>`);
     } else if (user) {
-      message.channel.createMessage(`Reset **${counterName}** for <@!${user.id}>`);
+      message.channel.send(`Reset **${counterName}** for <@!${user.id}>`);
     } else {
-      message.channel.createMessage(`Reset **${counterName}**`);
+      message.channel.send(`Reset **${counterName}**`);
     }
   },
 });

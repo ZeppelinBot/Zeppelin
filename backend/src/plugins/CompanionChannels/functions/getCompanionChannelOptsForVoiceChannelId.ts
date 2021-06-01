@@ -1,3 +1,4 @@
+import { StageChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 
@@ -8,7 +9,7 @@ const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
 export async function getCompanionChannelOptsForVoiceChannelId(
   pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
-  voiceChannel: VoiceChannel,
+  voiceChannel: VoiceChannel | StageChannel,
 ): Promise<TCompanionChannelOpts[]> {
   const config = await pluginData.config.getMatchingConfig({ userId, channelId: voiceChannel.id });
   return Object.values(config.entries)

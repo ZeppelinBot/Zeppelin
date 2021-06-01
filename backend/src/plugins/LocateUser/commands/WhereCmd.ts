@@ -14,6 +14,6 @@ export const WhereCmd = locateUserCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    sendWhere(pluginData, args.member, msg.channel, `${msg.member.mention} | `);
+    sendWhere(pluginData, args.member, msg.channel, `<@${msg.member.id}> | `);
   },
 });

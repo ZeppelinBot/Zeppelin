@@ -13,13 +13,13 @@ export const SavePinsToDBCmd = messageSaverCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    await msg.channel.createMessage(`Saving pins from <#${args.channel.id}>...`);
+    await msg.channel.send(`Saving pins from <#${args.channel.id}>...`);
 
-    const pins = await args.channel.getPins();
+    const pins = await args.channel.messages.fetchPinned();
     const { savedCount, failed } = await saveMessagesToDB(
       pluginData,
       args.channel,
-      pins.map(m => m.id),
+      pins.keyArray(),
     );
 
     if (failed.length) {

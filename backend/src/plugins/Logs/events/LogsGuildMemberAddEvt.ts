@@ -13,14 +13,14 @@ export const LogsGuildMemberAddEvt = logsEvt({
     const member = meta.args.member;
 
     const newThreshold = moment.utc().valueOf() - 1000 * 60 * 60;
-    const accountAge = humanizeDuration(moment.utc().valueOf() - member.createdAt, {
+    const accountAge = humanizeDuration(moment.utc().valueOf() - member.user.createdTimestamp, {
       largest: 2,
       round: true,
     });
 
     pluginData.state.guildLogs.log(LogType.MEMBER_JOIN, {
       member: stripObjectToScalars(member, ["user", "roles"]),
-      new: member.createdAt >= newThreshold ? " :new:" : "",
+      new: member.user.createdTimestamp >= newThreshold ? " :new:" : "",
       account_age: accountAge,
     });
 

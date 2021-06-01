@@ -1,5 +1,6 @@
 import { MessageSaverPluginType } from "./types";
 import { GuildPluginData } from "knub";
+import { TextChannel, Message } from "discord.js";
 
 export async function saveMessagesToDB(
   pluginData: GuildPluginData<MessageSaverPluginType>,
@@ -14,7 +15,7 @@ export async function saveMessagesToDB(
     let thisMsg: Message;
 
     try {
-      thisMsg = await channel.getMessage(id);
+      thisMsg = await channel.messages.fetch(id);
 
       if (!thisMsg) {
         failed.push(id);

@@ -3,20 +3,21 @@ import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
+import { GuildAuditLogs } from "discord.js";
 
 export const LogsGuildBanAddEvt = logsEvt({
   event: "guildBanAdd",
 
   async listener(meta) {
     const pluginData = meta.pluginData;
-    const user = meta.args.user;
+    const user = meta.args.ban.user;
 
     const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
       pluginData,
-      ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
+      GuildAuditLogs.Actions.MEMBER_BAN_ADD as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_BAN,
@@ -34,14 +35,14 @@ export const LogsGuildBanRemoveEvt = logsEvt({
 
   async listener(meta) {
     const pluginData = meta.pluginData;
-    const user = meta.args.user;
+    const user = meta.args.ban.user;
 
     const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
       pluginData,
-      ErisConstants.AuditLogActions.MEMBER_BAN_REMOVE,
+      GuildAuditLogs.Actions.MEMBER_BAN_REMOVE as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_UNBAN,

@@ -6,6 +6,7 @@ import { createChunkedMessage, get, noop } from "../../../utils";
 import { getLogMessage } from "./getLogMessage";
 import { allowTimeout } from "../../../RegExpRunner";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { MessageMentionTypes, TextChannel } from "discord.js";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
@@ -46,8 +47,8 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         for (const value of Object.values(data || {})) {
           if (value instanceof SavedMessage) {
             const member = pluginData.guild.members.cache.get(value.user_id);
-            for (const role of member?.roles || []) {
-              if (opts.excluded_roles.includes(role)) {
+            for (const role of member?.roles.cache || []) {
+              if (opts.excluded_roles.includes(role[0])) {
                 continue logChannelLoop;
               }
             }
@@ -128,7 +129,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (message) {
         // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
         if (typeof message !== "string") {
-          await channel.createMessage(message).catch(noop);
+          await channel.send(message).catch(noop);
           return;
         }
 
@@ -136,6 +137,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         const batched = opts.batched ?? true;
         const batchTime = opts.batch_time ?? 1000;
         const cfg = pluginData.config.get();
+        const parse: MessageMentionTypes[] | undefined = cfg.allow_user_mentions ? ["users"] : undefined;
 
         if (batched) {
           // If we're batching log messages, gather all log messages within the set batch_time into a single message
@@ -144,14 +146,14 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
             setTimeout(async () => {
               const batchedMessage = pluginData.state.batches.get(channel.id)!.join("\n");
               pluginData.state.batches.delete(channel.id);
-              createChunkedMessage(channel, batchedMessage, { users: cfg.allow_user_mentions }).catch(noop);
+              createChunkedMessage(channel, batchedMessage, { parse }).catch(noop);
             }, batchTime);
           }
 
           pluginData.state.batches.get(channel.id)!.push(message);
         } else {
           // If we're not batching log messages, just send them immediately
-          await createChunkedMessage(channel, message, { users: cfg.allow_user_mentions }).catch(noop);
+          await createChunkedMessage(channel, message, { parse }).catch(noop);
         }
       }
     }

@@ -12,15 +12,15 @@ import {
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { logger } from "../../../logger";
-import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageOptions } from "discord.js";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,
   type: LogType,
   data: any,
   opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
-): Promise<MessageContent | null> {
+): Promise<MessageOptions | null> {
   const config = pluginData.config.get();
   const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
   if (format === "" || format == null) return null;
