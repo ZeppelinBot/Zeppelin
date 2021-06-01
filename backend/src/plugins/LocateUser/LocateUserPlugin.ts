@@ -7,7 +7,7 @@ import { fillActiveAlertsList } from "./utils/fillAlertsList";
 import { WhereCmd } from "./commands/WhereCmd";
 import { FollowCmd } from "./commands/FollowCmd";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
-import { ChannelJoinAlertsEvt, ChannelLeaveAlertsEvt, ChannelSwitchAlertsEvt } from "./events/SendAlertsEvts";
+import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 import { trimPluginDescription } from "../../utils";
 import Timeout = NodeJS.Timeout;
@@ -53,9 +53,7 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
 
   // prettier-ignore
   events: [
-    ChannelJoinAlertsEvt,
-    ChannelSwitchAlertsEvt,
-    ChannelLeaveAlertsEvt,
+    VoiceStateUpdateAlertEvt,
     GuildBanRemoveAlertsEvt
   ],
 

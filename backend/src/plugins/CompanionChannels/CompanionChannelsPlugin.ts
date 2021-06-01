@@ -1,11 +1,9 @@
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { CompanionChannelsPluginType, ConfigSchema, TCompanionChannelOpts } from "./types";
-import { VoiceChannelJoinEvt } from "./events/VoiceChannelJoinEvt";
-import { VoiceChannelSwitchEvt } from "./events/VoiceChannelSwitchEvt";
-import { VoiceChannelLeaveEvt } from "./events/VoiceChannelLeaveEvt";
+import { CompanionChannelsPluginType, ConfigSchema } from "./types";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { CooldownManager } from "knub";
+import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt";
 
 const defaultOptions = {
   config: {
@@ -29,7 +27,7 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
   configSchema: ConfigSchema,
   defaultOptions,
 
-  events: [VoiceChannelJoinEvt, VoiceChannelSwitchEvt, VoiceChannelLeaveEvt],
+  events: [VoiceStateUpdateEvt],
 
   beforeLoad(pluginData) {
     pluginData.state.errorCooldownManager = new CooldownManager();

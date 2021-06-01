@@ -5,6 +5,7 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, resolveUser } from "../../../utils";
 import cloneDeep from "lodash.clonedeep";
+import { MessageEmbed } from "discord.js";
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,
@@ -14,13 +15,13 @@ export async function onMessageUpdate(
   // To log a message update, either the message content or a rich embed has to change
   let logUpdate = false;
 
-  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as Embed[])
+  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as MessageEmbed[])
     .map(e => cloneDeep(e))
-    .filter(e => (e as Embed).type === "rich");
+    .filter(e => (e as MessageEmbed).type === "rich");
 
-  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as Embed[])
+  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as MessageEmbed[])
     .map(e => cloneDeep(e))
-    .filter(e => (e as Embed).type === "rich");
+    .filter(e => (e as MessageEmbed).type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {

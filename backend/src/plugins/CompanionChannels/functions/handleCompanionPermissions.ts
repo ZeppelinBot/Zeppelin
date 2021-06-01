@@ -5,6 +5,7 @@ import { GuildPluginData } from "knub";
 import { isDiscordRESTError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
+import { VoiceChannel, TextChannel, Permissions, StageChannel } from "discord.js";
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;
@@ -12,20 +13,8 @@ const ERROR_COOLDOWN = 5 * MINUTES;
 export async function handleCompanionPermissions(
   pluginData: GuildPluginData<CompanionChannelsPluginType>,
   userId: string,
-  voiceChannel: VoiceChannel,
-  oldChannel?: VoiceChannel,
-);
-export async function handleCompanionPermissions(
-  pluginData: GuildPluginData<CompanionChannelsPluginType>,
-  userId: string,
-  voiceChannel: null,
-  oldChannel: VoiceChannel,
-);
-export async function handleCompanionPermissions(
-  pluginData: GuildPluginData<CompanionChannelsPluginType>,
-  userId: string,
-  voiceChannel: VoiceChannel | null,
-  oldChannel?: VoiceChannel,
+  voiceChannel: VoiceChannel | StageChannel | null,
+  oldChannel?: VoiceChannel | StageChannel | null,
 ) {
   if (pluginData.state.errorCooldownManager.isOnCooldown(ERROR_COOLDOWN_KEY)) {
     return;
@@ -65,18 +54,16 @@ export async function handleCompanionPermissions(
     for (const channelId of permsToDelete) {
       const channel = pluginData.guild.channels.cache.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.deletePermission(userId, `Companion Channel for ${oldChannel!.id} | User Left`);
+      await channel.permissionOverwrites.get(userId)?.delete(`Companion Channel for ${oldChannel!.id} | User Left`);
     }
 
     for (const [channelId, permissions] of permsToSet) {
       const channel = pluginData.guild.channels.cache.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.editPermission(
+      await channel.updateOverwrite(
         userId,
-        permissions,
-        0,
-        "member",
-        `Companion Channel for ${voiceChannel!.id} | User Joined`,
+        new Permissions(BigInt(permissions)).serialize(),
+        {reason: `Companion Channel for ${voiceChannel!.id} | User Joined`},
       );
     }
   } catch (e) {

@@ -41,7 +41,7 @@ export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
       hintLines.push(`Use \`${getGuildPrefix(pluginData)}counters reset_all <name>\` to reset a counter entirely`);
     }
 
-    message.channel.createMessage(
+    message.channel.send(
       trimMultilineString(`
       ${counterLines.join("\n\n")}
       

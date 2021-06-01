@@ -4,6 +4,7 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, resolveUser } from "../../../utils";
 import { disableCodeBlocks, deactivateMentions } from "knub/dist/helpers";
+import { TextChannel } from "discord.js";
 
 export async function censorMessage(
   pluginData: GuildPluginData<CensorPluginType>,
@@ -13,7 +14,8 @@ export async function censorMessage(
   pluginData.state.serverLogs.ignoreLog(LogType.MESSAGE_DELETE, savedMessage.id);
 
   try {
-    await pluginData.client.deleteMessage(savedMessage.channel_id, savedMessage.id, "Censored");
+    const channel = pluginData.guild.channels.resolve(savedMessage.channel_id) as TextChannel
+    await channel.messages.delete(savedMessage.id);
   } catch {
     return;
   }

@@ -1,18 +1,19 @@
 import { GuildPluginData } from "knub";
 import { LocateUserPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { GuildMember, TextChannel } from "discord.js";
 
 export async function moveMember(
   pluginData: GuildPluginData<LocateUserPluginType>,
   toMoveID: string,
-  target: Member,
-  errorChannel: TextableChannel,
+  target: GuildMember,
+  errorChannel: TextChannel,
 ) {
-  const modMember: Member = await pluginData.client.getRESTGuildMember(pluginData.guild.id, toMoveID);
-  if (modMember.voiceState.channelID != null) {
+  const modMember: GuildMember = await pluginData.guild.members.fetch(toMoveID);
+  if (modMember.voice.channelID != null) {
     try {
       await modMember.edit({
-        channelID: target.voiceState.channelID,
+        channel: target.voice.channelID
       });
     } catch {
       sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");

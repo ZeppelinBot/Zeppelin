@@ -5,6 +5,7 @@ import { LogType } from "../../../data/LogType";
 import isEqual from "lodash.isequal";
 import diff from "lodash.difference";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
+import { GuildAuditLogs } from "discord.js";
 
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",
@@ -12,17 +13,17 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
   async listener(meta) {
     const pluginData = meta.pluginData;
     const oldMember = meta.args.oldMember;
-    const member = meta.args.member;
+    const member = meta.args.newMember;
 
     if (!oldMember) return;
 
     const logMember = stripObjectToScalars(member, ["user", "roles"]);
 
-    if (member.nick !== oldMember.nick) {
+    if (member.nickname !== oldMember.nickname) {
       pluginData.state.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
         member: logMember,
-        oldNick: oldMember.nick != null ? oldMember.nick : "<none>",
-        newNick: member.nick != null ? member.nick : "<none>",
+        oldNick: oldMember.nickname != null ? oldMember.nickname : "<none>",
+        newNick: member.nickname != null ? member.nickname : "<none>",
       });
     }
 
@@ -49,10 +50,10 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
       if (!skip) {
         const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
           pluginData,
-          ErisConstants.AuditLogActions.MEMBER_ROLE_UPDATE,
+          GuildAuditLogs.Actions.MEMBER_ROLE_UPDATE as number,
           member.id,
         );
-        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.user : new UnknownUser();
+        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
 
         if (addedRoles.length && removedRoles.length) {
           // Roles added *and* removed

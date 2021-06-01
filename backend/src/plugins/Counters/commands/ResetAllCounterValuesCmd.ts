@@ -2,11 +2,8 @@ import { typedGuildCommand } from "knub";
 import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveChannel, waitForReply } from "knub/dist/helpers";
 
-import { confirm, MINUTES, noop, resolveUser, trimMultilineString, UnknownUser } from "../../../utils";
-import { changeCounterValue } from "../functions/changeCounterValue";
-import { setCounterValue } from "../functions/setCounterValue";
+import { confirm, MINUTES, noop, trimMultilineString } from "../../../utils";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
 import { counterIdLock } from "../../../utils/lockNameHelpers";
 
@@ -49,7 +46,7 @@ export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()(
     }
 
     const loadingMessage = await message.channel
-      .createMessage(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
+      .send(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
       .catch(() => null);
 
     const lock = await pluginData.locks.acquire(counterIdLock(counterId), 10 * MINUTES);

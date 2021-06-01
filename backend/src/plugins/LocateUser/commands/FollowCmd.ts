@@ -46,7 +46,7 @@ export const FollowCmd = locateUserCmd({
       sendSuccessMessage(
         pluginData,
         msg.channel,
-        `Every time ${args.member.mention} joins or switches VC in the next ${humanizeDuration(
+        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
           time,
         )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
       );
@@ -54,7 +54,7 @@ export const FollowCmd = locateUserCmd({
       sendSuccessMessage(
         pluginData,
         msg.channel,
-        `Every time ${args.member.mention} joins or switches VC in the next ${humanizeDuration(
+        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
           time,
         )} i will notify you`,
       );

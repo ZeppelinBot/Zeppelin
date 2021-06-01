@@ -1,9 +1,11 @@
-export async function createOrReuseInvite(vc: VoiceChannel) {
-  const existingInvites = await vc.getInvites();
+import { VoiceChannel } from "discord.js";
 
-  if (existingInvites.length !== 0) {
+export async function createOrReuseInvite(vc: VoiceChannel) {
+  const existingInvites = await vc.fetchInvites();
+
+  if (existingInvites.size !== 0) {
     return existingInvites[0];
   } else {
-    return vc.createInvite(undefined);
+    return vc.createInvite();
   }
 }
