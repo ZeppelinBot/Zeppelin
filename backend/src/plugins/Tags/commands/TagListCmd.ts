@@ -8,7 +8,7 @@ export const TagListCmd = tagsCmd({
   async run({ message: msg, pluginData }) {
     const tags = await pluginData.state.tags.all();
     if (tags.length === 0) {
-      msg.channel.createMessage(`No tags created yet! Use \`tag create\` command to create one.`);
+      msg.channel.send(`No tags created yet! Use \`tag create\` command to create one.`);
       return;
     }
 

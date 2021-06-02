@@ -11,6 +11,7 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import Timeout = NodeJS.Timeout;
 import { EventEmitter } from "events";
 import { Queue } from "../../Queue";
+import { TextChannel } from "discord.js";
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,

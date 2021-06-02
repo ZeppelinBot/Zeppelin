@@ -30,7 +30,7 @@ export async function outdatedTempbansLoop(pluginData: GuildPluginData<ModAction
     );
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, tempban.user_id);
-      await pluginData.guild.unbanMember(tempban.user_id, reason != null ? encodeURIComponent(reason) : undefined);
+      await pluginData.guild.bans.remove(tempban.user_id, reason != null ? encodeURIComponent(reason) : undefined);
     } catch (e) {
       pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
         body: `Encountered an error trying to automatically unban ${tempban.user_id} after tempban timeout`,

@@ -10,6 +10,7 @@ import { waitForReply } from "knub/dist/helpers";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
+import { TextChannel } from "discord.js";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
@@ -30,14 +31,14 @@ export const MassunbanCmd = modActionsCmd({
     }
 
     // Ask for unban reason (cleaner this way instead of trying to cram it into the args)
-    msg.channel.createMessage("Unban reason? `cancel` to cancel");
+    msg.channel.send("Unban reason? `cancel` to cancel");
     const unbanReasonReply = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (!unbanReasonReply || !unbanReasonReply.content || unbanReasonReply.content.toLowerCase().trim() === "cancel") {
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;
     }
 
-    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, msg.attachments);
+    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, msg.attachments.array());
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
@@ -48,7 +49,7 @@ export const MassunbanCmd = modActionsCmd({
     });
 
     // Show a loading indicator since this can take a while
-    const loadingMsg = await msg.channel.createMessage("Unbanning...");
+    const loadingMsg = await msg.channel.send("Unbanning...");
 
     // Unban each user and count failed unbans (if any)
     const failedUnbans: Array<{ userId: string; reason: UnbanFailReasons }> = [];
@@ -60,7 +61,7 @@ export const MassunbanCmd = modActionsCmd({
       }
 
       try {
-        await pluginData.guild.unbanMember(userId, unbanReason != null ? encodeURIComponent(unbanReason) : undefined);
+        await pluginData.guild.bans.remove(userId, unbanReason != null ? encodeURIComponent(unbanReason) : undefined);
 
         await casesPlugin.createCase({
           userId,

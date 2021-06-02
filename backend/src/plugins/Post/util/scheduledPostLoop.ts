@@ -6,6 +6,7 @@ import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 
 import { postMessage } from "./postMessage";
+import { TextChannel, User } from "discord.js";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 
@@ -15,7 +16,7 @@ export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginTy
     const channel = pluginData.guild.channels.cache.get(post.channel_id);
     if (channel instanceof TextChannel) {
       const [username, discriminator] = post.author_name.split("#");
-      const author: Partial<User> = pluginData.client.user!.get(post.author_id) || {
+      const author: User = (await pluginData.client.users.fetch(post.author_id)) || {
         id: post.author_id,
         username,
         discriminator,

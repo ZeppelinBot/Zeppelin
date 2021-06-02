@@ -3,6 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 
 import { isDiscordRESTError } from "../../../utils";
+import { Message } from "discord.js";
 
 export const ClearReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles clear",
@@ -21,9 +22,9 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
 
     pluginData.state.reactionRoles.removeFromMessage(args.message.messageId);
 
-    let targetMessage: Message<TextChannel>;
+    let targetMessage: Message;
     try {
-      targetMessage = await args.message.channel.getMessage(args.message.messageId);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     } catch (err) {
       if (isDiscordRESTError(err) && err.code === 50001) {
         sendErrorMessage(pluginData, msg.channel, "Missing access to the specified message");
@@ -33,7 +34,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
       throw err;
     }
 
-    await targetMessage.removeReactions();
+    await targetMessage.reactions.removeAll();
 
     sendSuccessMessage(pluginData, msg.channel, "Reaction roles cleared");
   },

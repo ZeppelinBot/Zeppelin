@@ -1,7 +1,6 @@
 import { utilityCmd } from "../types";
 import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
 
-
 import { getCurrentUptime } from "../../../uptime";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
@@ -9,6 +8,7 @@ import path from "path";
 import moment from "moment-timezone";
 import { rootDir } from "../../../paths";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { GuildChannel, MessageOptions } from "discord.js";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -41,7 +41,7 @@ export const AboutCmd = utilityCmd({
       version = "?";
     }
 
-    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!;
+    //const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!; FIXME Sharding stuff
 
     const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
       largest: 2,
@@ -53,7 +53,7 @@ export const AboutCmd = utilityCmd({
       ["Last reload", `${lastReload} ago`],
       ["Last update", lastUpdate],
       ["Version", version],
-      ["API latency", `${shard.latency}ms`],
+      // ["API latency", `${shard.latency}ms`],
       ["Server timezone", timeAndDate.getGuildTz()],
     ];
 
@@ -65,7 +65,7 @@ export const AboutCmd = utilityCmd({
     );
     loadedPlugins.sort();
 
-    const aboutContent: MessageContent & { embed: EmbedWith<"title" | "fields"> } = {
+    const aboutContent: MessageOptions & { embed: EmbedWith<"title" | "fields"> } = {
       embed: {
         title: `About ${pluginData.client.user!.username}`,
         fields: [
@@ -102,7 +102,7 @@ export const AboutCmd = utilityCmd({
 
     // For the embed color, find the highest colored role the bot has - this is their color on the server as well
     const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-    let botRoles = botMember?.roles.map(r => (msg.channel as GuildChannel).guild.roles.get(r)!) || [];
+    let botRoles = botMember?.roles.cache.map(r => (msg.channel as GuildChannel).guild.roles.cache.get(r.id)!) || [];
     botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
     botRoles = botRoles.filter(r => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
@@ -111,10 +111,10 @@ export const AboutCmd = utilityCmd({
     }
 
     // Use the bot avatar as the embed image
-    if (pluginData.client.user!avatarURL) {
-      aboutContent.embed.thumbnail = { url: pluginData.client.user!.avatarURL };
+    if (pluginData.client.user!.avatarURL()) {
+      aboutContent.embed.thumbnail = { url: pluginData.client.user!.avatarURL()! };
     }
 
-    msg.channel.createMessage(aboutContent);
+    msg.channel.send(aboutContent);
   },
 });

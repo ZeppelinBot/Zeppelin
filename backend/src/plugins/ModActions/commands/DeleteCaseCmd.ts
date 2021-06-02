@@ -10,6 +10,7 @@ import { LogType } from "../../../data/LogType";
 import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { Case } from "../../../data/entities/Case";
+import { TextChannel } from "discord.js";
 
 export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],
@@ -49,7 +50,7 @@ export const DeleteCaseCmd = modActionsCmd({
       if (!args.force) {
         const cases = pluginData.getPlugin(CasesPlugin);
         const embedContent = await cases.getCaseEmbed(theCase);
-        message.channel.createMessage({
+        message.channel.send({
           content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
           embed: embedContent.embed,
         });
@@ -62,7 +63,7 @@ export const DeleteCaseCmd = modActionsCmd({
         );
         const normalizedReply = (reply?.content || "").toLowerCase().trim();
         if (normalizedReply !== "yes" && normalizedReply !== "y") {
-          message.channel.createMessage("Cancelled. Case was not deleted.");
+          message.channel.send("Cancelled. Case was not deleted.");
           cancelled++;
           continue;
         }

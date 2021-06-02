@@ -9,6 +9,7 @@ import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
+import { Permissions, TextChannel } from "discord.js";
 
 const MAX_NATIVE_SLOWMODE = 6 * HOURS; // 6 hours
 const MAX_BOT_SLOWMODE = DAYS * 365 * 100; // 100 years
@@ -84,10 +85,13 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     // Verify permissions
-    const channelPermissions = channel.permissionsOf(pluginData.client.user!.id);
+    const channelPermissions = channel.permissionsFor(pluginData.client.user!.id);
 
     if (mode === "native") {
-      const missingPermissions = getMissingPermissions(channelPermissions, NATIVE_SLOWMODE_PERMISSIONS);
+      const missingPermissions = getMissingPermissions(
+        channelPermissions ? channelPermissions : new Permissions(),
+        NATIVE_SLOWMODE_PERMISSIONS,
+      );
       if (missingPermissions) {
         sendErrorMessage(
           pluginData,
@@ -99,7 +103,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     if (mode === "bot") {
-      const missingPermissions = getMissingPermissions(channelPermissions, BOT_SLOWMODE_PERMISSIONS);
+      const missingPermissions = getMissingPermissions(
+        channelPermissions ? channelPermissions : new Permissions(),
+        BOT_SLOWMODE_PERMISSIONS,
+      );
       if (missingPermissions) {
         sendErrorMessage(
           pluginData,

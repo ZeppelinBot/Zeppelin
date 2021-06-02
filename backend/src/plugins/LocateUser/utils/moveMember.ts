@@ -13,7 +13,7 @@ export async function moveMember(
   if (modMember.voice.channelID != null) {
     try {
       await modMember.edit({
-        channel: target.voice.channelID
+        channel: target.voice.channelID,
       });
     } catch {
       sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");

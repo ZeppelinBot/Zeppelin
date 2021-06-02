@@ -10,7 +10,7 @@ import {
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 
 import { LogType } from "../../../data/LogType";
-import { resolveChannel } from "knub/dist/helpers";
+import { VoiceChannel } from "discord.js";
 
 export const VcdisconnectCmd = utilityCmd({
   trigger: ["vcdisconnect", "vcdisc", "vcdc", "vckick", "vck"],
@@ -28,16 +28,14 @@ export const VcdisconnectCmd = utilityCmd({
       return;
     }
 
-    if (!args.member.voiceState || !args.member.voiceState.channelID) {
+    if (!args.member.voice || !args.member.voice.channelID) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
     }
-    const channel = (await resolveChannel(pluginData.guild, args.member.voiceState.channelID)) as VoiceChannel;
+    const channel = pluginData.guild.channels.cache.get(args.member.voice.channelID) as VoiceChannel;
 
     try {
-      await args.member.edit({
-        channelID: null,
-      });
+      await args.member.voice.kick();
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to disconnect member");
       return;

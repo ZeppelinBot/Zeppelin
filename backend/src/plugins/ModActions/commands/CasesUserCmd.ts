@@ -16,6 +16,7 @@ import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { asyncMap } from "../../../utils/async";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { MessageEmbedOptions, User } from "discord.js";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
@@ -75,13 +76,13 @@ export const CasesUserCmd = modActionsCmd({
         : `${user.username}#${user.discriminator}`;
 
     if (cases.length === 0) {
-      msg.channel.createMessage(`No cases found for **${userName}**`);
+      msg.channel.send(`No cases found for **${userName}**`);
     } else {
       const casesToDisplay = args.hidden ? cases : normalCases;
 
       if (args.expand) {
         if (casesToDisplay.length > 8) {
-          msg.channel.createMessage("Too many cases for expanded view. Please use compact view instead.");
+          msg.channel.send("Too many cases for expanded view. Please use compact view instead.");
           return;
         }
 
@@ -89,7 +90,7 @@ export const CasesUserCmd = modActionsCmd({
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
         for (const theCase of casesToDisplay) {
           const embed = await casesPlugin.getCaseEmbed(theCase.id);
-          msg.channel.createMessage(embed);
+          msg.channel.send(embed);
         }
       } else {
         // Compact view (= regular message with a preview of each case)
@@ -121,13 +122,13 @@ export const CasesUserCmd = modActionsCmd({
           const chunkStart = i * linesPerChunk + 1;
           const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
 
-          const embed: EmbedOptions = {
+          const embed: MessageEmbedOptions = {
             author: {
               name:
                 lineChunks.length === 1
                   ? `Cases for ${userName} (${lines.length} total)`
                   : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.avatarURL || user.defaultAvatarURL : undefined,
+              icon_url: user instanceof User ? user.avatarURL() || user.defaultAvatarURL : undefined,
             },
             fields: [
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
@@ -135,7 +136,7 @@ export const CasesUserCmd = modActionsCmd({
             ],
           };
 
-          msg.channel.createMessage({ embed });
+          msg.channel.send({ embed });
         }
       }
     }

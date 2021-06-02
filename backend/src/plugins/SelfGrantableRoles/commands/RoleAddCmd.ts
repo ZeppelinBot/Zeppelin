@@ -7,6 +7,7 @@ import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { findMatchingRoles } from "../util/findMatchingRoles";
 
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { Role } from "discord.js";
 
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],
@@ -49,7 +50,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     }
 
     // Grant the roles
-    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles]);
+    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles.cache.keys()]);
 
     // Remove extra roles (max_roles) for each entry
     const skipped: Set<Role> = new Set();
@@ -68,7 +69,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             newRoleIds.delete(roleId);
             rolesToAdd.delete(roleId);
 
-            if (msg.member.roles.includes(roleId)) {
+            if (msg.member.roles.cache.has(roleId)) {
               removed.add(pluginData.guild.roles.cache.get(roleId)!);
             } else {
               skipped.add(pluginData.guild.roles.cache.get(roleId)!);

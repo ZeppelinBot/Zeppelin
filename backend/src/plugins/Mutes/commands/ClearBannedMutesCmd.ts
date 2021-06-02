@@ -1,6 +1,7 @@
 import { mutesCmd } from "../types";
 
 import { sendSuccessMessage } from "../../../pluginUtils";
+import { User } from "discord.js";
 
 export const ClearBannedMutesCmd = mutesCmd({
   trigger: "clear_banned_mutes",
@@ -8,17 +9,14 @@ export const ClearBannedMutesCmd = mutesCmd({
   description: "Clear dangling mutes for members who have been banned",
 
   async run({ pluginData, message: msg }) {
-    await msg.channel.createMessage("Clearing mutes from banned users...");
+    await msg.channel.send("Clearing mutes from banned users...");
 
     const activeMutes = await pluginData.state.mutes.getActiveMutes();
 
-    // Mismatch in Eris docs and actual result here, based on Eris's code comments anyway
-    const bans: Array<{ reason: string; user: User }> = (await pluginData.guild.getBans()) as any;
+    const bans: Array<{ reason: string; user: User }> = (await pluginData.guild.bans.fetch({ cache: true })) as any;
     const bannedIds = bans.map(b => b.user.id);
 
-    await msg.channel.createMessage(
-      `Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`,
-    );
+    await msg.channel.send(`Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`);
 
     let cleared = 0;
     for (const mute of activeMutes) {

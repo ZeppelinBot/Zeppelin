@@ -42,7 +42,7 @@ export const InfoCmd = utilityCmd({
       if (channel) {
         const embed = await getChannelInfoEmbed(pluginData, channelId!, message.author.id);
         if (embed) {
-          message.channel.createMessage({ embed });
+          message.channel.send({ embed });
           return;
         }
       }
@@ -50,11 +50,11 @@ export const InfoCmd = utilityCmd({
 
     // 2. Server
     if (userCfg.can_server) {
-      const guild = pluginData.client.guilds.get(value);
+      const guild = pluginData.client.guilds.fetch(value);
       if (guild) {
         const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
         if (embed) {
-          message.channel.createMessage({ embed });
+          message.channel.send({ embed });
           return;
         }
       }
@@ -66,7 +66,7 @@ export const InfoCmd = utilityCmd({
       if (user && userCfg.can_userinfo) {
         const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact), message.author.id);
         if (embed) {
-          message.channel.createMessage({ embed });
+          message.channel.send({ embed });
           return;
         }
       }
@@ -84,7 +84,7 @@ export const InfoCmd = utilityCmd({
             message.author.id,
           );
           if (embed) {
-            message.channel.createMessage({ embed });
+            message.channel.send({ embed });
             return;
           }
         }
@@ -99,7 +99,7 @@ export const InfoCmd = utilityCmd({
         if (invite) {
           const embed = await getInviteInfoEmbed(pluginData, inviteCode);
           if (embed) {
-            message.channel.createMessage({ embed });
+            message.channel.send({ embed });
             return;
           }
         }
@@ -112,7 +112,7 @@ export const InfoCmd = utilityCmd({
       if (serverPreview) {
         const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
         if (embed) {
-          message.channel.createMessage({ embed });
+          message.channel.send({ embed });
           return;
         }
       }
@@ -124,7 +124,7 @@ export const InfoCmd = utilityCmd({
       const role = roleId && pluginData.guild.roles.cache.get(roleId);
       if (role) {
         const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
-        message.channel.createMessage({ embed });
+        message.channel.send({ embed });
         return;
       }
     }
@@ -135,7 +135,7 @@ export const InfoCmd = utilityCmd({
       if (emojiIdMatch?.[2]) {
         const embed = await getEmojiInfoEmbed(pluginData, emojiIdMatch[2]);
         if (embed) {
-          message.channel.createMessage({ embed });
+          message.channel.send({ embed });
           return;
         }
       }
@@ -144,7 +144,7 @@ export const InfoCmd = utilityCmd({
     // 9. Arbitrary ID
     if (isValidSnowflake(value) && userCfg.can_snowflake) {
       const embed = await getSnowflakeInfoEmbed(pluginData, value, true, message.author.id);
-      message.channel.createMessage({ embed });
+      message.channel.send({ embed });
       return;
     }
 

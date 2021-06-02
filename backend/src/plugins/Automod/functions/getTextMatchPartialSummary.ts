@@ -23,11 +23,11 @@ export function getTextMatchPartialSummary(
   } else if (type === "username") {
     return `username: ${context.user!.username}`;
   } else if (type === "nickname") {
-    return `nickname: ${context.member!.nick}`;
+    return `nickname: ${context.member!.nickname}`;
   } else if (type === "visiblename") {
-    const visibleName = context.member?.nick || context.user!.username;
+    const visibleName = context.member?.nickname || context.user!.username;
     return `visible name: ${visibleName}`;
   } else if (type === "customstatus") {
-    return `custom status: ${context.member!.game!.state}`;
+    return `custom status: ${context.member!.presence.activities.find(a => a.type === "CUSTOM_STATUS")?.name}`;
   }
 }

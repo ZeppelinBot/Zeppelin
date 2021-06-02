@@ -31,6 +31,6 @@ export const MessageInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed });
+    message.channel.send({ embed });
   },
 });

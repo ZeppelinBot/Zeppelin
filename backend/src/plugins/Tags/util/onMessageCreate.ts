@@ -7,6 +7,8 @@ import { LogType } from "../../../data/LogType";
 
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { TextChannel } from "discord.js";
+import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -100,9 +102,9 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   }
 
   const allowMentions = tagResult.category?.allow_mentions ?? config.allow_mentions;
-  const responseMsg = await channel.createMessage({
+  const responseMsg = await channel.send({
     ...tagResult.renderedContent,
-    allowedMentions: { roles: allowMentions, users: allowMentions },
+    allowedMentions: erisAllowedMentionsToDjsMentionOptions({ roles: allowMentions, users: allowMentions }),
   });
 
   // Save the command-response message pair once the message is in our database
@@ -116,6 +118,6 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const deleteInvoke = tagResult.category?.auto_delete_command ?? config.auto_delete_command;
   if (!deleteWithCommand && deleteInvoke) {
     // Try deleting the invoking message, ignore errors silently
-    pluginData.client.deleteMessage(msg.channel_id, msg.id).catch(noop);
+    (pluginData.guild.channels.resolve(msg.channel_id) as TextChannel).messages.delete(msg.id);
   }
 }

@@ -4,6 +4,7 @@ import { rolesCmd } from "../types";
 import { resolveMember, resolveRoleId, stripObjectToScalars, successMessage } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
+import { GuildMember } from "discord.js";
 
 export const MassAddRoleCmd = rolesCmd({
   trigger: "massaddrole",
@@ -15,9 +16,9 @@ export const MassAddRoleCmd = rolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    msg.channel.createMessage(`Resolving members...`);
+    msg.channel.send(`Resolving members...`);
 
-    const members: Member[] = [];
+    const members: GuildMember[] = [];
     const unknownMembers: string[] = [];
     for (const memberId of args.members) {
       const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
@@ -57,12 +58,12 @@ export const MassAddRoleCmd = rolesCmd({
       return;
     }
 
-    const membersWithoutTheRole = members.filter(m => !m.roles.includes(roleId));
+    const membersWithoutTheRole = members.filter(m => !m.roles.cache.has(roleId));
     let assigned = 0;
     const failed: string[] = [];
     const alreadyHadRole = members.length - membersWithoutTheRole.length;
 
-    msg.channel.createMessage(
+    msg.channel.send(
       `Adding role **${role.name}** to ${membersWithoutTheRole.length} ${
         membersWithoutTheRole.length === 1 ? "member" : "members"
       }...`,
@@ -71,7 +72,7 @@ export const MassAddRoleCmd = rolesCmd({
     for (const member of membersWithoutTheRole) {
       try {
         pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, member.id);
-        await member.addRole(roleId);
+        await member.roles.add(roleId);
         pluginData.state.logs.log(LogType.MEMBER_ROLE_ADD, {
           member: stripObjectToScalars(member, ["user", "roles"]),
           roles: role.name,
@@ -97,6 +98,6 @@ export const MassAddRoleCmd = rolesCmd({
       resultMessage += `\nUnknown members: ${unknownMembers.join(", ")}`;
     }
 
-    msg.channel.createMessage(successMessage(resultMessage));
+    msg.channel.send(successMessage(resultMessage));
   },
 });

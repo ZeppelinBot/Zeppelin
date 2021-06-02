@@ -2,6 +2,7 @@ import { noop } from "../../../utils";
 import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage";
 import { TStarboardOpts } from "../types";
 import Timeout = NodeJS.Timeout;
+import { Message } from "discord.js";
 
 const DEBOUNCE_DELAY = 1000;
 const debouncedUpdates: Record<string, Timeout> = {};

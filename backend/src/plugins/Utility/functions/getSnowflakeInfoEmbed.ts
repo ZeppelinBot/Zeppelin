@@ -14,6 +14,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import humanizeDuration from "humanize-duration";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageEmbedOptions } from "discord.js";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 
@@ -22,7 +23,7 @@ export async function getSnowflakeInfoEmbed(
   snowflake: string,
   showUnknownWarning = false,
   requestMemberId?: string,
-): Promise<EmbedOptions> {
+): Promise<MessageEmbedOptions> {
   const embed: EmbedWith<"fields"> = {
     fields: [],
   };

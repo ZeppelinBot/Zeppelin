@@ -32,7 +32,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
 
     // Remove the roles
     if (rolesToRemove.length) {
-      const newRoleIds = msg.member.roles.filter(roleId => !roleIdsToRemove.includes(roleId));
+      const newRoleIds = msg.member.roles.cache.filter(role => !roleIdsToRemove.includes(role.id));
 
       try {
         await msg.member.edit({

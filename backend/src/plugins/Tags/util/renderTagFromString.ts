@@ -9,6 +9,7 @@ import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { renderTagBody } from "./renderTagBody";
+import { GuildMember } from "discord.js";
 
 export async function renderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,
@@ -16,7 +17,7 @@ export async function renderTagFromString(
   prefix: string,
   tagName: string,
   tagBody: t.TypeOf<typeof Tag>,
-  member: Member,
+  member: GuildMember,
 ): Promise<StrictMessageContent | null> {
   const variableStr = str.slice(prefix.length + tagName.length).trim();
   const tagArgs = parseArguments(variableStr).map(v => v.value);

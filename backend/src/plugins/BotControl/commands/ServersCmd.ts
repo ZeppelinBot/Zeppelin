@@ -3,6 +3,7 @@ import { isOwnerPreFilter } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import escapeStringRegexp from "escape-string-regexp";
 import { createChunkedMessage, getUser, sorter } from "../../../utils";
+import { TextChannel } from "discord.js";
 
 export const ServersCmd = botControlCmd({
   trigger: ["servers", "guilds"],
@@ -23,7 +24,7 @@ export const ServersCmd = botControlCmd({
     const showList = Boolean(args.all || args.initialized || args.uninitialized || args.search);
     const search = args.search ? new RegExp([...args.search].map(s => escapeStringRegexp(s)).join(".*"), "i") : null;
 
-    const joinedGuilds = Array.from(pluginData.client.guilds.values());
+    const joinedGuilds = Array.from(pluginData.client.guilds.cache.values());
     const loadedGuilds = pluginData.getKnubInstance().getLoadedGuilds();
     const loadedGuildsMap = loadedGuilds.reduce((map, guildData) => map.set(guildData.guildId, guildData), new Map());
 
@@ -50,16 +51,16 @@ export const ServersCmd = botControlCmd({
           const owner = getUser(pluginData.client, g.ownerID);
           return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.username}#${owner.discriminator}** \`${owner.id}\`)`;
         });
-        createChunkedMessage(msg.channel, lines.join("\n"));
+        createChunkedMessage(msg.channel as TextChannel, lines.join("\n"));
       } else {
-        msg.channel.createMessage("No servers matched the filters");
+        msg.channel.send("No servers matched the filters");
       }
     } else {
       const total = joinedGuilds.length;
       const initialized = joinedGuilds.filter(g => loadedGuildsMap.has(g.id)).length;
       const unInitialized = total - initialized;
 
-      msg.channel.createMessage(
+      msg.channel.send(
         `I am on **${total} total servers**, of which **${initialized} are initialized** and **${unInitialized} are not initialized**`,
       );
     }

@@ -7,6 +7,7 @@ import { isValidEmbed, trimLines } from "../../../utils";
 import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
+import { MessageEmbed, MessageEmbedOptions } from "discord.js";
 
 export const PostEmbedCmd = postCmd({
   trigger: "post_embed",
@@ -46,7 +47,7 @@ export const PostEmbedCmd = postCmd({
       }
     }
 
-    let embed: Embed = { type: "rich" };
+    let embed: MessageEmbedOptions = {};
     if (args.title) embed.title = args.title;
     if (color) embed.color = color;
 
@@ -73,7 +74,7 @@ export const PostEmbedCmd = postCmd({
 
     if (args.content) {
       const prefix = pluginData.fullConfig.prefix || "!";
-      msg.channel.createMessage(
+      msg.channel.send(
         trimLines(`
         <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
         \`${prefix}edit_embed -title "Some title" content goes here\`

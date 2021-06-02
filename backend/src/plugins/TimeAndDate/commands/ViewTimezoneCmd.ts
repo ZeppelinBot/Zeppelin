@@ -13,11 +13,11 @@ export const ViewTimezoneCmd = timeAndDateCmd({
   async run({ pluginData, message, args }) {
     const memberTimezone = await pluginData.state.memberTimezones.get(message.author.id);
     if (memberTimezone) {
-      message.channel.createMessage(`Your timezone is currently set to **${memberTimezone.timezone}**`);
+      message.channel.send(`Your timezone is currently set to **${memberTimezone.timezone}**`);
       return;
     }
 
     const serverTimezone = getGuildTz(pluginData);
-    message.channel.createMessage(`Your timezone is currently set to **${serverTimezone}** (server default)`);
+    message.channel.send(`Your timezone is currently set to **${serverTimezone}** (server default)`);
   },
 });

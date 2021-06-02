@@ -1,12 +1,13 @@
 import { GuildPluginData } from "knub";
 import { UtilityPluginType } from "../types";
 import { trimLines, preEmbedPadding, EmbedWith } from "../../../utils";
+import { MessageEmbedOptions } from "discord.js";
 
 export async function getEmojiInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   emojiId: string,
-): Promise<EmbedOptions | null> {
-  const emoji = pluginData.guild.emojis.find(e => e.id === emojiId);
+): Promise<MessageEmbedOptions | null> {
+  const emoji = pluginData.guild.emojis.cache.find(e => e.id === emojiId);
   if (!emoji) {
     return null;
   }

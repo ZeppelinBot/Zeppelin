@@ -15,7 +15,7 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
 
       if (muteRole) {
         const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
-        await member.addRole(muteRole);
+        await member.roles.add(muteRole);
         memberRoleLock.unlock();
       }
 

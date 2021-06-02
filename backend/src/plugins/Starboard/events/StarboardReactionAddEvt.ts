@@ -4,6 +4,7 @@ import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
 import { allStarboardsLock } from "../../../utils/lockNameHelpers";
+import { Message, TextChannel } from "discord.js";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
@@ -11,14 +12,14 @@ export const StarboardReactionAddEvt = starboardEvt({
   async listener(meta) {
     const pluginData = meta.pluginData;
 
-    let msg = meta.args.message as Message;
-    const userId = meta.args.member.id;
-    const emoji = meta.args.emoji;
+    let msg = meta.args.reaction.message as Message;
+    const userId = meta.args.user.id;
+    const emoji = meta.args.reaction.emoji;
 
     if (!msg.author) {
       // Message is not cached, fetch it
       try {
-        msg = await msg.channel.getMessage(msg.id);
+        msg = await msg.channel.messages.fetch(msg.id);
       } catch {
         // Sometimes we get this event for messages we can't fetch with getMessage; ignore silently
         return;
@@ -29,7 +30,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     if (msg.author.id === userId) return;
 
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
-    if (!member || member.bot) return;
+    if (!member || member.user.bot) return;
 
     const config = await pluginData.config.getMatchingConfig({
       member,
@@ -76,10 +77,8 @@ export const StarboardReactionAddEvt = starboardEvt({
         // If the message has already been posted to this starboard, update star counts
         if (starboard.show_star_count) {
           for (const starboardMessage of starboardMessages) {
-            const realStarboardMessage = await pluginData.client.getMessage(
-              starboardMessage.starboard_channel_id,
-              starboardMessage.starboard_message_id,
-            );
+            const channel = pluginData.guild.channels.cache.get(starboardMessage.starboard_channel_id) as TextChannel;
+            const realStarboardMessage = await channel.messages.fetch(starboardMessage.starboard_message_id);
             await updateStarboardMessageStarCount(
               starboard,
               msg,

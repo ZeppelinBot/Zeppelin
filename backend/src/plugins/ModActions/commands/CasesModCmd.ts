@@ -9,6 +9,7 @@ import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
+import { MessageEmbedOptions, User } from "discord.js";
 
 const opts = {
   mod: ct.userId({ option: true }),
@@ -55,10 +56,10 @@ export const CasesModCmd = modActionsCmd({
         const lastCaseNum = page * casesPerPage;
         const title = `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${totalCases} by ${modName}`;
 
-        const embed: EmbedOptions = {
+        const embed: MessageEmbedOptions = {
           author: {
             name: title,
-            icon_url: mod instanceof User ? mod.avatarURL || mod.defaultAvatarURL : undefined,
+            iconURL: mod instanceof User ? mod.avatarURL() || mod.defaultAvatarURL : undefined,
           },
           fields: [
             ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),

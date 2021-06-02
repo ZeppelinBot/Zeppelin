@@ -47,6 +47,6 @@ export const RoleHelpCmd = selfGrantableRolesCmd({
       color: parseInt("42bff4", 16),
     };
 
-    msg.channel.createMessage({ embed: helpEmbed });
+    msg.channel.send({ embed: helpEmbed });
   },
 });

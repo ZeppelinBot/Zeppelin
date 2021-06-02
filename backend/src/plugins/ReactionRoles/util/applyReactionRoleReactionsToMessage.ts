@@ -6,6 +6,7 @@ import { isDiscordRESTError, sleep, isSnowflake } from "../../../utils";
 import { logger } from "../../../logger";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
+import { TextChannel } from "discord.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -26,7 +27,7 @@ export async function applyReactionRoleReactionsToMessage(
 
   let targetMessage;
   try {
-    targetMessage = await channel.getMessage(messageId);
+    targetMessage = await channel.messages.fetch(messageId);
   } catch (e) {
     if (isDiscordRESTError(e)) {
       if (e.code === 10008) {

@@ -6,6 +6,7 @@ import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
 import path from "path";
 import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage";
 import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage";
+import { Message, TextChannel } from "discord.js";
 
 export async function saveMessageToStarboard(
   pluginData: GuildPluginData<StarboardPluginType>,
@@ -19,6 +20,6 @@ export async function saveMessageToStarboard(
   const embed = createStarboardEmbedFromMessage(msg, Boolean(starboard.copy_full_embed), starboard.color);
   embed.fields!.push(createStarboardPseudoFooterForMessage(starboard, msg, starboard.star_emoji![0], starCount));
 
-  const starboardMessage = await (channel as TextChannel).createMessage({ embed });
+  const starboardMessage = await (channel as TextChannel).send(embed);
   await pluginData.state.starboardMessages.createStarboardMessage(channel.id, msg.id, starboardMessage.id);
 }

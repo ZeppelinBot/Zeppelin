@@ -18,7 +18,10 @@ export async function rehostAttachment(attachment: MessageAttachment, targetChan
   }
 
   try {
-    const content: MessageOptions = { content: `Rehost of attachment ${attachment.id}`, files: [{ name: attachment.name ? attachment.name : undefined, attachment: await fsp.readFile(downloaded.path)}]}
+    const content: MessageOptions = {
+      content: `Rehost of attachment ${attachment.id}`,
+      files: [{ name: attachment.name ? attachment.name : undefined, attachment: await fsp.readFile(downloaded.path) }],
+    };
     const rehostMessage = await targetChannel.send({ content, split: false });
     return rehostMessage.attachments.values()[0].url;
   } catch {

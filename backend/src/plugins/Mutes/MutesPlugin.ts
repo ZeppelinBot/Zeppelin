@@ -20,6 +20,7 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { EventEmitter } from "events";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { offMutesEvent } from "./functions/offMutesEvent";
+import { GuildMember } from "discord.js";
 
 const defaultOptions = {
   config: {
@@ -92,9 +93,9 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     muteUser: mapToPublicFn(muteUser),
     unmuteUser: mapToPublicFn(unmuteUser),
     hasMutedRole(pluginData) {
-      return (member: Member) => {
+      return (member: GuildMember) => {
         const muteRole = pluginData.config.get().mute_role;
-        return muteRole ? member.roles.includes(muteRole) : false;
+        return muteRole ? member.roles.cache.has(muteRole) : false;
       };
     },
 

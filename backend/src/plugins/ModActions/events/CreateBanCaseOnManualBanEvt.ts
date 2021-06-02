@@ -8,6 +8,7 @@ import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAu
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, resolveUser, UnknownUser } from "../../../utils";
 import { Case } from "../../../data/entities/Case";
+import { GuildAuditLogs, User } from "discord.js";
 
 /**
  * Create a BAN case automatically when a user is banned manually.
@@ -15,7 +16,8 @@ import { Case } from "../../../data/entities/Case";
  */
 export const CreateBanCaseOnManualBanEvt = modActionsEvt({
   event: "guildBanAdd",
-  async listener({ pluginData, args: { guild, user } }) {
+  async listener({ pluginData, args: { ban } }) {
+    const user = ban.user;
     if (isEventIgnored(pluginData, IgnoredEventType.Ban, user.id)) {
       clearIgnoredEvents(pluginData, IgnoredEventType.Ban, user.id);
       return;
@@ -23,7 +25,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
 
     const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
       pluginData,
-      ErisConstants.AuditLogActions.MEMBER_BAN_ADD,
+      GuildAuditLogs.Actions.MEMBER_BAN_ADD as number,
       user.id,
     );
 
@@ -34,7 +36,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
     let reason = "";
 
     if (relevantAuditLogEntry) {
-      const modId = relevantAuditLogEntry.user.id;
+      const modId = relevantAuditLogEntry.executor!.id;
       const auditLogId = relevantAuditLogEntry.id;
 
       mod = await resolveUser(pluginData.client, modId);

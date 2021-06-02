@@ -11,6 +11,7 @@ import {
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 
 import { LogType } from "../../../data/LogType";
+import { VoiceChannel } from "discord.js";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
@@ -47,7 +48,7 @@ export const VcmoveCmd = utilityCmd({
       channel = potentialChannel;
     } else {
       // Search string -> find closest matching voice channel name
-      const voiceChannels = pluginData.guild.channels.filter(theChannel => {
+      const voiceChannels = pluginData.guild.channels.cache.array().filter(theChannel => {
         return theChannel instanceof VoiceChannel;
       }) as VoiceChannel[];
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
@@ -59,21 +60,21 @@ export const VcmoveCmd = utilityCmd({
       channel = closestMatch;
     }
 
-    if (!args.member.voiceState || !args.member.voiceState.channelID) {
+    if (!args.member.voice || !args.member.voice.channelID) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
     }
 
-    if (args.member.voiceState.channelID === channel.id) {
+    if (args.member.voice.channelID === channel.id) {
       sendErrorMessage(pluginData, msg.channel, "Member is already on that channel!");
       return;
     }
 
-    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voiceState.channelID);
+    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelID);
 
     try {
       await args.member.edit({
-        channelID: channel.id,
+        channel: channel.id,
       });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to move member");
@@ -130,7 +131,7 @@ export const VcmoveAllCmd = utilityCmd({
       channel = potentialChannel;
     } else {
       // Search string -> find closest matching voice channel name
-      const voiceChannels = pluginData.guild.channels.filter(theChannel => {
+      const voiceChannels = pluginData.guild.channels.cache.array().filter(theChannel => {
         return theChannel instanceof VoiceChannel;
       }) as VoiceChannel[];
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
@@ -142,7 +143,7 @@ export const VcmoveAllCmd = utilityCmd({
       channel = closestMatch;
     }
 
-    if (args.oldChannel.voiceMembers.size === 0) {
+    if (args.oldChannel.members.size === 0) {
       sendErrorMessage(pluginData, msg.channel, "Voice channel is empty");
       return;
     }
@@ -154,9 +155,9 @@ export const VcmoveAllCmd = utilityCmd({
 
     // Cant leave null, otherwise we get an assignment error in the catch
     let currMember = msg.member;
-    const moveAmt = args.oldChannel.voiceMembers.size;
+    const moveAmt = args.oldChannel.members.size;
     let errAmt = 0;
-    for (const memberWithId of args.oldChannel.voiceMembers) {
+    for (const memberWithId of args.oldChannel.members) {
       currMember = memberWithId[1];
 
       // Check for permissions but allow self-moves
@@ -164,7 +165,7 @@ export const VcmoveAllCmd = utilityCmd({
         sendErrorMessage(
           pluginData,
           msg.channel,
-          `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id}): You cannot act on this member`,
+          `Failed to move ${currMember.user.username}#${currMember.user.discriminator} (${currMember.id}): You cannot act on this member`,
         );
         errAmt++;
         continue;
@@ -172,7 +173,7 @@ export const VcmoveAllCmd = utilityCmd({
 
       try {
         currMember.edit({
-          channelID: channel.id,
+          channel: channel.id,
         });
       } catch {
         if (msg.member.id === currMember.id) {
@@ -182,7 +183,7 @@ export const VcmoveAllCmd = utilityCmd({
         sendErrorMessage(
           pluginData,
           msg.channel,
-          `Failed to move ${currMember.username}#${currMember.discriminator} (${currMember.id})`,
+          `Failed to move ${currMember.user.username}#${currMember.user.discriminator} (${currMember.id})`,
         );
         errAmt++;
         continue;

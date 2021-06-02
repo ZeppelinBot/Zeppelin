@@ -2,7 +2,7 @@ import * as ioTs from "io-ts";
 import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, tAllowedMentions } from "./utils";
 
 import test from "ava";
-import { AllowedMentions as ErisAllowedMentions } from "eris";
+import { erisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions";
 
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
 
@@ -52,6 +52,6 @@ test("delay strings: reverse conversion (conservative)", t => {
 
 test("tAllowedMentions matches Eris's AllowedMentions", t => {
   type TAllowedMentions = ioTs.TypeOf<typeof tAllowedMentions>;
-  const typeTest: AssertEquals<TAllowedMentions, ErisAllowedMentions> = true;
+  const typeTest: AssertEquals<TAllowedMentions, erisAllowedMentionFormat> = true;
   t.pass();
 });

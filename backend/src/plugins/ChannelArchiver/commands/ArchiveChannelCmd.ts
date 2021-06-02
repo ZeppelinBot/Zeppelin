@@ -104,6 +104,15 @@ export const ArchiveChannelCmd = channelArchiverCmd({
     result += `\n\n${archiveLines.join("\n")}\n`;
 
     progressMsg.delete().catch(noop);
-    msg.channel.send({ content: "Archive created!", files: [{attachment: Buffer.from(result), name: `archive-${args.channel.name}-${moment.utc().format("YYYY-MM-DD-HH-mm-ss")}.txt`}], split: false });
+    msg.channel.send({
+      content: "Archive created!",
+      files: [
+        {
+          attachment: Buffer.from(result),
+          name: `archive-${args.channel.name}-${moment.utc().format("YYYY-MM-DD-HH-mm-ss")}.txt`,
+        },
+      ],
+      split: false,
+    });
   },
 });

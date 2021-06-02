@@ -6,6 +6,8 @@ import humanizeDuration from "humanize-duration";
 import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageEmbedOptions, Constants, TextChannel } from "discord.js";
+import { MessageTypeStrings } from "src/types";
 
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
 
@@ -14,8 +16,10 @@ export async function getMessageInfoEmbed(
   channelId: string,
   messageId: string,
   requestMemberId?: string,
-): Promise<EmbedOptions | null> {
-  const message = await pluginData.client.getMessage(channelId, messageId).catch(() => null);
+): Promise<MessageEmbedOptions | null> {
+  const message = await (pluginData.guild.channels.resolve(channelId) as TextChannel).messages
+    .fetch(messageId)
+    .catch(() => null);
   if (!message) {
     return null;
   }
@@ -36,12 +40,12 @@ export async function getMessageInfoEmbed(
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
   const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const messageAge = humanizeDuration(Date.now() - message.createdAt, {
+  const messageAge = humanizeDuration(Date.now() - message.createdTimestamp, {
     largest: 2,
     round: true,
   });
 
-  const editedAt = message.editedTimestamp && moment.utc(message.editedTimestamp, "x");
+  const editedAt = message.editedTimestamp ? moment.utc(message.editedTimestamp!, "x") : undefined;
   const tzEditedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, editedAt)
     : timeAndDate.inGuildTz(editedAt);
@@ -55,16 +59,16 @@ export async function getMessageInfoEmbed(
 
   const type =
     {
-      [Constants.MessageTypes.DEFAULT]: "Regular message",
-      [Constants.MessageTypes.CHANNEL_PINNED_MESSAGE]: "System message",
-      [Constants.MessageTypes.GUILD_MEMBER_JOIN]: "System message",
-      [Constants.MessageTypes.USER_PREMIUM_GUILD_SUBSCRIPTION]: "System message",
-      [Constants.MessageTypes.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_1]: "System message",
-      [Constants.MessageTypes.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_2]: "System message",
-      [Constants.MessageTypes.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3]: "System message",
-      [Constants.MessageTypes.CHANNEL_FOLLOW_ADD]: "System message",
-      [Constants.MessageTypes.GUILD_DISCOVERY_DISQUALIFIED]: "System message",
-      [Constants.MessageTypes.GUILD_DISCOVERY_REQUALIFIED]: "System message",
+      [MessageTypeStrings.DEFAULT]: "Regular message",
+      [MessageTypeStrings.PINS_ADD]: "System message",
+      [MessageTypeStrings.GUILD_MEMBER_JOIN]: "System message",
+      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION]: "System message",
+      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_1]: "System message",
+      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_2]: "System message",
+      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3]: "System message",
+      [MessageTypeStrings.CHANNEL_FOLLOW_ADD]: "System message",
+      [MessageTypeStrings.GUILD_DISCOVERY_DISQUALIFIED]: "System message",
+      [MessageTypeStrings.GUILD_DISCOVERY_REQUALIFIED]: "System message",
     }[message.type] || "Unknown";
 
   embed.fields.push({
@@ -87,12 +91,12 @@ export async function getMessageInfoEmbed(
     ? await timeAndDate.inMemberTz(requestMemberId, authorCreatedAt)
     : timeAndDate.inGuildTz(authorCreatedAt);
   const prettyAuthorCreatedAt = tzAuthorCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const authorAccountAge = humanizeDuration(Date.now() - message.author.createdAt, {
+  const authorAccountAge = humanizeDuration(Date.now() - message.author.createdTimestamp, {
     largest: 2,
     round: true,
   });
 
-  const authorJoinedAt = message.member && moment.utc(message.member.joinedAt, "x");
+  const authorJoinedAt = message.member && moment.utc(message.member.joinedTimestamp!, "x");
   const tzAuthorJoinedAt = authorJoinedAt
     ? requestMemberId
       ? await timeAndDate.inMemberTz(requestMemberId, authorJoinedAt)
@@ -101,7 +105,7 @@ export async function getMessageInfoEmbed(
   const prettyAuthorJoinedAt = tzAuthorJoinedAt?.format(timeAndDate.getDateFormat("pretty_datetime"));
   const authorServerAge =
     message.member &&
-    humanizeDuration(Date.now() - message.member.joinedAt, {
+    humanizeDuration(Date.now() - message.member.joinedTimestamp!, {
       largest: 2,
       round: true,
     });
@@ -126,7 +130,7 @@ export async function getMessageInfoEmbed(
     });
   }
 
-  if (message.attachments.length) {
+  if (message.attachments.size) {
     embed.fields.push({
       name: preEmbedPadding + "Attachments",
       value: message.attachments[0].url,

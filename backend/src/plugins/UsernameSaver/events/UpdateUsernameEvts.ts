@@ -11,10 +11,10 @@ export const MessageCreateUpdateUsernameEvt = usernameSaverEvt({
 });
 
 export const VoiceChannelJoinUpdateUsernameEvt = usernameSaverEvt({
-  event: "voiceChannelJoin",
+  event: "voiceStateUpdate",
 
   async listener(meta) {
-    if (meta.args.member.bot) return;
-    meta.pluginData.state.updateQueue.add(() => updateUsername(meta.pluginData, meta.args.member.user));
+    if (meta.args.newState.member?.user.bot) return;
+    meta.pluginData.state.updateQueue.add(() => updateUsername(meta.pluginData, meta.args.newState.member!.user));
   },
 });

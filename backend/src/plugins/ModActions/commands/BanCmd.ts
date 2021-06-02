@@ -6,7 +6,7 @@ import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { banUserId } from "../functions/banUserId";
-import { getMemberLevel, waitForReaction } from "knub/dist/helpers";
+import { getMemberLevel } from "knub/dist/helpers";
 import humanizeDuration from "humanize-duration";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -49,7 +49,7 @@ export const BanCmd = modActionsCmd({
     }
     const time = args["time"] ? args["time"] : null;
 
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+    const reason = formatReasonWithAttachments(args.reason, msg.attachments.array());
     const memberToBan = await resolveMember(pluginData.client, pluginData.guild, user.id);
     // The moderator who did the action is the message author or, if used, the specified -mod
     let mod = msg.member;
@@ -76,11 +76,11 @@ export const BanCmd = modActionsCmd({
         }
 
         // Ask the mod if we should update the existing ban
-        const alreadyBannedMsg = await msg.channel.createMessage("User is already banned, update ban?");
-        const reply = await waitForReaction(pluginData.client, alreadyBannedMsg, ["✅", "❌"], msg.author.id);
+        const alreadyBannedMsg = await msg.channel.send("User is already banned, update ban?");
+        const reply = false; // await waitForReaction(pluginData.client, alreadyBannedMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
 
         alreadyBannedMsg.delete().catch(noop);
-        if (!reply || reply.name === "❌") {
+        if (!reply /* || reply.name === "❌"*/) {
           sendErrorMessage(pluginData, msg.channel, "User already banned, update cancelled by moderator");
           lock.unlock();
           return;
@@ -124,11 +124,11 @@ export const BanCmd = modActionsCmd({
         }
       } else {
         // Ask the mod if we should upgrade to a forceban as the user is not on the server
-        const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forceban instead?");
-        const reply = await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id);
+        const notOnServerMsg = await msg.channel.send("User not found on the server, forceban instead?");
+        const reply = false; // await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id); Waiting for waitForButton
 
         notOnServerMsg.delete().catch(noop);
-        if (!reply || reply.name === "❌") {
+        if (!reply /*|| reply.name === "❌"*/) {
           sendErrorMessage(pluginData, msg.channel, "User not on server, ban cancelled by moderator");
           lock.unlock();
           return;

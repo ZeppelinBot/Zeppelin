@@ -8,6 +8,7 @@ import { waitForReply } from "knub/dist/helpers";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { TextChannel } from "discord.js";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
@@ -28,7 +29,7 @@ export const MassmuteCmd = modActionsCmd({
     }
 
     // Ask for mute reason
-    msg.channel.createMessage("Mute reason? `cancel` to cancel");
+    msg.channel.send("Mute reason? `cancel` to cancel");
     const muteReasonReceived = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (
       !muteReasonReceived ||
@@ -39,7 +40,7 @@ export const MassmuteCmd = modActionsCmd({
       return;
     }
 
-    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, msg.attachments);
+    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, msg.attachments.array());
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {
@@ -58,7 +59,7 @@ export const MassmuteCmd = modActionsCmd({
     });
 
     // Show loading indicator
-    const loadingMsg = await msg.channel.createMessage("Muting...");
+    const loadingMsg = await msg.channel.send("Muting...");
 
     // Mute everyone and count fails
     const modId = msg.author.id;

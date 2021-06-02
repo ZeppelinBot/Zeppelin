@@ -2,12 +2,13 @@ import { persistEvt } from "../types";
 import { IPartialPersistData } from "../../../data/GuildPersistedData";
 
 import intersection from "lodash.intersection";
+import { GuildMember } from "discord.js";
 
 export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",
 
   async listener(meta) {
-    const member = meta.args.member as Member;
+    const member = meta.args.member as GuildMember;
     const pluginData = meta.pluginData;
 
     let persist = false;
@@ -23,9 +24,9 @@ export const StoreDataEvt = persistEvt({
       }
     }
 
-    if (config.persist_nicknames && member.nick) {
+    if (config.persist_nicknames && member.nickname) {
       persist = true;
-      persistData.nickname = member.nick;
+      persistData.nickname = member.nickname;
     }
 
     if (persist) {

@@ -15,13 +15,14 @@ import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import humanizeDuration from "humanize-duration";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { MessageEmbedOptions, Role } from "discord.js";
 
 export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
   compact = false,
   requestMemberId?: string,
-): Promise<EmbedOptions | null> {
+): Promise<MessageEmbedOptions | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {
     return null;
@@ -39,7 +40,7 @@ export async function getUserInfoEmbed(
     name: `User:  ${user.username}#${user.discriminator}`,
   };
 
-  const avatarURL = user.avatarURL || user.defaultAvatarURL;
+  const avatarURL = user.avatarURL() || user.defaultAvatarURL;
   embed.author.icon_url = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");
@@ -47,7 +48,7 @@ export async function getUserInfoEmbed(
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
   const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const accountAge = humanizeDuration(moment.utc().valueOf() - user.createdAt, {
+  const accountAge = humanizeDuration(moment.utc().valueOf() - user.createdTimestamp, {
     largest: 2,
     round: true,
   });
@@ -61,12 +62,12 @@ export async function getUserInfoEmbed(
           `),
     });
     if (member) {
-      const joinedAt = moment.utc(member.joinedAt, "x");
+      const joinedAt = moment.utc(member.joinedTimestamp!, "x");
       const tzJoinedAt = requestMemberId
         ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
         : timeAndDate.inGuildTz(joinedAt);
       const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-      const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
+      const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedTimestamp!, {
         largest: 2,
         round: true,
       });
@@ -92,16 +93,18 @@ export async function getUserInfoEmbed(
   });
 
   if (member) {
-    const joinedAt = moment.utc(member.joinedAt, "x");
+    const joinedAt = moment.utc(member.joinedTimestamp!, "x");
     const tzJoinedAt = requestMemberId
       ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
       : timeAndDate.inGuildTz(joinedAt);
     const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-    const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedAt, {
+    const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedTimestamp!, {
       largest: 2,
       round: true,
     });
-    const roles = member.roles.map(id => pluginData.guild.roles.cache.get(id)).filter(r => r != null) as Role[];
+    const roles = member.roles.cache
+      .map(role => pluginData.guild.roles.cache.get(role.id))
+      .filter(r => r != null) as Role[];
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
@@ -112,16 +115,14 @@ export async function getUserInfoEmbed(
         `),
     });
 
-    const voiceChannel = member.voiceState.channelID
-      ? pluginData.guild.channels.cache.get(member.voiceState.channelID)
-      : null;
-    if (voiceChannel || member.voiceState.mute || member.voiceState.deaf) {
+    const voiceChannel = member.voice.channelID ? pluginData.guild.channels.cache.get(member.voice.channelID) : null;
+    if (voiceChannel || member.voice.mute || member.voice.deaf) {
       embed.fields.push({
         name: preEmbedPadding + "Voice information",
         value: trimLines(`
           ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
-          ${member.voiceState.mute ? "Server voice muted: **Yes**" : ""}
-          ${member.voiceState.deaf ? "Server voice deafened: **Yes**" : ""}
+          ${member.voice.mute ? "Server voice muted: **Yes**" : ""}
+          ${member.voice.deaf ? "Server voice deafened: **Yes**" : ""}
         `),
       });
     }

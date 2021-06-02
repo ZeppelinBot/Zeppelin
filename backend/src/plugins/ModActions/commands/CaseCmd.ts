@@ -24,6 +24,6 @@ export const CaseCmd = modActionsCmd({
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const embed = await casesPlugin.getCaseEmbed(theCase.id, msg.author.id);
-    msg.channel.createMessage(embed);
+    msg.channel.send(embed);
   },
 });

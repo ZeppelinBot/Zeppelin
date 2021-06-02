@@ -36,18 +36,17 @@ export async function unmuteUser(
       const lock = await pluginData.locks.acquire(memberRolesLock(member));
 
       const muteRole = pluginData.config.get().mute_role;
-      if (muteRole && member.roles.includes(muteRole)) {
-        await member.removeRole(muteRole);
-        member.roles = member.roles.filter(r => r !== muteRole);
+      if (muteRole && member.roles.cache.has(muteRole)) {
+        await member.roles.remove(muteRole);
       }
       if (existingMute?.roles_to_restore) {
-        const memberOptions: MemberOptions = {};
-        const guildRoles = pluginData.guild.roles;
-        memberOptions.roles = Array.from(
-          new Set([...existingMute.roles_to_restore, ...member.roles.filter(x => x !== muteRole && guildRoles.has(x))]),
-        );
-        await member.edit(memberOptions);
-        member.roles = memberOptions.roles;
+        const guildRoles = pluginData.guild.roles.cache;
+        let newRoles: string[] = member.roles.cache.keyArray();
+        newRoles = muteRole && newRoles.includes(muteRole) ? newRoles.splice(newRoles.indexOf(muteRole), 1) : newRoles;
+        for (const toRestore of existingMute.roles_to_restore) {
+          if (guildRoles.has(toRestore) && toRestore !== muteRole) newRoles.push(toRestore);
+        }
+        await member.roles.set(newRoles);
       }
 
       lock.unlock();
@@ -85,7 +84,7 @@ export async function unmuteUser(
   });
 
   // Log the action
-  const mod = pluginData.client.user!.get(modId);
+  const mod = pluginData.client.users.fetch(modId);
   if (unmuteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
       mod: stripObjectToScalars(mod),

@@ -128,13 +128,9 @@ export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
         `Added ${amount} to **${counterName}** for <@!${user.id}> in <#${channel.id}>. The value is now ${newValue}.`,
       );
     } else if (channel) {
-      message.channel.send(
-        `Added ${amount} to **${counterName}** in <#${channel.id}>. The value is now ${newValue}.`,
-      );
+      message.channel.send(`Added ${amount} to **${counterName}** in <#${channel.id}>. The value is now ${newValue}.`);
     } else if (user) {
-      message.channel.send(
-        `Added ${amount} to **${counterName}** for <@!${user.id}>. The value is now ${newValue}.`,
-      );
+      message.channel.send(`Added ${amount} to **${counterName}** for <@!${user.id}>. The value is now ${newValue}.`);
     } else {
       message.channel.send(`Added ${amount} to **${counterName}**. The value is now ${newValue}.`);
     }

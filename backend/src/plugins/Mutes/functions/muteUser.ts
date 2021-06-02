@@ -19,6 +19,7 @@ import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { muteLock } from "../../../utils/lockNameHelpers";
+import { TextChannel, User } from "discord.js";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -58,8 +59,8 @@ export async function muteUser(
   if (member) {
     const logs = pluginData.getPlugin(LogsPlugin);
     // remove and store any roles to be removed/restored
-    const currentUserRoles = member.roles;
-    const memberOptions: MemberOptions = {};
+    const currentUserRoles = member.roles.cache.keyArray();
+    let newRoles: string[] = currentUserRoles;
     const removeRoles = removeRolesOnMuteOverride ?? config.remove_roles_on_mute;
     const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_mute;
 
@@ -67,13 +68,13 @@ export async function muteUser(
     if (!Array.isArray(removeRoles)) {
       if (removeRoles) {
         // exclude managed roles from being removed
-        const managedRoles = pluginData.guild.roles.filter(x => x.managed).map(y => y.id);
-        memberOptions.roles = managedRoles.filter(x => member.roles.includes(x));
-        await member.edit(memberOptions);
+        const managedRoles = pluginData.guild.roles.cache.filter(x => x.managed).map(y => y.id);
+        newRoles = currentUserRoles.filter(r => !managedRoles.includes(r));
+        await member.roles.set(newRoles);
       }
     } else {
-      memberOptions.roles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
-      await member.edit(memberOptions);
+      newRoles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
+      await member.roles.set(newRoles);
     }
 
     // set roles to be restored
@@ -86,11 +87,11 @@ export async function muteUser(
     }
 
     // Apply mute role if it's missing
-    if (!member.roles.includes(muteRole)) {
+    if (!currentUserRoles.includes(muteRole)) {
       try {
-        await member.addRole(muteRole);
+        await member.roles.add(muteRole);
       } catch (e) {
-        const actualMuteRole = pluginData.guild.roles.find(x => x.id === muteRole);
+        const actualMuteRole = pluginData.guild.roles.cache.find(x => x.id === muteRole);
         if (!actualMuteRole) {
           lock.unlock();
           logs.log(LogType.BOT_ALERT, {
@@ -100,9 +101,9 @@ export async function muteUser(
         }
 
         const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-        const zepRoles = pluginData.guild.roles.filter(x => zep!.roles.includes(x.id));
+        const zepRoles = pluginData.guild.roles.cache.filter(x => zep!.roles.cache.has(x.id));
         // If we have roles and one of them is above the muted role, throw generic error
-        if (zepRoles.length >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
+        if (zepRoles.size >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
           lock.unlock();
           logs.log(LogType.BOT_ALERT, {
             body: `Cannot mute user ${member.id}: ${e}`,
@@ -125,7 +126,7 @@ export async function muteUser(
     if (moveToVoiceChannel || cfg.kick_from_voice_channel) {
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
       try {
-        await member.edit({ channelID: moveToVoiceChannel });
+        await member.edit({ channel: moveToVoiceChannel });
       } catch {} // tslint:disable-line
     }
   }

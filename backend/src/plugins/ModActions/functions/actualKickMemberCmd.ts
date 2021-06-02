@@ -9,6 +9,7 @@ import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { kickMember } from "./kickMember";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
+import { GuildMember, TextChannel } from "discord.js";
 
 export async function actualKickMemberCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -16,7 +17,7 @@ export async function actualKickMemberCmd(
   args: {
     user: string;
     reason: string;
-    mod: Member;
+    mod: GuildMember;
     notify?: string;
     "notify-channel"?: TextChannel;
     clean?: boolean;
@@ -81,7 +82,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Ban, memberToKick.id);
 
     try {
-      await memberToKick.ban(1, encodeURIComponent("kick -clean"));
+      await memberToKick.ban({ days: 1, reason: encodeURIComponent("kick -clean") });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
     }
@@ -90,14 +91,14 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, memberToKick.id);
 
     try {
-      await pluginData.guild.unbanMember(memberToKick.id, encodeURIComponent("kick -clean"));
+      await pluginData.guild.bans.remove(memberToKick.id, encodeURIComponent("kick -clean"));
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
     }
   }
 
   if (kickResult.status === "failed") {
-    msg.channel.createMessage(errorMessage(`Failed to kick user`));
+    msg.channel.send(errorMessage(`Failed to kick user`));
     return;
   }
 
