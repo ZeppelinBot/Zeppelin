@@ -1,6 +1,5 @@
 import { BaseConfig, Knub } from "knub";
 import * as t from "io-ts";
-import { Message } from "eris";
 
 export interface ZeppelinGuildConfig extends BaseConfig<any> {
   success_emoji?: string;
@@ -24,6 +23,9 @@ export const ZeppelinGuildConfigSchema = t.type({
   // Deprecated
   timezone: t.string,
   date_formats: t.unknown,
+
+  // YAML Stuff
+  aliases: t.unknown,
 });
 export const PartialZeppelinGuildConfigSchema = t.partial(ZeppelinGuildConfigSchema.props);
 
