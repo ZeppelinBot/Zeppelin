@@ -211,8 +211,9 @@ export class GuildSavedMessages extends BaseGuildRepository {
 
     const newMessage = { ...oldMessage, data: newData };
 
-    //@ts-ignore
-    await this.messages.update( // FIXME?
+    // @ts-ignore
+    await this.messages.update(
+      // FIXME?
       { id },
       {
         data: newData,

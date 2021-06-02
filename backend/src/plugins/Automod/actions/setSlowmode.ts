@@ -26,12 +26,13 @@ export const SetSlowmodeAction = automodAction({
         continue;
       }
 
-      let channelsToSlowmode: TextChannel[] = [];
+      const channelsToSlowmode: TextChannel[] = [];
       if (channel.type === ChannelTypeStrings.CATEGORY) {
         // Find all text channels within the category
         for (const ch of pluginData.guild.channels.cache.values()) {
-          if (ch.parentID === channel.id && ch.type === ChannelTypeStrings.TEXT)
+          if (ch.parentID === channel.id && ch.type === ChannelTypeStrings.TEXT) {
             channelsToSlowmode.push(ch as TextChannel);
+          }
         }
       } else {
         channelsToSlowmode.push(channel as TextChannel);

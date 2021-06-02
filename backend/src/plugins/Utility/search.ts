@@ -309,7 +309,7 @@ async function performMemberSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
 
-    /** FIXME if we ever get the intent for this again
+    /* FIXME if we ever get the intent for this again
     if (args["status-search"]) {
       matchingMembers = await asyncFilter(matchingMembers, async member => {
         if (member.game) {

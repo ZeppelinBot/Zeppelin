@@ -29,7 +29,7 @@ function updateGuildInfo(pluginData: GuildPluginData<GuildInfoSaverPluginType>) 
   pluginData.state.allowedGuilds.updateInfo(
     pluginData.guild.id,
     pluginData.guild.name,
-    pluginData.guild.iconURL,
+    pluginData.guild.iconURL(),
     pluginData.guild.ownerID,
   );
 }

@@ -61,7 +61,7 @@ export const UnmuteCmd = modActionsCmd({
       } else {
         // Ask the mod if we should upgrade to a forceunmute as the user is not on the server
         const notOnServerMsg = await msg.channel.send("User not found on the server, forceunmute instead?");
-        const reply = false; //await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
+        const reply = false; // await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
 
         notOnServerMsg.delete().catch(noop);
         if (!reply /*|| reply.name === "❌"*/) {

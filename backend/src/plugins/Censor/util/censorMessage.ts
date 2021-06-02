@@ -14,8 +14,8 @@ export async function censorMessage(
   pluginData.state.serverLogs.ignoreLog(LogType.MESSAGE_DELETE, savedMessage.id);
 
   try {
-    const channel = pluginData.guild.channels.resolve(savedMessage.channel_id) as TextChannel;
-    await channel.messages.delete(savedMessage.id);
+    const resolvedChannel = pluginData.guild.channels.resolve(savedMessage.channel_id) as TextChannel;
+    await resolvedChannel.messages.delete(savedMessage.id);
   } catch {
     return;
   }

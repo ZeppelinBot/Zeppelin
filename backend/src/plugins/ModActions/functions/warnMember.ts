@@ -46,7 +46,7 @@ export async function warnMember(
       const failedMsg = await warnOptions.retryPromptChannel.send(
         "Failed to message the user. Log the warning anyway?",
       );
-      const reply = false; //await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]); FIXME waiting on waitForButton
+      const reply = false; // await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]); FIXME waiting on waitForButton
       failedMsg.delete();
       if (!reply /*|| reply.name === "❌"*/) {
         return {
