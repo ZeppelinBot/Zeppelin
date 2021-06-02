@@ -32,7 +32,7 @@ export const TagEvalCmd = tagsCmd({
         return;
       }
 
-      msg.channel.createMessage(rendered);
+      msg.channel.send(rendered);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         sendErrorMessage(pluginData, msg.channel, `Failed to render tag: ${e.message}`);

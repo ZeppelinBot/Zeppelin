@@ -21,6 +21,6 @@ export const ServerInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed: serverInfoEmbed });
+    message.channel.send({ embed: serverInfoEmbed });
   },
 });

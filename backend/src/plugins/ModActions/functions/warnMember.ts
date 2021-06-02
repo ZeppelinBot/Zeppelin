@@ -10,15 +10,15 @@ import {
   ucfirst,
   UserNotificationResult,
 } from "../../../utils";
-import { waitForReaction } from "knub/dist/helpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
+import { GuildMember } from "discord.js";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  member: Member,
+  member: GuildMember,
   reason: string,
   warnOptions: WarnOptions = {},
 ): Promise<WarnResult> {
@@ -42,13 +42,13 @@ export async function warnMember(
   }
 
   if (!notifyResult.success) {
-    if (warnOptions.retryPromptChannel && pluginData.guild.channels.has(warnOptions.retryPromptChannel.id)) {
-      const failedMsg = await warnOptions.retryPromptChannel.createMessage(
+    if (warnOptions.retryPromptChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptChannel.id)) {
+      const failedMsg = await warnOptions.retryPromptChannel.send(
         "Failed to message the user. Log the warning anyway?",
       );
-      const reply = await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]);
+      const reply = false; //await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]); FIXME waiting on waitForButton
       failedMsg.delete();
-      if (!reply || reply.name === "❌") {
+      if (!reply /*|| reply.name === "❌"*/) {
         return {
           status: "failed",
           error: "Failed to message user",

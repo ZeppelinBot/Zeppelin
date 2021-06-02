@@ -22,9 +22,7 @@ export const SourceCmd = utilityCmd({
       return;
     }
 
-    const message = await pluginData.client
-      .getMessage(args.message.channel.id, args.message.messageId)
-      .catch(() => null);
+    const message = await args.message.channel.messages.fetch(args.message.messageId).catch(() => null);
     if (!message) {
       sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;
@@ -44,6 +42,6 @@ export const SourceCmd = utilityCmd({
     const archiveId = await pluginData.state.archives.create(source, moment.utc().add(1, "hour"));
     const baseUrl = getBaseUrl(pluginData);
     const url = pluginData.state.archives.getUrl(baseUrl, archiveId);
-    cmdMessage.channel.createMessage(`Message source: ${url}`);
+    cmdMessage.channel.send(`Message source: ${url}`);
   },
 });

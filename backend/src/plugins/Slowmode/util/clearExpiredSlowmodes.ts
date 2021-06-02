@@ -5,6 +5,7 @@ import { logger } from "../../../logger";
 
 import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
+import { GuildChannel, TextChannel } from "discord.js";
 
 export async function clearExpiredSlowmodes(pluginData: GuildPluginData<SlowmodePluginType>) {
   const expiredSlowmodeUsers = await pluginData.state.slowmodes.getExpiredSlowmodeUsers();
@@ -20,7 +21,7 @@ export async function clearExpiredSlowmodes(pluginData: GuildPluginData<Slowmode
     } catch (e) {
       logger.error(e);
 
-      const realUser = pluginData.client.user!.get(user.user_id) || new UnknownUser({ id: user.user_id });
+      const realUser = pluginData.client.users!.fetch(user.user_id) || new UnknownUser({ id: user.user_id });
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Failed to clear slowmode permissions from {userMention(user)} in {channelMention(channel)}`,
         user: stripObjectToScalars(realUser),

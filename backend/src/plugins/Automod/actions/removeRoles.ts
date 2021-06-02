@@ -57,13 +57,13 @@ export const RemoveRolesAction = automodAction({
 
     await Promise.all(
       members.map(async member => {
-        const memberRoles = new Set(member.roles);
+        const memberRoles = new Set(member.roles.cache.keyArray());
         for (const roleId of rolesToRemove) {
           memberRoles.delete(roleId);
           ignoreRoleChange(pluginData, member.id, roleId);
         }
 
-        if (memberRoles.size === member.roles.length) {
+        if (memberRoles.size === member.roles.cache.size) {
           // No role changes
           return;
         }
@@ -74,7 +74,6 @@ export const RemoveRolesAction = automodAction({
         await member.edit({
           roles: rolesArr,
         });
-        member.roles = rolesArr; // Make sure we know of the new roles internally as well
 
         memberRoleLock.unlock();
       }),

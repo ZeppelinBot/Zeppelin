@@ -8,9 +8,9 @@ import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { errorMessage, resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
-import { waitForReaction } from "knub/dist/helpers";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
+import { TextChannel } from "discord.js";
 
 export const WarnCmd = modActionsCmd({
   trigger: "warn",
@@ -56,7 +56,7 @@ export const WarnCmd = modActionsCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        msg.channel.createMessage(errorMessage("You don't have permission to use -mod"));
+        msg.channel.send(errorMessage("You don't have permission to use -mod"));
         return;
       }
 
@@ -64,19 +64,19 @@ export const WarnCmd = modActionsCmd({
     }
 
     const config = pluginData.config.get();
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+    const reason = formatReasonWithAttachments(args.reason, msg.attachments.array());
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
     if (config.warn_notify_enabled && priorWarnAmount >= config.warn_notify_threshold) {
-      const tooManyWarningsMsg = await msg.channel.createMessage(
+      const tooManyWarningsMsg = await msg.channel.send(
         config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
       );
 
-      const reply = await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id);
+      const reply = false; //await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
       tooManyWarningsMsg.delete();
-      if (!reply || reply.name === "❌") {
-        msg.channel.createMessage(errorMessage("Warn cancelled by moderator"));
+      if (!reply /*|| reply.name === "❌"*/) {
+        msg.channel.send(errorMessage("Warn cancelled by moderator"));
         return;
       }
     }

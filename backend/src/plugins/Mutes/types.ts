@@ -11,6 +11,7 @@ import { GuildMutes } from "../../data/GuildMutes";
 import { CaseArgs } from "../Cases/types";
 import Timeout = NodeJS.Timeout;
 import { EventEmitter } from "events";
+import { GuildMember } from "discord.js";
 
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -58,7 +59,7 @@ export interface MutesPluginType extends BasePluginType {
 }
 
 export interface IMuteWithDetails extends Mute {
-  member?: Member;
+  member?: GuildMember;
   banned?: boolean;
 }
 

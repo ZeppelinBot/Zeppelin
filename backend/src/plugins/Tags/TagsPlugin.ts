@@ -214,11 +214,11 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
           return input;
         }
 
-        if (pluginData.guild.members.has(input) || pluginData.client.user!.has(input)) {
+        if (pluginData.guild.members.cache.has(input) || pluginData.client.users.resolve(input)) {
           return `<@!${input}>`;
         }
 
-        if (pluginData.guild.channels.has(input) || pluginData.client.channelGuildMap[input]) {
+        if (pluginData.guild.channels.cache.has(input)) {
           return `<#${input}>`;
         }
 

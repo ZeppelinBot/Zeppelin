@@ -25,13 +25,13 @@ export const NoteCmd = modActionsCmd({
       return;
     }
 
-    if (!args.note && msg.attachments.length === 0) {
+    if (!args.note && msg.attachments.size === 0) {
       sendErrorMessage(pluginData, msg.channel, "Text or attachment required");
       return;
     }
 
     const userName = `${user.username}#${user.discriminator}`;
-    const reason = formatReasonWithAttachments(args.note, msg.attachments);
+    const reason = formatReasonWithAttachments(args.note, msg.attachments.array());
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const createdCase = await casesPlugin.createCase({

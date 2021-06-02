@@ -15,13 +15,14 @@ import { LogType } from "../../../data/LogType";
 import { ignoreEvent } from "./ignoreEvent";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { GuildMember } from "discord.js";
 
 /**
  * Kick the specified server member. Generates a case.
  */
 export async function kickMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  member: Member,
+  member: GuildMember,
   reason?: string,
   kickOptions: KickOptions = {},
 ): Promise<KickResult> {

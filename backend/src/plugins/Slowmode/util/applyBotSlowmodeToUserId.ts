@@ -4,6 +4,7 @@ import { GuildPluginData } from "knub";
 import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
+import { GuildChannel, TextChannel, Permissions } from "discord.js";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
@@ -12,13 +13,17 @@ export async function applyBotSlowmodeToUserId(
 ) {
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
   const existingOverride = channel.permissionOverwrites.get(userId);
-  const newDeniedPermissions = (existingOverride ? existingOverride.deny : 0n) | Constants.Permissions.sendMessages;
-  const newAllowedPermissions = (existingOverride ? existingOverride.allow : 0n) & ~Constants.Permissions.sendMessages;
+  const newDeniedPermissions =
+    (existingOverride ? existingOverride.deny.bitfield : 0n) | Permissions.FLAGS.SEND_MESSAGES;
+  const newAllowedPermissions =
+    (existingOverride ? existingOverride.allow.bitfield : 0n) & ~Permissions.FLAGS.SEND_MESSAGES;
 
   try {
-    await channel.editPermission(userId, newAllowedPermissions, newDeniedPermissions, "member");
+    await channel.overwritePermissions([
+      { id: userId, allow: newAllowedPermissions, deny: newDeniedPermissions, type: "member" },
+    ]);
   } catch (e) {
-    const user = pluginData.client.user!.get(userId) || new UnknownUser({ id: userId });
+    const user = pluginData.client.users.fetch(userId) || new UnknownUser({ id: userId });
 
     if (isDiscordRESTError(e) && e.code === 50013) {
       logger.warn(

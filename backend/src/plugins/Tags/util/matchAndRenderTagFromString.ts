@@ -4,6 +4,7 @@ import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
 import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
 import escapeStringRegexp from "escape-string-regexp";
+import { GuildMember } from "discord.js";
 
 interface BaseResult {
   renderedContent: StrictMessageContent;
@@ -25,7 +26,7 @@ type Result = ResultWithCategory | ResultWithoutCategory;
 export async function matchAndRenderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,
   str: string,
-  member: Member,
+  member: GuildMember,
   extraMatchParams: ExtendedMatchParams = {},
 ): Promise<Result | null> {
   const config = await pluginData.config.getMatchingConfig({

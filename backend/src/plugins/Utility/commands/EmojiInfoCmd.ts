@@ -27,6 +27,6 @@ export const EmojiInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed });
+    message.channel.send({ embed });
   },
 });

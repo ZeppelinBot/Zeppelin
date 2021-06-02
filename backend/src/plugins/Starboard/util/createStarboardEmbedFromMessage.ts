@@ -1,6 +1,7 @@
 import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
 
 import path from "path";
+import { Message, GuildChannel } from "discord.js";
 
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 const audioAttachmentExtensions = ["wav", "mp3", "m4a"];
@@ -21,15 +22,15 @@ export function createStarboardEmbedFromMessage(
       name: `${msg.author.username}#${msg.author.discriminator}`,
     },
     fields: [],
-    timestamp: new Date(msg.timestamp).toISOString(),
+    timestamp: msg.createdAt,
   };
 
   if (color != null) {
     embed.color = color;
   }
 
-  if (msg.author.avatarURL) {
-    embed.author.icon_url = msg.author.avatarURL;
+  if (msg.author.avatarURL()) {
+    embed.author.icon_url = msg.author.avatarURL()!;
   }
 
   // The second condition here checks for messages with only an image link that is then embedded.
@@ -59,15 +60,15 @@ export function createStarboardEmbedFromMessage(
   }
 
   // If there are no embeds, add the first image attachment explicitly
-  else if (msg.attachments.length) {
+  else if (msg.attachments.size) {
     for (const attachment of msg.attachments) {
       const ext = path
-        .extname(attachment.filename)
+        .extname(attachment[1].name!)
         .slice(1)
         .toLowerCase();
 
       if (imageAttachmentExtensions.includes(ext)) {
-        embed.image = { url: attachment.url };
+        embed.image = { url: attachment[1].url };
         break;
       }
 

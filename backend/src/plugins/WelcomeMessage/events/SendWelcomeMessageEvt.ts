@@ -4,6 +4,7 @@ import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 
 import { sendDM } from "../../../utils/sendDM";
+import { TextChannel } from "discord.js";
 
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",
@@ -55,7 +56,7 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
     }
 
     if (config.send_to_channel) {
-      const channel = meta.args.guild.channels.cache.get(config.send_to_channel);
+      const channel = meta.args.member.guild.channels.cache.get(config.send_to_channel);
       if (!channel || !(channel instanceof TextChannel)) return;
 
       try {

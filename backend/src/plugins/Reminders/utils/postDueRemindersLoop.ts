@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
 import { disableLinkPreviews } from "knub/dist/helpers";
 import { SECONDS } from "../../../utils";
+import { TextChannel } from "discord.js";
 
 const REMINDER_LOOP_TIME = 10 * SECONDS;
 const MAX_TRIES = 3;
@@ -19,7 +20,7 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
           const target = moment.utc();
           const diff = target.diff(moment.utc(reminder.created_at, "YYYY-MM-DD HH:mm:ss"));
           const result = humanizeDuration(diff, { largest: 2, round: true });
-          await channel.createMessage({
+          await channel.send({
             content: disableLinkPreviews(
               `Reminder for <@!${reminder.user_id}>: ${reminder.body} \n\`Set at ${reminder.created_at} (${result} ago)\``,
             ),
@@ -28,7 +29,7 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
             },
           });
         } else {
-          await channel.createMessage({
+          await channel.send({
             content: disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`),
             allowedMentions: {
               users: [reminder.user_id],

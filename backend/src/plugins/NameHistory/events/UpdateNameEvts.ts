@@ -2,10 +2,15 @@ import { nameHistoryEvt } from "../types";
 import { updateNickname } from "../updateNickname";
 
 export const ChannelJoinEvt = nameHistoryEvt({
-  event: "voiceChannelJoin",
+  event: "voiceStateUpdate",
 
   async listener(meta) {
-    meta.pluginData.state.updateQueue.add(() => updateNickname(meta.pluginData, meta.args.member));
+    meta.pluginData.state.updateQueue.add(() =>
+      updateNickname(
+        meta.pluginData,
+        meta.args.newState.member ? meta.args.newState.member : meta.args.oldState.member!,
+      ),
+    );
   },
 });
 

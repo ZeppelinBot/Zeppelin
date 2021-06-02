@@ -4,6 +4,7 @@ import { isDiscordHTTPError, isDiscordRESTError, SECONDS, sleep } from "../../..
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { Permissions } from "discord.js";
 
 export async function isBanned(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -11,7 +12,7 @@ export async function isBanned(
   timeout: number = 5 * SECONDS,
 ): Promise<boolean> {
   const botMember = pluginData.guild.members.cache.get(pluginData.client.user!.id);
-  if (botMember && !hasDiscordPermissions(botMember.permissions, Constants.Permissions.banMembers)) {
+  if (botMember && !hasDiscordPermissions(botMember.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
     pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
       body: `Missing "Ban Members" permission to check for existing bans`,
     });
@@ -19,7 +20,7 @@ export async function isBanned(
   }
 
   try {
-    const potentialBan = await Promise.race([pluginData.guild.getBan(userId), sleep(timeout)]);
+    const potentialBan = await Promise.race([pluginData.guild.bans.fetch({ user: userId }), sleep(timeout)]);
     return potentialBan != null;
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 10026) {

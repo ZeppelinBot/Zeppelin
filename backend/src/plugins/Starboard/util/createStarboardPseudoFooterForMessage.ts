@@ -1,3 +1,4 @@
+import { Message, EmbedField } from "discord.js";
 import { EMPTY_CHAR, messageLink } from "../../../utils";
 import { TStarboardOpts } from "../types";
 
@@ -22,5 +23,6 @@ export function createStarboardPseudoFooterForMessage(
   return {
     name: EMPTY_CHAR,
     value: content,
+    inline: false,
   };
 }

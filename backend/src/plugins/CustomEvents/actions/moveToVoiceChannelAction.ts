@@ -5,6 +5,7 @@ import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { canActOn } from "../../../pluginUtils";
+import { VoiceChannel } from "discord.js";
 
 export const MoveToVoiceChannelAction = t.type({
   type: t.literal("move_to_vc"),
@@ -33,8 +34,8 @@ export async function moveToVoiceChannelAction(
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof VoiceChannel)) throw new ActionError("Target channel is not a voice channel");
 
-  if (!target.voiceState.channelID) return;
+  if (!target.voice.channelID) return;
   await target.edit({
-    channelID: targetChannel.id,
+    channel: targetChannel.id,
   });
 }

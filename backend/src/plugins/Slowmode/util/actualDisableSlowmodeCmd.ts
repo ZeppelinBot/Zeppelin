@@ -4,13 +4,14 @@ import { noop } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { Message, TextChannel } from "discord.js";
 
 export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const botSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(args.channel.id);
   const hasNativeSlowmode = args.channel.rateLimitPerUser;
 
   if (!botSlowmode && hasNativeSlowmode === 0) {
-    sendErrorMessage(pluginData, msg.channel, "Channel is not on slowmode!");
+    sendErrorMessage(pluginData, msg.channel as TextChannel, "Channel is not on slowmode!");
     return;
   }
 
@@ -19,13 +20,13 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   if (missingPermissions) {
     sendErrorMessage(
       pluginData,
-      msg.channel,
+      msg.channel as TextChannel,
       `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`,
     );
     return;
   }
 
-  const initMsg = await msg.channel.createMessage("Disabling slowmode...");
+  const initMsg = await msg.channel.send("Disabling slowmode...");
 
   // Disable bot-maintained slowmode
   let failedUsers: string[] = [];
@@ -42,11 +43,11 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   if (failedUsers.length) {
     sendSuccessMessage(
       pluginData,
-      msg.channel,
+      msg.channel as TextChannel,
       `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
     );
   } else {
-    sendSuccessMessage(pluginData, msg.channel, "Slowmode disabled!");
+    sendSuccessMessage(pluginData, msg.channel as TextChannel, "Slowmode disabled!");
     initMsg.delete().catch(noop);
   }
 }

@@ -36,8 +36,8 @@ export function erisAllowedMentionsToDjsMentionOptions(
 }
 
 export interface erisAllowedMentionFormat {
-  everyone: boolean | undefined;
-  users: boolean | string[] | undefined;
-  roles: boolean | string[] | undefined;
-  repliedUser: boolean | undefined;
+  everyone?: boolean | undefined;
+  users?: boolean | string[] | undefined;
+  roles?: boolean | string[] | undefined;
+  repliedUser?: boolean | undefined;
 }

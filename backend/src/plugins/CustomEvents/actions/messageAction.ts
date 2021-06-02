@@ -3,6 +3,7 @@ import { CustomEventsPluginType } from "../types";
 import * as t from "io-ts";
 import { renderTemplate } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
+import { TextChannel } from "discord.js";
 
 export const MessageAction = t.type({
   type: t.literal("message"),
@@ -21,5 +22,5 @@ export async function messageAction(
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof TextChannel)) throw new ActionError("Target channel is not a text channel");
 
-  await targetChannel.createMessage({ content: action.content });
+  await targetChannel.send({ content: action.content });
 }

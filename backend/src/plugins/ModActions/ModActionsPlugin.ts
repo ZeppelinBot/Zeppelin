@@ -45,6 +45,7 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { Queue } from "../../Queue";
+import { GuildMember, Message } from "discord.js";
 
 const defaultOptions = {
   config: {
@@ -158,13 +159,13 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
   public: {
     warnMember(pluginData) {
-      return (member: Member, reason: string, warnOptions?: WarnOptions) => {
+      return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
         warnMember(pluginData, member, reason, warnOptions);
       };
     },
 
     kickMember(pluginData) {
-      return (member: Member, reason: string, kickOptions?: KickOptions) => {
+      return (member: GuildMember, reason: string, kickOptions?: KickOptions) => {
         kickMember(pluginData, member, reason, kickOptions);
       };
     },

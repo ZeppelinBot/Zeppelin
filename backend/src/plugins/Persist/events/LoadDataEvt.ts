@@ -8,8 +8,9 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { GuildMemberEditData, Permissions } from "discord.js";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
 export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
@@ -26,16 +27,16 @@ export const LoadDataEvt = persistEvt({
       return;
     }
 
-    const toRestore: MemberOptions = {};
+    let toRestore: GuildMemberEditData = {};
     const config = await pluginData.config.getForMember(member);
     const restoredData: string[] = [];
 
     // Check permissions
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     let requiredPermissions = 0n;
-    if (config.persist_nicknames) requiredPermissions |= p.manageNicknames;
-    if (config.persisted_roles) requiredPermissions |= p.manageRoles;
-    const missingPermissions = getMissingPermissions(me.permission, requiredPermissions);
+    if (config.persist_nicknames) requiredPermissions |= p.MANAGE_NICKNAMES;
+    if (config.persisted_roles) requiredPermissions |= p.MANAGE_ROLES;
+    const missingPermissions = getMissingPermissions(me.permissions, requiredPermissions);
     if (missingPermissions) {
       pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
         body: `Missing permissions for persist plugin: ${missingPermissionError(missingPermissions)}`,
@@ -61,7 +62,7 @@ export const LoadDataEvt = persistEvt({
 
       if (rolesToRestore.length) {
         restoredData.push("roles");
-        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles]));
+        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles.cache]));
       }
     }
 

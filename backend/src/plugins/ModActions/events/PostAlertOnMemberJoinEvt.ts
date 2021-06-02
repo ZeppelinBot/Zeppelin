@@ -4,13 +4,14 @@ import { LogType } from "../../../data/LogType";
 
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { TextChannel, Constants, Permissions } from "discord.js";
 
 /**
  * Show an alert if a member with prior notes joins the server
  */
 export const PostAlertOnMemberJoinEvt = modActionsEvt({
   event: "guildMemberAdd",
-  async listener({ pluginData, args: { guild, member } }) {
+  async listener({ pluginData, args: { member } }) {
     const config = pluginData.config.get();
 
     if (!config.alert_on_rejoin) return;
@@ -38,15 +39,15 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
       }
 
       const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-      const botPerms = alertChannel.permissionsOf(botMember ?? pluginData.client.user!.id);
-      if (!hasDiscordPermissions(botPerms, Constants.Permissions.sendMessages)) {
+      const botPerms = alertChannel.permissionsFor(botMember ?? pluginData.client.user!.id);
+      if (!hasDiscordPermissions(botPerms, Permissions.FLAGS.SEND_MESSAGES)) {
         logs.log(LogType.BOT_ALERT, {
           body: `Missing "Send Messages" permissions for the \`alert_channel\` configured in \`mod_actions\`: \`${alertChannelId}\``,
         });
         return;
       }
 
-      await alertChannel.createMessage(
+      await alertChannel.send(
         `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
       );
     }

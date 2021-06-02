@@ -23,6 +23,7 @@ import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { TextChannel } from "discord.js";
 
 export async function logAndDetectMessageSpam(
   pluginData: GuildPluginData<SpamPluginType>,
@@ -122,7 +123,7 @@ export async function logAndDetectMessageSpam(
         // Then, if enabled, remove the spam messages
         if (spamConfig.clean !== false) {
           msgIds.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-          pluginData.client.deleteMessages(savedMessage.channel_id, msgIds).catch(noop);
+          (pluginData.guild.channels.cache.get(savedMessage.channel_id)! as TextChannel).bulkDelete(msgIds).catch(noop);
         }
 
         // Store the ID of the last handled message

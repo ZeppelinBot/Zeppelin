@@ -5,10 +5,10 @@ import { mutesEvt } from "../types";
  */
 export const ClearActiveMuteOnMemberBanEvt = mutesEvt({
   event: "guildBanAdd",
-  async listener({ pluginData, args: { user } }) {
-    const mute = await pluginData.state.mutes.findExistingMuteForUserId(user.id);
+  async listener({ pluginData, args: { ban } }) {
+    const mute = await pluginData.state.mutes.findExistingMuteForUserId(ban.user.id);
     if (mute) {
-      pluginData.state.mutes.clear(user.id);
+      pluginData.state.mutes.clear(ban.user.id);
     }
   },
 });

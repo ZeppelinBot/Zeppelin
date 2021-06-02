@@ -34,6 +34,8 @@ import {
   MessageEmbedOptions,
   MessageMentionOptions,
   MessageOptions,
+  PartialChannelData,
+  PartialMessage,
   StringResolvable,
   TextChannel,
   User,
@@ -200,9 +202,9 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 }
 
 export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
-export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & { guild: Guild };
-export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & {
-  channel: InvitePartialChannel;
+export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite & { guild: Guild };
+export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite & {
+  channel: PartialChannelData;
   type: typeof Constants.ChannelTypes.GROUP;
 };
 
@@ -486,7 +488,7 @@ export async function findRelevantAuditLogEntry(
     }
   }
 
-  const entries = auditLogs ? auditLogs.entries : [];
+  const entries = auditLogs ? auditLogs.entries.array() : [];
 
   entries.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
@@ -497,7 +499,7 @@ export async function findRelevantAuditLogEntry(
   const cutoffTS = Date.now() - 1000 * 60 * 2;
 
   const relevantEntry = entries.find(entry => {
-    return entry.targetID === userId && entry.createdAt >= cutoffTS;
+    return (entry.target as { id }).id === userId && entry.createdTimestamp >= cutoffTS;
   });
 
   if (relevantEntry) {
@@ -1119,7 +1121,7 @@ export function resolveUserId(bot: Client, value: string) {
   // A non-mention, full username?
   const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
   if (usernameMatch) {
-    const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    const user = bot.users.cache.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
     if (user) return user.id;
   }
 
@@ -1250,9 +1252,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
 
 const inviteCache = new SimpleCache<Promise<Invite | null>>(10 * MINUTES, 200);
 
-type ResolveInviteReturnType<T extends boolean> = Promise<
-  (T extends true ? Invite<"withCount" | "withMetadata"> : Invite<"withMetadata">) | null
->;
+type ResolveInviteReturnType<T extends boolean> = Promise<Invite | null>;
 export async function resolveInvite<T extends boolean>(
   client: Client,
   code: string,
@@ -1278,7 +1278,7 @@ export async function confirm(
   content: StringResolvable | MessageOptions,
 ) {
   const msg = await channel.send(content);
-  const reply = await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId);
+  const reply: any = {}; // await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId); FIXME waiting on waitForButton
   msg.delete().catch(noop);
   return reply && reply.name === "✅";
 }
@@ -1436,19 +1436,19 @@ export function trimMultilineString(str) {
 }
 export const trimPluginDescription = trimMultilineString;
 
-export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
+export function isFullMessage(msg: Message | PartialMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GuildInvite<CT> {
+export function isGuildInvite<CT extends InviteOpts>(invite: Invite): invite is GuildInvite<CT> {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GroupDMInvite<CT> {
+export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite): invite is GroupDMInvite<CT> {
   return invite.guild == null && invite.channel?.type === "group";
 }
 
-export function inviteHasCounts(invite: Invite): invite is Invite<"withCount"> {
+export function inviteHasCounts(invite: Invite): invite is Invite {
   return invite.memberCount != null;
 }
 

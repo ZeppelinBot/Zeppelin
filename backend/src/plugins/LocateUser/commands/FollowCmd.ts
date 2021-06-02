@@ -54,9 +54,7 @@ export const FollowCmd = locateUserCmd({
       sendSuccessMessage(
         pluginData,
         msg.channel,
-        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
-          time,
-        )} i will notify you`,
+        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
       );
     }
   },

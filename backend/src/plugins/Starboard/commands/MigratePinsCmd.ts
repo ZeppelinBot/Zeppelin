@@ -3,6 +3,7 @@ import { starboardCmd } from "../types";
 import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
 
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
+import { TextChannel } from "discord.js";
 
 export const MigratePinsCmd = starboardCmd({
   trigger: "starboard migrate_pins",
@@ -29,9 +30,9 @@ export const MigratePinsCmd = starboardCmd({
       return;
     }
 
-    msg.channel.createMessage(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
+    msg.channel.send(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
 
-    const pins = await args.pinChannel.getPins();
+    const pins = (await args.pinChannel.messages.fetchPinned()).array();
     pins.reverse(); // Migrate pins starting from the oldest message
 
     for (const pin of pins) {

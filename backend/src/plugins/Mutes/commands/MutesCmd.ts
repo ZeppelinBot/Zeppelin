@@ -4,6 +4,7 @@ import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../..
 import moment from "moment-timezone";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
+import { GuildMember } from "discord.js";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",
@@ -21,7 +22,7 @@ export const MutesCmd = mutesCmd({
   },
 
   async run({ pluginData, message: msg, args }) {
-    const listMessagePromise = msg.channel.createMessage("Loading mutes...");
+    const listMessagePromise = msg.channel.send("Loading mutes...");
     const mutesPerPage = 10;
     let totalMutes = 0;
     let hasFilters = false;
@@ -47,13 +48,13 @@ export const MutesCmd = mutesCmd({
     if (args.manual) {
       // Show only manual mutes (i.e. "Muted" role added without a logged mute)
       const muteUserIds = new Set(activeMutes.map(m => m.user_id));
-      const manuallyMutedMembers: Member[] = [];
+      const manuallyMutedMembers: GuildMember[] = [];
       const muteRole = pluginData.config.get().mute_role;
 
       if (muteRole) {
-        pluginData.guild.members.forEach(member => {
+        pluginData.guild.members.cache.forEach(member => {
           if (muteUserIds.has(member.id)) return;
-          if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
+          if (member.roles.cache.has(muteRole)) manuallyMutedMembers.push(member);
         });
       }
 
@@ -85,7 +86,7 @@ export const MutesCmd = mutesCmd({
 
         if (!member) {
           if (!bannedIds) {
-            const bans = await pluginData.guild.getBans();
+            const bans = await pluginData.guild.bans.fetch({ cache: true });
             bannedIds = bans.map(u => u.user.id);
           }
 
@@ -111,7 +112,7 @@ export const MutesCmd = mutesCmd({
       const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
       lines = filteredMutes.map(mute => {
-        const user = pluginData.client.user!.get(mute.user_id);
+        const user = pluginData.client.users.resolve(mute.user_id);
         const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
@@ -194,29 +195,31 @@ export const MutesCmd = mutesCmd({
 
       if (totalPages > 1) {
         hasReactions = true;
-        listMessage.addReaction("⬅");
-        listMessage.addReaction("➡");
+        listMessage.react("⬅");
+        listMessage.react("➡");
 
         const paginationReactionListener = pluginData.events.on(
           "messageReactionAdd",
-          ({ args: { message: rMsg, emoji, member } }) => {
+          async ({ args: { reaction, user } }) => {
+            const rMsg = reaction.message;
+            const member = await pluginData.guild.members.fetch(user.id);
             if (!isFullMessage(rMsg)) return;
             if (rMsg.id !== listMessage.id) return;
             if (member.id !== msg.author.id) return;
-            if (!["⬅", "➡"].includes(emoji.name)) return;
+            if (!["⬅", "➡"].includes(reaction.emoji.name!)) return;
 
-            if (emoji.name === "⬅" && currentPage > 1) {
+            if (reaction.emoji.name === "⬅" && currentPage > 1) {
               drawListPage(currentPage - 1);
-            } else if (emoji.name === "➡" && currentPage < totalPages) {
+            } else if (reaction.emoji.name === "➡" && currentPage < totalPages) {
               drawListPage(currentPage + 1);
             }
 
-            rMsg.removeReaction(emoji.name, member.id).catch(noop);
+            reaction.remove().catch(noop);
           },
         );
 
         clearReactionsFn = () => {
-          listMessage.removeReactions().catch(noop);
+          listMessage.reactions.removeAll().catch(noop);
           pluginData.events.off("messageReactionAdd", paginationReactionListener);
         };
         bumpClearReactionsTimeout();

@@ -14,6 +14,7 @@ import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
 import { asyncFilter } from "../../utils/async";
 import Timeout = NodeJS.Timeout;
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
+import { Message, User, Constants, TextChannel, GuildMember, Permissions } from "discord.js";
 
 const SEARCH_RESULTS_PER_PAGE = 15;
 const SEARCH_ID_RESULTS_PER_PAGE = 50;
@@ -90,7 +91,7 @@ export async function displaySearch(
     if (originalSearchMsg) {
       searchMsgPromise = originalSearchMsg.edit("Searching...");
     } else {
-      searchMsgPromise = msg.channel.createMessage("Searching...");
+      searchMsgPromise = msg.channel.send("Searching...");
       searchMsgPromise.then(m => (originalSearchMsg = m));
     }
 
@@ -106,12 +107,12 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
         return;
       }
 
       if (e instanceof InvalidRegexError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
         return;
       }
 
@@ -119,7 +120,7 @@ export async function displaySearch(
     }
 
     if (searchResult.totalResults === 0) {
-      sendErrorMessage(pluginData, msg.channel, "No results found");
+      sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
       return;
     }
 
@@ -149,7 +150,7 @@ export async function displaySearch(
       const embed = await getUserInfoEmbed(pluginData, searchResult.results[0].id, false);
       if (embed) {
         searchMsg.edit("Only one result:");
-        msg.channel.createMessage({ embed });
+        msg.channel.send({ embed });
         return;
       }
     }
@@ -160,30 +161,32 @@ export async function displaySearch(
     if (searchResult.totalResults > perPage) {
       if (!hasReactions) {
         hasReactions = true;
-        searchMsg.addReaction("⬅");
-        searchMsg.addReaction("➡");
-        searchMsg.addReaction("🔄");
+        searchMsg.react("⬅");
+        searchMsg.react("➡");
+        searchMsg.react("🔄");
 
-        const listenerFn = pluginData.events.on("messageReactionAdd", ({ args: { message: rMsg, emoji, member } }) => {
+        const listenerFn = pluginData.events.on("messageReactionAdd", async ({ args: { reaction, user } }) => {
+          const rMsg = reaction.message;
+          const member = await pluginData.guild.members.fetch(user.id);
           if (rMsg.id !== searchMsg.id) return;
-          if (member.id !== msg.author.id) return;
-          if (!["⬅", "➡", "🔄"].includes(emoji.name)) return;
+          if (member.user.id !== msg.author.id) return;
+          if (!["⬅", "➡", "🔄"].includes(reaction.emoji.name!)) return;
 
-          if (emoji.name === "⬅" && currentPage > 1) {
+          if (reaction.emoji.name === "⬅" && currentPage > 1) {
             loadSearchPage(currentPage - 1);
-          } else if (emoji.name === "➡" && currentPage < searchResult.lastPage) {
+          } else if (reaction.emoji.name === "➡" && currentPage < searchResult.lastPage) {
             loadSearchPage(currentPage + 1);
-          } else if (emoji.name === "🔄") {
+          } else if (reaction.emoji.name === "🔄") {
             loadSearchPage(currentPage);
           }
 
           if (isFullMessage(rMsg)) {
-            rMsg.removeReaction(emoji.name, member.id);
+            reaction.remove();
           }
         });
 
         clearReactionsFn = async () => {
-          searchMsg.removeReactions().catch(noop);
+          searchMsg.reactions.removeAll().catch(noop);
           pluginData.events.off("messageReactionAdd", listenerFn);
         };
       }
@@ -229,12 +232,12 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
       return;
     }
 
     if (e instanceof InvalidRegexError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
       return;
     }
 
@@ -242,7 +245,7 @@ export async function archiveSearch(
   }
 
   if (results.totalResults === 0) {
-    sendErrorMessage(pluginData, msg.channel, "No results found");
+    sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
     return;
   }
 
@@ -260,7 +263,7 @@ export async function archiveSearch(
   const baseUrl = getBaseUrl(pluginData);
   const url = await pluginData.state.archives.getUrl(baseUrl, archiveId);
 
-  await msg.channel.createMessage(`Exported search results: ${url}`);
+  await msg.channel.send(`Exported search results: ${url}`);
 }
 
 async function performMemberSearch(
@@ -268,16 +271,16 @@ async function performMemberSearch(
   args: MemberSearchParams,
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
-): Promise<{ results: Member[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+): Promise<{ results: GuildMember[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
   await refreshMembersIfNeeded(pluginData.guild);
 
-  let matchingMembers = Array.from(pluginData.guild.members.values());
+  let matchingMembers = Array.from(pluginData.guild.members.cache.values());
 
   if (args.role) {
     const roleIds = args.role.split(",");
     matchingMembers = matchingMembers.filter(member => {
       for (const role of roleIds) {
-        if (!member.roles.includes(role)) return false;
+        if (!member.roles.cache.has(role)) return false;
       }
 
       return true;
@@ -285,11 +288,11 @@ async function performMemberSearch(
   }
 
   if (args.voice) {
-    matchingMembers = matchingMembers.filter(m => m.voiceState.channelID != null);
+    matchingMembers = matchingMembers.filter(m => m.voice.channelID != null);
   }
 
   if (args.bot) {
-    matchingMembers = matchingMembers.filter(m => m.bot);
+    matchingMembers = matchingMembers.filter(m => m.user.bot);
   }
 
   if (args.query) {
@@ -306,6 +309,7 @@ async function performMemberSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
 
+    /** FIXME if we ever get the intent for this again
     if (args["status-search"]) {
       matchingMembers = await asyncFilter(matchingMembers, async member => {
         if (member.game) {
@@ -344,17 +348,18 @@ async function performMemberSearch(
         return false;
       });
     } else {
-      matchingMembers = await asyncFilter(matchingMembers, async member => {
-        if (member.nick && (await execRegExp(queryRegex, member.nick).catch(allowTimeout))) {
-          return true;
-        }
+    */
+    matchingMembers = await asyncFilter(matchingMembers, async member => {
+      if (member.nickname && (await execRegExp(queryRegex, member.nickname).catch(allowTimeout))) {
+        return true;
+      }
 
-        const fullUsername = `${member.user.username}#${member.user.discriminator}`;
-        if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
+      const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+      if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
-        return false;
-      });
-    }
+      return false;
+    });
+    // } FIXME in conjunction with above comment
   }
 
   const [, sortDir, sortBy] = (args.sort && args.sort.match(/^(-?)(.*)$/)) ?? [null, "ASC", "name"];
@@ -396,11 +401,11 @@ async function performBanSearch(
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
   const member = pluginData.guild.members.cache.get(pluginData.client.user!.id);
-  if (member && !hasDiscordPermissions(member.permissions, Constants.Permissions.banMembers)) {
+  if (member && !hasDiscordPermissions(member.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
   }
 
-  let matchingBans = (await pluginData.guild.getBans()).map(x => x.user);
+  let matchingBans = (await pluginData.guild.bans.fetch({ cache: false })).map(x => x.user);
 
   if (args.query) {
     let isSafeRegex = true;
@@ -454,14 +459,14 @@ async function performBanSearch(
   };
 }
 
-function formatSearchResultList(members: Array<Member | User>): string {
+function formatSearchResultList(members: Array<GuildMember | User>): string {
   const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
   const lines = members.map(member => {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
-    if (member instanceof Member) {
+    if (member instanceof GuildMember) {
       line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
-      if (member.nick) line += ` (${member.nick})`;
+      if (member.nickname) line += ` (${member.nickname})`;
     } else {
       line = `${paddedId} ${member.username}#${member.discriminator}`;
     }
@@ -470,6 +475,6 @@ function formatSearchResultList(members: Array<Member | User>): string {
   return lines.join("\n");
 }
 
-function formatSearchResultIdList(members: Array<Member | User>): string {
+function formatSearchResultIdList(members: Array<GuildMember | User>): string {
   return members.map(m => m.id).join(" ");
 }

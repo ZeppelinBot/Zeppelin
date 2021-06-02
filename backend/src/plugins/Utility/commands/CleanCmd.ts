@@ -9,6 +9,7 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
+import { TextChannel, User, Message } from "discord.js";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -32,7 +33,7 @@ async function cleanMessages(
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
   // Actually delete the messages
-  await pluginData.client.deleteMessages(channel.id, idsToDelete);
+  (pluginData.guild.channels.cache.get(channel.id) as TextChannel).bulkDelete(idsToDelete);
   await pluginData.state.savedMessages.markBulkAsDeleted(idsToDelete);
 
   // Create an archive
@@ -106,18 +107,18 @@ export const CleanCmd = utilityCmd({
       }
     }
 
-    const cleaningMessage = msg.channel.createMessage("Cleaning...");
+    const cleaningMessage = msg.channel.send("Cleaning...");
 
     const messagesToClean: SavedMessage[] = [];
     let beforeId = msg.id;
-    const timeCutoff = msg.timestamp - MAX_CLEAN_TIME;
+    const timeCutoff = msg.createdTimestamp - MAX_CLEAN_TIME;
     const upToMsgId = args["to-id"];
     let foundId = false;
 
     const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
     let pins: Message[] = [];
     if (!deletePins) {
-      pins = await msg.channel.getPins();
+      pins = (await msg.channel.messages.fetchPinned()).array();
     }
 
     while (messagesToClean.length < args.count) {

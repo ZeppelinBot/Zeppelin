@@ -1,8 +1,6 @@
 import { reactionRolesCmd, TReactionRolePair } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-
-import { RecoverablePluginError, ERRORS } from "../../../RecoverablePluginError";
 import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 import { canReadChannel } from "../../../utils/canReadChannel";
@@ -41,7 +39,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage;
     try {
-      targetMessage = await args.message.channel.getMessage(args.message.messageId).catch(noop);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId).catch(noop);
     } catch (e) {
       if (isDiscordRESTError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
@@ -96,13 +94,13 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         return;
       }
 
-      if (!pluginData.guild.roles.has(pair[1])) {
+      if (!pluginData.guild.roles.cache.has(pair[1])) {
         sendErrorMessage(pluginData, msg.channel, `Unknown role ${pair[1]}`);
         return;
       }
     }
 
-    const progressMessage = msg.channel.createMessage("Adding reaction roles...");
+    const progressMessage = msg.channel.send("Adding reaction roles...");
 
     // Save the new reaction roles to the database
     for (const pair of emojiRolePairs) {

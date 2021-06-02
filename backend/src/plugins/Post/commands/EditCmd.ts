@@ -2,6 +2,7 @@ import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { formatContent } from "../util/formatContent";
+import { TextChannel } from "discord.js";
 
 export const EditCmd = postCmd({
   trigger: "edit",
@@ -24,7 +25,9 @@ export const EditCmd = postCmd({
       return;
     }
 
-    await pluginData.client.editMessage(savedMessage.channel_id, savedMessage.id, formatContent(args.content));
+    (pluginData.guild.channels.cache.get(savedMessage.channel_id) as TextChannel).messages.edit(savedMessage.id, {
+      content: formatContent(args.content),
+    });
     sendSuccessMessage(pluginData, msg.channel, "Message edited");
   },
 });

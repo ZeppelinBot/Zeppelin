@@ -30,11 +30,8 @@ export async function setChannelPermissionOverridesAction(
   }
 
   for (const override of action.overrides) {
-    await channel.editPermission(
-      override.id,
-      override.allow,
-      override.deny,
-      override.type,
+    await channel.overwritePermissions(
+      [{ id: override.id, allow: BigInt(override.allow), deny: BigInt(override.deny), type: override.type }],
       `Custom event: ${event.name}`,
     );
   }

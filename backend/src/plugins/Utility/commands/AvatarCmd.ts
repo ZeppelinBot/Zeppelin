@@ -2,6 +2,7 @@ import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { UnknownUser } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { MessageEmbedOptions } from "discord.js";
 
 export const AvatarCmd = utilityCmd({
   trigger: ["avatar", "av"],
@@ -15,15 +16,16 @@ export const AvatarCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      let extension = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
+      const avatar = user.avatarURL() || user.defaultAvatarURL;
+      let extension = avatar.slice(avatar.lastIndexOf("."), avatar.lastIndexOf("?"));
       // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
       extension = extension === ".gif" ? extension : ".png";
-      const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
-      const embed: EmbedOptions = {
+      const avatarUrl = avatar.slice(0, avatar.lastIndexOf("."));
+      const embed: MessageEmbedOptions = {
         image: { url: avatarUrl + `${extension}?size=2048` },
       };
       embed.title = `Avatar of ${user.username}#${user.discriminator}:`;
-      msg.channel.createMessage({ embed });
+      msg.channel.send({ embed });
     } else {
       sendErrorMessage(pluginData, msg.channel, "Invalid user ID");
     }

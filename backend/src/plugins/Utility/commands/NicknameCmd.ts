@@ -16,24 +16,24 @@ export const NicknameCmd = utilityCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (msg.member.id !== args.member.id && !canActOn(pluginData, msg.member, args.member)) {
-      msg.channel.createMessage(errorMessage("Cannot change nickname: insufficient permissions"));
+      msg.channel.send(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
     }
 
     const nicknameLength = [...args.nickname].length;
     if (nicknameLength < 2 || nicknameLength > 32) {
-      msg.channel.createMessage(errorMessage("Nickname must be between 2 and 32 characters long"));
+      msg.channel.send(errorMessage("Nickname must be between 2 and 32 characters long"));
       return;
     }
 
-    const oldNickname = args.member.nick || "<none>";
+    const oldNickname = args.member.nickname || "<none>";
 
     try {
       await args.member.edit({
         nick: args.nickname,
       });
     } catch {
-      msg.channel.createMessage(errorMessage("Failed to change nickname"));
+      msg.channel.send(errorMessage("Failed to change nickname"));
       return;
     }
 

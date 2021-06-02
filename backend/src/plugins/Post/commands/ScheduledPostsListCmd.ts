@@ -20,7 +20,7 @@ export const ScheduledPostsListCmd = postCmd({
   async run({ message: msg, pluginData }) {
     const scheduledPosts = await pluginData.state.scheduledPosts.all();
     if (scheduledPosts.length === 0) {
-      msg.channel.createMessage("No scheduled posts");
+      msg.channel.send("No scheduled posts");
       return;
     }
 

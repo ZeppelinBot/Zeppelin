@@ -60,11 +60,9 @@ export async function handleCompanionPermissions(
     for (const [channelId, permissions] of permsToSet) {
       const channel = pluginData.guild.channels.cache.get(channelId);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.updateOverwrite(
-        userId,
-        new Permissions(BigInt(permissions)).serialize(),
-        {reason: `Companion Channel for ${voiceChannel!.id} | User Joined`},
-      );
+      await channel.updateOverwrite(userId, new Permissions(BigInt(permissions)).serialize(), {
+        reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
+      });
     }
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 50001) {

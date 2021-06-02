@@ -17,6 +17,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { logger } from "../../../logger";
 import humanizeDuration from "humanize-duration";
+import { DiscordAPIError, User } from "discord.js";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -77,14 +78,13 @@ export async function banUserId(
   ignoreEvent(pluginData, IgnoredEventType.Ban, userId);
   try {
     const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
-    await pluginData.guild.banMember(
-      userId,
-      deleteMessageDays,
-      reason != null ? encodeURIComponent(reason) : undefined,
-    );
+    await pluginData.guild.bans.create(userId, {
+      days: deleteMessageDays,
+      reason: reason != null ? encodeURIComponent(reason) : undefined,
+    });
   } catch (e) {
     let errorMessage;
-    if (e instanceof DiscordRESTError) {
+    if (e instanceof DiscordAPIError) {
       errorMessage = `API error ${e.code}: ${e.message}`;
     } else {
       logger.warn(`Error applying ban to ${userId}: ${e}`);

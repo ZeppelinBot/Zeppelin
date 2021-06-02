@@ -7,7 +7,7 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildMutes } from "../../data/GuildMutes";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { clearOldRecentActions } from "./util/clearOldRecentActions";
-import { SpamVoiceJoinEvt, SpamVoiceSwitchEvt } from "./events/SpamVoiceEvt";
+import { SpamVoiceStateUpdateEvt } from "./events/SpamVoiceEvt";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 
@@ -60,8 +60,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
 
   // prettier-ignore
   events: [
-    SpamVoiceJoinEvt,
-    SpamVoiceSwitchEvt,
+    SpamVoiceStateUpdateEvt,
   ],
 
   beforeLoad(pluginData) {

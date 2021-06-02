@@ -15,6 +15,7 @@ import { LogType } from "../../../data/LogType";
 import { performance } from "perf_hooks";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { load } from "js-yaml";
+import { TextChannel } from "discord.js";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
@@ -35,14 +36,14 @@ export const MassbanCmd = modActionsCmd({
     }
 
     // Ask for ban reason (cleaner this way instead of trying to cram it into the args)
-    msg.channel.createMessage("Ban reason? `cancel` to cancel");
+    msg.channel.send("Ban reason? `cancel` to cancel");
     const banReasonReply = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (!banReasonReply || !banReasonReply.content || banReasonReply.content.toLowerCase().trim() === "cancel") {
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;
     }
 
-    const banReason = formatReasonWithAttachments(banReasonReply.content, msg.attachments);
+    const banReason = formatReasonWithAttachments(banReasonReply.content, msg.attachments.array());
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
@@ -60,7 +61,7 @@ export const MassbanCmd = modActionsCmd({
       pluginData.state.massbanQueue.length === 0
         ? "Banning..."
         : `Massban queued. Waiting for previous massban to finish (max wait ${maxWaitTimeFormatted}).`;
-    const loadingMsg = await msg.channel.createMessage(initialLoadingText);
+    const loadingMsg = await msg.channel.send(initialLoadingText);
 
     const waitTimeStart = performance.now();
     const waitingInterval = setInterval(() => {
@@ -95,7 +96,10 @@ export const MassbanCmd = modActionsCmd({
           ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
           pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
 
-          await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
+          await pluginData.guild.bans.create(userId, {
+            days: 1,
+            reason: banReason != null ? encodeURIComponent(banReason) : undefined,
+          });
 
           await casesPlugin.createCase({
             userId,

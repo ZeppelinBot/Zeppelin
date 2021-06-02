@@ -71,7 +71,7 @@ export const HelpCmd = utilityCmd({
     });
 
     if (totalResults === 0) {
-      msg.channel.createMessage("No matching commands found!");
+      msg.channel.send("No matching commands found!");
       return;
     }
 

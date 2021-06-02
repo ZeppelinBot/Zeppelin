@@ -30,6 +30,6 @@ export async function addRoleAction(
 
   const rolesToAdd = Array.isArray(action.role) ? action.role : [action.role];
   await target.edit({
-    roles: Array.from(new Set([...target.roles, ...rolesToAdd])),
+    roles: Array.from(new Set([...target.roles.cache.array(), ...rolesToAdd])),
   });
 }
