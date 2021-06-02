@@ -14,7 +14,8 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
-import { GuildMember } from "discord.js";
+import { GuildMember, MessageOptions } from "discord.js";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -43,12 +44,13 @@ export async function warnMember(
 
   if (!notifyResult.success) {
     if (warnOptions.retryPromptChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptChannel.id)) {
-      const failedMsg = await warnOptions.retryPromptChannel.send(
-        "Failed to message the user. Log the warning anyway?",
+      const reply = await waitForButtonConfirm(
+        warnOptions.retryPromptChannel,
+        { content: "Failed to message the user. Log the warning anyway?" },
+        { confirmText: "Yes", cancelText: "No", restrictToId: warnOptions.caseArgs?.modId },
       );
-      const reply = false; // await waitForReaction(pluginData.client, failedMsg, ["✅", "❌"]); FIXME waiting on waitForButton
-      failedMsg.delete();
-      if (!reply /*|| reply.name === "❌"*/) {
+
+      if (!reply) {
         return {
           status: "failed",
           error: "Failed to message user",
@@ -74,7 +76,7 @@ export async function warnMember(
     noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
   });
 
-  const mod = await resolveUser(pluginData.client, modId);
+  const mod = await pluginData.guild.members.fetch(modId);
   pluginData.state.serverLogs.log(LogType.MEMBER_WARN, {
     mod: stripObjectToScalars(mod),
     member: stripObjectToScalars(member, ["user", "roles"]),

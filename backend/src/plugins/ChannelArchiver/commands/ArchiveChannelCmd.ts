@@ -32,7 +32,6 @@ export const ArchiveChannelCmd = channelArchiverCmd({
   async run({ message: msg, args, pluginData }) {
     if (!args["attachment-channel"]) {
       const confirmed = await confirm(
-        pluginData.client,
         msg.channel,
         msg.author.id,
         "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",

@@ -51,7 +51,7 @@ export async function applyReactionRoleReactionsToMessage(
 
   // Remove old reactions, if any
   try {
-    await targetMessage.removeReactions();
+    await targetMessage.reactions.removeAll();
   } catch (e) {
     if (isDiscordRESTError(e)) {
       errors.push(`Error ${e.code} while removing old reactions: ${e.message}`);
@@ -74,7 +74,7 @@ export async function applyReactionRoleReactionsToMessage(
     const emoji = isSnowflake(rawEmoji) ? `foo:${rawEmoji}` : rawEmoji;
 
     try {
-      await targetMessage.addReaction(emoji);
+      await targetMessage.reactions.add(emoji);
       await sleep(1250); // Make sure we don't hit rate limits
     } catch (e) {
       if (isDiscordRESTError(e)) {

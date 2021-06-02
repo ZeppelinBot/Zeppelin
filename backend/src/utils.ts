@@ -27,9 +27,12 @@ import {
   GuildAuditLogsEntry,
   GuildChannel,
   GuildMember,
+  Interaction,
   Invite,
   Message,
+  MessageActionRow,
   MessageAttachment,
+  MessageComponent,
   MessageEmbed,
   MessageEmbedOptions,
   MessageMentionOptions,
@@ -41,6 +44,7 @@ import {
   User,
 } from "discord.js";
 import { ChannelTypeStrings } from "./types";
+import { waitForButtonConfirm } from "./utils/waitForInteraction";
 
 const fsp = fs.promises;
 
@@ -1160,7 +1164,7 @@ export async function resolveUser<T>(bot, value) {
 
   // If we have the user cached, return that directly
   if (bot.users.cache.has(userId)) {
-    return bot.users.get(userId);
+    return bot.users.fetch(userId);
   }
 
   // We don't want to spam the API by trying to fetch unknown users again and again,
@@ -1169,9 +1173,8 @@ export async function resolveUser<T>(bot, value) {
     return new UnknownUser({ id: userId });
   }
 
-  const freshUser = await bot.getRESTUser(userId).catch(noop);
+  const freshUser = await bot.users.fetch(userId, true, true).catch(noop);
   if (freshUser) {
-    bot.users.add(freshUser, bot);
     return freshUser;
   }
 
@@ -1272,15 +1275,11 @@ export async function resolveInvite<T extends boolean>(
 }
 
 export async function confirm(
-  bot: Client,
   channel: TextChannel,
   userId: string,
   content: StringResolvable | MessageOptions,
-) {
-  const msg = await channel.send(content);
-  const reply: any = {}; // await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId); FIXME waiting on waitForButton
-  msg.delete().catch(noop);
-  return reply && reply.name === "✅";
+): Promise<boolean> {
+  return waitForButtonConfirm(channel, { content }, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {
