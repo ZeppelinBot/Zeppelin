@@ -1,13 +1,13 @@
 import { MessageMentionOptions, MessageMentionTypes } from "discord.js";
 
 export function erisAllowedMentionsToDjsMentionOptions(
-  allowedMentions: erisAllowedMentionFormat | undefined,
+  allowedMentions: ErisAllowedMentionFormat | undefined,
 ): MessageMentionOptions | undefined {
   if (allowedMentions === undefined) return undefined;
 
-  let parse: MessageMentionTypes[] = [];
-  let users: string[] | undefined = undefined;
-  let roles: string[] | undefined = undefined;
+  const parse: MessageMentionTypes[] = [];
+  let users: string[] | undefined;
+  let roles: string[] | undefined;
 
   if (Array.isArray(allowedMentions.users)) {
     users = allowedMentions.users;
@@ -35,7 +35,7 @@ export function erisAllowedMentionsToDjsMentionOptions(
   return mentions;
 }
 
-export interface erisAllowedMentionFormat {
+export interface ErisAllowedMentionFormat {
   everyone?: boolean | undefined;
   users?: boolean | string[] | undefined;
   roles?: boolean | string[] | undefined;

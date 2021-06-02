@@ -21,7 +21,7 @@ export async function postToCaseLogChannel(
 
   let result;
   try {
-    if (file != undefined) {
+    if (file != null) {
       content.files = file;
     }
     result = await caseLogChannel.send({ ...content, split: false });

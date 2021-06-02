@@ -1159,7 +1159,7 @@ export async function resolveUser<T>(bot, value) {
   }
 
   // If we have the user cached, return that directly
-  if (bot.users.has(userId)) {
+  if (bot.users.cache.has(userId)) {
     return bot.users.get(userId);
   }
 

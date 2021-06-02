@@ -267,6 +267,8 @@ connect().then(async () => {
     startUptimeCounter();
   });
 
-  logger.info("Starting the bot");
+  logger.info("Logging in...");
+  await client.login(process.env.token);
+  logger.info("Initializing the bot");
   bot.initialize();
 });

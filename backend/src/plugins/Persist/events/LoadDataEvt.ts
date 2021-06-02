@@ -27,7 +27,7 @@ export const LoadDataEvt = persistEvt({
       return;
     }
 
-    let toRestore: GuildMemberEditData = {};
+    const toRestore: GuildMemberEditData = {};
     const config = await pluginData.config.getForMember(member);
     const restoredData: string[] = [];
 

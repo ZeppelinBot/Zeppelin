@@ -73,7 +73,7 @@ export const WarnCmd = modActionsCmd({
         config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
       );
 
-      const reply = false; //await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
+      const reply = false; // await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
       tooManyWarningsMsg.delete();
       if (!reply /*|| reply.name === "❌"*/) {
         msg.channel.send(errorMessage("Warn cancelled by moderator"));

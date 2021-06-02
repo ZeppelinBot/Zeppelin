@@ -41,7 +41,7 @@ export const AboutCmd = utilityCmd({
       version = "?";
     }
 
-    //const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!; FIXME Sharding stuff
+    // const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!; FIXME Sharding stuff
 
     const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
       largest: 2,
