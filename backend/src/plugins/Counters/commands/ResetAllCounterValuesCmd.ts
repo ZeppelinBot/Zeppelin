@@ -31,7 +31,6 @@ export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()(
 
     const counterName = counter.name || args.counterName;
     const confirmed = await confirm(
-      pluginData.client,
       message.channel,
       message.author.id,
       trimMultilineString(`

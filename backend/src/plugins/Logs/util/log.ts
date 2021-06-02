@@ -137,7 +137,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         const batched = opts.batched ?? true;
         const batchTime = opts.batch_time ?? 1000;
         const cfg = pluginData.config.get();
-        const parse: MessageMentionTypes[] | undefined = cfg.allow_user_mentions ? ["users"] : undefined;
+        const parse: MessageMentionTypes[] = cfg.allow_user_mentions ? ["users"] : [];
 
         if (batched) {
           // If we're batching log messages, gather all log messages within the set batch_time into a single message

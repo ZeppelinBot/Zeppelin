@@ -183,7 +183,7 @@ export function getPluginConfigPreprocessor(
   };
 }
 
-export function sendSuccessMessage(
+export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
   channel: TextChannel,
   body: string,
@@ -194,8 +194,9 @@ export function sendSuccessMessage(
   const content: MessageOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
+
   return channel
-    .send({ content }) // Force line break
+    .send({ ...content, split: false }) // Force line break
     .catch(err => {
       const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : `${channel.id}`;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
@@ -203,7 +204,7 @@ export function sendSuccessMessage(
     });
 }
 
-export function sendErrorMessage(
+export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
   channel: TextChannel,
   body: string,
@@ -214,6 +215,7 @@ export function sendErrorMessage(
   const content: MessageOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
+
   return channel
     .send({ ...content, split: false }) // Force line break
     .catch(err => {

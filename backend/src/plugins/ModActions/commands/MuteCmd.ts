@@ -5,6 +5,7 @@ import { noop, resolveMember, resolveUser } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 
 import { actualMuteUserCmd } from "../functions/actualMuteUserCmd";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -54,11 +55,13 @@ export const MuteCmd = modActionsCmd({
         return;
       } else {
         // Ask the mod if we should upgrade to a forcemute as the user is not on the server
-        const notOnServerMsg = await msg.channel.send("User not found on the server, forcemute instead?");
-        const reply = false; // await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
+        const reply = await waitForButtonConfirm(
+          msg.channel,
+          { content: "User not found on the server, forcemute instead?" },
+          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+        );
 
-        notOnServerMsg.delete().catch(noop);
-        if (!reply /*|| reply.name === "❌"*/) {
+        if (!reply) {
           sendErrorMessage(pluginData, msg.channel, "User not on server, mute cancelled by moderator");
           return;
         }

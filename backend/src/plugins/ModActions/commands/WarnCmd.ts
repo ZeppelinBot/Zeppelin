@@ -6,11 +6,12 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { errorMessage, resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
+import { errorMessage, resolveMember, resolveUser } from "../../../utils";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
 import { TextChannel } from "discord.js";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 
 export const WarnCmd = modActionsCmd({
   trigger: "warn",
@@ -69,13 +70,12 @@ export const WarnCmd = modActionsCmd({
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
     if (config.warn_notify_enabled && priorWarnAmount >= config.warn_notify_threshold) {
-      const tooManyWarningsMsg = await msg.channel.send(
-        config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
+      const reply = await waitForButtonConfirm(
+        msg.channel,
+        { content: config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`) },
+        { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
       );
-
-      const reply = false; // await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
-      tooManyWarningsMsg.delete();
-      if (!reply /*|| reply.name === "❌"*/) {
+      if (!reply) {
         msg.channel.send(errorMessage("Warn cancelled by moderator"));
         return;
       }

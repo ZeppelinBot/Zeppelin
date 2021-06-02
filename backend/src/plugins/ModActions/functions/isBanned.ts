@@ -20,7 +20,10 @@ export async function isBanned(
   }
 
   try {
-    const potentialBan = await Promise.race([pluginData.guild.bans.fetch({ user: userId }), sleep(timeout)]);
+    const potentialBan = await Promise.race([
+      pluginData.guild.bans.fetch({ user: userId }).catch(() => null),
+      sleep(timeout),
+    ]);
     return potentialBan != null;
   } catch (e) {
     if (isDiscordRESTError(e) && e.code === 10026) {

@@ -12,6 +12,7 @@ import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { banLock } from "../../../utils/lockNameHelpers";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -76,11 +77,12 @@ export const BanCmd = modActionsCmd({
         }
 
         // Ask the mod if we should update the existing ban
-        const alreadyBannedMsg = await msg.channel.send("User is already banned, update ban?");
-        const reply = false; // await waitForReaction(pluginData.client, alreadyBannedMsg, ["✅", "❌"], msg.author.id); FIXME waiting on waitForButton
-
-        alreadyBannedMsg.delete().catch(noop);
-        if (!reply /* || reply.name === "❌"*/) {
+        const reply = await waitForButtonConfirm(
+          msg.channel,
+          { content: "Failed to message the user. Log the warning anyway?" },
+          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+        );
+        if (!reply) {
           sendErrorMessage(pluginData, msg.channel, "User already banned, update cancelled by moderator");
           lock.unlock();
           return;
@@ -124,11 +126,12 @@ export const BanCmd = modActionsCmd({
         }
       } else {
         // Ask the mod if we should upgrade to a forceban as the user is not on the server
-        const notOnServerMsg = await msg.channel.send("User not found on the server, forceban instead?");
-        const reply = false; // await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id); Waiting for waitForButton
-
-        notOnServerMsg.delete().catch(noop);
-        if (!reply /*|| reply.name === "❌"*/) {
+        const reply = await waitForButtonConfirm(
+          msg.channel,
+          { content: "User not on server, forceban instead?" },
+          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+        );
+        if (!reply) {
           sendErrorMessage(pluginData, msg.channel, "User not on server, ban cancelled by moderator");
           lock.unlock();
           return;
