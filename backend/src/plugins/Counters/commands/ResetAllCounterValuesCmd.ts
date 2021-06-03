@@ -48,9 +48,7 @@ export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()(
       .send(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
       .catch(() => null);
 
-    const lock = await pluginData.locks.acquire(counterIdLock(counterId), 10 * MINUTES);
     await resetAllCounterValues(pluginData, args.counterName);
-    lock.interrupt();
 
     loadingMessage?.delete().catch(noop);
     sendSuccessMessage(pluginData, message.channel, `All counter values for **${counterName}** have been reset`);
