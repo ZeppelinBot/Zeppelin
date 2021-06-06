@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { tNullable, tPartialDictionary } from "../../utils";
 import { BasePluginType, typedGuildCommand } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
+import { tNullable, tPartialDictionary } from "../../utils";
 import { tValidTimezone } from "../../utils/tValidTimezone";
 import { defaultDateFormats } from "./defaultDateFormats";
 

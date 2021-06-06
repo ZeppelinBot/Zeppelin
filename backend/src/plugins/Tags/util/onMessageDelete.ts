@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { TagsPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { TagsPluginType } from "../types";
 
 export async function onMessageDelete(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   // Command message was deleted -> delete the response as well

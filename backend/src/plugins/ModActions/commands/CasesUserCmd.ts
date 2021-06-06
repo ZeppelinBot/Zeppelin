@@ -1,22 +1,16 @@
-import { modActionsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import {
-  UnknownUser,
-  multiSorter,
-  trimLines,
-  createChunkedMessage,
-  resolveUser,
-  emptyEmbedValue,
-  chunkArray,
-} from "../../../utils";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
-import { asyncMap } from "../../../utils/async";
-import { CaseTypes } from "../../../data/CaseTypes";
 import { MessageEmbedOptions, User } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { sendErrorMessage } from "../../../pluginUtils";
+import {
+    chunkArray, emptyEmbedValue, resolveUser, trimLines, UnknownUser
+} from "../../../utils";
+import { asyncMap } from "../../../utils/async";
+import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix";
+import { modActionsCmd } from "../types";
+
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),

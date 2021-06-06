@@ -1,18 +1,18 @@
-import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogType } from "../../../data/LogType";
-import {
-  createChunkedMessage,
-  messageLink,
-  stripObjectToScalars,
-  tAllowedMentions,
-  tNormalizedNullOptional,
-  verboseChannelMention,
-} from "../../../utils";
-import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TextChannel } from "discord.js";
+import * as t from "io-ts";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
+import { LogType } from "../../../data/LogType";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
+import {
+    createChunkedMessage,
+    messageLink,
+    stripObjectToScalars,
+    tAllowedMentions,
+    tNormalizedNullOptional,
+    verboseChannelMention
+} from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const AlertAction = automodAction({
   configType: t.type({

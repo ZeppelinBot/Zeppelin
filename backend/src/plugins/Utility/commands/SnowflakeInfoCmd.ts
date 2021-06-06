@@ -1,8 +1,6 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
 import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const SnowflakeInfoCmd = utilityCmd({
   trigger: ["snowflake", "snowflakeinfo"],

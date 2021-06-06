@@ -1,23 +1,22 @@
-import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import {
-  embedPadding,
-  EmbedWith,
-  formatNumber,
-  inviteHasCounts,
-  memoize,
-  MINUTES,
-  preEmbedPadding,
-  resolveInvite,
-  resolveUser,
-  trimLines,
-} from "../../../utils";
-
-import moment from "moment-timezone";
+import { CategoryChannel, MessageEmbedOptions, TextChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { getGuildPreview } from "./getGuildPreview";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import {
+    EmbedWith,
+    formatNumber,
+    inviteHasCounts,
+    memoize,
+    MINUTES,
+    preEmbedPadding,
+    resolveInvite,
+    resolveUser,
+    trimLines
+} from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { MessageEmbedOptions, CategoryChannel, TextChannel, VoiceChannel } from "discord.js";
+import { UtilityPluginType } from "../types";
+import { getGuildPreview } from "./getGuildPreview";
+
 
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

@@ -1,9 +1,9 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { tNullable, tDeepPartial } from "../../utils";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
+import { tDeepPartial, tNullable } from "../../utils";
 
 const StarboardOpts = t.type({
   channel_id: t.string,

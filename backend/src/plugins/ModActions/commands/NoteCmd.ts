@@ -1,12 +1,11 @@
-import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { modActionsCmd } from "../types";
 
 export const NoteCmd = modActionsCmd({
   trigger: "note",

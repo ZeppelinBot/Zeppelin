@@ -2,10 +2,10 @@ import * as t from "io-ts";
 import { BasePluginType } from "knub";
 import { AddRoleAction } from "./actions/addRoleAction";
 import { CreateCaseAction } from "./actions/createCaseAction";
-import { MoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
-import { MessageAction } from "./actions/messageAction";
 import { MakeRoleMentionableAction } from "./actions/makeRoleMentionableAction";
 import { MakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAction";
+import { MessageAction } from "./actions/messageAction";
+import { MoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
 import { SetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
 
 // Triggers

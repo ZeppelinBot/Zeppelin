@@ -1,7 +1,7 @@
-import { disableInlineCode, isSnowflake } from "../utils";
-import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
-import { GuildPluginData, TypeConversionError } from "knub";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
+import { isSnowflake } from "../utils";
 
 const channelAndMessageIdRegex = /^(\d+)[\-\/](\d+)$/;
 const messageLinkRegex = /^https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/\d+\/(\d+)\/(\d+)$/i;

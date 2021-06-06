@@ -1,11 +1,11 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { VoiceChannel } from "discord.js";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
+import { canActOn } from "../../../pluginUtils";
 import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
-import { canActOn } from "../../../pluginUtils";
-import { VoiceChannel } from "discord.js";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const MoveToVoiceChannelAction = t.type({
   type: t.literal("move_to_vc"),

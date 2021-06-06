@@ -1,12 +1,12 @@
+import { TextChannel } from "discord.js";
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
+import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { waitForReply } from "knub/dist/helpers";
-
 import { resolveUser, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
-import { TextChannel } from "discord.js";
+import { CountersPluginType } from "../types";
+
 
 export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters add", "counter add", "addcounter"],

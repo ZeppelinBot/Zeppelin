@@ -1,18 +1,16 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogType } from "../../../data/LogType";
 import {
-  asyncMap,
-  convertDelayStringToMS,
-  nonNullish,
-  resolveMember,
-  tDelayString,
-  tNullable,
-  unique,
+    convertDelayStringToMS,
+    nonNullish,
+
+    tDelayString,
+    tNullable,
+    unique
 } from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
+import { automodAction } from "../helpers";
 
 export const BanAction = automodAction({
   configType: t.type({

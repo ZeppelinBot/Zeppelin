@@ -1,9 +1,9 @@
-import { postCmd } from "../types";
-import { sorter } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { postMessage } from "../util/postMessage";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { sorter } from "../../../utils";
+import { postCmd } from "../types";
+import { postMessage } from "../util/postMessage";
 
 export const ScheduledPostsShowCmd = postCmd({
   trigger: ["scheduled_posts", "scheduled_posts show"],

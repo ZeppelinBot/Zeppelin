@@ -1,11 +1,11 @@
-import * as t from "io-ts";
 import escapeStringRegexp from "escape-string-regexp";
-import { automodTrigger } from "../helpers";
-import { disableInlineCode, verboseChannelMention } from "../../../utils";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import * as t from "io-ts";
+import { disableInlineCode } from "../../../utils";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   word: string;

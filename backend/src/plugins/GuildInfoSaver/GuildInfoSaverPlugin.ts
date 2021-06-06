@@ -1,9 +1,9 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { GuildInfoSaverPluginType } from "./types";
 import { MINUTES } from "../../utils";
-import * as t from "io-ts";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildInfoSaverPluginType } from "./types";
 
 export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
   name: "guild_info_saver",

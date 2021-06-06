@@ -1,11 +1,11 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { slowmodeCmd } from "../types";
-import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
 import { asSingleLine, disableInlineCode } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
+import { slowmodeCmd } from "../types";
+import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
 
 export const SlowmodeClearCmd = slowmodeCmd({
   trigger: ["slowmode clear", "slowmode c"],

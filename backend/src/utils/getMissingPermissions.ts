@@ -1,4 +1,4 @@
-import { PermissionOverwrites, Permissions } from "discord.js";
+import { Permissions } from "discord.js";
 
 /**
  * @param resolvedPermissions A Permission object from e.g. GuildChannel#permissionsFor() or Member#permission

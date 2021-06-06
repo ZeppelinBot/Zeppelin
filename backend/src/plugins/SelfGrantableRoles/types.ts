@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, CooldownManager } from "knub";
+import { BasePluginType, CooldownManager, typedGuildCommand } from "knub";
 
 const RoleMap = t.record(t.string, t.array(t.string));
 

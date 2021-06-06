@@ -1,11 +1,11 @@
-import { GuildPluginData } from "knub";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { availableTriggers } from "../triggers/availableTriggers";
-import { availableActions } from "../actions/availableActions";
-import { AutomodTriggerMatchResult } from "../helpers";
-import { CleanAction } from "../actions/clean";
-import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { availableActions } from "../actions/availableActions";
+import { CleanAction } from "../actions/clean";
+import { AutomodTriggerMatchResult } from "../helpers";
+import { availableTriggers } from "../triggers/availableTriggers";
+import { AutomodContext, AutomodPluginType } from "../types";
+import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;

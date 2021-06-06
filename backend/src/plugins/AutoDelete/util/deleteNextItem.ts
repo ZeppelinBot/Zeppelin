@@ -1,14 +1,14 @@
+import { Permissions, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { AutoDeletePluginType } from "../types";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType";
-import { resolveUser, stripObjectToScalars, verboseChannelMention } from "../../../utils";
 import { logger } from "../../../logger";
-import { scheduleNextDeletion } from "./scheduleNextDeletion";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { resolveUser, stripObjectToScalars, verboseChannelMention } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Permissions, TextChannel } from "discord.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { AutoDeletePluginType } from "../types";
+import { scheduleNextDeletion } from "./scheduleNextDeletion";
 
 export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePluginType>) {
   const [itemToDelete] = pluginData.state.deletionQueue.splice(0, 1);

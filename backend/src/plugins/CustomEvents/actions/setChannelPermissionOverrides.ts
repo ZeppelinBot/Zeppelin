@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),

@@ -1,7 +1,7 @@
-import { botControlCmd } from "../types";
+import { TextChannel } from "discord.js";
 import { isOwnerPreFilter } from "../../../pluginUtils";
 import { getActiveReload, setActiveReload } from "../activeReload";
-import { TextChannel } from "discord.js";
+import { botControlCmd } from "../types";
 
 export const ReloadGlobalPluginsCmd = botControlCmd({
   trigger: "bot_reload_global_plugins",

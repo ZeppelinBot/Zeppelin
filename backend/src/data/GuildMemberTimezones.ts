@@ -1,7 +1,7 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { MemberTimezone } from "./entities/MemberTimezone";
 import { getRepository, Repository } from "typeorm/index";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { connection } from "./db";
+import { MemberTimezone } from "./entities/MemberTimezone";
 
 export class GuildMemberTimezones extends BaseGuildRepository {
   protected memberTimezones: Repository<MemberTimezone>;

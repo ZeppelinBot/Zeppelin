@@ -1,8 +1,8 @@
 // tslint:disable:no-console
-import { connect } from "./data/db";
-import { Configs } from "./data/Configs";
-import path from "path";
 import * as _fs from "fs";
+import path from "path";
+import { Configs } from "./data/Configs";
+import { connect } from "./data/db";
 
 const fs = _fs.promises;
 

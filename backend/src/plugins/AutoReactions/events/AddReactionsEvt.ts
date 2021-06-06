@@ -1,12 +1,12 @@
-import { autoReactionsEvt } from "../types";
-import { isDiscordRESTError } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { readChannelPermissions } from "../../../utils/readChannelPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { GuildChannel, Permissions } from "discord.js";
+import { LogType } from "../../../data/LogType";
+import { isDiscordRESTError } from "../../../utils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { readChannelPermissions } from "../../../utils/readChannelPermissions";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { autoReactionsEvt } from "../types";
+
 
 const p = Permissions.FLAGS;
 

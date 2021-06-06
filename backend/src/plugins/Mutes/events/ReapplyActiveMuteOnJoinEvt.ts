@@ -1,7 +1,7 @@
-import { mutesEvt } from "../types";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { mutesEvt } from "../types";
 
 /**
  * Reapply active mutes on join

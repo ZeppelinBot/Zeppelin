@@ -1,7 +1,7 @@
 import express from "express";
 import { guildPlugins } from "../plugins/availablePlugins";
-import { notFound } from "./responses";
 import { indentLines } from "../utils";
+import { notFound } from "./responses";
 
 function formatConfigSchema(schema) {
   if (schema._tag === "InterfaceType" || schema._tag === "PartialType") {

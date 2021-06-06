@@ -1,8 +1,7 @@
+import { connect } from "../data/db";
+import { setIsAPI } from "../globals";
 import "./loadEnv";
 
-import { connect } from "../data/db";
-import path from "path";
-import { setIsAPI } from "../globals";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console

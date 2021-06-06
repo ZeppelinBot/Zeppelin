@@ -1,9 +1,8 @@
-import { timeAndDateCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { isValidTimezone } from "../../../utils/isValidTimezone";
 import { disableInlineCode, trimLines } from "../../../utils";
 import { parseFuzzyTimezone } from "../../../utils/parseFuzzyTimezone";
+import { timeAndDateCmd } from "../types";
 
 export const SetTimezoneCmd = timeAndDateCmd({
   trigger: "timezone",

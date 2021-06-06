@@ -1,6 +1,6 @@
-import { ReactionRole } from "./entities/ReactionRole";
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { ReactionRole } from "./entities/ReactionRole";
 
 export class GuildReactionRoles extends BaseGuildRepository {
   private reactionRoles: Repository<ReactionRole>;

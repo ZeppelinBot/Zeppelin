@@ -1,9 +1,9 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType } from "../types";
+import { TextChannel } from "discord.js";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
 import { renderTemplate } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
-import { TextChannel } from "discord.js";
+import { CustomEventsPluginType } from "../types";
 
 export const MessageAction = t.type({
   type: t.literal("message"),

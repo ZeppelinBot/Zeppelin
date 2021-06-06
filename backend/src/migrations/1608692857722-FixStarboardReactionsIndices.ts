@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, TableIndex, TableUnique } from "typeorm";
+import { MigrationInterface, QueryRunner, TableIndex } from "typeorm";
 
 export class FixStarboardReactionsIndices1608692857722 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

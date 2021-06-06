@@ -1,10 +1,10 @@
-import { welcomeMessageEvt } from "../types";
+import { TextChannel } from "discord.js";
+import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-
 import { sendDM } from "../../../utils/sendDM";
-import { TextChannel } from "discord.js";
+import { welcomeMessageEvt } from "../types";
+
 
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",

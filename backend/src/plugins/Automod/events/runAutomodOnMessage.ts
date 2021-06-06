@@ -1,10 +1,10 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { GuildPluginData } from "knub";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { runAutomod } from "../functions/runAutomod";
-import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage";
 import moment from "moment-timezone";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage";
 import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage";
+import { runAutomod } from "../functions/runAutomod";
+import { AutomodContext, AutomodPluginType } from "../types";
 
 export function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,

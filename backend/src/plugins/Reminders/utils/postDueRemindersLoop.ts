@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { RemindersPluginType } from "../types";
-import moment from "moment-timezone";
-import humanizeDuration from "humanize-duration";
-import { disableLinkPreviews } from "knub/dist/helpers";
-import { SECONDS } from "../../../utils";
 import { TextChannel } from "discord.js";
+import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import { disableLinkPreviews } from "knub/dist/helpers";
+import moment from "moment-timezone";
+import { SECONDS } from "../../../utils";
+import { RemindersPluginType } from "../types";
 
 const REMINDER_LOOP_TIME = 10 * SECONDS;
 const MAX_TRIES = 3;

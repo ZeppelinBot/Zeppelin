@@ -1,14 +1,14 @@
-import { modActionsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { stripObjectToScalars } from "../../../utils";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-
+import { TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { TextChannel } from "discord.js";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { stripObjectToScalars } from "../../../utils";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { modActionsCmd } from "../types";
+
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",

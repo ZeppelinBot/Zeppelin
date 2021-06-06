@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import { trimLines, preEmbedPadding, EmbedWith } from "../../../utils";
 import { MessageEmbedOptions } from "discord.js";
+import { GuildPluginData } from "knub";
+import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
+import { UtilityPluginType } from "../types";
 
 export async function getEmojiInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

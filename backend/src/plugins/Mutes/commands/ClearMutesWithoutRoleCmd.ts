@@ -1,6 +1,6 @@
-import { mutesCmd } from "../types";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
+import { mutesCmd } from "../types";
 
 export const ClearMutesWithoutRoleCmd = mutesCmd({
   trigger: "clear_mutes_without_role",

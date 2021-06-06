@@ -1,11 +1,11 @@
-import { logsEvt } from "../types";
-import { stripObjectToScalars, UnknownUser } from "../../../utils";
-
-import { LogType } from "../../../data/LogType";
-import isEqual from "lodash.isequal";
-import diff from "lodash.difference";
-import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { GuildAuditLogs } from "discord.js";
+import diff from "lodash.difference";
+import isEqual from "lodash.isequal";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars, UnknownUser } from "../../../utils";
+import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
+import { logsEvt } from "../types";
+
 
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",

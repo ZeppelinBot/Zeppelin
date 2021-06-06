@@ -1,15 +1,15 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { ConfigSchema, SpamPluginType } from "./types";
-import { GuildLogs } from "../../data/GuildLogs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { onMessageCreate } from "./util/onMessageCreate";
-import { clearOldRecentActions } from "./util/clearOldRecentActions";
-import { SpamVoiceStateUpdateEvt } from "./events/SpamVoiceEvt";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { SpamVoiceStateUpdateEvt } from "./events/SpamVoiceEvt";
+import { ConfigSchema, SpamPluginType } from "./types";
+import { clearOldRecentActions } from "./util/clearOldRecentActions";
+import { onMessageCreate } from "./util/onMessageCreate";
 
 const defaultOptions: PluginOptions<SpamPluginType> = {
   config: {

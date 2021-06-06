@@ -1,10 +1,10 @@
-import { tagsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-
-import { TemplateParseError } from "../../../templateFormatter";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { renderTagBody } from "../util/renderTagBody";
+import { TemplateParseError } from "../../../templateFormatter";
 import { stripObjectToScalars } from "../../../utils";
+import { tagsCmd } from "../types";
+import { renderTagBody } from "../util/renderTagBody";
+
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",

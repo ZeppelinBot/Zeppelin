@@ -1,4 +1,4 @@
-import { GuildMember, GuildChannel } from "discord.js";
+import { GuildChannel, GuildMember } from "discord.js";
 import { getMissingPermissions } from "./getMissingPermissions";
 
 /**

@@ -1,15 +1,15 @@
-import { IgnoredEventType, modActionsEvt } from "../types";
-import { isEventIgnored } from "../functions/isEventIgnored";
-import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-
-import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { GuildAuditLogs, User } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { logger } from "../../../logger";
+import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 import { resolveUser, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
-import { Case } from "../../../data/entities/Case";
-import { GuildAuditLogs, User } from "discord.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
+import { isEventIgnored } from "../functions/isEventIgnored";
+import { IgnoredEventType, modActionsEvt } from "../types";
+
 
 /**
  * Create a KICK case automatically when a user is kicked manually.

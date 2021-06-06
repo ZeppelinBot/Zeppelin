@@ -1,5 +1,5 @@
-import { get, has } from "./utils";
 import seedrandom from "seedrandom";
+import { get, has } from "./utils";
 
 const TEMPLATE_CACHE_SIZE = 200;
 const templateCache: Map<string, ParsedTemplate> = new Map();

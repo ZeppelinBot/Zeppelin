@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
+import { canActOn } from "../../../pluginUtils";
 import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
-import { canActOn } from "../../../pluginUtils";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const AddRoleAction = t.type({
   type: t.literal("add_role"),

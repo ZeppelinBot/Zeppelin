@@ -1,5 +1,5 @@
-import { decrypt, encrypt } from "../utils/crypt";
 import { ValueTransformer } from "typeorm";
+import { decrypt, encrypt } from "../utils/crypt";
 
 interface EncryptedJsonTransformer<T> extends ValueTransformer {
   from(dbValue: any): T;

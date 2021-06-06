@@ -1,16 +1,15 @@
-import { modActionsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { helpers } from "knub";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-
-import { SECONDS, stripObjectToScalars, trimLines } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import moment from "moment-timezone";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { Case } from "../../../data/entities/Case";
 import { TextChannel } from "discord.js";
+import { helpers } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { SECONDS, stripObjectToScalars, trimLines } from "../../../utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { modActionsCmd } from "../types";
+
 
 export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],

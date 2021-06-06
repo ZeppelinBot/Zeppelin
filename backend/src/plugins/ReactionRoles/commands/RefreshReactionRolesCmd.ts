@@ -1,6 +1,6 @@
-import { reactionRolesCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { reactionRolesCmd } from "../types";
 import { refreshReactionRoles } from "../util/refreshReactionRoles";
 
 export const RefreshReactionRolesCmd = reactionRolesCmd({

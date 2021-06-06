@@ -1,14 +1,14 @@
-import { GuildPluginData } from "knub";
-import { MutesPluginType, UnmuteResult } from "../types";
-import { CaseArgs } from "../../Cases/types";
-import { resolveUser, stripObjectToScalars, resolveMember } from "../../../utils";
-import { memberHasMutedRole } from "./memberHasMutedRole";
 import humanizeDuration from "humanize-duration";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-
+import { resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { CaseArgs } from "../../Cases/types";
+import { MutesPluginType, UnmuteResult } from "../types";
+import { memberHasMutedRole } from "./memberHasMutedRole";
+
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,

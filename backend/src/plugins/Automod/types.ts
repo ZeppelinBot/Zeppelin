@@ -1,22 +1,22 @@
+import { GuildMember, User } from "discord.js";
 import * as t from "io-ts";
-import { tNullable, UnknownUser } from "../../utils";
 import { BasePluginType, CooldownManager } from "knub";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildLogs } from "../../data/GuildLogs";
 import { SavedMessage } from "../../data/entities/SavedMessage";
-
-import { AvailableTriggers } from "./triggers/availableTriggers";
-import { AvailableActions } from "./actions/availableActions";
-import { Queue } from "../../Queue";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
-import { RecentActionType } from "./constants";
-import Timeout = NodeJS.Timeout;
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { Queue } from "../../Queue";
 import { RegExpRunner } from "../../RegExpRunner";
+import { tNullable } from "../../utils";
 import { CounterEvents } from "../Counters/types";
 import { ModActionsEvents, ModActionType } from "../ModActions/types";
 import { MutesEvents } from "../Mutes/types";
-import { GuildMember, User } from "discord.js";
+import { AvailableActions } from "./actions/availableActions";
+import { RecentActionType } from "./constants";
+import { AvailableTriggers } from "./triggers/availableTriggers";
+
+import Timeout = NodeJS.Timeout;
 
 export const Rule = t.type({
   enabled: t.boolean,

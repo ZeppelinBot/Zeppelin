@@ -1,14 +1,13 @@
-import { utilityCmd } from "../types";
-import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
-
-import { getCurrentUptime } from "../../../uptime";
+import { GuildChannel, MessageOptions } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
-import path from "path";
 import moment from "moment-timezone";
 import { rootDir } from "../../../paths";
+import { getCurrentUptime } from "../../../uptime";
+import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { GuildChannel, MessageOptions } from "discord.js";
+import { utilityCmd } from "../types";
+
 
 export const AboutCmd = utilityCmd({
   trigger: "about",

@@ -1,6 +1,6 @@
+import crypto from "crypto";
 import "../loadEnv";
 
-import crypto, { DecipherGCM } from "crypto";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console

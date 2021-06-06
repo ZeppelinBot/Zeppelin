@@ -1,12 +1,12 @@
-import { postCmd } from "../types";
+import { MessageEmbed, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-
 import { trimLines } from "../../../utils";
-import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
-import { MessageEmbed, TextChannel } from "discord.js";
+import { postCmd } from "../types";
+import { formatContent } from "../util/formatContent";
+
 
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 

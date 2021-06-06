@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import { verboseChannelMention } from "../../../utils";
+import { automodTrigger } from "../helpers";
 
 // tslint:disable-next-line:no-empty-interface
 interface AnyMessageResultType {}

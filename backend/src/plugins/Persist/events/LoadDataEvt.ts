@@ -1,14 +1,14 @@
-import { persistEvt } from "../types";
-
+import { GuildMemberEditData, Permissions } from "discord.js";
 import intersection from "lodash.intersection";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
-import { GuildMemberEditData, Permissions } from "discord.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { persistEvt } from "../types";
+
 
 const p = Permissions.FLAGS;
 

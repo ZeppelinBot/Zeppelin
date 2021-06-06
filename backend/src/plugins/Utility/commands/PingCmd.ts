@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
-import { noop, trimLines } from "../../../utils";
 import { Message } from "discord.js";
+import { noop, trimLines } from "../../../utils";
+import { utilityCmd } from "../types";
 
 const { performance } = require("perf_hooks");
 

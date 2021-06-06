@@ -1,8 +1,8 @@
-import { botControlCmd } from "../types";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { resolveInvite, verboseUserMention } from "../../../utils";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { resolveInvite, verboseUserMention } from "../../../utils";
+import { botControlCmd } from "../types";
 
 const REQUIRED_MEMBER_COUNT = 5000;
 

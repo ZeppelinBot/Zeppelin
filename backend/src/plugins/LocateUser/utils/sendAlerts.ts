@@ -1,10 +1,10 @@
+import { TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
 import { resolveMember } from "../../../utils";
+import { LocateUserPluginType } from "../types";
+import { moveMember } from "./moveMember";
 import { sendWhere } from "./sendWhere";
 
-import { moveMember } from "./moveMember";
-import { TextChannel } from "discord.js";
 
 export async function sendAlerts(pluginData: GuildPluginData<LocateUserPluginType>, userId: string) {
   const triggeredAlerts = await pluginData.state.alerts.getAlertsByUserId(userId);

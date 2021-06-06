@@ -1,9 +1,9 @@
-import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-
-import { GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
+import { AutomodPluginType } from "../types";
+
 
 export function resolveActionContactMethods(
   pluginData: GuildPluginData<AutomodPluginType>,

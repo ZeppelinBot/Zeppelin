@@ -1,13 +1,13 @@
-import { RecentActionType } from "../constants";
-import { automodTrigger } from "../helpers";
+import * as t from "io-ts";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
 import { convertDelayStringToMS, sorter, tDelayString, tNullable } from "../../../utils";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { RecentActionType } from "../constants";
+import { automodTrigger } from "../helpers";
 import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
-import * as t from "io-ts";
 import { getMessageSpamIdentifier } from "./getSpamIdentifier";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 
 const MessageSpamTriggerConfig = t.type({
   amount: t.number,

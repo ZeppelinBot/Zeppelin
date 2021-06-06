@@ -1,8 +1,8 @@
+import { TextChannel } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
 
-import humanizeDuration from "humanize-duration";
-import { TextChannel } from "discord.js";
 
 export const SlowmodeGetCmd = slowmodeCmd({
   trigger: "slowmode",

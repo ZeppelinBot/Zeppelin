@@ -1,9 +1,9 @@
 import { getRepository, In, Repository } from "typeorm";
-import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
+import { isAPI } from "../globals";
 import { MINUTES, SECONDS } from "../utils";
 import { BaseRepository } from "./BaseRepository";
-import { isAPI } from "../globals";
 import { cleanupUsernames } from "./cleanup/usernames";
+import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
 
 if (!isAPI()) {
   const CLEANUP_INTERVAL = 5 * MINUTES;

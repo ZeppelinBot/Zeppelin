@@ -1,10 +1,10 @@
+import { GuildMember } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, canActOn } from "../../../pluginUtils";
-import { rolesCmd } from "../types";
-import { resolveMember, stripObjectToScalars, successMessage, resolveRoleId } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { GuildMember } from "discord.js";
+import { canActOn, sendErrorMessage } from "../../../pluginUtils";
+import { resolveMember, resolveRoleId, stripObjectToScalars, successMessage } from "../../../utils";
+import { rolesCmd } from "../types";
 
 export const MassRemoveRoleCmd = rolesCmd({
   trigger: "massremoverole",

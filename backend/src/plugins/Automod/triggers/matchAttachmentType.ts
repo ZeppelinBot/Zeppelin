@@ -1,12 +1,12 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import {
-  asSingleLine,
-  disableCodeBlocks,
-  disableInlineCode,
-  messageSummary,
-  verboseChannelMention,
+    asSingleLine,
+
+    disableInlineCode,
+    messageSummary,
+    verboseChannelMention
 } from "../../../utils";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   matchedType: string;

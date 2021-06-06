@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { getBaseUrl } from "../../../pluginUtils";
+import { LogsPluginType } from "../types";
 
 export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPluginType>, savedMessages: SavedMessage[]) {
   const channel = pluginData.guild.channels.cache.get(savedMessages[0].channel_id);

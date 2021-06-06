@@ -1,25 +1,29 @@
-import { GuildPluginData } from "knub";
-import { MuteOptions, MutesPluginType } from "../types";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import humanizeDuration from "humanize-duration";
-import {
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-  resolveMember,
-  UserNotificationMethod,
-} from "../../../utils";
-import { renderTemplate } from "../../../templateFormatter";
-
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { Case } from "../../../data/entities/Case";
-import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
-import { muteLock } from "../../../utils/lockNameHelpers";
 import { TextChannel, User } from "discord.js";
+import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { renderTemplate } from "../../../templateFormatter";
+import {
+    notifyUser,
+
+
+
+
+    resolveMember, resolveUser,
+    stripObjectToScalars,
+    ucfirst,
+
+
+    UserNotificationMethod, UserNotificationResult
+} from "../../../utils";
+import { muteLock } from "../../../utils/lockNameHelpers";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { MuteOptions, MutesPluginType } from "../types";
+
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,

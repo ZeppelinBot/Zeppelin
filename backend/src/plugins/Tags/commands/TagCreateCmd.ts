@@ -1,7 +1,7 @@
-import { tagsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { parseTemplate, TemplateParseError } from "../../../templateFormatter";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { parseTemplate, TemplateParseError } from "../../../templateFormatter";
+import { tagsCmd } from "../types";
 
 export const TagCreateCmd = tagsCmd({
   trigger: "tag",

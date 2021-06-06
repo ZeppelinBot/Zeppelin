@@ -1,9 +1,9 @@
 import { GuildPluginData } from "knub";
-import { MutesPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
-
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { MutesPluginType } from "../types";
+
 
 export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginType>) {
   const expiredMutes = await pluginData.state.mutes.getExpiredMutes();

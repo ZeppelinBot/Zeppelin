@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildEventListener, typedGuildCommand } from "knub";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
 
 const ButtonOpts = t.type({

@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { PostPluginType } from "../types";
-
-import { downloadFile } from "../../../utils";
+import { Message, MessageAttachment, MessageOptions, TextChannel } from "discord.js";
 import fs from "fs";
+import { GuildPluginData } from "knub";
+import { downloadFile } from "../../../utils";
+import { PostPluginType } from "../types";
 import { formatContent } from "./formatContent";
-import { TextChannel, Message, MessageOptions, MessageAttachment } from "discord.js";
+
 
 const fsp = fs.promises;
 

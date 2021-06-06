@@ -1,10 +1,10 @@
-import { modActionsEvt } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { Permissions, TextChannel } from "discord.js";
 import { LogType } from "../../../data/LogType";
-
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
-import { TextChannel, Constants, Permissions } from "discord.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { modActionsEvt } from "../types";
+
 
 /**
  * Show an alert if a member with prior notes joins the server

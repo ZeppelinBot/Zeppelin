@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
-import { renderTemplate } from "../../../templateFormatter";
+import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { ActionError } from "../ActionError";
+import { renderTemplate } from "../../../templateFormatter";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { ActionError } from "../ActionError";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const CreateCaseAction = t.type({
   type: t.literal("create_case"),

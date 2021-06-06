@@ -1,20 +1,20 @@
 import * as t from "io-ts";
-import { CleanAction } from "./clean";
 import { AutomodActionBlueprint } from "../helpers";
-import { WarnAction } from "./warn";
-import { MuteAction } from "./mute";
-import { KickAction } from "./kick";
-import { BanAction } from "./ban";
-import { AlertAction } from "./alert";
-import { ChangeNicknameAction } from "./changeNickname";
-import { LogAction } from "./log";
 import { AddRolesAction } from "./addRoles";
-import { RemoveRolesAction } from "./removeRoles";
-import { SetAntiraidLevelAction } from "./setAntiraidLevel";
-import { ReplyAction } from "./reply";
 import { AddToCounterAction } from "./addToCounter";
+import { AlertAction } from "./alert";
+import { BanAction } from "./ban";
+import { ChangeNicknameAction } from "./changeNickname";
+import { CleanAction } from "./clean";
+import { KickAction } from "./kick";
+import { LogAction } from "./log";
+import { MuteAction } from "./mute";
+import { RemoveRolesAction } from "./removeRoles";
+import { ReplyAction } from "./reply";
+import { SetAntiraidLevelAction } from "./setAntiraidLevel";
 import { SetCounterAction } from "./setCounter";
 import { SetSlowmodeAction } from "./setSlowmode";
+import { WarnAction } from "./warn";
 
 export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   clean: CleanAction,

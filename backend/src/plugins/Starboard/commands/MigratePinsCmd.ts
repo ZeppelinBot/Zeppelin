@@ -1,9 +1,9 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { starboardCmd } from "../types";
-import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
-
-import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { starboardCmd } from "../types";
+import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
+
 
 export const MigratePinsCmd = starboardCmd({
   trigger: "starboard migrate_pins",

@@ -1,12 +1,12 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType, TLogChannelMap } from "../types";
-import { LogType } from "../../../data/LogType";
-
-import { createChunkedMessage, get, noop } from "../../../utils";
-import { getLogMessage } from "./getLogMessage";
-import { allowTimeout } from "../../../RegExpRunner";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { MessageMentionTypes, TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { allowTimeout } from "../../../RegExpRunner";
+import { createChunkedMessage, get, noop } from "../../../utils";
+import { LogsPluginType, TLogChannelMap } from "../types";
+import { getLogMessage } from "./getLogMessage";
+
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];

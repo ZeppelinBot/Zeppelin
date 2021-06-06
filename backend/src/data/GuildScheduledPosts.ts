@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ScheduledPost } from "./entities/ScheduledPost";
 
 export class GuildScheduledPosts extends BaseGuildRepository {

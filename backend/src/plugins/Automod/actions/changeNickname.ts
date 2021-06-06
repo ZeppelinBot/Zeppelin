@@ -1,8 +1,8 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { nonNullish, unique } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const ChangeNicknameAction = automodAction({
   configType: t.union([

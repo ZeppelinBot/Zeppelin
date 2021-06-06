@@ -1,7 +1,7 @@
-import { createChunkedMessage, HOURS, isDiscordRESTError } from "../utils";
-import { logger } from "../logger";
-import Timeout = NodeJS.Timeout;
 import { APIMessage, User } from "discord.js";
+import { logger } from "../logger";
+import { createChunkedMessage, HOURS, isDiscordRESTError } from "../utils";
+import Timeout = NodeJS.Timeout;
 
 let dmsDisabled = false;
 let dmsDisabledTimeout: Timeout;

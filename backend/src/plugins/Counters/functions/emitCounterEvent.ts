@@ -1,5 +1,5 @@
-import { CounterEvents, CountersPluginType } from "../types";
 import { GuildPluginData } from "knub";
+import { CounterEvents, CountersPluginType } from "../types";
 
 export function emitCounterEvent<TEvent extends keyof CounterEvents>(
   pluginData: GuildPluginData<CountersPluginType>,

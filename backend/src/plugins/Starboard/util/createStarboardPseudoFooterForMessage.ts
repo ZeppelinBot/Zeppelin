@@ -1,4 +1,4 @@
-import { Message, EmbedField } from "discord.js";
+import { EmbedField, Message } from "discord.js";
 import { EMPTY_CHAR, messageLink } from "../../../utils";
 import { TStarboardOpts } from "../types";
 

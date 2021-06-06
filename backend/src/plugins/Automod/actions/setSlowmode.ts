@@ -1,9 +1,9 @@
+import { TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import { Constants, TextChannel } from "discord.js";
 import { ChannelTypeStrings } from "src/types";
+import { LogType } from "../../../data/LogType";
+import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
+import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({

@@ -1,9 +1,8 @@
-import * as t from "io-ts";
-import { pipe } from "fp-ts/lib/pipeable";
-import { either, fold } from "fp-ts/lib/Either";
-import { noop } from "./utils";
 import deepDiff from "deep-diff";
-import safeRegex from "safe-regex";
+import { either, fold } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/pipeable";
+import * as t from "io-ts";
+import { noop } from "./utils";
 
 const regexWithFlags = /^\/(.*?)\/([i]*)$/;
 

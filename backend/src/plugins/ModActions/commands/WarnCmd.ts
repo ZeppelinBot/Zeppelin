@@ -1,17 +1,15 @@
-import { modActionsCmd } from "../types";
+import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Case } from "../../../data/entities/Case";
-import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { errorMessage, resolveMember, resolveUser } from "../../../utils";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
-import { TextChannel } from "discord.js";
-import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { modActionsCmd } from "../types";
 
 export const WarnCmd = modActionsCmd({
   trigger: "warn",

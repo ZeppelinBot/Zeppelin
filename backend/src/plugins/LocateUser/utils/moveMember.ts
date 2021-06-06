@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { GuildMember, TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { LocateUserPluginType } from "../types";
 
 export async function moveMember(
   pluginData: GuildPluginData<LocateUserPluginType>,

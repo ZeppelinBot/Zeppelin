@@ -1,6 +1,6 @@
 import test from "ava";
+import { decrypt, encrypt } from "./crypt";
 
-import { encrypt, decrypt } from "./crypt";
 
 test("encrypt() followed by decrypt()", t => {
   const original = "banana 123 👀 💕"; // Includes emojis to verify utf8 stuff works

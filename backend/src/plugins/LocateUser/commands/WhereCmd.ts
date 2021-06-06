@@ -1,6 +1,5 @@
-import { locateUserCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { resolveMember } from "../../../utils";
+import { locateUserCmd } from "../types";
 import { sendWhere } from "../utils/sendWhere";
 
 export const WhereCmd = locateUserCmd({

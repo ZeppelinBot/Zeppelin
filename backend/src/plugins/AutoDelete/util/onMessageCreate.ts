@@ -1,8 +1,8 @@
-import { AutoDeletePluginType, MAX_DELAY } from "../types";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { convertDelayStringToMS, resolveMember } from "../../../utils";
 import { LogType } from "../../../data/LogType";
+import { convertDelayStringToMS, resolveMember } from "../../../utils";
+import { AutoDeletePluginType, MAX_DELAY } from "../types";
 import { addMessageToDeletionQueue } from "./addMessageToDeletionQueue";
 
 export async function onMessageCreate(pluginData: GuildPluginData<AutoDeletePluginType>, msg: SavedMessage) {

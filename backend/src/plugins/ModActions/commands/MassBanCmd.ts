@@ -1,21 +1,17 @@
-import { modActionsCmd, IgnoredEventType } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars, noop, MINUTES } from "../../../utils";
-import { isBanned } from "../functions/isBanned";
-import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { banUserId } from "../functions/banUserId";
-import { CaseTypes } from "../../../data/CaseTypes";
-
-import { waitForReply } from "knub/dist/helpers";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
-import { performance } from "perf_hooks";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { load } from "js-yaml";
 import { TextChannel } from "discord.js";
+import { waitForReply } from "knub/dist/helpers";
+import { performance } from "perf_hooks";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { MINUTES, noop, stripObjectToScalars } from "../../../utils";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { ignoreEvent } from "../functions/ignoreEvent";
+import { IgnoredEventType, modActionsCmd } from "../types";
+
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",

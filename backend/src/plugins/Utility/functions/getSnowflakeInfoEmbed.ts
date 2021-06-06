@@ -1,20 +1,13 @@
-import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import {
-  UnknownUser,
-  trimLines,
-  embedPadding,
-  resolveMember,
-  resolveUser,
-  preEmbedPadding,
-  EmbedWith,
-} from "../../../utils";
-import moment from "moment-timezone";
-import { CaseTypes } from "../../../data/CaseTypes";
+import { MessageEmbedOptions } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import {
+    EmbedWith, preEmbedPadding
+} from "../../../utils";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { MessageEmbedOptions } from "discord.js";
+import { UtilityPluginType } from "../types";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 

@@ -1,13 +1,13 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { AutoReactionsPluginType, ConfigSchema } from "./types";
 import { PluginOptions } from "knub";
-import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
-import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
-import { AddReactionsEvt } from "./events/AddReactionsEvt";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
+import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
+import { AddReactionsEvt } from "./events/AddReactionsEvt";
+import { AutoReactionsPluginType, ConfigSchema } from "./types";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {

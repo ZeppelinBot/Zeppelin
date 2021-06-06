@@ -1,29 +1,29 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
-import moment from "moment-timezone";
-import { MuteResult } from "../../../plugins/Mutes/types";
-import {
-  convertDelayStringToMS,
-  DBDateFormat,
-  noop,
-  resolveMember,
-  stripObjectToScalars,
-  trimLines,
-} from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { logger } from "../../../logger";
+import { TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import moment from "moment-timezone";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { MuteResult } from "../../../plugins/Mutes/types";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import {
+    convertDelayStringToMS,
+    DBDateFormat,
+    noop,
+    resolveMember,
+    stripObjectToScalars,
+    trimLines
+} from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
 import { addRecentAction } from "./addRecentAction";
+import { clearRecentUserActions } from "./clearRecentUserActions";
 import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
-import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { TextChannel } from "discord.js";
 
 export async function logAndDetectMessageSpam(
   pluginData: GuildPluginData<SpamPluginType>,

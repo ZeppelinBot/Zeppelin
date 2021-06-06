@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { archiveSearch, displaySearch, SearchType } from "../search";
+import { utilityCmd } from "../types";
 
 // Separate from SearchCmd to avoid a circular reference from ./search.ts
 export const searchCmdSignature = {

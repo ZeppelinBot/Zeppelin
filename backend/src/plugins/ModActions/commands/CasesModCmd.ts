@@ -1,15 +1,14 @@
-import { modActionsCmd } from "../types";
+import { MessageEmbedOptions, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { trimLines, createChunkedMessage, emptyEmbedValue, sorter, resolveUser } from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { emptyEmbedValue, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
-
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
-import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
-import { MessageEmbedOptions, User } from "discord.js";
+import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { modActionsCmd } from "../types";
+
 
 const opts = {
   mod: ct.userId({ option: true }),

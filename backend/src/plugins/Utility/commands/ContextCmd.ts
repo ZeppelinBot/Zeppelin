@@ -1,10 +1,10 @@
-import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { messageLink } from "../../../utils";
-import { sendErrorMessage } from "../../../pluginUtils";
-
-import { canReadChannel } from "../../../utils/canReadChannel";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { messageLink } from "../../../utils";
+import { canReadChannel } from "../../../utils/canReadChannel";
+import { utilityCmd } from "../types";
+
 
 export const ContextCmd = utilityCmd({
   trigger: "context",

@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { helpers } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { utilityCmd } from "../types";
 
 const { getMemberLevel } = helpers;
 

@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,

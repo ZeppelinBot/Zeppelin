@@ -1,10 +1,10 @@
+import { GuildChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginUtils";
+import { LogType } from "../../../data/LogType";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
 import { rolesCmd } from "../types";
 
-import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, verboseUserMention, resolveRoleId } from "../../../utils";
-import { GuildChannel } from "discord.js";
 
 export const RemoveRoleCmd = rolesCmd({
   trigger: "removerole",

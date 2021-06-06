@@ -1,16 +1,16 @@
-import { modActionsCmd, IgnoredEventType } from "../types";
+import { TextChannel } from "discord.js";
+import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { stripObjectToScalars } from "../../../utils";
-import { isBanned } from "../functions/isBanned";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CaseTypes } from "../../../data/CaseTypes";
-
-import { waitForReply } from "knub/dist/helpers";
-import { ignoreEvent } from "../functions/ignoreEvent";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
-import { TextChannel } from "discord.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { ignoreEvent } from "../functions/ignoreEvent";
+import { isBanned } from "../functions/isBanned";
+import { IgnoredEventType, modActionsCmd } from "../types";
+
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",

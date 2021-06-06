@@ -1,12 +1,12 @@
-import { getRepository, Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
-import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import moment from "moment-timezone";
-import { MINUTES, SECONDS } from "../utils";
-import { isAPI } from "../globals";
-import { cleanupMessages } from "./cleanup/messages";
 import { GuildChannel, Message } from "discord.js";
+import moment from "moment-timezone";
+import { getRepository, Repository } from "typeorm";
+import { isAPI } from "../globals";
+import { QueuedEventEmitter } from "../QueuedEventEmitter";
+import { MINUTES, SECONDS } from "../utils";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { cleanupMessages } from "./cleanup/messages";
+import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 
 if (!isAPI()) {
   const CLEANUP_INTERVAL = 5 * MINUTES;

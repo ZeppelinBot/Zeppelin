@@ -1,9 +1,8 @@
-import * as t from "io-ts";
 import { either } from "fp-ts/lib/Either";
-import { convertDelayStringToMS } from "../utils";
+import * as t from "io-ts";
+import { intToRgb } from "./intToRgb";
 import { parseColor } from "./parseColor";
 import { rgbToInt } from "./rgbToInt";
-import { intToRgb } from "./intToRgb";
 
 export const tColor = new t.Type<number, string>(
   "tColor",

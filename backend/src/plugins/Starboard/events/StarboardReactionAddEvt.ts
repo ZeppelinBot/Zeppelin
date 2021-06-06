@@ -1,10 +1,10 @@
+import { Message, TextChannel } from "discord.js";
+import { noop, resolveMember } from "../../../utils";
+import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 import { starboardEvt } from "../types";
-
-import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
-import { allStarboardsLock } from "../../../utils/lockNameHelpers";
-import { Message, TextChannel } from "discord.js";
+
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",

@@ -1,7 +1,7 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const UserInfoCmd = utilityCmd({
   trigger: ["user", "userinfo", "whois"],

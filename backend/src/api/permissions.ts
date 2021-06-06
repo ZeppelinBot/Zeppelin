@@ -1,7 +1,7 @@
 import { ApiPermissions, hasPermission, permissionArrToSet } from "@shared/apiPermissions";
-import { isStaff } from "../staff";
-import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { Request, Response } from "express";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
+import { isStaff } from "../staff";
 import { unauthorized } from "./responses";
 
 const apiPermissionAssignments = new ApiPermissionAssignments();

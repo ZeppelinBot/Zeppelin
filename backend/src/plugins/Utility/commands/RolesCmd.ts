@@ -1,10 +1,10 @@
-import { utilityCmd } from "../types";
+import { Role, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-
+import { sendErrorMessage } from "../../../pluginUtils";
 import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { Role, TextChannel } from "discord.js";
+import { utilityCmd } from "../types";
+
 
 export const RolesCmd = utilityCmd({
   trigger: "roles",

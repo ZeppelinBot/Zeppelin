@@ -1,5 +1,5 @@
-import * as t from "io-ts";
 import { either } from "fp-ts/lib/Either";
+import * as t from "io-ts";
 import { isValidTimezone } from "./isValidTimezone";
 
 export const tValidTimezone = new t.Type<string, string>(

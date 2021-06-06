@@ -1,23 +1,23 @@
-import { GuildPluginData } from "knub";
-import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
-import {
-  createUserNotificationError,
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
-
-import { renderTemplate } from "../../../templateFormatter";
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import { LogType } from "../../../data/LogType";
-import { ignoreEvent } from "./ignoreEvent";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { logger } from "../../../logger";
-import humanizeDuration from "humanize-duration";
 import { DiscordAPIError, User } from "discord.js";
+import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
+import { renderTemplate } from "../../../templateFormatter";
+import {
+    createUserNotificationError,
+    notifyUser,
+    resolveUser,
+    stripObjectToScalars,
+    ucfirst,
+    UserNotificationResult
+} from "../../../utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
+import { getDefaultContactMethods } from "./getDefaultContactMethods";
+import { ignoreEvent } from "./ignoreEvent";
+
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.

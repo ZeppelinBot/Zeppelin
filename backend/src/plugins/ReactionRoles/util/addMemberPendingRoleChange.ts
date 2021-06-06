@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { ReactionRolesPluginType, RoleChangeMode, PendingMemberRoleChanges } from "../types";
-import { resolveMember } from "../../../utils";
 import { logger } from "../../../logger";
+import { resolveMember } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { PendingMemberRoleChanges, ReactionRolesPluginType, RoleChangeMode } from "../types";
 
 const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 1500;
 

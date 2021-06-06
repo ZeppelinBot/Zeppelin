@@ -1,8 +1,8 @@
+import test from "ava";
 import * as ioTs from "io-ts";
 import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, tAllowedMentions } from "./utils";
-
-import test from "ava";
 import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions";
+
 
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
 

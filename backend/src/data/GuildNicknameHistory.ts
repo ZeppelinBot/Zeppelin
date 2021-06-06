@@ -1,9 +1,9 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, In, Repository } from "typeorm";
-import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
-import { MINUTES, SECONDS } from "../utils";
 import { isAPI } from "../globals";
+import { MINUTES, SECONDS } from "../utils";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { cleanupNicknames } from "./cleanup/nicknames";
+import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
 
 if (!isAPI()) {
   const CLEANUP_INTERVAL = 5 * MINUTES;
