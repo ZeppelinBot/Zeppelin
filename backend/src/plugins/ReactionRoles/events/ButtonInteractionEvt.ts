@@ -1,5 +1,13 @@
-import { Interaction, MessageComponentInteraction, MessageComponentInteractionCollector } from "discord.js";
+import {
+  Interaction,
+  MessageActionRow,
+  MessageButton,
+  MessageComponentInteraction,
+  MessageComponentInteractionCollector,
+  TextChannel,
+} from "discord.js";
 import { LogType } from "src/data/LogType";
+import { logger } from "src/logger";
 import { pluginInfo } from "src/plugins/Automod/info";
 import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 import { reactionRolesEvt } from "../types";
@@ -57,21 +65,54 @@ export const ButtonInteractionEvt = reactionRolesEvt({
       const member = await meta.pluginData.guild.members.fetch(int.user.id);
       if (member.roles.cache.has(role.id)) {
         await member.roles.remove(role, `Button Roles on message ${int.message.id}`);
-        await sendEphemeralReply(int, `You have removed the role <@&${role.id}>`);
+        await sendEphemeralReply(int, `Role **${role.name}** removed`);
       } else {
         await member.roles.add(role, `Button Roles on message ${int.message.id}`);
-        await sendEphemeralReply(int, `You have added the role <@&${role.id}>`);
+        await sendEphemeralReply(int, `Role **${role.name}** added`);
       }
 
       return;
     }
 
-    // TODO: Send ephemeral reply with buttons that are part of the selected menu
     if (action === ButtonMenuActions.OPEN_MENU) {
-      console.log("Disable TSLint error");
+      const menuButtons: MessageButton[] = [];
+      for (const menuButton of Object.values(group.button_menus[roleOrMenu])) {
+        let customId = "";
+        customId = `${groupName}::${ButtonMenuActions.GRANT_ROLE}::${menuButton.role}`;
+
+        const btn = new MessageButton()
+          .setLabel(menuButton.label)
+          .setStyle("PRIMARY")
+          .setType("BUTTON")
+          .setCustomID(customId);
+
+        if (menuButton.emoji) {
+          const emo = meta.pluginData.client.emojis.resolve(menuButton.emoji) ?? menuButton.emoji;
+          btn.setEmoji(emo);
+        }
+        menuButtons.push(btn);
+      }
+
+      if (menuButtons.length === 0) {
+        await sendEphemeralReply(int, `A configuration error was encountered, please contact the Administrators!`);
+        meta.pluginData
+          .getPlugin(LogsPlugin)
+          .log(
+            LogType.BOT_ALERT,
+            `**A configuration error occured** on buttons for message ${int.message.id}, menu **${roleOrMenu}** not found in config`,
+          );
+        return;
+      }
+      const row = new MessageActionRow().addComponents(menuButtons);
+
+      int.reply({ content: `Click to add/remove a role`, components: [row], ephemeral: true, split: false });
+      return;
     }
 
-    await sendEphemeralReply(int, split.join("\n")); // TODO: Remove debug output
+    logger.warn(
+      `Action ${action} on button ${int.customID} (Guild: ${int.guildID}, Channel: ${int.channelID}) is unknown!`,
+    );
+    await sendEphemeralReply(int, `A internal error was encountered, please contact the Administrators!`);
   },
 });
 
