@@ -1,6 +1,6 @@
-import { downloadFile } from "../../utils";
-import fs from "fs";
 import { MessageAttachment, MessageOptions, TextChannel } from "discord.js";
+import fs from "fs";
+import { downloadFile } from "../../utils";
 const fsp = fs.promises;
 
 const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;

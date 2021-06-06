@@ -1,7 +1,7 @@
 import { typedGuildEventListener } from "knub";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { runAutomod } from "../functions/runAutomod";
 import { RecentActionType } from "../constants";
+import { runAutomod } from "../functions/runAutomod";
+import { AutomodContext, AutomodPluginType } from "../types";
 
 export const RunAutomodOnJoinEvt = typedGuildEventListener<AutomodPluginType>()({
   event: "guildMemberAdd",

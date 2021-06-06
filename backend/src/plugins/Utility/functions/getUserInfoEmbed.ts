@@ -1,21 +1,16 @@
+import { MessageEmbedOptions, Role } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import {
-  UnknownUser,
-  trimLines,
-  embedPadding,
-  resolveMember,
-  resolveUser,
-  preEmbedPadding,
-  sorter,
-  messageLink,
-  EmbedWith,
-} from "../../../utils";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
-import humanizeDuration from "humanize-duration";
+import {
+    EmbedWith, messageLink, preEmbedPadding, resolveMember,
+    resolveUser,
+
+    sorter, trimLines, UnknownUser
+} from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { MessageEmbedOptions, Role } from "discord.js";
+import { UtilityPluginType } from "../types";
 
 export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

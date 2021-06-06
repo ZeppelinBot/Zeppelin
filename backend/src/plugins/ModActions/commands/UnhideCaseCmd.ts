@@ -1,6 +1,6 @@
-import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { modActionsCmd } from "../types";
 
 export const UnhideCaseCmd = modActionsCmd({
   trigger: ["unhide", "unhidecase", "unhide_case"],

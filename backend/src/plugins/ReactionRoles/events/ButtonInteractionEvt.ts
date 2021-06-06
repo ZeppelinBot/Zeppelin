@@ -1,14 +1,10 @@
 import {
-  Interaction,
   MessageActionRow,
   MessageButton,
-  MessageComponentInteraction,
-  MessageComponentInteractionCollector,
-  TextChannel,
+  MessageComponentInteraction
 } from "discord.js";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
-import { pluginInfo } from "src/plugins/Automod/info";
 import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 import { reactionRolesEvt } from "../types";
 import { ButtonMenuActions } from "../util/buttonMenuActions";

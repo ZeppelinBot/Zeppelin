@@ -1,11 +1,11 @@
+import { GuildChannel, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SlowmodePluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-
 import { stripObjectToScalars, UnknownUser } from "../../../utils";
+import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
-import { GuildChannel, TextChannel } from "discord.js";
+
 
 export async function clearExpiredSlowmodes(pluginData: GuildPluginData<SlowmodePluginType>) {
   const expiredSlowmodeUsers = await pluginData.state.slowmodes.getExpiredSlowmodeUsers();

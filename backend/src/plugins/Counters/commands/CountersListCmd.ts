@@ -1,8 +1,8 @@
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
+import { CountersPluginType } from "../types";
 
 export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters list", "counter list", "counters"],

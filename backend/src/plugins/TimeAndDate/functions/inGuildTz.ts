@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { TimeAndDatePluginType } from "../types";
 import moment from "moment-timezone";
+import { TimeAndDatePluginType } from "../types";
 import { getGuildTz } from "./getGuildTz";
 
 export function inGuildTz(pluginData: GuildPluginData<TimeAndDatePluginType>, input?: moment.Moment | number) {

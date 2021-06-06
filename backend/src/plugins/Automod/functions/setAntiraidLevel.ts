@@ -1,10 +1,10 @@
+import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { runAutomodOnAntiraidLevel } from "../events/runAutomodOnAntiraidLevel";
-import { User } from "discord.js";
+import { AutomodPluginType } from "../types";
 
 export async function setAntiraidLevel(
   pluginData: GuildPluginData<AutomodPluginType>,

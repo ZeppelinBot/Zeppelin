@@ -1,8 +1,8 @@
-import { botControlCmd } from "../types";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { noop } from "../../../utils";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { noop } from "../../../utils";
+import { botControlCmd } from "../types";
 
 export const DisallowServerCmd = botControlCmd({
   trigger: ["disallow_server", "disallowserver", "remove_server", "removeserver"],

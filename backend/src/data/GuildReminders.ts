@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { Reminder } from "./entities/Reminder";
 
 export class GuildReminders extends BaseGuildRepository {

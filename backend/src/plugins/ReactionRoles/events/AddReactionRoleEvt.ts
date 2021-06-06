@@ -1,10 +1,8 @@
-import { reactionRolesEvt } from "../types";
+import { Message } from "discord.js";
 import { noop, resolveMember, sleep } from "../../../utils";
+import { reactionRolesEvt } from "../types";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
 
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import { Message } from "discord.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 

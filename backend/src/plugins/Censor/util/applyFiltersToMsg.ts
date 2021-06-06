@@ -1,15 +1,14 @@
-import { GuildPluginData } from "knub";
-import { CensorPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-
-import { ZalgoRegex } from "../../../data/Zalgo";
-import { getInviteCodesInString, getUrlsInString, resolveMember, resolveInvite, isGuildInvite } from "../../../utils";
-import cloneDeep from "lodash.clonedeep";
-import { censorMessage } from "./censorMessage";
+import { Invite, MessageEmbed } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { logger } from "../../../logger";
+import { GuildPluginData } from "knub";
+import cloneDeep from "lodash.clonedeep";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { ZalgoRegex } from "../../../data/Zalgo";
 import { allowTimeout } from "../../../RegExpRunner";
-import { MessageEmbed, Invite } from "discord.js";
+import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils";
+import { CensorPluginType } from "../types";
+import { censorMessage } from "./censorMessage";
+
 
 export async function applyFiltersToMsg(
   pluginData: GuildPluginData<CensorPluginType>,

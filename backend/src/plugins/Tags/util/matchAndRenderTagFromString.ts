@@ -1,10 +1,10 @@
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { GuildMember } from "discord.js";
+import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
+import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { StrictMessageContent } from "../../../utils";
 import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
-import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
-import escapeStringRegexp from "escape-string-regexp";
-import { GuildMember } from "discord.js";
 
 interface BaseResult {
   renderedContent: StrictMessageContent;

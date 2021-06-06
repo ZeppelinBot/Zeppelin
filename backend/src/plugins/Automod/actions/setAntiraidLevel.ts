@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { setAntiraidLevel } from "../functions/setAntiraidLevel";
 import { tNullable } from "../../../utils";
+import { setAntiraidLevel } from "../functions/setAntiraidLevel";
+import { automodAction } from "../helpers";
 
 export const SetAntiraidLevelAction = automodAction({
   configType: tNullable(t.string),

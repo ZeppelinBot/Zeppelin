@@ -1,11 +1,11 @@
-import { getRepository, Repository } from "typeorm";
-import { ApiLogin } from "./entities/ApiLogin";
-import { BaseRepository } from "./BaseRepository";
 import crypto from "crypto";
 import moment from "moment-timezone";
+import { getRepository, Repository } from "typeorm";
 // tslint:disable-next-line:no-submodule-imports
 import uuidv4 from "uuid/v4";
 import { DAYS, DBDateFormat } from "../utils";
+import { BaseRepository } from "./BaseRepository";
+import { ApiLogin } from "./entities/ApiLogin";
 
 const LOGIN_EXPIRY_TIME = 1 * DAYS;
 

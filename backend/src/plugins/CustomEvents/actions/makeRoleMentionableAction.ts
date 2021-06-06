@@ -1,8 +1,8 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
 import { convertDelayStringToMS, noop, tDelayString } from "../../../utils";
 import { ActionError } from "../ActionError";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const MakeRoleMentionableAction = t.type({
   type: t.literal("make_role_mentionable"),

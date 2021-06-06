@@ -1,8 +1,8 @@
-import { postCmd } from "../types";
+import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { postCmd } from "../types";
 import { formatContent } from "../util/formatContent";
-import { TextChannel } from "discord.js";
 
 export const EditCmd = postCmd({
   trigger: "edit",

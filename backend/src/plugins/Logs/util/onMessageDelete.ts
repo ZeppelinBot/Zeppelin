@@ -1,12 +1,12 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-
-import { useMediaUrls, stripObjectToScalars, resolveUser } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import moment from "moment-timezone";
-import { GuildPluginData } from "knub";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { MessageAttachment } from "discord.js";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { resolveUser, stripObjectToScalars, useMediaUrls } from "../../../utils";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
+
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);

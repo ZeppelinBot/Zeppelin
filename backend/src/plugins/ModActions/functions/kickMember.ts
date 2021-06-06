@@ -1,21 +1,21 @@
-import { GuildPluginData } from "knub";
-import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
-
-import {
-  createUserNotificationError,
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
-import { renderTemplate } from "../../../templateFormatter";
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import { LogType } from "../../../data/LogType";
-import { ignoreEvent } from "./ignoreEvent";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { GuildMember } from "discord.js";
+import { GuildPluginData } from "knub";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
+import { renderTemplate } from "../../../templateFormatter";
+import {
+    createUserNotificationError,
+    notifyUser,
+    resolveUser,
+    stripObjectToScalars,
+    ucfirst,
+    UserNotificationResult
+} from "../../../utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
+import { getDefaultContactMethods } from "./getDefaultContactMethods";
+import { ignoreEvent } from "./ignoreEvent";
+
 
 /**
  * Kick the specified server member. Generates a case.

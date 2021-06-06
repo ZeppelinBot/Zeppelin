@@ -1,7 +1,7 @@
-import { messageSaverCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { saveMessagesToDB } from "../saveMessagesToDB";
 import { sendSuccessMessage } from "../../../pluginUtils";
+import { saveMessagesToDB } from "../saveMessagesToDB";
+import { messageSaverCmd } from "../types";
 
 export const SaveMessagesToDBCmd = messageSaverCmd({
   trigger: "save_messages_to_db",

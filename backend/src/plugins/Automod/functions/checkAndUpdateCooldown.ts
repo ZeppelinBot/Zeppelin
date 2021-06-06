@@ -1,7 +1,6 @@
-import { AutomodContext, AutomodPluginType, TRule } from "../types";
 import { GuildPluginData } from "knub";
-import { AutomodTriggerMatchResult } from "../helpers";
 import { convertDelayStringToMS } from "../../../utils";
+import { AutomodContext, AutomodPluginType, TRule } from "../types";
 
 export function checkAndUpdateCooldown(
   pluginData: GuildPluginData<AutomodPluginType>,

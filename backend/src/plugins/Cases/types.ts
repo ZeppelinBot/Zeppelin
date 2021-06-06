@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { tDelayString, tPartialDictionary, tNullable } from "../../utils";
+import { BasePluginType } from "knub";
 import { CaseNameToType, CaseTypes } from "../../data/CaseTypes";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildCases } from "../../data/GuildCases";
 import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { tDelayString, tNullable, tPartialDictionary } from "../../utils";
 import { tColor } from "../../utils/tColor";
 
 export const ConfigSchema = t.type({

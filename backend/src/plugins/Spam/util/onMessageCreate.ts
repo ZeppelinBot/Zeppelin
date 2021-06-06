@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { SpamPluginType, RecentActionType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { getUserMentions, getRoleMentions, getUrlsInString, getEmojiInString } from "../../../utils";
+import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
+import { RecentActionType, SpamPluginType } from "../types";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {

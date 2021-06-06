@@ -1,10 +1,9 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogType } from "../../../data/LogType";
 import { asyncMap, nonNullish, resolveMember, tNullable, unique } from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
+import { automodAction } from "../helpers";
 
 export const KickAction = automodAction({
   configType: t.type({

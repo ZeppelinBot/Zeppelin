@@ -1,18 +1,18 @@
-import { modActionsCmd, IgnoredEventType } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars, noop } from "../../../utils";
-import { isBanned } from "../functions/isBanned";
-import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { banUserId } from "../functions/banUserId";
-import { getMemberLevel } from "knub/dist/helpers";
 import humanizeDuration from "humanize-duration";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { getMemberLevel } from "knub/dist/helpers";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
 import { banLock } from "../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { banUserId } from "../functions/banUserId";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { isBanned } from "../functions/isBanned";
+import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
+import { modActionsCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),

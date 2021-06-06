@@ -1,9 +1,9 @@
-import { reactionRolesCmd } from "../types";
+import { Message } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-
 import { isDiscordRESTError } from "../../../utils";
-import { Message } from "discord.js";
+import { reactionRolesCmd } from "../types";
+
 
 export const ClearReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles clear",

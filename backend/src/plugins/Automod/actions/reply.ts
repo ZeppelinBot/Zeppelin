@@ -1,23 +1,23 @@
+import { MessageOptions, Permissions, TextChannel, User } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import {
-  convertDelayStringToMS,
-  noop,
-  renderRecursively,
-  StrictMessageContent,
-  stripObjectToScalars,
-  tDelayString,
-  tMessageContent,
-  tNullable,
-  unique,
-  verboseChannelMention,
-} from "../../../utils";
-
-import { AutomodContext } from "../types";
-import { renderTemplate } from "../../../templateFormatter";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogType } from "../../../data/LogType";
-import { TextChannel, User, Constants, MessageOptions, Permissions } from "discord.js";
+import { renderTemplate } from "../../../templateFormatter";
+import {
+    convertDelayStringToMS,
+    noop,
+    renderRecursively,
+
+    stripObjectToScalars,
+    tDelayString,
+    tMessageContent,
+    tNullable,
+    unique,
+    verboseChannelMention
+} from "../../../utils";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { automodAction } from "../helpers";
+import { AutomodContext } from "../types";
+
 
 export const ReplyAction = automodAction({
   configType: t.union([

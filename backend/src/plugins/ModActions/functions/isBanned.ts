@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
-import { isDiscordHTTPError, isDiscordRESTError, SECONDS, sleep } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { Permissions } from "discord.js";
+import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
+import { isDiscordHTTPError, isDiscordRESTError, SECONDS, sleep } from "../../../utils";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ModActionsPluginType } from "../types";
 
 export async function isBanned(
   pluginData: GuildPluginData<ModActionsPluginType>,

@@ -1,9 +1,9 @@
-import { slowmodeCmd } from "../types";
-
+import { GuildChannel, TextChannel } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { createChunkedMessage } from "knub/dist/helpers";
 import { errorMessage } from "../../../utils";
-import humanizeDuration from "humanize-duration";
-import { GuildChannel, TextChannel } from "discord.js";
+import { slowmodeCmd } from "../types";
+
 
 export const SlowmodeListCmd = slowmodeCmd({
   trigger: ["slowmode list", "slowmode l", "slowmodes"],

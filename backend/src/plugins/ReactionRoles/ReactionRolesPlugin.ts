@@ -1,17 +1,17 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { ConfigSchema, ReactionRolesPluginType } from "./types";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
-import { autoRefreshLoop } from "./util/autoRefreshLoop";
-import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
-import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
-import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
-import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
+import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
 import { PostButtonRolesCmd } from "./commands/PostButtonRolesCmd";
+import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
+import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { ButtonInteractionEvt } from "./events/ButtonInteractionEvt";
+import { ConfigSchema, ReactionRolesPluginType } from "./types";
+import { autoRefreshLoop } from "./util/autoRefreshLoop";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 

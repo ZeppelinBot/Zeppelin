@@ -1,14 +1,14 @@
-import { TagsPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { GuildPluginData } from "knub";
-import { convertDelayStringToMS, noop, resolveMember, tStrictMessageContent } from "../../../utils";
-import { validate } from "../../../validatorUtils";
-import { LogType } from "../../../data/LogType";
-
-import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { validate } from "../../../validatorUtils";
+import { TagsPluginType } from "../types";
+import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
+
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;

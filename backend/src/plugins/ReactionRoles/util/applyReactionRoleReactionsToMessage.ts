@@ -1,12 +1,11 @@
-import { GuildPluginData } from "knub";
-import { ReactionRolesPluginType } from "../types";
-import { ReactionRole } from "../../../data/entities/ReactionRole";
-
-import { isDiscordRESTError, sleep, isSnowflake } from "../../../utils";
-import { logger } from "../../../logger";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { ReactionRole } from "../../../data/entities/ReactionRole";
+import { LogType } from "../../../data/LogType";
+import { isDiscordRESTError, sleep } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ReactionRolesPluginType } from "../types";
+
 
 const CLEAR_ROLES_EMOJI = "❌";
 

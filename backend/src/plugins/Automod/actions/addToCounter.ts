@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { CountersPlugin } from "../../Counters/CountersPlugin";
 import { LogType } from "../../../data/LogType";
+import { CountersPlugin } from "../../Counters/CountersPlugin";
+import { automodAction } from "../helpers";
 
 export const AddToCounterAction = automodAction({
   configType: t.type({

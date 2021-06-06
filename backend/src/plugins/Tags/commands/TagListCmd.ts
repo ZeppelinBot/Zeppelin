@@ -1,5 +1,5 @@
-import { tagsCmd } from "../types";
 import { createChunkedMessage } from "../../../utils";
+import { tagsCmd } from "../types";
 
 export const TagListCmd = tagsCmd({
   trigger: ["tag list", "tags", "taglist"],

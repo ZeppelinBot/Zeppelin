@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand } from "knub";
+import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
-import { GuildLogs } from "../../data/GuildLogs";
 
 export const ConfigSchema = t.type({
   can_post: t.boolean,

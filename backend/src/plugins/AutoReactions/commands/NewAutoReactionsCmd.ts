@@ -1,12 +1,12 @@
-import { autoReactionsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-
-import { readChannelPermissions } from "../../../utils/readChannelPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { GuildChannel, Permissions } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { readChannelPermissions } from "../../../utils/readChannelPermissions";
+import { autoReactionsCmd } from "../types";
+
 
 const requiredPermissions = readChannelPermissions | Permissions.FLAGS.ADD_REACTIONS;
 

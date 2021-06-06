@@ -1,10 +1,10 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import moment from "moment-timezone";
-import { convertDelayStringToMS, messageLink } from "../../../utils";
 import humanizeDuration from "humanize-duration";
+import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { remindersCmd } from "../types";
+import { convertDelayStringToMS, messageLink } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { remindersCmd } from "../types";
 
 export const RemindCmd = remindersCmd({
   trigger: ["remind", "remindme", "reminder"],

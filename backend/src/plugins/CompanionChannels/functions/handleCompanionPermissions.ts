@@ -1,11 +1,11 @@
-import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
-import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
+import { Permissions, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-
+import { LogType } from "../../../data/LogType";
 import { isDiscordRESTError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import { VoiceChannel, TextChannel, Permissions, StageChannel } from "discord.js";
+import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
+import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
+
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;

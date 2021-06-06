@@ -1,8 +1,6 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
-import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
-import { CountersPlugin } from "../../Counters/CountersPlugin";
 import { tNullable } from "../../../utils";
+import { automodTrigger } from "../helpers";
 
 // tslint:disable-next-line
 interface CounterTriggerResult {}

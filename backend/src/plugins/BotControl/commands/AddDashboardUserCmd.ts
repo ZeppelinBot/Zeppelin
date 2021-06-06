@@ -1,8 +1,8 @@
-import { botControlCmd } from "../types";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { ApiPermissions } from "@shared/apiPermissions";
 import { TextChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { botControlCmd } from "../types";
 
 export const AddDashboardUserCmd = botControlCmd({
   trigger: ["add_dashboard_user"],

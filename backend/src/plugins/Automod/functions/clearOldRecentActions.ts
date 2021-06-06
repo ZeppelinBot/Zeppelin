@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
 import { RECENT_ACTION_EXPIRY_TIME } from "../constants";
+import { AutomodPluginType } from "../types";
 
 export function clearOldRecentActions(pluginData: GuildPluginData<AutomodPluginType>) {
   const now = Date.now();

@@ -1,9 +1,9 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { CompanionChannelsPluginType, ConfigSchema } from "./types";
+import { CooldownManager } from "knub";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { CooldownManager } from "knub";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt";
+import { CompanionChannelsPluginType, ConfigSchema } from "./types";
 
 const defaultOptions = {
   config: {

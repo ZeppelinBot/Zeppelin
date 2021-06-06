@@ -1,6 +1,6 @@
 import { GlobalPluginData } from "knub";
-import { GuildConfigReloaderPluginType } from "../types";
 import { SECONDS } from "../../../utils";
+import { GuildConfigReloaderPluginType } from "../types";
 
 const CHECK_INTERVAL = 1 * SECONDS;
 

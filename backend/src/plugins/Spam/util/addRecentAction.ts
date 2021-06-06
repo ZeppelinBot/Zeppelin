@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { SpamPluginType, RecentActionType } from "../types";
+import { RecentActionType, SpamPluginType } from "../types";
 
 export function addRecentAction(
   pluginData: GuildPluginData<SpamPluginType>,

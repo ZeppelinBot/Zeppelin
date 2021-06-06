@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { AutoDeletePluginType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { AutoDeletePluginType } from "../types";
 import { scheduleNextDeletion } from "./scheduleNextDeletion";
 
 export function onMessageDelete(pluginData: GuildPluginData<AutoDeletePluginType>, msg: SavedMessage) {

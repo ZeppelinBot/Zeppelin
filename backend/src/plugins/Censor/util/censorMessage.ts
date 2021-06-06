@@ -1,10 +1,10 @@
+import { TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CensorPluginType } from "../types";
+import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, resolveUser } from "../../../utils";
-import { disableCodeBlocks, deactivateMentions } from "knub/dist/helpers";
-import { TextChannel } from "discord.js";
+import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { CensorPluginType } from "../types";
 
 export async function censorMessage(
   pluginData: GuildPluginData<CensorPluginType>,

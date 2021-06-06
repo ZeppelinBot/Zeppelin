@@ -1,19 +1,19 @@
-import { utilityCmd } from "../types";
+import { getChannelId, getRoleId } from "knub/dist/utils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
 import { customEmojiRegex, isValidSnowflake, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
-import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
-import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
 import { canReadChannel } from "../../../utils/canReadChannel";
-import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
+import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
 import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
-import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
-import { getChannelId, getRoleId } from "knub/dist/utils";
-import { getGuildPreview } from "../functions/getGuildPreview";
-import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
-import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
 import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
+import { getGuildPreview } from "../functions/getGuildPreview";
+import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
+import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
+import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
+import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
+import { getSnowflakeInfoEmbed } from "../functions/getSnowflakeInfoEmbed";
+import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const InfoCmd = utilityCmd({
   trigger: "info",

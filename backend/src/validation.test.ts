@@ -1,7 +1,7 @@
-import { tDeepPartial } from "./utils";
-import * as t from "io-ts";
-import * as validatorUtils from "./validatorUtils";
 import test from "ava";
+import * as t from "io-ts";
+import { tDeepPartial } from "./utils";
+import * as validatorUtils from "./validatorUtils";
 
 test("tDeepPartial works", ava => {
   const originalSchema = t.type({

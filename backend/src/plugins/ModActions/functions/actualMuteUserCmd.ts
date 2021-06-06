@@ -1,15 +1,15 @@
-import { asSingleLine, isDiscordRESTError, UnknownUser } from "../../../utils";
-import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
+import { GuildMember, Message, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { MuteResult } from "../../Mutes/types";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
-import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
-import { User, Message, TextChannel, GuildMember } from "discord.js";
+import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { asSingleLine, isDiscordRESTError, UnknownUser } from "../../../utils";
+import { MutesPlugin } from "../../Mutes/MutesPlugin";
+import { MuteResult } from "../../Mutes/types";
+import { ModActionsPluginType } from "../types";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 
 /**
  * The actual function run by both !mute and !forcemute.

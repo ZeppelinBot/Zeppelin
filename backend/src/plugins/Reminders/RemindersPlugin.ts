@@ -1,12 +1,12 @@
 import { PluginOptions } from "knub";
-import { ConfigSchema, RemindersPluginType } from "./types";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildReminders } from "../../data/GuildReminders";
-import { postDueRemindersLoop } from "./utils/postDueRemindersLoop";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { ConfigSchema, RemindersPluginType } from "./types";
+import { postDueRemindersLoop } from "./utils/postDueRemindersLoop";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {

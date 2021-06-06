@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { SpamPluginType, RecentActionType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { RecentActionType, SpamPluginType } from "../types";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function logCensor(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {

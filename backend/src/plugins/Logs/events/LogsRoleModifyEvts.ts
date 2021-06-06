@@ -1,6 +1,6 @@
-import { logsEvt } from "../types";
-import { stripObjectToScalars } from "../../../utils";
 import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars } from "../../../utils";
+import { logsEvt } from "../types";
 
 export const LogsRoleCreateEvt = logsEvt({
   event: "roleCreate",

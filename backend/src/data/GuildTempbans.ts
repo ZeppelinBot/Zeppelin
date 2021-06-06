@@ -1,7 +1,6 @@
 import moment from "moment-timezone";
-import { Mute } from "./entities/Mute";
+import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { Brackets, getRepository, Repository } from "typeorm";
 import { Tempban } from "./entities/Tempban";
 
 export class GuildTempbans extends BaseGuildRepository {

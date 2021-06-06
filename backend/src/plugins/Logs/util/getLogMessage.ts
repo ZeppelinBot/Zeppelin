@@ -1,19 +1,17 @@
-import { GuildPluginData } from "knub";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel, TLogFormats } from "../types";
-import { LogType } from "../../../data/LogType";
-import {
-  verboseUserMention,
-  verboseUserName,
-  verboseChannelMention,
-  messageSummary,
-  resolveMember,
-  renderRecursively,
-} from "../../../utils";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
-import { logger } from "../../../logger";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { MessageOptions } from "discord.js";
+import { GuildPluginData } from "knub";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
+import {
+    messageSummary,
+
+    renderRecursively, resolveMember, verboseChannelMention, verboseUserMention,
+    verboseUserName
+} from "../../../utils";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel } from "../types";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,

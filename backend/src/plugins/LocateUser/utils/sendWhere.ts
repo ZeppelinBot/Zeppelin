@@ -1,9 +1,9 @@
-import { getInviteLink } from "knub/dist/helpers";
-import { createOrReuseInvite } from "./createOrReuseInvite";
-import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { GuildMember, Invite, TextChannel, VoiceChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { getInviteLink } from "knub/dist/helpers";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { LocateUserPluginType } from "../types";
+import { createOrReuseInvite } from "./createOrReuseInvite";
 
 export async function sendWhere(
   pluginData: GuildPluginData<LocateUserPluginType>,

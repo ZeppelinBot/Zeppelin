@@ -1,12 +1,12 @@
+import { FileOptions, Message, MessageOptions, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CasesPluginType } from "../types";
-
-import { isDiscordRESTError } from "../../../utils";
-import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
+import { isDiscordRESTError } from "../../../utils";
+import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
-import { FileOptions, Message, MessageOptions, TextChannel } from "discord.js";
+
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,

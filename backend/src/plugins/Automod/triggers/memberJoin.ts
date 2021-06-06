@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import { convertDelayStringToMS, tDelayString } from "../../../utils";
+import { automodTrigger } from "../helpers";
 
 export const MemberJoinTrigger = automodTrigger<unknown>()({
   configType: t.type({

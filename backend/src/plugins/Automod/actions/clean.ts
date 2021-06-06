@@ -1,8 +1,8 @@
+import { TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
 import { noop } from "../../../utils";
-import { TextChannel } from "discord.js";
+import { automodAction } from "../helpers";
 
 export const CleanAction = automodAction({
   configType: t.boolean,

@@ -1,8 +1,8 @@
-import { typedGuildCommand, GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
-import { setAntiraidLevel } from "../functions/setAntiraidLevel";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { typedGuildCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { setAntiraidLevel } from "../functions/setAntiraidLevel";
+import { AutomodPluginType } from "../types";
 
 export const SetAntiraidCmd = typedGuildCommand<AutomodPluginType>()({
   trigger: "antiraid",

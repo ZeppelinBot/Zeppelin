@@ -1,11 +1,11 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-
-import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, resolveUser } from "../../../utils";
-import cloneDeep from "lodash.clonedeep";
 import { MessageEmbed } from "discord.js";
+import { GuildPluginData } from "knub";
+import cloneDeep from "lodash.clonedeep";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { LogsPluginType } from "../types";
+
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,

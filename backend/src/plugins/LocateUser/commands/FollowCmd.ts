@@ -1,9 +1,9 @@
-import { locateUserCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
-import { MINUTES, SECONDS } from "../../../utils";
+import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { MINUTES, SECONDS } from "../../../utils";
+import { locateUserCmd } from "../types";
 
 export const FollowCmd = locateUserCmd({
   trigger: ["follow", "f"],

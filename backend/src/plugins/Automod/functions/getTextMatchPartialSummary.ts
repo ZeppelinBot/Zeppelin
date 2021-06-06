@@ -1,7 +1,7 @@
-import { MatchableTextType } from "./matchMultipleTextTypesOnMessage";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { messageSummary, verboseChannelMention } from "../../../utils";
 import { GuildPluginData } from "knub";
+import { messageSummary, verboseChannelMention } from "../../../utils";
+import { AutomodContext, AutomodPluginType } from "../types";
+import { MatchableTextType } from "./matchMultipleTextTypesOnMessage";
 
 export function getTextMatchPartialSummary(
   pluginData: GuildPluginData<AutomodPluginType>,

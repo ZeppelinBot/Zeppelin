@@ -1,8 +1,8 @@
+import { Constants } from "discord.js";
+import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
-import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
-import { Activity, Constants } from "discord.js";
 
 type TextTriggerWithMultipleMatchTypes = {
   match_messages: boolean;

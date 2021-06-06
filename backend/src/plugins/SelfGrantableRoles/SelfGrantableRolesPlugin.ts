@@ -1,10 +1,10 @@
 import { CooldownManager, PluginOptions } from "knub";
-import { SelfGrantableRolesPluginType, ConfigSchema, defaultSelfGrantableRoleEntry } from "./types";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { trimPluginDescription } from "../../utils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
-import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
+import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
+import { ConfigSchema, defaultSelfGrantableRoleEntry, SelfGrantableRolesPluginType } from "./types";
 
 const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   config: {

@@ -1,10 +1,10 @@
-import { Config } from "./entities/Config";
 import { getRepository, Repository } from "typeorm";
-import { connection } from "./db";
-import { BaseRepository } from "./BaseRepository";
 import { isAPI } from "../globals";
 import { HOURS, SECONDS } from "../utils";
+import { BaseRepository } from "./BaseRepository";
 import { cleanupConfigs } from "./cleanup/configs";
+import { connection } from "./db";
+import { Config } from "./entities/Config";
 
 if (isAPI()) {
   const CLEANUP_INTERVAL = 1 * HOURS;

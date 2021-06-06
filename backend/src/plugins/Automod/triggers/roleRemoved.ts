@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
+import { automodTrigger } from "../helpers";
 
 interface RoleAddedMatchResult {
   matchedRoleId: string;

@@ -1,7 +1,7 @@
+import { TextChannel } from "discord.js";
+import { activeReloads } from "../guildReloads";
 import { utilityCmd } from "../types";
 
-import { activeReloads } from "../guildReloads";
-import { TextChannel } from "discord.js";
 
 export const ReloadGuildCmd = utilityCmd({
   trigger: "reload_guild",

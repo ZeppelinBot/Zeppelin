@@ -1,5 +1,5 @@
+import { getRepository, Repository } from "typeorm";
 import { SavedMessage } from "./entities/SavedMessage";
-import { Repository, getRepository } from "typeorm";
 
 let repository: Repository<SavedMessage>;
 

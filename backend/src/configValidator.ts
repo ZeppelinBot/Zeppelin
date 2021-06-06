@@ -1,10 +1,9 @@
-import * as t from "io-ts";
-import { guildPlugins } from "./plugins/availablePlugins";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
-import { PartialZeppelinGuildConfigSchema, ZeppelinGuildConfig } from "./types";
 import { configUtils, ConfigValidationError, PluginOptions } from "knub";
 import moment from "moment-timezone";
+import { guildPlugins } from "./plugins/availablePlugins";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { PartialZeppelinGuildConfigSchema, ZeppelinGuildConfig } from "./types";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {

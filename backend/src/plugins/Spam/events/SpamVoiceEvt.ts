@@ -1,4 +1,4 @@
-import { spamEvt, RecentActionType } from "../types";
+import { RecentActionType, spamEvt } from "../types";
 import { logAndDetectOtherSpam } from "../util/logAndDetectOtherSpam";
 
 export const SpamVoiceStateUpdateEvt = spamEvt({

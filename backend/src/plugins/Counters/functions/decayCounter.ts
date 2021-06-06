@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { CountersPluginType } from "../types";
-import { checkAllValuesForTrigger } from "./checkAllValuesForTrigger";
-import { checkAllValuesForReverseTrigger } from "./checkAllValuesForReverseTrigger";
 import { counterIdLock } from "../../../utils/lockNameHelpers";
+import { CountersPluginType } from "../types";
+import { checkAllValuesForReverseTrigger } from "./checkAllValuesForReverseTrigger";
+import { checkAllValuesForTrigger } from "./checkAllValuesForTrigger";
 
 export async function decayCounter(
   pluginData: GuildPluginData<CountersPluginType>,

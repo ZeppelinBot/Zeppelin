@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { AntiraidLevel } from "./entities/AntiraidLevel";
 
 export class GuildAntiraidLevels extends BaseGuildRepository {

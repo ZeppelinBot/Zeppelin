@@ -1,17 +1,14 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import {
-  disableCodeBlocks,
-  disableInlineCode,
-  getInviteCodesInString,
-  GuildInvite,
-  isGuildInvite,
-  resolveInvite,
-  tNullable,
-  verboseChannelMention,
+    getInviteCodesInString,
+    GuildInvite,
+    isGuildInvite,
+    resolveInvite,
+    tNullable
 } from "../../../utils";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   type: MatchableTextType;

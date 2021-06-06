@@ -1,9 +1,9 @@
-import { logsEvt } from "../types";
-import { stripObjectToScalars } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import moment from "moment-timezone";
+import { LogType } from "../../../data/LogType";
+import { stripObjectToScalars } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { logsEvt } from "../types";
 
 export const LogsGuildMemberAddEvt = logsEvt({
   event: "guildMemberAdd",

@@ -1,10 +1,10 @@
-import { IMuteWithDetails, mutesCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
+import { GuildMember } from "discord.js";
 import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
-import { GuildMember } from "discord.js";
+import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
+import { IMuteWithDetails, mutesCmd } from "../types";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",

@@ -1,7 +1,7 @@
-import { reactionRolesCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { MessageActionRow, MessageButton, TextChannel } from "discord.js";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { reactionRolesCmd } from "../types";
 import { ButtonMenuActions } from "../util/buttonMenuActions";
 
 export const PostButtonRolesCmd = reactionRolesCmd({

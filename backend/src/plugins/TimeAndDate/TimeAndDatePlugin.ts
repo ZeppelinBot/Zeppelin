@@ -1,19 +1,18 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, TimeAndDatePluginType } from "./types";
-import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
 import { PluginOptions } from "knub";
+import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
+import { mapToPublicFn } from "../../pluginUtils";
+import { trimPluginDescription } from "../../utils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
 import { SetTimezoneCmd } from "./commands/SetTimezoneCmd";
 import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd";
 import { defaultDateFormats } from "./defaultDateFormats";
-import { Tail } from "../../utils/typeUtils";
-import { inGuildTz } from "./functions/inGuildTz";
-import { mapToPublicFn } from "../../pluginUtils";
+import { getDateFormat } from "./functions/getDateFormat";
 import { getGuildTz } from "./functions/getGuildTz";
 import { getMemberTz } from "./functions/getMemberTz";
-import { getDateFormat } from "./functions/getDateFormat";
+import { inGuildTz } from "./functions/inGuildTz";
 import { inMemberTz } from "./functions/inMemberTz";
-import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
-import { trimPluginDescription } from "../../utils";
+import { ConfigSchema, TimeAndDatePluginType } from "./types";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {

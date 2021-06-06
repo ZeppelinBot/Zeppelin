@@ -1,6 +1,6 @@
+import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { Awaitable } from "knub/dist/utils";
-import * as t from "io-ts";
 import { AutomodContext, AutomodPluginType } from "./types";
 
 interface BaseAutomodTriggerMatchResult {

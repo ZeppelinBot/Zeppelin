@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
-import { UserNotificationMethod } from "../../../utils";
 import { TextChannel } from "discord.js";
+import { GuildPluginData } from "knub";
+import { UserNotificationMethod } from "../../../utils";
+import { ModActionsPluginType } from "../types";
 
 export function getDefaultContactMethods(
   pluginData: GuildPluginData<ModActionsPluginType>,

@@ -1,5 +1,5 @@
-import { selfGrantableRolesCmd } from "../types";
 import { asSingleLine, trimLines } from "../../../utils";
+import { selfGrantableRolesCmd } from "../types";
 import { getApplyingEntries } from "../util/getApplyingEntries";
 
 export const RoleHelpCmd = selfGrantableRolesCmd({

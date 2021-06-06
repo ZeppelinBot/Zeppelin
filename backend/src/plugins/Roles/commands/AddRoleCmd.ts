@@ -1,9 +1,9 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage, canActOn } from "../../../pluginUtils";
-import { rolesCmd } from "../types";
-import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
-import { LogType } from "../../../data/LogType";
 import { GuildChannel } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { LogType } from "../../../data/LogType";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
+import { rolesCmd } from "../types";
 
 export const AddRoleCmd = rolesCmd({
   trigger: "addrole",

@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import { trimLines, preEmbedPadding, EmbedWith } from "../../../utils";
-import moment from "moment-timezone";
+import { MessageEmbedOptions, Role } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { Role, MessageEmbedOptions } from "discord.js";
+import { UtilityPluginType } from "../types";
 
 const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
 

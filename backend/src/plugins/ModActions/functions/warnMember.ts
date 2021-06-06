@@ -1,21 +1,21 @@
+import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
-
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import {
-  createUserNotificationError,
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
-import { GuildMember, MessageOptions } from "discord.js";
+import {
+    createUserNotificationError,
+    notifyUser,
+    resolveUser,
+    stripObjectToScalars,
+    ucfirst,
+    UserNotificationResult
+} from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
+import { getDefaultContactMethods } from "./getDefaultContactMethods";
+
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,

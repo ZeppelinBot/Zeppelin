@@ -1,7 +1,7 @@
+import { User } from "discord.js";
+import { sendSuccessMessage } from "../../../pluginUtils";
 import { mutesCmd } from "../types";
 
-import { sendSuccessMessage } from "../../../pluginUtils";
-import { User } from "discord.js";
 
 export const ClearBannedMutesCmd = mutesCmd({
   trigger: "clear_banned_mutes",

@@ -1,13 +1,13 @@
-import { selfGrantableRolesCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getApplyingEntries } from "../util/getApplyingEntries";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { splitRoleNames } from "../util/splitRoleNames";
-import { normalizeRoleNames } from "../util/normalizeRoleNames";
-import { findMatchingRoles } from "../util/findMatchingRoles";
-
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { Role } from "discord.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { selfGrantableRolesCmd } from "../types";
+import { findMatchingRoles } from "../util/findMatchingRoles";
+import { getApplyingEntries } from "../util/getApplyingEntries";
+import { normalizeRoleNames } from "../util/normalizeRoleNames";
+import { splitRoleNames } from "../util/splitRoleNames";
+
 
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],

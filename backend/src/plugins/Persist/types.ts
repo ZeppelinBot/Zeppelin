@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildEventListener } from "knub";
-import { GuildPersistedData } from "../../data/GuildPersistedData";
 import { GuildLogs } from "../../data/GuildLogs";
+import { GuildPersistedData } from "../../data/GuildPersistedData";
 
 export const ConfigSchema = t.type({
   persisted_roles: t.array(t.string),

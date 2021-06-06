@@ -1,15 +1,14 @@
-import { Tag, TagsPluginType } from "../types";
-
-import * as t from "io-ts";
-import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "../../../utils";
-import { parseArguments } from "knub-command-manager";
-import { TemplateParseError } from "../../../templateFormatter";
-import { GuildPluginData } from "knub";
-import { logger } from "../../../logger";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import { renderTagBody } from "./renderTagBody";
 import { GuildMember } from "discord.js";
+import * as t from "io-ts";
+import { GuildPluginData } from "knub";
+import { parseArguments } from "knub-command-manager";
+import { LogType } from "../../../data/LogType";
+import { TemplateParseError } from "../../../templateFormatter";
+import { StrictMessageContent, stripObjectToScalars } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { Tag, TagsPluginType } from "../types";
+import { renderTagBody } from "./renderTagBody";
+
 
 export async function renderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,

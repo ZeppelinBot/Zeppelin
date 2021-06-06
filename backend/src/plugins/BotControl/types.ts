@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { tNullable } from "../../utils";
 import { BasePluginType, typedGlobalCommand, typedGlobalEventListener } from "knub";
-import { GuildArchives } from "../../data/GuildArchives";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
+import { GuildArchives } from "../../data/GuildArchives";
+import { tNullable } from "../../utils";
 
 export const ConfigSchema = t.type({
   can_use: t.boolean,

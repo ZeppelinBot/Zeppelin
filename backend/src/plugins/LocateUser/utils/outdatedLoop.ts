@@ -1,7 +1,7 @@
-import { SECONDS } from "../../../utils";
-import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts";
 import { GuildPluginData } from "knub";
+import { SECONDS } from "../../../utils";
 import { LocateUserPluginType } from "../types";
+import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts";
 
 const ALERT_LOOP_TIME = 30 * SECONDS;
 

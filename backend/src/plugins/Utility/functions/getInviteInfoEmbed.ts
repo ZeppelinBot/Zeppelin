@@ -1,24 +1,23 @@
+import { MessageEmbedOptions } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { ChannelTypeStrings } from "src/types";
+import {
+    EmbedWith,
+
+    formatNumber,
+    GroupDMInvite,
+    inviteHasCounts,
+    isGroupDMInvite,
+    isGuildInvite,
+    preEmbedPadding,
+    resolveInvite,
+    trimLines
+} from "../../../utils";
+import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { UtilityPluginType } from "../types";
 
-import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
-import moment from "moment-timezone";
-import humanizeDuration from "humanize-duration";
-import {
-  embedPadding,
-  EmbedWith,
-  emptyEmbedValue,
-  formatNumber,
-  GroupDMInvite,
-  inviteHasCounts,
-  isGroupDMInvite,
-  isGuildInvite,
-  preEmbedPadding,
-  resolveInvite,
-  trimLines,
-} from "../../../utils";
-import { MessageEmbedOptions, Constants, Invite } from "discord.js";
-import { ChannelTypeStrings } from "src/types";
 
 export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

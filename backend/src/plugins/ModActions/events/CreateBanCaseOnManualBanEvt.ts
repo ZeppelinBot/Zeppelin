@@ -1,14 +1,14 @@
-import { IgnoredEventType, modActionsEvt } from "../types";
-import { isEventIgnored } from "../functions/isEventIgnored";
-import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
-
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
-import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, resolveUser, UnknownUser } from "../../../utils";
-import { Case } from "../../../data/entities/Case";
 import { GuildAuditLogs, User } from "discord.js";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
+import { resolveUser, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
+import { isEventIgnored } from "../functions/isEventIgnored";
+import { IgnoredEventType, modActionsEvt } from "../types";
+
 
 /**
  * Create a BAN case automatically when a user is banned manually.

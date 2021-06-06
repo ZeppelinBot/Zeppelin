@@ -1,8 +1,8 @@
-import { persistEvt } from "../types";
-import { IPartialPersistData } from "../../../data/GuildPersistedData";
-
-import intersection from "lodash.intersection";
 import { GuildMember } from "discord.js";
+import intersection from "lodash.intersection";
+import { IPartialPersistData } from "../../../data/GuildPersistedData";
+import { persistEvt } from "../types";
+
 
 export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",

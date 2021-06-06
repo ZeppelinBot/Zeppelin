@@ -1,7 +1,7 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { errorMessage } from "../../../utils";
 import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
+import { errorMessage } from "../../../utils";
+import { utilityCmd } from "../types";
 
 export const NicknameCmd = utilityCmd({
   trigger: ["nickname", "nick"],
