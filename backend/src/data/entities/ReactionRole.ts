@@ -21,4 +21,6 @@ export class ReactionRole {
   @Column() role_id: string;
 
   @Column() is_exclusive: boolean;
+
+  @Column() order: number;
 }

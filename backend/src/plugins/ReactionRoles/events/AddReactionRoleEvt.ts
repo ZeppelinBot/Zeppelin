@@ -61,7 +61,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
       setTimeout(() => {
         pluginData.state.reactionRemoveQueue.add(async () => {
           const wait = sleep(1500);
-          await meta.args.reaction.remove().catch(noop);
+          await meta.args.reaction.users.remove(userId).catch(noop);
           await wait;
         });
       }, 1500);

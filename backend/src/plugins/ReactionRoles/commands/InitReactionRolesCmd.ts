@@ -103,6 +103,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     const progressMessage = msg.channel.send("Adding reaction roles...");
 
     // Save the new reaction roles to the database
+    let pos = 0;
     for (const pair of emojiRolePairs) {
       await pluginData.state.reactionRoles.add(
         args.message.channel.id,
@@ -110,7 +111,9 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         pair[0],
         pair[1],
         args.exclusive,
+        pos,
       );
+      pos++;
     }
 
     // Apply the reactions themselves
