@@ -10,11 +10,14 @@ import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { PostButtonRolesCmd } from "./commands/PostButtonRolesCmd";
+import { ButtonInteractionEvt } from "./events/ButtonInteractionEvt";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 
 const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   config: {
+    button_groups: {},
     auto_refresh_interval: MIN_AUTO_REFRESH,
     remove_user_reactions: true,
 
@@ -47,11 +50,13 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     RefreshReactionRolesCmd,
     ClearReactionRolesCmd,
     InitReactionRolesCmd,
+    PostButtonRolesCmd,
   ],
 
   // prettier-ignore
   events: [
     AddReactionRoleEvt,
+    ButtonInteractionEvt,
   ],
 
   beforeLoad(pluginData) {
