@@ -1,8 +1,7 @@
 import { reactionRolesCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { MessageActionRow, MessageButton, MessageComponentInteraction, TextChannel } from "discord.js";
+import { MessageActionRow, MessageButton, TextChannel } from "discord.js";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
-import moment from "moment";
 import { ButtonMenuActions } from "../util/buttonMenuActions";
 
 export const PostButtonRolesCmd = reactionRolesCmd({
@@ -35,7 +34,6 @@ export const PostButtonRolesCmd = reactionRolesCmd({
     for (const button of Object.values(group.default_buttons)) {
       let customId = "";
       if ((await pluginData.guild.roles.fetch(button.role_or_menu)) != null) {
-        // TODO: Make universal, currently can only handle custom emoji and not default ones
         customId = `${args.button_group}::${ButtonMenuActions.GRANT_ROLE}::${button.role_or_menu}`;
       } else {
         customId = `${args.button_group}::${ButtonMenuActions.OPEN_MENU}::${button.role_or_menu}`;
@@ -47,8 +45,10 @@ export const PostButtonRolesCmd = reactionRolesCmd({
         .setType("BUTTON")
         .setCustomID(customId);
 
-      const emo = pluginData.client.emojis.resolve(button.emoji);
-      if (emo) btn.setEmoji(emo);
+      if (button.emoji) {
+        const emo = pluginData.client.emojis.resolve(button.emoji) ?? button.emoji;
+        btn.setEmoji(emo);
+      }
 
       buttons.push(btn);
     }
