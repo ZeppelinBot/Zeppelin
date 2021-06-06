@@ -61,7 +61,7 @@ export const RemoveRoleCmd = rolesCmd({
     sendSuccessMessage(
       pluginData,
       msg.channel,
-      `Removed role **${role.name}** removed from ${verboseUserMention(args.member.user)}!`,
+      `Removed role **${role.name}** from ${verboseUserMention(args.member.user)}!`,
     );
   },
 });
