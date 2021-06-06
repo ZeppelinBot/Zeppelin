@@ -24,6 +24,9 @@ export class GuildReactionRoles extends BaseGuildRepository {
         guild_id: this.guildId,
         message_id: messageId,
       },
+      order: {
+        order: "ASC",
+      },
     });
   }
 
@@ -50,7 +53,14 @@ export class GuildReactionRoles extends BaseGuildRepository {
     await this.reactionRoles.delete(criteria);
   }
 
-  async add(channelId: string, messageId: string, emoji: string, roleId: string, exclusive?: boolean) {
+  async add(
+    channelId: string,
+    messageId: string,
+    emoji: string,
+    roleId: string,
+    exclusive?: boolean,
+    position?: number,
+  ) {
     await this.reactionRoles.insert({
       guild_id: this.guildId,
       channel_id: channelId,
@@ -58,6 +68,7 @@ export class GuildReactionRoles extends BaseGuildRepository {
       emoji,
       role_id: roleId,
       is_exclusive: Boolean(exclusive),
+      order: position,
     });
   }
 }

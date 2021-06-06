@@ -164,7 +164,7 @@ connect().then(async () => {
     intents: [
       // Privileged
       Intents.FLAGS.GUILD_MEMBERS,
-      // "guildPresences",
+      // Intents.FLAGS.GUILD_PRESENCES,
       Intents.FLAGS.GUILD_MESSAGE_TYPING,
 
       // Regular
