@@ -6,7 +6,6 @@ import { LogType } from "../../../data/LogType";
 import { resolveUser, stripObjectToScalars } from "../../../utils";
 import { LogsPluginType } from "../types";
 
-
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,
   savedMessage: SavedMessage,

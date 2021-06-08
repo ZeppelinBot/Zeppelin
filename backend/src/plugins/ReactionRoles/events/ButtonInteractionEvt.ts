@@ -1,8 +1,4 @@
-import {
-  MessageActionRow,
-  MessageButton,
-  MessageComponentInteraction
-} from "discord.js";
+import { MessageActionRow, MessageButton, MessageComponentInteraction } from "discord.js";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
 import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";

@@ -9,7 +9,6 @@ import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
 
-
 /**
  * Create a BAN case automatically when a user is banned manually.
  * Attempts to find the ban's details in the audit log.

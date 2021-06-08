@@ -5,10 +5,12 @@ import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import {
-    messageSummary,
-
-    renderRecursively, resolveMember, verboseChannelMention, verboseUserMention,
-    verboseUserName
+  messageSummary,
+  renderRecursively,
+  resolveMember,
+  verboseChannelMention,
+  verboseUserMention,
+  verboseUserName,
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel } from "../types";

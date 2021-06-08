@@ -3,21 +3,19 @@ import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
 import {
-    convertDelayStringToMS,
-    noop,
-    renderRecursively,
-
-    stripObjectToScalars,
-    tDelayString,
-    tMessageContent,
-    tNullable,
-    unique,
-    verboseChannelMention
+  convertDelayStringToMS,
+  noop,
+  renderRecursively,
+  stripObjectToScalars,
+  tDelayString,
+  tMessageContent,
+  tNullable,
+  unique,
+  verboseChannelMention,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
-
 
 export const ReplyAction = automodAction({
   configType: t.union([

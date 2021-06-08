@@ -10,12 +10,12 @@ import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { MuteResult } from "../../../plugins/Mutes/types";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import {
-    convertDelayStringToMS,
-    DBDateFormat,
-    noop,
-    resolveMember,
-    stripObjectToScalars,
-    trimLines
+  convertDelayStringToMS,
+  DBDateFormat,
+  noop,
+  resolveMember,
+  stripObjectToScalars,
+  trimLines,
 } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";

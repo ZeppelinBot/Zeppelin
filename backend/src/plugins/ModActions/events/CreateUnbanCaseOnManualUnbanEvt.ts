@@ -9,7 +9,6 @@ import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
 
-
 /**
  * Create an UNBAN case automatically when a user is unbanned manually.
  * Attempts to find the unban's details in the audit log.

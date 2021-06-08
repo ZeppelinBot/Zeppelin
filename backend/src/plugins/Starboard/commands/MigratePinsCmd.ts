@@ -4,7 +4,6 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { starboardCmd } from "../types";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
-
 export const MigratePinsCmd = starboardCmd({
   trigger: "starboard migrate_pins",
   permission: "can_migrate",

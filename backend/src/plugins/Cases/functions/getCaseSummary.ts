@@ -2,14 +2,7 @@ import { GuildPluginData } from "knub";
 import { splitMessageIntoChunks } from "knub/dist/helpers";
 import moment from "moment-timezone";
 import { Case } from "../../../data/entities/Case";
-import {
-    convertDelayStringToMS,
-    DAYS,
-    DBDateFormat,
-    disableLinkPreviews,
-
-    messageLink
-} from "../../../utils";
+import { convertDelayStringToMS, DAYS, DBDateFormat, disableLinkPreviews, messageLink } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { caseAbbreviations } from "../caseAbbreviations";
 import { CasesPluginType } from "../types";

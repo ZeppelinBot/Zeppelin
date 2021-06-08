@@ -1,11 +1,7 @@
 import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
-import {
-    disableInlineCode,
-    getUrlsInString,
-    tNullable
-} from "../../../utils";
+import { disableInlineCode, getUrlsInString, tNullable } from "../../../utils";
 import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";

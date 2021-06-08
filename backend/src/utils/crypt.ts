@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import "../loadEnv";
 
-
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
   console.error("Environment value KEY required for encryption");

@@ -5,7 +5,6 @@ import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
 import { utilityCmd } from "../types";
 
-
 export const RolesCmd = utilityCmd({
   trigger: "roles",
   description: "List all roles or roles matching a search",

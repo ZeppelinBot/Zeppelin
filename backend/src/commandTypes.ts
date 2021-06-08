@@ -2,16 +2,16 @@ import { GuildChannel, GuildMember, User } from "discord.js";
 import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
-    channelMentionRegex,
-    convertDelayStringToMS,
-    disableCodeBlocks,
-    disableInlineCode,
-    isValidSnowflake,
-    resolveMember,
-    resolveUser,
-    resolveUserId,
-    roleMentionRegex,
-    UnknownUser
+  channelMentionRegex,
+  convertDelayStringToMS,
+  disableCodeBlocks,
+  disableInlineCode,
+  isValidSnowflake,
+  resolveMember,
+  resolveUser,
+  resolveUserId,
+  roleMentionRegex,
+  UnknownUser,
 } from "./utils";
 import { isValidTimezone } from "./utils/isValidTimezone";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";

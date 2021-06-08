@@ -2,7 +2,6 @@ import { GuildChannel, Message } from "discord.js";
 import path from "path";
 import { EmbedWith, EMPTY_CHAR } from "../../../utils";
 
-
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 const audioAttachmentExtensions = ["wav", "mp3", "m4a"];
 const videoAttachmentExtensions = ["mp4", "mkv", "mov"];

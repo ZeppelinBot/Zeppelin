@@ -6,7 +6,6 @@ import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
 
-
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",
 

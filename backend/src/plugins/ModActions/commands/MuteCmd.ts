@@ -6,7 +6,6 @@ import { actualMuteUserCmd } from "../functions/actualMuteUserCmd";
 import { isBanned } from "../functions/isBanned";
 import { modActionsCmd } from "../types";
 
-
 const opts = {
   mod: ct.member({ option: true }),
   notify: ct.string({ option: true }),

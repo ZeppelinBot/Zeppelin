@@ -5,7 +5,6 @@ import { LocateUserPluginType } from "../types";
 import { moveMember } from "./moveMember";
 import { sendWhere } from "./sendWhere";
 
-
 export async function sendAlerts(pluginData: GuildPluginData<LocateUserPluginType>, userId: string) {
   const triggeredAlerts = await pluginData.state.alerts.getAlertsByUserId(userId);
   const member = await resolveMember(pluginData.client, pluginData.guild, userId);

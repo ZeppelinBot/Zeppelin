@@ -11,7 +11,6 @@ import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
 import { IgnoredEventType, modActionsCmd } from "../types";
 
-
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
   permission: "can_massunban",

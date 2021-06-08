@@ -10,7 +10,6 @@ import { allowTimeout } from "../../../RegExpRunner";
 import { DAYS, getInviteCodesInString, noop, SECONDS, stripObjectToScalars } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
 
-
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
 const CLEAN_COMMAND_DELETE_DELAY = 5 * SECONDS;

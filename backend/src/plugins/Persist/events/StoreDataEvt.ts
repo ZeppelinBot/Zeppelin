@@ -3,7 +3,6 @@ import intersection from "lodash.intersection";
 import { IPartialPersistData } from "../../../data/GuildPersistedData";
 import { persistEvt } from "../types";
 
-
 export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",
 

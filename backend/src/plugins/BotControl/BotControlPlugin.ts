@@ -19,7 +19,6 @@ import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
 
-
 const defaultOptions = {
   config: {
     can_use: false,

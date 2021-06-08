@@ -9,7 +9,6 @@ import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, 
 import { CensorPluginType } from "../types";
 import { censorMessage } from "./censorMessage";
 
-
 export async function applyFiltersToMsg(
   pluginData: GuildPluginData<CensorPluginType>,
   savedMessage: SavedMessage,

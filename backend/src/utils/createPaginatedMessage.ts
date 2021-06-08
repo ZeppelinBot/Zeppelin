@@ -1,12 +1,4 @@
-import {
-    Client,
-    Message,
-    MessageOptions,
-    MessageReaction,
-    PartialUser,
-    TextChannel,
-    User
-} from "discord.js";
+import { Client, Message, MessageOptions, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
 import { Awaitable } from "knub/dist/utils";
 import { MINUTES, noop } from "../utils";
 import Timeout = NodeJS.Timeout;

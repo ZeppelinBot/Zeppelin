@@ -6,7 +6,6 @@ import { isDiscordRESTError, sleep } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ReactionRolesPluginType } from "../types";
 
-
 const CLEAR_ROLES_EMOJI = "❌";
 
 /**

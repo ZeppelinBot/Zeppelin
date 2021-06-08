@@ -9,7 +9,6 @@ import { validate } from "../../../validatorUtils";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
 
-
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
   if (!msg.data.content) return;

@@ -7,7 +7,6 @@ import { DBDateFormat, SECONDS, stripObjectToScalars } from "../../../utils";
 import { PostPluginType } from "../types";
 import { postMessage } from "./postMessage";
 
-
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 
 export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginType>) {

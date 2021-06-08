@@ -1,11 +1,5 @@
 import * as t from "io-ts";
-import {
-    asSingleLine,
-
-    disableInlineCode,
-    messageSummary,
-    verboseChannelMention
-} from "../../../utils";
+import { asSingleLine, disableInlineCode, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface MatchResultType {

@@ -7,7 +7,6 @@ import { EmbedWith, formatNumber, preEmbedPadding, trimLines } from "../../../ut
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
-
 const TEXT_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/740656843545772062/text-channel.png";
 const VOICE_CHANNEL_ICON =

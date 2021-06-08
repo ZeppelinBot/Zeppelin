@@ -12,7 +12,6 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
 
-
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
   permission: "can_massban",

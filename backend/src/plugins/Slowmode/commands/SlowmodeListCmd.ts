@@ -4,7 +4,6 @@ import { createChunkedMessage } from "knub/dist/helpers";
 import { errorMessage } from "../../../utils";
 import { slowmodeCmd } from "../types";
 
-
 export const SlowmodeListCmd = slowmodeCmd({
   trigger: ["slowmode list", "slowmode l", "slowmodes"],
   permission: "can_manage",

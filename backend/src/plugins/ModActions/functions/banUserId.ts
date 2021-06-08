@@ -6,18 +6,17 @@ import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { renderTemplate } from "../../../templateFormatter";
 import {
-    createUserNotificationError,
-    notifyUser,
-    resolveUser,
-    stripObjectToScalars,
-    ucfirst,
-    UserNotificationResult
+  createUserNotificationError,
+  notifyUser,
+  resolveUser,
+  stripObjectToScalars,
+  ucfirst,
+  UserNotificationResult,
 } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
-
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.

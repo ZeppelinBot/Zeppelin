@@ -46,7 +46,6 @@ import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
 
-
 const defaultOptions = {
   config: {
     dm_on_warn: true,

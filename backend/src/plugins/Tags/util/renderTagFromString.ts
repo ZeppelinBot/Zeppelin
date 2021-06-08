@@ -9,7 +9,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Tag, TagsPluginType } from "../types";
 import { renderTagBody } from "./renderTagBody";
 
-
 export async function renderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,
   str: string,

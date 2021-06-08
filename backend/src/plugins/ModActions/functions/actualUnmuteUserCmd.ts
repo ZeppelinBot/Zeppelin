@@ -7,7 +7,6 @@ import { asSingleLine, UnknownUser } from "../../../utils";
 import { ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 
-
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,

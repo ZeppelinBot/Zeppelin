@@ -7,7 +7,6 @@ import { resolveUser, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
 import { CountersPluginType } from "../types";
 
-
 export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters add", "counter add", "addcounter"],
   permission: "can_edit",

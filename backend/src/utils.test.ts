@@ -3,7 +3,6 @@ import * as ioTs from "io-ts";
 import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, tAllowedMentions } from "./utils";
 import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions";
 
-
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
 
 test("getUrlsInString(): detects full links", t => {

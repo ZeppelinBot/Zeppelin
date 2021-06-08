@@ -2,10 +2,10 @@ import { EventEmitter } from "events";
 import { PluginOptions } from "knub";
 import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 import {
-    buildCounterConditionString,
-    CounterTrigger,
-    getReverseCounterComparisonOp,
-    parseCounterConditionString
+  buildCounterConditionString,
+  CounterTrigger,
+  getReverseCounterComparisonOp,
+  parseCounterConditionString,
 } from "../../data/entities/CounterTrigger";
 import { GuildCounters } from "../../data/GuildCounters";
 import { mapToPublicFn } from "../../pluginUtils";

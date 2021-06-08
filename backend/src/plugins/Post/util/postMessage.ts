@@ -5,7 +5,6 @@ import { downloadFile } from "../../../utils";
 import { PostPluginType } from "../types";
 import { formatContent } from "./formatContent";
 
-
 const fsp = fs.promises;
 
 export async function postMessage(

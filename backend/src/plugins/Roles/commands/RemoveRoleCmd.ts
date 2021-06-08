@@ -5,7 +5,6 @@ import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginU
 import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
 import { rolesCmd } from "../types";
 
-
 export const RemoveRoleCmd = rolesCmd({
   trigger: "removerole",
   permission: "can_assign",

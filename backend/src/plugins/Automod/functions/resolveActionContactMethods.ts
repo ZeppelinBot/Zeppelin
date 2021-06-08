@@ -4,7 +4,6 @@ import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError"
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
 import { AutomodPluginType } from "../types";
 
-
 export function resolveActionContactMethods(
   pluginData: GuildPluginData<AutomodPluginType>,
   actionConfig: {

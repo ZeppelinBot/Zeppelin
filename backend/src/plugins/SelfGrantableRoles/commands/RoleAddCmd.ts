@@ -8,7 +8,6 @@ import { getApplyingEntries } from "../util/getApplyingEntries";
 import { normalizeRoleNames } from "../util/normalizeRoleNames";
 import { splitRoleNames } from "../util/splitRoleNames";
 
-
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],
   permission: null,

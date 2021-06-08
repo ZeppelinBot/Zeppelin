@@ -8,7 +8,6 @@ import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { utilityCmd } from "../types";
 
-
 export const AboutCmd = utilityCmd({
   trigger: "about",
   description: "Show information about Zeppelin's status on the server",

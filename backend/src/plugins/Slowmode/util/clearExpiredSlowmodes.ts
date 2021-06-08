@@ -6,7 +6,6 @@ import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
 
-
 export async function clearExpiredSlowmodes(pluginData: GuildPluginData<SlowmodePluginType>) {
   const expiredSlowmodeUsers = await pluginData.state.slowmodes.getExpiredSlowmodeUsers();
   for (const user of expiredSlowmodeUsers) {

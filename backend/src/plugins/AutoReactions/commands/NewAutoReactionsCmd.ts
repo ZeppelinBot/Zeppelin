@@ -7,7 +7,6 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { autoReactionsCmd } from "../types";
 
-
 const requiredPermissions = readChannelPermissions | Permissions.FLAGS.ADD_REACTIONS;
 
 export const NewAutoReactionsCmd = autoReactionsCmd({

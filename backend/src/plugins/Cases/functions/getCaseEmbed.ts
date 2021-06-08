@@ -9,7 +9,6 @@ import { CasesPluginType } from "../types";
 import { getCaseColor } from "./getCaseColor";
 import { resolveCaseId } from "./resolveCaseId";
 
-
 export async function getCaseEmbed(
   pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,

@@ -5,7 +5,6 @@ import { starboardEvt } from "../types";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
 
-
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
 

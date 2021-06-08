@@ -4,20 +4,18 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { ChannelTypeStrings } from "src/types";
 import {
-    EmbedWith,
-
-    formatNumber,
-    GroupDMInvite,
-    inviteHasCounts,
-    isGroupDMInvite,
-    isGuildInvite,
-    preEmbedPadding,
-    resolveInvite,
-    trimLines
+  EmbedWith,
+  formatNumber,
+  GroupDMInvite,
+  inviteHasCounts,
+  isGroupDMInvite,
+  isGuildInvite,
+  preEmbedPadding,
+  resolveInvite,
+  trimLines,
 } from "../../../utils";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { UtilityPluginType } from "../types";
-
 
 export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

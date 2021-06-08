@@ -5,7 +5,6 @@ import { messageLink } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { utilityCmd } from "../types";
 
-
 export const ContextCmd = utilityCmd({
   trigger: "context",
   description: "Get a link to the context of the specified message",

@@ -5,7 +5,6 @@ import { confirm, noop, trimMultilineString } from "../../../utils";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
 import { CountersPluginType } from "../types";
 
-
 export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],
   permission: "can_reset_all",

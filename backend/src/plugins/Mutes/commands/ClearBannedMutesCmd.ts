@@ -2,7 +2,6 @@ import { User } from "discord.js";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { mutesCmd } from "../types";
 
-
 export const ClearBannedMutesCmd = mutesCmd({
   trigger: "clear_banned_mutes",
   permission: "can_cleanup",
