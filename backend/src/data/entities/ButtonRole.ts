@@ -8,6 +8,10 @@ export class ButtonRole {
 
   @Column()
   @PrimaryColumn()
+  channel_id: string;
+
+  @Column()
+  @PrimaryColumn()
   message_id: string;
 
   @Column()

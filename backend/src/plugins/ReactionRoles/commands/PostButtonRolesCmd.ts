@@ -2,42 +2,33 @@ import { MessageActionRow, MessageButton, TextChannel } from "discord.js";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { reactionRolesCmd } from "../types";
-import { ButtonMenuActions } from "../util/buttonMenuActions";
+import { createHash } from "crypto";
+import moment from "moment";
 
 export const PostButtonRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles post",
   permission: "can_manage",
 
   signature: {
-    button_group: ct.string(),
+    channel: ct.textChannel(),
+    buttonGroup: ct.string(),
   },
 
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
-    const group = cfg.button_groups[args.button_group];
+    const group = cfg.button_groups[args.buttonGroup];
 
     if (!group) {
-      sendErrorMessage(pluginData, msg.channel, `No button group matches the name **${args.button_group}**`);
-    }
-
-    const channel = pluginData.guild.channels.resolve(group.channel_id);
-    if (!channel) {
-      await sendErrorMessage(
-        pluginData,
-        msg.channel,
-        `The ID ${group.channel_id} does not match a channel on the server`,
-      );
+      sendErrorMessage(pluginData, msg.channel, `No button group matches the name **${args.buttonGroup}**`);
       return;
     }
 
     const buttons: MessageButton[] = [];
-    for (const button of Object.values(group.default_buttons)) {
-      let customId = "";
-      if ((await pluginData.guild.roles.fetch(button.role_or_menu)) != null) {
-        customId = `${args.button_group}::${ButtonMenuActions.GRANT_ROLE}::${button.role_or_menu}`;
-      } else {
-        customId = `${args.button_group}::${ButtonMenuActions.OPEN_MENU}::${button.role_or_menu}`;
-      }
+    const toInsert: Array<{ customId; buttonGroup; buttonName }> = [];
+    for (const [buttonName, button] of Object.entries(group.default_buttons)) {
+      const customId = createHash("md5")
+        .update(`${buttonName}${moment.utc().valueOf()}`)
+        .digest("hex");
 
       const btn = new MessageButton()
         .setLabel(button.label)
@@ -51,15 +42,27 @@ export const PostButtonRolesCmd = reactionRolesCmd({
       }
 
       buttons.push(btn);
+      toInsert.push({ customId, buttonGroup: args.buttonGroup, buttonName });
     }
     const row = new MessageActionRow().addComponents(buttons);
 
     try {
-      await (channel as TextChannel).send({ content: group.message, components: [row], split: false });
+      const newMsg = await args.channel.send({ content: group.message, components: [row], split: false });
+
+      for (const btn of toInsert) {
+        await pluginData.state.buttonRoles.add(
+          args.channel.id,
+          newMsg.id,
+          btn.customId,
+          btn.buttonGroup,
+          btn.buttonName,
+        );
+      }
     } catch (e) {
       sendErrorMessage(pluginData, msg.channel, `Error trying to post message: ${e}`);
       return;
     }
-    await sendSuccessMessage(pluginData, msg.channel, `Successfully posted message in <#${channel.id}>`);
+
+    await sendSuccessMessage(pluginData, msg.channel, `Successfully posted message in <#${args.channel.id}>`);
   },
 });

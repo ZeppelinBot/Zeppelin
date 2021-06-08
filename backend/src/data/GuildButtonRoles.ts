@@ -38,9 +38,17 @@ export class GuildButtonRoles extends BaseGuildRepository {
     });
   }
 
-  async add(messageId: string, buttonId: string, buttonGroup: string, buttonName: string) {
+  async getForButtonGroup(buttonGroup: string) {
+    return this.buttonRoles.find({
+      guild_id: this.guildId,
+      button_group: buttonGroup,
+    });
+  }
+
+  async add(channelId: string, messageId: string, buttonId: string, buttonGroup: string, buttonName: string) {
     await this.buttonRoles.insert({
       guild_id: this.guildId,
+      channel_id: channelId,
       message_id: messageId,
       button_id: buttonId,
       button_group: buttonGroup,
