@@ -6,7 +6,7 @@ export const BUTTON_CONTEXT_SEPARATOR = "::";
 
 export async function getButtonAction(pluginData: GuildPluginData<ReactionRolesPluginType>, roleOrMenu: string) {
   if (await pluginData.guild.roles.fetch(roleOrMenu)) {
-    return ButtonMenuActions.GRANT_ROLE;
+    return ButtonMenuActions.MODIFY_ROLE;
   } else {
     return ButtonMenuActions.OPEN_MENU;
   }
