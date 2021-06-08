@@ -8,22 +8,17 @@ import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { renderTemplate } from "../../../templateFormatter";
 import {
-    notifyUser,
-
-
-
-
-    resolveMember, resolveUser,
-    stripObjectToScalars,
-    ucfirst,
-
-
-    UserNotificationMethod, UserNotificationResult
+  notifyUser,
+  resolveMember,
+  resolveUser,
+  stripObjectToScalars,
+  ucfirst,
+  UserNotificationMethod,
+  UserNotificationResult,
 } from "../../../utils";
 import { muteLock } from "../../../utils/lockNameHelpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { MuteOptions, MutesPluginType } from "../types";
-
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,

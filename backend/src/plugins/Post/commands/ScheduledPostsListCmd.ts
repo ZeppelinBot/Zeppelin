@@ -1,8 +1,12 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import {
-    createChunkedMessage,
-    DBDateFormat, deactivateMentions, disableCodeBlocks, sorter, trimLines
+  createChunkedMessage,
+  DBDateFormat,
+  deactivateMentions,
+  disableCodeBlocks,
+  sorter,
+  trimLines,
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { postCmd } from "../types";

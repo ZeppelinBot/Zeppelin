@@ -6,7 +6,6 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { CountersPluginType } from "../types";
 
-
 export const ViewCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters view", "counter view", "viewcounter", "counter"],
   permission: "can_view",

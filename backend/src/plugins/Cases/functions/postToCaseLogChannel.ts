@@ -7,7 +7,6 @@ import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
 
-
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
   content: MessageOptions,

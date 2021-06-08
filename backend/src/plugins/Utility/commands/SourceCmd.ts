@@ -4,7 +4,6 @@ import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { utilityCmd } from "../types";
 
-
 export const SourceCmd = utilityCmd({
   trigger: "source",
   description: "View the message source of the specified message id",

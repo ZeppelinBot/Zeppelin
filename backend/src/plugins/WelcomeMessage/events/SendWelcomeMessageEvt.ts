@@ -5,7 +5,6 @@ import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
 import { sendDM } from "../../../utils/sendDM";
 import { welcomeMessageEvt } from "../types";
 
-
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",
 

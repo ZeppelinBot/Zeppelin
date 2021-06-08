@@ -4,10 +4,14 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import {
-    EmbedWith, messageLink, preEmbedPadding, resolveMember,
-    resolveUser,
-
-    sorter, trimLines, UnknownUser
+  EmbedWith,
+  messageLink,
+  preEmbedPadding,
+  resolveMember,
+  resolveUser,
+  sorter,
+  trimLines,
+  UnknownUser,
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";

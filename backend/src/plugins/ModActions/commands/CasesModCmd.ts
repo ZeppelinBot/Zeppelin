@@ -9,7 +9,6 @@ import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { modActionsCmd } from "../types";
 
-
 const opts = {
   mod: ct.userId({ option: true }),
 };

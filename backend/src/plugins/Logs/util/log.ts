@@ -7,7 +7,6 @@ import { createChunkedMessage, get, noop } from "../../../utils";
 import { LogsPluginType, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
 
-
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
 

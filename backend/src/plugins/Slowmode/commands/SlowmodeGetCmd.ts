@@ -3,7 +3,6 @@ import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
 
-
 export const SlowmodeGetCmd = slowmodeCmd({
   trigger: "slowmode",
   permission: "can_manage",

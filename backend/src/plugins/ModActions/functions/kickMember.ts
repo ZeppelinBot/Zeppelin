@@ -4,18 +4,17 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
 import {
-    createUserNotificationError,
-    notifyUser,
-    resolveUser,
-    stripObjectToScalars,
-    ucfirst,
-    UserNotificationResult
+  createUserNotificationError,
+  notifyUser,
+  resolveUser,
+  stripObjectToScalars,
+  ucfirst,
+  UserNotificationResult,
 } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
-
 
 /**
  * Kick the specified server member. Generates a case.

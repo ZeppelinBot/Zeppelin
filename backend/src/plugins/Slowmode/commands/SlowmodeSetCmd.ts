@@ -10,7 +10,6 @@ import { slowmodeCmd } from "../types";
 import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
 import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
 
-
 const MAX_NATIVE_SLOWMODE = 6 * HOURS; // 6 hours
 const MAX_BOT_SLOWMODE = DAYS * 365 * 100; // 100 years
 const MIN_BOT_SLOWMODE = 15 * MINUTES;

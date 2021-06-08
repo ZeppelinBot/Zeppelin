@@ -5,7 +5,6 @@ import { logger } from "../../../logger";
 import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { SlowmodePluginType } from "../types";
 
-
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
   channel: GuildChannel & TextChannel,

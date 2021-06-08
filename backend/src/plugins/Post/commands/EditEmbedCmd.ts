@@ -7,7 +7,6 @@ import { rgbToInt } from "../../../utils/rgbToInt";
 import { postCmd } from "../types";
 import { formatContent } from "../util/formatContent";
 
-
 const COLOR_MATCH_REGEX = /^#?([0-9a-f]{6})$/;
 
 export const EditEmbedCmd = postCmd({

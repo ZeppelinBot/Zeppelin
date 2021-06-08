@@ -10,7 +10,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { modActionsCmd } from "../types";
 
-
 export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],
   permission: "can_deletecase",

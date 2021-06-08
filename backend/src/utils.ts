@@ -1,27 +1,24 @@
 import {
-    Client,
-    Constants,
-    Emoji,
-    Guild,
-    GuildAuditLogs,
-    GuildAuditLogsEntry,
-    GuildChannel,
-    GuildMember,
-
-    Invite,
-    Message,
-
-    MessageAttachment,
-
-    MessageEmbed,
-    MessageEmbedOptions,
-    MessageMentionOptions,
-    MessageOptions,
-    PartialChannelData,
-    PartialMessage,
-    StringResolvable,
-    TextChannel,
-    User
+  Client,
+  Constants,
+  Emoji,
+  Guild,
+  GuildAuditLogs,
+  GuildAuditLogsEntry,
+  GuildChannel,
+  GuildMember,
+  Invite,
+  Message,
+  MessageAttachment,
+  MessageEmbed,
+  MessageEmbedOptions,
+  MessageMentionOptions,
+  MessageOptions,
+  PartialChannelData,
+  PartialMessage,
+  StringResolvable,
+  TextChannel,
+  User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import { either } from "fp-ts/lib/Either";
@@ -38,7 +35,6 @@ import { SimpleCache } from "./SimpleCache";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-
 
 const fsp = fs.promises;
 

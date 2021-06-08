@@ -6,7 +6,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
 
-
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;
 

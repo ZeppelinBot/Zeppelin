@@ -9,7 +9,6 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { persistEvt } from "../types";
 
-
 const p = Permissions.FLAGS;
 
 export const LoadDataEvt = persistEvt({

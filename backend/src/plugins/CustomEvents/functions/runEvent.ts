@@ -11,7 +11,6 @@ import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
 import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
-
 export async function runEvent(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   event: TCustomEvent,

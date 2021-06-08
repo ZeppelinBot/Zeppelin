@@ -12,7 +12,6 @@ import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { SlowmodePluginType } from "../types";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
 
-
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 

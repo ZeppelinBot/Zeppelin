@@ -10,7 +10,6 @@ import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
 
-
 /**
  * Create a KICK case automatically when a user is kicked manually.
  * Attempts to find the kick's details in the audit log.

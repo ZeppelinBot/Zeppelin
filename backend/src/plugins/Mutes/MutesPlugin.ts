@@ -22,7 +22,6 @@ import { onMutesEvent } from "./functions/onMutesEvent";
 import { unmuteUser } from "./functions/unmuteUser";
 import { ConfigSchema, MutesPluginType } from "./types";
 
-
 const defaultOptions = {
   config: {
     mute_role: null,

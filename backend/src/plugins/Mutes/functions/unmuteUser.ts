@@ -9,7 +9,6 @@ import { CaseArgs } from "../../Cases/types";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { memberHasMutedRole } from "./memberHasMutedRole";
 
-
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
   userId: string,

@@ -9,7 +9,6 @@ import { stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
 
-
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
   permission: "can_massmute",

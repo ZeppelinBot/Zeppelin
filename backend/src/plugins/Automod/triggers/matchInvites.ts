@@ -1,11 +1,5 @@
 import * as t from "io-ts";
-import {
-    getInviteCodesInString,
-    GuildInvite,
-    isGuildInvite,
-    resolveInvite,
-    tNullable
-} from "../../../utils";
+import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, tNullable } from "../../../utils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";

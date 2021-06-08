@@ -4,7 +4,6 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { isDiscordRESTError } from "../../../utils";
 import { reactionRolesCmd } from "../types";
 
-
 export const ClearReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles clear",
   permission: "can_manage",

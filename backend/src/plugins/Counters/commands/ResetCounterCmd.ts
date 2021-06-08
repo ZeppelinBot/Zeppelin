@@ -7,7 +7,6 @@ import { resolveUser, UnknownUser } from "../../../utils";
 import { setCounterValue } from "../functions/setCounterValue";
 import { CountersPluginType } from "../types";
 
-
 export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters reset", "counter reset", "resetcounter"],
   permission: "can_edit",

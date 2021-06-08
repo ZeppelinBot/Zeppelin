@@ -5,7 +5,6 @@ import { stripObjectToScalars } from "../../../utils";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
 
-
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",
   permission: "can_create",

@@ -21,9 +21,6 @@ import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
 
-
-
-
 const fsp = fs.promises;
 
 if (!process.env.KEY) {

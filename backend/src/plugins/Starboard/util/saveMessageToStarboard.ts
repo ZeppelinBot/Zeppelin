@@ -4,7 +4,6 @@ import { StarboardPluginType, TStarboardOpts } from "../types";
 import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage";
 import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage";
 
-
 export async function saveMessageToStarboard(
   pluginData: GuildPluginData<StarboardPluginType>,
   msg: Message,

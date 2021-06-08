@@ -8,7 +8,6 @@ import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLi
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
-
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
 
 export async function getMessageInfoEmbed(

@@ -4,12 +4,12 @@ import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMen
 import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import {
-    createChunkedMessage,
-    messageLink,
-    stripObjectToScalars,
-    tAllowedMentions,
-    tNormalizedNullOptional,
-    verboseChannelMention
+  createChunkedMessage,
+  messageLink,
+  stripObjectToScalars,
+  tAllowedMentions,
+  tNormalizedNullOptional,
+  verboseChannelMention,
 } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";

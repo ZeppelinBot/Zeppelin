@@ -5,12 +5,7 @@ import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { connection } from "./db";
 import { Counter } from "./entities/Counter";
-import {
-    CounterTrigger,
-    isValidCounterComparisonOp,
-
-    TriggerComparisonOp
-} from "./entities/CounterTrigger";
+import { CounterTrigger, isValidCounterComparisonOp, TriggerComparisonOp } from "./entities/CounterTrigger";
 import { CounterTriggerState } from "./entities/CounterTriggerState";
 import { CounterValue } from "./entities/CounterValue";
 

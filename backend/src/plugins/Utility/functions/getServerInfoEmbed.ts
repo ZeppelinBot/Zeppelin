@@ -3,20 +3,19 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import {
-    EmbedWith,
-    formatNumber,
-    inviteHasCounts,
-    memoize,
-    MINUTES,
-    preEmbedPadding,
-    resolveInvite,
-    resolveUser,
-    trimLines
+  EmbedWith,
+  formatNumber,
+  inviteHasCounts,
+  memoize,
+  MINUTES,
+  preEmbedPadding,
+  resolveInvite,
+  resolveUser,
+  trimLines,
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
-
 
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

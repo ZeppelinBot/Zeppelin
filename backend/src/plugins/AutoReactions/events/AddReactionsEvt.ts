@@ -7,7 +7,6 @@ import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { autoReactionsEvt } from "../types";
 
-
 const p = Permissions.FLAGS;
 
 export const AddReactionsEvt = autoReactionsEvt({

@@ -5,7 +5,6 @@ import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { modActionsEvt } from "../types";
 
-
 /**
  * Show an alert if a member with prior notes joins the server
  */

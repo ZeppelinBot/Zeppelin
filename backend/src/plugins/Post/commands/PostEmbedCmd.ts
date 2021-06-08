@@ -8,7 +8,6 @@ import { postCmd } from "../types";
 import { actualPostCmd } from "../util/actualPostCmd";
 import { formatContent } from "../util/formatContent";
 
-
 export const PostEmbedCmd = postCmd({
   trigger: "post_embed",
   permission: "can_post",

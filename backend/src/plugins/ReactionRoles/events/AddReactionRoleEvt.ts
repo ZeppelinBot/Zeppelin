@@ -3,7 +3,6 @@ import { noop, resolveMember, sleep } from "../../../utils";
 import { reactionRolesEvt } from "../types";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
 
-
 const CLEAR_ROLES_EMOJI = "❌";
 
 export const AddReactionRoleEvt = reactionRolesEvt({

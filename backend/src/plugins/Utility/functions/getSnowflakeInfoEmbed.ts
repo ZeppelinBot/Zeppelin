@@ -2,9 +2,7 @@ import { MessageEmbedOptions } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import {
-    EmbedWith, preEmbedPadding
-} from "../../../utils";
+import { EmbedWith, preEmbedPadding } from "../../../utils";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
