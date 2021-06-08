@@ -1,4 +1,5 @@
 import { PluginOptions } from "knub";
+import { GuildButtonRoles } from "src/data/GuildButtonRoles";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
@@ -10,6 +11,7 @@ import { PostButtonRolesCmd } from "./commands/PostButtonRolesCmd";
 import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { ButtonInteractionEvt } from "./events/ButtonInteractionEvt";
+import { MessageDeletedEvt } from "./events/MessageDeletedEvt";
 import { ConfigSchema, ReactionRolesPluginType } from "./types";
 import { autoRefreshLoop } from "./util/autoRefreshLoop";
 
@@ -57,6 +59,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   events: [
     AddReactionRoleEvt,
     ButtonInteractionEvt,
+    MessageDeletedEvt,
   ],
 
   beforeLoad(pluginData) {
@@ -64,6 +67,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
 
     state.reactionRoles = GuildReactionRoles.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.buttonRoles = GuildButtonRoles.getGuildInstance(guild.id);
     state.reactionRemoveQueue = new Queue();
     state.roleChangeQueue = new Queue();
     state.pendingRoleChanges = new Map();

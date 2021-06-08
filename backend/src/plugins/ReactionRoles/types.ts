@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { GuildButtonRoles } from "src/data/GuildButtonRoles";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
@@ -11,18 +12,10 @@ const ButtonOpts = t.type({
 });
 export type TButtonOpts = t.TypeOf<typeof ButtonOpts>;
 
-const MenuButtonOpts = t.type({
-  label: t.string,
-  emoji: t.string,
-  role: t.string,
-});
-export type TMenuButtonOpts = t.TypeOf<typeof MenuButtonOpts>;
-
 const ButtonPairOpts = t.type({
-  channel_id: t.string,
   message: t.string,
   default_buttons: t.record(t.string, ButtonOpts),
-  button_menus: t.record(t.string, t.record(t.string, MenuButtonOpts)),
+  button_menus: t.record(t.string, t.record(t.string, ButtonOpts)),
 });
 export type TButtonPairOpts = t.TypeOf<typeof ButtonPairOpts>;
 
@@ -54,6 +47,7 @@ export interface ReactionRolesPluginType extends BasePluginType {
   state: {
     reactionRoles: GuildReactionRoles;
     savedMessages: GuildSavedMessages;
+    buttonRoles: GuildButtonRoles;
 
     reactionRemoveQueue: Queue;
     roleChangeQueue: Queue;

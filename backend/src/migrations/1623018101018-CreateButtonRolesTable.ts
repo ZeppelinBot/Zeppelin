@@ -12,6 +12,11 @@ export class CreateButtonRolesTable1623018101018 implements MigrationInterface {
             isPrimary: true,
           },
           {
+            name: "channel_id",
+            type: "bigint",
+            isPrimary: true,
+          },
+          {
             name: "message_id",
             type: "bigint",
             isPrimary: true,
