@@ -1,4 +1,4 @@
 export enum ButtonMenuActions {
   OPEN_MENU = "goto",
-  GRANT_ROLE = "grant",
+  MODIFY_ROLE = "grant",
 }

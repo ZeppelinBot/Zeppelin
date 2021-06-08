@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageButton, MessageComponentInteraction } from "discord.js";
+import { MessageComponentInteraction } from "discord.js";
 import moment from "moment";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
@@ -6,13 +6,10 @@ import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 import { MINUTES } from "src/utils";
 import { idToTimestamp } from "src/utils/idToTimestamp";
 import { reactionRolesEvt } from "../types";
-import {
-  generateStatelessCustomId,
-  resolveStatefulCustomId,
-  BUTTON_CONTEXT_SEPARATOR,
-} from "../util/buttonCustomIdFunctions";
+import { resolveStatefulCustomId, BUTTON_CONTEXT_SEPARATOR } from "../util/buttonCustomIdFunctions";
 import { ButtonMenuActions } from "../util/buttonMenuActions";
 import humanizeDuration from "humanize-duration";
+import { handleModifyRole, handleOpenMenu } from "../util/buttonActionHandlers";
 
 const BUTTON_INVALIDATION_TIME = 15 * MINUTES;
 
@@ -70,62 +67,13 @@ export const ButtonInteractionEvt = reactionRolesEvt({
       return;
     }
 
-    if (context.action === ButtonMenuActions.GRANT_ROLE) {
-      const role = await meta.pluginData.guild.roles.fetch(context.roleOrMenu);
-      if (!role) {
-        await sendEphemeralReply(int, `A configuration error was encountered, please contact the Administrators!`);
-        meta.pluginData
-          .getPlugin(LogsPlugin)
-          .log(
-            LogType.BOT_ALERT,
-            `**A configuration error occured** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
-          );
-        return;
-      }
-
-      const member = await meta.pluginData.guild.members.fetch(int.user.id);
-      if (member.roles.cache.has(role.id)) {
-        await member.roles.remove(role, `Button Roles on message ${int.message.id}`);
-        await sendEphemeralReply(int, `Role **${role.name}** removed`);
-      } else {
-        await member.roles.add(role, `Button Roles on message ${int.message.id}`);
-        await sendEphemeralReply(int, `Role **${role.name}** added`);
-      }
-
+    if (context.action === ButtonMenuActions.MODIFY_ROLE) {
+      await handleModifyRole(meta.pluginData, int, group, context);
       return;
     }
 
     if (context.action === ButtonMenuActions.OPEN_MENU) {
-      const menuButtons: MessageButton[] = [];
-      for (const menuButton of Object.values(group.button_menus[context.roleOrMenu])) {
-        const customId = await generateStatelessCustomId(meta.pluginData, context.groupName, menuButton.role_or_menu);
-
-        const btn = new MessageButton()
-          .setLabel(menuButton.label)
-          .setStyle("PRIMARY")
-          .setType("BUTTON")
-          .setCustomID(customId);
-
-        if (menuButton.emoji) {
-          const emo = meta.pluginData.client.emojis.resolve(menuButton.emoji) ?? menuButton.emoji;
-          btn.setEmoji(emo);
-        }
-        menuButtons.push(btn);
-      }
-
-      if (menuButtons.length === 0) {
-        await sendEphemeralReply(int, `A configuration error was encountered, please contact the Administrators!`);
-        meta.pluginData
-          .getPlugin(LogsPlugin)
-          .log(
-            LogType.BOT_ALERT,
-            `**A configuration error occured** on buttons for message ${int.message.id}, menu **${context.roleOrMenu}** not found in config`,
-          );
-        return;
-      }
-      const row = new MessageActionRow().addComponents(menuButtons);
-
-      int.reply({ content: `Click to add/remove a role`, components: [row], ephemeral: true, split: false });
+      await handleOpenMenu(meta.pluginData, int, group, context);
       return;
     }
 
