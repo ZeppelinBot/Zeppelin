@@ -32,7 +32,7 @@ async function cleanMessages(
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
   // Actually delete the messages
-  (pluginData.guild.channels.cache.get(channel.id) as TextChannel).bulkDelete(idsToDelete);
+  channel.bulkDelete(idsToDelete);
   await pluginData.state.savedMessages.markBulkAsDeleted(idsToDelete);
 
   // Create an archive
