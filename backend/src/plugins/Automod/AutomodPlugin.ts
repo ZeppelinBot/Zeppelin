@@ -20,7 +20,7 @@ import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
 import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
-import { RunAutomodOnJoinEvt } from "./events/RunAutomodOnJoinEvt";
+import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt";
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
@@ -176,6 +176,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   events: [
     RunAutomodOnJoinEvt,
     RunAutomodOnMemberUpdate,
+    RunAutomodOnLeaveEvt,
     // Messages use message events from SavedMessages, see onLoad below
   ],
 

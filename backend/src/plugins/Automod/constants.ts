@@ -15,4 +15,5 @@ export enum RecentActionType {
   VoiceChannelMove,
   MemberJoin,
   Sticker,
+  MemberLeave,
 }
