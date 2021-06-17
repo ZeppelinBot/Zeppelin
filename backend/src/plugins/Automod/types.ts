@@ -1,4 +1,4 @@
-import { GuildMember, User } from "discord.js";
+import { GuildMember, PartialGuildMember, User } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType, CooldownManager } from "knub";
 import { SavedMessage } from "../../data/entities/SavedMessage";
@@ -115,6 +115,7 @@ export interface AutomodContext {
   user?: User;
   message?: SavedMessage;
   member?: GuildMember;
+  partialMember?: GuildMember | PartialGuildMember;
   joined?: boolean;
   rolesChanged?: {
     added?: string[];

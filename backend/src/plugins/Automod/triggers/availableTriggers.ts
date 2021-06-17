@@ -17,6 +17,7 @@ import { MatchRegexTrigger } from "./matchRegex";
 import { MatchWordsTrigger } from "./matchWords";
 import { MemberJoinTrigger } from "./memberJoin";
 import { MemberJoinSpamTrigger } from "./memberJoinSpam";
+import { MemberLeaveTrigger } from "./memberLeave";
 import { MentionSpamTrigger } from "./mentionSpam";
 import { MessageSpamTrigger } from "./messageSpam";
 import { MuteTrigger } from "./mute";
@@ -72,6 +73,7 @@ export const AvailableTriggers = t.type({
   match_links: MatchLinksTrigger.configType,
   match_attachment_type: MatchAttachmentTypeTrigger.configType,
   member_join: MemberJoinTrigger.configType,
+  member_leave: MemberLeaveTrigger.configType,
   role_added: RoleAddedTrigger.configType,
   role_removed: RoleRemovedTrigger.configType,
 

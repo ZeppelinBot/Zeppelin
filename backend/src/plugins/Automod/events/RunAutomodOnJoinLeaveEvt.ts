@@ -25,3 +25,25 @@ export const RunAutomodOnJoinEvt = typedGuildEventListener<AutomodPluginType>()(
     });
   },
 });
+
+export const RunAutomodOnLeaveEvt = typedGuildEventListener<AutomodPluginType>()({
+  event: "guildMemberRemove",
+  listener({ pluginData, args: { member } }) {
+    const context: AutomodContext = {
+      timestamp: Date.now(),
+      partialMember: member,
+      joined: true,
+    };
+
+    pluginData.state.queue.add(() => {
+      pluginData.state.recentActions.push({
+        type: RecentActionType.MemberLeave,
+        context,
+        count: 1,
+        identifier: null,
+      });
+
+      runAutomod(pluginData, context);
+    });
+  },
+});
