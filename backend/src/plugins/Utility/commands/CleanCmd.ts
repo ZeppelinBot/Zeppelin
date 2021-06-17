@@ -121,11 +121,20 @@ export const CleanCmd = utilityCmd({
     }
 
     while (messagesToClean.length < args.count) {
-      const potentialMessagesToClean = await pluginData.state.savedMessages.getLatestByChannelBeforeId(
-        targetChannel.id,
-        beforeId,
-        args.count,
-      );
+      const potentialMessages = await targetChannel.messages.fetch({
+        before: beforeId,
+        limit: args.count,
+      });
+      if (potentialMessages.size === 0) break;
+
+      const existingStored = await pluginData.state.savedMessages.getMultiple(potentialMessages.keyArray());
+      const alreadyStored = existingStored.map(stored => stored.id);
+      const messagesToStore = potentialMessages
+        .array()
+        .filter(potentialMsg => !alreadyStored.includes(potentialMsg.id));
+      await pluginData.state.savedMessages.createFromMessages(messagesToStore);
+
+      const potentialMessagesToClean = await pluginData.state.savedMessages.getMultiple(potentialMessages.keyArray());
       if (potentialMessagesToClean.length === 0) break;
 
       const filtered: SavedMessage[] = [];
@@ -150,12 +159,9 @@ export const CleanCmd = utilityCmd({
       const withoutOverflow = filtered.slice(0, remaining);
       messagesToClean.push(...withoutOverflow);
 
-      beforeId = potentialMessagesToClean[potentialMessagesToClean.length - 1].id;
+      beforeId = potentialMessages.lastKey()!;
 
-      if (
-        foundId ||
-        moment.utc(potentialMessagesToClean[potentialMessagesToClean.length - 1].posted_at).valueOf() < timeCutoff
-      ) {
+      if (foundId || moment.utc(potentialMessages.last()!.createdTimestamp).valueOf() < timeCutoff) {
         break;
       }
     }

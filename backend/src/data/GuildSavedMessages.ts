@@ -159,6 +159,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
     return this.create({ ...data, ...overrides });
   }
 
+  async createFromMessages(messages: Message[], overrides = {}) {
+    for (const msg of messages) {
+      await this.createFromMsg(msg, overrides);
+    }
+  }
+
   async markAsDeleted(id) {
     await this.messages
       .createQueryBuilder("messages")
