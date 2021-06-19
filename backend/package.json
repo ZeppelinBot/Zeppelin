@@ -61,7 +61,7 @@
     "seedrandom": "^3.0.1",
     "sharp": "^0.23.4",
     "strip-combining-marks": "^1.0.0",
-    "tlds": "^1.203.1",
+    "tlds": "^1.221.1",
     "tmp": "0.0.33",
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
