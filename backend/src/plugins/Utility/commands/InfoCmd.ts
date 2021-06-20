@@ -1,7 +1,14 @@
 import { getChannelId, getRoleId } from "knub/dist/utils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { customEmojiRegex, isValidSnowflake, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
+import {
+  customEmojiRegex,
+  isValidSnowflake,
+  noop,
+  parseInviteCodeInput,
+  resolveInvite,
+  resolveUser,
+} from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
 import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
@@ -50,7 +57,7 @@ export const InfoCmd = utilityCmd({
 
     // 2. Server
     if (userCfg.can_server) {
-      const guild = pluginData.client.guilds.fetch(value);
+      const guild = await pluginData.client.guilds.fetch(value).catch(noop);
       if (guild) {
         const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
         if (embed) {
@@ -108,7 +115,7 @@ export const InfoCmd = utilityCmd({
 
     // 6. Server again (fallback for discovery servers)
     if (userCfg.can_server) {
-      const serverPreview = getGuildPreview(pluginData.client, value).catch(() => null);
+      const serverPreview = await getGuildPreview(pluginData.client, value).catch(() => null);
       if (serverPreview) {
         const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
         if (embed) {
