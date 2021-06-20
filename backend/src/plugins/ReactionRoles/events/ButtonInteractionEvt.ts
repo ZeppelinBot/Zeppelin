@@ -21,6 +21,8 @@ export const ButtonInteractionEvt = reactionRolesEvt({
       ? (meta.args.interaction as MessageComponentInteraction)
       : null;
     if (!int) return;
+    const allOnMessage = await meta.pluginData.state.buttonRoles.getAllForMessageId(int.message.id);
+    if (allOnMessage.length === 0) return;
     const cfg = meta.pluginData.config.get();
     const split = int.customID.split(BUTTON_CONTEXT_SEPARATOR);
     const context = (await resolveStatefulCustomId(meta.pluginData, int.customID)) ?? {

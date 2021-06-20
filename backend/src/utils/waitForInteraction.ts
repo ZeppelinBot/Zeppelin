@@ -1,16 +1,6 @@
 import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageOptions, TextChannel } from "discord.js";
-import { PluginError } from "knub";
 import { noop } from "knub/dist/utils";
 import moment from "moment";
-
-export async function waitForComponent(
-  channel: TextChannel,
-  toPost: MessageOptions,
-  components: MessageActionRow[],
-  options?: WaitForOptions,
-) {
-  throw new PluginError("Unimplemented method waitForComponent called.");
-}
 
 export async function waitForButtonConfirm(
   channel: TextChannel,
