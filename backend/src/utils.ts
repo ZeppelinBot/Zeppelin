@@ -1258,7 +1258,7 @@ export async function resolveInvite<T extends boolean>(
   }
 
   // @ts-ignore: the getInvite() withCounts typings are blergh
-  const promise = client.getInvite(code, withCounts).catch(() => null);
+  const promise = client.fetchInvite(code).catch(() => null);
   inviteCache.set(key, promise);
 
   return promise as ResolveInviteReturnType<T>;
