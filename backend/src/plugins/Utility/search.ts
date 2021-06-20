@@ -1,11 +1,20 @@
-import { GuildMember, Message, Permissions, TextChannel, User } from "discord.js";
+import {
+  GuildMember,
+  Message,
+  MessageActionRow,
+  MessageButton,
+  MessageComponentInteraction,
+  Permissions,
+  TextChannel,
+  User,
+} from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
 import { ArgsFromSignatureOrArray } from "knub/dist/commands/commandUtils";
 import moment from "moment-timezone";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
 import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
-import { isFullMessage, MINUTES, multiSorter, noop, sorter, trimLines } from "../../utils";
+import { MINUTES, multiSorter, sorter, trimLines } from "../../utils";
 import { asyncFilter } from "../../utils/async";
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
 import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
@@ -75,9 +84,8 @@ export async function displaySearch(
   let originalSearchMsg: Message;
   let searching = false;
   let currentPage = args.page || 1;
-  let hasReactions = false;
-  let clearReactionsFn: () => void;
-  let clearReactionsTimeout: Timeout;
+  let stopCollectionFn: () => void;
+  let stopCollectionTimeout: Timeout;
 
   const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
 
@@ -155,47 +163,78 @@ export async function displaySearch(
       }
     }
 
-    searchMsg.edit(result);
+    currentPage = searchResult.page;
 
     // Set up pagination reactions if needed. The reactions are cleared after a timeout.
     if (searchResult.totalResults > perPage) {
-      if (!hasReactions) {
-        hasReactions = true;
-        searchMsg.react("⬅");
-        searchMsg.react("➡");
-        searchMsg.react("🔄");
+      const idMod = `${searchMsg.id}:${moment.utc().valueOf()}`;
+      const buttons: MessageButton[] = [];
 
-        const listenerFn = pluginData.events.on("messageReactionAdd", async ({ args: { reaction, user } }) => {
-          const rMsg = reaction.message;
-          const member = await pluginData.guild.members.fetch(user.id);
-          if (rMsg.id !== searchMsg.id) return;
-          if (member.user.id !== msg.author.id) return;
-          if (!["⬅", "➡", "🔄"].includes(reaction.emoji.name!)) return;
+      buttons.push(
+        new MessageButton()
+          .setStyle("SECONDARY")
+          .setEmoji("⬅")
+          .setType("BUTTON")
+          .setCustomID(`previousButton:${idMod}`)
+          .setDisabled(currentPage === 1),
+      );
 
-          if (reaction.emoji.name === "⬅" && currentPage > 1) {
-            loadSearchPage(currentPage - 1);
-          } else if (reaction.emoji.name === "➡" && currentPage < searchResult.lastPage) {
-            loadSearchPage(currentPage + 1);
-          } else if (reaction.emoji.name === "🔄") {
-            loadSearchPage(currentPage);
+      buttons.push(
+        new MessageButton()
+          .setStyle("SECONDARY")
+          .setEmoji("➡")
+          .setType("BUTTON")
+          .setCustomID(`nextButton:${idMod}`)
+          .setDisabled(currentPage === searchResult.lastPage),
+      );
+
+      buttons.push(
+        new MessageButton()
+          .setStyle("SECONDARY")
+          .setEmoji("🔄")
+          .setType("BUTTON")
+          .setCustomID(`reloadButton:${idMod}`),
+      );
+
+      const row = new MessageActionRow().addComponents(buttons);
+      await searchMsg.edit({ content: result, components: [row] });
+
+      const filter = (iac: MessageComponentInteraction) => iac.message.id === searchMsg.id;
+      const collector = searchMsg.createMessageComponentInteractionCollector(filter, { time: 2 * MINUTES });
+
+      collector.on("collect", async (interaction: MessageComponentInteraction) => {
+        if (msg.author.id !== interaction.user.id) {
+          interaction.reply(`You are not permitted to use these buttons.`, { ephemeral: true });
+        } else {
+          if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {
+            collector.stop();
+            await interaction.deferUpdate();
+            await loadSearchPage(currentPage - 1);
+          } else if (interaction.customID === `nextButton:${idMod}` && currentPage < searchResult.lastPage) {
+            collector.stop();
+            await interaction.deferUpdate();
+            await loadSearchPage(currentPage + 1);
+          } else if (interaction.customID === `reloadButton:${idMod}`) {
+            collector.stop();
+            await interaction.deferUpdate();
+            await loadSearchPage(currentPage);
+          } else {
+            await interaction.deferUpdate();
           }
+        }
+      });
 
-          if (isFullMessage(rMsg)) {
-            reaction.remove();
-          }
-        });
+      stopCollectionFn = async () => {
+        collector.stop();
+        await searchMsg.edit({ content: searchMsg.content, components: [] });
+      };
 
-        clearReactionsFn = async () => {
-          searchMsg.reactions.removeAll().catch(noop);
-          pluginData.events.off("messageReactionAdd", listenerFn);
-        };
-      }
-
-      clearTimeout(clearReactionsTimeout);
-      clearReactionsTimeout = setTimeout(clearReactionsFn, 5 * MINUTES);
+      clearTimeout(stopCollectionTimeout);
+      stopCollectionTimeout = setTimeout(stopCollectionFn, 2 * MINUTES);
+    } else {
+      searchMsg.edit(result);
     }
 
-    currentPage = searchResult.page;
     searching = false;
   };
 
@@ -370,7 +409,7 @@ async function performMemberSearch(
   } else {
     matchingMembers.sort(
       multiSorter([
-        [m => m.username.toLowerCase(), realSortDir],
+        [m => m.user.username.toLowerCase(), realSortDir],
         [m => m.discriminator, realSortDir],
       ]),
     );

@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
@@ -27,10 +27,9 @@ export const MutesCmd = mutesCmd({
     let totalMutes = 0;
     let hasFilters = false;
 
-    let hasReactions = false;
-    let clearReactionsFn;
-    let clearReactionsTimeout;
-    const clearReactionsDebounce = 5 * MINUTES;
+    let stopCollectionFn;
+    let stopCollectionTimeout;
+    const stopCollectionDebounce = 5 * MINUTES;
 
     let lines: string[] = [];
 
@@ -167,13 +166,12 @@ export const MutesCmd = mutesCmd({
       message += "\n\n" + pageLines.join("\n");
 
       listMessage.edit(message);
-      bumpClearReactionsTimeout();
+      bumpCollectionTimeout();
     };
 
-    const bumpClearReactionsTimeout = () => {
-      if (!hasReactions) return;
-      clearTimeout(clearReactionsTimeout);
-      clearReactionsTimeout = setTimeout(clearReactionsFn, clearReactionsDebounce);
+    const bumpCollectionTimeout = () => {
+      clearTimeout(stopCollectionTimeout);
+      stopCollectionTimeout = setTimeout(stopCollectionFn, stopCollectionDebounce);
     };
 
     if (totalMutes === 0) {
@@ -194,35 +192,55 @@ export const MutesCmd = mutesCmd({
       drawListPage(1);
 
       if (totalPages > 1) {
-        hasReactions = true;
-        listMessage.react("⬅");
-        listMessage.react("➡");
+        const idMod = `${listMessage.id}:muteList`;
+        const buttons: MessageButton[] = [];
 
-        const paginationReactionListener = pluginData.events.on(
-          "messageReactionAdd",
-          async ({ args: { reaction, user } }) => {
-            const rMsg = reaction.message;
-            const member = await pluginData.guild.members.fetch(user.id);
-            if (!isFullMessage(rMsg)) return;
-            if (rMsg.id !== listMessage.id) return;
-            if (member.id !== msg.author.id) return;
-            if (!["⬅", "➡"].includes(reaction.emoji.name!)) return;
-
-            if (reaction.emoji.name === "⬅" && currentPage > 1) {
-              drawListPage(currentPage - 1);
-            } else if (reaction.emoji.name === "➡" && currentPage < totalPages) {
-              drawListPage(currentPage + 1);
-            }
-
-            reaction.remove().catch(noop);
-          },
+        buttons.push(
+          new MessageButton()
+            .setStyle("SECONDARY")
+            .setEmoji("⬅")
+            .setType("BUTTON")
+            .setCustomID(`previousButton:${idMod}`),
         );
 
-        clearReactionsFn = () => {
-          listMessage.reactions.removeAll().catch(noop);
-          pluginData.events.off("messageReactionAdd", paginationReactionListener);
+        buttons.push(
+          new MessageButton()
+            .setStyle("SECONDARY")
+            .setEmoji("➡")
+            .setType("BUTTON")
+            .setCustomID(`nextButton:${idMod}`),
+        );
+
+        const row = new MessageActionRow().addComponents(buttons);
+        await listMessage.edit({ components: [row] });
+
+        const filter = (iac: MessageComponentInteraction) => iac.message.id === listMessage.id;
+        const collector = listMessage.createMessageComponentInteractionCollector(filter, {
+          time: stopCollectionDebounce,
+        });
+
+        collector.on("collect", async (interaction: MessageComponentInteraction) => {
+          if (msg.author.id !== interaction.user.id) {
+            interaction.reply(`You are not permitted to use these buttons.`, { ephemeral: true });
+          } else {
+            collector.resetTimer();
+            if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {
+              await interaction.deferUpdate();
+              await drawListPage(currentPage - 1);
+            } else if (interaction.customID === `nextButton:${idMod}` && currentPage < totalPages) {
+              await interaction.deferUpdate();
+              await drawListPage(currentPage + 1);
+            } else {
+              await interaction.deferUpdate();
+            }
+          }
+        });
+
+        stopCollectionFn = async () => {
+          collector.stop();
+          await listMessage.edit({ content: listMessage.content, components: [] });
         };
-        bumpClearReactionsTimeout();
+        bumpCollectionTimeout();
       }
     }
   },
