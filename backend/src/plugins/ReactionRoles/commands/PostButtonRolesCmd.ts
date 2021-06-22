@@ -4,6 +4,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { reactionRolesCmd } from "../types";
 import { createHash } from "crypto";
 import moment from "moment";
+import { splitButtonsIntoRows } from "../util/splitButtonsIntoRows";
 
 export const PostButtonRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles post",
@@ -16,6 +17,10 @@ export const PostButtonRolesCmd = reactionRolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     const cfg = pluginData.config.get();
+    if (!cfg.button_groups) {
+      sendErrorMessage(pluginData, msg.channel, "No button groups defined in config");
+      return;
+    }
     const group = cfg.button_groups[args.buttonGroup];
 
     if (!group) {
@@ -31,10 +36,11 @@ export const PostButtonRolesCmd = reactionRolesCmd({
         .digest("hex");
 
       const btn = new MessageButton()
-        .setLabel(button.label)
-        .setStyle("PRIMARY")
+        .setLabel(button.label ?? "")
+        .setStyle(button.style ?? "PRIMARY")
         .setType("BUTTON")
-        .setCustomID(customId);
+        .setCustomID(customId)
+        .setDisabled(button.disabled ?? false);
 
       if (button.emoji) {
         const emo = pluginData.client.emojis.resolve(button.emoji) ?? button.emoji;
@@ -44,10 +50,10 @@ export const PostButtonRolesCmd = reactionRolesCmd({
       buttons.push(btn);
       toInsert.push({ customId, buttonGroup: args.buttonGroup, buttonName });
     }
-    const row = new MessageActionRow().addComponents(buttons);
+    const rows = splitButtonsIntoRows(buttons, Object.values(group.default_buttons)); // new MessageActionRow().addComponents(buttons);
 
     try {
-      const newMsg = await args.channel.send({ content: group.message, components: [row], split: false });
+      const newMsg = await args.channel.send({ content: group.message, components: rows, split: false });
 
       for (const btn of toInsert) {
         await pluginData.state.buttonRoles.add(
