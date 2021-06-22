@@ -1,5 +1,8 @@
 import { PluginOptions } from "knub";
-import { GuildButtonRoles } from "src/data/GuildButtonRoles";
+import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
+import { GuildButtonRoles } from "../../data/GuildButtonRoles";
+import { isValidSnowflake } from "../../utils";
+import { StrictValidationError } from "../../validatorUtils";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
@@ -14,6 +17,7 @@ import { ButtonInteractionEvt } from "./events/ButtonInteractionEvt";
 import { MessageDeletedEvt } from "./events/MessageDeletedEvt";
 import { ConfigSchema, ReactionRolesPluginType } from "./types";
 import { autoRefreshLoop } from "./util/autoRefreshLoop";
+import { getRowCount } from "./util/splitButtonsIntoRows";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 
@@ -34,6 +38,57 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
       },
     },
   ],
+};
+
+const MAXIMUM_COMPONENT_ROWS = 5;
+
+const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = options => {
+  if (options.config.button_groups) {
+    for (const [groupName, group] of Object.entries(options.config.button_groups)) {
+      const defaultButtonNames = Object.keys(group.default_buttons);
+      const defaultButtons = Object.values(group.default_buttons);
+      const menuNames = Object.keys(group.button_menus ?? []);
+
+      const defaultBtnRowCount = getRowCount(defaultButtons);
+      if (defaultBtnRowCount > MAXIMUM_COMPONENT_ROWS || defaultBtnRowCount === 0) {
+        throw new StrictValidationError([
+          `Invalid row count for default_buttons: You currently have ${defaultBtnRowCount}, the maximum is 5. A new row is started automatically each 5 consecutive buttons.`,
+        ]);
+      }
+
+      for (let i = 0; i < defaultButtons.length; i++) {
+        const defBtn = defaultButtons[i];
+        if (!menuNames.includes(defBtn.role_or_menu) && !isValidSnowflake(defBtn.role_or_menu)) {
+          throw new StrictValidationError([
+            `Invalid value for default_buttons/${defaultButtonNames[i]}/role_or_menu: ${defBtn.role_or_menu} is neither an existing menu nor a valid snowflake.`,
+          ]);
+        }
+      }
+
+      for (const [menuName, menuButtonEntries] of Object.entries(group.button_menus ?? [])) {
+        const menuButtonNames = Object.keys(menuButtonEntries);
+        const menuButtons = Object.values(menuButtonEntries);
+
+        const menuButtonRowCount = getRowCount(menuButtons);
+        if (menuButtonRowCount > MAXIMUM_COMPONENT_ROWS || menuButtonRowCount === 0) {
+          throw new StrictValidationError([
+            `Invalid row count for button_menus/${menuName}: You currently have ${menuButtonRowCount}, the maximum is 5. A new row is started automatically each 5 consecutive buttons.`,
+          ]);
+        }
+
+        for (let i = 0; i < menuButtons.length; i++) {
+          const menuBtn = menuButtons[i];
+          if (!menuNames.includes(menuBtn.role_or_menu) && !isValidSnowflake(menuBtn.role_or_menu)) {
+            throw new StrictValidationError([
+              `Invalid value for button_menus/${menuButtonNames[i]}/role_or_menu: ${menuBtn.role_or_menu} is neither an existing menu nor a valid snowflake.`,
+            ]);
+          }
+        }
+      }
+    }
+  }
+
+  return options;
 };
 
 export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>()({
@@ -61,6 +116,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     ButtonInteractionEvt,
     MessageDeletedEvt,
   ],
+  configPreprocessor,
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
