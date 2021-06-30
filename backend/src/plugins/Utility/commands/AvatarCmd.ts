@@ -17,7 +17,7 @@ export const AvatarCmd = utilityCmd({
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
       let extension = user.avatarURL.slice(user.avatarURL.lastIndexOf("."), user.avatarURL.lastIndexOf("?"));
-      // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
+      // Some pngs can have the .jpg extension for some reason, so we always use .png for static images
       extension = extension === ".gif" ? extension : ".png";
       const avatarUrl = user.avatarURL.slice(0, user.avatarURL.lastIndexOf("."));
       const embed: EmbedOptions = {
