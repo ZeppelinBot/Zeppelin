@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { messageLink } from "../../../utils";
@@ -38,7 +38,7 @@ export const ContextCmd = utilityCmd({
     const previousMessage = (
       await (pluginData.guild.channels.cache.get(channel.id) as TextChannel).messages.fetch({
         limit: 1,
-        before: messageId,
+        before: messageId as Snowflake,
       })
     )[0];
     if (!previousMessage) {

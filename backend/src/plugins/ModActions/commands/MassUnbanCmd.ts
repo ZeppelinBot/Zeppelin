@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -60,7 +60,10 @@ export const MassunbanCmd = modActionsCmd({
       }
 
       try {
-        await pluginData.guild.bans.remove(userId, unbanReason != null ? encodeURIComponent(unbanReason) : undefined);
+        await pluginData.guild.bans.remove(
+          userId as Snowflake,
+          unbanReason != null ? encodeURIComponent(unbanReason) : undefined,
+        );
 
         await casesPlugin.createCase({
           userId,

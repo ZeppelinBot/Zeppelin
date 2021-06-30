@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { botControlCmd } from "../types";
@@ -15,7 +15,7 @@ export const ReloadServerCmd = botControlCmd({
   },
 
   async run({ pluginData, message: msg, args }) {
-    if (!pluginData.client.guilds.cache.has(args.guildId)) {
+    if (!pluginData.client.guilds.cache.has(args.guildId as Snowflake)) {
       sendErrorMessage(pluginData, msg.channel as TextChannel, "I am not in that guild");
       return;
     }
@@ -27,7 +27,7 @@ export const ReloadServerCmd = botControlCmd({
       return;
     }
 
-    const guild = await pluginData.client.guilds.fetch(args.guildId);
+    const guild = await pluginData.client.guilds.fetch(args.guildId as Snowflake);
     sendSuccessMessage(pluginData, msg.channel as TextChannel, `Reloaded guild **${guild?.name || "???"}**`);
   },
 });

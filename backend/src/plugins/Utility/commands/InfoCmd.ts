@@ -58,7 +58,7 @@ export const InfoCmd = utilityCmd({
 
     // 2. Server
     if (userCfg.can_server) {
-      const guild = await pluginData.client.guilds.fetch(value).catch(noop);
+      const guild = await pluginData.client.guilds.fetch(value as Snowflake).catch(noop);
       if (guild) {
         const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
         if (embed) {

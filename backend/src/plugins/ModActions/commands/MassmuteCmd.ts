@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
@@ -43,7 +43,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.cache.get(userId);
+      const member = pluginData.guild.members.cache.get(userId as Snowflake);
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massmute one or more users: insufficient permissions");
         return;

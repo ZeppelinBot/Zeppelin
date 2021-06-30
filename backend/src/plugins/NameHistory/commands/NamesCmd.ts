@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { createChunkedMessage, disableCodeBlocks } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
@@ -29,7 +30,7 @@ export const NamesCmd = nameHistoryCmd({
     );
     const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
-    const user = await pluginData.client.users.fetch(args.userId);
+    const user = await pluginData.client.users.fetch(args.userId as Snowflake);
     const currentUsername = user ? `${user.username}#${user.discriminator}` : args.userId;
 
     const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);

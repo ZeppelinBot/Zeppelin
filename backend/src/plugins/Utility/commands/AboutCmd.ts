@@ -63,24 +63,26 @@ export const AboutCmd = utilityCmd({
     );
     loadedPlugins.sort();
 
-    const aboutContent: MessageOptions & { embed: EmbedWith<"title" | "fields"> } = {
-      embed: {
-        title: `About ${pluginData.client.user!.username}`,
-        fields: [
-          {
-            name: "Status",
-            value: basicInfoRows
-              .map(([label, value]) => {
-                return `${label}: **${value}**`;
-              })
-              .join("\n"),
-          },
-          {
-            name: `Loaded plugins on this server (${loadedPlugins.length})`,
-            value: loadedPlugins.join(", "),
-          },
-        ],
-      },
+    const aboutContent: MessageOptions = {
+      embeds: [
+        {
+          title: `About ${pluginData.client.user!.username}`,
+          fields: [
+            {
+              name: "Status",
+              value: basicInfoRows
+                .map(([label, value]) => {
+                  return `${label}: **${value}**`;
+                })
+                .join("\n"),
+            },
+            {
+              name: `Loaded plugins on this server (${loadedPlugins.length})`,
+              value: loadedPlugins.join(", "),
+            },
+          ],
+        },
+      ],
     };
 
     const supporters = await pluginData.state.supporters.getAll();
@@ -92,9 +94,10 @@ export const AboutCmd = utilityCmd({
     );
 
     if (supporters.length) {
-      aboutContent.embed.fields.push({
+      aboutContent.embeds![0].fields!.push({
         name: "Zeppelin supporters 🎉",
         value: supporters.map(s => `**${s.name}** ${s.amount ? `${s.amount}€/mo` : ""}`.trim()).join("\n"),
+        inline: false,
       });
     }
 
@@ -105,12 +108,12 @@ export const AboutCmd = utilityCmd({
     botRoles = botRoles.filter(r => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
     if (botRoles.length) {
-      aboutContent.embed.color = botRoles[0].color;
+      aboutContent.embeds![0].color = botRoles[0].color;
     }
 
     // Use the bot avatar as the embed image
     if (pluginData.client.user!.avatarURL()) {
-      aboutContent.embed.thumbnail = { url: pluginData.client.user!.avatarURL()! };
+      aboutContent.embeds![0].thumbnail = { url: pluginData.client.user!.avatarURL()! };
     }
 
     msg.channel.send(aboutContent);
