@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import { Snowflake, User } from "discord.js";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { mutesCmd } from "../types";
 
@@ -19,7 +19,7 @@ export const ClearBannedMutesCmd = mutesCmd({
 
     let cleared = 0;
     for (const mute of activeMutes) {
-      if (bannedIds.includes(mute.user_id)) {
+      if (bannedIds.includes(mute.user_id as Snowflake)) {
         await pluginData.state.mutes.clear(mute.user_id);
         cleared++;
       }

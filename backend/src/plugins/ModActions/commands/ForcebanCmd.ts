@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -66,7 +67,7 @@ export const ForcebanCmd = modActionsCmd({
 
     try {
       // FIXME: Use banUserId()?
-      await pluginData.guild.bans.create(user.id, {
+      await pluginData.guild.bans.create(user.id as Snowflake, {
         days: 1,
         reason: reason != null ? encodeURIComponent(reason) : undefined,
       });

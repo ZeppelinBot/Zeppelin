@@ -8,12 +8,12 @@ export function hasDiscordPermissions(
   resolvedPermissions: Permissions | Readonly<Permissions> | null,
   requiredPermissions: number | bigint,
 ) {
-  const allowedPermissions = BigInt(resolvedPermissions);
-  const nRequiredPermissions = BigInt(requiredPermissions);
+  const allowedPermissions = resolvedPermissions;
+  const nRequiredPermissions = requiredPermissions;
 
-  if (Boolean(allowedPermissions & BigInt(Permissions.FLAGS.ADMINISTRATOR))) {
+  if (Boolean(allowedPermissions?.bitfield! & Permissions.FLAGS.ADMINISTRATOR)) {
     return true;
   }
 
-  return Boolean((allowedPermissions & nRequiredPermissions) === nRequiredPermissions);
+  return Boolean((allowedPermissions?.bitfield! & BigInt(nRequiredPermissions)) === nRequiredPermissions);
 }

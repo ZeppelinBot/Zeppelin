@@ -28,7 +28,6 @@ export async function sendWhere(
     channel.send({
       content: prepend + `<@${member.id}> is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
       allowedMentions: { parse: ["users"] },
-      split: false,
     });
   }
 }

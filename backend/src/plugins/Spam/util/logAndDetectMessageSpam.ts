@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -123,7 +123,9 @@ export async function logAndDetectMessageSpam(
         // Then, if enabled, remove the spam messages
         if (spamConfig.clean !== false) {
           msgIds.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-          (pluginData.guild.channels.cache.get(savedMessage.channel_id)! as TextChannel).bulkDelete(msgIds).catch(noop);
+          (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake)! as TextChannel)
+            .bulkDelete(msgIds as Snowflake[])
+            .catch(noop);
         }
 
         // Store the ID of the last handled message
@@ -146,7 +148,7 @@ export async function logAndDetectMessageSpam(
         clearRecentUserActions(pluginData, type, savedMessage.user_id, savedMessage.channel_id);
 
         // Generate a log from the detected messages
-        const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
+        const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
         const archiveUrl = await saveSpamArchives(pluginData, uniqueMessages);
 
         // Create a case

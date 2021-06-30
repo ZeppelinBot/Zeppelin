@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { LogType } from "../../../data/LogType";
@@ -24,7 +24,7 @@ export const AlertAction = automodAction({
   defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
-    const channel = pluginData.guild.channels.cache.get(actionConfig.channel);
+    const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
     if (channel && channel instanceof TextChannel) {

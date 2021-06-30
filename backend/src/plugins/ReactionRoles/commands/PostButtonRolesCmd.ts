@@ -1,4 +1,4 @@
-import { MessageActionRow, MessageButton, TextChannel } from "discord.js";
+import { MessageActionRow, MessageButton, Snowflake, TextChannel } from "discord.js";
 import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { reactionRolesCmd } from "../types";
@@ -38,12 +38,11 @@ export const PostButtonRolesCmd = reactionRolesCmd({
       const btn = new MessageButton()
         .setLabel(button.label ?? "")
         .setStyle(button.style ?? "PRIMARY")
-        .setType("BUTTON")
         .setCustomID(customId)
         .setDisabled(button.disabled ?? false);
 
       if (button.emoji) {
-        const emo = pluginData.client.emojis.resolve(button.emoji) ?? button.emoji;
+        const emo = pluginData.client.emojis.resolve(button.emoji as Snowflake) ?? button.emoji;
         btn.setEmoji(emo);
       }
 

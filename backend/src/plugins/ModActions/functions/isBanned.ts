@@ -1,4 +1,4 @@
-import { Permissions } from "discord.js";
+import { Permissions, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { isDiscordHTTPError, isDiscordRESTError, SECONDS, sleep } from "../../../utils";
@@ -21,7 +21,7 @@ export async function isBanned(
 
   try {
     const potentialBan = await Promise.race([
-      pluginData.guild.bans.fetch({ user: userId }).catch(() => null),
+      pluginData.guild.bans.fetch({ user: userId as Snowflake }).catch(() => null),
       sleep(timeout),
     ]);
     return potentialBan != null;

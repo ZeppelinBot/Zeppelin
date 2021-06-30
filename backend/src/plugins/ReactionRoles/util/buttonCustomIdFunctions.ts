@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType } from "../types";
 import { ButtonMenuActions } from "./buttonMenuActions";
@@ -5,7 +6,7 @@ import { ButtonMenuActions } from "./buttonMenuActions";
 export const BUTTON_CONTEXT_SEPARATOR = "::";
 
 export async function getButtonAction(pluginData: GuildPluginData<ReactionRolesPluginType>, roleOrMenu: string) {
-  if (await pluginData.guild.roles.fetch(roleOrMenu)) {
+  if (await pluginData.guild.roles.fetch(roleOrMenu as Snowflake).catch(() => false)) {
     return ButtonMenuActions.MODIFY_ROLE;
   } else {
     return ButtonMenuActions.OPEN_MENU;

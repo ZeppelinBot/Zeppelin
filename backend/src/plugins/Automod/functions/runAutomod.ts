@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { availableActions } from "../actions/availableActions";
 import { CleanAction } from "../actions/clean";
@@ -9,10 +9,10 @@ import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
-  const user = context.user || (userId && pluginData.client.users!.cache.get(userId));
-  const member = context.member || (userId && pluginData.guild.members.cache.get(userId)) || null;
+  const user = context.user || (userId && pluginData.client.users!.cache.get(userId as Snowflake));
+  const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
   const channelId = context.message?.channel_id;
-  const channel = channelId ? (pluginData.guild.channels.cache.get(channelId) as TextChannel) : null;
+  const channel = channelId ? (pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel) : null;
   const categoryId = channel?.parentID;
 
   const config = await pluginData.config.getMatchingConfig({

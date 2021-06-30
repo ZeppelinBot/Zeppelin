@@ -1,4 +1,4 @@
-import { TextChannel, User } from "discord.js";
+import { Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType";
@@ -12,10 +12,10 @@ const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginType>) {
   const duePosts = await pluginData.state.scheduledPosts.getDueScheduledPosts();
   for (const post of duePosts) {
-    const channel = pluginData.guild.channels.cache.get(post.channel_id);
+    const channel = pluginData.guild.channels.cache.get(post.channel_id as Snowflake);
     if (channel instanceof TextChannel) {
       const [username, discriminator] = post.author_name.split("#");
-      const author: User = (await pluginData.client.users.fetch(post.author_id)) || {
+      const author: User = (await pluginData.client.users.fetch(post.author_id as Snowflake)) || {
         id: post.author_id,
         username,
         discriminator,

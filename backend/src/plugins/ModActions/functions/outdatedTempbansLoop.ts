@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -30,7 +31,10 @@ export async function outdatedTempbansLoop(pluginData: GuildPluginData<ModAction
     );
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, tempban.user_id);
-      await pluginData.guild.bans.remove(tempban.user_id, reason != null ? encodeURIComponent(reason) : undefined);
+      await pluginData.guild.bans.remove(
+        tempban.user_id as Snowflake,
+        reason != null ? encodeURIComponent(reason) : undefined,
+      );
     } catch (e) {
       pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
         body: `Encountered an error trying to automatically unban ${tempban.user_id} after tempban timeout`,

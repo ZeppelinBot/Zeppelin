@@ -196,7 +196,7 @@ export async function sendSuccessMessage(
     : { content: formattedBody };
 
   return channel
-    .send({ ...content, split: false }) // Force line break
+    .send({ ...content }) // Force line break
     .catch(err => {
       const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : `${channel.id}`;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
@@ -217,7 +217,7 @@ export async function sendErrorMessage(
     : { content: formattedBody };
 
   return channel
-    .send({ ...content, split: false }) // Force line break
+    .send({ ...content }) // Force line break
     .catch(err => {
       const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : `${channel.id}`;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);

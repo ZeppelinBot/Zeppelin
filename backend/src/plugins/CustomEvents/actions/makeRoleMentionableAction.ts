@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { convertDelayStringToMS, noop, tDelayString } from "../../../utils";
@@ -18,7 +19,7 @@ export async function makeRoleMentionableAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const role = pluginData.guild.roles.cache.get(action.role);
+  const role = pluginData.guild.roles.cache.get(action.role as Snowflake);
   if (!role) {
     throw new ActionError(`Unknown role: ${role}`);
   }

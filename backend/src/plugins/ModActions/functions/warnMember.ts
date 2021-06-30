@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -75,7 +75,7 @@ export async function warnMember(
     noteDetails: notifyResult.text ? [ucfirst(notifyResult.text)] : [],
   });
 
-  const mod = await pluginData.guild.members.fetch(modId);
+  const mod = await pluginData.guild.members.fetch(modId as Snowflake);
   pluginData.state.serverLogs.log(LogType.MEMBER_WARN, {
     mod: stripObjectToScalars(mod),
     member: stripObjectToScalars(member, ["user", "roles"]),

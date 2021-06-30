@@ -1,4 +1,4 @@
-import { MessageMentionTypes, TextChannel } from "discord.js";
+import { MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -19,7 +19,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
   const typeStr = LogType[type];
 
   logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
-    const channel = pluginData.guild.channels.cache.get(channelId);
+    const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
     if (!channel || !(channel instanceof TextChannel)) continue;
 
     if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
@@ -45,7 +45,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (opts.excluded_roles) {
         for (const value of Object.values(data || {})) {
           if (value instanceof SavedMessage) {
-            const member = pluginData.guild.members.cache.get(value.user_id);
+            const member = pluginData.guild.members.cache.get(value.user_id as Snowflake);
             for (const role of member?.roles.cache || []) {
               if (opts.excluded_roles.includes(role[0])) {
                 continue logChannelLoop;

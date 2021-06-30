@@ -1,4 +1,4 @@
-import { Guild } from "discord.js";
+import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
 import { renderTemplate } from "../templateFormatter";
@@ -73,7 +73,7 @@ export class GuildArchives extends BaseGuildRepository {
   protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
     const msgLines: string[] = [];
     for (const msg of savedMessages) {
-      const channel = guild.channels.cache.get(msg.channel_id);
+      const channel = guild.channels.cache.get(msg.channel_id as Snowflake);
       const user = { ...msg.data.author, id: msg.user_id };
 
       const line = await renderTemplate(MESSAGE_ARCHIVE_MESSAGE_FORMAT, {

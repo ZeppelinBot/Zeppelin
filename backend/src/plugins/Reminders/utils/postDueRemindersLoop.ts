@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { disableLinkPreviews } from "knub/dist/helpers";
@@ -12,7 +12,7 @@ const MAX_TRIES = 3;
 export async function postDueRemindersLoop(pluginData: GuildPluginData<RemindersPluginType>) {
   const pendingReminders = await pluginData.state.reminders.getDueReminders();
   for (const reminder of pendingReminders) {
-    const channel = pluginData.guild.channels.cache.get(reminder.channel_id);
+    const channel = pluginData.guild.channels.cache.get(reminder.channel_id as Snowflake);
     if (channel && channel instanceof TextChannel) {
       try {
         // Only show created at date if one exists
@@ -25,14 +25,14 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
               `Reminder for <@!${reminder.user_id}>: ${reminder.body} \n\`Set at ${reminder.created_at} (${result} ago)\``,
             ),
             allowedMentions: {
-              users: [reminder.user_id],
+              users: [reminder.user_id as Snowflake],
             },
           });
         } else {
           await channel.send({
             content: disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`),
             allowedMentions: {
-              users: [reminder.user_id],
+              users: [reminder.user_id as Snowflake],
             },
           });
         }

@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
@@ -39,7 +40,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage;
     try {
-      targetMessage = await args.message.channel.messages.fetch(args.message.messageId).catch(noop);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(noop);
     } catch (e) {
       if (isDiscordRESTError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
@@ -94,7 +95,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         return;
       }
 
-      if (!pluginData.guild.roles.cache.has(pair[1])) {
+      if (!pluginData.guild.roles.cache.has(pair[1] as Snowflake)) {
         sendErrorMessage(pluginData, msg.channel, `Unknown role ${pair[1]}`);
         return;
       }

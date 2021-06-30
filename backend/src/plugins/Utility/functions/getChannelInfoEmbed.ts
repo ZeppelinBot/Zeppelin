@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, StageChannel, VoiceChannel } from "discord.js";
+import { MessageEmbedOptions, Snowflake, StageChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -21,7 +21,7 @@ export async function getChannelInfoEmbed(
   channelId: string,
   requestMemberId?: string,
 ): Promise<MessageEmbedOptions | null> {
-  const channel = pluginData.guild.channels.cache.get(channelId);
+  const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
   if (!channel) {
     return null;
   }

@@ -13,23 +13,21 @@ export async function waitForButtonConfirm(
       new MessageButton()
         .setStyle("SUCCESS")
         .setLabel(options?.confirmText || "Confirm")
-        .setType("BUTTON")
         .setCustomID(`confirmButton:${idMod}`),
 
       new MessageButton()
         .setStyle("DANGER")
         .setLabel(options?.cancelText || "Cancel")
-        .setType("BUTTON")
         .setCustomID(`cancelButton:${idMod}`),
     ]);
-    const message = await channel.send({ ...toPost, components: [row], split: false });
+    const message = await channel.send({ ...toPost, components: [row] });
 
     const filter = (iac: MessageComponentInteraction) => iac.message.id === message.id;
-    const collector = message.createMessageComponentInteractionCollector(filter, { time: 10000 });
+    const collector = message.createMessageComponentInteractionCollector({ filter, time: 10000 });
 
     collector.on("collect", (interaction: MessageComponentInteraction) => {
       if (options?.restrictToId && options.restrictToId !== interaction.user.id) {
-        interaction.reply(`You are not permitted to use these buttons.`, { ephemeral: true });
+        interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
       } else {
         if (interaction.customID === `confirmButton:${idMod}`) {
           message.delete();

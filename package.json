@@ -8,7 +8,6 @@
     "lint": "tslint \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
     "codestyle-check": "prettier --check \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\""
   },
-  "dependencies": {},
   "devDependencies": {
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",

@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -15,7 +15,7 @@ import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 
-  const channel = pluginData.guild.channels.cache.get(msg.channel_id) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
   if (!channel) return;
 
   // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
@@ -49,7 +49,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
-    const message = await channel.messages.fetch(msg.id);
+    const message = await channel.messages.fetch(msg.id as Snowflake);
     if (message) {
       message.delete();
       return thisMsgLock.interrupt();

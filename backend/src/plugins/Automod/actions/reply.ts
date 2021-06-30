@@ -1,4 +1,4 @@
-import { MessageOptions, Permissions, TextChannel, User } from "discord.js";
+import { MessageOptions, Permissions, Snowflake, TextChannel, User } from "discord.js";
 import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
@@ -31,7 +31,7 @@ export const ReplyAction = automodAction({
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const contextsWithTextChannels = contexts
       .filter(c => c.message?.channel_id)
-      .filter(c => pluginData.guild.channels.cache.get(c.message!.channel_id) instanceof TextChannel);
+      .filter(c => pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake) instanceof TextChannel);
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
       if (!map.has(context.message!.channel_id)) {
@@ -56,7 +56,7 @@ export const ReplyAction = automodAction({
           : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageOptions);
 
       if (formatted) {
-        const channel = pluginData.guild.channels.cache.get(channelId) as TextChannel;
+        const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
 
         // Check for basic Send Messages and View Channel permissions
         if (
@@ -90,7 +90,6 @@ export const ReplyAction = automodAction({
           allowedMentions: {
             users: [user.id],
           },
-          split: false,
         });
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {

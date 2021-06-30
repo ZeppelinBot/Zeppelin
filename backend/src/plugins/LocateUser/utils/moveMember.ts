@@ -1,4 +1,4 @@
-import { GuildMember, TextChannel } from "discord.js";
+import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { LocateUserPluginType } from "../types";
@@ -9,7 +9,7 @@ export async function moveMember(
   target: GuildMember,
   errorChannel: TextChannel,
 ) {
-  const modMember: GuildMember = await pluginData.guild.members.fetch(toMoveID);
+  const modMember: GuildMember = await pluginData.guild.members.fetch(toMoveID as Snowflake);
   if (modMember.voice.channelID != null) {
     try {
       await modMember.edit({

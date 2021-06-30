@@ -1,4 +1,4 @@
-import { MessageMentionOptions, MessageMentionTypes } from "discord.js";
+import { MessageMentionOptions, MessageMentionTypes, Snowflake } from "discord.js";
 
 export function erisAllowedMentionsToDjsMentionOptions(
   allowedMentions: ErisAllowedMentionFormat | undefined,
@@ -6,17 +6,17 @@ export function erisAllowedMentionsToDjsMentionOptions(
   if (allowedMentions === undefined) return undefined;
 
   const parse: MessageMentionTypes[] = [];
-  let users: string[] | undefined;
-  let roles: string[] | undefined;
+  let users: Snowflake[] | undefined;
+  let roles: Snowflake[] | undefined;
 
   if (Array.isArray(allowedMentions.users)) {
-    users = allowedMentions.users;
+    users = allowedMentions.users as Snowflake[];
   } else if (allowedMentions.users === true) {
     parse.push("users");
   }
 
   if (Array.isArray(allowedMentions.roles)) {
-    roles = allowedMentions.roles;
+    roles = allowedMentions.roles as Snowflake[];
   } else if (allowedMentions.roles === true) {
     parse.push("roles");
   }

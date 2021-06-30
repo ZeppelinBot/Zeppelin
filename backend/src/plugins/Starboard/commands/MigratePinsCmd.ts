@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { starboardCmd } from "../types";
@@ -23,7 +23,7 @@ export const MigratePinsCmd = starboardCmd({
       return;
     }
 
-    const starboardChannel = pluginData.guild.channels.cache.get(starboard.channel_id);
+    const starboardChannel = pluginData.guild.channels.cache.get(starboard.channel_id as Snowflake);
     if (!starboardChannel || !(starboardChannel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, "Starboard has an unknown/invalid channel id");
       return;

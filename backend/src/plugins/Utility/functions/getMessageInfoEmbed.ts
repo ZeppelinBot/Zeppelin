@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, TextChannel } from "discord.js";
+import { MessageEmbedOptions, Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
@@ -16,8 +16,8 @@ export async function getMessageInfoEmbed(
   messageId: string,
   requestMemberId?: string,
 ): Promise<MessageEmbedOptions | null> {
-  const message = await (pluginData.guild.channels.resolve(channelId) as TextChannel).messages
-    .fetch(messageId)
+  const message = await (pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel).messages
+    .fetch(messageId as Snowflake)
     .catch(() => null);
   if (!message) {
     return null;

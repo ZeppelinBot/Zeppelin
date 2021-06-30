@@ -12,13 +12,13 @@ import { modActionsCmd } from "../types";
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
   hidden: ct.bool({ option: true, isSwitch: true, shortcut: "h" }),
-  reverseFilters: ct.switchOption({ shortcut: "r" }),
-  notes: ct.switchOption({ shortcut: "n" }),
-  warns: ct.switchOption({ shortcut: "w" }),
-  mutes: ct.switchOption({ shortcut: "m" }),
-  unmutes: ct.switchOption({ shortcut: "um" }),
-  bans: ct.switchOption({ shortcut: "b" }),
-  unbans: ct.switchOption({ shortcut: "ub" }),
+  reverseFilters: ct.switchOption({ def: false, shortcut: "r" }),
+  notes: ct.switchOption({ def: false, shortcut: "n" }),
+  warns: ct.switchOption({ def: false, shortcut: "w" }),
+  mutes: ct.switchOption({ def: false, shortcut: "m" }),
+  unmutes: ct.switchOption({ def: false, shortcut: "um" }),
+  bans: ct.switchOption({ def: false, shortcut: "b" }),
+  unbans: ct.switchOption({ def: false, shortcut: "ub" }),
 };
 
 export const CasesUserCmd = modActionsCmd({
@@ -127,7 +127,7 @@ export const CasesUserCmd = modActionsCmd({
             ],
           };
 
-          msg.channel.send({ embed });
+          msg.channel.send({ embeds: [embed] });
         }
       }
     }

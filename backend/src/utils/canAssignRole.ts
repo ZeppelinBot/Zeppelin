@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Permissions, Role } from "discord.js";
+import { Guild, GuildMember, Permissions, Role, Snowflake } from "discord.js";
 import { getMissingPermissions } from "./getMissingPermissions";
 import { hasDiscordPermissions } from "./hasDiscordPermissions";
 
@@ -11,7 +11,7 @@ export function canAssignRole(guild: Guild, member: GuildMember, roleId: string)
     return false;
   }
 
-  const targetRole = guild.roles.cache.get(roleId);
+  const targetRole = guild.roles.cache.get(roleId as Snowflake);
   if (!targetRole) {
     return false;
   }

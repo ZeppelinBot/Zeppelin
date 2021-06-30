@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { postCmd } from "../types";
@@ -25,9 +25,12 @@ export const EditCmd = postCmd({
       return;
     }
 
-    (pluginData.guild.channels.cache.get(savedMessage.channel_id) as TextChannel).messages.edit(savedMessage.id, {
-      content: formatContent(args.content),
-    });
+    (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake) as TextChannel).messages.edit(
+      savedMessage.id as Snowflake,
+      {
+        content: formatContent(args.content),
+      },
+    );
     sendSuccessMessage(pluginData, msg.channel, "Message edited");
   },
 });

@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 import { mutesCmd } from "../types";
@@ -19,7 +20,7 @@ export const ClearMutesWithoutRoleCmd = mutesCmd({
       const member = await resolveMember(pluginData.client, pluginData.guild, mute.user_id);
       if (!member) continue;
 
-      if (!member.roles.cache.has(muteRole)) {
+      if (!member.roles.cache.has(muteRole as Snowflake)) {
         await pluginData.state.mutes.clear(mute.user_id);
         cleared++;
       }

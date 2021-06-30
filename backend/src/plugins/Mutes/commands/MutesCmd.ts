@@ -1,4 +1,4 @@
-import { GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction } from "discord.js";
+import { GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
@@ -16,9 +16,9 @@ export const MutesCmd = mutesCmd({
       shortcut: "a",
     }),
 
-    left: ct.switchOption({ shortcut: "l" }),
-    manual: ct.switchOption({ shortcut: "m" }),
-    export: ct.switchOption({ shortcut: "e" }),
+    left: ct.switchOption({ def: false, shortcut: "l" }),
+    manual: ct.switchOption({ def: false, shortcut: "m" }),
+    export: ct.switchOption({ def: false, shortcut: "e" }),
   },
 
   async run({ pluginData, message: msg, args }) {
@@ -53,7 +53,7 @@ export const MutesCmd = mutesCmd({
       if (muteRole) {
         pluginData.guild.members.cache.forEach(member => {
           if (muteUserIds.has(member.id)) return;
-          if (member.roles.cache.has(muteRole)) manuallyMutedMembers.push(member);
+          if (member.roles.cache.has(muteRole as Snowflake)) manuallyMutedMembers.push(member);
         });
       }
 
@@ -111,7 +111,7 @@ export const MutesCmd = mutesCmd({
       const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
       lines = filteredMutes.map(mute => {
-        const user = pluginData.client.users.resolve(mute.user_id);
+        const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
         const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
@@ -199,7 +199,6 @@ export const MutesCmd = mutesCmd({
           new MessageButton()
             .setStyle("SECONDARY")
             .setEmoji("⬅")
-            .setType("BUTTON")
             .setCustomID(`previousButton:${idMod}`),
         );
 
@@ -207,7 +206,6 @@ export const MutesCmd = mutesCmd({
           new MessageButton()
             .setStyle("SECONDARY")
             .setEmoji("➡")
-            .setType("BUTTON")
             .setCustomID(`nextButton:${idMod}`),
         );
 
@@ -215,13 +213,14 @@ export const MutesCmd = mutesCmd({
         await listMessage.edit({ components: [row] });
 
         const filter = (iac: MessageComponentInteraction) => iac.message.id === listMessage.id;
-        const collector = listMessage.createMessageComponentInteractionCollector(filter, {
+        const collector = listMessage.createMessageComponentInteractionCollector({
+          filter,
           time: stopCollectionDebounce,
         });
 
         collector.on("collect", async (interaction: MessageComponentInteraction) => {
           if (msg.author.id !== interaction.user.id) {
-            interaction.reply(`You are not permitted to use these buttons.`, { ephemeral: true });
+            interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
           } else {
             collector.resetTimer();
             if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {

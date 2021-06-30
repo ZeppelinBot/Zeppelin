@@ -22,7 +22,7 @@ export async function rehostAttachment(attachment: MessageAttachment, targetChan
       content: `Rehost of attachment ${attachment.id}`,
       files: [{ name: attachment.name ? attachment.name : undefined, attachment: await fsp.readFile(downloaded.path) }],
     };
-    const rehostMessage = await targetChannel.send({ content, split: false });
+    const rehostMessage = await targetChannel.send(content);
     return rehostMessage.attachments.values()[0].url;
   } catch {
     return "Failed to rehost attachment";

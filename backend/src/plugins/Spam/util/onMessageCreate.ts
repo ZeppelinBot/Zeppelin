@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
@@ -7,7 +8,7 @@ import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 export async function onMessageCreate(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
   if (savedMessage.is_bot) return;
 
-  const member = pluginData.guild.members.cache.get(savedMessage.user_id);
+  const member = pluginData.guild.members.cache.get(savedMessage.user_id as Snowflake);
   const config = await pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,

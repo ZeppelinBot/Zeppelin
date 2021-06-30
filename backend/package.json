@@ -29,7 +29,7 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
-    "discord.js": "github:monbrey/discord.js#9c42f571093b2565df28b756fdca4ac59cad0fe3",
+    "discord.js": "^13.0.0-dev.edab5af.1624996138",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "erlpack": "github:discord/erlpack",
@@ -39,8 +39,8 @@
     "humanize-duration": "^3.15.0",
     "io-ts": "^2.0.0",
     "js-yaml": "^3.13.1",
-    "knub": "^30.0.0-beta.38",
-    "knub-command-manager": "^8.1.2",
+    "knub": "file:../../Knub",
+    "knub-command-manager": "^9.1.0",
     "last-commit-log": "^2.1.0",
     "lodash.chunk": "^4.2.0",
     "lodash.clonedeep": "^4.5.0",
@@ -88,7 +88,7 @@
     "rimraf": "^2.6.2",
     "source-map-support": "^0.5.16",
     "tsc-watch": "^4.0.0",
-    "typescript": "^4.1.3"
+    "typescript": "^4.4.0-dev.20210629"
   },
   "ava": {
     "files": [

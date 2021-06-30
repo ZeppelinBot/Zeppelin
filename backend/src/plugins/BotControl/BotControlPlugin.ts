@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
@@ -58,9 +58,9 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       const [guildId, channelId] = activeReload;
       resetActiveReload();
 
-      const guild = await pluginData.client.guilds.fetch(guildId);
+      const guild = await pluginData.client.guilds.fetch(guildId as Snowflake);
       if (guild) {
-        const channel = guild.channels.cache.get(channelId);
+        const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {
           sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
         }

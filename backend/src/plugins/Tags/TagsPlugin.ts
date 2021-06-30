@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { PluginOptions } from "knub";
 import moment from "moment-timezone";
@@ -214,11 +215,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
           return input;
         }
 
-        if (pluginData.guild.members.cache.has(input) || pluginData.client.users.resolve(input)) {
+        if (
+          pluginData.guild.members.cache.has(input as Snowflake) ||
+          pluginData.client.users.resolve(input as Snowflake)
+        ) {
           return `<@!${input}>`;
         }
 
-        if (pluginData.guild.channels.cache.has(input)) {
+        if (pluginData.guild.channels.cache.has(input as Snowflake)) {
           return `<#${input}>`;
         }
 

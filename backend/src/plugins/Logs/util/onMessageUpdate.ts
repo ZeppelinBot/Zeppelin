@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -47,7 +47,7 @@ export async function onMessageUpdate(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
 
   pluginData.state.guildLogs.log(LogType.MESSAGE_EDIT, {
     user: stripObjectToScalars(user),

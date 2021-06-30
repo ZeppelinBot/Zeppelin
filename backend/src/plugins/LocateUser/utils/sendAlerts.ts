@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { resolveMember } from "../../../utils";
 import { LocateUserPluginType } from "../types";
@@ -12,7 +12,7 @@ export async function sendAlerts(pluginData: GuildPluginData<LocateUserPluginTyp
 
   triggeredAlerts.forEach(alert => {
     const prepend = `<@!${alert.requestor_id}>, an alert requested by you has triggered!\nReminder: \`${alert.body}\`\n`;
-    const txtChannel = pluginData.guild.channels.resolve(alert.channel_id) as TextChannel;
+    const txtChannel = pluginData.guild.channels.resolve(alert.channel_id as Snowflake) as TextChannel;
     sendWhere(pluginData, member, txtChannel, prepend);
     if (alert.active) {
       moveMember(pluginData, alert.requestor_id, member, txtChannel);

@@ -27,8 +27,12 @@ export function messageHasContent(content: string | MessageOptions): boolean {
     return true;
   }
 
-  if (content.embed && embedHasContent(content.embed)) {
-    return true;
+  if (content.embeds) {
+    for (const embed of content.embeds) {
+      if (embed && embedHasContent(embed)) {
+        return true;
+      }
+    }
   }
 
   return false;

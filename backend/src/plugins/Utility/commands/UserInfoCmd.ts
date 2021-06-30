@@ -12,7 +12,7 @@ export const UserInfoCmd = utilityCmd({
   signature: {
     user: ct.resolvedUserLoose({ required: false }),
 
-    compact: ct.switchOption({ shortcut: "c" }),
+    compact: ct.switchOption({ def: false, shortcut: "c" }),
   },
 
   async run({ message, args, pluginData }) {
@@ -23,6 +23,6 @@ export const UserInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.send({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

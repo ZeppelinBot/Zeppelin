@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
@@ -20,7 +21,7 @@ export const SourceCmd = utilityCmd({
       return;
     }
 
-    const message = await args.message.channel.messages.fetch(args.message.messageId).catch(() => null);
+    const message = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(() => null);
     if (!message) {
       sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;

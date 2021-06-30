@@ -1,4 +1,4 @@
-import { Permissions, StageChannel, TextChannel, VoiceChannel } from "discord.js";
+import { Permissions, Snowflake, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { isDiscordRESTError, MINUTES } from "../../../utils";
@@ -51,13 +51,15 @@ export async function handleCompanionPermissions(
 
   try {
     for (const channelId of permsToDelete) {
-      const channel = pluginData.guild.channels.cache.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.permissionOverwrites.get(userId)?.delete(`Companion Channel for ${oldChannel!.id} | User Left`);
+      await channel.permissionOverwrites
+        .get(userId as Snowflake)
+        ?.delete(`Companion Channel for ${oldChannel!.id} | User Left`);
     }
 
     for (const [channelId, permissions] of permsToSet) {
-      const channel = pluginData.guild.channels.cache.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
       await channel.updateOverwrite(userId, new Permissions(BigInt(permissions)).serialize(), {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,

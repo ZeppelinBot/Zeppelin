@@ -8,10 +8,10 @@ export const banSearchSignature = {
 
   page: ct.number({ option: true, shortcut: "p" }),
   sort: ct.string({ option: true }),
-  "case-sensitive": ct.switchOption({ shortcut: "cs" }),
-  export: ct.switchOption({ shortcut: "e" }),
+  "case-sensitive": ct.switchOption({ def: false, shortcut: "cs" }),
+  export: ct.switchOption({ def: false, shortcut: "e" }),
   ids: ct.switchOption(),
-  regex: ct.switchOption({ shortcut: "re" }),
+  regex: ct.switchOption({ def: false, shortcut: "re" }),
 };
 
 export const BanSearchCmd = utilityCmd({

@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { isDiscordRESTError } from "../../../utils";
@@ -23,7 +23,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage: Message;
     try {
-      targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake);
     } catch (err) {
       if (isDiscordRESTError(err) && err.code === 50001) {
         sendErrorMessage(pluginData, msg.channel, "Missing access to the specified message");

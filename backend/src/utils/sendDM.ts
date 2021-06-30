@@ -1,4 +1,4 @@
-import { APIMessage, User } from "discord.js";
+import { MessagePayload, User } from "discord.js";
 import { logger } from "../logger";
 import { createChunkedMessage, HOURS, isDiscordRESTError } from "../utils";
 import Timeout = NodeJS.Timeout;
@@ -16,7 +16,7 @@ export class DMError extends Error {}
 
 const error20026 = "The bot cannot currently send DMs";
 
-export async function sendDM(user: User, content: string | APIMessage, source: string) {
+export async function sendDM(user: User, content: string | MessagePayload, source: string) {
   if (dmsDisabled) {
     throw new DMError(error20026);
   }

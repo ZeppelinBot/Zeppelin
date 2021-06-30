@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -49,7 +50,7 @@ export const UnbanCmd = modActionsCmd({
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
-      await pluginData.guild.bans.remove(user.id, reason != null ? encodeURIComponent(reason) : undefined);
+      await pluginData.guild.bans.remove(user.id as Snowflake, reason != null ? encodeURIComponent(reason) : undefined);
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban member; are you sure they're banned?");
       return;

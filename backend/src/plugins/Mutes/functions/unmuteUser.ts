@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -35,7 +36,7 @@ export async function unmuteUser(
       const lock = await pluginData.locks.acquire(memberRolesLock(member));
 
       const muteRole = pluginData.config.get().mute_role;
-      if (muteRole && member.roles.cache.has(muteRole)) {
+      if (muteRole && member.roles.cache.has(muteRole as Snowflake)) {
         await member.roles.remove(muteRole);
       }
       if (existingMute?.roles_to_restore) {
@@ -43,7 +44,7 @@ export async function unmuteUser(
         let newRoles: string[] = member.roles.cache.keyArray();
         newRoles = muteRole && newRoles.includes(muteRole) ? newRoles.splice(newRoles.indexOf(muteRole), 1) : newRoles;
         for (const toRestore of existingMute.roles_to_restore) {
-          if (guildRoles.has(toRestore) && toRestore !== muteRole) newRoles.push(toRestore);
+          if (guildRoles.has(toRestore as Snowflake) && toRestore !== muteRole) newRoles.push(toRestore);
         }
         await member.roles.set(newRoles);
       }
@@ -83,7 +84,7 @@ export async function unmuteUser(
   });
 
   // Log the action
-  const mod = pluginData.client.users.fetch(modId);
+  const mod = pluginData.client.users.fetch(modId as Snowflake);
   if (unmuteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
       mod: stripObjectToScalars(mod),

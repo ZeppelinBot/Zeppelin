@@ -21,7 +21,7 @@ export const DeleteCaseCmd = modActionsCmd({
   signature: {
     caseNumber: ct.number({ rest: true }),
 
-    force: ct.switchOption({ shortcut: "f" }),
+    force: ct.switchOption({ def: false, shortcut: "f" }),
   },
 
   async run({ pluginData, message, args }) {
@@ -49,8 +49,8 @@ export const DeleteCaseCmd = modActionsCmd({
         const cases = pluginData.getPlugin(CasesPlugin);
         const embedContent = await cases.getCaseEmbed(theCase);
         message.channel.send({
+          ...embedContent,
           content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
-          embed: embedContent.embed,
         });
 
         const reply = await helpers.waitForReply(

@@ -1,4 +1,4 @@
-import { Permissions } from "discord.js";
+import { Permissions, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
@@ -42,7 +42,7 @@ export const RemoveRolesAction = automodAction({
 
     if (rolesWeCannotRemove.length) {
       const roleNamesWeCannotRemove = rolesWeCannotRemove.map(
-        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
+        roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
@@ -56,7 +56,7 @@ export const RemoveRolesAction = automodAction({
       members.map(async member => {
         const memberRoles = new Set(member.roles.cache.keyArray());
         for (const roleId of rolesToRemove) {
-          memberRoles.delete(roleId);
+          memberRoles.delete(roleId as Snowflake);
           ignoreRoleChange(pluginData, member.id, roleId);
         }
 

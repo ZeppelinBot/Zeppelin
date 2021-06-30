@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { typedGuildCommand } from "knub";
 import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
@@ -68,7 +68,7 @@ export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
         return;
       }
 
-      const potentialChannel = pluginData.guild.channels.resolve(reply.content);
+      const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof TextChannel)) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;

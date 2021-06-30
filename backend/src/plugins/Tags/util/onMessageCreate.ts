@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -16,7 +16,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const channel = pluginData.guild.channels.cache.get(msg.channel_id) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
   if (!channel) return;
 
   const config = await pluginData.config.getMatchingConfig({
@@ -117,6 +117,8 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const deleteInvoke = tagResult.category?.auto_delete_command ?? config.auto_delete_command;
   if (!deleteWithCommand && deleteInvoke) {
     // Try deleting the invoking message, ignore errors silently
-    (pluginData.guild.channels.resolve(msg.channel_id) as TextChannel).messages.delete(msg.id);
+    (pluginData.guild.channels.resolve(msg.channel_id as Snowflake) as TextChannel).messages.delete(
+      msg.id as Snowflake,
+    );
   }
 }
