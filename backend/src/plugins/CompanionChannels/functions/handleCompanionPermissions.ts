@@ -1,7 +1,7 @@
 import { Permissions, Snowflake, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
-import { isDiscordRESTError, MINUTES } from "../../../utils";
+import { isDiscordAPIError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
@@ -66,7 +66,7 @@ export async function handleCompanionPermissions(
       });
     }
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 50001) {
+    if (isDiscordAPIError(e) && e.code === 50001) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
         body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,

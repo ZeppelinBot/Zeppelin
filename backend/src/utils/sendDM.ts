@@ -1,6 +1,6 @@
 import { MessagePayload, User } from "discord.js";
 import { logger } from "../logger";
-import { createChunkedMessage, HOURS, isDiscordRESTError } from "../utils";
+import { createChunkedMessage, HOURS, isDiscordAPIError } from "../utils";
 import Timeout = NodeJS.Timeout;
 
 let dmsDisabled = false;
@@ -30,7 +30,7 @@ export async function sendDM(user: User, content: string | MessagePayload, sourc
       await user.send(content);
     }
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 20026) {
+    if (isDiscordAPIError(e) && e.code === 20026) {
       logger.warn(`Received error code 20026: ${e.message}`);
       logger.warn("Disabling attempts to send DMs for 1 hour");
       disableDMs(1 * HOURS);

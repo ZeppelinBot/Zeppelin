@@ -2,7 +2,7 @@ import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "src/types";
 import { LogType } from "../../../data/LogType";
-import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
+import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
@@ -49,7 +49,7 @@ export const SetSlowmodeAction = automodAction({
       } catch (e) {
         // Check for invalid form body -> indicates duration was too large
         const errorMessage =
-          isDiscordRESTError(e) && e.code === 50035
+          isDiscordAPIError(e) && e.code === 50035
             ? `Duration is greater than maximum native slowmode duration`
             : e.message;
 

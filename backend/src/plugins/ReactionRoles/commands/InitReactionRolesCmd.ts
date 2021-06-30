@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
+import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { reactionRolesCmd, TReactionRolePair } from "../types";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
@@ -42,7 +42,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     try {
       targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(noop);
     } catch (e) {
-      if (isDiscordRESTError(e)) {
+      if (isDiscordAPIError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
         return;
       }

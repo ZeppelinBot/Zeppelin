@@ -1,6 +1,6 @@
 import { GuildChannel, Permissions } from "discord.js";
 import { LogType } from "../../../data/LogType";
-import { isDiscordRESTError } from "../../../utils";
+import { isDiscordAPIError } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
@@ -36,7 +36,7 @@ export const AddReactionsEvt = autoReactionsEvt({
       try {
         await message.react(reaction);
       } catch (e) {
-        if (isDiscordRESTError(e)) {
+        if (isDiscordAPIError(e)) {
           const logs = pluginData.getPlugin(LogsPlugin);
           if (e.code === 10008) {
             logs.log(LogType.BOT_ALERT, {

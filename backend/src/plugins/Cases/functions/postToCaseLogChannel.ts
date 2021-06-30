@@ -2,7 +2,7 @@ import { FileOptions, Message, MessageOptions, Snowflake, TextChannel } from "di
 import { GuildPluginData } from "knub";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
-import { isDiscordRESTError } from "../../../utils";
+import { isDiscordAPIError } from "../../../utils";
 import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
@@ -25,7 +25,7 @@ export async function postToCaseLogChannel(
     }
     result = await caseLogChannel.send({ ...content });
   } catch (e) {
-    if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
+    if (isDiscordAPIError(e) && (e.code === 50013 || e.code === 50001)) {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Missing permissions to post mod cases in <#${caseLogChannel.id}>`,
       });
