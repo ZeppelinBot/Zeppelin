@@ -70,13 +70,13 @@ export function isValidSnowflake(str: string) {
 }
 
 export const DISCORD_HTTP_ERROR_NAME = "DiscordHTTPError";
-export const DISCORD_REST_ERROR_NAME = "DiscordRESTError";
+export const DISCORD_REST_ERROR_NAME = "DiscordAPIError";
 
 export function isDiscordHTTPError(err: Error | string) {
   return typeof err === "object" && err.constructor?.name === DISCORD_HTTP_ERROR_NAME;
 }
 
-export function isDiscordRESTError(err: Error | string) {
+export function isDiscordAPIError(err: Error | string) {
   return typeof err === "object" && err.constructor?.name === DISCORD_REST_ERROR_NAME;
 }
 
@@ -470,7 +470,7 @@ export async function findRelevantAuditLogEntry(
   try {
     auditLogs = await guild.fetchAuditLogs({ limit: 5, type: actionType });
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 50013) {
+    if (isDiscordAPIError(e) && e.code === 50013) {
       // If we don't have permission to read audit log, set audit log requests on cooldown
       auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
     } else if (isDiscordHTTPError(e) && e.code === 500) {

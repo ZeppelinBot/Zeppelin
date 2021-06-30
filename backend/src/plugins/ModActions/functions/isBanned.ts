@@ -1,7 +1,7 @@
 import { Permissions, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
-import { isDiscordHTTPError, isDiscordRESTError, SECONDS, sleep } from "../../../utils";
+import { isDiscordHTTPError, isDiscordAPIError, SECONDS, sleep } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../types";
@@ -26,7 +26,7 @@ export async function isBanned(
     ]);
     return potentialBan != null;
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 10026) {
+    if (isDiscordAPIError(e) && e.code === 10026) {
       // [10026]: Unknown Ban
       return false;
     }
@@ -36,7 +36,7 @@ export async function isBanned(
       return false;
     }
 
-    if (isDiscordRESTError(e) && e.code === 50013) {
+    if (isDiscordAPIError(e) && e.code === 50013) {
       pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
         body: `Missing "Ban Members" permission to check for existing bans`,
       });

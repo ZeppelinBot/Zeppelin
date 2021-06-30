@@ -2,7 +2,7 @@ import { GuildChannel, Permissions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { isDiscordRESTError, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { isDiscordAPIError, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { SlowmodePluginType } from "../types";
 
 export async function applyBotSlowmodeToUserId(
@@ -24,7 +24,7 @@ export async function applyBotSlowmodeToUserId(
   } catch (e) {
     const user = pluginData.client.users.fetch(userId as Snowflake) || new UnknownUser({ id: userId });
 
-    if (isDiscordRESTError(e) && e.code === 50013) {
+    if (isDiscordAPIError(e) && e.code === 50013) {
       logger.warn(
         `Missing permissions to apply bot slowmode to user ${userId} on channel ${channel.name} (${channel.id}) on server ${pluginData.guild.name} (${pluginData.guild.id})`,
       );

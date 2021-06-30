@@ -4,7 +4,7 @@ import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { asSingleLine, isDiscordRESTError, UnknownUser } from "../../../utils";
+import { asSingleLine, isDiscordAPIError, UnknownUser } from "../../../utils";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MuteResult } from "../../Mutes/types";
 import { ModActionsPluginType } from "../types";
@@ -60,7 +60,7 @@ export async function actualMuteUserCmd(
   } catch (e) {
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
       sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user: no mute role set in config");
-    } else if (isDiscordRESTError(e) && e.code === 10007) {
+    } else if (isDiscordAPIError(e) && e.code === 10007) {
       sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user: unknown member");
     } else {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);

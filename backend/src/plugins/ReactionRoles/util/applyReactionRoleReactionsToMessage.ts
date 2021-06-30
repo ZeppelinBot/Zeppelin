@@ -2,7 +2,7 @@ import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ReactionRole } from "../../../data/entities/ReactionRole";
 import { LogType } from "../../../data/LogType";
-import { isDiscordRESTError, sleep } from "../../../utils";
+import { isDiscordAPIError, sleep } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ReactionRolesPluginType } from "../types";
 
@@ -27,7 +27,7 @@ export async function applyReactionRoleReactionsToMessage(
   try {
     targetMessage = await channel.messages.fetch(messageId as Snowflake);
   } catch (e) {
-    if (isDiscordRESTError(e)) {
+    if (isDiscordAPIError(e)) {
       if (e.code === 10008) {
         // Unknown message, remove reaction roles from the message
         logs.log(LogType.BOT_ALERT, {
@@ -51,7 +51,7 @@ export async function applyReactionRoleReactionsToMessage(
   try {
     await targetMessage.reactions.removeAll();
   } catch (e) {
-    if (isDiscordRESTError(e)) {
+    if (isDiscordAPIError(e)) {
       errors.push(`Error ${e.code} while removing old reactions: ${e.message}`);
       logs.log(LogType.BOT_ALERT, {
         body: `Error ${e.code} while removing old reaction role reactions from message ${channelId}/${messageId}: ${e.message}`,
@@ -73,7 +73,7 @@ export async function applyReactionRoleReactionsToMessage(
       await targetMessage.react(rawEmoji);
       await sleep(750); // Make sure we don't hit rate limits
     } catch (e) {
-      if (isDiscordRESTError(e)) {
+      if (isDiscordAPIError(e)) {
         if (e.code === 10014) {
           pluginData.state.reactionRoles.removeFromMessage(messageId, rawEmoji);
           errors.push(`Unknown emoji: ${rawEmoji}`);

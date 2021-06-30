@@ -19,7 +19,7 @@ import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordHTTPError, isDiscordRESTError, successMessage } from "./utils";
+import { errorMessage, isDiscordHTTPError, isDiscordAPIError, successMessage } from "./utils";
 
 const fsp = fs.promises;
 
@@ -113,7 +113,7 @@ function errorHandler(err) {
       console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
       process.exit(1);
     }
-  } else if (isDiscordRESTError(err) || isDiscordHTTPError(err)) {
+  } else if (isDiscordAPIError(err) || isDiscordHTTPError(err)) {
     // Discord API errors, usually safe to just log instead of crash
     // We still bail if we get a ton of them in a short amount of time
     if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
