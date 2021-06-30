@@ -1,4 +1,4 @@
-import { VoiceChannel } from "discord.js";
+import { Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -21,7 +21,7 @@ export const VcmoveCmd = utilityCmd({
 
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
-      const potentialChannel = pluginData.guild.channels.cache.get(args.channel);
+      const potentialChannel = pluginData.guild.channels.cache.get(args.channel as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -31,7 +31,7 @@ export const VcmoveCmd = utilityCmd({
     } else if (channelMentionRegex.test(args.channel)) {
       // Channel mention -> parse channel id and resolve channel from that
       const channelId = args.channel.match(channelMentionRegex)![1];
-      const potentialChannel = pluginData.guild.channels.cache.get(channelId);
+      const potentialChannel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -104,7 +104,7 @@ export const VcmoveAllCmd = utilityCmd({
 
     if (isSnowflake(args.channel)) {
       // Snowflake -> resolve channel directly
-      const potentialChannel = pluginData.guild.channels.cache.get(args.channel);
+      const potentialChannel = pluginData.guild.channels.cache.get(args.channel as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;
@@ -114,7 +114,7 @@ export const VcmoveAllCmd = utilityCmd({
     } else if (channelMentionRegex.test(args.channel)) {
       // Channel mention -> parse channel id and resolve channel from that
       const channelId = args.channel.match(channelMentionRegex)![1];
-      const potentialChannel = pluginData.guild.channels.cache.get(channelId);
+      const potentialChannel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
         sendErrorMessage(pluginData, msg.channel, "Unknown or non-voice channel");
         return;

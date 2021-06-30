@@ -52,7 +52,7 @@ export const PostButtonRolesCmd = reactionRolesCmd({
     const rows = splitButtonsIntoRows(buttons, Object.values(group.default_buttons)); // new MessageActionRow().addComponents(buttons);
 
     try {
-      const newMsg = await args.channel.send({ content: group.message, components: rows, split: false });
+      const newMsg = await args.channel.send({ content: group.message, components: rows });
 
       for (const btn of toInsert) {
         await pluginData.state.buttonRoles.add(

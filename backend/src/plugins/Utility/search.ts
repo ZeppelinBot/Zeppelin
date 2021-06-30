@@ -5,6 +5,7 @@ import {
   MessageButton,
   MessageComponentInteraction,
   Permissions,
+  Snowflake,
   TextChannel,
   User,
 } from "discord.js";
@@ -316,7 +317,7 @@ async function performMemberSearch(
     const roleIds = args.role.split(",");
     matchingMembers = matchingMembers.filter(member => {
       for (const role of roleIds) {
-        if (!member.roles.cache.has(role)) return false;
+        if (!member.roles.cache.has(role as Snowflake)) return false;
       }
 
       return true;

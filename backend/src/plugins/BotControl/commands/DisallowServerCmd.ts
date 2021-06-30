@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { noop } from "../../../utils";
@@ -24,7 +24,7 @@ export const DisallowServerCmd = botControlCmd({
 
     await pluginData.state.allowedGuilds.remove(args.guildId);
     await pluginData.client.guilds.cache
-      .get(args.guildId)
+      .get(args.guildId as Snowflake)
       ?.leave()
       .catch(noop);
     sendSuccessMessage(pluginData, msg.channel as TextChannel, "Server removed!");

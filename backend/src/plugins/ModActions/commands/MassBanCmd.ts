@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
 import { performance } from "perf_hooks";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
@@ -42,7 +42,7 @@ export const MassbanCmd = modActionsCmd({
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.cache.get(userId); // TODO: Get members on demand?
+      const member = pluginData.guild.members.cache.get(userId as Snowflake); // TODO: Get members on demand?
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massban one or more users: insufficient permissions");
         return;
@@ -91,7 +91,7 @@ export const MassbanCmd = modActionsCmd({
           ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
           pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
 
-          await pluginData.guild.bans.create(userId, {
+          await pluginData.guild.bans.create(userId as Snowflake, {
             days: 1,
             reason: banReason != null ? encodeURIComponent(banReason) : undefined,
           });

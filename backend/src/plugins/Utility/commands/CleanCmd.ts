@@ -87,7 +87,7 @@ export const CleanCmd = utilityCmd({
       return;
     }
 
-    const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel) : msg.channel;
+    const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
     if (!targetChannel || !(targetChannel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`);
       return;
