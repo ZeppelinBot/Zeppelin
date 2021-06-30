@@ -7,7 +7,8 @@ export const SpamVoiceStateUpdateEvt = spamEvt({
   async listener(meta) {
     const member = meta.args.newState.member;
     if (!member) return;
-    const channel = meta.args.newState.channel!;
+    const channel = meta.args.newState.channel;
+    if (!channel) return;
 
     const config = await meta.pluginData.config.getMatchingConfig({ member, channelId: channel.id });
     const maxVoiceMoves = config.max_voice_moves;
