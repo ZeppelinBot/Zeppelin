@@ -63,6 +63,11 @@ const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = option
             `Invalid value for default_buttons/${defaultButtonNames[i]}/role_or_menu: ${defBtn.role_or_menu} is neither an existing menu nor a valid snowflake.`,
           ]);
         }
+        if (!defBtn.label && !defBtn.emoji) {
+          throw new StrictValidationError([
+            `Invalid values for default_buttons/${defaultButtonNames[i]}/(label|emoji): Must have label, emoji or both set for the button to be valid.`,
+          ]);
+        }
       }
 
       for (const [menuName, menuButtonEntries] of Object.entries(group.button_menus ?? [])) {
@@ -81,6 +86,11 @@ const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = option
           if (!menuNames.includes(menuBtn.role_or_menu) && !isValidSnowflake(menuBtn.role_or_menu)) {
             throw new StrictValidationError([
               `Invalid value for button_menus/${menuButtonNames[i]}/role_or_menu: ${menuBtn.role_or_menu} is neither an existing menu nor a valid snowflake.`,
+            ]);
+          }
+          if (!menuBtn.label && !menuBtn.emoji) {
+            throw new StrictValidationError([
+              `Invalid values for default_buttons/${defaultButtonNames[i]}/(label|emoji): Must have label, emoji or both set for the button to be valid.`,
             ]);
           }
         }
