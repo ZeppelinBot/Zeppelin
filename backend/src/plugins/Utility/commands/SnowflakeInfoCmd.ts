@@ -14,6 +14,6 @@ export const SnowflakeInfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     const embed = await getSnowflakeInfoEmbed(pluginData, args.id, false, message.author.id);
-    message.channel.send({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

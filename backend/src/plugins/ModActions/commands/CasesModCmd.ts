@@ -71,7 +71,7 @@ export const CasesModCmd = modActionsCmd({
           ],
         };
 
-        return { embed };
+        return { embeds: [embed] };
       },
       {
         limitToUserId: msg.author.id,

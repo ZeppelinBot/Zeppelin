@@ -83,6 +83,6 @@ export const JumboCmd = utilityCmd({
       };
     }
 
-    msg.channel.send("", file);
+    msg.channel.send({ content: "", files: [file] });
   },
 });

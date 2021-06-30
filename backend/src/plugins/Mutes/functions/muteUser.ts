@@ -1,4 +1,4 @@
-import { TextChannel, User } from "discord.js";
+import { Snowflake, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -86,7 +86,7 @@ export async function muteUser(
     }
 
     // Apply mute role if it's missing
-    if (!currentUserRoles.includes(muteRole)) {
+    if (!currentUserRoles.includes(muteRole as Snowflake)) {
       try {
         await member.roles.add(muteRole);
       } catch (e) {
@@ -125,7 +125,7 @@ export async function muteUser(
     if (moveToVoiceChannel || cfg.kick_from_voice_channel) {
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
       try {
-        await member.edit({ channel: moveToVoiceChannel });
+        await member.edit({ channel: moveToVoiceChannel as Snowflake });
       } catch {} // tslint:disable-line
     }
   }
@@ -172,7 +172,8 @@ export async function muteUser(
       }
 
       const useChannel = existingMute ? config.message_on_update : config.message_on_mute;
-      const channel = config.message_channel && pluginData.guild.channels.cache.get(config.message_channel);
+      const channel =
+        config.message_channel && pluginData.guild.channels.cache.get(config.message_channel as Snowflake);
       if (useChannel && channel instanceof TextChannel) {
         contactMethods.push({ type: "channel", channel });
       }

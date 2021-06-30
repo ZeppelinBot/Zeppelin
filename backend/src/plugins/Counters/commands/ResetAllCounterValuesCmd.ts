@@ -28,15 +28,13 @@ export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()(
     }
 
     const counterName = counter.name || args.counterName;
-    const confirmed = await confirm(
-      message.channel,
-      message.author.id,
-      trimMultilineString(`
+    const confirmed = await confirm(message.channel, message.author.id, {
+      content: trimMultilineString(`
         Do you want to reset **ALL** values for counter **${counterName}**?
         This will reset the counter for **all** users and channels.
         **Note:** This will *not* trigger any triggers or counter triggers.
       `),
-    );
+    });
     if (!confirmed) {
       sendErrorMessage(pluginData, message.channel, "Cancelled");
       return;

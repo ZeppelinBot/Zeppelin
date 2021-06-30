@@ -1,4 +1,4 @@
-import { Permissions, TextChannel } from "discord.js";
+import { Permissions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType";
@@ -16,7 +16,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
 
   scheduleNextDeletion(pluginData);
 
-  const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id);
+  const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id as Snowflake) as TextChannel;
   if (!channel) {
     // Channel was deleted, ignore
     return;
@@ -44,7 +44,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   pluginData.state.guildLogs.ignoreLog(LogType.MESSAGE_DELETE, itemToDelete.message.id);
-  (channel as TextChannel).messages.delete(itemToDelete.message.id).catch(err => {
+  (channel as TextChannel).messages.delete(itemToDelete.message.id as Snowflake).catch(err => {
     if (err.code === 10008) {
       // "Unknown Message", probably already deleted by automod or another bot, ignore
       return;

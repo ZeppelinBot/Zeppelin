@@ -1,4 +1,4 @@
-import { MessageButton, MessageActionRow, MessageComponentInteraction } from "discord.js";
+import { MessageButton, MessageActionRow, MessageComponentInteraction, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
@@ -33,12 +33,11 @@ export async function handleOpenMenu(
     const btn = new MessageButton()
       .setLabel(menuButton.label ?? "")
       .setStyle("PRIMARY")
-      .setType("BUTTON")
       .setCustomID(customId)
       .setDisabled(menuButton.disabled ?? false);
 
     if (menuButton.emoji) {
-      const emo = pluginData.client.emojis.resolve(menuButton.emoji) ?? menuButton.emoji;
+      const emo = pluginData.client.emojis.resolve(menuButton.emoji as Snowflake) ?? menuButton.emoji;
       btn.setEmoji(emo);
     }
     menuButtons.push(btn);

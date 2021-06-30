@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "src/types";
 import { LogType } from "../../../data/LogType";
@@ -19,7 +19,7 @@ export const SetSlowmodeAction = automodAction({
     const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);
 
     for (const channelId of actionConfig.channels) {
-      const channel = pluginData.guild.channels.cache.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
 
       // Only text channels and text channels within categories support slowmodes
       if (!channel || !(channel.type === ChannelTypeStrings.TEXT || ChannelTypeStrings.CATEGORY)) {

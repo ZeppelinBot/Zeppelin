@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { locateUserEvt } from "../types";
 import { sendAlerts } from "../utils/sendAlerts";
 
@@ -17,7 +17,7 @@ export const VoiceStateUpdateAlertEvt = locateUserEvt({
       const voiceChannel = meta.args.oldState.channel!;
 
       triggeredAlerts.forEach(alert => {
-        const txtChannel = meta.pluginData.guild.channels.resolve(alert.channel_id) as TextChannel;
+        const txtChannel = meta.pluginData.guild.channels.resolve(alert.channel_id as Snowflake) as TextChannel;
         txtChannel.send(
           `🔴 <@!${alert.requestor_id}> the user <@!${alert.user_id}> disconnected out of \`<#!${voiceChannel.id}>\``,
         );

@@ -108,5 +108,5 @@ export async function getCaseEmbed(
     });
   }
 
-  return { embed };
+  return { embeds: [embed] };
 }

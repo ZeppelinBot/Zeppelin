@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { UserNotificationMethod } from "../../../utils";
 import { ModActionsPluginType } from "../types";
@@ -15,7 +15,7 @@ export function getDefaultContactMethods(
   }
 
   if (config[`message_on_${type}`] && config.message_channel) {
-    const channel = pluginData.guild.channels.cache.get(config.message_channel);
+    const channel = pluginData.guild.channels.cache.get(config.message_channel as Snowflake);
     if (channel instanceof TextChannel) {
       methods.push({
         type: "channel",

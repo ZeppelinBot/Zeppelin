@@ -1,4 +1,4 @@
-import { MessageAttachment } from "discord.js";
+import { MessageAttachment, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -9,7 +9,7 @@ import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id);
+  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
 
   if (user) {
     // Replace attachment URLs with media URLs

@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { renderTemplate } from "../../../templateFormatter";
@@ -18,7 +18,7 @@ export async function messageAction(
   values: any,
 ) {
   const targetChannelId = await renderTemplate(action.channel, values, false);
-  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId);
+  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId as Snowflake);
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof TextChannel)) throw new ActionError("Target channel is not a text channel");
 

@@ -87,5 +87,5 @@ export const ButtonInteractionEvt = reactionRolesEvt({
 });
 
 async function sendEphemeralReply(interaction: MessageComponentInteraction, message: string) {
-  await interaction.reply(message, { ephemeral: true });
+  await interaction.reply({ content: message, ephemeral: true });
 }

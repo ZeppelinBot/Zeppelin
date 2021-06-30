@@ -1,3 +1,4 @@
+import { Collection, Message, Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwner, sendErrorMessage } from "../../../pluginUtils";
@@ -31,11 +32,10 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!args["attachment-channel"]) {
-      const confirmed = await confirm(
-        msg.channel,
-        msg.author.id,
-        "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
-      );
+      const confirmed = await confirm(msg.channel, msg.author.id, {
+        content:
+          "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
+      });
       if (!confirmed) {
         sendErrorMessage(pluginData, msg.channel, "Canceled");
         return;
@@ -60,7 +60,10 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
     while (archivedMessages < maxMessagesToArchive) {
       const messagesToFetch = Math.min(MAX_MESSAGES_PER_FETCH, maxMessagesToArchive - archivedMessages);
-      const messages = await args.channel.messages.fetch({ limit: messagesToFetch, before: previousId });
+      const messages = (await args.channel.messages.fetch({
+        limit: messagesToFetch,
+        before: previousId,
+      })) as Collection<Snowflake, Message>;
       if (messages.size === 0) break;
 
       for (const message of messages.values()) {
@@ -111,7 +114,6 @@ export const ArchiveChannelCmd = channelArchiverCmd({
           name: `archive-${args.channel.name}-${moment.utc().format("YYYY-MM-DD-HH-mm-ss")}.txt`,
         },
       ],
-      split: false,
     });
   },
 });

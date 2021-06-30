@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
 import { isSnowflake } from "../utils";
@@ -46,7 +46,7 @@ export async function resolveMessageTarget(pluginData: GuildPluginData<any>, val
     return null;
   }
 
-  const channel = pluginData.guild.channels.resolve(result.channelId);
+  const channel = pluginData.guild.channels.resolve(result.channelId as Snowflake);
   if (!channel || !(channel instanceof TextChannel)) {
     return null;
   }

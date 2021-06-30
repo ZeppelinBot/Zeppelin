@@ -1,4 +1,4 @@
-import { DiscordAPIError, User } from "discord.js";
+import { DiscordAPIError, Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -77,7 +77,7 @@ export async function banUserId(
   ignoreEvent(pluginData, IgnoredEventType.Ban, userId);
   try {
     const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
-    await pluginData.guild.bans.create(userId, {
+    await pluginData.guild.bans.create(userId as Snowflake, {
       days: deleteMessageDays,
       reason: reason != null ? encodeURIComponent(reason) : undefined,
     });

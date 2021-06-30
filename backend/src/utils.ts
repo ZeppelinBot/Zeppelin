@@ -16,7 +16,7 @@ import {
   MessageOptions,
   PartialChannelData,
   PartialMessage,
-  StringResolvable,
+  Snowflake,
   TextChannel,
   User,
 } from "discord.js";
@@ -1133,7 +1133,7 @@ export function resolveUserId(bot: Client, value: string) {
  */
 export function getUser(client: Client, userResolvable: string): User | UnknownUser {
   const id = resolveUserId(client, userResolvable);
-  return id ? client.users.resolve(id) || new UnknownUser({ id }) : new UnknownUser();
+  return id ? client.users.resolve(id as Snowflake) || new UnknownUser({ id }) : new UnknownUser();
 }
 
 /**
@@ -1188,8 +1188,8 @@ export async function resolveMember(
   if (!userId) return null;
 
   // If we have the member cached, return that directly
-  if (guild.members.cache.has(userId) && !fresh) {
-    return guild.members.cache.get(userId) || null;
+  if (guild.members.cache.has(userId as Snowflake) && !fresh) {
+    return guild.members.cache.get(userId as Snowflake) || null;
   }
 
   // We don't want to spam the API by trying to fetch unknown members again and again,
@@ -1199,7 +1199,7 @@ export async function resolveMember(
     return null;
   }
 
-  const freshMember = await guild.members.fetch({ user: userId, force: true }).catch(noop);
+  const freshMember = await guild.members.fetch({ user: userId as Snowflake, force: true }).catch(noop);
   if (freshMember) {
     // freshMember.id = userId; // I dont even know why this is here -Dark
     return freshMember;
@@ -1229,7 +1229,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
 
   // Role name
-  const roleList = await (await bot.guilds.fetch(guildId)).roles.cache;
+  const roleList = await (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role[0]) {
     return role[0].id;
@@ -1264,12 +1264,8 @@ export async function resolveInvite<T extends boolean>(
   return promise as ResolveInviteReturnType<T>;
 }
 
-export async function confirm(
-  channel: TextChannel,
-  userId: string,
-  content: StringResolvable | MessageOptions,
-): Promise<boolean> {
-  return waitForButtonConfirm(channel, { content }, { restrictToId: userId });
+export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
+  return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {

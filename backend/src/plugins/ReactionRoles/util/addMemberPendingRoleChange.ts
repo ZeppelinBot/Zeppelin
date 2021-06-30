@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { resolveMember } from "../../../utils";
@@ -25,8 +26,8 @@ export async function addMemberPendingRoleChange(
         if (member) {
           const newRoleIds = new Set(member.roles.cache.keyArray());
           for (const change of newPendingRoleChangeObj.changes) {
-            if (change.mode === "+") newRoleIds.add(change.roleId);
-            else newRoleIds.delete(change.roleId);
+            if (change.mode === "+") newRoleIds.add(change.roleId as Snowflake);
+            else newRoleIds.delete(change.roleId as Snowflake);
           }
 
           try {

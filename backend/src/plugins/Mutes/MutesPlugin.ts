@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -95,7 +95,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     hasMutedRole(pluginData) {
       return (member: GuildMember) => {
         const muteRole = pluginData.config.get().mute_role;
-        return muteRole ? member.roles.cache.has(muteRole) : false;
+        return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
       };
     },
 

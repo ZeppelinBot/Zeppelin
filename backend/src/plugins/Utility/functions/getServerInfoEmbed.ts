@@ -1,4 +1,4 @@
-import { CategoryChannel, MessageEmbedOptions, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, MessageEmbedOptions, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -25,7 +25,7 @@ export async function getServerInfoEmbed(
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
-      ? memoize(() => pluginData.client.guilds.fetch(serverId), `getRESTGuild_${serverId}`, 10 * MINUTES)
+      ? memoize(() => pluginData.client.guilds.fetch(serverId as Snowflake), `getRESTGuild_${serverId}`, 10 * MINUTES)
       : null,
     getGuildPreview(pluginData.client, serverId),
   ]);
@@ -68,7 +68,7 @@ export async function getServerInfoEmbed(
     const ownerName = `${owner.username}#${owner.discriminator}`;
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerID}\`)`);
-    basicInformation.push(`Voice region: **${thisServer.region}**`);
+    // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
   }
 
   if (features.length > 0) {

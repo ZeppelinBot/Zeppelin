@@ -1,4 +1,4 @@
-import { VoiceChannel } from "discord.js";
+import { Snowflake, VoiceChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";
@@ -30,7 +30,7 @@ export async function moveToVoiceChannelAction(
   }
 
   const targetChannelId = await renderTemplate(action.channel, values, false);
-  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId);
+  const targetChannel = pluginData.guild.channels.cache.get(targetChannelId as Snowflake);
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof VoiceChannel)) throw new ActionError("Target channel is not a voice channel");
 

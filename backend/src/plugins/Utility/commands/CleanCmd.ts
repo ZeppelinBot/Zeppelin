@@ -1,4 +1,4 @@
-import { Message, TextChannel, User } from "discord.js";
+import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
@@ -25,7 +25,7 @@ async function cleanMessages(
 
   // Delete & archive in ID order
   savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-  const idsToDelete = savedMessages.map(m => m.id);
+  const idsToDelete = savedMessages.map(m => m.id) as Snowflake[];
 
   // Make sure the deletions aren't double logged
   idsToDelete.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
@@ -53,9 +53,9 @@ async function cleanMessages(
 const opts = {
   user: ct.userId({ option: true, shortcut: "u" }),
   channel: ct.channelId({ option: true, shortcut: "c" }),
-  bots: ct.switchOption({ shortcut: "b" }),
-  "delete-pins": ct.switchOption({ shortcut: "p" }),
-  "has-invites": ct.switchOption({ shortcut: "i" }),
+  bots: ct.switchOption({ def: false, shortcut: "b" }),
+  "delete-pins": ct.switchOption({ def: false, shortcut: "p" }),
+  "has-invites": ct.switchOption({ def: false, shortcut: "i" }),
   match: ct.regex({ option: true, shortcut: "m" }),
   "to-id": ct.anyId({ option: true, shortcut: "id" }),
 };
@@ -75,7 +75,7 @@ export const CleanCmd = utilityCmd({
     },
     {
       count: ct.number(),
-      update: ct.switchOption({ shortcut: "up" }),
+      update: ct.switchOption({ def: false, shortcut: "up" }),
 
       ...opts,
     },

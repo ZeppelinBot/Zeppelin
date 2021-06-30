@@ -15,9 +15,9 @@ export const ServersCmd = botControlCmd({
   signature: {
     search: ct.string({ catchAll: true, required: false }),
 
-    all: ct.switchOption({ shortcut: "a" }),
-    initialized: ct.switchOption({ shortcut: "i" }),
-    uninitialized: ct.switchOption({ shortcut: "u" }),
+    all: ct.switchOption({ def: false, shortcut: "a" }),
+    initialized: ct.switchOption({ def: false, shortcut: "i" }),
+    uninitialized: ct.switchOption({ def: false, shortcut: "u" }),
   },
 
   async run({ pluginData, message: msg, args }) {

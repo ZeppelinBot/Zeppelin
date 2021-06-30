@@ -24,7 +24,7 @@ export async function createPaginatedMessage(
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
   const firstPageContent = await loadPageFn(1);
-  const message = await channel.send({ content: firstPageContent });
+  const message = await channel.send(firstPageContent);
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages

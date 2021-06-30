@@ -158,7 +158,7 @@ export async function displaySearch(
       const embed = await getUserInfoEmbed(pluginData, searchResult.results[0].id, false);
       if (embed) {
         searchMsg.edit("Only one result:");
-        msg.channel.send({ embed });
+        msg.channel.send({ embeds: [embed] });
         return;
       }
     }
@@ -174,7 +174,6 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("⬅")
-          .setType("BUTTON")
           .setCustomID(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
       );
@@ -183,7 +182,6 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("➡")
-          .setType("BUTTON")
           .setCustomID(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
       );
@@ -192,7 +190,6 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("🔄")
-          .setType("BUTTON")
           .setCustomID(`reloadButton:${idMod}`),
       );
 
@@ -200,11 +197,11 @@ export async function displaySearch(
       await searchMsg.edit({ content: result, components: [row] });
 
       const filter = (iac: MessageComponentInteraction) => iac.message.id === searchMsg.id;
-      const collector = searchMsg.createMessageComponentInteractionCollector(filter, { time: 2 * MINUTES });
+      const collector = searchMsg.createMessageComponentInteractionCollector({ filter, time: 2 * MINUTES });
 
       collector.on("collect", async (interaction: MessageComponentInteraction) => {
         if (msg.author.id !== interaction.user.id) {
-          interaction.reply(`You are not permitted to use these buttons.`, { ephemeral: true });
+          interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
         } else {
           if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {
             collector.stop();

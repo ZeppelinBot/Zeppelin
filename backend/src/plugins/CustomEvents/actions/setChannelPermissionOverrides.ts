@@ -1,3 +1,4 @@
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
@@ -24,7 +25,7 @@ export async function setChannelPermissionOverridesAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const channel = pluginData.guild.channels.cache.get(action.channel);
+  const channel = pluginData.guild.channels.cache.get(action.channel as Snowflake) as TextChannel;
   if (!channel) {
     throw new ActionError(`Unknown channel: ${action.channel}`);
   }

@@ -1,4 +1,4 @@
-import { MessageEmbed, TextChannel } from "discord.js";
+import { MessageEmbed, Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { trimLines } from "../../../utils";
@@ -47,9 +47,12 @@ export const EditEmbedCmd = postCmd({
     if (content) embed.description = formatContent(content);
     if (color) embed.color = color;
 
-    (pluginData.guild.channels.cache.get(savedMessage.channel_id) as TextChannel).messages.edit(savedMessage.id, {
-      embed,
-    });
+    (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake) as TextChannel).messages.edit(
+      savedMessage.id as Snowflake,
+      {
+        embeds: [embed],
+      },
+    );
     await sendSuccessMessage(pluginData, msg.channel, "Embed edited");
 
     if (args.content) {

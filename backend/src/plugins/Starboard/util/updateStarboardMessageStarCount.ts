@@ -23,6 +23,6 @@ export async function updateStarboardMessageStarCount(
     const embed = starboardMessage.embeds[0]!;
     embed.fields!.pop(); // Remove pseudo footer
     embed.fields!.push(createStarboardPseudoFooterForMessage(starboard, originalMessage, starEmoji, starCount)); // Create new pseudo footer
-    starboardMessage.edit({ embed });
+    starboardMessage.edit({ embeds: [embed] });
   }, DEBOUNCE_DELAY);
 }

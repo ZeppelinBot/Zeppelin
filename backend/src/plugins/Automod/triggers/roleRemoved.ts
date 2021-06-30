@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
 import { automodTrigger } from "../helpers";
@@ -33,7 +34,7 @@ export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
   },
 
   renderMatchInformation({ matchResult, pluginData, contexts }) {
-    const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId);
+    const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId as Snowflake);
     const roleName = role?.name || "Unknown";
     const member = contexts[0].member!;
     const memberName = `**${member.user.username}#${member.user.discriminator}** (\`${member.id}\`)`;

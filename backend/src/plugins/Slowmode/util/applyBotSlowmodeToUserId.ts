@@ -1,4 +1,4 @@
-import { GuildChannel, Permissions, TextChannel } from "discord.js";
+import { GuildChannel, Permissions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -11,7 +11,7 @@ export async function applyBotSlowmodeToUserId(
   userId: string,
 ) {
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
-  const existingOverride = channel.permissionOverwrites.get(userId);
+  const existingOverride = channel.permissionOverwrites.get(userId as Snowflake);
   const newDeniedPermissions =
     (existingOverride ? existingOverride.deny.bitfield : 0n) | Permissions.FLAGS.SEND_MESSAGES;
   const newAllowedPermissions =
@@ -22,7 +22,7 @@ export async function applyBotSlowmodeToUserId(
       { id: userId, allow: newAllowedPermissions, deny: newDeniedPermissions, type: "member" },
     ]);
   } catch (e) {
-    const user = pluginData.client.users.fetch(userId) || new UnknownUser({ id: userId });
+    const user = pluginData.client.users.fetch(userId as Snowflake) || new UnknownUser({ id: userId });
 
     if (isDiscordRESTError(e) && e.code === 50013) {
       logger.warn(

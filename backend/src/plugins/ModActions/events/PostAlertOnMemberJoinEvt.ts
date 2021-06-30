@@ -1,4 +1,4 @@
-import { Permissions, TextChannel } from "discord.js";
+import { Permissions, Snowflake, TextChannel } from "discord.js";
 import { LogType } from "../../../data/LogType";
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
@@ -22,7 +22,7 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
     const logs = pluginData.getPlugin(LogsPlugin);
 
     if (actions.length) {
-      const alertChannel = pluginData.guild.channels.cache.get(alertChannelId);
+      const alertChannel = pluginData.guild.channels.cache.get(alertChannelId as Snowflake);
       if (!alertChannel) {
         logs.log(LogType.BOT_ALERT, {
           body: `Unknown \`alert_channel\` configured for \`mod_actions\`: \`${alertChannelId}\``,

@@ -1,4 +1,4 @@
-import { Message, TextChannel } from "discord.js";
+import { Message, Snowflake, TextChannel } from "discord.js";
 import { noop, resolveMember } from "../../../utils";
 import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 import { starboardEvt } from "../types";
@@ -76,8 +76,12 @@ export const StarboardReactionAddEvt = starboardEvt({
         // If the message has already been posted to this starboard, update star counts
         if (starboard.show_star_count) {
           for (const starboardMessage of starboardMessages) {
-            const channel = pluginData.guild.channels.cache.get(starboardMessage.starboard_channel_id) as TextChannel;
-            const realStarboardMessage = await channel.messages.fetch(starboardMessage.starboard_message_id);
+            const channel = pluginData.guild.channels.cache.get(
+              starboardMessage.starboard_channel_id as Snowflake,
+            ) as TextChannel;
+            const realStarboardMessage = await channel.messages.fetch(
+              starboardMessage.starboard_message_id as Snowflake,
+            );
             await updateStarboardMessageStarCount(
               starboard,
               msg,
