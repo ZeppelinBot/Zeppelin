@@ -39,7 +39,7 @@ export const JumboCmd = utilityCmd({
     const size = config.jumbo_size > 2048 ? 2048 : config.jumbo_size;
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
-    let extention = ".png";
+    let extension = ".png";
     let file;
 
     if (!isEmoji(args.emoji)) {
@@ -50,19 +50,19 @@ export const JumboCmd = utilityCmd({
     if (results) {
       let url = "https://cdn.discordapp.com/emojis/";
       if (results[1] === "<a:") {
-        extention = ".gif";
+        extension = ".gif";
       }
-      url += `${results[2]}${extention}`;
-      if (extention === ".png") {
+      url += `${results[2]}${extension}`;
+      if (extension === ".png") {
         const image = await resizeBuffer(await getBufferFromUrl(url), size, size);
         file = {
-          name: `emoji${extention}`,
+          name: `emoji${extension}`,
           file: image,
         };
       } else {
         const image = await getBufferFromUrl(url);
         file = {
-          name: `emoji${extention}`,
+          name: `emoji${extension}`,
           file: image,
         };
       }
