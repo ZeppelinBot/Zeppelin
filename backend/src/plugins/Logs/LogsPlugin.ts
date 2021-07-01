@@ -15,6 +15,12 @@ import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannel
 import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
 import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
 import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
+import {
+  LogsStageInstanceCreateEvt,
+  LogsStageInstanceDeleteEvt,
+  LogsStageInstanceUpdateEvt,
+} from "./events/LogsStageInstanceModifyEvts";
+import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
 import { ConfigSchema, FORMAT_NO_TIMESTAMP, LogsPluginType } from "./types";
@@ -67,6 +73,12 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsRoleCreateEvt,
     LogsRoleDeleteEvt,
     LogsVoiceStateUpdateEvt,
+    LogsStageInstanceCreateEvt,
+    LogsStageInstanceDeleteEvt,
+    LogsStageInstanceUpdateEvt,
+    LogsThreadCreateEvt,
+    LogsThreadDeleteEvt,
+    LogsThreadUpdateEvt,
   ],
 
   public: {
