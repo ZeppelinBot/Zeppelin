@@ -26,6 +26,10 @@
   "CHANNEL_DELETE": "🗑 Channel {channelMention(channel)} was deleted",
   "CHANNEL_EDIT": "✏ Channel {channelMention(channel)} was edited",
 
+  "THREAD_CREATE": "🖊 Thread {channelMention(thread)} was created in channel <#{thread.parentID}>",
+  "THREAD_DELETE": "🗑 Thread {channelMention(thread)} was deleted/archived from channel <#{thread.parentID}>",
+  "THREAD_UPDATE": "✏ Thread {channelMention(newThread)} was edited. Previous name: `{oldThread.name}`",
+
   "ROLE_CREATE": "🖊 Role **{role.name}** (`{role.id}`) was created",
   "ROLE_DELETE": "🖊 Role **{role.name}** (`{role.id}`) was deleted",
   "ROLE_EDIT": "🖊 Role **{role.name}** (`{role.id}`) was edited",
@@ -41,6 +45,10 @@
   "VOICE_CHANNEL_LEAVE": "🎙 🔴 {userMention(member)} left {channelMention(channel)}",
   "VOICE_CHANNEL_FORCE_MOVE": "\uD83C\uDF99 ✍ {userMention(member)} was moved from **{oldChannel.name}** to **{newChannel.name}** by {userMention(mod)}",
   "VOICE_CHANNEL_FORCE_DISCONNECT": "\uD83C\uDF99 🚫 {userMention(member)} was forcefully disconnected from **{oldChannel.name}** by {userMention(mod)}",
+
+  "STAGE_INSTANCE_CREATE": "📣 Stage Instance `{stageInstance.topic}` was created in Stage Channel <#{stageChannel.id}>",
+  "STAGE_INSTANCE_DELETE": "📣 Stage Instance `{stageInstance.topic}` was deleted in Stage Channel <#{stageChannel.id}>",
+  "STAGE_INSTANCE_UPDATE": "📣 Stage Instance `{newStageInstance.topic}` was edited in Stage Channel <#{stageChannel.id}>. Previous topic: `{oldStageInstance.topic}`",
 
   "COMMAND": "🤖 {userMention(member)} used command in {channelMention(channel)}:\n`{command}`",
 
