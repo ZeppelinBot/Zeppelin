@@ -11,10 +11,10 @@ import { disableCodeBlocks } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { LogsChannelCreateEvt, LogsChannelDeleteEvt } from "./events/LogsChannelModifyEvts";
+import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
 import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
 import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
-import { LogsRoleCreateEvt, LogsRoleDeleteEvt } from "./events/LogsRoleModifyEvts";
+import { LogsRoleCreateEvt, LogsRoleDeleteEvt, LogsRoleUpdateEvt } from "./events/LogsRoleModifyEvts";
 import {
   LogsStageInstanceCreateEvt,
   LogsStageInstanceDeleteEvt,
@@ -70,8 +70,10 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsGuildMemberUpdateEvt,
     LogsChannelCreateEvt,
     LogsChannelDeleteEvt,
+    LogsChannelUpdateEvt,
     LogsRoleCreateEvt,
     LogsRoleDeleteEvt,
+    LogsRoleUpdateEvt,
     LogsVoiceStateUpdateEvt,
     LogsStageInstanceCreateEvt,
     LogsStageInstanceDeleteEvt,
