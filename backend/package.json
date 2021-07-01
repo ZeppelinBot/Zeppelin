@@ -29,7 +29,7 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
-    "discord.js": "^13.0.0-dev.64f093f.1625054868",
+    "discord.js": "^13.0.0-dev.a08ce7d.1625097834",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "erlpack": "github:discord/erlpack",
