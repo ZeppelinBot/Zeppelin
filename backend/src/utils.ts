@@ -35,6 +35,7 @@ import { SimpleCache } from "./SimpleCache";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { isEqual } from "lodash";
 
 const fsp = fs.promises;
 
@@ -163,6 +164,32 @@ function tDeepPartialProp(prop: any) {
   } else {
     return prop;
   }
+}
+
+export function getScalarDifference<T>(
+  base: T,
+  object: T,
+  ignoreKeys: string[] = [],
+): Map<string, { was: any; is: any }> {
+  base = stripObjectToScalars(base) as T;
+  object = stripObjectToScalars(object) as T;
+  const diff = new Map<string, { was: any; is: any }>();
+
+  for (const [key, value] of Object.entries(object)) {
+    if (!isEqual(value, base[key]) && !ignoreKeys.includes(key)) {
+      diff.set(key, { was: base[key], is: value });
+    }
+  }
+
+  return diff;
+}
+
+export function differenceToString(diff: Map<string, { was: any; is: any }>): string {
+  let toReturn = "";
+  for (const [key, difference] of diff) {
+    toReturn += `${key[0].toUpperCase() + key.slice(1)}: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
+  }
+  return toReturn;
 }
 
 // https://stackoverflow.com/a/49262929/316944

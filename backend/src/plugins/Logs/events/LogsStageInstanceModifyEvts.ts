@@ -1,5 +1,5 @@
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
+import { differenceToString, getScalarDifference, stripObjectToScalars } from "../../../utils";
 import { logsEvt } from "../types";
 
 export const LogsStageInstanceCreateEvt = logsEvt({
@@ -37,10 +37,15 @@ export const LogsStageInstanceUpdateEvt = logsEvt({
     const stageChannel =
       meta.args.newStageInstance.channel ??
       (await meta.pluginData.guild.channels.fetch(meta.args.newStageInstance.channelID));
+
+    const diff = getScalarDifference(meta.args.oldStageInstance, meta.args.newStageInstance);
+    const differenceString = differenceToString(diff);
+
     meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_UPDATE, {
       oldStageInstance: stripObjectToScalars(meta.args.oldStageInstance),
       newStageInstance: stripObjectToScalars(meta.args.newStageInstance),
       stageChannel: stripObjectToScalars(stageChannel),
+      differenceString,
     });
   },
 });
