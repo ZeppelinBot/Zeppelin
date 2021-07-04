@@ -16,7 +16,7 @@ export async function getCompanionChannelOptsForVoiceChannelId(
     .filter(
       opts =>
         opts.voice_channel_ids.includes(voiceChannel.id) ||
-        (voiceChannel.parentID && opts.voice_channel_ids.includes(voiceChannel.parentID)),
+        (voiceChannel.parentId && opts.voice_channel_ids.includes(voiceChannel.parentId)),
     )
     .map(opts => Object.assign({}, defaultCompanionChannelOpts, opts));
 }

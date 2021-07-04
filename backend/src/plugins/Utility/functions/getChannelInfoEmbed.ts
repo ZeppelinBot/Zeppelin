@@ -105,11 +105,11 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === ChannelTypeStrings.CATEGORY) {
     const textChannels = pluginData.guild.channels.cache.filter(
-      ch => ch.parentID === channel.id && ch.type !== ChannelTypeStrings.VOICE,
+      ch => ch.parentId === channel.id && ch.type !== ChannelTypeStrings.VOICE,
     );
     const voiceChannels = pluginData.guild.channels.cache.filter(
       ch =>
-        ch.parentID === channel.id && (ch.type === ChannelTypeStrings.VOICE || ch.type === ChannelTypeStrings.STAGE),
+        ch.parentId === channel.id && (ch.type === ChannelTypeStrings.VOICE || ch.type === ChannelTypeStrings.STAGE),
     );
 
     embed.fields.push({

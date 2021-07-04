@@ -38,5 +38,7 @@ export async function resolveStatefulCustomId(pluginData: GuildPluginData<Reacti
       roleOrMenu: cfgButton.role_or_menu,
       stateless: false,
     };
+  } else {
+    return null;
   }
 }

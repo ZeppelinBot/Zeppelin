@@ -38,7 +38,7 @@ export const PostButtonRolesCmd = reactionRolesCmd({
       const btn = new MessageButton()
         .setLabel(button.label ?? "")
         .setStyle(button.style ?? "PRIMARY")
-        .setCustomID(customId)
+        .setCustomId(customId)
         .setDisabled(button.disabled ?? false);
 
       if (button.emoji) {

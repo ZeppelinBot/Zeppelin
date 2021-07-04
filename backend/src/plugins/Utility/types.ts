@@ -34,6 +34,7 @@ export const ConfigSchema = t.type({
   jumbo_size: t.Integer,
   can_avatar: t.boolean,
   info_on_single_result: t.boolean,
+  autojoin_threads: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

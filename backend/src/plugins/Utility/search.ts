@@ -175,7 +175,7 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("⬅")
-          .setCustomID(`previousButton:${idMod}`)
+          .setCustomId(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
       );
 
@@ -183,7 +183,7 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("➡")
-          .setCustomID(`nextButton:${idMod}`)
+          .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
       );
 
@@ -191,7 +191,7 @@ export async function displaySearch(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("🔄")
-          .setCustomID(`reloadButton:${idMod}`),
+          .setCustomId(`reloadButton:${idMod}`),
       );
 
       const row = new MessageActionRow().addComponents(buttons);
@@ -204,15 +204,15 @@ export async function displaySearch(
         if (msg.author.id !== interaction.user.id) {
           interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
         } else {
-          if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {
+          if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
             collector.stop();
             await interaction.deferUpdate();
             await loadSearchPage(currentPage - 1);
-          } else if (interaction.customID === `nextButton:${idMod}` && currentPage < searchResult.lastPage) {
+          } else if (interaction.customId === `nextButton:${idMod}` && currentPage < searchResult.lastPage) {
             collector.stop();
             await interaction.deferUpdate();
             await loadSearchPage(currentPage + 1);
-          } else if (interaction.customID === `reloadButton:${idMod}`) {
+          } else if (interaction.customId === `reloadButton:${idMod}`) {
             collector.stop();
             await interaction.deferUpdate();
             await loadSearchPage(currentPage);
@@ -325,7 +325,7 @@ async function performMemberSearch(
   }
 
   if (args.voice) {
-    matchingMembers = matchingMembers.filter(m => m.voice.channelID != null);
+    matchingMembers = matchingMembers.filter(m => m.voice.channelId != null);
   }
 
   if (args.bot) {

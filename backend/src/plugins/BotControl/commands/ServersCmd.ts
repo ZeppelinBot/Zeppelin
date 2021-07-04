@@ -48,7 +48,7 @@ export const ServersCmd = botControlCmd({
         const longestId = filteredGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
         const lines = filteredGuilds.map(g => {
           const paddedId = g.id.padEnd(longestId, " ");
-          const owner = getUser(pluginData.client, g.ownerID);
+          const owner = getUser(pluginData.client, g.ownerId);
           return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.username}#${owner.discriminator}** \`${owner.id}\`)`;
         });
         createChunkedMessage(msg.channel as TextChannel, lines.join("\n"));

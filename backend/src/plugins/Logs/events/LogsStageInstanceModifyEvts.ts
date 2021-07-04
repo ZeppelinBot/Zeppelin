@@ -8,7 +8,7 @@ export const LogsStageInstanceCreateEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.stageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelID));
+      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId));
     meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_CREATE, {
       stageInstance: stripObjectToScalars(meta.args.stageInstance),
       stageChannel: stripObjectToScalars(stageChannel),
@@ -22,7 +22,7 @@ export const LogsStageInstanceDeleteEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.stageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelID));
+      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId));
     meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_DELETE, {
       stageInstance: stripObjectToScalars(meta.args.stageInstance),
       stageChannel: stripObjectToScalars(stageChannel),
@@ -36,7 +36,7 @@ export const LogsStageInstanceUpdateEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.newStageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.newStageInstance.channelID));
+      (await meta.pluginData.guild.channels.fetch(meta.args.newStageInstance.channelId));
 
     const diff = getScalarDifference(meta.args.oldStageInstance, meta.args.newStageInstance);
     const differenceString = differenceToString(diff);
