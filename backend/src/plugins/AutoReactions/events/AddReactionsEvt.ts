@@ -10,7 +10,7 @@ import { autoReactionsEvt } from "../types";
 const p = Permissions.FLAGS;
 
 export const AddReactionsEvt = autoReactionsEvt({
-  event: "message",
+  event: "messageCreate",
   allowBots: true,
   allowSelf: true,
 

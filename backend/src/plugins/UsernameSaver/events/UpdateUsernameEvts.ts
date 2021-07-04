@@ -2,7 +2,7 @@ import { usernameSaverEvt } from "../types";
 import { updateUsername } from "../updateUsername";
 
 export const MessageCreateUpdateUsernameEvt = usernameSaverEvt({
-  event: "message",
+  event: "messageCreate",
 
   async listener(meta) {
     if (meta.args.message.author.bot) return;

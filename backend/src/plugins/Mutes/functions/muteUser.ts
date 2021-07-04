@@ -69,11 +69,11 @@ export async function muteUser(
         // exclude managed roles from being removed
         const managedRoles = pluginData.guild.roles.cache.filter(x => x.managed).map(y => y.id);
         newRoles = currentUserRoles.filter(r => !managedRoles.includes(r));
-        await member.roles.set(newRoles);
+        await member.roles.set(newRoles as Snowflake[]);
       }
     } else {
       newRoles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
-      await member.roles.set(newRoles);
+      await member.roles.set(newRoles as Snowflake[]);
     }
 
     // set roles to be restored
@@ -88,7 +88,7 @@ export async function muteUser(
     // Apply mute role if it's missing
     if (!currentUserRoles.includes(muteRole as Snowflake)) {
       try {
-        await member.roles.add(muteRole);
+        await member.roles.add(muteRole as Snowflake);
       } catch (e) {
         const actualMuteRole = pluginData.guild.roles.cache.find(x => x.id === muteRole);
         if (!actualMuteRole) {

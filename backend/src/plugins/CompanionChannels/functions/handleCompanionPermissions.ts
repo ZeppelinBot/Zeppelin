@@ -54,14 +54,14 @@ export async function handleCompanionPermissions(
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
       await channel.permissionOverwrites
-        .get(userId as Snowflake)
+        .resolve(userId as Snowflake)
         ?.delete(`Companion Channel for ${oldChannel!.id} | User Left`);
     }
 
     for (const [channelId, permissions] of permsToSet) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
-      await channel.updateOverwrite(userId, new Permissions(BigInt(permissions)).serialize(), {
+      await channel.permissionOverwrites.create(userId as Snowflake, new Permissions(BigInt(permissions)).serialize(), {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
       });
     }

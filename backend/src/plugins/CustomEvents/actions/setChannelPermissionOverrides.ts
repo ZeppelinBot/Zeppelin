@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Permissions, Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
@@ -31,9 +31,16 @@ export async function setChannelPermissionOverridesAction(
   }
 
   for (const override of action.overrides) {
-    await channel.overwritePermissions(
+    channel.permissionOverwrites.create(
+      override.id as Snowflake,
+      new Permissions(BigInt(override.allow)).add(BigInt(override.deny)).serialize(),
+    );
+
+    /*
+    await channel.permissionOverwrites overwritePermissions(
       [{ id: override.id, allow: BigInt(override.allow), deny: BigInt(override.deny), type: override.type }],
       `Custom event: ${event.name}`,
     );
+    */
   }
 }
