@@ -37,7 +37,7 @@ export async function unmuteUser(
 
       const muteRole = pluginData.config.get().mute_role;
       if (muteRole && member.roles.cache.has(muteRole as Snowflake)) {
-        await member.roles.remove(muteRole);
+        await member.roles.remove(muteRole as Snowflake);
       }
       if (existingMute?.roles_to_restore) {
         const guildRoles = pluginData.guild.roles.cache;
@@ -46,7 +46,7 @@ export async function unmuteUser(
         for (const toRestore of existingMute.roles_to_restore) {
           if (guildRoles.has(toRestore as Snowflake) && toRestore !== muteRole) newRoles.push(toRestore);
         }
-        await member.roles.set(newRoles);
+        await member.roles.set(newRoles as Snowflake[]);
       }
 
       lock.unlock();

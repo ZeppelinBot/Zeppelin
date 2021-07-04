@@ -15,7 +15,7 @@ export const ChannelJoinEvt = nameHistoryEvt({
 });
 
 export const MessageCreateEvt = nameHistoryEvt({
-  event: "message",
+  event: "messageCreate",
 
   async listener(meta) {
     meta.pluginData.state.updateQueue.add(() => updateNickname(meta.pluginData, meta.args.message.member!));

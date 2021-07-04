@@ -2,7 +2,7 @@ import { Message } from "discord.js";
 import { messageSaverEvt } from "../types";
 
 export const MessageCreateEvt = messageSaverEvt({
-  event: "message",
+  event: "messageCreate",
   allowBots: true,
   allowSelf: true,
 

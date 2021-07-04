@@ -23,7 +23,7 @@ export async function waitForButtonConfirm(
     const message = await channel.send({ ...toPost, components: [row] });
 
     const filter = (iac: MessageComponentInteraction) => iac.message.id === message.id;
-    const collector = message.createMessageComponentInteractionCollector({ filter, time: 10000 });
+    const collector = message.createMessageComponentCollector({ filter, time: 10000 });
 
     collector.on("collect", (interaction: MessageComponentInteraction) => {
       if (options?.restrictToId && options.restrictToId !== interaction.user.id) {

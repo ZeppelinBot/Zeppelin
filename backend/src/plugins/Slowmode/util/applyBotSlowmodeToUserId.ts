@@ -11,16 +11,13 @@ export async function applyBotSlowmodeToUserId(
   userId: string,
 ) {
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
-  const existingOverride = channel.permissionOverwrites.get(userId as Snowflake);
-  const newDeniedPermissions =
-    (existingOverride ? existingOverride.deny.bitfield : 0n) | Permissions.FLAGS.SEND_MESSAGES;
-  const newAllowedPermissions =
-    (existingOverride ? existingOverride.allow.bitfield : 0n) & ~Permissions.FLAGS.SEND_MESSAGES;
-
+  const existingOverride = channel.permissionOverwrites.resolve(userId as Snowflake);
   try {
-    await channel.overwritePermissions([
-      { id: userId, allow: newAllowedPermissions, deny: newDeniedPermissions, type: "member" },
-    ]);
+    if (existingOverride) {
+      await existingOverride.edit({ SEND_MESSAGES: false });
+    } else {
+      await channel.permissionOverwrites.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
+    }
   } catch (e) {
     const user = pluginData.client.users.fetch(userId as Snowflake) || new UnknownUser({ id: userId });
 

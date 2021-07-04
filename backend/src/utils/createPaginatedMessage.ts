@@ -1,9 +1,18 @@
-import { Client, Message, MessageOptions, MessageReaction, PartialUser, TextChannel, User } from "discord.js";
+import {
+  Client,
+  Message,
+  MessageEditOptions,
+  MessageOptions,
+  MessageReaction,
+  PartialUser,
+  TextChannel,
+  User,
+} from "discord.js";
 import { Awaitable } from "knub/dist/utils";
 import { MINUTES, noop } from "../utils";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageOptions>;
+export type LoadPageFn = (page: number) => Awaitable<MessageOptions & MessageEditOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;

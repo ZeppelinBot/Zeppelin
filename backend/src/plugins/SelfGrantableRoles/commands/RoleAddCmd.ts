@@ -80,7 +80,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
 
     try {
       await msg.member.edit({
-        roles: Array.from(newRoleIds),
+        roles: Array.from(newRoleIds) as Snowflake[],
       });
     } catch {
       sendErrorMessage(
