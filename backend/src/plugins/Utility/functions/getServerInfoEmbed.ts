@@ -185,9 +185,19 @@ export async function getServerInfoEmbed(
         2: 150,
         3: 250,
       }[restGuild.premiumTier] || 50;
+    const maxStickers =
+      {
+        0: 0,
+        1: 15,
+        2: 30,
+        3: 60,
+      }[restGuild.premiumTier] || 0;
+
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
+    otherStats.push(`Stickers: ? / ${maxStickers}`); // Wait on DJS: **${restGuild.stickers.cache.size}**
   } else {
     otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
+    // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
   }
 
   if (thisServer) {
