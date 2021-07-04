@@ -20,6 +20,7 @@ export function splitButtonsIntoRows(actualButtons: MessageButton[], configButto
     }
   }
 
+  if (curRow.components.length >= 1) rows.push(curRow);
   return rows;
 }
 

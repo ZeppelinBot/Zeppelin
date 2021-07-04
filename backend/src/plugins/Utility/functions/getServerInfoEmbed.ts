@@ -64,10 +64,10 @@ export async function getServerInfoEmbed(
   basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
 
   if (thisServer) {
-    const owner = await resolveUser(pluginData.client, thisServer.ownerID);
+    const owner = await resolveUser(pluginData.client, thisServer.ownerId);
     const ownerName = `${owner.username}#${owner.discriminator}`;
 
-    basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerID}\`)`);
+    basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
     // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
   }
 
@@ -81,10 +81,10 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL})`;
-  const bannerUrl = restGuild?.bannerURL ? `[Link](${restGuild.bannerURL})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
+  const bannerUrl = restGuild?.bannerURL() ? `[Link](${restGuild.bannerURL()})` : "None";
   const splashUrl =
-    (restGuild || guildPreview)!.splashURL != null
+    (restGuild || guildPreview)!.splashURL() != null
       ? `[Link](${(restGuild || guildPreview)!.splashURL()?.replace("size=128", "size=2048")})`
       : "None";
 

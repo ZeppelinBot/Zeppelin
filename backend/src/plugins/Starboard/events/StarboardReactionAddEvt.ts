@@ -34,7 +34,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     const config = await pluginData.config.getMatchingConfig({
       member,
       channelId: msg.channel.id,
-      categoryId: (msg.channel as TextChannel).parentID,
+      categoryId: (msg.channel as TextChannel).parentId,
     });
 
     const boardLock = await pluginData.locks.acquire(allStarboardsLock());

@@ -27,9 +27,16 @@ export const MutesCmd = mutesCmd({
     let totalMutes = 0;
     let hasFilters = false;
 
-    let stopCollectionFn;
-    let stopCollectionTimeout;
+    let stopCollectionFn = () => {
+      return;
+    };
+    let stopCollectionTimeout: NodeJS.Timeout;
     const stopCollectionDebounce = 5 * MINUTES;
+
+    const bumpCollectionTimeout = () => {
+      clearTimeout(stopCollectionTimeout);
+      stopCollectionTimeout = setTimeout(stopCollectionFn, stopCollectionDebounce);
+    };
 
     let lines: string[] = [];
 
@@ -169,11 +176,6 @@ export const MutesCmd = mutesCmd({
       bumpCollectionTimeout();
     };
 
-    const bumpCollectionTimeout = () => {
-      clearTimeout(stopCollectionTimeout);
-      stopCollectionTimeout = setTimeout(stopCollectionFn, stopCollectionDebounce);
-    };
-
     if (totalMutes === 0) {
       if (args.manual) {
         listMessage.edit("No manual mutes found!");
@@ -199,14 +201,14 @@ export const MutesCmd = mutesCmd({
           new MessageButton()
             .setStyle("SECONDARY")
             .setEmoji("⬅")
-            .setCustomID(`previousButton:${idMod}`),
+            .setCustomId(`previousButton:${idMod}`),
         );
 
         buttons.push(
           new MessageButton()
             .setStyle("SECONDARY")
             .setEmoji("➡")
-            .setCustomID(`nextButton:${idMod}`),
+            .setCustomId(`nextButton:${idMod}`),
         );
 
         const row = new MessageActionRow().addComponents(buttons);
@@ -223,10 +225,10 @@ export const MutesCmd = mutesCmd({
             interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
           } else {
             collector.resetTimer();
-            if (interaction.customID === `previousButton:${idMod}` && currentPage > 1) {
+            if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
               await interaction.deferUpdate();
               await drawListPage(currentPage - 1);
-            } else if (interaction.customID === `nextButton:${idMod}` && currentPage < totalPages) {
+            } else if (interaction.customId === `nextButton:${idMod}` && currentPage < totalPages) {
               await interaction.deferUpdate();
               await drawListPage(currentPage + 1);
             } else {

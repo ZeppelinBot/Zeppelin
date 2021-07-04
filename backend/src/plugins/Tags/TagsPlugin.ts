@@ -150,6 +150,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       },
 
       timeAdd(...args) {
+        if (args.length === 0) return;
         let reference;
         let delay;
 
@@ -171,6 +172,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       },
 
       timeSub(...args) {
+        if (args.length === 0) return;
         let reference;
         let delay;
 

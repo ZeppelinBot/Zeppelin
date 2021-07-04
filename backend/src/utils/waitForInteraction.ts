@@ -13,12 +13,12 @@ export async function waitForButtonConfirm(
       new MessageButton()
         .setStyle("SUCCESS")
         .setLabel(options?.confirmText || "Confirm")
-        .setCustomID(`confirmButton:${idMod}`),
+        .setCustomId(`confirmButton:${idMod}`),
 
       new MessageButton()
         .setStyle("DANGER")
         .setLabel(options?.cancelText || "Cancel")
-        .setCustomID(`cancelButton:${idMod}`),
+        .setCustomId(`cancelButton:${idMod}`),
     ]);
     const message = await channel.send({ ...toPost, components: [row] });
 
@@ -29,10 +29,10 @@ export async function waitForButtonConfirm(
       if (options?.restrictToId && options.restrictToId !== interaction.user.id) {
         interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
       } else {
-        if (interaction.customID === `confirmButton:${idMod}`) {
+        if (interaction.customId === `confirmButton:${idMod}`) {
           message.delete();
           resolve(true);
-        } else if (interaction.customID === `cancelButton:${idMod}`) {
+        } else if (interaction.customId === `cancelButton:${idMod}`) {
           message.delete();
           resolve(false);
         }

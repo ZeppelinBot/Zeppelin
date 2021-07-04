@@ -33,7 +33,7 @@ export async function handleOpenMenu(
     const btn = new MessageButton()
       .setLabel(menuButton.label ?? "")
       .setStyle("PRIMARY")
-      .setCustomID(customId)
+      .setCustomId(customId)
       .setDisabled(menuButton.disabled ?? false);
 
     if (menuButton.emoji) {

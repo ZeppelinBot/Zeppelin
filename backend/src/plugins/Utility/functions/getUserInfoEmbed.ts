@@ -114,7 +114,7 @@ export async function getUserInfoEmbed(
         `),
     });
 
-    const voiceChannel = member.voice.channelID ? pluginData.guild.channels.cache.get(member.voice.channelID) : null;
+    const voiceChannel = member.voice.channelId ? pluginData.guild.channels.cache.get(member.voice.channelId) : null;
     if (voiceChannel || member.voice.mute || member.voice.deaf) {
       embed.fields.push({
         name: preEmbedPadding + "Voice information",

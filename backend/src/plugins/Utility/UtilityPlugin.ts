@@ -35,6 +35,7 @@ import { SourceCmd } from "./commands/SourceCmd";
 import { UserInfoCmd } from "./commands/UserInfoCmd";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
+import { AutoJoinThreadEvt } from "./events/AutoJoinThreadEvt";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { ConfigSchema, UtilityPluginType } from "./types";
@@ -67,6 +68,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     jumbo_size: 128,
     can_avatar: false,
     info_on_single_result: true,
+    autojoin_threads: true,
   },
   overrides: [
     {
@@ -146,6 +148,11 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     SnowflakeInfoCmd,
     RoleInfoCmd,
     EmojiInfoCmd,
+  ],
+
+  // prettier-ignore
+  events: [
+    AutoJoinThreadEvt,
   ],
 
   beforeLoad(pluginData) {

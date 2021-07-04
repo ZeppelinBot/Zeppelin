@@ -11,8 +11,8 @@ export async function sendWhere(
   channel: TextChannel,
   prepend: string,
 ) {
-  const voice = member.voice.channelID
-    ? (pluginData.guild.channels.resolve(member.voice.channelID) as VoiceChannel)
+  const voice = member.voice.channelId
+    ? (pluginData.guild.channels.resolve(member.voice.channelId) as VoiceChannel)
     : null;
 
   if (voice == null) {

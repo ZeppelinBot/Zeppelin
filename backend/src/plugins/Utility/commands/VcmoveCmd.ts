@@ -52,17 +52,17 @@ export const VcmoveCmd = utilityCmd({
       channel = closestMatch;
     }
 
-    if (!args.member.voice || !args.member.voice.channelID) {
+    if (!args.member.voice || !args.member.voice.channelId) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
     }
 
-    if (args.member.voice.channelID === channel.id) {
+    if (args.member.voice.channelId === channel.id) {
       sendErrorMessage(pluginData, msg.channel, "Member is already on that channel!");
       return;
     }
 
-    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelID);
+    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelId);
 
     try {
       await args.member.edit({

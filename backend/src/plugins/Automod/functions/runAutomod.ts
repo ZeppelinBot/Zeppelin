@@ -13,7 +13,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
   const channelId = context.message?.channel_id;
   const channel = channelId ? (pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel) : null;
-  const categoryId = channel?.parentID;
+  const categoryId = channel?.parentId;
 
   const config = await pluginData.config.getMatchingConfig({
     channelId,

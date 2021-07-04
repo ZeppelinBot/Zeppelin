@@ -34,7 +34,7 @@ export async function moveToVoiceChannelAction(
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof VoiceChannel)) throw new ActionError("Target channel is not a voice channel");
 
-  if (!target.voice.channelID) return;
+  if (!target.voice.channelId) return;
   await target.edit({
     channel: targetChannel.id,
   });

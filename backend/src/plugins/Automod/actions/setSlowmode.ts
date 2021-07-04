@@ -30,7 +30,7 @@ export const SetSlowmodeAction = automodAction({
       if (channel.type === ChannelTypeStrings.CATEGORY) {
         // Find all text channels within the category
         for (const ch of pluginData.guild.channels.cache.values()) {
-          if (ch.parentID === channel.id && ch.type === ChannelTypeStrings.TEXT) {
+          if (ch.parentId === channel.id && ch.type === ChannelTypeStrings.TEXT) {
             channelsToSlowmode.push(ch as TextChannel);
           }
         }

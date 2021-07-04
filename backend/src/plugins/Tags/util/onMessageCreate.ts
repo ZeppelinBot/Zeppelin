@@ -22,12 +22,12 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const config = await pluginData.config.getMatchingConfig({
     member,
     channelId: msg.channel_id,
-    categoryId: channel.parentID,
+    categoryId: channel.parentId,
   });
 
   const tagResult = await matchAndRenderTagFromString(pluginData, msg.data.content, member, {
     channelId: msg.channel_id,
-    categoryId: channel.parentID,
+    categoryId: channel.parentId,
   });
 
   if (!tagResult) {

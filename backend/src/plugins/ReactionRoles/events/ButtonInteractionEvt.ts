@@ -14,18 +14,17 @@ import { handleModifyRole, handleOpenMenu } from "../util/buttonActionHandlers";
 const BUTTON_INVALIDATION_TIME = 15 * MINUTES;
 
 export const ButtonInteractionEvt = reactionRolesEvt({
-  event: "interaction",
+  event: "interactionCreate",
 
   async listener(meta) {
     const int = meta.args.interaction.isMessageComponent()
       ? (meta.args.interaction as MessageComponentInteraction)
       : null;
     if (!int) return;
-    const allOnMessage = await meta.pluginData.state.buttonRoles.getAllForMessageId(int.message.id);
-    if (allOnMessage.length === 0) return;
+
     const cfg = meta.pluginData.config.get();
-    const split = int.customID.split(BUTTON_CONTEXT_SEPARATOR);
-    const context = (await resolveStatefulCustomId(meta.pluginData, int.customID)) ?? {
+    const split = int.customId.split(BUTTON_CONTEXT_SEPARATOR);
+    const context = (await resolveStatefulCustomId(meta.pluginData, int.customId)) ?? {
       groupName: split[0],
       action: split[1],
       roleOrMenu: split[2],
@@ -80,7 +79,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
     }
 
     logger.warn(
-      `Action ${context.action} on button ${int.customID} (Guild: ${int.guildID}, Channel: ${int.channelID}) is unknown!`,
+      `Action ${context.action} on button ${int.customId} (Guild: ${int.guildId}, Channel: ${int.channelId}) is unknown!`,
     );
     await sendEphemeralReply(int, `A internal error was encountered, please contact the Administrators!`);
   },
