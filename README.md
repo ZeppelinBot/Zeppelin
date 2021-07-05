@@ -24,7 +24,7 @@ See <https://zeppelin.gg/> for more details.
 
 ## Development
 
-These instructions are intended for bot development only, they are not safe to follow for self-hosting.
+These instructions are intended for bot development only, they are not recommended for self-hosting.
 
 👉 **No support is guaranteed for self-hosting the bot!** 👈
 
