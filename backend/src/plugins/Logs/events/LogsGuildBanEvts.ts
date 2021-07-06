@@ -1,6 +1,6 @@
 import { GuildAuditLogs } from "discord.js";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
 
@@ -16,13 +16,13 @@ export const LogsGuildBanAddEvt = logsEvt({
       GuildAuditLogs.Actions.MEMBER_BAN_ADD as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_BAN,
       {
-        mod: stripObjectToScalars(mod),
-        user: stripObjectToScalars(user),
+        mod: mod ? userToConfigAccessibleUser(mod) : {},
+        user: userToConfigAccessibleUser(user),
       },
       user.id,
     );
@@ -41,12 +41,12 @@ export const LogsGuildBanRemoveEvt = logsEvt({
       GuildAuditLogs.Actions.MEMBER_BAN_REMOVE as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
+    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_UNBAN,
       {
-        mod: stripObjectToScalars(mod),
+        mod: mod ? userToConfigAccessibleUser(mod) : {},
         userId: user.id,
       },
       user.id,

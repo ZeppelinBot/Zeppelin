@@ -1,3 +1,4 @@
+import { channelToConfigAccessibleChannel, memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
 import { logsEvt } from "../types";
@@ -10,25 +11,23 @@ export const LogsVoiceStateUpdateEvt = logsEvt({
     const newChannel = meta.args.newState.channel;
     const member = meta.args.newState.member ?? meta.args.oldState.member!;
 
-    if (!newChannel) {
+    if (!newChannel && oldChannel) {
       // Leave evt
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
-        oldChannel: stripObjectToScalars(oldChannel),
-        newChannel: stripObjectToScalars(newChannel),
+        member: memberToConfigAccessibleMember(member),
+        oldChannel: channelToConfigAccessibleChannel(oldChannel!),
       });
-    } else if (!oldChannel) {
+    } else if (!oldChannel && newChannel) {
       // Join Evt
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
-        oldChannel: stripObjectToScalars(oldChannel),
-        newChannel: stripObjectToScalars(newChannel),
+        member: memberToConfigAccessibleMember(member),
+        newChannel: channelToConfigAccessibleChannel(newChannel),
       });
     } else {
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
-        oldChannel: stripObjectToScalars(oldChannel),
-        newChannel: stripObjectToScalars(newChannel),
+        member: memberToConfigAccessibleMember(member),
+        oldChannel: channelToConfigAccessibleChannel(oldChannel!),
+        newChannel: channelToConfigAccessibleChannel(newChannel!),
       });
     }
   },

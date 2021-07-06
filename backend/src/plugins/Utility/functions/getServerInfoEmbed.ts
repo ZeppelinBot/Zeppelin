@@ -126,7 +126,7 @@ export async function getServerInfoEmbed(
   }
 
   if (!onlineMemberCount && thisServer) {
-    onlineMemberCount = thisServer.members.cache.filter(m => m.presence.status !== "offline").size; // Extremely inaccurate fallback
+    onlineMemberCount = thisServer.members.cache.filter(m => m.presence?.status !== "offline").size; // Extremely inaccurate fallback
   }
 
   const offlineMemberCount = totalMembers - onlineMemberCount;

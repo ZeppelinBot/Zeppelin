@@ -1,5 +1,5 @@
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
 import { logsEvt } from "../types";
 
 export const LogsGuildMemberRemoveEvt = logsEvt({
@@ -7,7 +7,7 @@ export const LogsGuildMemberRemoveEvt = logsEvt({
 
   async listener(meta) {
     meta.pluginData.state.guildLogs.log(LogType.MEMBER_LEAVE, {
-      member: stripObjectToScalars(meta.args.member, ["user", "roles"]),
+      member: memberToConfigAccessibleMember(meta.args.member),
     });
   },
 });

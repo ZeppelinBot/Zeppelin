@@ -25,9 +25,6 @@ export const StarboardReactionAddEvt = starboardEvt({
       }
     }
 
-    // No self-votes!
-    if (msg.author.id === userId) return;
-
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
     if (!member || member.user.bot) return;
 
@@ -61,7 +58,10 @@ export const StarboardReactionAddEvt = starboardEvt({
         });
       });
 
+    const selfStar = msg.author.id === userId;
     for (const starboard of applicableStarboards) {
+      if (selfStar && !starboard.allow_selfstars) continue;
+
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 

@@ -36,6 +36,7 @@ import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { isEqual } from "lodash";
+import humanizeDuration from "humanize-duration";
 
 const fsp = fs.promises;
 
@@ -184,8 +185,28 @@ export function getScalarDifference<T>(
   return diff;
 }
 
+// This is a stupid, messy solution that is not extendable at all.
+// If anyone plans on adding anything to this, they should rewrite this first.
+// I just want to get this done and this works for now :)
+export function prettyDifference(diff: Map<string, { was: any; is: any }>): Map<string, { was: any; is: any }> {
+  const toReturn = new Map<string, { was: any; is: any }>();
+
+  for (let [key, difference] of diff) {
+    if (key === "rateLimitPerUser") {
+      difference.is = humanizeDuration(difference.is * 1000);
+      difference.was = humanizeDuration(difference.was * 1000);
+      key = "slowmode";
+    }
+
+    toReturn.set(key, { was: difference.was, is: difference.is });
+  }
+
+  return toReturn;
+}
+
 export function differenceToString(diff: Map<string, { was: any; is: any }>): string {
   let toReturn = "";
+  diff = prettyDifference(diff);
   for (const [key, difference] of diff) {
     toReturn += `${key[0].toUpperCase() + key.slice(1)}: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
   }

@@ -35,7 +35,7 @@ import { SourceCmd } from "./commands/SourceCmd";
 import { UserInfoCmd } from "./commands/UserInfoCmd";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
-import { AutoJoinThreadEvt } from "./events/AutoJoinThreadEvt";
+import { AutoJoinThreadEvt, AutoJoinThreadSyncEvt } from "./events/AutoJoinThreadEvt";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { ConfigSchema, UtilityPluginType } from "./types";
@@ -153,6 +153,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   // prettier-ignore
   events: [
     AutoJoinThreadEvt,
+    AutoJoinThreadSyncEvt,
   ],
 
   beforeLoad(pluginData) {

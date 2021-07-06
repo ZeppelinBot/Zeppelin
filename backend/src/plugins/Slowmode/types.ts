@@ -19,6 +19,7 @@ export interface SlowmodePluginType extends BasePluginType {
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
     clearInterval: NodeJS.Timeout;
+    serverLogs: GuildLogs;
 
     onMessageCreateFn;
   };

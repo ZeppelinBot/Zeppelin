@@ -10,3 +10,18 @@ export const AutoJoinThreadEvt = utilityEvt({
     }
   },
 });
+
+export const AutoJoinThreadSyncEvt = utilityEvt({
+  event: "threadListSync",
+
+  async listener(meta) {
+    const config = meta.pluginData.config.get();
+    if (config.autojoin_threads) {
+      for (const thread of meta.args.threads.values()) {
+        if (!thread.joined && thread.joinable) {
+          await thread.join();
+        }
+      }
+    }
+  },
+});
