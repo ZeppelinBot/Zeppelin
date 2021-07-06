@@ -53,6 +53,7 @@ export async function handleCompanionPermissions(
     for (const channelId of permsToDelete) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
+      pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channelId, 3 * 1000);
       await channel.permissionOverwrites
         .resolve(userId as Snowflake)
         ?.delete(`Companion Channel for ${oldChannel!.id} | User Left`);
@@ -61,6 +62,7 @@ export async function handleCompanionPermissions(
     for (const [channelId, permissions] of permsToSet) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
+      pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channelId, 3 * 1000);
       await channel.permissionOverwrites.create(userId as Snowflake, new Permissions(BigInt(permissions)).serialize(), {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
       });

@@ -52,7 +52,7 @@ export async function* matchMultipleTextTypesOnMessage(
     yield ["nickname", member.nickname];
   }
 
-  for (const activity of member.presence.activities) {
+  for (const activity of member.presence?.activities ?? []) {
     if (activity.type === Constants.ActivityTypes[4]) {
       yield ["customstatus", `${activity.emoji} ${activity.name}`];
       break;

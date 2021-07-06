@@ -1,5 +1,6 @@
+import { roleToConfigAccessibleRole } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { differenceToString, getScalarDifference, stripObjectToScalars } from "../../../utils";
+import { differenceToString, getScalarDifference } from "../../../utils";
 import { logsEvt } from "../types";
 
 export const LogsRoleCreateEvt = logsEvt({
@@ -7,7 +8,7 @@ export const LogsRoleCreateEvt = logsEvt({
 
   async listener(meta) {
     meta.pluginData.state.guildLogs.log(LogType.ROLE_CREATE, {
-      role: stripObjectToScalars(meta.args.role),
+      role: roleToConfigAccessibleRole(meta.args.role),
     });
   },
 });
@@ -17,7 +18,7 @@ export const LogsRoleDeleteEvt = logsEvt({
 
   async listener(meta) {
     meta.pluginData.state.guildLogs.log(LogType.ROLE_DELETE, {
-      role: stripObjectToScalars(meta.args.role),
+      role: roleToConfigAccessibleRole(meta.args.role),
     });
   },
 });
@@ -30,8 +31,8 @@ export const LogsRoleUpdateEvt = logsEvt({
     const differenceString = differenceToString(diff);
 
     meta.pluginData.state.guildLogs.log(LogType.ROLE_UPDATE, {
-      newRole: stripObjectToScalars(meta.args.newRole),
-      oldRole: stripObjectToScalars(meta.args.oldRole),
+      newRole: roleToConfigAccessibleRole(meta.args.newRole),
+      oldRole: roleToConfigAccessibleRole(meta.args.oldRole),
       differenceString,
     });
   },

@@ -1,4 +1,5 @@
 import { CooldownManager } from "knub";
+import { GuildLogs } from "../../../data/GuildLogs";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -31,5 +32,9 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
 
   beforeLoad(pluginData) {
     pluginData.state.errorCooldownManager = new CooldownManager();
+  },
+
+  afterLoad(pluginData) {
+    pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
   },
 });

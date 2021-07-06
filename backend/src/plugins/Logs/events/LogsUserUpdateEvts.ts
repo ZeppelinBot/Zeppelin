@@ -1,8 +1,8 @@
 import { GuildAuditLogs } from "discord.js";
 import diff from "lodash.difference";
 import isEqual from "lodash.isequal";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
 
@@ -16,7 +16,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
 
     if (!oldMember) return;
 
-    const logMember = stripObjectToScalars(member, ["user", "roles"]);
+    const logMember = memberToConfigAccessibleMember(member);
 
     if (member.nickname !== oldMember.nickname) {
       pluginData.state.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
@@ -52,7 +52,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           GuildAuditLogs.Actions.MEMBER_ROLE_UPDATE as number,
           member.id,
         );
-        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : new UnknownUser();
+        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
 
         if (addedRoles.length && removedRoles.length) {
           // Roles added *and* removed
@@ -68,7 +68,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
                 .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
-              mod: stripObjectToScalars(mod),
+              mod: mod ? userToConfigAccessibleUser(mod) : {},
             },
             member.id,
           );
@@ -82,7 +82,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
                 .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
-              mod: stripObjectToScalars(mod),
+              mod: mod ? userToConfigAccessibleUser(mod) : {},
             },
             member.id,
           );
@@ -96,7 +96,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
                 .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
-              mod: stripObjectToScalars(mod),
+              mod: mod ? userToConfigAccessibleUser(mod) : {},
             },
             member.id,
           );

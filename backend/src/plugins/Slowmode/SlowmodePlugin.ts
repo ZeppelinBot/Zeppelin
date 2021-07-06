@@ -66,6 +66,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   afterLoad(pluginData) {
     const { state } = pluginData;
 
+    state.serverLogs = new GuildLogs(pluginData.guild.id);
     state.clearInterval = setInterval(() => clearExpiredSlowmodes(pluginData), BOT_SLOWMODE_CLEAR_INTERVAL);
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
