@@ -1,6 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
 import { performance } from "perf_hooks";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -80,6 +81,7 @@ export const MassbanCmd = modActionsCmd({
       const startTime = performance.now();
       const failedBans: string[] = [];
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
+      const deleteDays = (await pluginData.config.getForMessage(msg)).ban_delete_message_days;
       for (const [i, userId] of args.userIds.entries()) {
         if (pluginData.state.unloaded) {
           break;
@@ -92,7 +94,7 @@ export const MassbanCmd = modActionsCmd({
           pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
 
           await pluginData.guild.bans.create(userId as Snowflake, {
-            days: 1,
+            days: deleteDays,
             reason: banReason != null ? encodeURIComponent(banReason) : undefined,
           });
 
@@ -128,7 +130,7 @@ export const MassbanCmd = modActionsCmd({
       } else {
         // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
         pluginData.state.serverLogs.log(LogType.MASSBAN, {
-          mod: stripObjectToScalars(msg.author),
+          mod: userToConfigAccessibleUser(msg.author),
           count: successfulBanCount,
           reason: banReason,
         });

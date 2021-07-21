@@ -1,4 +1,9 @@
 import { Snowflake, VoiceChannel } from "discord.js";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+  userToConfigAccessibleUser,
+} from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -74,10 +79,10 @@ export const VcmoveCmd = utilityCmd({
     }
 
     pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
-      mod: stripObjectToScalars(msg.author),
-      member: stripObjectToScalars(args.member, ["user", "roles"]),
-      oldChannel: stripObjectToScalars(oldVoiceChannel),
-      newChannel: stripObjectToScalars(channel),
+      mod: userToConfigAccessibleUser(msg.author),
+      member: memberToConfigAccessibleMember(args.member),
+      oldChannel: channelToConfigAccessibleChannel(oldVoiceChannel!),
+      newChannel: channelToConfigAccessibleChannel(channel),
     });
 
     sendSuccessMessage(
@@ -182,10 +187,10 @@ export const VcmoveAllCmd = utilityCmd({
       }
 
       pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
-        mod: stripObjectToScalars(msg.author),
-        member: stripObjectToScalars(currMember, ["user", "roles"]),
-        oldChannel: stripObjectToScalars(args.oldChannel),
-        newChannel: stripObjectToScalars(channel),
+        mod: userToConfigAccessibleUser(msg.author),
+        member: memberToConfigAccessibleMember(currMember),
+        oldChannel: channelToConfigAccessibleChannel(args.oldChannel),
+        newChannel: channelToConfigAccessibleChannel(channel),
       });
     }
 

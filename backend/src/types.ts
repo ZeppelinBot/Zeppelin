@@ -65,15 +65,18 @@ export interface CommandInfo {
 }
 
 export enum ChannelTypeStrings {
-  TEXT = "text",
-  DM = "dm",
-  VOICE = "voice",
-  GROUP = "group",
-  CATEGORY = "category",
-  NEWS = "news",
-  STORE = "store",
-  STAGE = "stage",
-  UNKNOWN = "unknown",
+  TEXT = "GUILD_TEXT",
+  DM = "DM",
+  VOICE = "GUILD_VOICE",
+  GROUP = "GROUP_DM",
+  CATEGORY = "GUILD_CATEGORY",
+  NEWS = "GUILD_NEWS",
+  STORE = "GUILD_STORE",
+  NEWS_THREAD = "GUILD_NEWS_THREAD",
+  PUBLIC_THREAD = "GUILD_PUBLIC_THREAD",
+  PRIVATE_THREAD = "GUILD_PRIVATE_THREAD",
+  STAGE = "GUILD_STAGE_VOICE",
+  UNKNOWN = "UNKNOWN",
 }
 
 export enum MessageTypeStrings {

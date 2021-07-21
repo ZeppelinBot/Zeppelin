@@ -1,11 +1,13 @@
+import { User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/dist/helpers";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
+import { resolveMember, resolveUser } from "../../../utils";
 import { banLock } from "../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { banUserId } from "../functions/banUserId";
@@ -109,8 +111,8 @@ export const BanCmd = modActionsCmd({
           });
           const logtype = time ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
           pluginData.state.serverLogs.log(logtype, {
-            mod: stripObjectToScalars(mod.user),
-            user: stripObjectToScalars(user),
+            mod: userToConfigAccessibleUser(mod.user),
+            user: userToConfigAccessibleUser(user),
             caseNumber: createdCase.case_number,
             reason,
             banTime: time ? humanizeDuration(time) : null,

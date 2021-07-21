@@ -1,5 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -87,7 +88,7 @@ export const MassunbanCmd = modActionsCmd({
     } else {
       // Some or all unbans were successful. Create a log entry for the mass unban and notify the user.
       pluginData.state.serverLogs.log(LogType.MASSUNBAN, {
-        mod: stripObjectToScalars(msg.author),
+        mod: userToConfigAccessibleUser(msg.author),
         count: successfulUnbanCount,
         reason: unbanReason,
       });

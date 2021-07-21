@@ -1,6 +1,7 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
@@ -84,19 +85,19 @@ export async function unmuteUser(
   });
 
   // Log the action
-  const mod = pluginData.client.users.fetch(modId as Snowflake);
+  const mod = await pluginData.client.users.fetch(modId as Snowflake);
   if (unmuteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNMUTE, {
-      mod: stripObjectToScalars(mod),
-      user: stripObjectToScalars(user),
+      mod: userToConfigAccessibleUser(mod),
+      user: userToConfigAccessibleUser(user),
       caseNumber: createdCase.case_number,
       time: timeUntilUnmute,
       reason: caseArgs.reason,
     });
   } else {
     pluginData.state.serverLogs.log(LogType.MEMBER_UNMUTE, {
-      mod: stripObjectToScalars(mod),
-      user: stripObjectToScalars(user),
+      mod: userToConfigAccessibleUser(mod),
+      user: userToConfigAccessibleUser(user),
       caseNumber: createdCase.case_number,
       reason: caseArgs.reason,
     });

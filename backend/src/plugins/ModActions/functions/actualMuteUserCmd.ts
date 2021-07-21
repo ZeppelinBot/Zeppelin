@@ -1,4 +1,4 @@
-import { GuildMember, Message, TextChannel, User } from "discord.js";
+import { GuildMember, Message, TextChannel, ThreadChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
@@ -19,7 +19,13 @@ export async function actualMuteUserCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
   msg: Message,
-  args: { time?: number; reason?: string; mod: GuildMember; notify?: string; "notify-channel"?: TextChannel },
+  args: {
+    time?: number;
+    reason?: string;
+    mod: GuildMember;
+    notify?: string;
+    "notify-channel"?: TextChannel | ThreadChannel;
+  },
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
   let mod: GuildMember = msg.member!;

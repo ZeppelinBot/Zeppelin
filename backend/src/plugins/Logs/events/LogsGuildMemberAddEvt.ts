@@ -2,7 +2,6 @@ import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { logsEvt } from "../types";
 
@@ -20,7 +19,7 @@ export const LogsGuildMemberAddEvt = logsEvt({
     });
 
     pluginData.state.guildLogs.log(LogType.MEMBER_JOIN, {
-      member: stripObjectToScalars(member, ["user", "roles"]),
+      member: memberToConfigAccessibleMember(member),
       new: member.user.createdTimestamp >= newThreshold ? " :new:" : "",
       account_age: accountAge,
     });

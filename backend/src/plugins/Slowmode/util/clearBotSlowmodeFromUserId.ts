@@ -1,11 +1,11 @@
-import { GuildChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { SlowmodePluginType } from "../types";
 
 export async function clearBotSlowmodeFromUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
-  channel: GuildChannel & TextChannel,
+  channel: TextChannel,
   userId: string,
   force = false,
 ) {

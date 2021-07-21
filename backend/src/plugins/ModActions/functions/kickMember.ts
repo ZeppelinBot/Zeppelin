@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
@@ -40,7 +41,7 @@ export async function kickMember(
           guildName: pluginData.guild.name,
           reason,
           moderator: kickOptions.caseArgs?.modId
-            ? stripObjectToScalars(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+            ? userToConfigAccessibleUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
             : {},
         });
 
@@ -79,8 +80,8 @@ export async function kickMember(
   // Log the action
   const mod = await resolveUser(pluginData.client, modId);
   pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-    mod: stripObjectToScalars(mod),
-    user: stripObjectToScalars(member.user),
+    mod: userToConfigAccessibleUser(mod),
+    user: userToConfigAccessibleUser(member.user),
     caseNumber: createdCase.case_number,
     reason,
   });

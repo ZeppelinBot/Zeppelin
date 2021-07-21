@@ -30,6 +30,7 @@ export async function resolveStatefulCustomId(pluginData: GuildPluginData<Reacti
 
   if (button) {
     const group = pluginData.config.get().button_groups[button.button_group];
+    if (!group) return null;
     const cfgButton = group.default_buttons[button.button_name];
 
     return {

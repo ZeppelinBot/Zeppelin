@@ -1,6 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -185,8 +186,8 @@ export async function logAndDetectMessageSpam(
 
         // Create a log entry
         logs.log(LogType.MESSAGE_SPAM_DETECTED, {
-          member: stripObjectToScalars(member, ["user", "roles"]),
-          channel: stripObjectToScalars(channel),
+          member: memberToConfigAccessibleMember(member!),
+          channel: channelToConfigAccessibleChannel(channel!),
           description,
           limit: spamConfig.count,
           interval: spamConfig.interval,

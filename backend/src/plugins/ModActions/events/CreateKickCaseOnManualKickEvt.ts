@@ -1,9 +1,10 @@
 import { GuildAuditLogs, User } from "discord.js";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { resolveUser, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { resolveUser, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
@@ -58,8 +59,8 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt({
       }
 
       pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-        user: stripObjectToScalars(member.user),
-        mod: mod ? stripObjectToScalars(mod) : null,
+        user: userToConfigAccessibleUser(member.user!),
+        mod: mod ? userToConfigAccessibleUser(mod) : null,
         caseNumber: createdCase?.case_number ?? 0,
         reason: kickAuditLogEntry.reason || "",
       });

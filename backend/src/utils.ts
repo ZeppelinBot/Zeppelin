@@ -8,6 +8,7 @@ import {
   GuildChannel,
   GuildMember,
   Invite,
+  LimitedCollection,
   Message,
   MessageAttachment,
   MessageEmbed,
@@ -17,7 +18,9 @@ import {
   PartialChannelData,
   PartialMessage,
   Snowflake,
+  Sticker,
   TextChannel,
+  ThreadChannel,
   User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
@@ -37,6 +40,7 @@ import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { isEqual } from "lodash";
 import humanizeDuration from "humanize-duration";
+import { ChannelTypeStrings } from "./types";
 
 const fsp = fs.promises;
 
@@ -247,7 +251,7 @@ export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
 export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite & { guild: Guild };
 export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite & {
   channel: PartialChannelData;
-  type: typeof Constants.ChannelTypes.GROUP;
+  type: typeof Constants.ChannelTypes.GROUP_DM;
 };
 
 /**
@@ -1015,7 +1019,7 @@ export type CustomEmoji = {
   id: string;
 } & Emoji;
 
-export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel };
+export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel | ThreadChannel };
 
 export const disableUserNotificationStrings = ["no", "none", "off"];
 
@@ -1312,6 +1316,18 @@ export async function resolveInvite<T extends boolean>(
   return promise as ResolveInviteReturnType<T>;
 }
 
+const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection(500);
+
+export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker> {
+  const cachedSticker = internalStickerCache.get(id);
+  if (cachedSticker) return cachedSticker;
+
+  const fetchedSticker = await bot.fetchSticker(id).catch(undefined);
+  internalStickerCache.set(id, fetchedSticker);
+
+  return fetchedSticker;
+}
+
 export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
   return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
@@ -1352,7 +1368,10 @@ export function verboseUserName(user: User | UnknownUser): string {
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {
-  const plainTextName = channel.type === "voice" || channel.type === "stage" ? channel.name : `#${channel.name}`;
+  const plainTextName =
+    channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
+      ? channel.name
+      : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
 }
 
@@ -1478,7 +1497,7 @@ export function isGuildInvite<CT extends InviteOpts>(invite: Invite): invite is 
 }
 
 export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite): invite is GroupDMInvite<CT> {
-  return invite.guild == null && invite.channel?.type === "group";
+  return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {

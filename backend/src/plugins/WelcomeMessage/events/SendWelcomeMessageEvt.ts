@@ -1,4 +1,9 @@
 import { Snowflake, TextChannel } from "discord.js";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+  userToConfigAccessibleUser,
+} from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
@@ -49,7 +54,7 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       } catch {
         pluginData.state.logs.log(LogType.DM_FAILED, {
           source: "welcome message",
-          user: stripObjectToScalars(member.user),
+          user: userToConfigAccessibleUser(member.user),
         });
       }
     }
@@ -63,8 +68,8 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       } catch {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome message for {userMention(member)} to {channelMention(channel)}`,
-          member: stripObjectToScalars(member),
-          channel: stripObjectToScalars(channel),
+          member: memberToConfigAccessibleMember(member),
+          channel: channelToConfigAccessibleChannel(channel),
         });
       }
     }

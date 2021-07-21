@@ -1,6 +1,7 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { DBDateFormat, SECONDS, stripObjectToScalars } from "../../../utils";
@@ -30,15 +31,15 @@ export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginTy
           post.enable_mentions,
         );
         pluginData.state.logs.log(LogType.POSTED_SCHEDULED_MESSAGE, {
-          author: stripObjectToScalars(author),
-          channel: stripObjectToScalars(channel),
+          author: userToConfigAccessibleUser(author),
+          channel: channelToConfigAccessibleChannel(channel),
           messageId: postedMessage.id,
         });
       } catch {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed to post scheduled message by {userMention(author)} to {channelMention(channel)}`,
-          channel: stripObjectToScalars(channel),
-          author: stripObjectToScalars(author),
+          channel: channelToConfigAccessibleChannel(channel),
+          author: userToConfigAccessibleUser(author),
         });
         logger.warn(
           `Failed to post scheduled message to #${channel.name} (${channel.id}) on ${pluginData.guild.name} (${pluginData.guild.id})`,

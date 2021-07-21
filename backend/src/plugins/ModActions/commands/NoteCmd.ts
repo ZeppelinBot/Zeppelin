@@ -1,8 +1,10 @@
+import { User } from "discord.js";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
@@ -41,8 +43,8 @@ export const NoteCmd = modActionsCmd({
     });
 
     pluginData.state.serverLogs.log(LogType.MEMBER_NOTE, {
-      mod: stripObjectToScalars(msg.author),
-      user: stripObjectToScalars(user, ["user", "roles"]),
+      mod: userToConfigAccessibleUser(msg.author),
+      user: userToConfigAccessibleUser(user),
       caseNumber: createdCase.case_number,
       reason,
     });

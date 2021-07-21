@@ -1,4 +1,5 @@
 import { GuildPluginData } from "knub";
+import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
@@ -78,7 +79,7 @@ export async function logAndDetectOtherSpam(
       clearRecentUserActions(pluginData, RecentActionType.VoiceChannelMove, userId, actionGroupId);
 
       logs.log(LogType.OTHER_SPAM_DETECTED, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member!),
         description,
         limit: spamConfig.count,
         interval: spamConfig.interval,

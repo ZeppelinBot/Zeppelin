@@ -1,4 +1,4 @@
-import { GuildMember, TextChannel } from "discord.js";
+import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/dist/helpers";
 import { LogType } from "../../../data/LogType";
@@ -19,7 +19,7 @@ export async function actualKickMemberCmd(
     reason: string;
     mod: GuildMember;
     notify?: string;
-    "notify-channel"?: TextChannel;
+    "notify-channel"?: TextChannel | ThreadChannel;
     clean?: boolean;
   },
 ) {

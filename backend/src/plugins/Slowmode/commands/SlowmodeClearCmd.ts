@@ -1,3 +1,4 @@
+import { ChannelTypeStrings } from "src/types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine, disableInlineCode } from "../../../utils";
@@ -37,7 +38,19 @@ export const SlowmodeClearCmd = slowmodeCmd({
     }
 
     try {
-      await clearBotSlowmodeFromUserId(pluginData, args.channel, args.user.id, args.force);
+      if (args.channel.type === ChannelTypeStrings.TEXT) {
+        await clearBotSlowmodeFromUserId(pluginData, args.channel, args.user.id, args.force);
+      } else {
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          asSingleLine(`
+            Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>:
+            Threads cannot have Bot Slowmode
+          `),
+        );
+        return;
+      }
     } catch (e) {
       sendErrorMessage(
         pluginData,

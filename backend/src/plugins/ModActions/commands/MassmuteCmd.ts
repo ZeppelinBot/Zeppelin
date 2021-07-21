@@ -1,5 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -87,7 +88,7 @@ export const MassmuteCmd = modActionsCmd({
     } else {
       // Success on all or some mutes
       pluginData.state.serverLogs.log(LogType.MASSMUTE, {
-        mod: stripObjectToScalars(msg.author),
+        mod: userToConfigAccessibleUser(msg.author),
         count: successfulMuteCount,
       });
 

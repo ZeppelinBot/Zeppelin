@@ -1,10 +1,11 @@
 import { Snowflake } from "discord.js";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
+import { resolveMember, resolveUser } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
@@ -91,7 +92,7 @@ export const ForcebanCmd = modActionsCmd({
 
     // Log the action
     pluginData.state.serverLogs.log(LogType.MEMBER_FORCEBAN, {
-      mod: stripObjectToScalars(mod.user),
+      mod: userToConfigAccessibleUser(mod.user),
       userId: user.id,
       caseNumber: createdCase.case_number,
       reason,

@@ -1,4 +1,5 @@
 import { Snowflake } from "discord.js";
+import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
@@ -21,7 +22,7 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
       }
 
       pluginData.state.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member),
       });
     }
   },
