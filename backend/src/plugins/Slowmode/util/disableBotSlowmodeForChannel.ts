@@ -1,11 +1,11 @@
-import { GuildChannel, TextChannel } from "discord.js";
+import { GuildChannel, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
 
 export async function disableBotSlowmodeForChannel(
   pluginData: GuildPluginData<SlowmodePluginType>,
-  channel: GuildChannel & TextChannel,
+  channel: TextChannel,
 ) {
   // Disable channel slowmode
   await pluginData.state.slowmodes.deleteChannelSlowmode(channel.id);

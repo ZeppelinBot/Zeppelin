@@ -1,11 +1,14 @@
-import { MessageAttachment, MessageOptions, TextChannel } from "discord.js";
+import { MessageAttachment, MessageOptions, TextChannel, ThreadChannel } from "discord.js";
 import fs from "fs";
 import { downloadFile } from "../../utils";
 const fsp = fs.promises;
 
 const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;
 
-export async function rehostAttachment(attachment: MessageAttachment, targetChannel: TextChannel): Promise<string> {
+export async function rehostAttachment(
+  attachment: MessageAttachment,
+  targetChannel: TextChannel | ThreadChannel,
+): Promise<string> {
   if (attachment.size > MAX_ATTACHMENT_REHOST_SIZE) {
     return "Attachment too big to rehost";
   }

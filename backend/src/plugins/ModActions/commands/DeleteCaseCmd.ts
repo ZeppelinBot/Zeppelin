@@ -1,5 +1,6 @@
 import { TextChannel } from "discord.js";
 import { helpers } from "knub";
+import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -81,7 +82,7 @@ export const DeleteCaseCmd = modActionsCmd({
 
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.CASE_DELETE, {
-        mod: stripObjectToScalars(message.member, ["user", "roles"]),
+        mod: memberToConfigAccessibleMember(message.member),
         case: stripObjectToScalars(theCase),
       });
     }

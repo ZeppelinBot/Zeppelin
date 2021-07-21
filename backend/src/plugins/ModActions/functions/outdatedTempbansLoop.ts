@@ -4,6 +4,7 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { resolveUser, SECONDS, stripObjectToScalars } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -57,7 +58,7 @@ export async function outdatedTempbansLoop(pluginData: GuildPluginData<ModAction
     // Log the unban
     const banTime = moment(tempban.created_at).diff(moment(tempban.expires_at));
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNBAN, {
-      mod: stripObjectToScalars(await resolveUser(pluginData.client, tempban.mod_id)),
+      mod: userToConfigAccessibleUser(await resolveUser(pluginData.client, tempban.mod_id)),
       userId: tempban.user_id,
       caseNumber: createdCase.case_number,
       reason,

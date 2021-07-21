@@ -1,5 +1,6 @@
-import { Permissions, TextChannel } from "discord.js";
+import { Permissions, TextChannel, ThreadChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { ChannelTypeStrings } from "src/types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine, DAYS, disableInlineCode, HOURS, MINUTES } from "../../../utils";
@@ -38,7 +39,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
   ],
 
   async run({ message: msg, args, pluginData }) {
-    const channel: TextChannel = args.channel || msg.channel;
+    const channel: TextChannel | ThreadChannel = args.channel || msg.channel;
 
     if (args.time === 0) {
       // Workaround until we can call SlowmodeDisableCmd from here
@@ -122,7 +123,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
     if (mode === "native") {
       // If there is an existing bot-maintained slowmode, disable that first
       const existingBotSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
-      if (existingBotSlowmode) {
+      if (existingBotSlowmode && channel.type === ChannelTypeStrings.TEXT) {
         await disableBotSlowmodeForChannel(pluginData, channel);
       }
 

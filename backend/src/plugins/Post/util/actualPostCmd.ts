@@ -2,6 +2,7 @@ import { Channel, Message, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, errorMessage, MINUTES, StrictMessageContent, stripObjectToScalars } from "../../../utils";
@@ -158,8 +159,8 @@ export async function actualPostCmd(
 
     if (opts.repeat) {
       pluginData.state.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
-        author: stripObjectToScalars(msg.author),
-        channel: stripObjectToScalars(targetChannel),
+        author: userToConfigAccessibleUser(msg.author),
+        channel: channelToConfigAccessibleChannel(targetChannel),
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
@@ -168,8 +169,8 @@ export async function actualPostCmd(
       });
     } else {
       pluginData.state.logs.log(LogType.SCHEDULED_MESSAGE, {
-        author: stripObjectToScalars(msg.author),
-        channel: stripObjectToScalars(targetChannel),
+        author: userToConfigAccessibleUser(msg.author),
+        channel: channelToConfigAccessibleChannel(targetChannel),
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
@@ -184,8 +185,8 @@ export async function actualPostCmd(
 
   if (opts.repeat) {
     pluginData.state.logs.log(LogType.REPEATED_MESSAGE, {
-      author: stripObjectToScalars(msg.author),
-      channel: stripObjectToScalars(targetChannel),
+      author: userToConfigAccessibleUser(msg.author),
+      channel: channelToConfigAccessibleChannel(targetChannel),
       datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
       date: postAt.format(timeAndDate.getDateFormat("date")),
       time: postAt.format(timeAndDate.getDateFormat("time")),

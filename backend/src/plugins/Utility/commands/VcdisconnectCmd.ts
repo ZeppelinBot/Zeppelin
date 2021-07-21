@@ -1,4 +1,9 @@
 import { VoiceChannel } from "discord.js";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+  userToConfigAccessibleUser,
+} from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -35,9 +40,9 @@ export const VcdisconnectCmd = utilityCmd({
     }
 
     pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_DISCONNECT, {
-      mod: stripObjectToScalars(msg.author),
-      member: stripObjectToScalars(args.member, ["user", "roles"]),
-      oldChannel: stripObjectToScalars(channel),
+      mod: userToConfigAccessibleUser(msg.author),
+      member: memberToConfigAccessibleMember(args.member),
+      oldChannel: channelToConfigAccessibleChannel(channel),
     });
 
     sendSuccessMessage(

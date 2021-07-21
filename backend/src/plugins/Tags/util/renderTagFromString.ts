@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { TemplateParseError } from "../../../templateFormatter";
 import { StrictMessageContent, stripObjectToScalars } from "../../../utils";
@@ -27,8 +28,8 @@ export async function renderTagFromString(
       tagBody,
       tagArgs,
       {
-        member: stripObjectToScalars(member, ["user"]),
-        user: stripObjectToScalars(member.user),
+        member: memberToConfigAccessibleMember(member),
+        user: userToConfigAccessibleUser(member.user),
       },
       { member },
     );

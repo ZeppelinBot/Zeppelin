@@ -1,6 +1,7 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -156,7 +157,7 @@ export async function muteUser(
       reason: reason || "None",
       time: timeUntilUnmute,
       moderator: muteOptions.caseArgs?.modId
-        ? stripObjectToScalars(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+        ? userToConfigAccessibleUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
         : "",
     }));
 
@@ -225,16 +226,16 @@ export async function muteUser(
   const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId);
   if (muteTime) {
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-      mod: stripObjectToScalars(mod),
-      user: stripObjectToScalars(user),
+      mod: userToConfigAccessibleUser(mod),
+      user: userToConfigAccessibleUser(user),
       time: timeUntilUnmute,
       caseNumber: theCase.case_number,
       reason,
     });
   } else {
     pluginData.state.serverLogs.log(LogType.MEMBER_MUTE, {
-      mod: stripObjectToScalars(mod),
-      user: stripObjectToScalars(user),
+      mod: userToConfigAccessibleUser(mod),
+      user: userToConfigAccessibleUser(user),
       caseNumber: theCase.case_number,
       reason,
     });

@@ -1,5 +1,5 @@
 import { CooldownManager } from "knub";
-import { GuildLogs } from "../../../data/GuildLogs";
+import { GuildLogs } from "../../data/GuildLogs";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";

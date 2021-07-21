@@ -1,5 +1,6 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
@@ -30,7 +31,7 @@ export async function warnMember(
       guildName: pluginData.guild.name,
       reason,
       moderator: warnOptions.caseArgs?.modId
-        ? stripObjectToScalars(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+        ? userToConfigAccessibleUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
         : {},
     });
     const contactMethods = warnOptions?.contactMethods
@@ -77,8 +78,8 @@ export async function warnMember(
 
   const mod = await pluginData.guild.members.fetch(modId as Snowflake);
   pluginData.state.serverLogs.log(LogType.MEMBER_WARN, {
-    mod: stripObjectToScalars(mod),
-    member: stripObjectToScalars(member, ["user", "roles"]),
+    mod: memberToConfigAccessibleMember(mod),
+    member: memberToConfigAccessibleMember(member),
     caseNumber: createdCase.case_number,
     reason,
   });

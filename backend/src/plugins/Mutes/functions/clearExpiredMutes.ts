@@ -1,5 +1,6 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
+import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
@@ -33,7 +34,7 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
       } catch {
         pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
           body: `Failed to remove mute role from {userMention(member)}`,
-          member: stripObjectToScalars(member),
+          member: memberToConfigAccessibleMember(member),
         });
       }
     }
@@ -42,7 +43,7 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
 
     pluginData.state.serverLogs.log(LogType.MEMBER_MUTE_EXPIRED, {
       member: member
-        ? stripObjectToScalars(member, ["user", "roles"])
+        ? memberToConfigAccessibleMember(member)
         : { id: mute.user_id, user: new UnknownUser({ id: mute.user_id }) },
     });
 

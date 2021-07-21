@@ -1,4 +1,4 @@
-import { Client, Intents, TextChannel } from "discord.js";
+import { Client, Collection, Intents, Options, TextChannel } from "discord.js";
 import fs from "fs";
 import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
@@ -166,7 +166,7 @@ connect().then(async () => {
       // Regular
       Intents.FLAGS.DIRECT_MESSAGES,
       Intents.FLAGS.GUILD_BANS,
-      Intents.FLAGS.GUILD_EMOJIS,
+      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
       Intents.FLAGS.GUILD_INVITES,
       Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
       Intents.FLAGS.GUILD_MESSAGES,

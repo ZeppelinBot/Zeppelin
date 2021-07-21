@@ -1,4 +1,5 @@
 import { GuildAuditLogs, User } from "discord.js";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -65,8 +66,8 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
     }
 
     pluginData.state.serverLogs.log(LogType.MEMBER_BAN, {
-      mod: mod ? stripObjectToScalars(mod, ["user"]) : null,
-      user: stripObjectToScalars(user, ["user"]),
+      mod: mod ? userToConfigAccessibleUser(mod) : null,
+      user: userToConfigAccessibleUser(user),
       caseNumber: createdCase?.case_number ?? 0,
       reason,
     });

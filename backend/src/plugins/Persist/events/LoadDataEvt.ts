@@ -1,5 +1,6 @@
 import { GuildMemberEditData, Permissions } from "discord.js";
 import intersection from "lodash.intersection";
+import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
@@ -75,7 +76,7 @@ export const LoadDataEvt = persistEvt({
       await pluginData.state.persistedData.clear(member.id);
 
       pluginData.state.logs.log(LogType.MEMBER_RESTORE, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member),
         restoredData: restoredData.join(", "),
       });
     }

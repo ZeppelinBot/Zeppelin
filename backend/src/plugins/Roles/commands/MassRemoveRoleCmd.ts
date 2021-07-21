@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -74,9 +75,9 @@ export const MassRemoveRoleCmd = rolesCmd({
         pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
         await member.roles.remove(roleId);
         pluginData.state.logs.log(LogType.MEMBER_ROLE_REMOVE, {
-          member: stripObjectToScalars(member, ["user", "roles"]),
+          member: memberToConfigAccessibleMember(member),
           roles: role.name,
-          mod: stripObjectToScalars(msg.author),
+          mod: userToConfigAccessibleUser(msg.author),
         });
         assigned++;
       } catch (e) {

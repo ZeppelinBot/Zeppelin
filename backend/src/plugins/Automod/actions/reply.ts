@@ -1,12 +1,12 @@
 import { MessageOptions, Permissions, Snowflake, TextChannel, User } from "discord.js";
 import * as t from "io-ts";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,
   renderRecursively,
-  stripObjectToScalars,
   tDelayString,
   tMessageContent,
   tNullable,
@@ -48,7 +48,7 @@ export const ReplyAction = automodAction({
 
       const renderReplyText = async str =>
         renderTemplate(str, {
-          user: stripObjectToScalars(user),
+          user: userToConfigAccessibleUser(user),
         });
       const formatted =
         typeof actionConfig === "string"

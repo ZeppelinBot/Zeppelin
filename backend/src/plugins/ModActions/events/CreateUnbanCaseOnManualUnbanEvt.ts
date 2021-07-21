@@ -1,8 +1,9 @@
 import { GuildAuditLogs, User } from "discord.js";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
-import { resolveUser, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { resolveUser, UnknownUser } from "../../../utils";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
@@ -63,7 +64,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt({
     }
 
     pluginData.state.serverLogs.log(LogType.MEMBER_UNBAN, {
-      mod: mod ? stripObjectToScalars(mod, ["user"]) : null,
+      mod: mod ? userToConfigAccessibleUser(mod) : null,
       userId: user.id,
       caseNumber: createdCase?.case_number ?? 0,
     });

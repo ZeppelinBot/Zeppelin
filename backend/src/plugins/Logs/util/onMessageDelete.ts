@@ -1,15 +1,16 @@
-import { MessageAttachment, Snowflake } from "discord.js";
+import { MessageAttachment, Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { resolveUser, stripObjectToScalars, useMediaUrls } from "../../../utils";
+import { resolveUser, useMediaUrls } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)!;
 
   if (user) {
     // Replace attachment URLs with media URLs
@@ -27,8 +28,8 @@ export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType
     pluginData.state.guildLogs.log(
       LogType.MESSAGE_DELETE,
       {
-        user: stripObjectToScalars(user),
-        channel: stripObjectToScalars(channel),
+        user: userToConfigAccessibleUser(user),
+        channel: channelToConfigAccessibleChannel(channel),
         messageDate: pluginData
           .getPlugin(TimeAndDatePlugin)
           .inGuildTz(moment.utc(savedMessage.data.timestamp, "x"))
@@ -42,7 +43,7 @@ export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType
       LogType.MESSAGE_DELETE_BARE,
       {
         messageId: savedMessage.id,
-        channel: stripObjectToScalars(channel),
+        channel: channelToConfigAccessibleChannel(channel),
       },
       savedMessage.id,
     );

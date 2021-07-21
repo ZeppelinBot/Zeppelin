@@ -1,9 +1,10 @@
-import { Permissions, Snowflake, TextChannel } from "discord.js";
+import { Permissions, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { resolveUser, stripObjectToScalars, verboseChannelMention } from "../../../utils";
+import { resolveUser, verboseChannelMention } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -60,8 +61,8 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
 
   pluginData.state.guildLogs.log(LogType.MESSAGE_DELETE_AUTO, {
     message: itemToDelete.message,
-    user: stripObjectToScalars(user),
-    channel: stripObjectToScalars(channel),
+    user: userToConfigAccessibleUser(user),
+    channel: channelToConfigAccessibleChannel(channel),
     messageDate,
   });
 }

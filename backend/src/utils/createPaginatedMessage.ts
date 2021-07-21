@@ -4,6 +4,7 @@ import {
   MessageEditOptions,
   MessageOptions,
   MessageReaction,
+  PartialMessageReaction,
   PartialUser,
   TextChannel,
   User,
@@ -37,7 +38,10 @@ export async function createPaginatedMessage(
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages
-  const reactionListener = async (reactionMessage: MessageReaction, reactor: User | PartialUser) => {
+  const reactionListener = async (
+    reactionMessage: MessageReaction | PartialMessageReaction,
+    reactor: User | PartialUser,
+  ) => {
     if (reactionMessage.message.id !== message.id) {
       return;
     }

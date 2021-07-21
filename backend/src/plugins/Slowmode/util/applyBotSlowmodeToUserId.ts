@@ -1,5 +1,6 @@
 import { GuildChannel, Permissions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { isDiscordAPIError, stripObjectToScalars, UnknownUser } from "../../../utils";
@@ -20,7 +21,7 @@ export async function applyBotSlowmodeToUserId(
       await channel.permissionOverwrites.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
     }
   } catch (e) {
-    const user = pluginData.client.users.fetch(userId as Snowflake) || new UnknownUser({ id: userId });
+    const user = (await pluginData.client.users.fetch(userId as Snowflake)) || new UnknownUser({ id: userId });
 
     if (isDiscordAPIError(e) && e.code === 50013) {
       logger.warn(
@@ -28,14 +29,14 @@ export async function applyBotSlowmodeToUserId(
       );
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Missing permissions to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
-        user: stripObjectToScalars(user),
-        channel: stripObjectToScalars(channel),
+        user: userToConfigAccessibleUser(user),
+        channel: channelToConfigAccessibleChannel(channel),
       });
     } else {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Failed to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
-        user: stripObjectToScalars(user),
-        channel: stripObjectToScalars(channel),
+        user: userToConfigAccessibleUser(user),
+        channel: channelToConfigAccessibleChannel(channel),
       });
       throw e;
     }

@@ -1,3 +1,4 @@
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { TemplateParseError } from "../../../templateFormatter";
@@ -20,8 +21,8 @@ export const TagEvalCmd = tagsCmd({
         args.body,
         [],
         {
-          member: stripObjectToScalars(msg.member, ["user"]),
-          user: stripObjectToScalars(msg.member.user),
+          member: memberToConfigAccessibleMember(msg.member),
+          user: userToConfigAccessibleUser(msg.member.user),
         },
         { member: msg.member },
       );

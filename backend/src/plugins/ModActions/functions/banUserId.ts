@@ -1,6 +1,7 @@
 import { DiscordAPIError, Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -129,8 +130,8 @@ export async function banUserId(
   const mod = await resolveUser(pluginData.client, modId);
   const logtype = banTime ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
   pluginData.state.serverLogs.log(logtype, {
-    mod: stripObjectToScalars(mod),
-    user: stripObjectToScalars(user),
+    mod: userToConfigAccessibleUser(mod),
+    user: userToConfigAccessibleUser(user),
     caseNumber: createdCase.case_number,
     reason,
     banTime: banTime ? humanizeDuration(banTime) : null,

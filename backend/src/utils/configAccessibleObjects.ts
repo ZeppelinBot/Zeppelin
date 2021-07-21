@@ -8,15 +8,16 @@ import {
   ThreadChannel,
   User,
 } from "discord.js";
+import { UnknownUser } from "src/utils";
 
 export interface IConfigAccessibleUser {
-  id: Snowflake;
+  id: Snowflake | string;
   username: string;
   discriminator: string;
   mention: string;
-  avatarURL: string;
-  bot: boolean;
-  createdAt: number;
+  avatarURL?: string;
+  bot?: boolean;
+  createdAt?: number;
 }
 
 export interface IConfigAccessibleRole {
@@ -36,15 +37,27 @@ export interface IConfigAccessibleMember extends IConfigAccessibleUser {
   guildName: string;
 }
 
-export function userToConfigAccessibleUser(user: User): IConfigAccessibleUser {
+export function userToConfigAccessibleUser(user: User | UnknownUser): IConfigAccessibleUser {
+  if (`${user.username}#${user.discriminator}` === "Unknown#0000") {
+    const toReturnPartial: IConfigAccessibleUser = {
+      id: user.id,
+      username: "Unknown",
+      discriminator: "0000",
+      mention: `<@${user.id}>`,
+    };
+
+    return toReturnPartial;
+  }
+
+  const properUser = user as User;
   const toReturn: IConfigAccessibleUser = {
-    id: user.id,
-    username: user.username,
-    discriminator: user.discriminator,
-    mention: `<@${user.id}>`,
-    avatarURL: user.displayAvatarURL({ dynamic: true }),
-    bot: user.bot,
-    createdAt: user.createdTimestamp,
+    id: properUser.id,
+    username: properUser.username,
+    discriminator: properUser.discriminator,
+    mention: `<@${properUser.id}>`,
+    avatarURL: properUser.displayAvatarURL({ dynamic: true }),
+    bot: properUser.bot,
+    createdAt: properUser.createdTimestamp,
   };
 
   return toReturn;

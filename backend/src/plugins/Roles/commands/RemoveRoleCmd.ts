@@ -1,4 +1,5 @@
 import { GuildChannel } from "discord.js";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -53,9 +54,9 @@ export const RemoveRoleCmd = rolesCmd({
     await args.member.roles.remove(roleId);
 
     pluginData.state.logs.log(LogType.MEMBER_ROLE_REMOVE, {
-      member: stripObjectToScalars(args.member, ["user", "roles"]),
+      member: memberToConfigAccessibleMember(args.member),
       roles: role.name,
-      mod: stripObjectToScalars(msg.author),
+      mod: userToConfigAccessibleUser(msg.author),
     });
 
     sendSuccessMessage(

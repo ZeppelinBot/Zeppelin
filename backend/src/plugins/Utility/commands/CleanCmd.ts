@@ -1,6 +1,7 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -41,8 +42,8 @@ async function cleanMessages(
   const archiveUrl = pluginData.state.archives.getUrl(baseUrl, archiveId);
 
   pluginData.state.logs.log(LogType.CLEAN, {
-    mod: stripObjectToScalars(mod),
-    channel: stripObjectToScalars(channel),
+    mod: userToConfigAccessibleUser(mod),
+    channel: channelToConfigAccessibleChannel(channel),
     count: savedMessages.length,
     archiveUrl,
   });
@@ -172,7 +173,7 @@ export const CleanCmd = utilityCmd({
 
       let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
       if (targetChannel.id !== msg.channel.id) {
-        responseText += ` in <#${targetChannel.id}>\n${cleanResult.archiveUrl}`;
+        responseText += ` in <#${targetChannel.id}>: ${cleanResult.archiveUrl}`;
       }
 
       if (args.update) {
