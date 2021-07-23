@@ -10,7 +10,7 @@
 
     <div class="flex items-center flex-wrap">
       <h1 class="flex-full md:flex-auto">Config for {{ guild.name }}</h1>
-      <button v-if="!saving" class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700" v-on:click="save">
+      <button v-if="!saving" class="flex-none bg-green-800 px-5 py-2 rounded hover:bg-green-700 transition duration-100" v-on:click="save">
         <span v-if="saved">Saved!</span>
         <span v-else>Save</span>
       </button>
