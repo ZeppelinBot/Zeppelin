@@ -7,21 +7,21 @@
         <img class="w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
 
         <router-link to="/dashboard">
-          <h1 class="font-semibold">Zeppelin Dashboard</h1>
+          <h1 class="font-semibold hover:opacity-75 transition duration-250">Zeppelin Dashboard</h1>
         </router-link>
       </div>
 
       <div class="flex-1 flex items-center flex-wrap">
         <ul class="dashboard-nav list-none flex md:ml-8">
-          <router-link class="flex-auto mr-4" to="/dashboard">Guilds</router-link>
-          <a href="javascript:void(0)" class="navbar-item hover:text-red-400 mr-2" v-on:click="logout()">Log out</a>
+          <router-link class="flex-auto mr-4 transition duration-250" to="/dashboard">Guilds</router-link>
+          <a href="javascript:void(0)" class="navbar-item hover:text-red-400 mr-2 transition duration-250" v-on:click="logout()">Log out</a>
         </ul>
 
         <div class="flex-1 flex items-center md:justify-end">
           <router-link
             to="/docs"
             role="menuitem"
-            class="py-1 px-2 rounded hover:bg-gray-700">
+            class="py-1 px-2 rounded hover:bg-gray-700 transition duration-250">
             Go to documentation
           </router-link>
         </div>

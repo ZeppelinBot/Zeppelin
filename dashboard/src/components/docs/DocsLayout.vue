@@ -8,14 +8,14 @@
         <img class="flex-auto w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
 
         <router-link to="/docs">
-          <h1 class="flex-auto font-semibold">Zeppelin Documentation</h1>
+          <h1 class="flex-auto font-semibold hover:opacity-75 transition duration-250">Zeppelin Documentation</h1>
         </router-link>
       </div>
       <div class="flex-1 flex items-center justify-end">
         <router-link
           to="/dashboard"
           role="menuitem"
-          class="py-1 px-2 rounded hover:bg-gray-700 hidden lg:block">
+          class="py-1 px-2 rounded hover:bg-gray-700 hidden lg:block transition duration-250">
           Go to dashboard
         </router-link>
         <button class="link-button text-2xl leading-zero lg:hidden" v-on:click="toggleMobileMenu()" aria-hidden="true">
