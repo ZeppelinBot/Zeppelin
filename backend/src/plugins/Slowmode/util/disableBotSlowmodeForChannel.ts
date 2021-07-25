@@ -1,4 +1,4 @@
-import { GuildChannel, TextChannel, ThreadChannel } from "discord.js";
+import { TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";

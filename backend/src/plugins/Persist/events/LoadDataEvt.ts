@@ -1,8 +1,7 @@
 import { GuildMemberEditData, Permissions } from "discord.js";
 import intersection from "lodash.intersection";
-import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";

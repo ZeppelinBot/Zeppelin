@@ -1,10 +1,10 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildButtonRoles } from "src/data/GuildButtonRoles";
-import { tNullable } from "../../utils";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
+import { tNullable } from "../../utils";
 
 // These need to be updated every time discord adds/removes a style,
 // but i cant figure out how to import MessageButtonStyles at runtime

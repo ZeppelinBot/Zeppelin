@@ -1,5 +1,5 @@
-import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { logsEvt } from "../types";
 
 export const LogsGuildMemberRemoveEvt = logsEvt({

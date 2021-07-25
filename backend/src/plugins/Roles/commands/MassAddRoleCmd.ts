@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
-import { resolveMember, resolveRoleId, stripObjectToScalars, successMessage } from "../../../utils";
+import { resolveMember, resolveRoleId, successMessage } from "../../../utils";
 import { rolesCmd } from "../types";
 
 export const MassAddRoleCmd = rolesCmd({

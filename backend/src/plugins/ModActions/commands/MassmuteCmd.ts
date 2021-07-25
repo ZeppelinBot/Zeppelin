@@ -1,12 +1,11 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { stripObjectToScalars } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
 

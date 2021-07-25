@@ -4,7 +4,7 @@ import LCL from "last-commit-log";
 import moment from "moment-timezone";
 import { rootDir } from "../../../paths";
 import { getCurrentUptime } from "../../../uptime";
-import { EmbedWith, multiSorter, resolveMember, sorter } from "../../../utils";
+import { multiSorter, resolveMember, sorter } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { utilityCmd } from "../types";
 

@@ -1,10 +1,10 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { DBDateFormat, SECONDS, stripObjectToScalars } from "../../../utils";
+import { DBDateFormat, SECONDS } from "../../../utils";
 import { PostPluginType } from "../types";
 import { postMessage } from "./postMessage";
 

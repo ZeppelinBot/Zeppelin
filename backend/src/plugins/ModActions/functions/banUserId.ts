@@ -1,7 +1,7 @@
 import { DiscordAPIError, Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";

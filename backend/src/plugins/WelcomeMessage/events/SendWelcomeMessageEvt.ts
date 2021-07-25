@@ -3,7 +3,7 @@ import {
   channelToConfigAccessibleChannel,
   memberToConfigAccessibleMember,
   userToConfigAccessibleUser,
-} from "src/utils/configAccessibleObjects";
+} from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../../../utils";

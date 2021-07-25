@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
-import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
+import { DBDateFormat, MINUTES, resolveMember } from "../../../utils";
 import { IMuteWithDetails, mutesCmd } from "../types";
 
 export const MutesCmd = mutesCmd({

@@ -1,6 +1,8 @@
-import { channelToConfigAccessibleChannel, memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+} from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
 import { logsEvt } from "../types";
 
 export const LogsVoiceStateUpdateEvt = logsEvt({

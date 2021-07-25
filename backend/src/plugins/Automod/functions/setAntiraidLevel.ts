@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { runAutomodOnAntiraidLevel } from "../events/runAutomodOnAntiraidLevel";

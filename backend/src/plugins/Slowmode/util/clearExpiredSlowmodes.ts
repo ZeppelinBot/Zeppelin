@@ -1,9 +1,9 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { stripObjectToScalars, UnknownUser } from "../../../utils";
+import { UnknownUser } from "../../../utils";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
 

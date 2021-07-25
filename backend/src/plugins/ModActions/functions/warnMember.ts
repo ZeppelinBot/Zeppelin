@@ -1,17 +1,10 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
-import {
-  createUserNotificationError,
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
+import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";

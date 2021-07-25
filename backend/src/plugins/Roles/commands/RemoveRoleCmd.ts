@@ -1,9 +1,9 @@
 import { GuildChannel } from "discord.js";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveRoleId, stripObjectToScalars, verboseUserMention } from "../../../utils";
+import { resolveRoleId, verboseUserMention } from "../../../utils";
 import { rolesCmd } from "../types";
 
 export const RemoveRoleCmd = rolesCmd({

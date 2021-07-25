@@ -1,6 +1,6 @@
 import { MessageOptions, Permissions, Snowflake, TextChannel, User } from "discord.js";
 import * as t from "io-ts";
-import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { renderTemplate } from "../../../templateFormatter";
 import {

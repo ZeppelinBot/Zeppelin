@@ -1,7 +1,7 @@
-import { MessageAttachment, Snowflake, User } from "discord.js";
+import { MessageAttachment, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { resolveUser, useMediaUrls } from "../../../utils";

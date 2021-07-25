@@ -1,7 +1,7 @@
-import { Permissions, Snowflake, TextChannel, User } from "discord.js";
+import { Permissions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { resolveUser, verboseChannelMention } from "../../../utils";

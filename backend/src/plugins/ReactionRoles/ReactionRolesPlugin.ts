@@ -1,11 +1,11 @@
 import { PluginOptions } from "knub";
 import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 import { GuildButtonRoles } from "../../data/GuildButtonRoles";
-import { isValidSnowflake } from "../../utils";
-import { StrictValidationError } from "../../validatorUtils";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
+import { isValidSnowflake } from "../../utils";
+import { StrictValidationError } from "../../validatorUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
