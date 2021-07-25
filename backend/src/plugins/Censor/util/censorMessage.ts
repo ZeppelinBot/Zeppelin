@@ -1,7 +1,7 @@
-import { Snowflake, TextChannel, User } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { resolveUser } from "../../../utils";

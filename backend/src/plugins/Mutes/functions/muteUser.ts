@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -12,7 +12,6 @@ import {
   notifyUser,
   resolveMember,
   resolveUser,
-  stripObjectToScalars,
   ucfirst,
   UserNotificationMethod,
   UserNotificationResult,

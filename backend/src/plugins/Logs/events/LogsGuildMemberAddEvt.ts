@@ -1,7 +1,7 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { logsEvt } from "../types";
 

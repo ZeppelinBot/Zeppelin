@@ -1,10 +1,10 @@
-import { MessageEmbed, Snowflake, User } from "discord.js";
+import { MessageEmbed, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { resolveUser, stripObjectToScalars } from "../../../utils";
+import { resolveUser } from "../../../utils";
 import { LogsPluginType } from "../types";
 
 export async function onMessageUpdate(

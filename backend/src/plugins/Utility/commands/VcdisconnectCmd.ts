@@ -3,11 +3,10 @@ import {
   channelToConfigAccessibleChannel,
   memberToConfigAccessibleMember,
   userToConfigAccessibleUser,
-} from "src/utils/configAccessibleObjects";
+} from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { stripObjectToScalars } from "../../../utils";
 import { utilityCmd } from "../types";
 
 export const VcdisconnectCmd = utilityCmd({

@@ -1,6 +1,6 @@
 import { GuildAuditLogs } from "discord.js";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
 

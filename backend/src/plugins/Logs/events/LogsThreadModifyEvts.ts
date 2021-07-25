@@ -1,6 +1,6 @@
-import { channelToConfigAccessibleChannel } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars, getScalarDifference, differenceToString } from "../../../utils";
+import { differenceToString, getScalarDifference } from "../../../utils";
+import { channelToConfigAccessibleChannel } from "../../../utils/configAccessibleObjects";
 import { logsEvt } from "../types";
 
 export const LogsThreadCreateEvt = logsEvt({

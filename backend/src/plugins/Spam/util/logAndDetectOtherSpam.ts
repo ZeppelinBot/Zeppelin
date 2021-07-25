@@ -1,11 +1,11 @@
 import { GuildPluginData } from "knub";
-import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { convertDelayStringToMS, resolveMember, stripObjectToScalars } from "../../../utils";
+import { convertDelayStringToMS, resolveMember } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RecentActionType, SpamPluginType } from "../types";
 import { addRecentAction } from "./addRecentAction";

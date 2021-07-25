@@ -1,4 +1,5 @@
 import { MessageComponentInteraction } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import moment from "moment";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
@@ -6,10 +7,9 @@ import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
 import { MINUTES } from "src/utils";
 import { idToTimestamp } from "src/utils/idToTimestamp";
 import { reactionRolesEvt } from "../types";
-import { resolveStatefulCustomId, BUTTON_CONTEXT_SEPARATOR } from "../util/buttonCustomIdFunctions";
-import { ButtonMenuActions } from "../util/buttonMenuActions";
-import humanizeDuration from "humanize-duration";
 import { handleModifyRole, handleOpenMenu } from "../util/buttonActionHandlers";
+import { BUTTON_CONTEXT_SEPARATOR, resolveStatefulCustomId } from "../util/buttonCustomIdFunctions";
+import { ButtonMenuActions } from "../util/buttonMenuActions";
 
 const BUTTON_INVALIDATION_TIME = 15 * MINUTES;
 

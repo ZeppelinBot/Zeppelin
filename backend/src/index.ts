@@ -1,4 +1,4 @@
-import { Client, Collection, Intents, Options, TextChannel } from "discord.js";
+import { Client, Intents, TextChannel } from "discord.js";
 import fs from "fs";
 import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
@@ -19,7 +19,7 @@ import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordHTTPError, isDiscordAPIError, successMessage } from "./utils";
+import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
 
 const fsp = fs.promises;
 

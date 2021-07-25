@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, Unique } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity("button_roles")
 export class ButtonRole {

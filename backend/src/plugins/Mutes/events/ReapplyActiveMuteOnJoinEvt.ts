@@ -1,7 +1,6 @@
 import { Snowflake } from "discord.js";
-import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { mutesEvt } from "../types";
 

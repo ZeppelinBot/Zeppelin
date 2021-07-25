@@ -1,8 +1,7 @@
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { TemplateParseError } from "../../../templateFormatter";
-import { stripObjectToScalars } from "../../../utils";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
 

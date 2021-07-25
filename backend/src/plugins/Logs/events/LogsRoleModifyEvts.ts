@@ -1,6 +1,6 @@
-import { roleToConfigAccessibleRole } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
+import { roleToConfigAccessibleRole } from "../../../utils/configAccessibleObjects";
 import { logsEvt } from "../types";
 
 export const LogsRoleCreateEvt = logsEvt({

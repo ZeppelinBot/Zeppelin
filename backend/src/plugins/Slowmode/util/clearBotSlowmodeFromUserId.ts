@@ -1,4 +1,4 @@
-import { GuildChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { SlowmodePluginType } from "../types";

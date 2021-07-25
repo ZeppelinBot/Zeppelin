@@ -1,6 +1,6 @@
-import { channelToConfigAccessibleChannel, stageToConfigAccessibleStage } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { differenceToString, getScalarDifference, stripObjectToScalars } from "../../../utils";
+import { differenceToString, getScalarDifference } from "../../../utils";
+import { channelToConfigAccessibleChannel, stageToConfigAccessibleStage } from "../../../utils/configAccessibleObjects";
 import { logsEvt } from "../types";
 
 export const LogsStageInstanceCreateEvt = logsEvt({

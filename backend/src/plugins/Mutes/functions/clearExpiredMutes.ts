@@ -1,8 +1,8 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { resolveMember, stripObjectToScalars, UnknownUser } from "../../../utils";
+import { resolveMember, UnknownUser } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { MutesPluginType } from "../types";
 

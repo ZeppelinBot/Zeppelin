@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
 import { helpers } from "knub";
-import { memberToConfigAccessibleMember } from "src/utils/configAccessibleObjects";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";

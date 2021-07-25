@@ -1,4 +1,4 @@
-import { MessageButton, MessageActionRow, MessageComponentInteraction, Snowflake } from "discord.js";
+import { MessageButton, MessageComponentInteraction, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";

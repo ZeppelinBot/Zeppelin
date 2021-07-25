@@ -1,14 +1,14 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "src/utils/configAccessibleObjects";
+import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { allowTimeout } from "../../../RegExpRunner";
-import { DAYS, getInviteCodesInString, noop, SECONDS, stripObjectToScalars } from "../../../utils";
+import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
 
 const MAX_CLEAN_COUNT = 150;
