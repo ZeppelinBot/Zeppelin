@@ -1,3 +1,4 @@
+import { Snowflake } from "discord.js";
 import { GlobalPluginData } from "knub";
 import { SECONDS } from "../../../utils";
 import { GuildConfigReloaderPluginType } from "../types";
@@ -11,7 +12,7 @@ export async function reloadChangedGuilds(pluginData: GlobalPluginData<GuildConf
   for (const item of changedConfigs) {
     if (!item.key.startsWith("guild-")) continue;
 
-    const guildId = item.key.slice("guild-".length);
+    const guildId = item.key.slice("guild-".length) as Snowflake;
     console.log(`Config changed, reloading guild ${guildId}`);
     await pluginData.getKnubInstance().reloadGuild(guildId);
 

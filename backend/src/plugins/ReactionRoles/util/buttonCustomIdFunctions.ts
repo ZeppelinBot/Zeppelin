@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { ReactionRolesPluginType } from "../types";
 import { ButtonMenuActions } from "./buttonMenuActions";
 
-export const BUTTON_CONTEXT_SEPARATOR = "::";
+export const BUTTON_CONTEXT_SEPARATOR = ":rb:";
 
 export async function getButtonAction(pluginData: GuildPluginData<ReactionRolesPluginType>, roleOrMenu: string) {
   if (await pluginData.guild.roles.fetch(roleOrMenu as Snowflake).catch(() => false)) {
