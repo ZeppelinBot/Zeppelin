@@ -18,9 +18,10 @@ export const VoiceStateUpdateAlertEvt = locateUserEvt({
 
       triggeredAlerts.forEach(alert => {
         const txtChannel = meta.pluginData.guild.channels.resolve(alert.channel_id as Snowflake) as TextChannel;
-        txtChannel.send(
-          `🔴 <@!${alert.requestor_id}> the user <@!${alert.user_id}> disconnected out of \`<#!${voiceChannel.id}>\``,
-        );
+        txtChannel.send({
+          content: `🔴 <@!${alert.requestor_id}> the user <@!${alert.user_id}> disconnected out of \`${voiceChannel.name}\``,
+          allowedMentions: { users: [alert.requestor_id as Snowflake] },
+        });
       });
     }
   },

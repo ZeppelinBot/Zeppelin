@@ -32,6 +32,10 @@ export const ButtonInteractionEvt = reactionRolesEvt({
     };
 
     if (context.stateless) {
+      if (context.roleOrMenu == null) {
+        // Not reaction from this plugin
+        return;
+      }
       const timeSinceCreation = moment.utc().valueOf() - idToTimestamp(int.message.id)!;
       if (timeSinceCreation >= BUTTON_INVALIDATION_TIME) {
         sendEphemeralReply(

@@ -1,4 +1,4 @@
-import { GuildChannel, GuildMember, User } from "discord.js";
+import { GuildChannel, GuildMember, Snowflake, User } from "discord.js";
 import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
@@ -72,16 +72,16 @@ export const commandTypes = {
 
   async anyId(value: string, context: CommandContext<any>) {
     const userId = resolveUserId(context.pluginData.client, value);
-    if (userId) return userId;
+    if (userId) return userId as Snowflake;
 
     const channelIdMatch = value.match(channelMentionRegex);
-    if (channelIdMatch) return channelIdMatch[1];
+    if (channelIdMatch) return channelIdMatch[1] as Snowflake;
 
     const roleIdMatch = value.match(roleMentionRegex);
-    if (roleIdMatch) return roleIdMatch[1];
+    if (roleIdMatch) return roleIdMatch[1] as Snowflake;
 
     if (isValidSnowflake(value)) {
-      return value;
+      return value as Snowflake;
     }
 
     throw new TypeConversionError(`Could not parse ID: \`${disableInlineCode(value)}\``);
@@ -112,7 +112,7 @@ export const commandTypeHelpers = {
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
   resolvedMember: createTypeHelper<Promise<GuildMember>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
-  anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
+  anyId: createTypeHelper<Promise<Snowflake>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),
   timezone: createTypeHelper<string>(commandTypes.timezone),
 };

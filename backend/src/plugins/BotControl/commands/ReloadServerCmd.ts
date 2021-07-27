@@ -11,7 +11,7 @@ export const ReloadServerCmd = botControlCmd({
   },
 
   signature: {
-    guildId: ct.string(),
+    guildId: ct.anyId(),
   },
 
   async run({ pluginData, message: msg, args }) {
