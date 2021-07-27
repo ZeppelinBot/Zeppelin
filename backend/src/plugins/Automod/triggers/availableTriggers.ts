@@ -13,6 +13,7 @@ import { LinkSpamTrigger } from "./linkSpam";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
 import { MatchInvitesTrigger } from "./matchInvites";
 import { MatchLinksTrigger } from "./matchLinks";
+import { MatchMimeTypeTrigger } from "./matchMimeType";
 import { MatchRegexTrigger } from "./matchRegex";
 import { MatchWordsTrigger } from "./matchWords";
 import { MemberJoinTrigger } from "./memberJoin";
@@ -37,6 +38,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   match_invites: MatchInvitesTrigger,
   match_links: MatchLinksTrigger,
   match_attachment_type: MatchAttachmentTypeTrigger,
+  match_mime_type: MatchMimeTypeTrigger,
   member_join: MemberJoinTrigger,
   role_added: RoleAddedTrigger,
   role_removed: RoleRemovedTrigger,

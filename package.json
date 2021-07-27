@@ -9,6 +9,7 @@
     "codestyle-check": "prettier --check \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\""
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.5.12",
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "prettier": "^1.19.1",
@@ -27,5 +28,9 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "file-type": "^16.5.2",
+    "node-fetch": "^2.6.1"
   }
 }
