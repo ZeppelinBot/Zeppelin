@@ -46,7 +46,7 @@ export const ListDashboardPermsCmd = botControlCmd({
 
     // If we have user, always display which guilds they have permissions in (or only specified guild permissions)
     if (args.user) {
-      const userInfo = `**${args.user.username}#${args.user.discriminator}** (\`${args.user.id}\`)`;
+      const userInfo = `**${args.user.tag}** (\`${args.user.id}\`)`;
 
       for (const assignment of existingUserAssignment!) {
         if (guild != null && assignment.guild_id !== args.guildId) continue;
@@ -82,9 +82,7 @@ export const ListDashboardPermsCmd = botControlCmd({
       finalMessage += `The server ${guildInfo} has the following assigned permissions:\n`; // Double \n for consistency with AddDashboardUserCmd
       for (const assignment of existingGuildAssignment) {
         const user = await resolveUser(pluginData.client, assignment.target_id);
-        finalMessage += `\n**${user.username}#${user.discriminator}**, \`${
-          assignment.target_id
-        }\`: ${assignment.permissions.join(", ")}`;
+        finalMessage += `\n**${user.tag}**, \`${assignment.target_id}\`: ${assignment.permissions.join(", ")}`;
       }
     }
 

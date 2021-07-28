@@ -196,7 +196,7 @@ export const BanCmd = modActionsCmd({
     // Confirm the action to the moderator
     let response = "";
     if (!forceban) {
-      response = `Banned **${user.username}#${user.discriminator}** ${forTime}(Case #${banResult.case.case_number})`;
+      response = `Banned **${user.tag}** ${forTime}(Case #${banResult.case.case_number})`;
       if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
     } else {
       response = `Member forcebanned ${forTime}(Case #${banResult.case.case_number})`;

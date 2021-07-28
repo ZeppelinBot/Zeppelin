@@ -391,7 +391,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+      const fullUsername = `${member.user.tag}`;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -458,7 +458,7 @@ async function performBanSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async user => {
-      const fullUsername = `${user.username}#${user.discriminator}`;
+      const fullUsername = `${user.tag}`;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });
@@ -502,10 +502,10 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
     if (member instanceof GuildMember) {
-      line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+      line = `${paddedId} ${member.user.tag}`;
       if (member.nickname) line += ` (${member.nickname})`;
     } else {
-      line = `${paddedId} ${member.username}#${member.discriminator}`;
+      line = `${paddedId} ${member.tag}`;
     }
     return line;
   });

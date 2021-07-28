@@ -34,9 +34,7 @@ export const RemoveDashboardUserCmd = botControlCmd({
       await pluginData.state.apiPermissionAssignments.removeUser(args.guildId, user.id);
     }
 
-    const userNameList = args.users.map(
-      user => `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`,
-    );
+    const userNameList = args.users.map(user => `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`);
     sendSuccessMessage(
       pluginData,
       msg.channel as TextChannel,
