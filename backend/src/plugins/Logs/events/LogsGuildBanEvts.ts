@@ -16,7 +16,7 @@ export const LogsGuildBanAddEvt = logsEvt({
       GuildAuditLogs.Actions.MEMBER_BAN_ADD as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
+    const mod = relevantAuditLogEntry?.executor ?? null;
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_BAN,
@@ -41,7 +41,7 @@ export const LogsGuildBanRemoveEvt = logsEvt({
       GuildAuditLogs.Actions.MEMBER_BAN_REMOVE as number,
       user.id,
     );
-    const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
+    const mod = relevantAuditLogEntry?.executor ?? null;
 
     pluginData.state.guildLogs.log(
       LogType.MEMBER_UNBAN,
