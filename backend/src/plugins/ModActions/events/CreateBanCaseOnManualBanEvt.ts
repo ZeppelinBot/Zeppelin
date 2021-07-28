@@ -44,7 +44,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
       const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
       if (config.create_cases_for_manual_actions) {
-        reason = relevantAuditLogEntry.reason || "";
+        reason = relevantAuditLogEntry.reason ?? "";
         createdCase = await casesPlugin.createCase({
           userId: user.id,
           modId,
