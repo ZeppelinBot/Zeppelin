@@ -212,7 +212,7 @@ export function differenceToString(diff: Map<string, { was: any; is: any }>): st
   let toReturn = "";
   diff = prettyDifference(diff);
   for (const [key, difference] of diff) {
-    toReturn += `${key[0].toUpperCase() + key.slice(1)}: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
+    toReturn += `**${key[0].toUpperCase() + key.slice(1)}**: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
   }
   return toReturn;
 }

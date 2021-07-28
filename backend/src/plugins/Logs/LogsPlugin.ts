@@ -20,6 +20,14 @@ import {
   LogsStageInstanceDeleteEvt,
   LogsStageInstanceUpdateEvt,
 } from "./events/LogsStageInstanceModifyEvts";
+import {
+  LogsEmojiCreateEvt,
+  LogsEmojiDeleteEvt,
+  LogsEmojiUpdateEvt,
+  LogsStickerCreateEvt,
+  LogsStickerDeleteEvt,
+  LogsStickerUpdateEvt,
+} from "./events/LogsStickerEmojiModifyEvts";
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
@@ -81,6 +89,12 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsThreadCreateEvt,
     LogsThreadDeleteEvt,
     LogsThreadUpdateEvt,
+    LogsEmojiCreateEvt,
+    LogsEmojiDeleteEvt,
+    LogsEmojiUpdateEvt,
+    LogsStickerCreateEvt,
+    LogsStickerDeleteEvt,
+    LogsStickerUpdateEvt,
   ],
 
   public: {
