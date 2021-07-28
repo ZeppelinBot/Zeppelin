@@ -119,7 +119,7 @@ export const CasesUserCmd = modActionsCmd({
                 lineChunks.length === 1
                   ? `Cases for ${userName} (${lines.length} total)`
                   : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.avatarURL() || user.defaultAvatarURL : undefined,
+              icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
             },
             fields: [
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),

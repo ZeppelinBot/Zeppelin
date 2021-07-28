@@ -16,7 +16,7 @@ export const AvatarCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      const avatar = user.avatarURL() || user.defaultAvatarURL;
+      const avatar = user.displayAvatarURL();
       let extension = avatar.slice(avatar.lastIndexOf("."), avatar.lastIndexOf("?"));
       // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
       extension = extension === ".gif" ? extension : ".png";

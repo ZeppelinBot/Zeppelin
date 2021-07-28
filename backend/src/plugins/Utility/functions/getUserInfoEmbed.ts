@@ -39,7 +39,7 @@ export async function getUserInfoEmbed(
     name: `User:  ${user.username}#${user.discriminator}`,
   };
 
-  const avatarURL = user.avatarURL() || user.defaultAvatarURL;
+  const avatarURL = user.displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");

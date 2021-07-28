@@ -57,7 +57,7 @@ export const CasesModCmd = modActionsCmd({
         const embed: MessageEmbedOptions = {
           author: {
             name: title,
-            iconURL: mod instanceof User ? mod.avatarURL() || mod.defaultAvatarURL : undefined,
+            iconURL: mod instanceof User ? mod.displayAvatarURL() : undefined,
           },
           fields: [
             ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
