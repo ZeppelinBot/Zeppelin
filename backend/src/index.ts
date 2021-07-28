@@ -1,5 +1,4 @@
 import { Client, Intents, TextChannel } from "discord.js";
-import fs from "fs";
 import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
@@ -11,7 +10,7 @@ import { Configs } from "./data/Configs";
 import { connect } from "./data/db";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
-import { ErisError } from "./ErisError";
+import { DiscordJSError } from "./DiscordJSError";
 import "./loadEnv";
 import { logger } from "./logger";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
@@ -20,8 +19,6 @@ import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
-
-const fsp = fs.promises;
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -81,7 +78,7 @@ function errorHandler(err) {
     return;
   }
 
-  if (err instanceof ErisError) {
+  if (err instanceof DiscordJSError) {
     if (err.code && SAFE_TO_IGNORE_ERIS_ERROR_CODES.includes(err.code)) {
       return;
     }
@@ -176,14 +173,12 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
-  client.on("debug", message => {
-    if (message.includes(" 429 ")) {
-      logger.info(`[429] ${message}`);
-    }
+  client.on("rateLimit", rateLimitData => {
+    logger.info(`[429] ${rateLimitData}`);
   });
 
   client.on("error", err => {
-    errorHandler(new ErisError(err.message, (err as any).code, 0));
+    errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
   const allowedGuilds = new AllowedGuilds();
@@ -266,5 +261,5 @@ connect().then(async () => {
   bot.initialize();
   logger.info("Bot Initialized");
   logger.info("Logging in...");
-  await client.login(process.env.token);
+  await client.login(process.env.TOKEN);
 });
