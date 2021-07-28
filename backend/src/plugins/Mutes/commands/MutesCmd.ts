@@ -225,14 +225,11 @@ export const MutesCmd = mutesCmd({
             interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
           } else {
             collector.resetTimer();
+            await interaction.deferUpdate();
             if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
-              await interaction.deferUpdate();
               await drawListPage(currentPage - 1);
             } else if (interaction.customId === `nextButton:${idMod}` && currentPage < totalPages) {
-              await interaction.deferUpdate();
               await drawListPage(currentPage + 1);
-            } else {
-              await interaction.deferUpdate();
             }
           }
         });
