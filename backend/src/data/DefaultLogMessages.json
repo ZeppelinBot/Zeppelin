@@ -26,8 +26,8 @@
   "CHANNEL_DELETE": "🗑 Channel {channelMention(channel)} was deleted",
   "CHANNEL_UPDATE": "✏ Channel {channelMention(newChannel)} was edited. Changes:\n{differenceString}",
 
-  "THREAD_CREATE": "🖊 Thread {channelMention(thread)} was created in channel <#{thread.parentID}>",
-  "THREAD_DELETE": "🗑 Thread {channelMention(thread)} was deleted/archived from channel <#{thread.parentID}>",
+  "THREAD_CREATE": "🖊 Thread {channelMention(thread)} was created in channel <#{thread.parentId}>",
+  "THREAD_DELETE": "🗑 Thread {channelMention(thread)} was deleted/archived from channel <#{thread.parentId}>",
   "THREAD_UPDATE": "✏ Thread {channelMention(newThread)} was edited. Changes:\n{differenceString}",
 
   "ROLE_CREATE": "🖊 Role **{role.name}** (`{role.id}`) was created",
