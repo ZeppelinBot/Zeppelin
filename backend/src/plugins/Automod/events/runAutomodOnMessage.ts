@@ -12,7 +12,7 @@ export function runAutomodOnMessage(
   message: SavedMessage,
   isEdit: boolean,
 ) {
-  const user = pluginData.client.users.cache!.get(message.user_id as Snowflake);
+  const user = pluginData.client.users.cache.get(message.user_id as Snowflake);
   const member = pluginData.guild.members.cache.get(message.user_id as Snowflake);
 
   const context: AutomodContext = {
