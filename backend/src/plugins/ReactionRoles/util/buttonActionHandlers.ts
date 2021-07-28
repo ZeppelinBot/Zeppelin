@@ -22,7 +22,7 @@ export async function handleOpenMenu(
       .getPlugin(LogsPlugin)
       .log(
         LogType.BOT_ALERT,
-        `**A configuration error occured** on buttons for message ${int.message.id}, no menus found in config`,
+        `**A configuration error occurred** on buttons for message ${int.message.id}, no menus found in config`,
       );
     return;
   }
@@ -52,14 +52,13 @@ export async function handleOpenMenu(
       .getPlugin(LogsPlugin)
       .log(
         LogType.BOT_ALERT,
-        `**A configuration error occured** on buttons for message ${int.message.id}, menu **${context.roleOrMenu}** not found in config`,
+        `**A configuration error occurred** on buttons for message ${int.message.id}, menu **${context.roleOrMenu}** not found in config`,
       );
     return;
   }
   const rows = splitButtonsIntoRows(menuButtons, Object.values(group.button_menus[context.roleOrMenu])); // new MessageActionRow().addComponents(menuButtons);
 
   int.reply({ content: `Click to add/remove a role`, components: rows, ephemeral: true });
-  return;
 }
 
 export async function handleModifyRole(
@@ -78,7 +77,7 @@ export async function handleModifyRole(
       .getPlugin(LogsPlugin)
       .log(
         LogType.BOT_ALERT,
-        `**A configuration error occured** on buttons for message ${int.message.id}, role **${context.roleOrMenu}** not found on server`,
+        `**A configuration error occurred** on buttons for message ${int.message.id}, role **${context.roleOrMenu}** not found on server`,
       );
     return;
   }
@@ -101,10 +100,7 @@ export async function handleModifyRole(
       .getPlugin(LogsPlugin)
       .log(
         LogType.BOT_ALERT,
-        `**A configuration error occured** on buttons for message ${int.message.id}, error: ${e}. We might be missing permissions!`,
+        `**A configuration error occurred** on buttons for message ${int.message.id}, error: ${e}. We might be missing permissions!`,
       );
-    return;
   }
-
-  return;
 }
