@@ -21,7 +21,7 @@ export async function applyBotSlowmodeToUserId(
       await channel.permissionOverwrites.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
     }
   } catch (e) {
-    const user = (await pluginData.client.users.fetch(userId as Snowflake)) || new UnknownUser({ id: userId });
+    const user = await pluginData.client.users.fetch(userId as Snowflake).catch(() => new UnknownUser({ id: userId }));
 
     if (isDiscordAPIError(e) && e.code === 50013) {
       logger.warn(
