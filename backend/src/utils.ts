@@ -1099,6 +1099,7 @@ export class UnknownUser {
   public id: string;
   public username = "Unknown";
   public discriminator = "0000";
+  public tag = "Unknown#0000";
 
   constructor(props = {}) {
     for (const key in props) {
@@ -1353,18 +1354,18 @@ export function messageSummary(msg: SavedMessage) {
 
 export function verboseUserMention(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
+  return `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
+  return `**${user.tag}** (\`${user.id}\`)`;
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {

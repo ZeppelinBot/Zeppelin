@@ -67,7 +67,7 @@ export const MutesCmd = mutesCmd({
       totalMutes = manuallyMutedMembers.length;
 
       lines = manuallyMutedMembers.map(member => {
-        return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+        return `<@!${member.id}> (**${member.user.tag}**, \`${member.id}\`)   🔧 Manual mute`;
       });
     } else {
       // Show filtered active mutes (but not manual mutes)
@@ -119,7 +119,7 @@ export const MutesCmd = mutesCmd({
 
       lines = filteredMutes.map(mute => {
         const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
-        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+        const username = user ? `${user.tag}` : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 

@@ -45,7 +45,7 @@ export const SlowmodeClearCmd = slowmodeCmd({
           pluginData,
           msg.channel,
           asSingleLine(`
-            Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>:
+            Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
             Threads cannot have Bot Slowmode
           `),
         );
@@ -56,17 +56,13 @@ export const SlowmodeClearCmd = slowmodeCmd({
         pluginData,
         msg.channel,
         asSingleLine(`
-          Failed to clear slowmode from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>:
+          Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
           \`${disableInlineCode(e.message)}\`
         `),
       );
       return;
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `Slowmode cleared from **${args.user.username}#${args.user.discriminator}** in <#${args.channel.id}>`,
-    );
+    sendSuccessMessage(pluginData, msg.channel, `Slowmode cleared from **${args.user.tag}** in <#${args.channel.id}>`);
   },
 });

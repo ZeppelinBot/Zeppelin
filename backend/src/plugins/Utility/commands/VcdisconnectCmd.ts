@@ -44,10 +44,6 @@ export const VcdisconnectCmd = utilityCmd({
       oldChannel: channelToConfigAccessibleChannel(channel),
     });
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `**${args.member.user.username}#${args.member.user.discriminator}** disconnected from **${channel.name}**`,
-    );
+    sendSuccessMessage(pluginData, msg.channel, `**${args.member.user.tag}** disconnected from **${channel.name}**`);
   },
 });

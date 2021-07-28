@@ -24,7 +24,7 @@ export const AvatarCmd = utilityCmd({
       const embed: MessageEmbedOptions = {
         image: { url: avatarUrl + `${extension}?size=2048` },
       };
-      embed.title = `Avatar of ${user.username}#${user.discriminator}:`;
+      embed.title = `Avatar of ${user.tag}:`;
       msg.channel.send({ embeds: [embed] });
     } else {
       sendErrorMessage(pluginData, msg.channel, "Invalid user ID");
