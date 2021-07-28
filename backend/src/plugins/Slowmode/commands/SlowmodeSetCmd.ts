@@ -89,7 +89,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "native") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ? channelPermissions : new Permissions(),
+        channelPermissions ?? new Permissions(),
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -104,7 +104,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "bot") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ? channelPermissions : new Permissions(),
+        channelPermissions ?? new Permissions(),
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
