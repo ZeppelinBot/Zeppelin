@@ -82,7 +82,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Ban, memberToKick.id);
 
     try {
-      await memberToKick.ban({ days: 1, reason: encodeURIComponent("kick -clean") });
+      await memberToKick.ban({ days: 1, reason: "kick -clean" });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
     }
@@ -91,7 +91,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, memberToKick.id);
 
     try {
-      await pluginData.guild.bans.remove(memberToKick.id, encodeURIComponent("kick -clean"));
+      await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
     }
