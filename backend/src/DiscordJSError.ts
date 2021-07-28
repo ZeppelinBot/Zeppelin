@@ -1,6 +1,6 @@
 import util from "util";
 
-export class ErisError extends Error {
+export class DiscordJSError extends Error {
   code: number | string | undefined;
   shardId: number;
 
@@ -11,6 +11,6 @@ export class ErisError extends Error {
   }
 
   [util.inspect.custom]() {
-    return `[ERIS] [ERROR CODE ${this.code || "?"}] [SHARD ${this.shardId}] ${this.message}`;
+    return `[DISCORDJS] [ERROR CODE ${this.code ?? "?"}] [SHARD ${this.shardId}] ${this.message}`;
   }
 }
