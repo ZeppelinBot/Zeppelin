@@ -6,10 +6,7 @@ export const ChannelJoinEvt = nameHistoryEvt({
 
   async listener(meta) {
     meta.pluginData.state.updateQueue.add(() =>
-      updateNickname(
-        meta.pluginData,
-        meta.args.newState.member ? meta.args.newState.member : meta.args.oldState.member!,
-      ),
+      updateNickname(meta.pluginData, meta.args.newState.member ?? meta.args.oldState.member!),
     );
   },
 });
