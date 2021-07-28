@@ -1,10 +1,12 @@
 import {
+  Emoji,
   GuildChannel,
   GuildMember,
   PartialGuildMember,
   Role,
   Snowflake,
   StageInstance,
+  Sticker,
   ThreadChannel,
   User,
 } from "discord.js";
@@ -123,6 +125,54 @@ export function stageToConfigAccessibleStage(stage: StageInstance): IConfigAcces
     createdAt: stage.createdTimestamp,
     discoverable: !stage.discoverableDisabled,
     topic: stage.topic,
+  };
+
+  return toReturn;
+}
+
+export interface IConfigAccessibleEmoji {
+  id: Snowflake;
+  name: string;
+  createdAt?: number;
+  animated: boolean;
+  identifier: string;
+}
+
+export function emojiToConfigAccessibleEmoji(emoji: Emoji): IConfigAccessibleEmoji {
+  const toReturn: IConfigAccessibleEmoji = {
+    id: emoji.id!,
+    name: emoji.name!,
+    createdAt: emoji.createdTimestamp ?? undefined,
+    animated: emoji.animated ?? false,
+    identifier: emoji.identifier,
+  };
+
+  return toReturn;
+}
+
+export interface IConfigAccessibleSticker {
+  id: Snowflake;
+  guildId?: Snowflake;
+  packId?: Snowflake;
+  name: string;
+  description: string;
+  tags: string;
+  format: string;
+  animated: boolean;
+  url: string;
+}
+
+export function stickerToConfigAccessibleSticker(sticker: Sticker): IConfigAccessibleSticker {
+  const toReturn: IConfigAccessibleSticker = {
+    id: sticker.id,
+    guildId: sticker.guildId ?? undefined,
+    packId: sticker.packId ?? undefined,
+    name: sticker.name,
+    description: sticker.description ?? "",
+    tags: sticker.tags?.join(", ") ?? "",
+    format: sticker.format,
+    animated: sticker.format === "PNG" ? false : true,
+    url: sticker.url,
   };
 
   return toReturn;

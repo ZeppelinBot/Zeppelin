@@ -50,6 +50,14 @@
   "STAGE_INSTANCE_DELETE": "📣 Stage Instance `{stageInstance.topic}` was deleted in Stage Channel <#{stageChannel.id}>",
   "STAGE_INSTANCE_UPDATE": "📣 Stage Instance `{newStageInstance.topic}` was edited in Stage Channel <#{stageChannel.id}>. Changes:\n{differenceString}",
 
+  "EMOJI_CREATE": "<{emoji.identifier}> Emoji `{emoji.name} ({emoji.id})` was created",
+  "EMOJI_DELETE": "👋 Emoji `{emoji.name} ({emoji.id})` was deleted",
+  "EMOJI_UPDATE": "<{newEmoji.identifier}> Emoji `{newEmoji.name} ({newEmoji.id})` was updated. Changes:\n{differenceString}",
+
+  "STICKER_CREATE": "🖼️ Sticker `{sticker.name} ({sticker.id})` was created. Description: `{sticker.description}` Format: {emoji.format}",
+  "STICKER_DELETE": "🖼️ Sticker `{sticker.name} ({sticker.id})` was deleted.",
+  "STICKER_UPDATE": "🖼️ Sticker `{newSticker.name} ({sticker.id})` was updated. Changes:\n{differenceString}",
+
   "COMMAND": "🤖 {userMention(member)} used command in {channelMention(channel)}:\n`{command}`",
 
   "MESSAGE_SPAM_DETECTED": "🛑 {userMention(member)} spam detected in {channelMention(channel)}: {description} (more than {limit} in {interval}s)\n{archiveUrl}",
