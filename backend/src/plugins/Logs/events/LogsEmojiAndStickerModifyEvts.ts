@@ -47,7 +47,7 @@ export const LogsStickerCreateEvt = logsEvt({
 
   async listener(meta) {
     meta.pluginData.state.guildLogs.log(LogType.STICKER_CREATE, {
-      thread: stickerToConfigAccessibleSticker(meta.args.sticker),
+      sticker: stickerToConfigAccessibleSticker(meta.args.sticker),
     });
   },
 });
@@ -57,7 +57,7 @@ export const LogsStickerDeleteEvt = logsEvt({
 
   async listener(meta) {
     meta.pluginData.state.guildLogs.log(LogType.STICKER_DELETE, {
-      thread: stickerToConfigAccessibleSticker(meta.args.sticker),
+      sticker: stickerToConfigAccessibleSticker(meta.args.sticker),
     });
   },
 });
@@ -72,8 +72,8 @@ export const LogsStickerUpdateEvt = logsEvt({
     meta.pluginData.state.guildLogs.log(
       LogType.STICKER_UPDATE,
       {
-        oldThread: stickerToConfigAccessibleSticker(meta.args.oldSticker),
-        newThread: stickerToConfigAccessibleSticker(meta.args.newSticker),
+        oldSticker: stickerToConfigAccessibleSticker(meta.args.oldSticker),
+        newSticker: stickerToConfigAccessibleSticker(meta.args.newSticker),
         differenceString,
       },
       meta.args.newSticker.id,

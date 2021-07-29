@@ -27,7 +27,7 @@ import {
   LogsStickerCreateEvt,
   LogsStickerDeleteEvt,
   LogsStickerUpdateEvt,
-} from "./events/LogsStickerEmojiModifyEvts";
+} from "./events/LogsEmojiAndStickerModifyEvts";
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
