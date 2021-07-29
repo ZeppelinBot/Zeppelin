@@ -1,4 +1,4 @@
-import { CategoryChannel, MessageEmbedOptions, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, MessageEmbedOptions, Snowflake, SnowflakeUtil, TextChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -50,7 +50,7 @@ export async function getServerInfoEmbed(
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc((guildPreview || restGuild)!.id, "x"); // FIXME ID -> Timestamp
+  const createdAt = moment.utc(SnowflakeUtil.deconstruct((guildPreview || restGuild)!.id).timestamp, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
@@ -194,7 +194,7 @@ export async function getServerInfoEmbed(
       }[restGuild.premiumTier] || 0;
 
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
-    otherStats.push(`Stickers: ? / ${maxStickers}`); // Wait on DJS: **${restGuild.stickers.cache.size}**
+    otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
     otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
