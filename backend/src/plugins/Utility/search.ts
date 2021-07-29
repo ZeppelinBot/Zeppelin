@@ -191,8 +191,7 @@ export async function displaySearch(
       const row = new MessageActionRow().addComponents(buttons);
       await searchMsg.edit({ content: result, components: [row] });
 
-      const filter = (iac: MessageComponentInteraction) => iac.message.id === searchMsg.id;
-      const collector = searchMsg.createMessageComponentCollector({ filter, time: 2 * MINUTES });
+      const collector = searchMsg.createMessageComponentCollector({ time: 2 * MINUTES });
 
       collector.on("collect", async (interaction: MessageComponentInteraction) => {
         if (msg.author.id !== interaction.user.id) {
