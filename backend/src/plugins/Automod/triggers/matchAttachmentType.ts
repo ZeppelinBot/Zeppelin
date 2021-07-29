@@ -1,6 +1,6 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake, TextChannel, Util } from "discord.js";
 import * as t from "io-ts";
-import { asSingleLine, disableInlineCode, messageSummary, verboseChannelMention } from "../../../utils";
+import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
@@ -73,7 +73,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
 
     return (
       asSingleLine(`
-        Matched attachment type \`${disableInlineCode(matchResult.extra.matchedType)}\`
+        Matched attachment type \`${Util.escapeInlineCode(matchResult.extra.matchedType)}\`
         (${matchResult.extra.mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
         in message (\`${contexts[0].message!.id}\`) in ${prettyChannel}:
       `) + messageSummary(contexts[0].message!)

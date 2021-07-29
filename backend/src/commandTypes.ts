@@ -1,11 +1,9 @@
-import { GuildChannel, GuildMember, Snowflake, User } from "discord.js";
+import { GuildChannel, GuildMember, Snowflake, Util, User } from "discord.js";
 import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,
   convertDelayStringToMS,
-  disableCodeBlocks,
-  disableInlineCode,
   isValidSnowflake,
   resolveMember,
   resolveUser,
@@ -32,7 +30,7 @@ export const commandTypes = {
   async resolvedUser(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null || result instanceof UnknownUser) {
-      throw new TypeConversionError(`User \`${disableCodeBlocks(value)}\` was not found`);
+      throw new TypeConversionError(`User \`${Util.escapeCodeBlock(value)}\` was not found`);
     }
     return result;
   },
@@ -40,7 +38,7 @@ export const commandTypes = {
   async resolvedUserLoose(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null) {
-      throw new TypeConversionError(`Invalid user: \`${disableCodeBlocks(value)}\``);
+      throw new TypeConversionError(`Invalid user: \`${Util.escapeCodeBlock(value)}\``);
     }
     return result;
   },
@@ -53,7 +51,7 @@ export const commandTypes = {
     const result = await resolveMember(context.pluginData.client, context.message.channel.guild, value);
     if (result == null) {
       throw new TypeConversionError(
-        `Member \`${disableCodeBlocks(value)}\` was not found or they have left the server`,
+        `Member \`${Util.escapeCodeBlock(value)}\` was not found or they have left the server`,
       );
     }
     return result;
@@ -64,7 +62,7 @@ export const commandTypes = {
 
     const result = await resolveMessageTarget(context.pluginData, value);
     if (!result) {
-      throw new TypeConversionError(`Unknown message \`${disableInlineCode(value)}\``);
+      throw new TypeConversionError(`Unknown message \`${Util.escapeInlineCode(value)}\``);
     }
 
     return result;
@@ -84,20 +82,20 @@ export const commandTypes = {
       return value as Snowflake;
     }
 
-    throw new TypeConversionError(`Could not parse ID: \`${disableInlineCode(value)}\``);
+    throw new TypeConversionError(`Could not parse ID: \`${Util.escapeInlineCode(value)}\``);
   },
 
   regex(value: string, context: CommandContext<any>): RegExp {
     try {
       return inputPatternToRegExp(value);
     } catch (e) {
-      throw new TypeConversionError(`Could not parse RegExp: \`${disableInlineCode(e.message)}\``);
+      throw new TypeConversionError(`Could not parse RegExp: \`${Util.escapeInlineCode(e.message)}\``);
     }
   },
 
   timezone(value: string) {
     if (!isValidTimezone(value)) {
-      throw new TypeConversionError(`Invalid timezone: ${disableInlineCode(value)}`);
+      throw new TypeConversionError(`Invalid timezone: ${Util.escapeInlineCode(value)}`);
     }
 
     return value;

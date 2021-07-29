@@ -1,7 +1,8 @@
+import { Util } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
-import { disableInlineCode, getUrlsInString, tNullable } from "../../../utils";
+import { getUrlsInString, tNullable } from "../../../utils";
 import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
@@ -129,6 +130,6 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched link \`${disableInlineCode(matchResult.extra.link)}\` in ${partialSummary}`;
+    return `Matched link \`${Util.escapeInlineCode(matchResult.extra.link)}\` in ${partialSummary}`;
   },
 });
