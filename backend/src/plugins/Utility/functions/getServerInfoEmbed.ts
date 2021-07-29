@@ -1,7 +1,8 @@
-import { CategoryChannel, MessageEmbedOptions, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { MessageEmbedOptions, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { ChannelTypeStrings } from "../../../types";
 import {
   EmbedWith,
   formatNumber,
@@ -82,12 +83,11 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
-  const bannerUrl = restGuild?.bannerURL() ? `[Link](${restGuild.bannerURL()})` : "None";
-  const splashUrl =
-    (restGuild || guildPreview)!.splashURL() != null
-      ? `[Link](${(restGuild || guildPreview)!.splashURL()?.replace("size=128", "size=2048")})`
-      : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const splashUrl = (restGuild || guildPreview)!.splash
+    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    : "None";
 
   embed.fields.push(
     {
@@ -155,9 +155,9 @@ export async function getServerInfoEmbed(
   // CHANNEL COUNTS
   if (thisServer) {
     const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter(channel => channel instanceof CategoryChannel);
-    const textChannels = thisServer.channels.cache.filter(channel => channel instanceof TextChannel);
-    const voiceChannels = thisServer.channels.cache.filter(channel => channel instanceof VoiceChannel);
+    const categories = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.CATEGORY);
+    const textChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.TEXT);
+    const voiceChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.VOICE);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",

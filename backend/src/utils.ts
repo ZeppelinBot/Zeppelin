@@ -1282,7 +1282,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
 
   // Role name
-  const roleList = await (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
+  const roleList = (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role[0]) {
     return role[0].id;
@@ -1310,7 +1310,6 @@ export async function resolveInvite<T extends boolean>(
     return inviteCache.get(key) as ResolveInviteReturnType<T>;
   }
 
-  // @ts-ignore: the getInvite() withCounts typings are blergh
   const promise = client.fetchInvite(code).catch(() => null);
   inviteCache.set(key, promise);
 
@@ -1319,12 +1318,14 @@ export async function resolveInvite<T extends boolean>(
 
 const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection(500);
 
-export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker> {
+export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker | null> {
   const cachedSticker = internalStickerCache.get(id);
   if (cachedSticker) return cachedSticker;
 
-  const fetchedSticker = await bot.fetchSticker(id).catch(undefined);
-  internalStickerCache.set(id, fetchedSticker);
+  const fetchedSticker = await bot.fetchSticker(id).catch(() => null);
+  if (fetchedSticker) {
+    internalStickerCache.set(id, fetchedSticker);
+  }
 
   return fetchedSticker;
 }
