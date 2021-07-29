@@ -174,7 +174,7 @@ connect().then(async () => {
   client.setMaxListeners(200);
 
   client.on("rateLimit", rateLimitData => {
-    logger.info(`[429] ${rateLimitData}`);
+    logger.info(`[429] ${JSON.stringify(rateLimitData)}`);
   });
 
   client.on("error", err => {
