@@ -95,7 +95,7 @@ export const MassbanCmd = modActionsCmd({
 
           await pluginData.guild.bans.create(userId as Snowflake, {
             days: deleteDays,
-            reason: banReason != null ? encodeURIComponent(banReason) : undefined,
+            reason: banReason ?? undefined,
           });
 
           await casesPlugin.createCase({

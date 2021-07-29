@@ -55,7 +55,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
         .getPlugin(LogsPlugin)
         .log(
           LogType.BOT_ALERT,
-          `**A configuration error occured** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
+          `**A configuration error occurred** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
         );
       return;
     }
@@ -67,7 +67,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
         .getPlugin(LogsPlugin)
         .log(
           LogType.BOT_ALERT,
-          `**A internal error occured** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
+          `**A internal error occurred** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
         );
       return;
     }

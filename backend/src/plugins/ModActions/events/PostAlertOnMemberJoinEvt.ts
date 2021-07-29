@@ -47,7 +47,7 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
       }
 
       await alertChannel.send(
-        `<@!${member.id}> (${member.user.username}#${member.user.discriminator} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
+        `<@!${member.id}> (${member.user.tag} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
       );
     }
   },

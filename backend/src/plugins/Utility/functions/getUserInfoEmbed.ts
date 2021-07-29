@@ -36,10 +36,10 @@ export async function getUserInfoEmbed(
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
-    name: `User:  ${user.username}#${user.discriminator}`,
+    name: `User:  ${user.tag}`,
   };
 
-  const avatarURL = user.avatarURL() || user.defaultAvatarURL;
+  const avatarURL = user.displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");
@@ -84,7 +84,7 @@ export async function getUserInfoEmbed(
   embed.fields.push({
     name: preEmbedPadding + "User information",
     value: trimLines(`
-        Name: **${user.username}#${user.discriminator}**
+        Name: **${user.tag}**
         ID: \`${user.id}\`
         Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
         Mention: <@!${user.id}>
