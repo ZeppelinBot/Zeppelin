@@ -21,7 +21,7 @@ export function createStarboardEmbedFromMessage(
       name: `${msg.author.tag}`,
     },
     fields: [],
-    timestamp: msg.createdAt,
+    timestamp: msg.createdTimestamp,
   };
 
   if (color != null) {
