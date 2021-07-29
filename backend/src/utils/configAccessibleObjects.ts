@@ -17,6 +17,7 @@ export interface IConfigAccessibleUser {
   username: string;
   discriminator: string;
   mention: string;
+  tag: string;
   avatarURL?: string;
   bot?: boolean;
   createdAt?: number;
@@ -46,6 +47,7 @@ export function userToConfigAccessibleUser(user: User | UnknownUser): IConfigAcc
       username: "Unknown",
       discriminator: "0000",
       mention: `<@${user.id}>`,
+      tag: "Unknown#0000",
     };
 
     return toReturnPartial;
@@ -57,6 +59,7 @@ export function userToConfigAccessibleUser(user: User | UnknownUser): IConfigAcc
     username: properUser.username,
     discriminator: properUser.discriminator,
     mention: `<@${properUser.id}>`,
+    tag: properUser.tag,
     avatarURL: properUser.displayAvatarURL({ dynamic: true }),
     bot: properUser.bot,
     createdAt: properUser.createdTimestamp,
