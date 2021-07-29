@@ -25,7 +25,7 @@ export const VcdisconnectCmd = utilityCmd({
       return;
     }
 
-    if (!args.member.voice || !args.member.voice.channelId) {
+    if (!args.member.voice?.channelId) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
     }
