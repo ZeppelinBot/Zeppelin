@@ -214,11 +214,7 @@ export const MutesCmd = mutesCmd({
         const row = new MessageActionRow().addComponents(buttons);
         await listMessage.edit({ components: [row] });
 
-        const filter = (iac: MessageComponentInteraction) => iac.message.id === listMessage.id;
-        const collector = listMessage.createMessageComponentCollector({
-          filter,
-          time: stopCollectionDebounce,
-        });
+        const collector = listMessage.createMessageComponentCollector({ time: stopCollectionDebounce });
 
         collector.on("collect", async (interaction: MessageComponentInteraction) => {
           if (msg.author.id !== interaction.user.id) {
