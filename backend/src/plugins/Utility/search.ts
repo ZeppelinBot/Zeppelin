@@ -391,7 +391,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = `${member.user.tag}`;
+      const fullUsername = member.user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -458,7 +458,7 @@ async function performBanSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async user => {
-      const fullUsername = `${user.tag}`;
+      const fullUsername = user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });

@@ -68,7 +68,7 @@ export const DeleteCaseCmd = modActionsCmd({
         }
       }
 
-      const deletedByName = `${message.author.tag}`;
+      const deletedByName = message.author.tag;
 
       const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
       const deletedAt = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));

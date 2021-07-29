@@ -65,7 +65,7 @@ export async function getServerInfoEmbed(
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerId);
-    const ownerName = `${owner.tag}`;
+    const ownerName = owner.tag;
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
     // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
