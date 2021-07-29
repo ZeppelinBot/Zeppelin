@@ -17,10 +17,8 @@ export const ButtonInteractionEvt = reactionRolesEvt({
   event: "interactionCreate",
 
   async listener(meta) {
-    const int = meta.args.interaction.isMessageComponent()
-      ? (meta.args.interaction as MessageComponentInteraction)
-      : null;
-    if (!int) return;
+    const int = meta.args.interaction;
+    if (!int.isMessageComponent()) return;
 
     const cfg = meta.pluginData.config.get();
     const split = int.customId.split(BUTTON_CONTEXT_SEPARATOR);

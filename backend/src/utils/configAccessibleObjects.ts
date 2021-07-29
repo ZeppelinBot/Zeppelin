@@ -40,7 +40,7 @@ export interface IConfigAccessibleMember extends IConfigAccessibleUser {
 }
 
 export function userToConfigAccessibleUser(user: User | UnknownUser): IConfigAccessibleUser {
-  if (`${user.tag}` === "Unknown#0000") {
+  if (user.tag === "Unknown#0000") {
     const toReturnPartial: IConfigAccessibleUser = {
       id: user.id,
       username: "Unknown",

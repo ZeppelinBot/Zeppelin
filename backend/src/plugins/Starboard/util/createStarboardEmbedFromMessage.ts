@@ -18,7 +18,7 @@ export function createStarboardEmbedFromMessage(
       text: `#${(msg.channel as GuildChannel).name}`,
     },
     author: {
-      name: `${msg.author.tag}`,
+      name: msg.author.tag,
     },
     fields: [],
     timestamp: msg.createdTimestamp,

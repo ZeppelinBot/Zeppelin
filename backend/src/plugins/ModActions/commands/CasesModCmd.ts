@@ -29,7 +29,7 @@ export const CasesModCmd = modActionsCmd({
   async run({ pluginData, message: msg, args }) {
     const modId = args.mod || msg.author.id;
     const mod = await resolveUser(pluginData.client, modId);
-    const modName = mod instanceof User ? `${mod.tag}` : modId;
+    const modName = mod instanceof User ? mod.tag : modId;
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const totalCases = await casesPlugin.getTotalCasesByMod(modId);
