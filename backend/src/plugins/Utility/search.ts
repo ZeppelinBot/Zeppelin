@@ -177,17 +177,11 @@ export async function displaySearch(
           .setEmoji("⬅")
           .setCustomId(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
-      );
-
-      buttons.push(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("➡")
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
-      );
-
-      buttons.push(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("🔄")
@@ -325,7 +319,7 @@ async function performMemberSearch(
   }
 
   if (args.voice) {
-    matchingMembers = matchingMembers.filter(m => m.voice.channelId != null);
+    matchingMembers = matchingMembers.filter(m => m.voice.channelId);
   }
 
   if (args.bot) {
@@ -391,7 +385,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = `${member.user.tag}`;
+      const fullUsername = member.user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -458,7 +452,7 @@ async function performBanSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async user => {
-      const fullUsername = `${user.tag}`;
+      const fullUsername = user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });

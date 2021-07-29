@@ -61,7 +61,7 @@ export const CasesUserCmd = modActionsCmd({
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
-    const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : `${user.tag}`;
+    const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : user.tag;
 
     if (cases.length === 0) {
       msg.channel.send(`No cases found for **${userName}**`);

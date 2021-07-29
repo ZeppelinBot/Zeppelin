@@ -30,8 +30,8 @@ export const NamesCmd = nameHistoryCmd({
     );
     const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
-    const user = await pluginData.client.users.fetch(args.userId as Snowflake);
-    const currentUsername = user ? `${user.tag}` : args.userId;
+    const user = await pluginData.client.users.fetch(args.userId as Snowflake).catch(() => null);
+    const currentUsername = user ? user.tag : args.userId;
 
     const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);
     const usernameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);

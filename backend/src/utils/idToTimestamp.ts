@@ -1,10 +1,6 @@
-import moment from "moment";
-
-const EPOCH = 1420070400000;
+import { Snowflake, SnowflakeUtil } from "discord.js";
 
 export function idToTimestamp(id: string) {
   if (typeof id === "number") return null;
-  return moment(+id / 4194304 + EPOCH)
-    .utc()
-    .valueOf();
+  return SnowflakeUtil.deconstruct(id as Snowflake).timestamp;
 }
