@@ -1,13 +1,7 @@
+import { Util } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import {
-  createChunkedMessage,
-  DBDateFormat,
-  deactivateMentions,
-  disableCodeBlocks,
-  sorter,
-  trimLines,
-} from "../../../utils";
+import { createChunkedMessage, DBDateFormat, deactivateMentions, sorter, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { postCmd } from "../types";
 
@@ -33,7 +27,7 @@ export const ScheduledPostsListCmd = postCmd({
 
       const isTruncated = previewText.length > SCHEDULED_POST_PREVIEW_TEXT_LENGTH;
 
-      previewText = disableCodeBlocks(deactivateMentions(previewText))
+      previewText = Util.escapeCodeBlock(deactivateMentions(previewText))
         .replace(/\s+/g, " ")
         .slice(0, SCHEDULED_POST_PREVIEW_TEXT_LENGTH);
 
@@ -61,7 +55,7 @@ export const ScheduledPostsListCmd = postCmd({
 
     const finalMessage = trimLines(`
       ${postLines.join("\n")}
-      
+
       Use \`scheduled_posts <num>\` to view a scheduled post in full
       Use \`scheduled_posts delete <num>\` to delete a scheduled post
     `);
