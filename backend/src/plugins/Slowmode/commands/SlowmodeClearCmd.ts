@@ -1,7 +1,8 @@
+import { Util } from "discord.js";
 import { ChannelTypeStrings } from "src/types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, disableInlineCode } from "../../../utils";
+import { asSingleLine } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
@@ -57,7 +58,7 @@ export const SlowmodeClearCmd = slowmodeCmd({
         msg.channel,
         asSingleLine(`
           Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
-          \`${disableInlineCode(e.message)}\`
+          \`${Util.escapeInlineCode(e.message)}\`
         `),
       );
       return;

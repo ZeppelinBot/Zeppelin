@@ -1,6 +1,6 @@
+import { Util } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
-import { disableInlineCode } from "../../../utils";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
@@ -89,6 +89,6 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched word \`${disableInlineCode(matchResult.extra.word)}\` in ${partialSummary}`;
+    return `Matched word \`${Util.escapeInlineCode(matchResult.extra.word)}\` in ${partialSummary}`;
   },
 });

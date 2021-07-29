@@ -1,6 +1,7 @@
+import { Util } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { disableInlineCode, trimLines } from "../../../utils";
+import { trimLines } from "../../../utils";
 import { parseFuzzyTimezone } from "../../../utils/parseFuzzyTimezone";
 import { timeAndDateCmd } from "../types";
 
@@ -19,7 +20,7 @@ export const SetTimezoneCmd = timeAndDateCmd({
         pluginData,
         message.channel,
         trimLines(`
-        Invalid timezone: \`${disableInlineCode(args.timezone)}\`
+        Invalid timezone: \`${Util.escapeInlineCode(args.timezone)}\`
         Zeppelin uses timezone locations rather than specific timezone names.
         See the **TZ database name** column at <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones> for a list of valid options.
       `),
