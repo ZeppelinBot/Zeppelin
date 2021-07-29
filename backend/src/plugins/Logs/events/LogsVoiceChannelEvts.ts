@@ -17,13 +17,13 @@ export const LogsVoiceStateUpdateEvt = logsEvt({
       // Leave evt
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
         member: memberToConfigAccessibleMember(member),
-        oldChannel: channelToConfigAccessibleChannel(oldChannel!),
+        channel: channelToConfigAccessibleChannel(oldChannel!),
       });
     } else if (!oldChannel && newChannel) {
       // Join Evt
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
         member: memberToConfigAccessibleMember(member),
-        newChannel: channelToConfigAccessibleChannel(newChannel),
+        channel: channelToConfigAccessibleChannel(newChannel),
       });
     } else {
       meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
