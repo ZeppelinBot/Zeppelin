@@ -16,15 +16,12 @@ export const AvatarCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      const avatar = user.displayAvatarURL();
-      let extension = avatar.slice(avatar.lastIndexOf("."), avatar.lastIndexOf("?"));
-      // Some pngs can have the .jpg extention for some reason, so we always use .png for static images
-      extension = extension === ".gif" ? extension : ".png";
-      const avatarUrl = avatar.slice(0, avatar.lastIndexOf("."));
       const embed: MessageEmbedOptions = {
-        image: { url: avatarUrl + `${extension}?size=2048` },
+        image: {
+          url: user.displayAvatarURL({ dynamic: true, format: "png", size: 2048 }),
+        },
+        title: `Avatar of ${user.tag}:`,
       };
-      embed.title = `Avatar of ${user.tag}:`;
       msg.channel.send({ embeds: [embed] });
     } else {
       sendErrorMessage(pluginData, msg.channel, "Invalid user ID");
