@@ -39,8 +39,6 @@ export const AboutCmd = utilityCmd({
       version = "?";
     }
 
-    // const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!; FIXME Sharding stuff
-
     const lastReload = humanizeDuration(Date.now() - pluginData.state.lastReload, {
       largest: 2,
       round: true,
@@ -51,7 +49,7 @@ export const AboutCmd = utilityCmd({
       ["Last reload", `${lastReload} ago`],
       ["Last update", lastUpdate],
       ["Version", version],
-      // ["API latency", `${shard.latency}ms`],
+      ["API latency", `${pluginData.client.ws.ping}ms`],
       ["Server timezone", timeAndDate.getGuildTz()],
     ];
 
@@ -70,11 +68,7 @@ export const AboutCmd = utilityCmd({
           fields: [
             {
               name: "Status",
-              value: basicInfoRows
-                .map(([label, value]) => {
-                  return `${label}: **${value}**`;
-                })
-                .join("\n"),
+              value: basicInfoRows.map(([label, value]) => `${label}: **${value}**`).join("\n"),
             },
             {
               name: `Loaded plugins on this server (${loadedPlugins.length})`,
