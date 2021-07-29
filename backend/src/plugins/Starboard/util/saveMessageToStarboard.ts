@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, Snowflake, TextChannel } from "discord.js";
+import { Message, MessageEmbedOptions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { StarboardPluginType, TStarboardOpts } from "../types";
 import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage";
@@ -16,6 +16,6 @@ export async function saveMessageToStarboard(
   const embed = createStarboardEmbedFromMessage(msg, Boolean(starboard.copy_full_embed), starboard.color);
   embed.fields!.push(createStarboardPseudoFooterForMessage(starboard, msg, starboard.star_emoji![0], starCount));
 
-  const starboardMessage = await (channel as TextChannel).send({ embeds: [embed as MessageEmbed] });
+  const starboardMessage = await (channel as TextChannel).send({ embeds: [embed as MessageEmbedOptions] });
   await pluginData.state.starboardMessages.createStarboardMessage(channel.id, msg.id, starboardMessage.id);
 }
