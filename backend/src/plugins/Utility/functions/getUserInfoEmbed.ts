@@ -103,7 +103,7 @@ export async function getUserInfoEmbed(
     });
     const roles = member.roles.cache
       .map(role => pluginData.guild.roles.cache.get(role.id))
-      .filter(r => r != null) as Role[];
+      .filter((r): r is Role => !!r);
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
@@ -119,7 +119,7 @@ export async function getUserInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Voice information",
         value: trimLines(`
-          ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
+          ${voiceChannel ? `Current voice channel: **${voiceChannel.name ?? "None"}**` : ""}
           ${member.voice.mute ? "Server voice muted: **Yes**" : ""}
           ${member.voice.deaf ? "Server voice deafened: **Yes**" : ""}
         `),

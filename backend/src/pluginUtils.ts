@@ -198,7 +198,7 @@ export async function sendSuccessMessage(
   return channel
     .send({ ...content }) // Force line break
     .catch(err => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : `${channel.id}`;
+      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });
@@ -219,7 +219,7 @@ export async function sendErrorMessage(
   return channel
     .send({ ...content }) // Force line break
     .catch(err => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : `${channel.id}`;
+      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });

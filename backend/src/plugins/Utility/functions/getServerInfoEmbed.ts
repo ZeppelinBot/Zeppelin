@@ -13,6 +13,7 @@ import {
   resolveUser,
   trimLines,
 } from "../../../utils";
+import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
@@ -50,7 +51,7 @@ export async function getServerInfoEmbed(
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc((guildPreview || restGuild)!.id, "x"); // FIXME ID -> Timestamp
+  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
@@ -65,7 +66,7 @@ export async function getServerInfoEmbed(
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerId);
-    const ownerName = `${owner.tag}`;
+    const ownerName = owner.tag;
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
     // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
@@ -194,7 +195,7 @@ export async function getServerInfoEmbed(
       }[restGuild.premiumTier] || 0;
 
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
-    otherStats.push(`Stickers: ? / ${maxStickers}`); // Wait on DJS: **${restGuild.stickers.cache.size}**
+    otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
     otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS

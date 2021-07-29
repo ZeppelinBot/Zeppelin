@@ -119,7 +119,7 @@ export const MutesCmd = mutesCmd({
 
       lines = filteredMutes.map(mute => {
         const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
-        const username = user ? `${user.tag}` : "Unknown#0000";
+        const username = user ? user.tag : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 
