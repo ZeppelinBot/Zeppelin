@@ -38,9 +38,7 @@ export async function addMemberPendingRoleChange(
               "Reaction roles",
             );
           } catch (e) {
-            logger.warn(
-              `Failed to apply role changes to ${member.user.username}#${member.user.discriminator} (${member.id}): ${e.message}`,
-            );
+            logger.warn(`Failed to apply role changes to ${member.user.tag} (${member.id}): ${e.message}`);
           }
         }
         lock.unlock();

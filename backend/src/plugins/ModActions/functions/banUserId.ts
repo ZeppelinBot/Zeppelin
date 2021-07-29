@@ -80,7 +80,7 @@ export async function banUserId(
     const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
     await pluginData.guild.bans.create(userId as Snowflake, {
       days: deleteMessageDays,
-      reason: reason != null ? encodeURIComponent(reason) : undefined,
+      reason: reason ?? undefined,
     });
   } catch (e) {
     let errorMessage;

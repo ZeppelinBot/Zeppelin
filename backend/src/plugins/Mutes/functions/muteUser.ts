@@ -90,7 +90,7 @@ export async function muteUser(
       try {
         await member.roles.add(muteRole as Snowflake);
       } catch (e) {
-        const actualMuteRole = pluginData.guild.roles.cache.find(x => x.id === muteRole);
+        const actualMuteRole = pluginData.guild.roles.cache.get(muteRole as Snowflake);
         if (!actualMuteRole) {
           lock.unlock();
           logs.log(LogType.BOT_ALERT, {

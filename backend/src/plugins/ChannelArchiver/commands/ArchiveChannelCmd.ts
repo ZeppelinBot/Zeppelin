@@ -60,10 +60,10 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
     while (archivedMessages < maxMessagesToArchive) {
       const messagesToFetch = Math.min(MAX_MESSAGES_PER_FETCH, maxMessagesToArchive - archivedMessages);
-      const messages = (await args.channel.messages.fetch({
+      const messages = await args.channel.messages.fetch({
         limit: messagesToFetch,
         before: previousId as Snowflake,
-      })) as Collection<Snowflake, Message>;
+      });
       if (messages.size === 0) break;
 
       for (const message of messages.values()) {

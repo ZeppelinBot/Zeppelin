@@ -85,24 +85,24 @@ export async function actualMuteUserCmd(
   if (args.time) {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${user.username}#${user.discriminator}**'s
+        Updated **${user.tag}**'s
         mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${user.username}#${user.discriminator}**
+        Muted **${user.tag}**
         for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     }
   } else {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${user.username}#${user.discriminator}**'s
+        Updated **${user.tag}**'s
         mute to indefinite (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${user.username}#${user.discriminator}**
+        Muted **${user.tag}**
         indefinitely (Case #${muteResult.case.case_number})
       `);
     }

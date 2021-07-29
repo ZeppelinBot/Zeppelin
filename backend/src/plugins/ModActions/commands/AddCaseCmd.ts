@@ -73,11 +73,7 @@ export const AddCaseCmd = modActionsCmd({
     });
 
     if (user) {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
-        `Case #${theCase.case_number} created for **${user.username}#${user.discriminator}**`,
-      );
+      sendSuccessMessage(pluginData, msg.channel, `Case #${theCase.case_number} created for **${user.tag}**`);
     } else {
       sendSuccessMessage(pluginData, msg.channel, `Case #${theCase.case_number} created`);
     }

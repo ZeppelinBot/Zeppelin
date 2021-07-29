@@ -52,7 +52,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           GuildAuditLogs.Actions.MEMBER_ROLE_UPDATE as number,
           member.id,
         );
-        const mod = relevantAuditLogEntry ? relevantAuditLogEntry.executor : null;
+        const mod = relevantAuditLogEntry?.executor ?? null;
 
         if (addedRoles.length && removedRoles.length) {
           // Roles added *and* removed
@@ -61,11 +61,11 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               addedRoles: addedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               removedRoles: removedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: mod ? userToConfigAccessibleUser(mod) : {},
@@ -79,7 +79,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: addedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: mod ? userToConfigAccessibleUser(mod) : {},
@@ -93,7 +93,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             {
               member: logMember,
               roles: removedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) || { id: roleId, name: `Unknown (${roleId})` })
+                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
                 .map(r => r.name)
                 .join(", "),
               mod: mod ? userToConfigAccessibleUser(mod) : {},

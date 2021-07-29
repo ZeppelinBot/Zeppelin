@@ -1,3 +1,4 @@
+import { MessageAttachment } from "discord.js";
 import fs from "fs";
 import sharp from "sharp";
 import twemoji from "twemoji";
@@ -39,8 +40,8 @@ export const JumboCmd = utilityCmd({
     const size = config.jumbo_size > 2048 ? 2048 : config.jumbo_size;
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
-    let extention = ".png";
-    let file;
+    let extension = ".png";
+    let file: MessageAttachment | undefined;
 
     if (!isEmoji(args.emoji)) {
       sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
@@ -50,25 +51,19 @@ export const JumboCmd = utilityCmd({
     if (results) {
       let url = "https://cdn.discordapp.com/emojis/";
       if (results[1] === "<a:") {
-        extention = ".gif";
+        extension = ".gif";
       }
-      url += `${results[2]}${extention}`;
-      if (extention === ".png") {
+      url += `${results[2]}${extension}`;
+      if (extension === ".png") {
         const image = await resizeBuffer(await getBufferFromUrl(url), size, size);
-        file = {
-          name: `emoji${extention}`,
-          file: image,
-        };
+        file = new MessageAttachment(image, `emoji${extension}`);
       } else {
         const image = await getBufferFromUrl(url);
-        file = {
-          name: `emoji${extention}`,
-          file: image,
-        };
+        file = new MessageAttachment(image, `emoji${extension}`);
       }
     } else {
       let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
-      let image;
+      let image: Buffer | undefined;
       try {
         image = await resizeBuffer(await getBufferFromUrl(url), size, size);
       } catch {
@@ -77,12 +72,14 @@ export const JumboCmd = utilityCmd({
           image = await resizeBuffer(await getBufferFromUrl(url), size, size);
         }
       }
-      file = {
-        name: `emoji.png`,
-        file: image,
-      };
+      if (!image) {
+        sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
+        return;
+      }
+
+      file = new MessageAttachment(image, "emoji.png");
     }
 
-    msg.channel.send({ content: "", files: [file] });
+    msg.channel.send({ files: [file] });
   },
 });

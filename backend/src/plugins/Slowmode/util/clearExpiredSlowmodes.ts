@@ -21,8 +21,9 @@ export async function clearExpiredSlowmodes(pluginData: GuildPluginData<Slowmode
     } catch (e) {
       logger.error(e);
 
-      const realUser =
-        pluginData.client.users!.fetch(user.user_id as Snowflake) || new UnknownUser({ id: user.user_id });
+      const realUser = await pluginData.client
+        .users!.fetch(user.user_id as Snowflake)
+        .catch(() => new UnknownUser({ id: user.user_id }));
 
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Failed to clear slowmode permissions from {userMention(user)} in {channelMention(channel)}`,
