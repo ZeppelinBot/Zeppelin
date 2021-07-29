@@ -1,4 +1,4 @@
-import { CategoryChannel, MessageEmbedOptions, Snowflake, SnowflakeUtil, TextChannel, VoiceChannel } from "discord.js";
+import { CategoryChannel, MessageEmbedOptions, Snowflake, TextChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -13,6 +13,7 @@ import {
   resolveUser,
   trimLines,
 } from "../../../utils";
+import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
@@ -50,7 +51,7 @@ export async function getServerInfoEmbed(
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc(SnowflakeUtil.deconstruct((guildPreview || restGuild)!.id).timestamp, "x");
+  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
