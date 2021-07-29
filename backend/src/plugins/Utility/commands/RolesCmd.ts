@@ -34,13 +34,9 @@ export const RolesCmd = utilityCmd({
     if (args.counts) {
       await refreshMembersIfNeeded(guild);
 
-      // If the user requested role member counts as well, calculate them and sort the roles by their member count
-      const roleCounts: Map<string, number> = Array.from(guild.members.cache.values()).reduce((map, member) => {
-        for (const roleId of member.roles.cache) {
-          if (!map.has(roleId)) map.set(roleId, 0);
-          map.set(roleId, map.get(roleId) + 1);
-        }
-
+      // If the user requested role member counts as well, fetch them and sort the roles by their member count
+      const roleCounts: Map<string, number> = Array.from(guild.roles.cache.values()).reduce((map, role) => {
+        map.set(role.id, role.members.size);
         return map;
       }, new Map());
 
