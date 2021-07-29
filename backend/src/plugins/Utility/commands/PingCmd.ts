@@ -29,8 +29,6 @@ export const PingCmd = utilityCmd({
     const lowest = Math.round(Math.min(...times));
     const mean = Math.round(times.reduce((total, ms) => total + ms, 0) / times.length);
 
-    // const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!; FIXME sharding stuff
-
     msg.channel.send(
       trimLines(`
       **Ping:**
@@ -38,7 +36,8 @@ export const PingCmd = utilityCmd({
       Highest: **${highest}ms**
       Mean: **${mean}ms**
       Time between ping command and first reply: **${msgToMsgDelay!}ms**
-    `), // Omitted line: Shard latency: **${shard.latency}ms**
+      Shard latency: **${pluginData.client.ws.ping}ms**
+    `),
     );
 
     // Clean up test messages
