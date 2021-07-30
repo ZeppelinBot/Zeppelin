@@ -96,7 +96,7 @@ export async function getInviteInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Invite creator",
         value: trimLines(`
-          Name: **${invite.inviter.username}#${invite.inviter.discriminator}**
+          Name: **${invite.inviter.tag}**
           ID: \`${invite.inviter.id}\`
           Mention: <@!${invite.inviter.id}>
         `),
@@ -143,7 +143,7 @@ export async function getInviteInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Invite creator",
         value: trimLines(`
-          Name: **${invite.inviter.username}#${invite.inviter.discriminator}**
+          Name: **${invite.inviter.tag}**
           ID: \`${invite.inviter.id}\`
           Mention: <@!${invite.inviter.id}>
         `),

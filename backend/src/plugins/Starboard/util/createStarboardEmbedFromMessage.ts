@@ -18,19 +18,17 @@ export function createStarboardEmbedFromMessage(
       text: `#${(msg.channel as GuildChannel).name}`,
     },
     author: {
-      name: `${msg.author.username}#${msg.author.discriminator}`,
+      name: msg.author.tag,
     },
     fields: [],
-    timestamp: msg.createdAt,
+    timestamp: msg.createdTimestamp,
   };
 
   if (color != null) {
     embed.color = color;
   }
 
-  if (msg.author.avatarURL()) {
-    embed.author.icon_url = msg.author.avatarURL()!;
-  }
+  embed.author.icon_url = msg.author.displayAvatarURL({ dynamic: true });
 
   // The second condition here checks for messages with only an image link that is then embedded.
   // The message content in that case is hidden by the Discord client, so we hide it here too.

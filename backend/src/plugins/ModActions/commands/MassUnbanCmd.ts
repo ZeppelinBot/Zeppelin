@@ -60,10 +60,7 @@ export const MassunbanCmd = modActionsCmd({
       }
 
       try {
-        await pluginData.guild.bans.remove(
-          userId as Snowflake,
-          unbanReason != null ? encodeURIComponent(unbanReason) : undefined,
-        );
+        await pluginData.guild.bans.remove(userId as Snowflake, unbanReason ?? undefined);
 
         await casesPlugin.createCase({
           userId,

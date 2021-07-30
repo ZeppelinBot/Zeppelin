@@ -17,10 +17,8 @@ export const ButtonInteractionEvt = reactionRolesEvt({
   event: "interactionCreate",
 
   async listener(meta) {
-    const int = meta.args.interaction.isMessageComponent()
-      ? (meta.args.interaction as MessageComponentInteraction)
-      : null;
-    if (!int) return;
+    const int = meta.args.interaction;
+    if (!int.isMessageComponent()) return;
 
     const cfg = meta.pluginData.config.get();
     const split = int.customId.split(BUTTON_CONTEXT_SEPARATOR);
@@ -32,6 +30,10 @@ export const ButtonInteractionEvt = reactionRolesEvt({
     };
 
     if (context.stateless) {
+      if (context.roleOrMenu == null) {
+        // Not reaction from this plugin
+        return;
+      }
       const timeSinceCreation = moment.utc().valueOf() - idToTimestamp(int.message.id)!;
       if (timeSinceCreation >= BUTTON_INVALIDATION_TIME) {
         sendEphemeralReply(
@@ -51,7 +53,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
         .getPlugin(LogsPlugin)
         .log(
           LogType.BOT_ALERT,
-          `**A configuration error occured** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
+          `**A configuration error occurred** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
         );
       return;
     }
@@ -63,7 +65,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
         .getPlugin(LogsPlugin)
         .log(
           LogType.BOT_ALERT,
-          `**A internal error occured** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
+          `**A internal error occurred** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
         );
       return;
     }

@@ -30,7 +30,7 @@ export const NoteCmd = modActionsCmd({
       return;
     }
 
-    const userName = `${user.username}#${user.discriminator}`;
+    const userName = user.tag;
     const reason = formatReasonWithAttachments(args.note, msg.attachments.array());
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);

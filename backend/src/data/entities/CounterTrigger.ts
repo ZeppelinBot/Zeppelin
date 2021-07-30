@@ -17,7 +17,7 @@ export function getReverseCounterComparisonOp(op: TriggerComparisonOp): TriggerC
   return REVERSE_OPS[op];
 }
 
-const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})([1-9]\\d*)$`);
+const comparisonStringRegex = new RegExp(`^(${TRIGGER_COMPARISON_OPS.join("|")})(\\d*)$`);
 
 /**
  * @return Parsed comparison op and value, or null if the comparison string was invalid

@@ -51,7 +51,7 @@ export const UnbanCmd = modActionsCmd({
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
-      await pluginData.guild.bans.remove(user.id as Snowflake, reason != null ? encodeURIComponent(reason) : undefined);
+      await pluginData.guild.bans.remove(user.id as Snowflake, reason ?? undefined);
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban member; are you sure they're banned?");
       return;

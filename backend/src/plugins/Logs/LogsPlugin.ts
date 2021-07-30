@@ -7,7 +7,6 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { disableCodeBlocks } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -20,6 +19,14 @@ import {
   LogsStageInstanceDeleteEvt,
   LogsStageInstanceUpdateEvt,
 } from "./events/LogsStageInstanceModifyEvts";
+import {
+  LogsEmojiCreateEvt,
+  LogsEmojiDeleteEvt,
+  LogsEmojiUpdateEvt,
+  LogsStickerCreateEvt,
+  LogsStickerDeleteEvt,
+  LogsStickerUpdateEvt,
+} from "./events/LogsEmojiAndStickerModifyEvts";
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
@@ -29,6 +36,7 @@ import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
+import { Util } from "discord.js";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -81,6 +89,12 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsThreadCreateEvt,
     LogsThreadDeleteEvt,
     LogsThreadUpdateEvt,
+    LogsEmojiCreateEvt,
+    LogsEmojiDeleteEvt,
+    LogsEmojiUpdateEvt,
+    LogsStickerCreateEvt,
+    LogsStickerDeleteEvt,
+    LogsStickerUpdateEvt,
   ],
 
   public: {
@@ -133,7 +147,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
             The following regex has taken longer than ${timeoutMs}ms for ${failedTimes} times and has been temporarily disabled:
           `.trim() +
           "\n```" +
-          disableCodeBlocks(regexSource) +
+          Util.escapeCodeBlock(regexSource) +
           "```",
       });
     };

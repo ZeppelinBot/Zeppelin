@@ -138,7 +138,7 @@ export async function actualPostCmd(
 
     await pluginData.state.scheduledPosts.create({
       author_id: msg.author.id,
-      author_name: `${msg.author.username}#${msg.author.discriminator}`,
+      author_name: msg.author.tag,
       channel_id: targetChannel.id,
       content,
       attachments: msg.attachments.array(),

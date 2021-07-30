@@ -177,17 +177,11 @@ export async function displaySearch(
           .setEmoji("⬅")
           .setCustomId(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
-      );
-
-      buttons.push(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("➡")
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
-      );
-
-      buttons.push(
         new MessageButton()
           .setStyle("SECONDARY")
           .setEmoji("🔄")
@@ -197,8 +191,7 @@ export async function displaySearch(
       const row = new MessageActionRow().addComponents(buttons);
       await searchMsg.edit({ content: result, components: [row] });
 
-      const filter = (iac: MessageComponentInteraction) => iac.message.id === searchMsg.id;
-      const collector = searchMsg.createMessageComponentCollector({ filter, time: 2 * MINUTES });
+      const collector = searchMsg.createMessageComponentCollector({ time: 2 * MINUTES });
 
       collector.on("collect", async (interaction: MessageComponentInteraction) => {
         if (msg.author.id !== interaction.user.id) {
@@ -325,7 +318,7 @@ async function performMemberSearch(
   }
 
   if (args.voice) {
-    matchingMembers = matchingMembers.filter(m => m.voice.channelId != null);
+    matchingMembers = matchingMembers.filter(m => m.voice.channelId);
   }
 
   if (args.bot) {
@@ -391,7 +384,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = `${member.user.username}#${member.user.discriminator}`;
+      const fullUsername = member.user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -458,7 +451,7 @@ async function performBanSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async user => {
-      const fullUsername = `${user.username}#${user.discriminator}`;
+      const fullUsername = user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });
@@ -502,10 +495,10 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
     if (member instanceof GuildMember) {
-      line = `${paddedId} ${member.user.username}#${member.user.discriminator}`;
+      line = `${paddedId} ${member.user.tag}`;
       if (member.nickname) line += ` (${member.nickname})`;
     } else {
-      line = `${paddedId} ${member.username}#${member.discriminator}`;
+      line = `${paddedId} ${member.tag}`;
     }
     return line;
   });

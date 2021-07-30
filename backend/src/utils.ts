@@ -22,6 +22,7 @@ import {
   TextChannel,
   ThreadChannel,
   User,
+  Util,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import { either } from "fp-ts/lib/Either";
@@ -212,7 +213,7 @@ export function differenceToString(diff: Map<string, { was: any; is: any }>): st
   let toReturn = "";
   diff = prettyDifference(diff);
   for (const [key, difference] of diff) {
-    toReturn += `${key[0].toUpperCase() + key.slice(1)}: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
+    toReturn += `**${key[0].toUpperCase() + key.slice(1)}**: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
   }
   return toReturn;
 }
@@ -785,21 +786,6 @@ export function deactivateMentions(content: string): string {
   return content.replace(/@/g, "@\u200b");
 }
 
-/**
- * Disable inline code in the given string by replacing backticks/grave accents with acute accents
- * FIXME: Find a better way that keeps the grave accents? Can't use the code block approach here since it's just 1 character.
- */
-export function disableInlineCode(content: string): string {
-  return content.replace(/`/g, "\u00b4");
-}
-
-/**
- * Disable code blocks in the given string by adding invisible unicode characters between backticks
- */
-export function disableCodeBlocks(content: string): string {
-  return content.replace(/`/g, "`\u200b");
-}
-
 export function useMediaUrls(content: string): string {
   return content.replace(/cdn\.discord(app)?\.com/g, "media.discordapp.net");
 }
@@ -1099,6 +1085,7 @@ export class UnknownUser {
   public id: string;
   public username = "Unknown";
   public discriminator = "0000";
+  public tag = "Unknown#0000";
 
   constructor(props = {}) {
     for (const key in props) {
@@ -1281,7 +1268,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
 
   // Role name
-  const roleList = await (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
+  const roleList = (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role[0]) {
     return role[0].id;
@@ -1309,7 +1296,6 @@ export async function resolveInvite<T extends boolean>(
     return inviteCache.get(key) as ResolveInviteReturnType<T>;
   }
 
-  // @ts-ignore: the getInvite() withCounts typings are blergh
   const promise = client.fetchInvite(code).catch(() => null);
   inviteCache.set(key, promise);
 
@@ -1318,12 +1304,14 @@ export async function resolveInvite<T extends boolean>(
 
 const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection(500);
 
-export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker> {
+export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker | null> {
   const cachedSticker = internalStickerCache.get(id);
   if (cachedSticker) return cachedSticker;
 
-  const fetchedSticker = await bot.fetchSticker(id).catch(undefined);
-  internalStickerCache.set(id, fetchedSticker);
+  const fetchedSticker = await bot.fetchSticker(id).catch(() => null);
+  if (fetchedSticker) {
+    internalStickerCache.set(id, fetchedSticker);
+  }
 
   return fetchedSticker;
 }
@@ -1334,11 +1322,11 @@ export async function confirm(channel: TextChannel, userId: string, content: Mes
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```\n" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
   const richEmbed = (msg.data.embeds || []).find(e => (e as MessageEmbed).type === "rich");
-  if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
+  if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments) {
@@ -1353,18 +1341,18 @@ export function messageSummary(msg: SavedMessage) {
 
 export function verboseUserMention(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
+  return `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
+  return `**${user.tag}** (\`${user.id}\`)`;
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {

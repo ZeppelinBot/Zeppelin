@@ -61,10 +61,7 @@ export const CasesUserCmd = modActionsCmd({
     const normalCases = cases.filter(c => !c.is_hidden);
     const hiddenCases = cases.filter(c => c.is_hidden);
 
-    const userName =
-      user instanceof UnknownUser && cases.length
-        ? cases[cases.length - 1].user_name
-        : `${user.username}#${user.discriminator}`;
+    const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : user.tag;
 
     if (cases.length === 0) {
       msg.channel.send(`No cases found for **${userName}**`);
@@ -119,7 +116,7 @@ export const CasesUserCmd = modActionsCmd({
                 lineChunks.length === 1
                   ? `Cases for ${userName} (${lines.length} total)`
                   : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.avatarURL() || user.defaultAvatarURL : undefined,
+              icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
             },
             fields: [
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),

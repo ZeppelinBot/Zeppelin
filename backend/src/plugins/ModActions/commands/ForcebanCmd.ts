@@ -70,7 +70,7 @@ export const ForcebanCmd = modActionsCmd({
       // FIXME: Use banUserId()?
       await pluginData.guild.bans.create(user.id as Snowflake, {
         days: 1,
-        reason: reason != null ? encodeURIComponent(reason) : undefined,
+        reason: reason ?? undefined,
       });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to forceban member");

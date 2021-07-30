@@ -24,9 +24,7 @@ export const ListDashboardUsersCmd = botControlCmd({
 
     const dashboardUsers = await pluginData.state.apiPermissionAssignments.getByGuildId(guild.id);
     const users = await Promise.all(dashboardUsers.map(perm => resolveUser(pluginData.client, perm.target_id)));
-    const userNameList = users.map(
-      user => `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`,
-    );
+    const userNameList = users.map(user => `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`);
 
     sendSuccessMessage(
       pluginData,

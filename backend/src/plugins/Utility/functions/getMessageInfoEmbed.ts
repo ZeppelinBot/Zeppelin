@@ -112,7 +112,7 @@ export async function getMessageInfoEmbed(
   embed.fields.push({
     name: preEmbedPadding + "Author information",
     value: trimLines(`
-      Name: **${message.author.username}#${message.author.discriminator}**
+      Name: **${message.author.tag}**
       ID: \`${message.author.id}\`
       Created: **${authorAccountAge} ago** (\`${prettyAuthorCreatedAt}\`)
       ${authorJoinedAt ? `Joined: **${authorServerAge} ago** (\`${prettyAuthorJoinedAt}\`)` : ""}

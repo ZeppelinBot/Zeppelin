@@ -1,11 +1,9 @@
-import { GuildChannel, GuildMember, User } from "discord.js";
+import { GuildChannel, GuildMember, Snowflake, Util, User } from "discord.js";
 import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,
   convertDelayStringToMS,
-  disableCodeBlocks,
-  disableInlineCode,
   isValidSnowflake,
   resolveMember,
   resolveUser,
@@ -32,7 +30,7 @@ export const commandTypes = {
   async resolvedUser(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null || result instanceof UnknownUser) {
-      throw new TypeConversionError(`User \`${disableCodeBlocks(value)}\` was not found`);
+      throw new TypeConversionError(`User \`${Util.escapeCodeBlock(value)}\` was not found`);
     }
     return result;
   },
@@ -40,7 +38,7 @@ export const commandTypes = {
   async resolvedUserLoose(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null) {
-      throw new TypeConversionError(`Invalid user: \`${disableCodeBlocks(value)}\``);
+      throw new TypeConversionError(`Invalid user: \`${Util.escapeCodeBlock(value)}\``);
     }
     return result;
   },
@@ -53,7 +51,7 @@ export const commandTypes = {
     const result = await resolveMember(context.pluginData.client, context.message.channel.guild, value);
     if (result == null) {
       throw new TypeConversionError(
-        `Member \`${disableCodeBlocks(value)}\` was not found or they have left the server`,
+        `Member \`${Util.escapeCodeBlock(value)}\` was not found or they have left the server`,
       );
     }
     return result;
@@ -64,7 +62,7 @@ export const commandTypes = {
 
     const result = await resolveMessageTarget(context.pluginData, value);
     if (!result) {
-      throw new TypeConversionError(`Unknown message \`${disableInlineCode(value)}\``);
+      throw new TypeConversionError(`Unknown message \`${Util.escapeInlineCode(value)}\``);
     }
 
     return result;
@@ -72,32 +70,32 @@ export const commandTypes = {
 
   async anyId(value: string, context: CommandContext<any>) {
     const userId = resolveUserId(context.pluginData.client, value);
-    if (userId) return userId;
+    if (userId) return userId as Snowflake;
 
     const channelIdMatch = value.match(channelMentionRegex);
-    if (channelIdMatch) return channelIdMatch[1];
+    if (channelIdMatch) return channelIdMatch[1] as Snowflake;
 
     const roleIdMatch = value.match(roleMentionRegex);
-    if (roleIdMatch) return roleIdMatch[1];
+    if (roleIdMatch) return roleIdMatch[1] as Snowflake;
 
     if (isValidSnowflake(value)) {
-      return value;
+      return value as Snowflake;
     }
 
-    throw new TypeConversionError(`Could not parse ID: \`${disableInlineCode(value)}\``);
+    throw new TypeConversionError(`Could not parse ID: \`${Util.escapeInlineCode(value)}\``);
   },
 
   regex(value: string, context: CommandContext<any>): RegExp {
     try {
       return inputPatternToRegExp(value);
     } catch (e) {
-      throw new TypeConversionError(`Could not parse RegExp: \`${disableInlineCode(e.message)}\``);
+      throw new TypeConversionError(`Could not parse RegExp: \`${Util.escapeInlineCode(e.message)}\``);
     }
   },
 
   timezone(value: string) {
     if (!isValidTimezone(value)) {
-      throw new TypeConversionError(`Invalid timezone: ${disableInlineCode(value)}`);
+      throw new TypeConversionError(`Invalid timezone: ${Util.escapeInlineCode(value)}`);
     }
 
     return value;
@@ -112,7 +110,7 @@ export const commandTypeHelpers = {
   resolvedUserLoose: createTypeHelper<Promise<User | UnknownUser>>(commandTypes.resolvedUserLoose),
   resolvedMember: createTypeHelper<Promise<GuildMember>>(commandTypes.resolvedMember),
   messageTarget: createTypeHelper<Promise<MessageTarget>>(commandTypes.messageTarget),
-  anyId: createTypeHelper<Promise<string>>(commandTypes.anyId),
+  anyId: createTypeHelper<Promise<Snowflake>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),
   timezone: createTypeHelper<string>(commandTypes.timezone),
 };

@@ -27,7 +27,7 @@ export const SlowmodeGetCmd = slowmodeCmd({
     }
 
     if (currentSlowmode) {
-      const humanized = humanizeDuration(channel.rateLimitPerUser * 1000);
+      const humanized = humanizeDuration(currentSlowmode * 1000);
       const slowmodeType = isNative ? "native" : "bot-maintained";
       msg.channel.send(`The current slowmode of <#${channel.id}> is **${humanized}** (${slowmodeType})`);
     } else {

@@ -120,8 +120,8 @@ export async function logAndDetectMessageSpam(
         // Then, if enabled, remove the spam messages
         if (spamConfig.clean !== false) {
           msgIds.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-          (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake)! as TextChannel)
-            .bulkDelete(msgIds as Snowflake[])
+          (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake)! as TextChannel | undefined)
+            ?.bulkDelete(msgIds as Snowflake[])
             .catch(noop);
         }
 

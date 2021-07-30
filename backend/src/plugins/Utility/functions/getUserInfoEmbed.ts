@@ -36,10 +36,10 @@ export async function getUserInfoEmbed(
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
-    name: `User:  ${user.username}#${user.discriminator}`,
+    name: `User:  ${user.tag}`,
   };
 
-  const avatarURL = user.avatarURL() || user.defaultAvatarURL;
+  const avatarURL = user.displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");
@@ -84,7 +84,7 @@ export async function getUserInfoEmbed(
   embed.fields.push({
     name: preEmbedPadding + "User information",
     value: trimLines(`
-        Name: **${user.username}#${user.discriminator}**
+        Name: **${user.tag}**
         ID: \`${user.id}\`
         Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
         Mention: <@!${user.id}>
@@ -103,7 +103,7 @@ export async function getUserInfoEmbed(
     });
     const roles = member.roles.cache
       .map(role => pluginData.guild.roles.cache.get(role.id))
-      .filter(r => r != null) as Role[];
+      .filter((r): r is Role => !!r);
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
@@ -119,7 +119,7 @@ export async function getUserInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Voice information",
         value: trimLines(`
-          ${voiceChannel ? `Current voice channel: **${voiceChannel ? voiceChannel.name : "None"}**` : ""}
+          ${voiceChannel ? `Current voice channel: **${voiceChannel.name ?? "None"}**` : ""}
           ${member.voice.mute ? "Server voice muted: **Yes**" : ""}
           ${member.voice.deaf ? "Server voice deafened: **Yes**" : ""}
         `),

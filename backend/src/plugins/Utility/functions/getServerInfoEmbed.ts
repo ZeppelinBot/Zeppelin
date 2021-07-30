@@ -1,7 +1,8 @@
-import { CategoryChannel, MessageEmbedOptions, Snowflake, TextChannel, VoiceChannel } from "discord.js";
+import { MessageEmbedOptions, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { ChannelTypeStrings } from "../../../types";
 import {
   EmbedWith,
   formatNumber,
@@ -13,6 +14,7 @@ import {
   resolveUser,
   trimLines,
 } from "../../../utils";
+import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
@@ -50,7 +52,7 @@ export async function getServerInfoEmbed(
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc((guildPreview || restGuild)!.id, "x"); // FIXME ID -> Timestamp
+  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
@@ -65,7 +67,7 @@ export async function getServerInfoEmbed(
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerId);
-    const ownerName = `${owner.username}#${owner.discriminator}`;
+    const ownerName = owner.tag;
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
     // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
@@ -81,12 +83,11 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
-  const bannerUrl = restGuild?.bannerURL() ? `[Link](${restGuild.bannerURL()})` : "None";
-  const splashUrl =
-    (restGuild || guildPreview)!.splashURL() != null
-      ? `[Link](${(restGuild || guildPreview)!.splashURL()?.replace("size=128", "size=2048")})`
-      : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const splashUrl = (restGuild || guildPreview)!.splash
+    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    : "None";
 
   embed.fields.push(
     {
@@ -154,9 +155,9 @@ export async function getServerInfoEmbed(
   // CHANNEL COUNTS
   if (thisServer) {
     const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter(channel => channel instanceof CategoryChannel);
-    const textChannels = thisServer.channels.cache.filter(channel => channel instanceof TextChannel);
-    const voiceChannels = thisServer.channels.cache.filter(channel => channel instanceof VoiceChannel);
+    const categories = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.CATEGORY);
+    const textChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.TEXT);
+    const voiceChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.VOICE);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
@@ -194,7 +195,7 @@ export async function getServerInfoEmbed(
       }[restGuild.premiumTier] || 0;
 
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
-    otherStats.push(`Stickers: ? / ${maxStickers}`); // Wait on DJS: **${restGuild.stickers.cache.size}**
+    otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
     otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS

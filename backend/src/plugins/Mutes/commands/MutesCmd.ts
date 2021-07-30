@@ -67,7 +67,7 @@ export const MutesCmd = mutesCmd({
       totalMutes = manuallyMutedMembers.length;
 
       lines = manuallyMutedMembers.map(member => {
-        return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+        return `<@!${member.id}> (**${member.user.tag}**, \`${member.id}\`)   🔧 Manual mute`;
       });
     } else {
       // Show filtered active mutes (but not manual mutes)
@@ -119,7 +119,7 @@ export const MutesCmd = mutesCmd({
 
       lines = filteredMutes.map(mute => {
         const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
-        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+        const username = user ? user.tag : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 
@@ -214,25 +214,18 @@ export const MutesCmd = mutesCmd({
         const row = new MessageActionRow().addComponents(buttons);
         await listMessage.edit({ components: [row] });
 
-        const filter = (iac: MessageComponentInteraction) => iac.message.id === listMessage.id;
-        const collector = listMessage.createMessageComponentCollector({
-          filter,
-          time: stopCollectionDebounce,
-        });
+        const collector = listMessage.createMessageComponentCollector({ time: stopCollectionDebounce });
 
         collector.on("collect", async (interaction: MessageComponentInteraction) => {
           if (msg.author.id !== interaction.user.id) {
             interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
           } else {
             collector.resetTimer();
+            await interaction.deferUpdate();
             if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
-              await interaction.deferUpdate();
               await drawListPage(currentPage - 1);
             } else if (interaction.customId === `nextButton:${idMod}` && currentPage < totalPages) {
-              await interaction.deferUpdate();
               await drawListPage(currentPage + 1);
-            } else {
-              await interaction.deferUpdate();
             }
           }
         });

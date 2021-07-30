@@ -7,15 +7,15 @@ import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
   const user = await resolveUser(pluginData.client, args.userId);
-  const userName = `${user.username}#${user.discriminator}`;
+  const userName = user.tag;
 
   const mod = await resolveUser(pluginData.client, args.modId);
-  const modName = `${mod.username}#${mod.discriminator}`;
+  const modName = mod.tag;
 
   let ppName: string | null = null;
   if (args.ppId) {
     const pp = await resolveUser(pluginData.client, args.ppId);
-    ppName = `${pp.username}#${pp.discriminator}`;
+    ppName = pp.tag;
   }
 
   if (args.auditLogId) {

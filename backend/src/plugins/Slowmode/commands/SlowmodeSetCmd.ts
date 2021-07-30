@@ -1,9 +1,9 @@
-import { Permissions, TextChannel, ThreadChannel } from "discord.js";
+import { Permissions, TextChannel, ThreadChannel, Util } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { ChannelTypeStrings } from "src/types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, DAYS, disableInlineCode, HOURS, MINUTES } from "../../../utils";
+import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
@@ -89,7 +89,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "native") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ? channelPermissions : new Permissions(),
+        channelPermissions ?? new Permissions(),
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -104,7 +104,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "bot") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ? channelPermissions : new Permissions(),
+        channelPermissions ?? new Permissions(),
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -133,7 +133,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
           rateLimitPerUser: rateLimitSeconds,
         });
       } catch (e) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${disableInlineCode(e.message)}`);
+        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${Util.escapeInlineCode(e.message)}`);
         return;
       }
     } else {

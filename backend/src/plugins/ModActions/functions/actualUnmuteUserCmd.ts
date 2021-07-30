@@ -48,7 +48,7 @@ export async function actualUnmuteCmd(
       pluginData,
       msg.channel as TextChannel,
       asSingleLine(`
-        Unmuting **${user.username}#${user.discriminator}**
+        Unmuting **${user.tag}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
       `),
     );
@@ -57,7 +57,7 @@ export async function actualUnmuteCmd(
       pluginData,
       msg.channel as TextChannel,
       asSingleLine(`
-        Unmuted **${user.username}#${user.discriminator}**
+        Unmuted **${user.tag}**
         (Case #${result.case.case_number})
       `),
     );

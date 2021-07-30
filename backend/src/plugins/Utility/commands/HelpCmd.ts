@@ -80,7 +80,7 @@ export const HelpCmd = utilityCmd({
         ? `Results (${totalResults} total, showing first ${limitedResults.length}):\n\n`
         : "";
 
-    message += `${commandSnippets.join("\n\n")}`;
+    message += commandSnippets.join("\n\n");
     createChunkedMessage(msg.channel, message);
   },
 });

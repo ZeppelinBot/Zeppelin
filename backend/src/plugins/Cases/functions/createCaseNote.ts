@@ -16,7 +16,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }
 
-  const modName = `${mod.username}#${mod.discriminator}`;
+  const modName = mod.tag;
 
   let body = args.body;
 

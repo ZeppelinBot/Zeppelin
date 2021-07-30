@@ -94,7 +94,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
           type === LogType.CENSOR ||
           type === LogType.CLEAN
         ) {
-          if (data.channel.parentID && opts.excluded_categories.includes(data.channel.parentID)) {
+          if (data.channel.parentId && opts.excluded_categories.includes(data.channel.parentId)) {
             continue logChannelLoop;
           }
         }
