@@ -11,9 +11,9 @@ import { KickTrigger } from "./kick";
 import { LineSpamTrigger } from "./lineSpam";
 import { LinkSpamTrigger } from "./linkSpam";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
+import { MatchMimeTypeTrigger } from "./matchMimeType";
 import { MatchInvitesTrigger } from "./matchInvites";
 import { MatchLinksTrigger } from "./matchLinks";
-import { MatchMimeTypeTrigger } from "./matchMimeType";
 import { MatchRegexTrigger } from "./matchRegex";
 import { MatchWordsTrigger } from "./matchWords";
 import { MemberJoinTrigger } from "./memberJoin";
@@ -74,6 +74,7 @@ export const AvailableTriggers = t.type({
   match_invites: MatchInvitesTrigger.configType,
   match_links: MatchLinksTrigger.configType,
   match_attachment_type: MatchAttachmentTypeTrigger.configType,
+  match_mime_type: MatchMimeTypeTrigger.configType,
   member_join: MemberJoinTrigger.configType,
   member_leave: MemberLeaveTrigger.configType,
   role_added: RoleAddedTrigger.configType,
