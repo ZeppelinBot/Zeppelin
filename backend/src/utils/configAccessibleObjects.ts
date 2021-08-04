@@ -87,7 +87,7 @@ export function memberToConfigAccessibleMember(member: GuildMember | PartialGuil
     ...user,
     user,
     nick: member.nickname ?? "*None*",
-    roles: member.roles.cache.mapValues(r => roleToConfigAccessibleRole(r)).array(),
+    roles: [...member.roles.cache.mapValues(r => roleToConfigAccessibleRole(r)).values()],
     joinedAt: member.joinedTimestamp ?? undefined,
     guildName: member.guild.name,
   };

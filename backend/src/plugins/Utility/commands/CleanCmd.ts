@@ -118,7 +118,7 @@ export const CleanCmd = utilityCmd({
     const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
     let pins: Message[] = [];
     if (!deletePins) {
-      pins = (await msg.channel.messages.fetchPinned()).array();
+      pins = [...(await msg.channel.messages.fetchPinned().catch(() => [])).values()];
     }
 
     while (messagesToClean.length < args.count) {
@@ -128,14 +128,14 @@ export const CleanCmd = utilityCmd({
       });
       if (potentialMessages.size === 0) break;
 
-      const existingStored = await pluginData.state.savedMessages.getMultiple(potentialMessages.keyArray());
+      const existingStored = await pluginData.state.savedMessages.getMultiple([...potentialMessages.keys()]);
       const alreadyStored = existingStored.map(stored => stored.id);
-      const messagesToStore = potentialMessages
-        .array()
-        .filter(potentialMsg => !alreadyStored.includes(potentialMsg.id));
+      const messagesToStore = [
+        ...potentialMessages.filter(potentialMsg => !alreadyStored.includes(potentialMsg.id)).values(),
+      ];
       await pluginData.state.savedMessages.createFromMessages(messagesToStore);
 
-      const potentialMessagesToClean = await pluginData.state.savedMessages.getMultiple(potentialMessages.keyArray());
+      const potentialMessagesToClean = await pluginData.state.savedMessages.getMultiple([...potentialMessages.keys()]);
       if (potentialMessagesToClean.length === 0) break;
 
       const filtered: SavedMessage[] = [];

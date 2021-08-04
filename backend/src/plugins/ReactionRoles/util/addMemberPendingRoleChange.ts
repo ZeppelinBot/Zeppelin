@@ -24,7 +24,7 @@ export async function addMemberPendingRoleChange(
 
         const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
         if (member) {
-          const newRoleIds = new Set(member.roles.cache.keyArray());
+          const newRoleIds = new Set(member.roles.cache.keys());
           for (const change of newPendingRoleChangeObj.changes) {
             if (change.mode === "+") newRoleIds.add(change.roleId as Snowflake);
             else newRoleIds.delete(change.roleId as Snowflake);

@@ -39,7 +39,7 @@ export const MassmuteCmd = modActionsCmd({
       return;
     }
 
-    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, msg.attachments.array());
+    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, [...msg.attachments.values()]);
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {

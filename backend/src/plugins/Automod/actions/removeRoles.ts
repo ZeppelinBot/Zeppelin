@@ -54,7 +54,7 @@ export const RemoveRolesAction = automodAction({
 
     await Promise.all(
       members.map(async member => {
-        const memberRoles = new Set(member.roles.cache.keyArray());
+        const memberRoles = new Set(member.roles.cache.keys());
         for (const roleId of rolesToRemove) {
           memberRoles.delete(roleId as Snowflake);
           ignoreRoleChange(pluginData, member.id, roleId);

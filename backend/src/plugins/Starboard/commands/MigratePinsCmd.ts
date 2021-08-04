@@ -31,7 +31,7 @@ export const MigratePinsCmd = starboardCmd({
 
     msg.channel.send(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
 
-    const pins = (await args.pinChannel.messages.fetchPinned()).array();
+    const pins = [...(await args.pinChannel.messages.fetchPinned().catch(() => [])).values()];
     pins.reverse(); // Migrate pins starting from the oldest message
 
     for (const pin of pins) {
