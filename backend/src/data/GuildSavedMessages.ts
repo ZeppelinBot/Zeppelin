@@ -45,9 +45,9 @@ export class GuildSavedMessages extends BaseGuildRepository {
       timestamp: msg.createdTimestamp,
     };
 
-    if (msg.attachments.size) data.attachments = msg.attachments.array();
+    if (msg.attachments.size) data.attachments = [...msg.attachments.values()];
     if (msg.embeds.length) data.embeds = msg.embeds;
-    if (msg.stickers?.size) data.stickers = msg.stickers.array();
+    if (msg.stickers?.size) data.stickers = [...msg.stickers.values()];
 
     return data;
   }

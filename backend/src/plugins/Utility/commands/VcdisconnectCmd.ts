@@ -32,7 +32,7 @@ export const VcdisconnectCmd = utilityCmd({
     const channel = pluginData.guild.channels.cache.get(args.member.voice.channelId) as VoiceChannel;
 
     try {
-      await args.member.voice.kick();
+      await args.member.voice.disconnect();
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to disconnect member");
       return;
