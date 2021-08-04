@@ -46,11 +46,9 @@ export const VcmoveCmd = utilityCmd({
       channel = potentialChannel;
     } else {
       // Search string -> find closest matching voice channel name
-      const voiceChannels = [
-        ...pluginData.guild.channels.cache
-          .filter((c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE)
-          .values(),
-      ];
+      const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
+        (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
+      );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
       if (!closestMatch) {
         sendErrorMessage(pluginData, msg.channel, "No matching voice channels");
@@ -127,11 +125,9 @@ export const VcmoveAllCmd = utilityCmd({
       channel = potentialChannel;
     } else {
       // Search string -> find closest matching voice channel name
-      const voiceChannels = [
-        ...pluginData.guild.channels.cache
-          .filter((c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE)
-          .values(),
-      ];
+      const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
+        (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
+      );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
       if (!closestMatch) {
         sendErrorMessage(pluginData, msg.channel, "No matching voice channels");
