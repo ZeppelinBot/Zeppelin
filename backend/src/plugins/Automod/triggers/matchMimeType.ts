@@ -2,7 +2,8 @@ import { automodTrigger } from "../helpers";
 import * as t from "io-ts";
 import fetch from "node-fetch";
 import { fromBuffer } from "file-type";
-import { asSingleLine, disableInlineCode, messageSummary, verboseChannelMention } from "src/utils";
+import { asSingleLine, messageSummary, verboseChannelMention } from "src/utils";
+import { Snowflake, TextChannel, Util } from "discord.js";
 
 interface MatchResultType {
   matchedType: string;
@@ -11,16 +12,16 @@ interface MatchResultType {
 
 export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
-    mimetype_blacklist: t.array(t.string),
+    mime_type_blacklist: t.array(t.string),
     blacklist_enabled: t.boolean,
-    mimetype_whitelist: t.array(t.string),
+    mime_type_whitelist: t.array(t.string),
     whitelist_enabled: t.boolean,
   }),
 
   defaultConfig: {
-    mimetype_blacklist: [],
+    mime_type_blacklist: [],
     blacklist_enabled: false,
-    mimetype_whitelist: [],
+    mime_type_whitelist: [],
     whitelist_enabled: false,
   },
 
@@ -31,15 +32,14 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
     if (!attachments) return null;
 
     for (const attachment of attachments) {
-      const res = await fetch(attachment.proxyURL);
+      const res = await fetch(attachment.url);
       const mimeType = await fromBuffer(await res.buffer());
-      if (!mimeType) return;
 
       const blacklist = trigger.blacklist_enabled
-        ? (trigger.mimetype_blacklist || []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_blacklist || []).map(_t => _t.toLowerCase())
         : null;
 
-      if (blacklist?.includes(mimeType.mime)) {
+      if (mimeType && blacklist?.includes(mimeType.mime)) {
         return {
           extra: {
             matchedType: mimeType.mime,
@@ -49,13 +49,13 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
       }
 
       const whitelist = trigger.whitelist_enabled
-        ? (trigger.mimetype_whitelist || []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_whitelist || []).map(_t => _t.toLowerCase())
         : null;
 
-      if (whitelist?.includes(mimeType.mime)) {
+      if (whitelist && (!mimeType || !whitelist.includes(mimeType.mime))) {
         return {
           extra: {
-            matchedType: mimeType.mime,
+            matchedType: mimeType?.mime || "unknown",
             mode: "whitelist",
           },
         };
@@ -66,19 +66,17 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const [context] = contexts;
-    const { message } = context;
-    if (!message) return;
-    const channel = pluginData.guild.channels.cache.get(message.channel_id);
+    const { message } = contexts[0];
+    const channel = pluginData.guild.channels.cache.get(message!.channel_id as Snowflake) as TextChannel;
     const prettyChannel = verboseChannelMention(channel);
     const { matchedType, mode } = matchResult.extra;
 
     return (
       asSingleLine(`
-        Matched MIME type \`${disableInlineCode(matchedType)}\`
-        (${mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
-        in message (\`${message.id}\`) in ${prettyChannel}
-      `) + messageSummary(message)
+        Matched MIME type \`${Util.escapeInlineCode(matchedType)}\`
+        (${mode === "blacklist" ? "blacklisted" : "not in whitelist"})
+        in message (\`${message!.id}\`) in ${prettyChannel}
+      `) + messageSummary(message!)
     );
   },
 });
