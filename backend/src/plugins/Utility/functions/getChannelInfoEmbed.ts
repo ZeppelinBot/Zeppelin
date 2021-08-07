@@ -130,11 +130,13 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === ChannelTypeStrings.PRIVATE_THREAD || channel.type === ChannelTypeStrings.PUBLIC_THREAD) {
     const thread = channel as ThreadChannel;
-    const parentChannelName = thread.parent?.name ? thread.parent.name : `<#${thread.parentId}>`;
+    const parentChannelName = thread.parent?.name ?? `<#${thread.parentId}>`;
     const memberCount = thread.memberCount ?? thread.members.cache.size;
-    const owner = await pluginData.guild.members.fetch(thread.ownerId).catch(() => null);
-    const ownerMention = owner ? verboseUserMention(owner.user) : "Unknown#0000";
-    const humanizedArchiveTime = `Archive duration: **${humanizeDuration(thread.autoArchiveDuration * MINUTES)}**`;
+    const owner = await thread.fetchOwner().catch(() => null);
+    const ownerMention = owner?.user ? verboseUserMention(owner.user) : "Unknown#0000";
+    const humanizedArchiveTime = `Archive duration: **${humanizeDuration(
+      (thread.autoArchiveDuration ?? 0) * MINUTES,
+    )}**`;
 
     embed.fields.push({
       name: preEmbedPadding + "Thread information",

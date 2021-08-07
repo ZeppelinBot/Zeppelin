@@ -58,7 +58,7 @@ export async function muteUser(
   if (member) {
     const logs = pluginData.getPlugin(LogsPlugin);
     // remove and store any roles to be removed/restored
-    const currentUserRoles = member.roles.cache.keyArray();
+    const currentUserRoles = [...member.roles.cache.keys()];
     let newRoles: string[] = currentUserRoles;
     const removeRoles = removeRolesOnMuteOverride ?? config.remove_roles_on_mute;
     const restoreRoles = restoreRolesOnMuteOverride ?? config.restore_roles_on_mute;

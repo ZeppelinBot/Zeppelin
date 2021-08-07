@@ -535,7 +535,7 @@ export async function findRelevantAuditLogEntry(
     }
   }
 
-  const entries = auditLogs ? auditLogs.entries.array() : [];
+  const entries = auditLogs ? [...auditLogs.entries.values()] : [];
 
   entries.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
@@ -1302,7 +1302,7 @@ export async function resolveInvite<T extends boolean>(
   return promise as ResolveInviteReturnType<T>;
 }
 
-const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection(500);
+const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection({ maxSize: 500 });
 
 export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker | null> {
   const cachedSticker = internalStickerCache.get(id);

@@ -37,7 +37,7 @@ export const MassunbanCmd = modActionsCmd({
       return;
     }
 
-    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, msg.attachments.array());
+    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, [...msg.attachments.values()]);
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
