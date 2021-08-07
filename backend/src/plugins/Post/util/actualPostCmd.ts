@@ -141,7 +141,7 @@ export async function actualPostCmd(
       author_name: msg.author.tag,
       channel_id: targetChannel.id,
       content,
-      attachments: msg.attachments.array(),
+      attachments: [...msg.attachments.values()],
       post_at: postAt
         .clone()
         .tz("Etc/UTC")
@@ -180,7 +180,7 @@ export async function actualPostCmd(
 
   // When the message isn't scheduled for later, post it immediately
   if (!opts.schedule) {
-    await postMessage(pluginData, targetChannel, content, msg.attachments.array(), opts["enable-mentions"]);
+    await postMessage(pluginData, targetChannel, content, [...msg.attachments.values()], opts["enable-mentions"]);
   }
 
   if (opts.repeat) {
