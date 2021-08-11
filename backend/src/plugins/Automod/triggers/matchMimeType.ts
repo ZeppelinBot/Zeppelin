@@ -1,7 +1,5 @@
 import { automodTrigger } from "../helpers";
 import * as t from "io-ts";
-import fetch from "node-fetch";
-import { fromBuffer } from "file-type";
 import { asSingleLine, messageSummary, verboseChannelMention } from "src/utils";
 import { Snowflake, TextChannel, Util } from "discord.js";
 
@@ -32,17 +30,16 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
     if (!attachments) return null;
 
     for (const attachment of attachments) {
-      const res = await fetch(attachment.url);
-      const mimeType = await fromBuffer(await res.buffer());
+      const { contentType } = attachment;
 
       const blacklist = trigger.blacklist_enabled
         ? (trigger.mime_type_blacklist || []).map(_t => _t.toLowerCase())
         : null;
 
-      if (mimeType && blacklist?.includes(mimeType.mime)) {
+      if (contentType && blacklist?.includes(contentType)) {
         return {
           extra: {
-            matchedType: mimeType.mime,
+            matchedType: contentType,
             mode: "blacklist",
           },
         };
@@ -52,10 +49,10 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
         ? (trigger.mime_type_whitelist || []).map(_t => _t.toLowerCase())
         : null;
 
-      if (whitelist && (!mimeType || !whitelist.includes(mimeType.mime))) {
+      if (whitelist && (!contentType || !whitelist.includes(contentType))) {
         return {
           extra: {
-            matchedType: mimeType?.mime || "unknown",
+            matchedType: contentType || "unknown",
             mode: "whitelist",
           },
         };
