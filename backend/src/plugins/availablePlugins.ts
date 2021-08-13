@@ -6,6 +6,7 @@ import { CasesPlugin } from "./Cases/CasesPlugin";
 import { CensorPlugin } from "./Censor/CensorPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
+import { ContextMenuPlugin } from "./ContextMenus/ContextMenuPlugin";
 import { CountersPlugin } from "./Counters/CountersPlugin";
 import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
@@ -67,6 +68,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   CustomEventsPlugin,
   TimeAndDatePlugin,
   CountersPlugin,
+  ContextMenuPlugin,
 ];
 
 // prettier-ignore

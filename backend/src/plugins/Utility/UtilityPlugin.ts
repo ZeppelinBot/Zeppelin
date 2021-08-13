@@ -13,7 +13,7 @@ import { AboutCmd } from "./commands/AboutCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
-import { CleanCmd } from "./commands/CleanCmd";
+import { CleanArgs, cleanCmd, CleanCmd } from "./commands/CleanCmd";
 import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
 import { HelpCmd } from "./commands/HelpCmd";
@@ -155,6 +155,14 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     AutoJoinThreadEvt,
     AutoJoinThreadSyncEvt,
   ],
+
+  public: {
+    clean(pluginData) {
+      return (args: CleanArgs, msg) => {
+        cleanCmd(pluginData, args, msg);
+      };
+    },
+  },
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
