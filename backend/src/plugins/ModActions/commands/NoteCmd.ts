@@ -31,7 +31,7 @@ export const NoteCmd = modActionsCmd({
     }
 
     const userName = user.tag;
-    const reason = formatReasonWithAttachments(args.note, msg.attachments.array());
+    const reason = formatReasonWithAttachments(args.note, [...msg.attachments.values()]);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const createdCase = await casesPlugin.createCase({

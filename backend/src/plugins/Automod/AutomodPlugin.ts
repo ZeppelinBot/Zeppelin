@@ -73,6 +73,10 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
         rule["enabled"] = true;
       }
 
+      if (rule["allow_further_rules"] == null) {
+        rule["allow_further_rules"] = false;
+      }
+
       if (rule["affects_bots"] == null) {
         rule["affects_bots"] = false;
       }

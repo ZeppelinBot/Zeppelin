@@ -14,6 +14,11 @@ import {
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel } from "../types";
+import {
+  getConfigAccessibleMemberLevel,
+  IConfigAccessibleMember,
+  memberToConfigAccessibleMember,
+} from "../../../utils/configAccessibleObjects";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,
@@ -48,17 +53,26 @@ export async function getLogMessage(
       const mentions: string[] = [];
       for (const userOrMember of usersOrMembers) {
         let user;
-        let member;
+        let member: IConfigAccessibleMember | null = null;
 
         if (userOrMember.user) {
-          member = userOrMember;
+          member = userOrMember as IConfigAccessibleMember;
           user = member.user;
         } else {
           user = userOrMember;
-          member = await resolveMember(pluginData.client, pluginData.guild, user.id);
+          const apiMember = await resolveMember(pluginData.client, pluginData.guild, user.id);
+          if (apiMember) {
+            member = memberToConfigAccessibleMember(apiMember);
+          }
         }
 
-        const memberConfig = (await pluginData.config.getMatchingConfig({ member, userId: user.id })) || ({} as any);
+        const level = member ? getConfigAccessibleMemberLevel(pluginData, member) : 0;
+        const memberConfig =
+          (await pluginData.config.getMatchingConfig({
+            level,
+            memberRoles: member ? member.roles.map(r => r.id) : [],
+            userId: user.id,
+          })) || ({} as any);
 
         // Revert to old behavior (verbose name w/o ping if allow_user_mentions is enabled (for whatever reason))
         if (config.allow_user_mentions) {

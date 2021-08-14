@@ -8,6 +8,7 @@ import {
   GuildChannel,
   GuildMember,
   Invite,
+  InviteGuild,
   LimitedCollection,
   Message,
   MessageAttachment,
@@ -248,9 +249,8 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
   return v != null;
 }
 
-export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
-export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite & { guild: Guild };
-export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite & {
+export type GuildInvite = Invite & { guild: InviteGuild | Guild };
+export type GroupDMInvite = Invite & {
   channel: PartialChannelData;
   type: typeof Constants.ChannelTypes.GROUP_DM;
 };
@@ -535,7 +535,7 @@ export async function findRelevantAuditLogEntry(
     }
   }
 
-  const entries = auditLogs ? auditLogs.entries.array() : [];
+  const entries = auditLogs ? [...auditLogs.entries.values()] : [];
 
   entries.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
@@ -1302,7 +1302,7 @@ export async function resolveInvite<T extends boolean>(
   return promise as ResolveInviteReturnType<T>;
 }
 
-const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection(500);
+const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection({ maxSize: 500 });
 
 export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker | null> {
   const cachedSticker = internalStickerCache.get(id);
@@ -1480,11 +1480,11 @@ export function isFullMessage(msg: Message | PartialMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite<CT extends InviteOpts>(invite: Invite): invite is GuildInvite<CT> {
+export function isGuildInvite(invite: Invite): invite is GuildInvite {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite): invite is GroupDMInvite<CT> {
+export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
   return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
 }
 

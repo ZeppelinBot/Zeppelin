@@ -39,7 +39,7 @@ export const MassbanCmd = modActionsCmd({
       return;
     }
 
-    const banReason = formatReasonWithAttachments(banReasonReply.content, msg.attachments.array());
+    const banReason = formatReasonWithAttachments(banReasonReply.content, [...msg.attachments.values()]);
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {

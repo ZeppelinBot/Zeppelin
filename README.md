@@ -65,6 +65,8 @@ These instructions are intended for bot development only.
 Configuration is stored in the database in the `configs` table
 
 ```yml
+prefix: '!'
+
 # role id: level
 levels:
   "12345678": 100 # Example admin

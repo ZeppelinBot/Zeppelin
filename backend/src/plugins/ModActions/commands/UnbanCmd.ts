@@ -47,7 +47,7 @@ export const UnbanCmd = modActionsCmd({
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments.array());
+    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);

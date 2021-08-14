@@ -53,7 +53,7 @@ export const AddRolesAction = automodAction({
 
     await Promise.all(
       members.map(async member => {
-        const memberRoles = new Set(member.roles.cache.keyArray());
+        const memberRoles = new Set(member.roles.cache.keys());
         for (const roleId of rolesToAssign) {
           memberRoles.add(roleId as Snowflake);
           ignoreRoleChange(pluginData, member.id, roleId);

@@ -26,14 +26,6 @@ if (!process.env.KEY) {
   process.exit(1);
 }
 
-declare global {
-  // This is here so TypeScript doesn't give an error when importing twemoji
-  // since one of the signatures of twemoji.parse() takes an HTMLElement but
-  // we're not in a browser environment so including the DOM lib would not make
-  // sense
-  type HTMLElement = unknown;
-}
-
 // Error handling
 let recentPluginErrors = 0;
 const RECENT_PLUGIN_ERROR_EXIT_THRESHOLD = 5;
