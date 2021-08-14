@@ -16,7 +16,10 @@ export const RunAutomodOnVoiceStateUpdate = typedGuildEventListener<AutomodPlugi
     const context: AutomodContext = {
       member,
       timestamp,
-      voiceChannel: {},
+      voiceChannel: {
+        joined: null,
+        left: null,
+      },
       user: member.user,
     };
     let addToQueue = false;

@@ -141,8 +141,8 @@ export interface AutomodContext {
   };
   channel?: TextChannel | ThreadChannel;
   voiceChannel?: {
-    joined?: VoiceChannel | StageChannel;
-    left?: VoiceChannel | StageChannel;
+    joined?: VoiceChannel | StageChannel | null;
+    left?: VoiceChannel | StageChannel | null;
   };
 }
 
