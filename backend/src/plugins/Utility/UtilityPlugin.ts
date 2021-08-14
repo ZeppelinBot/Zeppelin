@@ -1,3 +1,4 @@
+import { MessageEmbedOptions } from "discord.js";
 import { PluginOptions } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -36,6 +37,7 @@ import { UserInfoCmd } from "./commands/UserInfoCmd";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
 import { AutoJoinThreadEvt, AutoJoinThreadSyncEvt } from "./events/AutoJoinThreadEvt";
+import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { ConfigSchema, UtilityPluginType } from "./types";
@@ -160,6 +162,12 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     clean(pluginData) {
       return (args: CleanArgs, msg) => {
         cleanCmd(pluginData, args, msg);
+      };
+    },
+
+    userInfo(pluginData) {
+      return (userId: string, requestMemberId?: string) => {
+        return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
       };
     },
   },
