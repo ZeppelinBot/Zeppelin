@@ -27,5 +27,8 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "dependencies": {
+    "knub": "^30.0.0-beta.39"
   }
 }
