@@ -39,17 +39,9 @@ export const NicknameCmd = utilityCmd({
     const oldNickname = args.member.nickname || "<none>";
 
     try {
-<<<<<<< HEAD
       await args.member.setNickname(args.nickname ?? null);
     } catch {
       msg.channel.send(errorMessage("Failed to change nickname"));
-=======
-      await args.member.edit({
-        nick: args.nickname,
-      });
-    } catch {
-      msg.channel.createMessage(errorMessage("Failed to change nickname"));
->>>>>>> 1ad3f4dd (removed unused exception parameter)
       return;
     }
 
