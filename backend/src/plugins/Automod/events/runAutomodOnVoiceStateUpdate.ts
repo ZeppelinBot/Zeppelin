@@ -13,43 +13,27 @@ export const RunAutomodOnVoiceStateUpdate = typedGuildEventListener<AutomodPlugi
     const member = newState.member ?? oldState.member ?? (await guild.members.fetch(newState.id).catch(noop));
     if (!member) return;
 
+    const context: AutomodContext = {
+      member,
+      timestamp,
+      voiceChannel: {},
+      user: member.user,
+    };
+    let addToQueue = false;
+
     if (!oldChannel && newChannel) {
-      const context: AutomodContext = {
-        member,
-        timestamp,
-        voiceChannel: {
-          joined: newChannel,
-        },
-        user: member.user,
-      };
-
-      pluginData.state.queue.add(() => {
-        runAutomod(pluginData, context);
-      });
+      context.voiceChannel!.joined = newChannel;
+      addToQueue = true;
     } else if (oldChannel && !newChannel) {
-      const context: AutomodContext = {
-        member,
-        timestamp,
-        voiceChannel: {
-          left: oldChannel,
-        },
-        user: member.user,
-      };
-
-      pluginData.state.queue.add(() => {
-        runAutomod(pluginData, context);
-      });
+      context.voiceChannel!.left = oldChannel;
+      addToQueue = true;
     } else if (oldChannel?.id && newChannel?.id && oldChannel.id === newChannel.id) {
-      const context: AutomodContext = {
-        member,
-        timestamp,
-        voiceChannel: {
-          left: oldChannel,
-          joined: newChannel,
-        },
-        user: member.user,
-      };
+      context.voiceChannel!.left = oldChannel;
+      context.voiceChannel!.joined = newChannel;
+      addToQueue = true;
+    }
 
+    if (addToQueue) {
       pluginData.state.queue.add(() => {
         runAutomod(pluginData, context);
       });
