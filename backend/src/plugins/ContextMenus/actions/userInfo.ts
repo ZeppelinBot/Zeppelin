@@ -9,11 +9,10 @@ export async function userInfoAction(pluginData: GuildPluginData<ContextMenuPlug
     channelId: interaction.channelId,
     member: executingMember,
   });
+  const utility = pluginData.getPlugin(UtilityPlugin);
 
-  // TODO: Add can_userinfo perm check
-  if (userCfg.can_use) {
-    const util = pluginData.getPlugin(UtilityPlugin);
-    const embed = await util.userInfo(interaction.targetId, interaction.user.id);
+  if (userCfg.can_use && (await utility.hasPermission(executingMember, interaction.channelId, "can_userinfo"))) {
+    const embed = await utility.userInfo(interaction.targetId, interaction.user.id);
     await interaction.followUp({ embeds: [embed] });
   } else {
     await interaction.followUp({ content: "Cannot info: insufficient permissions" });
