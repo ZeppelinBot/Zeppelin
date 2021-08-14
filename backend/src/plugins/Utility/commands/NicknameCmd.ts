@@ -1,6 +1,7 @@
+import { Util } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { errorMessage } from "../../../utils";
+import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { utilityCmd } from "../types";
 
 export const NicknameCmd = utilityCmd({
@@ -11,10 +12,19 @@ export const NicknameCmd = utilityCmd({
 
   signature: {
     member: ct.resolvedMember(),
-    nickname: ct.string({ catchAll: true }),
+    nickname: ct.string({ catchAll: true, required: false }),
   },
 
   async run({ message: msg, args, pluginData }) {
+    if (!args.nickname) {
+      if (!args.member.nickname) {
+        msg.channel.send(`<@!${args.member.id}> does not have a nickname`);
+      } else {
+        msg.channel.send(`The nickname of <@!${args.member.id}> is **${Util.escapeBold(args.nickname)}**`);
+      }
+      return;
+    }
+
     if (msg.member.id !== args.member.id && !canActOn(pluginData, msg.member, args.member)) {
       msg.channel.send(errorMessage("Cannot change nickname: insufficient permissions"));
       return;
@@ -29,9 +39,7 @@ export const NicknameCmd = utilityCmd({
     const oldNickname = args.member.nickname || "<none>";
 
     try {
-      await args.member.edit({
-        nick: args.nickname,
-      });
+      await args.member.setNickname(args.nickname ?? null);
     } catch {
       msg.channel.send(errorMessage("Failed to change nickname"));
       return;
