@@ -1,6 +1,6 @@
 import { MessageAttachment } from "discord.js";
 import fs from "fs";
-import sharp from "sharp";
+import photon from "@silvia-odwyer/photon-node";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
@@ -14,12 +14,24 @@ async function getBufferFromUrl(url: string): Promise<Buffer> {
   return fsp.readFile(downloadedEmoji.path);
 }
 
-async function resizeBuffer(input: Buffer, width: number, height: number): Promise<Buffer> {
-  return sharp(input, { density: 800 })
-    .resize(width, height, {
-      fit: "inside",
-    })
-    .toBuffer();
+function bufferToPhotonImage(input: Buffer): photon.PhotonImage {
+  const base64 = input
+    .toString("base64")
+    .replace(/^data:image\/\w+;base64,/, "");
+
+  return photon.PhotonImage.new_from_base64(base64);
+}
+
+function photonImageToBuffer(image: photon.PhotonImage): Buffer {
+  const base64 = image.get_base64()
+    .replace(/^data:image\/\w+;base64,/, "");
+  return Buffer.from(base64, "base64");
+}
+
+function resizeBuffer(input: Buffer, width: number, height: number): Buffer {
+  const photonImage = bufferToPhotonImage(input);
+  photon.resize(photonImage, width, height, photon.SamplingFilter.Lanczos3);
+  return photonImageToBuffer(photonImage);
 }
 
 const CDN_URL = "https://twemoji.maxcdn.com/2/svg";
