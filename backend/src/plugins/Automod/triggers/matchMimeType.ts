@@ -1,7 +1,7 @@
 import { automodTrigger } from "../helpers";
 import * as t from "io-ts";
-import { asSingleLine, messageSummary, verboseChannelMention } from "src/utils";
-import { Snowflake, TextChannel, Util } from "discord.js";
+import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
+import { GuildChannel, Util } from "discord.js";
 
 interface MatchResultType {
   matchedType: string;
@@ -33,7 +33,7 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
       const { contentType } = attachment;
 
       const blacklist = trigger.blacklist_enabled
-        ? (trigger.mime_type_blacklist || []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_blacklist ?? []).map(_t => _t.toLowerCase())
         : null;
 
       if (contentType && blacklist?.includes(contentType)) {
@@ -46,13 +46,13 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
       }
 
       const whitelist = trigger.whitelist_enabled
-        ? (trigger.mime_type_whitelist || []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_whitelist ?? []).map(_t => _t.toLowerCase())
         : null;
 
       if (whitelist && (!contentType || !whitelist.includes(contentType))) {
         return {
           extra: {
-            matchedType: contentType || "unknown",
+            matchedType: contentType || "<unknown>",
             mode: "whitelist",
           },
         };
@@ -64,8 +64,8 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const { message } = contexts[0];
-    const channel = pluginData.guild.channels.cache.get(message!.channel_id as Snowflake) as TextChannel;
-    const prettyChannel = verboseChannelMention(channel);
+    const channel = pluginData.guild.channels.resolve(message!.channel_id);
+    const prettyChannel = verboseChannelMention(channel as GuildChannel);
     const { matchedType, mode } = matchResult.extra;
 
     return (
