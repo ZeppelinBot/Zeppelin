@@ -25,7 +25,7 @@ export const NicknameResetCmd = utilityCmd({
     }
 
     try {
-      await args.member.setNickname("");
+      await args.member.setNickname(null);
     } catch {
       msg.channel.send(errorMessage("Failed to reset nickname"));
       return;
