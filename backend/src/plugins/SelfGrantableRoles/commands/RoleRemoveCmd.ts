@@ -51,12 +51,14 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
             msg.channel,
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord};` +
               ` couldn't recognize the other roles you mentioned`,
+            { users: [msg.author.id] },
           );
         } else {
           sendSuccessMessage(
             pluginData,
             msg.channel,
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`,
+            { users: [msg.author.id] },
           );
         }
       } catch {
@@ -64,6 +66,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
           pluginData,
           msg.channel,
           `<@!${msg.author.id}> Got an error while trying to remove the roles`,
+          { users: [msg.author.id] },
         );
       }
     } else {
@@ -71,6 +74,7 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
         pluginData,
         msg.channel,
         `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`,
+        { users: [msg.author.id] },
       );
     }
 
