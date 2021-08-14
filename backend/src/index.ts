@@ -19,6 +19,7 @@ import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
+import { loadYamlSafely } from "./utils/loadYamlSafely";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -209,7 +210,12 @@ connect().then(async () => {
         const key = id === "global" ? "global" : `guild-${id}`;
         const row = await guildConfigs.getActiveByKey(key);
         if (row) {
-          return yaml.safeLoad(row.config);
+          try {
+            return loadYamlSafely(row.config);
+          } catch (err) {
+            logger.error(`Error while loading config "${key}": ${err.message}`);
+            return {};
+          }
         }
 
         logger.warn(`No config with key "${key}"`);
