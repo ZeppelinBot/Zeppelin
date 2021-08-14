@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { StrictValidationError } from "src/validatorUtils";
-import { ConfigPreprocessorFn } from "../../../../../Knub/dist/config/configTypes";
+import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";

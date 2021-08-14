@@ -1,7 +1,7 @@
 import { ApplicationCommandData } from "discord.js";
 import { LogType } from "src/data/LogType";
 import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
-import { GuildPluginData } from "../../../../../../Knub/dist";
+import { GuildPluginData } from "knub";
 import { ContextMenuPluginType, ContextMenuTypeNameToNumber } from "../types";
 
 export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPluginType>) {

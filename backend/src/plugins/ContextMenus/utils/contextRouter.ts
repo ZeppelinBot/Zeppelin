@@ -1,5 +1,5 @@
 import { ContextMenuInteraction } from "discord.js";
-import { GuildPluginData } from "../../../../../../Knub/dist";
+import { GuildPluginData } from "knub";
 import { availableActions } from "../actions/availableActions";
 import { ContextMenuPluginType } from "../types";
 

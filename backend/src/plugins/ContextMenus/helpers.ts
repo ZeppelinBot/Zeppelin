@@ -1,7 +1,7 @@
 import { ContextMenuInteraction } from "discord.js";
 import * as t from "io-ts";
-import { GuildPluginData } from "../../../../../Knub/dist";
-import { Awaitable } from "../../../../../Knub/dist/utils";
+import { GuildPluginData } from "knub";
+import { Awaitable } from "knub/dist/utils";
 import { ContextMenuPluginType } from "./types";
 
 type ContextActionApplyFn<TConfigType> = (meta: {
