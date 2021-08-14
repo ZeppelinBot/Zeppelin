@@ -1,5 +1,5 @@
-import { selfGrantableRolesCmd } from "../types";
 import { asSingleLine, trimLines } from "../../../utils";
+import { selfGrantableRolesCmd } from "../types";
 import { getApplyingEntries } from "../util/getApplyingEntries";
 
 export const RoleHelpCmd = selfGrantableRolesCmd({
@@ -47,6 +47,6 @@ export const RoleHelpCmd = selfGrantableRolesCmd({
       color: parseInt("42bff4", 16),
     };
 
-    msg.channel.createMessage({ embed: helpEmbed });
+    msg.channel.send({ embeds: [helpEmbed] });
   },
 });

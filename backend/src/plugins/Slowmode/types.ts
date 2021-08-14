@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildSlowmodes } from "../../data/GuildSlowmodes";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildSlowmodes } from "../../data/GuildSlowmodes";
 
 export const ConfigSchema = t.type({
   use_native_slowmode: t.boolean,
@@ -19,6 +19,7 @@ export interface SlowmodePluginType extends BasePluginType {
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
     clearInterval: NodeJS.Timeout;
+    serverLogs: GuildLogs;
 
     onMessageCreateFn;
   };

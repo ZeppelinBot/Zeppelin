@@ -1,14 +1,13 @@
-import { GuildPluginData } from "knub";
-import { CensorPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { Embed, Invite } from "eris";
-import { ZalgoRegex } from "../../../data/Zalgo";
-import { getInviteCodesInString, getUrlsInString, resolveMember, resolveInvite, isGuildInvite } from "../../../utils";
-import cloneDeep from "lodash.clonedeep";
-import { censorMessage } from "./censorMessage";
+import { Invite, MessageEmbed } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { logger } from "../../../logger";
+import { GuildPluginData } from "knub";
+import cloneDeep from "lodash.clonedeep";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { ZalgoRegex } from "../../../data/Zalgo";
 import { allowTimeout } from "../../../RegExpRunner";
+import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils";
+import { CensorPluginType } from "../types";
+import { censorMessage } from "./censorMessage";
 
 export async function applyFiltersToMsg(
   pluginData: GuildPluginData<CensorPluginType>,
@@ -20,7 +19,7 @@ export async function applyFiltersToMsg(
   let messageContent = savedMessage.data.content || "";
   if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
   if (savedMessage.data.embeds) {
-    const embeds = (savedMessage.data.embeds as Embed[]).map(e => cloneDeep(e));
+    const embeds = (savedMessage.data.embeds as MessageEmbed[]).map(e => cloneDeep(e));
     for (const embed of embeds) {
       if (embed.type === "video") {
         // Ignore video descriptions as they're not actually shown on the embed
@@ -69,20 +68,20 @@ export async function applyFiltersToMsg(
       }
 
       if (isGuildInvite(invite)) {
-        if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild.id)) {
+        if (inviteGuildWhitelist && !inviteGuildWhitelist.includes(invite.guild!.id)) {
           censorMessage(
             pluginData,
             savedMessage,
-            `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) not found in whitelist`,
+            `invite guild (**${invite.guild!.name}** \`${invite.guild!.id}\`) not found in whitelist`,
           );
           return true;
         }
 
-        if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild.id)) {
+        if (inviteGuildBlacklist && inviteGuildBlacklist.includes(invite.guild!.id)) {
           censorMessage(
             pluginData,
             savedMessage,
-            `invite guild (**${invite.guild.name}** \`${invite.guild.id}\`) found in blacklist`,
+            `invite guild (**${invite.guild!.name}** \`${invite.guild!.id}\`) found in blacklist`,
           );
           return true;
         }

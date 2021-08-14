@@ -1,11 +1,11 @@
+import { Snowflake, TextChannel } from "discord.js";
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
+import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { resolveChannel, waitForReply } from "knub/dist/helpers";
-import { TextChannel, User } from "eris";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
+import { CountersPluginType } from "../types";
 
 export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters add", "counter add", "addcounter"],
@@ -66,14 +66,14 @@ export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let channel = args.channel;
     if (!channel && counter.per_channel) {
-      message.channel.createMessage(`Which channel's counter value would you like to add to?`);
+      message.channel.send(`Which channel's counter value would you like to add to?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
         return;
       }
 
-      const potentialChannel = resolveChannel(pluginData.guild, reply.content);
+      const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof TextChannel)) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;
@@ -84,7 +84,7 @@ export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let user = args.user;
     if (!user && counter.per_user) {
-      message.channel.createMessage(`Which user's counter value would you like to add to?`);
+      message.channel.send(`Which user's counter value would you like to add to?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -102,7 +102,7 @@ export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let amount = args.amount;
     if (!amount) {
-      message.channel.createMessage("How much would you like to add to the counter's value?");
+      message.channel.send("How much would you like to add to the counter's value?");
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -123,19 +123,15 @@ export const AddCounterCmd = typedGuildCommand<CountersPluginType>()({
     const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.createMessage(
+      message.channel.send(
         `Added ${amount} to **${counterName}** for <@!${user.id}> in <#${channel.id}>. The value is now ${newValue}.`,
       );
     } else if (channel) {
-      message.channel.createMessage(
-        `Added ${amount} to **${counterName}** in <#${channel.id}>. The value is now ${newValue}.`,
-      );
+      message.channel.send(`Added ${amount} to **${counterName}** in <#${channel.id}>. The value is now ${newValue}.`);
     } else if (user) {
-      message.channel.createMessage(
-        `Added ${amount} to **${counterName}** for <@!${user.id}>. The value is now ${newValue}.`,
-      );
+      message.channel.send(`Added ${amount} to **${counterName}** for <@!${user.id}>. The value is now ${newValue}.`);
     } else {
-      message.channel.createMessage(`Added ${amount} to **${counterName}**. The value is now ${newValue}.`);
+      message.channel.send(`Added ${amount} to **${counterName}**. The value is now ${newValue}.`);
     }
   },
 });

@@ -1,18 +1,18 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { ConfigSchema, SlowmodePluginType } from "./types";
-import { GuildSlowmodes } from "../../data/GuildSlowmodes";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildSlowmodes } from "../../data/GuildSlowmodes";
 import { SECONDS } from "../../utils";
-import { onMessageCreate } from "./util/onMessageCreate";
-import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
-import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
-import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd";
-import { SlowmodeListCmd } from "./commands/SlowmodeListCmd";
-import { SlowmodeGetCmd } from "./commands/SlowmodeGetCmd";
-import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd";
+import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
+import { SlowmodeGetCmd } from "./commands/SlowmodeGetCmd";
+import { SlowmodeListCmd } from "./commands/SlowmodeListCmd";
+import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
+import { ConfigSchema, SlowmodePluginType } from "./types";
+import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
+import { onMessageCreate } from "./util/onMessageCreate";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 
@@ -66,6 +66,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   afterLoad(pluginData) {
     const { state } = pluginData;
 
+    state.serverLogs = new GuildLogs(pluginData.guild.id);
     state.clearInterval = setInterval(() => clearExpiredSlowmodes(pluginData), BOT_SLOWMODE_CLEAR_INTERVAL);
 
     state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);

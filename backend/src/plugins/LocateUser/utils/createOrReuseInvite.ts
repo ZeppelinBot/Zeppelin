@@ -1,11 +1,11 @@
-import { VoiceChannel } from "eris";
+import { VoiceChannel } from "discord.js";
 
 export async function createOrReuseInvite(vc: VoiceChannel) {
-  const existingInvites = await vc.getInvites();
+  const existingInvites = await vc.fetchInvites();
 
-  if (existingInvites.length !== 0) {
-    return existingInvites[0];
+  if (existingInvites.size !== 0) {
+    return existingInvites.first()!;
   } else {
-    return vc.createInvite(undefined);
+    return vc.createInvite();
   }
 }

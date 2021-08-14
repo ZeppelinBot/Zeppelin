@@ -1,11 +1,10 @@
-import { reactionRolesCmd, TReactionRolePair } from "../types";
+import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
-import { RecoverablePluginError, ERRORS } from "../../../RecoverablePluginError";
-import { canUseEmoji, isDiscordRESTError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
-import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
+import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
+import { reactionRolesCmd, TReactionRolePair } from "../types";
+import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -41,9 +40,9 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage;
     try {
-      targetMessage = await args.message.channel.getMessage(args.message.messageId).catch(noop);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(noop);
     } catch (e) {
-      if (isDiscordRESTError(e)) {
+      if (isDiscordAPIError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
         return;
       }
@@ -96,15 +95,16 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         return;
       }
 
-      if (!pluginData.guild.roles.has(pair[1])) {
+      if (!pluginData.guild.roles.cache.has(pair[1] as Snowflake)) {
         sendErrorMessage(pluginData, msg.channel, `Unknown role ${pair[1]}`);
         return;
       }
     }
 
-    const progressMessage = msg.channel.createMessage("Adding reaction roles...");
+    const progressMessage = msg.channel.send("Adding reaction roles...");
 
     // Save the new reaction roles to the database
+    let pos = 0;
     for (const pair of emojiRolePairs) {
       await pluginData.state.reactionRoles.add(
         args.message.channel.id,
@@ -112,7 +112,9 @@ export const InitReactionRolesCmd = reactionRolesCmd({
         pair[0],
         pair[1],
         args.exclusive,
+        pos,
       );
+      pos++;
     }
 
     // Apply the reactions themselves

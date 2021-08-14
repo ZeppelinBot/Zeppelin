@@ -1,12 +1,11 @@
+import { Snowflake, TextChannel } from "discord.js";
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
+import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { resolveChannel, waitForReply } from "knub/dist/helpers";
-import { TextChannel, User } from "eris";
 import { resolveUser, UnknownUser } from "../../../utils";
-import { changeCounterValue } from "../functions/changeCounterValue";
 import { setCounterValue } from "../functions/setCounterValue";
+import { CountersPluginType } from "../types";
 
 export const SetCounterCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters set", "counter set", "setcounter"],
@@ -67,14 +66,14 @@ export const SetCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let channel = args.channel;
     if (!channel && counter.per_channel) {
-      message.channel.createMessage(`Which channel's counter value would you like to change?`);
+      message.channel.send(`Which channel's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
         return;
       }
 
-      const potentialChannel = resolveChannel(pluginData.guild, reply.content);
+      const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof TextChannel)) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;
@@ -85,7 +84,7 @@ export const SetCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let user = args.user;
     if (!user && counter.per_user) {
-      message.channel.createMessage(`Which user's counter value would you like to change?`);
+      message.channel.send(`Which user's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -103,7 +102,7 @@ export const SetCounterCmd = typedGuildCommand<CountersPluginType>()({
 
     let value = args.value;
     if (!value) {
-      message.channel.createMessage("What would you like to set the counter's value to?");
+      message.channel.send("What would you like to set the counter's value to?");
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
         sendErrorMessage(pluginData, message.channel, "Cancelling");
@@ -128,13 +127,13 @@ export const SetCounterCmd = typedGuildCommand<CountersPluginType>()({
     const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.createMessage(`Set **${counterName}** for <@!${user.id}> in <#${channel.id}> to ${value}`);
+      message.channel.send(`Set **${counterName}** for <@!${user.id}> in <#${channel.id}> to ${value}`);
     } else if (channel) {
-      message.channel.createMessage(`Set **${counterName}** in <#${channel.id}> to ${value}`);
+      message.channel.send(`Set **${counterName}** in <#${channel.id}> to ${value}`);
     } else if (user) {
-      message.channel.createMessage(`Set **${counterName}** for <@!${user.id}> to ${value}`);
+      message.channel.send(`Set **${counterName}** for <@!${user.id}> to ${value}`);
     } else {
-      message.channel.createMessage(`Set **${counterName}** to ${value}`);
+      message.channel.send(`Set **${counterName}** to ${value}`);
     }
   },
 });

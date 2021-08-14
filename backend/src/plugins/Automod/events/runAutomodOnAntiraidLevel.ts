@@ -1,7 +1,7 @@
+import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { AutomodContext, AutomodPluginType } from "../types";
 import { runAutomod } from "../functions/runAutomod";
-import { User } from "eris";
+import { AutomodContext, AutomodPluginType } from "../types";
 
 export async function runAutomodOnAntiraidLevel(
   pluginData: GuildPluginData<AutomodPluginType>,

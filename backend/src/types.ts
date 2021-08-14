@@ -1,6 +1,5 @@
-import { BaseConfig, Knub } from "knub";
 import * as t from "io-ts";
-import { Message } from "eris";
+import { BaseConfig, Knub } from "knub";
 
 export interface ZeppelinGuildConfig extends BaseConfig<any> {
   success_emoji?: string;
@@ -63,4 +62,41 @@ export interface CommandInfo {
   optionDescriptions?: {
     [key: string]: TMarkdown;
   };
+}
+
+export enum ChannelTypeStrings {
+  TEXT = "GUILD_TEXT",
+  DM = "DM",
+  VOICE = "GUILD_VOICE",
+  GROUP = "GROUP_DM",
+  CATEGORY = "GUILD_CATEGORY",
+  NEWS = "GUILD_NEWS",
+  STORE = "GUILD_STORE",
+  NEWS_THREAD = "GUILD_NEWS_THREAD",
+  PUBLIC_THREAD = "GUILD_PUBLIC_THREAD",
+  PRIVATE_THREAD = "GUILD_PRIVATE_THREAD",
+  STAGE = "GUILD_STAGE_VOICE",
+  UNKNOWN = "UNKNOWN",
+}
+
+export enum MessageTypeStrings {
+  "DEFAULT",
+  "RECIPIENT_ADD",
+  "RECIPIENT_REMOVE",
+  "CALL",
+  "CHANNEL_NAME_CHANGE",
+  "CHANNEL_ICON_CHANGE",
+  "PINS_ADD",
+  "GUILD_MEMBER_JOIN",
+  "USER_PREMIUM_GUILD_SUBSCRIPTION",
+  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_1",
+  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_2",
+  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3",
+  "CHANNEL_FOLLOW_ADD",
+  "GUILD_DISCOVERY_DISQUALIFIED",
+  "GUILD_DISCOVERY_REQUALIFIED",
+  "GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING",
+  "GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING",
+  "REPLY",
+  "APPLICATION_COMMAND",
 }

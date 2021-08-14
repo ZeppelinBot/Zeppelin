@@ -1,43 +1,47 @@
 import {
-  AllowedMentions,
-  Attachment,
   Client,
   Constants,
-  Embed,
-  EmbedOptions,
   Emoji,
   Guild,
-  GuildAuditLog,
-  GuildAuditLogEntry,
+  GuildAuditLogs,
+  GuildAuditLogsEntry,
   GuildChannel,
+  GuildMember,
   Invite,
-  InvitePartialChannel,
-  Member,
+  LimitedCollection,
   Message,
-  MessageContent,
-  PossiblyUncachedMessage,
-  TextableChannel,
+  MessageAttachment,
+  MessageEmbed,
+  MessageEmbedOptions,
+  MessageMentionOptions,
+  MessageOptions,
+  PartialChannelData,
+  PartialMessage,
+  Snowflake,
+  Sticker,
   TextChannel,
+  ThreadChannel,
   User,
-} from "eris";
-import { URL } from "url";
-import tlds from "tlds";
+  Util,
+} from "discord.js";
 import emojiRegex from "emoji-regex";
-import * as t from "io-ts";
-
+import { either } from "fp-ts/lib/Either";
+import { unsafeCoerce } from "fp-ts/lib/function";
 import fs from "fs";
 import https from "https";
-import tmp from "tmp";
-import { helpers } from "knub";
-import { SavedMessage } from "./data/entities/SavedMessage";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { either } from "fp-ts/lib/Either";
+import humanizeDuration from "humanize-duration";
+import * as t from "io-ts";
+import { isEqual } from "lodash";
 import moment from "moment-timezone";
+import tlds from "tlds";
+import tmp from "tmp";
+import { URL } from "url";
+import { SavedMessage } from "./data/entities/SavedMessage";
 import { SimpleCache } from "./SimpleCache";
-import { logger } from "./logger";
-import { unsafeCoerce } from "fp-ts/lib/function";
+import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
-import { LogType } from "./data/LogType";
+import { waitForButtonConfirm } from "./utils/waitForInteraction";
+import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const fsp = fs.promises;
 
@@ -73,13 +77,13 @@ export function isValidSnowflake(str: string) {
 }
 
 export const DISCORD_HTTP_ERROR_NAME = "DiscordHTTPError";
-export const DISCORD_REST_ERROR_NAME = "DiscordRESTError";
+export const DISCORD_REST_ERROR_NAME = "DiscordAPIError";
 
 export function isDiscordHTTPError(err: Error | string) {
   return typeof err === "object" && err.constructor?.name === DISCORD_HTTP_ERROR_NAME;
 }
 
-export function isDiscordRESTError(err: Error | string) {
+export function isDiscordAPIError(err: Error | string) {
   return typeof err === "object" && err.constructor?.name === DISCORD_REST_ERROR_NAME;
 }
 
@@ -168,6 +172,52 @@ function tDeepPartialProp(prop: any) {
   }
 }
 
+export function getScalarDifference<T>(
+  base: T,
+  object: T,
+  ignoreKeys: string[] = [],
+): Map<string, { was: any; is: any }> {
+  base = stripObjectToScalars(base) as T;
+  object = stripObjectToScalars(object) as T;
+  const diff = new Map<string, { was: any; is: any }>();
+
+  for (const [key, value] of Object.entries(object)) {
+    if (!isEqual(value, base[key]) && !ignoreKeys.includes(key)) {
+      diff.set(key, { was: base[key], is: value });
+    }
+  }
+
+  return diff;
+}
+
+// This is a stupid, messy solution that is not extendable at all.
+// If anyone plans on adding anything to this, they should rewrite this first.
+// I just want to get this done and this works for now :)
+export function prettyDifference(diff: Map<string, { was: any; is: any }>): Map<string, { was: any; is: any }> {
+  const toReturn = new Map<string, { was: any; is: any }>();
+
+  for (let [key, difference] of diff) {
+    if (key === "rateLimitPerUser") {
+      difference.is = humanizeDuration(difference.is * 1000);
+      difference.was = humanizeDuration(difference.was * 1000);
+      key = "slowmode";
+    }
+
+    toReturn.set(key, { was: difference.was, is: difference.is });
+  }
+
+  return toReturn;
+}
+
+export function differenceToString(diff: Map<string, { was: any; is: any }>): string {
+  let toReturn = "";
+  diff = prettyDifference(diff);
+  for (const [key, difference] of diff) {
+    toReturn += `**${key[0].toUpperCase() + key.slice(1)}**: \`${difference.was}\` ➜ \`${difference.is}\`\n`;
+  }
+  return toReturn;
+}
+
 // https://stackoverflow.com/a/49262929/316944
 export type Not<T, E> = T & Exclude<T, E>;
 
@@ -199,9 +249,9 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 }
 
 export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
-export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & { guild: Guild };
-export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite<CT> & {
-  channel: InvitePartialChannel;
+export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite & { guild: Guild };
+export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite & {
+  channel: PartialChannelData;
   type: typeof Constants.ChannelTypes.GROUP_DM;
 };
 
@@ -269,9 +319,15 @@ export const tEmbed = t.type({
   ),
 });
 
-export type EmbedWith<T extends keyof EmbedOptions> = EmbedOptions & Pick<Required<EmbedOptions>, T>;
+export type EmbedWith<T extends keyof MessageEmbedOptions> = MessageEmbedOptions &
+  Pick<Required<MessageEmbedOptions>, T>;
 
-export type StrictMessageContent = { content?: string; tts?: boolean; disableEveryone?: boolean; embed?: EmbedOptions };
+export type StrictMessageContent = {
+  content?: string;
+  tts?: boolean;
+  disableEveryone?: boolean;
+  embed?: MessageEmbedOptions;
+};
 
 export const tStrictMessageContent = t.type({
   content: tNullable(t.string),
@@ -458,16 +514,16 @@ export async function findRelevantAuditLogEntry(
   userId: string,
   attempts: number = 3,
   attemptDelay: number = 3000,
-): Promise<GuildAuditLogEntry | null> {
+): Promise<GuildAuditLogsEntry | null> {
   if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id)! > Date.now()) {
     return null;
   }
 
-  let auditLogs: GuildAuditLog | null = null;
+  let auditLogs: GuildAuditLogs | null = null;
   try {
-    auditLogs = await guild.getAuditLogs(5, undefined, actionType);
+    auditLogs = await guild.fetchAuditLogs({ limit: 5, type: actionType });
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 50013) {
+    if (isDiscordAPIError(e) && e.code === 50013) {
       // If we don't have permission to read audit log, set audit log requests on cooldown
       auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
     } else if (isDiscordHTTPError(e) && e.code === 500) {
@@ -479,7 +535,7 @@ export async function findRelevantAuditLogEntry(
     }
   }
 
-  const entries = auditLogs ? auditLogs.entries : [];
+  const entries = auditLogs ? [...auditLogs.entries.values()] : [];
 
   entries.sort((a, b) => {
     if (a.createdAt > b.createdAt) return -1;
@@ -490,7 +546,7 @@ export async function findRelevantAuditLogEntry(
   const cutoffTS = Date.now() - 1000 * 60 * 2;
 
   const relevantEntry = entries.find(entry => {
-    return entry.targetID === userId && entry.createdAt >= cutoffTS;
+    return (entry.target as { id }).id === userId && entry.createdTimestamp >= cutoffTS;
   });
 
   if (relevantEntry) {
@@ -730,21 +786,6 @@ export function deactivateMentions(content: string): string {
   return content.replace(/@/g, "@\u200b");
 }
 
-/**
- * Disable inline code in the given string by replacing backticks/grave accents with acute accents
- * FIXME: Find a better way that keeps the grave accents? Can't use the code block approach here since it's just 1 character.
- */
-export function disableInlineCode(content: string): string {
-  return content.replace(/`/g, "\u00b4");
-}
-
-/**
- * Disable code blocks in the given string by adding invisible unicode characters between backticks
- */
-export function disableCodeBlocks(content: string): string {
-  return content.replace(/`/g, "`\u200b");
-}
-
 export function useMediaUrls(content: string): string {
   return content.replace(/cdn\.discord(app)?\.com/g, "media.discordapp.net");
 }
@@ -830,13 +871,13 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextableChannel,
+  channel: TextChannel | User,
   messageText: string,
-  allowedMentions?: AllowedMentions,
+  allowedMentions?: MessageMentionOptions,
 ) {
   const chunks = chunkMessageLines(messageText);
   for (const chunk of chunks) {
-    await channel.createMessage({ content: chunk, allowedMentions });
+    await channel.send({ content: chunk, allowedMentions });
   }
 }
 
@@ -964,7 +1005,7 @@ export type CustomEmoji = {
   id: string;
 } & Emoji;
 
-export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel };
+export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel | ThreadChannel };
 
 export const disableUserNotificationStrings = ["no", "none", "off"];
 
@@ -1011,7 +1052,7 @@ export async function notifyUser(
       }
     } else if (method.type === "channel") {
       try {
-        await method.channel.createMessage({
+        await method.channel.send({
           content: `<@!${user.id}> ${body}`,
           allowedMentions: { users: [user.id] },
         });
@@ -1044,6 +1085,7 @@ export class UnknownUser {
   public id: string;
   public username = "Unknown";
   public discriminator = "0000";
+  public tag = "Unknown#0000";
 
   constructor(props = {}) {
     for (const key in props) {
@@ -1112,7 +1154,7 @@ export function resolveUserId(bot: Client, value: string) {
   // A non-mention, full username?
   const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
   if (usernameMatch) {
-    const user = bot.users.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    const user = bot.users.cache.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
     if (user) return user.id;
   }
 
@@ -1130,7 +1172,7 @@ export function resolveUserId(bot: Client, value: string) {
  */
 export function getUser(client: Client, userResolvable: string): User | UnknownUser {
   const id = resolveUserId(client, userResolvable);
-  return id ? client.users.get(id) || new UnknownUser({ id }) : new UnknownUser();
+  return id ? client.users.resolve(id as Snowflake) || new UnknownUser({ id }) : new UnknownUser();
 }
 
 /**
@@ -1150,8 +1192,8 @@ export async function resolveUser<T>(bot, value) {
   }
 
   // If we have the user cached, return that directly
-  if (bot.users.has(userId)) {
-    return bot.users.get(userId);
+  if (bot.users.cache.has(userId)) {
+    return bot.users.fetch(userId);
   }
 
   // We don't want to spam the API by trying to fetch unknown users again and again,
@@ -1160,9 +1202,8 @@ export async function resolveUser<T>(bot, value) {
     return new UnknownUser({ id: userId });
   }
 
-  const freshUser = await bot.getRESTUser(userId).catch(noop);
+  const freshUser = await bot.users.fetch(userId, true, true).catch(noop);
   if (freshUser) {
-    bot.users.add(freshUser, bot);
     return freshUser;
   }
 
@@ -1176,13 +1217,18 @@ export async function resolveUser<T>(bot, value) {
  * Resolves a guild Member from the passed user id, user mention, or full username (with discriminator).
  * If the member is not found in the cache, it's fetched from the API.
  */
-export async function resolveMember(bot: Client, guild: Guild, value: string, fresh = false): Promise<Member | null> {
+export async function resolveMember(
+  bot: Client,
+  guild: Guild,
+  value: string,
+  fresh = false,
+): Promise<GuildMember | null> {
   const userId = resolveUserId(bot, value);
   if (!userId) return null;
 
   // If we have the member cached, return that directly
-  if (guild.members.has(userId) && !fresh) {
-    return guild.members.get(userId) || null;
+  if (guild.members.cache.has(userId as Snowflake) && !fresh) {
+    return guild.members.cache.get(userId as Snowflake) || null;
   }
 
   // We don't want to spam the API by trying to fetch unknown members again and again,
@@ -1192,9 +1238,9 @@ export async function resolveMember(bot: Client, guild: Guild, value: string, fr
     return null;
   }
 
-  const freshMember = await bot.getRESTGuildMember(guild.id, userId).catch(noop);
+  const freshMember = await guild.members.fetch({ user: userId as Snowflake, force: true }).catch(noop);
   if (freshMember) {
-    freshMember.id = userId;
+    // freshMember.id = userId; // I dont even know why this is here -Dark
     return freshMember;
   }
 
@@ -1222,7 +1268,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   }
 
   // Role name
-  const roleList = await bot.getRESTGuildRoles(guildId);
+  const roleList = (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role[0]) {
     return role[0].id;
@@ -1236,11 +1282,9 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
-const inviteCache = new SimpleCache<Promise<Invite<any> | null>>(10 * MINUTES, 200);
+const inviteCache = new SimpleCache<Promise<Invite | null>>(10 * MINUTES, 200);
 
-type ResolveInviteReturnType<T extends boolean> = Promise<
-  (T extends true ? Invite<"withCount" | "withMetadata"> : Invite<"withMetadata">) | null
->;
+type ResolveInviteReturnType<T extends boolean> = Promise<Invite | null>;
 export async function resolveInvite<T extends boolean>(
   client: Client,
   code: string,
@@ -1252,32 +1296,44 @@ export async function resolveInvite<T extends boolean>(
     return inviteCache.get(key) as ResolveInviteReturnType<T>;
   }
 
-  // @ts-ignore: the getInvite() withCounts typings are blergh
-  const promise = client.getInvite(code, withCounts).catch(() => null);
+  const promise = client.fetchInvite(code).catch(() => null);
   inviteCache.set(key, promise);
 
   return promise as ResolveInviteReturnType<T>;
 }
 
-export async function confirm(bot: Client, channel: TextableChannel, userId: string, content: MessageContent) {
-  const msg = await channel.createMessage(content);
-  const reply = await helpers.waitForReaction(bot, msg, ["✅", "❌"], userId);
-  msg.delete().catch(noop);
-  return reply && reply.name === "✅";
+const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection({ maxSize: 500 });
+
+export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Sticker | null> {
+  const cachedSticker = internalStickerCache.get(id);
+  if (cachedSticker) return cachedSticker;
+
+  const fetchedSticker = await bot.fetchSticker(id).catch(() => null);
+  if (fetchedSticker) {
+    internalStickerCache.set(id, fetchedSticker);
+  }
+
+  return fetchedSticker;
+}
+
+export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
+  return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```\n" + (msg.data.content ? disableCodeBlocks(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find(e => (e as Embed).type === "rich");
-  if (richEmbed) result += "Embed:```" + disableCodeBlocks(JSON.stringify(richEmbed)) + "```";
+  const richEmbed = (msg.data.embeds || []).find(e => (e as MessageEmbed).type === "rich");
+  if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments) {
     result +=
-      "Attachments:\n" + msg.data.attachments.map((a: Attachment) => disableLinkPreviews(a.url)).join("\n") + "\n";
+      "Attachments:\n" +
+      msg.data.attachments.map((a: MessageAttachment) => disableLinkPreviews(a.url)).join("\n") +
+      "\n";
   }
 
   return result;
@@ -1285,23 +1341,23 @@ export function messageSummary(msg: SavedMessage) {
 
 export function verboseUserMention(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `<@!${user.id}> (**${user.username}#${user.discriminator}**, \`${user.id}\`)`;
+  return `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.username}#${user.discriminator}**`;
+    return `**${user.tag}**`;
   }
 
-  return `**${user.username}#${user.discriminator}** (\`${user.id}\`)`;
+  return `**${user.tag}** (\`${user.id}\`)`;
 }
 
 export function verboseChannelMention(channel: GuildChannel): string {
   const plainTextName =
-    channel.type === Constants.ChannelTypes.GUILD_VOICE || channel.type === Constants.ChannelTypes.GUILD_STAGE
+    channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
       ? channel.name
       : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
@@ -1396,8 +1452,8 @@ export function canUseEmoji(client: Client, emoji: string): boolean {
   if (isUnicodeEmoji(emoji)) {
     return true;
   } else if (isSnowflake(emoji)) {
-    for (const guild of client.guilds.values()) {
-      if (guild.emojis.some(e => (e as any).id === emoji)) {
+    for (const guild of client.guilds.cache) {
+      if (guild[1].emojis.cache.some(e => (e as any).id === emoji)) {
         return true;
       }
     }
@@ -1420,19 +1476,19 @@ export function trimMultilineString(str) {
 }
 export const trimPluginDescription = trimMultilineString;
 
-export function isFullMessage(msg: PossiblyUncachedMessage): msg is Message {
+export function isFullMessage(msg: Message | PartialMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GuildInvite<CT> {
+export function isGuildInvite<CT extends InviteOpts>(invite: Invite): invite is GuildInvite<CT> {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite<CT>): invite is GroupDMInvite<CT> {
-  return invite.guild == null && invite.channel?.type === Constants.ChannelTypes.GROUP_DM;
+export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite): invite is GroupDMInvite<CT> {
+  return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
 }
 
-export function inviteHasCounts(invite: Invite<any>): invite is Invite<"withCount"> {
+export function inviteHasCounts(invite: Invite): invite is Invite {
   return invite.memberCount != null;
 }
 

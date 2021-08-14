@@ -1,9 +1,9 @@
+import { Message, Snowflake, TextChannel } from "discord.js";
+import { noop, resolveMember } from "../../../utils";
+import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 import { starboardEvt } from "../types";
-import { Message, TextChannel } from "eris";
-import { UnknownUser, resolveMember, noop, resolveUser } from "../../../utils";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
-import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
@@ -11,30 +11,27 @@ export const StarboardReactionAddEvt = starboardEvt({
   async listener(meta) {
     const pluginData = meta.pluginData;
 
-    let msg = meta.args.message as Message;
-    const userId = meta.args.member.id;
-    const emoji = meta.args.emoji;
+    let msg = meta.args.reaction.message as Message;
+    const userId = meta.args.user.id;
+    const emoji = meta.args.reaction.emoji;
 
     if (!msg.author) {
       // Message is not cached, fetch it
       try {
-        msg = await msg.channel.getMessage(msg.id);
+        msg = await msg.channel.messages.fetch(msg.id);
       } catch {
         // Sometimes we get this event for messages we can't fetch with getMessage; ignore silently
         return;
       }
     }
 
-    // No self-votes!
-    if (msg.author.id === userId) return;
-
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
-    if (!member || member.bot) return;
+    if (!member || member.user.bot) return;
 
     const config = await pluginData.config.getMatchingConfig({
       member,
       channelId: msg.channel.id,
-      categoryId: (msg.channel as TextChannel).parentID,
+      categoryId: (msg.channel as TextChannel).parentId,
     });
 
     const boardLock = await pluginData.locks.acquire(allStarboardsLock());
@@ -61,7 +58,10 @@ export const StarboardReactionAddEvt = starboardEvt({
         });
       });
 
+    const selfStar = msg.author.id === userId;
     for (const starboard of applicableStarboards) {
+      if (selfStar && !starboard.allow_selfstars) continue;
+
       // Save reaction into the database
       await pluginData.state.starboardReactions.createStarboardReaction(msg.id, userId).catch(noop);
 
@@ -76,9 +76,11 @@ export const StarboardReactionAddEvt = starboardEvt({
         // If the message has already been posted to this starboard, update star counts
         if (starboard.show_star_count) {
           for (const starboardMessage of starboardMessages) {
-            const realStarboardMessage = await pluginData.client.getMessage(
-              starboardMessage.starboard_channel_id,
-              starboardMessage.starboard_message_id,
+            const channel = pluginData.guild.channels.cache.get(
+              starboardMessage.starboard_channel_id as Snowflake,
+            ) as TextChannel;
+            const realStarboardMessage = await channel.messages.fetch(
+              starboardMessage.starboard_message_id as Snowflake,
             );
             await updateStarboardMessageStarCount(
               starboard,

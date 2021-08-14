@@ -1,7 +1,9 @@
+import { MessageEmbedOptions, Snowflake } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
+import moment from "moment-timezone";
+import { ChannelTypeStrings } from "../../../types";
 import {
-  embedPadding,
   EmbedWith,
   formatNumber,
   inviteHasCounts,
@@ -12,21 +14,20 @@ import {
   resolveUser,
   trimLines,
 } from "../../../utils";
-import { CategoryChannel, EmbedOptions, Guild, TextChannel, VoiceChannel } from "eris";
-import moment from "moment-timezone";
-import humanizeDuration from "humanize-duration";
-import { getGuildPreview } from "./getGuildPreview";
+import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { UtilityPluginType } from "../types";
+import { getGuildPreview } from "./getGuildPreview";
 
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
   requestMemberId?: string,
-): Promise<EmbedOptions | null> {
+): Promise<MessageEmbedOptions | null> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
-      ? memoize(() => pluginData.client.getRESTGuild(serverId), `getRESTGuild_${serverId}`, 10 * MINUTES)
+      ? memoize(() => pluginData.client.guilds.fetch(serverId as Snowflake), `getRESTGuild_${serverId}`, 10 * MINUTES)
       : null,
     getGuildPreview(pluginData.client, serverId),
   ]);
@@ -46,12 +47,12 @@ export async function getServerInfoEmbed(
 
   embed.author = {
     name: `Server:  ${(guildPreview || restGuild)!.name}`,
-    icon_url: (guildPreview || restGuild)!.iconURL ?? undefined,
+    iconURL: (guildPreview || restGuild)!.iconURL() ?? undefined,
   };
 
   // BASIC INFORMATION
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc((guildPreview || restGuild)!.createdAt, "x");
+  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
   const tzCreatedAt = requestMemberId
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
@@ -65,11 +66,11 @@ export async function getServerInfoEmbed(
   basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
 
   if (thisServer) {
-    const owner = await resolveUser(pluginData.client, thisServer.ownerID);
-    const ownerName = `${owner.username}#${owner.discriminator}`;
+    const owner = await resolveUser(pluginData.client, thisServer.ownerId);
+    const ownerName = owner.tag;
 
-    basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerID}\`)`);
-    basicInformation.push(`Voice region: **${thisServer.region}**`);
+    basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
+    // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
   }
 
   if (features.length > 0) {
@@ -82,12 +83,11 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL})`;
-  const bannerUrl = restGuild?.bannerURL ? `[Link](${restGuild.bannerURL})` : "None";
-  const splashUrl =
-    (restGuild || guildPreview)!.splashURL != null
-      ? `[Link](${(restGuild || guildPreview)!.splashURL?.replace("size=128", "size=2048")})`
-      : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const splashUrl = (restGuild || guildPreview)!.splash
+    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    : "None";
 
   embed.fields.push(
     {
@@ -113,33 +113,33 @@ export async function getServerInfoEmbed(
     restGuild?.approximateMemberCount ||
     restGuild?.memberCount ||
     thisServer?.memberCount ||
-    thisServer?.members.size ||
+    thisServer?.members.cache.size ||
     0;
 
   let onlineMemberCount = (guildPreview?.approximatePresenceCount || restGuild?.approximatePresenceCount)!;
 
-  if (onlineMemberCount == null && restGuild?.vanityURL) {
+  if (onlineMemberCount == null && restGuild?.vanityURLCode) {
     // For servers with a vanity URL, we can also use the numbers from the invite for online count
-    const invite = await resolveInvite(pluginData.client, restGuild.vanityURL!, true);
+    const invite = await resolveInvite(pluginData.client, restGuild.vanityURLCode!, true);
     if (invite && inviteHasCounts(invite)) {
       onlineMemberCount = invite.presenceCount;
     }
   }
 
   if (!onlineMemberCount && thisServer) {
-    onlineMemberCount = thisServer.members.filter(m => m.status !== "offline").length; // Extremely inaccurate fallback
+    onlineMemberCount = thisServer.members.cache.filter(m => m.presence?.status !== "offline").size; // Extremely inaccurate fallback
   }
 
   const offlineMemberCount = totalMembers - onlineMemberCount;
 
   let memberCountTotalLines = `Total: **${formatNumber(totalMembers)}**`;
-  if (restGuild?.maxMembers) {
-    memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maxMembers)}**`;
+  if (restGuild?.maximumMembers) {
+    memberCountTotalLines += `\nMax: **${formatNumber(restGuild.maximumMembers)}**`;
   }
 
   let memberCountOnlineLines = `Online: **${formatNumber(onlineMemberCount)}**`;
-  if (restGuild?.maxPresences) {
-    memberCountOnlineLines += `\nMax online: **${formatNumber(restGuild.maxPresences)}**`;
+  if (restGuild?.maximumPresences) {
+    memberCountOnlineLines += `\nMax online: **${formatNumber(restGuild.maximumPresences)}**`;
   }
 
   embed.fields.push({
@@ -154,19 +154,19 @@ export async function getServerInfoEmbed(
 
   // CHANNEL COUNTS
   if (thisServer) {
-    const totalChannels = thisServer.channels.size;
-    const categories = thisServer.channels.filter(channel => channel instanceof CategoryChannel);
-    const textChannels = thisServer.channels.filter(channel => channel instanceof TextChannel);
-    const voiceChannels = thisServer.channels.filter(channel => channel instanceof VoiceChannel);
+    const totalChannels = thisServer.channels.cache.size;
+    const categories = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.CATEGORY);
+    const textChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.TEXT);
+    const voiceChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.VOICE);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
       inline: true,
       value: trimLines(`
           Total: **${totalChannels}** / 500
-          Categories: **${categories.length}**
-          Text: **${textChannels.length}**
-          Voice: **${voiceChannels.length}**
+          Categories: **${categories.size}**
+          Text: **${textChannels.size}**
+          Voice: **${voiceChannels.size}**
         `),
     });
   }
@@ -175,7 +175,7 @@ export async function getServerInfoEmbed(
   const otherStats: string[] = [];
 
   if (thisServer) {
-    otherStats.push(`Roles: **${thisServer.roles.size}** / 250`);
+    otherStats.push(`Roles: **${thisServer.roles.cache.size}** / 250`);
   }
 
   if (restGuild) {
@@ -186,9 +186,19 @@ export async function getServerInfoEmbed(
         2: 150,
         3: 250,
       }[restGuild.premiumTier] || 50;
-    otherStats.push(`Emojis: **${restGuild.emojis.length}** / ${maxEmojis * 2}`);
+    const maxStickers =
+      {
+        0: 0,
+        1: 15,
+        2: 30,
+        3: 60,
+      }[restGuild.premiumTier] || 0;
+
+    otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
+    otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
-    otherStats.push(`Emojis: **${guildPreview!.emojis.length}**`);
+    otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
+    // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
   }
 
   if (thisServer) {

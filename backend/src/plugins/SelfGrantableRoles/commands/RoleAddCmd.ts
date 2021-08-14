@@ -1,12 +1,12 @@
-import { selfGrantableRolesCmd } from "../types";
+import { Role, Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getApplyingEntries } from "../util/getApplyingEntries";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { splitRoleNames } from "../util/splitRoleNames";
-import { normalizeRoleNames } from "../util/normalizeRoleNames";
-import { findMatchingRoles } from "../util/findMatchingRoles";
-import { Role } from "eris";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { selfGrantableRolesCmd } from "../types";
+import { findMatchingRoles } from "../util/findMatchingRoles";
+import { getApplyingEntries } from "../util/getApplyingEntries";
+import { normalizeRoleNames } from "../util/normalizeRoleNames";
+import { splitRoleNames } from "../util/splitRoleNames";
 
 export const RoleAddCmd = selfGrantableRolesCmd({
   trigger: ["role", "role add"],
@@ -31,7 +31,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     const hasUnknownRoles = matchedRoleIds.length !== roleNames.length;
 
     const rolesToAdd: Map<string, Role> = Array.from(matchedRoleIds.values())
-      .map(id => pluginData.guild.roles.get(id)!)
+      .map(id => pluginData.guild.roles.cache.get(id as Snowflake)!)
       .filter(Boolean)
       .reduce((map, role) => {
         map.set(role.id, role);
@@ -49,7 +49,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     }
 
     // Grant the roles
-    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles]);
+    const newRoleIds = new Set([...rolesToAdd.keys(), ...msg.member.roles.cache.keys()]);
 
     // Remove extra roles (max_roles) for each entry
     const skipped: Set<Role> = new Set();
@@ -68,10 +68,10 @@ export const RoleAddCmd = selfGrantableRolesCmd({
             newRoleIds.delete(roleId);
             rolesToAdd.delete(roleId);
 
-            if (msg.member.roles.includes(roleId)) {
-              removed.add(pluginData.guild.roles.get(roleId)!);
+            if (msg.member.roles.cache.has(roleId as Snowflake)) {
+              removed.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
             } else {
-              skipped.add(pluginData.guild.roles.get(roleId)!);
+              skipped.add(pluginData.guild.roles.cache.get(roleId as Snowflake)!);
             }
           }
         }
@@ -80,7 +80,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
 
     try {
       await msg.member.edit({
-        roles: Array.from(newRoleIds),
+        roles: Array.from(newRoleIds) as Snowflake[],
       });
     } catch {
       sendErrorMessage(

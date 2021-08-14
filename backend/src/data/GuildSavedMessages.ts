@@ -1,12 +1,13 @@
-import { getRepository, Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
-import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { GuildChannel, Message, PossiblyUncachedTextableChannel } from "eris";
+import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
-import { MINUTES, SECONDS } from "../utils";
+import { getRepository, Repository } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { isAPI } from "../globals";
+import { QueuedEventEmitter } from "../QueuedEventEmitter";
+import { MINUTES, SECONDS } from "../utils";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { cleanupMessages } from "./cleanup/messages";
+import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 
 if (!isAPI()) {
   const CLEANUP_INTERVAL = 5 * MINUTES;
@@ -34,19 +35,19 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.toBePermanent = new Set();
   }
 
-  public msgToSavedMessageData(msg: Message<PossiblyUncachedTextableChannel>): ISavedMessageData {
+  public msgToSavedMessageData(msg: Message): ISavedMessageData {
     const data: ISavedMessageData = {
       author: {
         username: msg.author.username,
         discriminator: msg.author.discriminator,
       },
       content: msg.content,
-      timestamp: msg.timestamp,
+      timestamp: msg.createdTimestamp,
     };
 
-    if (msg.attachments.length) data.attachments = msg.attachments;
+    if (msg.attachments.size) data.attachments = [...msg.attachments.values()];
     if (msg.embeds.length) data.embeds = msg.embeds;
-    if (msg.stickers?.length) data.stickers = msg.stickers;
+    if (msg.stickers?.size) data.stickers = [...msg.stickers.values()];
 
     return data;
   }
@@ -139,12 +140,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.events.emit(`create:${data.id}`, [inserted]);
   }
 
-  async createFromMsg(msg: Message<PossiblyUncachedTextableChannel>, overrides = {}) {
+  async createFromMsg(msg: Message, overrides = {}) {
     const existingSavedMsg = await this.find(msg.id);
     if (existingSavedMsg) return;
 
     const savedMessageData = this.msgToSavedMessageData(msg);
-    const postedAt = moment.utc(msg.timestamp, "x").format("YYYY-MM-DD HH:mm:ss");
+    const postedAt = moment.utc(msg.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
     const data = {
       id: msg.id,
@@ -157,6 +158,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
     };
 
     return this.create({ ...data, ...overrides });
+  }
+
+  async createFromMessages(messages: Message[], overrides = {}) {
+    for (const msg of messages) {
+      await this.createFromMsg(msg, overrides);
+    }
   }
 
   async markAsDeleted(id) {
@@ -211,10 +218,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
 
     const newMessage = { ...oldMessage, data: newData };
 
+    // @ts-ignore
     await this.messages.update(
+      // FIXME?
       { id },
       {
-        data: newData,
+        data: newData as QueryDeepPartialEntity<ISavedMessageData>,
       },
     );
 
@@ -222,7 +231,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     this.events.emit(`update:${id}`, [newMessage, oldMessage]);
   }
 
-  async saveEditFromMsg(msg: Message<PossiblyUncachedTextableChannel>) {
+  async saveEditFromMsg(msg: Message) {
     const newData = this.msgToSavedMessageData(msg);
     return this.saveEdit(msg.id, newData);
   }

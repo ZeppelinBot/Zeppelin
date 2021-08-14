@@ -1,6 +1,6 @@
-import { EmbedWith, EMPTY_CHAR, messageLink } from "../../../utils";
-import { EmbedOptions, GuildChannel, Message } from "eris";
+import { GuildChannel, Message } from "discord.js";
 import path from "path";
+import { EmbedWith, EMPTY_CHAR } from "../../../utils";
 
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 const audioAttachmentExtensions = ["wav", "mp3", "m4a"];
@@ -18,19 +18,17 @@ export function createStarboardEmbedFromMessage(
       text: `#${(msg.channel as GuildChannel).name}`,
     },
     author: {
-      name: `${msg.author.username}#${msg.author.discriminator}`,
+      name: msg.author.tag,
     },
     fields: [],
-    timestamp: new Date(msg.timestamp).toISOString(),
+    timestamp: msg.createdTimestamp,
   };
 
   if (color != null) {
     embed.color = color;
   }
 
-  if (msg.author.avatarURL) {
-    embed.author.icon_url = msg.author.avatarURL;
-  }
+  embed.author.icon_url = msg.author.displayAvatarURL({ dynamic: true });
 
   // The second condition here checks for messages with only an image link that is then embedded.
   // The message content in that case is hidden by the Discord client, so we hide it here too.
@@ -59,15 +57,15 @@ export function createStarboardEmbedFromMessage(
   }
 
   // If there are no embeds, add the first image attachment explicitly
-  else if (msg.attachments.length) {
+  else if (msg.attachments.size) {
     for (const attachment of msg.attachments) {
       const ext = path
-        .extname(attachment.filename)
+        .extname(attachment[1].name!)
         .slice(1)
         .toLowerCase();
 
       if (imageAttachmentExtensions.includes(ext)) {
-        embed.image = { url: attachment.url };
+        embed.image = { url: attachment[1].url };
         break;
       }
 

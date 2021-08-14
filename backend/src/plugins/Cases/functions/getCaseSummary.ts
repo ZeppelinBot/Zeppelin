@@ -1,22 +1,12 @@
 import { GuildPluginData } from "knub";
-import { CasesPluginType } from "../types";
-import {
-  convertDelayStringToMS,
-  DAYS,
-  DBDateFormat,
-  disableLinkPreviews,
-  emptyEmbedValue,
-  messageLink,
-} from "../../../utils";
-import { CaseTypes, CaseTypeToName } from "../../../data/CaseTypes";
+import { splitMessageIntoChunks } from "knub/dist/helpers";
 import moment from "moment-timezone";
 import { Case } from "../../../data/entities/Case";
-import humanizeDuration from "humanize-duration";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { caseAbbreviations } from "../caseAbbreviations";
-import { getCaseIcon } from "./getCaseIcon";
+import { convertDelayStringToMS, DAYS, DBDateFormat, disableLinkPreviews, messageLink } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { splitIntoCleanChunks, splitMessageIntoChunks } from "knub/dist/helpers";
+import { caseAbbreviations } from "../caseAbbreviations";
+import { CasesPluginType } from "../types";
+import { getCaseIcon } from "./getCaseIcon";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;

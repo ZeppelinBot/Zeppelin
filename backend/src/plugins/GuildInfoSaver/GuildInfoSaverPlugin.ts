@@ -1,9 +1,9 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { GuildInfoSaverPluginType } from "./types";
 import { MINUTES } from "../../utils";
-import * as t from "io-ts";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { GuildInfoSaverPluginType } from "./types";
 
 export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
   name: "guild_info_saver",
@@ -29,7 +29,7 @@ function updateGuildInfo(pluginData: GuildPluginData<GuildInfoSaverPluginType>) 
   pluginData.state.allowedGuilds.updateInfo(
     pluginData.guild.id,
     pluginData.guild.name,
-    pluginData.guild.iconURL,
-    pluginData.guild.ownerID,
+    pluginData.guild.iconURL(),
+    pluginData.guild.ownerId,
   );
 }

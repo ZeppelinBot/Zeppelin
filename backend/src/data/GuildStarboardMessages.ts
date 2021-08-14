@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { StarboardMessage } from "./entities/StarboardMessage";
 
 export class GuildStarboardMessages extends BaseGuildRepository {

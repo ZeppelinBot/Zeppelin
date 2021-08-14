@@ -1,13 +1,13 @@
-import { Tag, TagsPluginType } from "../types";
-import { Member } from "eris";
+import { GuildMember } from "discord.js";
 import * as t from "io-ts";
-import { renderRecursively, StrictMessageContent, stripObjectToScalars } from "../../../utils";
-import { parseArguments } from "knub-command-manager";
-import { TemplateParseError } from "../../../templateFormatter";
 import { GuildPluginData } from "knub";
-import { logger } from "../../../logger";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { parseArguments } from "knub-command-manager";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
+import { TemplateParseError } from "../../../templateFormatter";
+import { StrictMessageContent } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { Tag, TagsPluginType } from "../types";
 import { renderTagBody } from "./renderTagBody";
 
 export async function renderTagFromString(
@@ -16,7 +16,7 @@ export async function renderTagFromString(
   prefix: string,
   tagName: string,
   tagBody: t.TypeOf<typeof Tag>,
-  member: Member,
+  member: GuildMember,
 ): Promise<StrictMessageContent | null> {
   const variableStr = str.slice(prefix.length + tagName.length).trim();
   const tagArgs = parseArguments(variableStr).map(v => v.value);
@@ -28,8 +28,8 @@ export async function renderTagFromString(
       tagBody,
       tagArgs,
       {
-        member: stripObjectToScalars(member, ["user"]),
-        user: stripObjectToScalars(member.user),
+        member: memberToConfigAccessibleMember(member),
+        user: userToConfigAccessibleUser(member.user),
       },
       { member },
     );

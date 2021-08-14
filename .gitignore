@@ -77,3 +77,5 @@ npm-audit.txt
 # Debug files
 *.debug.ts
 *.debug.js
+
+.vscode/

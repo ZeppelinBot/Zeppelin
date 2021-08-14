@@ -1,22 +1,22 @@
-import { Invite, Member, TextableChannel, VoiceChannel } from "eris";
-import { getInviteLink } from "knub/dist/helpers";
-import { createOrReuseInvite } from "./createOrReuseInvite";
+import { GuildMember, Invite, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
+import { getInviteLink } from "knub/dist/helpers";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { LocateUserPluginType } from "../types";
+import { createOrReuseInvite } from "./createOrReuseInvite";
 
 export async function sendWhere(
   pluginData: GuildPluginData<LocateUserPluginType>,
-  member: Member,
-  channel: TextableChannel,
+  member: GuildMember,
+  channel: TextChannel,
   prepend: string,
 ) {
-  const voice = member.voiceState.channelID
-    ? (pluginData.guild.channels.get(member.voiceState.channelID) as VoiceChannel)
+  const voice = member.voice.channelId
+    ? (pluginData.guild.channels.resolve(member.voice.channelId) as VoiceChannel)
     : null;
 
   if (voice == null) {
-    channel.createMessage(prepend + "That user is not in a channel");
+    channel.send(prepend + "That user is not in a channel");
   } else {
     let invite: Invite;
     try {
@@ -25,9 +25,9 @@ export async function sendWhere(
       sendErrorMessage(pluginData, channel, "Cannot create an invite to that channel!");
       return;
     }
-    channel.createMessage({
-      content: prepend + `${member.mention} is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
-      allowedMentions: { users: true },
+    channel.send({
+      content: prepend + `<@${member.id}> is in the following channel: \`${voice.name}\` ${getInviteLink(invite)}`,
+      allowedMentions: { parse: ["users"] },
     });
   }
 }

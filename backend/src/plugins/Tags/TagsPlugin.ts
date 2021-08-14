@@ -1,25 +1,26 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, TagsPluginType } from "./types";
+import { Snowflake } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { PluginOptions } from "knub";
+import moment from "moment-timezone";
+import { StrictValidationError } from "src/validatorUtils";
 import { GuildArchives } from "../../data/GuildArchives";
-import { GuildTags } from "../../data/GuildTags";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
-import { onMessageCreate } from "./util/onMessageCreate";
-import { onMessageDelete } from "./util/onMessageDelete";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildTags } from "../../data/GuildTags";
+import { mapToPublicFn } from "../../pluginUtils";
+import { convertDelayStringToMS } from "../../utils";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
 import { TagDeleteCmd } from "./commands/TagDeleteCmd";
 import { TagEvalCmd } from "./commands/TagEvalCmd";
 import { TagListCmd } from "./commands/TagListCmd";
 import { TagSourceCmd } from "./commands/TagSourceCmd";
-import moment from "moment-timezone";
-import humanizeDuration from "humanize-duration";
-import { convertDelayStringToMS } from "../../utils";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { mapToPublicFn } from "../../pluginUtils";
-import { renderTagBody } from "./util/renderTagBody";
+import { ConfigSchema, TagsPluginType } from "./types";
 import { findTagByName } from "./util/findTagByName";
-import { StrictValidationError } from "src/validatorUtils";
+import { onMessageCreate } from "./util/onMessageCreate";
+import { onMessageDelete } from "./util/onMessageDelete";
+import { renderTagBody } from "./util/renderTagBody";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -149,6 +150,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       },
 
       timeAdd(...args) {
+        if (args.length === 0) return;
         let reference;
         let delay;
 
@@ -170,6 +172,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       },
 
       timeSub(...args) {
+        if (args.length === 0) return;
         let reference;
         let delay;
 
@@ -214,11 +217,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
           return input;
         }
 
-        if (pluginData.guild.members.has(input) || pluginData.client.users.has(input)) {
+        if (
+          pluginData.guild.members.cache.has(input as Snowflake) ||
+          pluginData.client.users.resolve(input as Snowflake)
+        ) {
           return `<@!${input}>`;
         }
 
-        if (pluginData.guild.channels.has(input) || pluginData.client.channelGuildMap[input]) {
+        if (pluginData.guild.channels.cache.has(input as Snowflake)) {
           return `<#${input}>`;
         }
 

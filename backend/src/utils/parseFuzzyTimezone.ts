@@ -1,5 +1,5 @@
-import moment from "moment-timezone";
 import escapeStringRegexp from "escape-string-regexp";
+import moment from "moment-timezone";
 
 const normalizeTzName = str => str.replace(/[^a-zA-Z0-9+\-]/g, "").toLowerCase();
 

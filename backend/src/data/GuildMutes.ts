@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
-import { Mute } from "./entities/Mute";
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { Brackets, getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { Mute } from "./entities/Mute";
 
 export class GuildMutes extends BaseGuildRepository {
   private mutes: Repository<Mute>;

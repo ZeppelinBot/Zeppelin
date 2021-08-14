@@ -1,6 +1,6 @@
-import { MessageContent } from "eris";
+import { MessageOptions } from "discord.js";
 import { messageHasContent } from "./messageHasContent";
 
-export function messageIsEmpty(content: MessageContent): boolean {
+export function messageIsEmpty(content: string | MessageOptions): boolean {
   return !messageHasContent(content);
 }

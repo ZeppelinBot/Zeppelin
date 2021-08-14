@@ -1,8 +1,8 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
 import { canReadChannel } from "../../../utils/canReadChannel";
+import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const MessageInfoCmd = utilityCmd({
   trigger: ["message", "messageinfo"],
@@ -31,6 +31,6 @@ export const MessageInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

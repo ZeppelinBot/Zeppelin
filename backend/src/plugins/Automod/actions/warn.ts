@@ -1,10 +1,9 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogType } from "../../../data/LogType";
 import { asyncMap, nonNullish, resolveMember, tNullable, unique } from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
+import { automodAction } from "../helpers";
 
 export const WarnAction = automodAction({
   configType: t.type({
@@ -25,7 +24,7 @@ export const WarnAction = automodAction({
     const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

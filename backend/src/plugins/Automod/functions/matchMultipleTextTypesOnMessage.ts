@@ -1,6 +1,7 @@
+import { Constants } from "discord.js";
+import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
-import { GuildPluginData } from "knub";
 import { AutomodPluginType } from "../types";
 
 type TextTriggerWithMultipleMatchTypes = {
@@ -40,19 +41,21 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   if (trigger.match_visible_names) {
-    yield ["visiblename", member.nick || msg.data.author.username];
+    yield ["visiblename", member.nickname || msg.data.author.username];
   }
 
   if (trigger.match_usernames) {
     yield ["username", `${msg.data.author.username}#${msg.data.author.discriminator}`];
   }
 
-  if (trigger.match_nicknames && member.nick) {
-    yield ["nickname", member.nick];
+  if (trigger.match_nicknames && member.nickname) {
+    yield ["nickname", member.nickname];
   }
 
-  // type 4 = custom status
-  if (trigger.match_custom_status && member.game?.type === 4 && member.game?.state) {
-    yield ["customstatus", member.game.state];
+  for (const activity of member.presence?.activities ?? []) {
+    if (activity.type === Constants.ActivityTypes[4]) {
+      yield ["customstatus", `${activity.emoji} ${activity.name}`];
+      break;
+    }
   }
 }

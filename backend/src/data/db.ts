@@ -1,5 +1,5 @@
-import { SimpleError } from "../SimpleError";
 import { Connection, createConnection } from "typeorm";
+import { SimpleError } from "../SimpleError";
 
 let connectionPromise: Promise<Connection>;
 

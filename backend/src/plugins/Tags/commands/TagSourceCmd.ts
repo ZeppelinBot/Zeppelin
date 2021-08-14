@@ -1,7 +1,7 @@
-import { tagsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, getBaseUrl, sendSuccessMessage } from "../../../pluginUtils";
 import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { tagsCmd } from "../types";
 
 export const TagSourceCmd = tagsCmd({
   trigger: "tag",
@@ -35,6 +35,6 @@ export const TagSourceCmd = tagsCmd({
     const archiveId = await pluginData.state.archives.create(tag.body, moment.utc().add(10, "minutes"));
     const url = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
 
-    msg.channel.createMessage(`Tag source:\n${url}`);
+    msg.channel.send(`Tag source:\n${url}`);
   },
 });

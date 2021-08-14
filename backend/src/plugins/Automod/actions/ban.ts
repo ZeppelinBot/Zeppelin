@@ -1,18 +1,9 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogType } from "../../../data/LogType";
-import {
-  asyncMap,
-  convertDelayStringToMS,
-  nonNullish,
-  resolveMember,
-  tDelayString,
-  tNullable,
-  unique,
-} from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { convertDelayStringToMS, nonNullish, tDelayString, tNullable, unique } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
+import { automodAction } from "../helpers";
 
 export const BanAction = automodAction({
   configType: t.type({
@@ -37,7 +28,7 @@ export const BanAction = automodAction({
     const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

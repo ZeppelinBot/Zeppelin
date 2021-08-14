@@ -1,6 +1,6 @@
-import { autoReactionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { autoReactionsCmd } from "../types";
 
 export const DisableAutoReactionsCmd = autoReactionsCmd({
   trigger: "auto_reactions disable",

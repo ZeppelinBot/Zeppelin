@@ -1,50 +1,50 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { CasesPlugin } from "../Cases/CasesPlugin";
-import { MutesPlugin } from "../Mutes/MutesPlugin";
-import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
-import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
-import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
-import { CreateKickCaseOnManualKickEvt } from "./events/CreateKickCaseOnManualKickEvt";
-import { UpdateCmd } from "./commands/UpdateCmd";
-import { NoteCmd } from "./commands/NoteCmd";
-import { WarnCmd } from "./commands/WarnCmd";
-import { MuteCmd } from "./commands/MuteCmd";
-import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
-import { ForcemuteCmd } from "./commands/ForcemuteCmd";
-import { UnmuteCmd } from "./commands/UnmuteCmd";
-import { KickCmd } from "./commands/KickCmd";
-import { SoftbanCmd } from "./commands/SoftbanCommand";
-import { BanCmd } from "./commands/BanCmd";
-import { UnbanCmd } from "./commands/UnbanCmd";
-import { ForcebanCmd } from "./commands/ForcebanCmd";
-import { MassunbanCmd } from "./commands/MassUnbanCmd";
-import { MassbanCmd } from "./commands/MassBanCmd";
-import { AddCaseCmd } from "./commands/AddCaseCmd";
-import { CaseCmd } from "./commands/CaseCmd";
-import { CasesUserCmd } from "./commands/CasesUserCmd";
-import { CasesModCmd } from "./commands/CasesModCmd";
-import { HideCaseCmd } from "./commands/HideCaseCmd";
-import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
-import { GuildMutes } from "../../data/GuildMutes";
+import { GuildMember, Message } from "discord.js";
+import { EventEmitter } from "events";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
-import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
-import { warnMember } from "./functions/warnMember";
-import { Member, Message } from "eris";
-import { kickMember } from "./functions/kickMember";
-import { banUserId } from "./functions/banUserId";
-import { MassmuteCmd } from "./commands/MassmuteCmd";
-import { MINUTES, trimPluginDescription } from "../../utils";
-import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
-import { EventEmitter } from "events";
 import { mapToPublicFn } from "../../pluginUtils";
-import { onModActionsEvent } from "./functions/onModActionsEvent";
-import { offModActionsEvent } from "./functions/offModActionsEvent";
-import { updateCase } from "./functions/updateCase";
 import { Queue } from "../../Queue";
+import { MINUTES, trimPluginDescription } from "../../utils";
+import { CasesPlugin } from "../Cases/CasesPlugin";
+import { MutesPlugin } from "../Mutes/MutesPlugin";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { AddCaseCmd } from "./commands/AddCaseCmd";
+import { BanCmd } from "./commands/BanCmd";
+import { CaseCmd } from "./commands/CaseCmd";
+import { CasesModCmd } from "./commands/CasesModCmd";
+import { CasesUserCmd } from "./commands/CasesUserCmd";
+import { DeleteCaseCmd } from "./commands/DeleteCaseCmd";
+import { ForcebanCmd } from "./commands/ForcebanCmd";
+import { ForcemuteCmd } from "./commands/ForcemuteCmd";
+import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd";
+import { HideCaseCmd } from "./commands/HideCaseCmd";
+import { KickCmd } from "./commands/KickCmd";
+import { MassbanCmd } from "./commands/MassBanCmd";
+import { MassmuteCmd } from "./commands/MassmuteCmd";
+import { MassunbanCmd } from "./commands/MassUnbanCmd";
+import { MuteCmd } from "./commands/MuteCmd";
+import { NoteCmd } from "./commands/NoteCmd";
+import { SoftbanCmd } from "./commands/SoftbanCommand";
+import { UnbanCmd } from "./commands/UnbanCmd";
+import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
+import { UnmuteCmd } from "./commands/UnmuteCmd";
+import { UpdateCmd } from "./commands/UpdateCmd";
+import { WarnCmd } from "./commands/WarnCmd";
+import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
+import { CreateKickCaseOnManualKickEvt } from "./events/CreateKickCaseOnManualKickEvt";
+import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
+import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
+import { banUserId } from "./functions/banUserId";
+import { kickMember } from "./functions/kickMember";
+import { offModActionsEvent } from "./functions/offModActionsEvent";
+import { onModActionsEvent } from "./functions/onModActionsEvent";
+import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
+import { updateCase } from "./functions/updateCase";
+import { warnMember } from "./functions/warnMember";
+import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
 
 const defaultOptions = {
   config: {
@@ -158,13 +158,13 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
   public: {
     warnMember(pluginData) {
-      return (member: Member, reason: string, warnOptions?: WarnOptions) => {
+      return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
         warnMember(pluginData, member, reason, warnOptions);
       };
     },
 
     kickMember(pluginData) {
-      return (member: Member, reason: string, kickOptions?: KickOptions) => {
+      return (member: GuildMember, reason: string, kickOptions?: KickOptions) => {
         kickMember(pluginData, member, reason, kickOptions);
       };
     },

@@ -24,11 +24,15 @@
 
   "CHANNEL_CREATE": "🖊 Channel {channelMention(channel)} was created",
   "CHANNEL_DELETE": "🗑 Channel {channelMention(channel)} was deleted",
-  "CHANNEL_EDIT": "✏ Channel {channelMention(channel)} was edited",
+  "CHANNEL_UPDATE": "✏ Channel {channelMention(newChannel)} was edited. Changes:\n{differenceString}",
+
+  "THREAD_CREATE": "🖊 Thread {channelMention(thread)} was created in channel <#{thread.parentId}>",
+  "THREAD_DELETE": "🗑 Thread {channelMention(thread)} was deleted/archived from channel <#{thread.parentId}>",
+  "THREAD_UPDATE": "✏ Thread {channelMention(newThread)} was edited. Changes:\n{differenceString}",
 
   "ROLE_CREATE": "🖊 Role **{role.name}** (`{role.id}`) was created",
   "ROLE_DELETE": "🖊 Role **{role.name}** (`{role.id}`) was deleted",
-  "ROLE_EDIT": "🖊 Role **{role.name}** (`{role.id}`) was edited",
+  "ROLE_UPDATE": "🖊 Role **{newRole.name}** (`{newRole.id}`) was edited. Changes:\n{differenceString}",
 
   "MESSAGE_EDIT": "✏ {userMention(user)} edited their message (`{after.id}`) in {channelMention(channel)}:\n**Before:**{messageSummary(before)}**After:**{messageSummary(after)}",
   "MESSAGE_DELETE": "🗑 Message (`{message.id}`) from {userMention(user)} deleted in {channelMention(channel)} (originally posted at **{messageDate}**):{messageSummary(message)}",
@@ -41,6 +45,18 @@
   "VOICE_CHANNEL_LEAVE": "🎙 🔴 {userMention(member)} left {channelMention(channel)}",
   "VOICE_CHANNEL_FORCE_MOVE": "\uD83C\uDF99 ✍ {userMention(member)} was moved from **{oldChannel.name}** to **{newChannel.name}** by {userMention(mod)}",
   "VOICE_CHANNEL_FORCE_DISCONNECT": "\uD83C\uDF99 🚫 {userMention(member)} was forcefully disconnected from **{oldChannel.name}** by {userMention(mod)}",
+
+  "STAGE_INSTANCE_CREATE": "📣 Stage Instance `{stageInstance.topic}` was created in Stage Channel <#{stageChannel.id}>",
+  "STAGE_INSTANCE_DELETE": "📣 Stage Instance `{stageInstance.topic}` was deleted in Stage Channel <#{stageChannel.id}>",
+  "STAGE_INSTANCE_UPDATE": "📣 Stage Instance `{newStageInstance.topic}` was edited in Stage Channel <#{stageChannel.id}>. Changes:\n{differenceString}",
+
+  "EMOJI_CREATE": "<{emoji.identifier}> Emoji `{emoji.name} ({emoji.id})` was created",
+  "EMOJI_DELETE": "👋 Emoji `{emoji.name} ({emoji.id})` was deleted",
+  "EMOJI_UPDATE": "<{newEmoji.identifier}> Emoji `{newEmoji.name} ({newEmoji.id})` was updated. Changes:\n{differenceString}",
+
+  "STICKER_CREATE": "🖼️ Sticker `{sticker.name} ({sticker.id})` was created. Description: `{sticker.description}` Format: {emoji.format}",
+  "STICKER_DELETE": "🖼️ Sticker `{sticker.name} ({sticker.id})` was deleted.",
+  "STICKER_UPDATE": "🖼️ Sticker `{newSticker.name} ({sticker.id})` was updated. Changes:\n{differenceString}",
 
   "COMMAND": "🤖 {userMention(member)} used command in {channelMention(channel)}:\n`{command}`",
 

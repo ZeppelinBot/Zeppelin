@@ -1,9 +1,9 @@
-import { logsEvt } from "../types";
-import { stripObjectToScalars } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import moment from "moment-timezone";
+import { LogType } from "../../../data/LogType";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { logsEvt } from "../types";
 
 export const LogsGuildMemberAddEvt = logsEvt({
   event: "guildMemberAdd",
@@ -13,14 +13,14 @@ export const LogsGuildMemberAddEvt = logsEvt({
     const member = meta.args.member;
 
     const newThreshold = moment.utc().valueOf() - 1000 * 60 * 60;
-    const accountAge = humanizeDuration(moment.utc().valueOf() - member.createdAt, {
+    const accountAge = humanizeDuration(moment.utc().valueOf() - member.user.createdTimestamp, {
       largest: 2,
       round: true,
     });
 
     pluginData.state.guildLogs.log(LogType.MEMBER_JOIN, {
-      member: stripObjectToScalars(member, ["user", "roles"]),
-      new: member.createdAt >= newThreshold ? " :new:" : "",
+      member: memberToConfigAccessibleMember(member),
+      new: member.user.createdTimestamp >= newThreshold ? " :new:" : "",
       account_age: accountAge,
     });
 
@@ -46,7 +46,7 @@ export const LogsGuildMemberAddEvt = logsEvt({
       }
 
       pluginData.state.guildLogs.log(LogType.MEMBER_JOIN_WITH_PRIOR_RECORDS, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member),
         recentCaseSummary,
       });
     }

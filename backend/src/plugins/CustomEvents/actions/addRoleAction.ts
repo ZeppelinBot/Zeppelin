@@ -1,11 +1,11 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
+import { canActOn } from "../../../pluginUtils";
 import { renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
-import { canActOn } from "../../../pluginUtils";
-import { Message } from "eris";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const AddRoleAction = t.type({
   type: t.literal("add_role"),
@@ -31,6 +31,6 @@ export async function addRoleAction(
 
   const rolesToAdd = Array.isArray(action.role) ? action.role : [action.role];
   await target.edit({
-    roles: Array.from(new Set([...target.roles, ...rolesToAdd])),
+    roles: Array.from(new Set([...target.roles.cache.values(), ...rolesToAdd])) as Snowflake[],
   });
 }

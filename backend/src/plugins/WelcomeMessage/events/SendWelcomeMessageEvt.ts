@@ -1,9 +1,14 @@
-import { welcomeMessageEvt } from "../types";
+import { Snowflake, TextChannel } from "discord.js";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+  userToConfigAccessibleUser,
+} from "../../../utils/configAccessibleObjects";
+import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars } from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
 import { sendDM } from "../../../utils/sendDM";
+import { welcomeMessageEvt } from "../types";
 
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",
@@ -49,13 +54,13 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       } catch {
         pluginData.state.logs.log(LogType.DM_FAILED, {
           source: "welcome message",
-          user: stripObjectToScalars(member.user),
+          user: userToConfigAccessibleUser(member.user),
         });
       }
     }
 
     if (config.send_to_channel) {
-      const channel = meta.args.guild.channels.get(config.send_to_channel);
+      const channel = meta.args.member.guild.channels.cache.get(config.send_to_channel as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) return;
 
       try {
@@ -63,8 +68,8 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       } catch {
         pluginData.state.logs.log(LogType.BOT_ALERT, {
           body: `Failed send a welcome message for {userMention(member)} to {channelMention(channel)}`,
-          member: stripObjectToScalars(member),
-          channel: stripObjectToScalars(channel),
+          member: memberToConfigAccessibleMember(member),
+          channel: channelToConfigAccessibleChannel(channel),
         });
       }
     }

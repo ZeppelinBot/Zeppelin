@@ -1,5 +1,5 @@
-import { CountersPluginType, TTrigger } from "../types";
 import { GuildPluginData } from "knub";
+import { CountersPluginType, TTrigger } from "../types";
 
 export function getPrettyNameForCounterTrigger(
   pluginData: GuildPluginData<CountersPluginType>,

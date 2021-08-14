@@ -1,7 +1,6 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const RoleInfoCmd = utilityCmd({
   trigger: ["roleinfo"],
@@ -15,6 +14,6 @@ export const RoleInfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     const embed = await getRoleInfoEmbed(pluginData, args.role, message.author.id);
-    message.channel.createMessage({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

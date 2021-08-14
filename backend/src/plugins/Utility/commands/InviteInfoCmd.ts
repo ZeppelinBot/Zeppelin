@@ -1,8 +1,8 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
 import { parseInviteCodeInput } from "../../../utils";
+import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const InviteInfoCmd = utilityCmd({
   trigger: ["invite", "inviteinfo"],
@@ -22,6 +22,6 @@ export const InviteInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

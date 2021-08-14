@@ -1,27 +1,26 @@
+import { MessageOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel, TLogFormats } from "../types";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import {
+  messageSummary,
+  renderRecursively,
+  resolveMember,
+  verboseChannelMention,
   verboseUserMention,
   verboseUserName,
-  verboseChannelMention,
-  messageSummary,
-  resolveMember,
-  renderRecursively,
 } from "../../../utils";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
-import { logger } from "../../../logger";
-import moment from "moment-timezone";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { MessageContent } from "eris";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType, TLogChannel } from "../types";
 
 export async function getLogMessage(
   pluginData: GuildPluginData<LogsPluginType>,
   type: LogType,
   data: any,
   opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
-): Promise<MessageContent | null> {
+): Promise<MessageOptions | null> {
   const config = pluginData.config.get();
   const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
   if (format === "" || format == null) return null;

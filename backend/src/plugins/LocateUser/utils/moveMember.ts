@@ -1,19 +1,19 @@
-import { Member, TextableChannel } from "eris";
+import { GuildMember, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { LocateUserPluginType } from "../types";
 
 export async function moveMember(
   pluginData: GuildPluginData<LocateUserPluginType>,
   toMoveID: string,
-  target: Member,
-  errorChannel: TextableChannel,
+  target: GuildMember,
+  errorChannel: TextChannel,
 ) {
-  const modMember: Member = await pluginData.client.getRESTGuildMember(pluginData.guild.id, toMoveID);
-  if (modMember.voiceState.channelID != null) {
+  const modMember: GuildMember = await pluginData.guild.members.fetch(toMoveID as Snowflake);
+  if (modMember.voice.channelId != null) {
     try {
       await modMember.edit({
-        channelID: target.voiceState.channelID,
+        channel: target.voice.channelId,
       });
     } catch {
       sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");

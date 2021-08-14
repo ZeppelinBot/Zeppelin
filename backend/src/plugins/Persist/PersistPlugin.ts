@@ -1,12 +1,12 @@
 import { PluginOptions } from "knub";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, PersistPluginType } from "./types";
-import { GuildPersistedData } from "../../data/GuildPersistedData";
 import { GuildLogs } from "../../data/GuildLogs";
-import { StoreDataEvt } from "./events/StoreDataEvt";
-import { LoadDataEvt } from "./events/LoadDataEvt";
+import { GuildPersistedData } from "../../data/GuildPersistedData";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { LoadDataEvt } from "./events/LoadDataEvt";
+import { StoreDataEvt } from "./events/StoreDataEvt";
+import { ConfigSchema, PersistPluginType } from "./types";
 
 const defaultOptions: PluginOptions<PersistPluginType> = {
   config: {

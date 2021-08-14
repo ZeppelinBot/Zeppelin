@@ -1,21 +1,21 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { TextChannel } from "eris";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SlowmodePluginType } from "../types";
-import { resolveMember } from "../../../utils";
-import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
-import { hasPermission } from "../../../pluginUtils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { hasPermission } from "../../../pluginUtils";
+import { resolveMember } from "../../../utils";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { messageLock } from "../../../utils/lockNameHelpers";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
+import { SlowmodePluginType } from "../types";
+import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 
-  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
   if (!channel) return;
 
   // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
@@ -36,7 +36,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   if (!isAffected) return thisMsgLock.unlock();
 
   // Make sure we have the appropriate permissions to manage this slowmode
-  const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+  const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
   const missingPermissions = getMissingChannelPermissions(me, channel, BOT_SLOWMODE_PERMISSIONS);
   if (missingPermissions) {
     const logs = pluginData.getPlugin(LogsPlugin);
@@ -49,7 +49,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
-    const message = await channel.getMessage(msg.id);
+    const message = await channel.messages.fetch(msg.id as Snowflake);
     if (message) {
       message.delete();
       return thisMsgLock.interrupt();

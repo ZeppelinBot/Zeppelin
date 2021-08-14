@@ -1,16 +1,19 @@
-import { Constants, Permission } from "eris";
+import { Permissions } from "discord.js";
 
 /**
  * @param resolvedPermissions A Permission object from e.g. GuildChannel#permissionsOf() or Member#permission
  * @param requiredPermissions Bitmask of required permissions
  */
-export function hasDiscordPermissions(resolvedPermissions: Permission, requiredPermissions: number | bigint) {
-  const allowedPermissions = BigInt(resolvedPermissions.allow);
-  const nRequiredPermissions = BigInt(requiredPermissions);
+export function hasDiscordPermissions(
+  resolvedPermissions: Permissions | Readonly<Permissions> | null,
+  requiredPermissions: number | bigint,
+) {
+  const allowedPermissions = resolvedPermissions;
+  const nRequiredPermissions = requiredPermissions;
 
-  if (Boolean(allowedPermissions & BigInt(Constants.Permissions.administrator))) {
+  if (Boolean(allowedPermissions?.bitfield! & Permissions.FLAGS.ADMINISTRATOR)) {
     return true;
   }
 
-  return Boolean((allowedPermissions & nRequiredPermissions) === nRequiredPermissions);
+  return Boolean((allowedPermissions?.bitfield! & BigInt(nRequiredPermissions)) === nRequiredPermissions);
 }

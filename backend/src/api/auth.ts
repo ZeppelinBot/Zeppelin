@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express";
-import passport from "passport";
-import OAuth2Strategy from "passport-oauth2";
-import { Strategy as CustomStrategy } from "passport-custom";
-import { ApiLogins } from "../data/ApiLogins";
-import pick from "lodash.pick";
 import https from "https";
+import pick from "lodash.pick";
+import passport from "passport";
+import { Strategy as CustomStrategy } from "passport-custom";
+import OAuth2Strategy from "passport-oauth2";
+import { ApiLogins } from "../data/ApiLogins";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
-import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ok } from "./responses";
 
 interface IPassportApiUser {

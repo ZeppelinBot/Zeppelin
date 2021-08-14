@@ -1,6 +1,6 @@
-import { Tag } from "./entities/Tag";
 import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
+import { Tag } from "./entities/Tag";
 import { TagResponse } from "./entities/TagResponse";
 
 export class GuildTags extends BaseGuildRepository {

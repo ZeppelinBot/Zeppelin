@@ -1,17 +1,15 @@
-import { modActionsCmd } from "../types";
+import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Case } from "../../../data/entities/Case";
-import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { errorMessage, resolveMember, resolveUser, stripObjectToScalars } from "../../../utils";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { errorMessage, resolveMember, resolveUser } from "../../../utils";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { isBanned } from "../functions/isBanned";
-import { waitForReaction } from "knub/dist/helpers";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
-import { TextChannel } from "eris";
+import { modActionsCmd } from "../types";
 
 export const WarnCmd = modActionsCmd({
   trigger: "warn",
@@ -57,7 +55,7 @@ export const WarnCmd = modActionsCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        msg.channel.createMessage(errorMessage("You don't have permission to use -mod"));
+        msg.channel.send(errorMessage("You don't have permission to use -mod"));
         return;
       }
 
@@ -65,19 +63,18 @@ export const WarnCmd = modActionsCmd({
     }
 
     const config = pluginData.config.get();
-    const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
     if (config.warn_notify_enabled && priorWarnAmount >= config.warn_notify_threshold) {
-      const tooManyWarningsMsg = await msg.channel.createMessage(
-        config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`),
+      const reply = await waitForButtonConfirm(
+        msg.channel,
+        { content: config.warn_notify_message.replace("{priorWarnings}", `${priorWarnAmount}`) },
+        { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
       );
-
-      const reply = await waitForReaction(pluginData.client, tooManyWarningsMsg, ["✅", "❌"], msg.author.id);
-      tooManyWarningsMsg.delete();
-      if (!reply || reply.name === "❌") {
-        msg.channel.createMessage(errorMessage("Warn cancelled by moderator"));
+      if (!reply) {
+        msg.channel.send(errorMessage("Warn cancelled by moderator"));
         return;
       }
     }
@@ -110,7 +107,7 @@ export const WarnCmd = modActionsCmd({
     sendSuccessMessage(
       pluginData,
       msg.channel,
-      `Warned **${memberToWarn.user.username}#${memberToWarn.user.discriminator}** (Case #${warnResult.case.case_number})${messageResultText}`,
+      `Warned **${memberToWarn.user.tag}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );
   },
 });

@@ -1,5 +1,5 @@
-import { postCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { postCmd } from "../types";
 import { actualPostCmd } from "../util/actualPostCmd";
 
 export const PostCmd = postCmd({

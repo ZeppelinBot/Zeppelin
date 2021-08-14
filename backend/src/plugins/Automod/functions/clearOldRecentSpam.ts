@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
 import { RECENT_SPAM_EXPIRY_TIME } from "../constants";
+import { AutomodPluginType } from "../types";
 
 export function clearOldRecentSpam(pluginData: GuildPluginData<AutomodPluginType>) {
   const now = Date.now();

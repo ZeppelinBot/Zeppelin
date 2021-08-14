@@ -1,21 +1,12 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
 import { LogType } from "../../../data/LogType";
-import {
-  asyncMap,
-  convertDelayStringToMS,
-  nonNullish,
-  resolveMember,
-  tDelayString,
-  tNullable,
-  unique,
-} from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { convertDelayStringToMS, nonNullish, tDelayString, tNullable, unique } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { MutesPlugin } from "../../Mutes/MutesPlugin";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
+import { automodAction } from "../helpers";
 
 export const MuteAction = automodAction({
   configType: t.type({
@@ -42,7 +33,7 @@ export const MuteAction = automodAction({
     const rolesToRestore = actionConfig.restore_roles_on_mute;
 
     const caseArgs: Partial<CaseArgs> = {
-      modId: pluginData.client.user.id,
+      modId: pluginData.client.user!.id,
       extraNotes: matchResult.fullSummary ? [matchResult.fullSummary] : [],
       automatic: true,
       postInCaseLogOverride: actionConfig.postInCaseLog ?? undefined,

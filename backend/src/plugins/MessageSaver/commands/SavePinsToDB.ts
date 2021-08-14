@@ -1,7 +1,7 @@
-import { messageSaverCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { saveMessagesToDB } from "../saveMessagesToDB";
 import { sendSuccessMessage } from "../../../pluginUtils";
+import { saveMessagesToDB } from "../saveMessagesToDB";
+import { messageSaverCmd } from "../types";
 
 export const SavePinsToDBCmd = messageSaverCmd({
   trigger: "save_pins_to_db",
@@ -13,14 +13,10 @@ export const SavePinsToDBCmd = messageSaverCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    await msg.channel.createMessage(`Saving pins from <#${args.channel.id}>...`);
+    await msg.channel.send(`Saving pins from <#${args.channel.id}>...`);
 
-    const pins = await args.channel.getPins();
-    const { savedCount, failed } = await saveMessagesToDB(
-      pluginData,
-      args.channel,
-      pins.map(m => m.id),
-    );
+    const pins = await args.channel.messages.fetchPinned();
+    const { savedCount, failed } = await saveMessagesToDB(pluginData, args.channel, [...pins.keys()]);
 
     if (failed.length) {
       sendSuccessMessage(

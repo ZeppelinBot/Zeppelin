@@ -1,9 +1,8 @@
-import * as t from "io-ts";
-import { pipe } from "fp-ts/lib/pipeable";
-import { either, fold } from "fp-ts/lib/Either";
-import { noop } from "./utils";
 import deepDiff from "deep-diff";
-import safeRegex from "safe-regex";
+import { either, fold } from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/pipeable";
+import * as t from "io-ts";
+import { noop } from "./utils";
 
 const regexWithFlags = /^\/(.*?)\/([i]*)$/;
 
@@ -123,7 +122,7 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
       err => report(validationResult),
       result => {
         // Make sure there are no extra properties
-        if (debug)
+        if (debug) {
           console.log(
             "JSON.stringify() check:",
             JSON.stringify(value) === JSON.stringify(result)
@@ -131,6 +130,7 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
               : "they are not the same, might have excess",
             result,
           );
+        }
         if (JSON.stringify(value) !== JSON.stringify(result)) {
           const diff = deepDiff(result, value);
           const errors = diff.filter(d => d.kind === "N").map(d => `Unknown property <${d.path.join(".")}>`);

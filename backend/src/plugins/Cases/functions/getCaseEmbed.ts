@@ -1,20 +1,20 @@
-import { Case } from "../../../data/entities/Case";
-import { AdvancedMessageContent, MessageContent } from "eris";
+import { MessageEditOptions, MessageOptions } from "discord.js";
+import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { GuildPluginData, helpers } from "knub";
-import { CasesPluginType } from "../types";
-import { resolveCaseId } from "./resolveCaseId";
-import { chunkLines, chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
-import { getCaseColor } from "./getCaseColor";
+import { Case } from "../../../data/entities/Case";
+import { chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { CasesPluginType } from "../types";
+import { getCaseColor } from "./getCaseColor";
+import { resolveCaseId } from "./resolveCaseId";
 
 export async function getCaseEmbed(
   pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
   requestMemberId?: string,
   noOriginalCaseLink?: boolean,
-): Promise<AdvancedMessageContent> {
+): Promise<MessageOptions & MessageEditOptions> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) {
     throw new Error("Unknown case");
@@ -108,5 +108,5 @@ export async function getCaseEmbed(
     });
   }
 
-  return { embed };
+  return { embeds: [embed] };
 }

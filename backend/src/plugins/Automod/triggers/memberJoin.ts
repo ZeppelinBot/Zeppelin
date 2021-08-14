@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import { convertDelayStringToMS, tDelayString } from "../../../utils";
+import { automodTrigger } from "../helpers";
 
 export const MemberJoinTrigger = automodTrigger<unknown>()({
   configType: t.type({
@@ -20,7 +20,7 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
 
     if (triggerConfig.only_new) {
       const threshold = Date.now() - convertDelayStringToMS(triggerConfig.new_threshold)!;
-      return context.member.createdAt >= threshold ? {} : null;
+      return context.member.user.createdTimestamp >= threshold ? {} : null;
     }
 
     return {};

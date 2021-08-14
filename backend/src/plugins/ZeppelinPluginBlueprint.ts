@@ -1,17 +1,17 @@
+import * as t from "io-ts";
 import {
   BasePluginType,
-  typedGlobalPlugin,
   GlobalPluginBlueprint,
   GlobalPluginData,
-  typedGuildPlugin,
   GuildPluginBlueprint,
   GuildPluginData,
+  typedGlobalPlugin,
+  typedGuildPlugin,
 } from "knub";
-import * as t from "io-ts";
+import { PluginOptions } from "knub/dist/config/configTypes";
+import { Awaitable } from "knub/dist/utils";
 import { getPluginConfigPreprocessor } from "../pluginUtils";
 import { TMarkdown } from "../types";
-import { Awaitable } from "knub/dist/utils";
-import { PluginOptions } from "knub/dist/config/configTypes";
 
 /**
  * GUILD PLUGINS

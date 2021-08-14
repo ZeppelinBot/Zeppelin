@@ -1,5 +1,5 @@
+import { Message } from "discord.js";
 import { messageSaverEvt } from "../types";
-import { Message } from "eris";
 
 export const MessageCreateEvt = messageSaverEvt({
   event: "messageCreate",
@@ -8,7 +8,7 @@ export const MessageCreateEvt = messageSaverEvt({
 
   async listener(meta) {
     // Only save regular chat messages
-    if (meta.args.message.type !== 0) {
+    if (meta.args.message.type !== "DEFAULT" && meta.args.message.type !== "REPLY") {
       return;
     }
 
@@ -22,11 +22,11 @@ export const MessageUpdateEvt = messageSaverEvt({
   allowSelf: true,
 
   async listener(meta) {
-    if (meta.args.message.type !== 0) {
+    if (meta.args.newMessage.type !== "DEFAULT" && meta.args.newMessage.type !== "REPLY") {
       return;
     }
 
-    await meta.pluginData.state.savedMessages.saveEditFromMsg(meta.args.message);
+    await meta.pluginData.state.savedMessages.saveEditFromMsg(meta.args.newMessage as Message);
   },
 });
 
@@ -37,7 +37,7 @@ export const MessageDeleteEvt = messageSaverEvt({
 
   async listener(meta) {
     const msg = meta.args.message as Message;
-    if (msg.type != null && msg.type !== 0) {
+    if (msg.type != null && meta.args.message.type !== "DEFAULT" && meta.args.message.type !== "REPLY") {
       return;
     }
 

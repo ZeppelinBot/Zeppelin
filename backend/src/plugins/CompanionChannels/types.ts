@@ -1,8 +1,7 @@
 import * as t from "io-ts";
-import { tNullable } from "../../utils";
 import { BasePluginType, CooldownManager, typedGuildEventListener } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { tNullable } from "../../utils";
 
 // Permissions using these numbers: https://abal.moe/Eris/docs/reference (add all allowed/denied ones up)
 export const CompanionChannelOpts = t.type({
@@ -26,6 +25,7 @@ export interface CompanionChannelsPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
     errorCooldownManager: CooldownManager;
+    serverLogs: GuildLogs;
   };
 }
 

@@ -1,12 +1,12 @@
-import { postCmd } from "../types";
+import { MessageEmbedOptions } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { actualPostCmd } from "../util/actualPostCmd";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { Embed } from "eris";
 import { isValidEmbed, trimLines } from "../../../utils";
-import { formatContent } from "../util/formatContent";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
+import { postCmd } from "../types";
+import { actualPostCmd } from "../util/actualPostCmd";
+import { formatContent } from "../util/formatContent";
 
 export const PostEmbedCmd = postCmd({
   trigger: "post_embed",
@@ -46,7 +46,7 @@ export const PostEmbedCmd = postCmd({
       }
     }
 
-    let embed: Embed = { type: "rich" };
+    let embed: MessageEmbedOptions = {};
     if (args.title) embed.title = args.title;
     if (color) embed.color = color;
 
@@ -73,7 +73,7 @@ export const PostEmbedCmd = postCmd({
 
     if (args.content) {
       const prefix = pluginData.fullConfig.prefix || "!";
-      msg.channel.createMessage(
+      msg.channel.send(
         trimLines(`
         <@!${msg.author.id}> You can now specify an embed's content directly at the end of the command:
         \`${prefix}edit_embed -title "Some title" content goes here\`

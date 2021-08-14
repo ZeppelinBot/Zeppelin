@@ -1,23 +1,23 @@
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
-import { BotControlPluginType, ConfigSchema } from "./types";
-import { GuildArchives } from "../../data/GuildArchives";
-import { TextChannel } from "eris";
-import { sendSuccessMessage } from "../../pluginUtils";
-import { getActiveReload, resetActiveReload } from "./activeReload";
-import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
-import { ServersCmd } from "./commands/ServersCmd";
-import { LeaveServerCmd } from "./commands/LeaveServerCmd";
-import { ReloadServerCmd } from "./commands/ReloadServerCmd";
+import { Snowflake, TextChannel } from "discord.js";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
+import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
+import { Configs } from "../../data/Configs";
+import { GuildArchives } from "../../data/GuildArchives";
+import { sendSuccessMessage } from "../../pluginUtils";
+import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
+import { getActiveReload, resetActiveReload } from "./activeReload";
+import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
 import { AllowServerCmd } from "./commands/AllowServerCmd";
 import { DisallowServerCmd } from "./commands/DisallowServerCmd";
-import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
-import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
-import { Configs } from "../../data/Configs";
-import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
-import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
-import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
 import { EligibleCmd } from "./commands/EligibleCmd";
+import { LeaveServerCmd } from "./commands/LeaveServerCmd";
+import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
+import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
+import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
+import { ReloadServerCmd } from "./commands/ReloadServerCmd";
+import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
+import { ServersCmd } from "./commands/ServersCmd";
+import { BotControlPluginType, ConfigSchema } from "./types";
 
 const defaultOptions = {
   config: {
@@ -47,7 +47,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
     EligibleCmd,
   ],
 
-  afterLoad(pluginData) {
+  async afterLoad(pluginData) {
     pluginData.state.archives = new GuildArchives(0);
     pluginData.state.allowedGuilds = new AllowedGuilds();
     pluginData.state.configs = new Configs();
@@ -58,9 +58,9 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       const [guildId, channelId] = activeReload;
       resetActiveReload();
 
-      const guild = pluginData.client.guilds.get(guildId);
+      const guild = await pluginData.client.guilds.fetch(guildId as Snowflake);
       if (guild) {
-        const channel = guild.channels.get(channelId);
+        const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {
           sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
         }

@@ -1,10 +1,10 @@
-import { IMuteWithDetails, mutesCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { DBDateFormat, isFullMessage, MINUTES, noop, resolveMember } from "../../../utils";
+import { GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, Snowflake } from "discord.js";
 import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
-import { Member } from "eris";
+import { DBDateFormat, MINUTES, resolveMember } from "../../../utils";
+import { IMuteWithDetails, mutesCmd } from "../types";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",
@@ -16,21 +16,27 @@ export const MutesCmd = mutesCmd({
       shortcut: "a",
     }),
 
-    left: ct.switchOption({ shortcut: "l" }),
-    manual: ct.switchOption({ shortcut: "m" }),
-    export: ct.switchOption({ shortcut: "e" }),
+    left: ct.switchOption({ def: false, shortcut: "l" }),
+    manual: ct.switchOption({ def: false, shortcut: "m" }),
+    export: ct.switchOption({ def: false, shortcut: "e" }),
   },
 
   async run({ pluginData, message: msg, args }) {
-    const listMessagePromise = msg.channel.createMessage("Loading mutes...");
+    const listMessagePromise = msg.channel.send("Loading mutes...");
     const mutesPerPage = 10;
     let totalMutes = 0;
     let hasFilters = false;
 
-    let hasReactions = false;
-    let clearReactionsFn;
-    let clearReactionsTimeout;
-    const clearReactionsDebounce = 5 * MINUTES;
+    let stopCollectionFn = () => {
+      return;
+    };
+    let stopCollectionTimeout: NodeJS.Timeout;
+    const stopCollectionDebounce = 5 * MINUTES;
+
+    const bumpCollectionTimeout = () => {
+      clearTimeout(stopCollectionTimeout);
+      stopCollectionTimeout = setTimeout(stopCollectionFn, stopCollectionDebounce);
+    };
 
     let lines: string[] = [];
 
@@ -48,20 +54,20 @@ export const MutesCmd = mutesCmd({
     if (args.manual) {
       // Show only manual mutes (i.e. "Muted" role added without a logged mute)
       const muteUserIds = new Set(activeMutes.map(m => m.user_id));
-      const manuallyMutedMembers: Member[] = [];
+      const manuallyMutedMembers: GuildMember[] = [];
       const muteRole = pluginData.config.get().mute_role;
 
       if (muteRole) {
-        pluginData.guild.members.forEach(member => {
+        pluginData.guild.members.cache.forEach(member => {
           if (muteUserIds.has(member.id)) return;
-          if (member.roles.includes(muteRole)) manuallyMutedMembers.push(member);
+          if (member.roles.cache.has(muteRole as Snowflake)) manuallyMutedMembers.push(member);
         });
       }
 
       totalMutes = manuallyMutedMembers.length;
 
       lines = manuallyMutedMembers.map(member => {
-        return `<@!${member.id}> (**${member.user.username}#${member.user.discriminator}**, \`${member.id}\`)   🔧 Manual mute`;
+        return `<@!${member.id}> (**${member.user.tag}**, \`${member.id}\`)   🔧 Manual mute`;
       });
     } else {
       // Show filtered active mutes (but not manual mutes)
@@ -86,7 +92,7 @@ export const MutesCmd = mutesCmd({
 
         if (!member) {
           if (!bannedIds) {
-            const bans = await pluginData.guild.getBans();
+            const bans = await pluginData.guild.bans.fetch({ cache: true });
             bannedIds = bans.map(u => u.user.id);
           }
 
@@ -112,8 +118,8 @@ export const MutesCmd = mutesCmd({
       const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
       lines = filteredMutes.map(mute => {
-        const user = pluginData.client.users.get(mute.user_id);
-        const username = user ? `${user.username}#${user.discriminator}` : "Unknown#0000";
+        const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
+        const username = user ? user.tag : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
         const caseName = theCase ? `Case #${theCase.case_number}` : "No case";
 
@@ -167,13 +173,7 @@ export const MutesCmd = mutesCmd({
       message += "\n\n" + pageLines.join("\n");
 
       listMessage.edit(message);
-      bumpClearReactionsTimeout();
-    };
-
-    const bumpClearReactionsTimeout = () => {
-      if (!hasReactions) return;
-      clearTimeout(clearReactionsTimeout);
-      clearReactionsTimeout = setTimeout(clearReactionsFn, clearReactionsDebounce);
+      bumpCollectionTimeout();
     };
 
     if (totalMutes === 0) {
@@ -194,33 +194,47 @@ export const MutesCmd = mutesCmd({
       drawListPage(1);
 
       if (totalPages > 1) {
-        hasReactions = true;
-        listMessage.addReaction("⬅");
-        listMessage.addReaction("➡");
+        const idMod = `${listMessage.id}:muteList`;
+        const buttons: MessageButton[] = [];
 
-        const paginationReactionListener = pluginData.events.on(
-          "messageReactionAdd",
-          ({ args: { message: rMsg, emoji, member } }) => {
-            if (!isFullMessage(rMsg)) return;
-            if (rMsg.id !== listMessage.id) return;
-            if (member.id !== msg.author.id) return;
-            if (!["⬅", "➡"].includes(emoji.name)) return;
-
-            if (emoji.name === "⬅" && currentPage > 1) {
-              drawListPage(currentPage - 1);
-            } else if (emoji.name === "➡" && currentPage < totalPages) {
-              drawListPage(currentPage + 1);
-            }
-
-            rMsg.removeReaction(emoji.name, member.id).catch(noop);
-          },
+        buttons.push(
+          new MessageButton()
+            .setStyle("SECONDARY")
+            .setEmoji("⬅")
+            .setCustomId(`previousButton:${idMod}`),
         );
 
-        clearReactionsFn = () => {
-          listMessage.removeReactions().catch(noop);
-          pluginData.events.off("messageReactionAdd", paginationReactionListener);
+        buttons.push(
+          new MessageButton()
+            .setStyle("SECONDARY")
+            .setEmoji("➡")
+            .setCustomId(`nextButton:${idMod}`),
+        );
+
+        const row = new MessageActionRow().addComponents(buttons);
+        await listMessage.edit({ components: [row] });
+
+        const collector = listMessage.createMessageComponentCollector({ time: stopCollectionDebounce });
+
+        collector.on("collect", async (interaction: MessageComponentInteraction) => {
+          if (msg.author.id !== interaction.user.id) {
+            interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
+          } else {
+            collector.resetTimer();
+            await interaction.deferUpdate();
+            if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
+              await drawListPage(currentPage - 1);
+            } else if (interaction.customId === `nextButton:${idMod}` && currentPage < totalPages) {
+              await drawListPage(currentPage + 1);
+            }
+          }
+        });
+
+        stopCollectionFn = async () => {
+          collector.stop();
+          await listMessage.edit({ content: listMessage.content, components: [] });
         };
-        bumpClearReactionsTimeout();
+        bumpCollectionTimeout();
       }
     }
   },

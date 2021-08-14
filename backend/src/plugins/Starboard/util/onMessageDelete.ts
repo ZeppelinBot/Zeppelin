@@ -1,5 +1,5 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { GuildPluginData } from "knub";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { StarboardPluginType } from "../types";
 import { removeMessageFromStarboard } from "./removeMessageFromStarboard";
 import { removeMessageFromStarboardMessages } from "./removeMessageFromStarboardMessages";

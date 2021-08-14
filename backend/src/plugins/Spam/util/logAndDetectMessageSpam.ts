@@ -1,28 +1,26 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
-import moment from "moment-timezone";
-import { MuteResult } from "../../../plugins/Mutes/types";
-import {
-  convertDelayStringToMS,
-  DBDateFormat,
-  noop,
-  resolveMember,
-  stripObjectToScalars,
-  trimLines,
-} from "../../../utils";
-import { LogType } from "../../../data/LogType";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { logger } from "../../../logger";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import moment from "moment-timezone";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+} from "../../../utils/configAccessibleObjects";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { MuteResult } from "../../../plugins/Mutes/types";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { convertDelayStringToMS, DBDateFormat, noop, resolveMember, trimLines } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RecentActionType, SpamPluginType, TBaseSingleSpamConfig } from "../types";
 import { addRecentAction } from "./addRecentAction";
+import { clearRecentUserActions } from "./clearRecentUserActions";
 import { getRecentActionCount } from "./getRecentActionCount";
 import { getRecentActions } from "./getRecentActions";
-import { clearRecentUserActions } from "./clearRecentUserActions";
 import { saveSpamArchives } from "./saveSpamArchives";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 
 export async function logAndDetectMessageSpam(
   pluginData: GuildPluginData<SpamPluginType>,
@@ -88,7 +86,7 @@ export async function logAndDetectMessageSpam(
               "Automatic spam detection",
               {
                 caseArgs: {
-                  modId: pluginData.client.user.id,
+                  modId: pluginData.client.user!.id,
                   postInCaseLogOverride: false,
                 },
               },
@@ -122,7 +120,9 @@ export async function logAndDetectMessageSpam(
         // Then, if enabled, remove the spam messages
         if (spamConfig.clean !== false) {
           msgIds.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
-          pluginData.client.deleteMessages(savedMessage.channel_id, msgIds).catch(noop);
+          (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake)! as TextChannel | undefined)
+            ?.bulkDelete(msgIds as Snowflake[])
+            .catch(noop);
         }
 
         // Store the ID of the last handled message
@@ -145,7 +145,7 @@ export async function logAndDetectMessageSpam(
         clearRecentUserActions(pluginData, type, savedMessage.user_id, savedMessage.channel_id);
 
         // Generate a log from the detected messages
-        const channel = pluginData.guild.channels.get(savedMessage.channel_id);
+        const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
         const archiveUrl = await saveSpamArchives(pluginData, uniqueMessages);
 
         // Create a case
@@ -173,7 +173,7 @@ export async function logAndDetectMessageSpam(
 
           casesPlugin.createCase({
             userId: savedMessage.user_id,
-            modId: pluginData.client.user.id,
+            modId: pluginData.client.user!.id,
             type: CaseTypes.Note,
             reason: caseText,
             automatic: true,
@@ -182,8 +182,8 @@ export async function logAndDetectMessageSpam(
 
         // Create a log entry
         logs.log(LogType.MESSAGE_SPAM_DETECTED, {
-          member: stripObjectToScalars(member, ["user", "roles"]),
-          channel: stripObjectToScalars(channel),
+          member: memberToConfigAccessibleMember(member!),
+          channel: channelToConfigAccessibleChannel(channel!),
           description,
           limit: spamConfig.count,
           interval: spamConfig.interval,

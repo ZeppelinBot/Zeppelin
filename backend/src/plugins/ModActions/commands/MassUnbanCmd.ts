@@ -1,15 +1,15 @@
-import { modActionsCmd, IgnoredEventType } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { stripObjectToScalars } from "../../../utils";
-import { isBanned } from "../functions/isBanned";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { TextChannel } from "eris";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { ignoreEvent } from "../functions/ignoreEvent";
+import { isBanned } from "../functions/isBanned";
+import { IgnoredEventType, modActionsCmd } from "../types";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
@@ -30,14 +30,14 @@ export const MassunbanCmd = modActionsCmd({
     }
 
     // Ask for unban reason (cleaner this way instead of trying to cram it into the args)
-    msg.channel.createMessage("Unban reason? `cancel` to cancel");
+    msg.channel.send("Unban reason? `cancel` to cancel");
     const unbanReasonReply = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (!unbanReasonReply || !unbanReasonReply.content || unbanReasonReply.content.toLowerCase().trim() === "cancel") {
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;
     }
 
-    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, msg.attachments);
+    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, [...msg.attachments.values()]);
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
@@ -48,7 +48,7 @@ export const MassunbanCmd = modActionsCmd({
     });
 
     // Show a loading indicator since this can take a while
-    const loadingMsg = await msg.channel.createMessage("Unbanning...");
+    const loadingMsg = await msg.channel.send("Unbanning...");
 
     // Unban each user and count failed unbans (if any)
     const failedUnbans: Array<{ userId: string; reason: UnbanFailReasons }> = [];
@@ -60,7 +60,7 @@ export const MassunbanCmd = modActionsCmd({
       }
 
       try {
-        await pluginData.guild.unbanMember(userId, unbanReason != null ? encodeURIComponent(unbanReason) : undefined);
+        await pluginData.guild.bans.remove(userId as Snowflake, unbanReason ?? undefined);
 
         await casesPlugin.createCase({
           userId,
@@ -84,7 +84,7 @@ export const MassunbanCmd = modActionsCmd({
     } else {
       // Some or all unbans were successful. Create a log entry for the mass unban and notify the user.
       pluginData.state.serverLogs.log(LogType.MASSUNBAN, {
-        mod: stripObjectToScalars(msg.author),
+        mod: userToConfigAccessibleUser(msg.author),
         count: successfulUnbanCount,
         reason: unbanReason,
       });

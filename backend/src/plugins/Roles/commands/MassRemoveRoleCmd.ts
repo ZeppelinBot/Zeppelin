@@ -1,10 +1,11 @@
+import { GuildMember } from "discord.js";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, canActOn } from "../../../pluginUtils";
-import { rolesCmd } from "../types";
-import { resolveMember, stripObjectToScalars, successMessage, resolveRoleId } from "../../../utils";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { Member } from "eris";
+import { canActOn, sendErrorMessage } from "../../../pluginUtils";
+import { resolveMember, resolveRoleId, successMessage } from "../../../utils";
+import { rolesCmd } from "../types";
 
 export const MassRemoveRoleCmd = rolesCmd({
   trigger: "massremoverole",
@@ -16,9 +17,9 @@ export const MassRemoveRoleCmd = rolesCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    msg.channel.createMessage(`Resolving members...`);
+    msg.channel.send(`Resolving members...`);
 
-    const members: Member[] = [];
+    const members: GuildMember[] = [];
     const unknownMembers: string[] = [];
     for (const memberId of args.members) {
       const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
@@ -49,7 +50,7 @@ export const MassRemoveRoleCmd = rolesCmd({
       return;
     }
 
-    const role = pluginData.guild.roles.get(roleId);
+    const role = pluginData.guild.roles.cache.get(roleId);
     if (!role) {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
@@ -58,12 +59,12 @@ export const MassRemoveRoleCmd = rolesCmd({
       return;
     }
 
-    const membersWithTheRole = members.filter(m => m.roles.includes(roleId));
+    const membersWithTheRole = members.filter(m => m.roles.cache.has(roleId));
     let assigned = 0;
     const failed: string[] = [];
     const didNotHaveRole = members.length - membersWithTheRole.length;
 
-    msg.channel.createMessage(
+    msg.channel.send(
       `Removing role **${role.name}** from ${membersWithTheRole.length} ${
         membersWithTheRole.length === 1 ? "member" : "members"
       }...`,
@@ -72,11 +73,11 @@ export const MassRemoveRoleCmd = rolesCmd({
     for (const member of membersWithTheRole) {
       try {
         pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
-        await member.removeRole(roleId);
+        await member.roles.remove(roleId);
         pluginData.state.logs.log(LogType.MEMBER_ROLE_REMOVE, {
-          member: stripObjectToScalars(member, ["user", "roles"]),
+          member: memberToConfigAccessibleMember(member),
           roles: role.name,
-          mod: stripObjectToScalars(msg.author),
+          mod: userToConfigAccessibleUser(msg.author),
         });
         assigned++;
       } catch (e) {
@@ -98,6 +99,6 @@ export const MassRemoveRoleCmd = rolesCmd({
       resultMessage += `\nUnknown members: ${unknownMembers.join(", ")}`;
     }
 
-    msg.channel.createMessage(successMessage(resultMessage));
+    msg.channel.send(successMessage(resultMessage));
   },
 });

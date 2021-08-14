@@ -1,10 +1,10 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { tNullable, tEmbed } from "../../utils";
 import { GuildArchives } from "../../data/GuildArchives";
-import { GuildTags } from "../../data/GuildTags";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildTags } from "../../data/GuildTags";
+import { tEmbed, tNullable } from "../../utils";
 
 export const Tag = t.union([t.string, tEmbed]);
 

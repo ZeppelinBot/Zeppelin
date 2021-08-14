@@ -1,32 +1,33 @@
 import * as t from "io-ts";
-import { MatchWordsTrigger } from "./matchWords";
 import { AutomodTriggerBlueprint } from "../helpers";
-import { MessageSpamTrigger } from "./messageSpam";
-import { MentionSpamTrigger } from "./mentionSpam";
-import { LinkSpamTrigger } from "./linkSpam";
+import { AntiraidLevelTrigger } from "./antiraidLevel";
+import { AnyMessageTrigger } from "./anyMessage";
 import { AttachmentSpamTrigger } from "./attachmentSpam";
-import { EmojiSpamTrigger } from "./emojiSpam";
-import { LineSpamTrigger } from "./lineSpam";
+import { BanTrigger } from "./ban";
 import { CharacterSpamTrigger } from "./characterSpam";
-import { MatchRegexTrigger } from "./matchRegex";
+import { CounterTrigger } from "./counterTrigger";
+import { EmojiSpamTrigger } from "./emojiSpam";
+import { KickTrigger } from "./kick";
+import { LineSpamTrigger } from "./lineSpam";
+import { LinkSpamTrigger } from "./linkSpam";
+import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
 import { MatchInvitesTrigger } from "./matchInvites";
 import { MatchLinksTrigger } from "./matchLinks";
-import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
-import { MemberJoinSpamTrigger } from "./memberJoinSpam";
+import { MatchRegexTrigger } from "./matchRegex";
+import { MatchWordsTrigger } from "./matchWords";
 import { MemberJoinTrigger } from "./memberJoin";
+import { MemberJoinSpamTrigger } from "./memberJoinSpam";
+import { MemberLeaveTrigger } from "./memberLeave";
+import { MentionSpamTrigger } from "./mentionSpam";
+import { MessageSpamTrigger } from "./messageSpam";
+import { MuteTrigger } from "./mute";
+import { NoteTrigger } from "./note";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
-import { CounterTrigger } from "./counterTrigger";
-import { NoteTrigger } from "./note";
-import { WarnTrigger } from "./warn";
-import { MuteTrigger } from "./mute";
-import { UnmuteTrigger } from "./unmute";
-import { KickTrigger } from "./kick";
-import { BanTrigger } from "./ban";
 import { UnbanTrigger } from "./unban";
-import { AnyMessageTrigger } from "./anyMessage";
-import { AntiraidLevelTrigger } from "./antiraidLevel";
+import { UnmuteTrigger } from "./unmute";
+import { WarnTrigger } from "./warn";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   any_message: AnyMessageTrigger,
@@ -72,6 +73,7 @@ export const AvailableTriggers = t.type({
   match_links: MatchLinksTrigger.configType,
   match_attachment_type: MatchAttachmentTypeTrigger.configType,
   member_join: MemberJoinTrigger.configType,
+  member_leave: MemberLeaveTrigger.configType,
   role_added: RoleAddedTrigger.configType,
   role_removed: RoleRemovedTrigger.configType,
 

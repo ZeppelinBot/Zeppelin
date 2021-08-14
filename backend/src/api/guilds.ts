@@ -1,13 +1,13 @@
-import express, { Request, Response } from "express";
-import { AllowedGuilds } from "../data/AllowedGuilds";
-import { clientError, ok, serverError, unauthorized } from "./responses";
-import { Configs } from "../data/Configs";
-import { validateGuildConfig } from "../configValidator";
-import yaml, { YAMLException } from "js-yaml";
-import { apiTokenAuthHandlers } from "./auth";
 import { ApiPermissions } from "@shared/apiPermissions";
-import { hasGuildPermission, requireGuildPermission } from "./permissions";
+import express, { Request, Response } from "express";
+import yaml, { YAMLException } from "js-yaml";
+import { validateGuildConfig } from "../configValidator";
+import { AllowedGuilds } from "../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
+import { Configs } from "../data/Configs";
+import { apiTokenAuthHandlers } from "./auth";
+import { hasGuildPermission, requireGuildPermission } from "./permissions";
+import { clientError, ok, serverError, unauthorized } from "./responses";
 
 const apiPermissionAssignments = new ApiPermissionAssignments();
 

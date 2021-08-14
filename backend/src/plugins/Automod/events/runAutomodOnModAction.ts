@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { runAutomod } from "../functions/runAutomod";
 import { resolveMember, resolveUser, UnknownUser } from "../../../utils";
 import { ModActionType } from "../../ModActions/types";
+import { runAutomod } from "../functions/runAutomod";
+import { AutomodContext, AutomodPluginType } from "../types";
 
 export async function runAutomodOnModAction(
   pluginData: GuildPluginData<AutomodPluginType>,

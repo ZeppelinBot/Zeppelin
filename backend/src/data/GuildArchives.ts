@@ -1,11 +1,12 @@
+import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
-import { ArchiveEntry } from "./entities/ArchiveEntry";
+import { isDefaultSticker } from "src/utils/isDefaultSticker";
 import { getRepository, Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { trimLines } from "../utils";
-import { SavedMessage } from "./entities/SavedMessage";
-import { Guild } from "eris";
 import { renderTemplate } from "../templateFormatter";
+import { trimLines } from "../utils";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { ArchiveEntry } from "./entities/ArchiveEntry";
+import { SavedMessage } from "./entities/SavedMessage";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
@@ -13,7 +14,7 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
   Server: {guild.name} ({guild.id})
 `);
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
-  "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}";
+  "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}{stickers}";
 
 export class GuildArchives extends BaseGuildRepository {
   protected archives: Repository<ArchiveEntry>;
@@ -73,13 +74,19 @@ export class GuildArchives extends BaseGuildRepository {
   protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
     const msgLines: string[] = [];
     for (const msg of savedMessages) {
-      const channel = guild.channels.get(msg.channel_id);
+      const channel = guild.channels.cache.get(msg.channel_id as Snowflake);
       const user = { ...msg.data.author, id: msg.user_id };
 
       const line = await renderTemplate(MESSAGE_ARCHIVE_MESSAGE_FORMAT, {
         id: msg.id,
         timestamp: moment.utc(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
         content: msg.data.content,
+        attachments: msg.data.attachments?.map(att => {
+          return JSON.stringify({ name: att.name, url: att.url, type: att.contentType });
+        }),
+        stickers: msg.data.stickers?.map(sti => {
+          return JSON.stringify({ name: sti.name, id: sti.id, isDefault: isDefaultSticker(sti.id) });
+        }),
         user,
         channel,
       });

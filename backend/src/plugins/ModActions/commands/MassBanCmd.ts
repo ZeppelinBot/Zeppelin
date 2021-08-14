@@ -1,20 +1,17 @@
-import { modActionsCmd, IgnoredEventType } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, hasPermission, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, stripObjectToScalars, noop, MINUTES } from "../../../utils";
-import { isBanned } from "../functions/isBanned";
-import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { banUserId } from "../functions/banUserId";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { TextChannel } from "eris";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { LogType } from "../../../data/LogType";
 import { performance } from "perf_hooks";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { LogType } from "../../../data/LogType";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { load } from "js-yaml";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { MINUTES, noop } from "../../../utils";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { ignoreEvent } from "../functions/ignoreEvent";
+import { IgnoredEventType, modActionsCmd } from "../types";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
@@ -35,18 +32,18 @@ export const MassbanCmd = modActionsCmd({
     }
 
     // Ask for ban reason (cleaner this way instead of trying to cram it into the args)
-    msg.channel.createMessage("Ban reason? `cancel` to cancel");
+    msg.channel.send("Ban reason? `cancel` to cancel");
     const banReasonReply = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (!banReasonReply || !banReasonReply.content || banReasonReply.content.toLowerCase().trim() === "cancel") {
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;
     }
 
-    const banReason = formatReasonWithAttachments(banReasonReply.content, msg.attachments);
+    const banReason = formatReasonWithAttachments(banReasonReply.content, [...msg.attachments.values()]);
 
     // Verify we can act on each of the users specified
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.get(userId); // TODO: Get members on demand?
+      const member = pluginData.guild.members.cache.get(userId as Snowflake); // TODO: Get members on demand?
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massban one or more users: insufficient permissions");
         return;
@@ -60,7 +57,7 @@ export const MassbanCmd = modActionsCmd({
       pluginData.state.massbanQueue.length === 0
         ? "Banning..."
         : `Massban queued. Waiting for previous massban to finish (max wait ${maxWaitTimeFormatted}).`;
-    const loadingMsg = await msg.channel.createMessage(initialLoadingText);
+    const loadingMsg = await msg.channel.send(initialLoadingText);
 
     const waitTimeStart = performance.now();
     const waitingInterval = setInterval(() => {
@@ -84,6 +81,7 @@ export const MassbanCmd = modActionsCmd({
       const startTime = performance.now();
       const failedBans: string[] = [];
       const casesPlugin = pluginData.getPlugin(CasesPlugin);
+      const deleteDays = (await pluginData.config.getForMessage(msg)).ban_delete_message_days;
       for (const [i, userId] of args.userIds.entries()) {
         if (pluginData.state.unloaded) {
           break;
@@ -95,7 +93,10 @@ export const MassbanCmd = modActionsCmd({
           ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
           pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
 
-          await pluginData.guild.banMember(userId, 1, banReason != null ? encodeURIComponent(banReason) : undefined);
+          await pluginData.guild.bans.create(userId as Snowflake, {
+            days: deleteDays,
+            reason: banReason ?? undefined,
+          });
 
           await casesPlugin.createCase({
             userId,
@@ -129,7 +130,7 @@ export const MassbanCmd = modActionsCmd({
       } else {
         // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
         pluginData.state.serverLogs.log(LogType.MASSBAN, {
-          mod: stripObjectToScalars(msg.author),
+          mod: userToConfigAccessibleUser(msg.author),
           count: successfulBanCount,
           reason: banReason,
         });

@@ -1,11 +1,14 @@
-import { Attachment, TextChannel } from "eris";
-import { downloadFile } from "../../utils";
+import { MessageAttachment, MessageOptions, TextChannel, ThreadChannel } from "discord.js";
 import fs from "fs";
+import { downloadFile } from "../../utils";
 const fsp = fs.promises;
 
 const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;
 
-export async function rehostAttachment(attachment: Attachment, targetChannel: TextChannel): Promise<string> {
+export async function rehostAttachment(
+  attachment: MessageAttachment,
+  targetChannel: TextChannel | ThreadChannel,
+): Promise<string> {
   if (attachment.size > MAX_ATTACHMENT_REHOST_SIZE) {
     return "Attachment too big to rehost";
   }
@@ -18,11 +21,12 @@ export async function rehostAttachment(attachment: Attachment, targetChannel: Te
   }
 
   try {
-    const rehostMessage = await targetChannel.createMessage(`Rehost of attachment ${attachment.id}`, {
-      name: attachment.filename,
-      file: await fsp.readFile(downloaded.path),
-    });
-    return rehostMessage.attachments[0].url;
+    const content: MessageOptions = {
+      content: `Rehost of attachment ${attachment.id}`,
+      files: [{ name: attachment.name ? attachment.name : undefined, attachment: await fsp.readFile(downloaded.path) }],
+    };
+    const rehostMessage = await targetChannel.send(content);
+    return rehostMessage.attachments.values()[0].url;
   } catch {
     return "Failed to rehost attachment";
   }

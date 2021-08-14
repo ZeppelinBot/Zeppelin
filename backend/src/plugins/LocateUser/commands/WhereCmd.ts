@@ -1,6 +1,5 @@
-import { locateUserCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { resolveMember } from "../../../utils";
+import { locateUserCmd } from "../types";
 import { sendWhere } from "../utils/sendWhere";
 
 export const WhereCmd = locateUserCmd({
@@ -14,6 +13,6 @@ export const WhereCmd = locateUserCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    sendWhere(pluginData, args.member, msg.channel, `${msg.member.mention} | `);
+    sendWhere(pluginData, args.member, msg.channel, `<@${msg.member.id}> | `);
   },
 });

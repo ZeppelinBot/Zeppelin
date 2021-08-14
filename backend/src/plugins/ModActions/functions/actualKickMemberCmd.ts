@@ -1,15 +1,15 @@
-import { Member, TextChannel } from "eris";
-import { LogType } from "../../../data/LogType";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { errorMessage, resolveUser, resolveMember } from "../../../utils";
+import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage, canActOn, sendSuccessMessage } from "../../../pluginUtils";
 import { hasPermission } from "knub/dist/helpers";
-import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
+import { LogType } from "../../../data/LogType";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { errorMessage, resolveMember, resolveUser } from "../../../utils";
+import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { kickMember } from "./kickMember";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
+import { kickMember } from "./kickMember";
+import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 
 export async function actualKickMemberCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -17,9 +17,9 @@ export async function actualKickMemberCmd(
   args: {
     user: string;
     reason: string;
-    mod: Member;
+    mod: GuildMember;
     notify?: string;
-    "notify-channel"?: TextChannel;
+    "notify-channel"?: TextChannel | ThreadChannel;
     clean?: boolean;
   },
 ) {
@@ -82,7 +82,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Ban, memberToKick.id);
 
     try {
-      await memberToKick.ban(1, encodeURIComponent("kick -clean"));
+      await memberToKick.ban({ days: 1, reason: "kick -clean" });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
     }
@@ -91,19 +91,19 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, memberToKick.id);
 
     try {
-      await pluginData.guild.unbanMember(memberToKick.id, encodeURIComponent("kick -clean"));
+      await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
     }
   }
 
   if (kickResult.status === "failed") {
-    msg.channel.createMessage(errorMessage(`Failed to kick user`));
+    msg.channel.send(errorMessage(`Failed to kick user`));
     return;
   }
 
   // Confirm the action to the moderator
-  let response = `Kicked **${memberToKick.user.username}#${memberToKick.user.discriminator}** (Case #${kickResult.case.case_number})`;
+  let response = `Kicked **${memberToKick.user.tag}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
   sendSuccessMessage(pluginData, msg.channel, response);

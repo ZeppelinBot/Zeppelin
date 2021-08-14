@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { CasesPluginType } from "../types";
 import { Case } from "../../../data/entities/Case";
+import { CasesPluginType } from "../types";
 
 export function getRecentCasesByMod(
   pluginData: GuildPluginData<CasesPluginType>,
