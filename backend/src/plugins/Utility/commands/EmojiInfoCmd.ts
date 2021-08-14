@@ -11,7 +11,7 @@ export const EmojiInfoCmd = utilityCmd({
   permission: "can_emojiinfo",
 
   signature: {
-    emoji: ct.string({ required: false }),
+    emoji: ct.string({ required: true }),
   },
 
   async run({ message, args, pluginData }) {
