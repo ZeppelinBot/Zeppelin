@@ -49,6 +49,7 @@ export interface ZeppelinPluginInfo {
   description?: TMarkdown;
   usageGuide?: TMarkdown;
   configurationGuide?: TMarkdown;
+  legacy?: boolean;
 }
 
 export interface CommandInfo {

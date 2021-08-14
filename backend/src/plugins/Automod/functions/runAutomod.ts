@@ -72,7 +72,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
 
           matchResult.fullSummary = `Triggered automod rule **${ruleName}**\n${matchResult.summary}`.trim();
 
-          break triggerLoop;
+          if (!rule.allow_further_rules) break triggerLoop;
         }
       }
     }
@@ -94,7 +94,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         });
       }
 
-      break;
+      if (!rule.allow_further_rules) break;
     }
   }
 }

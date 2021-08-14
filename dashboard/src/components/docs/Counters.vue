@@ -321,7 +321,7 @@
                     actions:
                       set_counter:
                         counter: "antiraid_decay"
-                        amount: 10 # "Disable after 10min"
+                        value: 10 # "Disable after 10min"
 
                   start_antiraid_timer_high:
                     triggers:
@@ -330,7 +330,7 @@
                     actions:
                       set_counter:
                         counter: "antiraid_decay"
-                        amount: 20 # "Disable after 20min"
+                        value: 20 # "Disable after 20min"
 
                   disable_antiraid_after_timer:
                     triggers:

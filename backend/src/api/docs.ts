@@ -37,7 +37,7 @@ export function initDocs(app: express.Express) {
   app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
       docsPlugins.map(plugin => {
-        const thinInfo = plugin.info ? { prettyName: plugin.info.prettyName } : {};
+        const thinInfo = plugin.info ? { prettyName: plugin.info.prettyName, legacy: plugin.info.legacy ?? false } : {};
         return {
           name: plugin.name,
           info: thinInfo,
