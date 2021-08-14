@@ -23,6 +23,7 @@
     "test-watch": "tsc-watch --onSuccess \"npx ava\""
   },
   "dependencies": {
+    "@silvia-odwyer/photon-node": "^0.3.1",
     "bufferutil": "^4.0.3",
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
@@ -58,7 +59,6 @@
     "regexp-worker": "^1.1.0",
     "safe-regex": "^2.0.2",
     "seedrandom": "^3.0.1",
-    "sharp": "github:almeidx/sharp#68b4f387ae2ee1ee2dd8f289f5ec5fcf722fd3d3",
     "strip-combining-marks": "^1.0.0",
     "tlds": "^1.203.1",
     "tmp": "0.0.33",
@@ -82,7 +82,6 @@
     "@types/passport-oauth2": "^1.4.8",
     "@types/passport-strategy": "^0.2.35",
     "@types/safe-regex": "^1.1.2",
-    "@types/sharp": "^0.23.1",
     "@types/tmp": "0.0.33",
     "@types/twemoji": "^12.1.0",
     "ava": "^3.10.0",
