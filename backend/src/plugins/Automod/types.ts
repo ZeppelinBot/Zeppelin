@@ -26,6 +26,7 @@ export const Rule = t.type({
   triggers: t.array(t.partial(AvailableTriggers.props)),
   actions: t.partial(AvailableActions.props),
   cooldown: tNullable(t.string),
+  allow_further_rules: t.boolean,
 });
 export type TRule = t.TypeOf<typeof Rule>;
 
