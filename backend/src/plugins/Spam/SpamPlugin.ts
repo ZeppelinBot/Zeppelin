@@ -51,6 +51,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
       Basic spam detection and auto-muting.
       For more advanced spam filtering, check out the Automod plugin!
     `),
+    legacy: true,
   },
 
   dependencies: [LogsPlugin],
