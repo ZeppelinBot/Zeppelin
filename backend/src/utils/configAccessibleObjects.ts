@@ -11,6 +11,7 @@ import {
   User,
 } from "discord.js";
 import { UnknownUser } from "src/utils";
+import { GuildPluginData } from "knub";
 
 export interface IConfigAccessibleUser {
   id: Snowflake | string;
@@ -179,4 +180,22 @@ export function stickerToConfigAccessibleSticker(sticker: Sticker): IConfigAcces
   };
 
   return toReturn;
+}
+
+export function getConfigAccessibleMemberLevel(
+  pluginData: GuildPluginData<any>,
+  member: IConfigAccessibleMember,
+): number {
+  if (member.id === pluginData.guild.ownerId) {
+    return 99999;
+  }
+
+  const levels = pluginData.fullConfig.levels ?? {};
+  for (const [id, level] of Object.entries(levels)) {
+    if (member.id === id || member.roles?.find(r => r.id === id)) {
+      return level as number;
+    }
+  }
+
+  return 0;
 }
