@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from "discord.js";
+import { GuildMember, MessageEmbedOptions } from "discord.js";
 import { PluginOptions } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -38,6 +38,7 @@ import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
 import { AutoJoinThreadEvt, AutoJoinThreadSyncEvt } from "./events/AutoJoinThreadEvt";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
+import { hasPermission } from "./functions/hasPermission";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { ConfigSchema, UtilityPluginType } from "./types";
@@ -168,6 +169,12 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     userInfo(pluginData) {
       return (userId: string, requestMemberId?: string) => {
         return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
+      };
+    },
+
+    hasPermission(pluginData) {
+      return (member: GuildMember, channelId: string, permission: string) => {
+        return hasPermission(pluginData, member, channelId, permission);
       };
     },
   },

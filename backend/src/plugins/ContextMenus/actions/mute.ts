@@ -1,5 +1,6 @@
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { canActOn } from "src/pluginUtils";
 import { LogType } from "../../../data/LogType";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
@@ -17,8 +18,8 @@ export async function muteAction(pluginData: GuildPluginData<ContextMenuPluginTy
     member: executingMember,
   });
 
-  // TODO: Add perm check for can_mute
-  if (!userCfg.can_use) {
+  const modactions = pluginData.getPlugin(ModActionsPlugin);
+  if (!userCfg.can_use || !(await modactions.hasMutePermission(executingMember, interaction.channelId))) {
     await interaction.followUp({ content: "Cannot mute: insufficient permissions" });
     return;
   }

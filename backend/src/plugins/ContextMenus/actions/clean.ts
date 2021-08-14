@@ -17,9 +17,9 @@ export async function cleanAction(
     channelId: interaction.channelId,
     member: executingMember,
   });
+  const utility = pluginData.getPlugin(UtilityPlugin);
 
-  // TODO: Add perm check for can_clean in util
-  if (!userCfg.can_use) {
+  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, interaction.channelId, "can_clean"))) {
     await interaction.followUp({ content: "Cannot clean: insufficient permissions" });
     return;
   }
@@ -36,7 +36,6 @@ export async function cleanAction(
 
   try {
     interaction.followUp(`Cleaning... Amount: ${amount}, User Only: ${targetUserOnly}, Pins: ${deletePins}`);
-    const utility = pluginData.getPlugin(UtilityPlugin);
     utility.clean({ count: amount, user, channel: targetMessage.channel.id, "delete-pins": deletePins }, targetMessage);
   } catch (e) {
     interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
