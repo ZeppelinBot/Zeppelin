@@ -1,10 +1,10 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildEventListener } from "knub";
-import { tNullable } from "../../utils";
-import { GuildLogs } from "../../data/GuildLogs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { tNullable } from "../../utils";
 
 const BaseSingleSpamConfig = t.type({
   interval: t.number,

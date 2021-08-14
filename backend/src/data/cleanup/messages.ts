@@ -1,8 +1,8 @@
-import { DAYS, DBDateFormat, MINUTES } from "../../utils";
-import { getRepository, In } from "typeorm";
-import { SavedMessage } from "../entities/SavedMessage";
 import moment from "moment-timezone";
+import { getRepository, In } from "typeorm";
+import { DAYS, DBDateFormat, MINUTES } from "../../utils";
 import { connection } from "../db";
+import { SavedMessage } from "../entities/SavedMessage";
 
 /**
  * How long message edits, deletions, etc. will include the original message content.

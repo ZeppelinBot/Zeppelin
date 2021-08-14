@@ -1,4 +1,4 @@
-import { MessageContent } from "eris";
+import { MessageOptions } from "discord.js";
 
 function embedHasContent(embed: any) {
   for (const [key, value] of Object.entries(embed)) {
@@ -18,7 +18,7 @@ function embedHasContent(embed: any) {
   return false;
 }
 
-export function messageHasContent(content: MessageContent): boolean {
+export function messageHasContent(content: string | MessageOptions): boolean {
   if (typeof content === "string") {
     return content.trim() !== "";
   }
@@ -27,8 +27,12 @@ export function messageHasContent(content: MessageContent): boolean {
     return true;
   }
 
-  if (content.embed && embedHasContent(content.embed)) {
-    return true;
+  if (content.embeds) {
+    for (const embed of content.embeds) {
+      if (embed && embedHasContent(embed)) {
+        return true;
+      }
+    }
   }
 
   return false;

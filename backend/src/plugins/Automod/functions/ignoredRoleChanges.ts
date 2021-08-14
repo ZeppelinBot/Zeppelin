@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { AutomodPluginType } from "../types";
 import { MINUTES } from "../../../utils";
+import { AutomodPluginType } from "../types";
 
 const IGNORED_ROLE_CHANGE_LIFETIME = 5 * MINUTES;
 

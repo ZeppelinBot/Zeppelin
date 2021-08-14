@@ -1,8 +1,8 @@
-import { reactionRolesCmd } from "../types";
+import { Message, Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { Message, TextChannel } from "eris";
-import { isDiscordRESTError } from "../../../utils";
+import { isDiscordAPIError } from "../../../utils";
+import { reactionRolesCmd } from "../types";
 
 export const ClearReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles clear",
@@ -21,11 +21,11 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
 
     pluginData.state.reactionRoles.removeFromMessage(args.message.messageId);
 
-    let targetMessage: Message<TextChannel>;
+    let targetMessage: Message;
     try {
-      targetMessage = await args.message.channel.getMessage(args.message.messageId);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake);
     } catch (err) {
-      if (isDiscordRESTError(err) && err.code === 50001) {
+      if (isDiscordAPIError(err) && err.code === 50001) {
         sendErrorMessage(pluginData, msg.channel, "Missing access to the specified message");
         return;
       }
@@ -33,7 +33,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
       throw err;
     }
 
-    await targetMessage.removeReactions();
+    await targetMessage.reactions.removeAll();
 
     sendSuccessMessage(pluginData, msg.channel, "Reaction roles cleared");
   },

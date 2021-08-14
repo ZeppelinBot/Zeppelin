@@ -1,11 +1,11 @@
-import { clientError, error, notFound } from "./responses";
-import express from "express";
 import cors from "cors";
-import { initAuth } from "./auth";
-import { initGuildsAPI } from "./guilds";
-import { initArchives } from "./archives";
-import { initDocs } from "./docs";
+import express from "express";
 import { TokenError } from "passport-oauth2";
+import { initArchives } from "./archives";
+import { initAuth } from "./auth";
+import { initDocs } from "./docs";
+import { initGuildsAPI } from "./guilds";
+import { clientError, error, notFound } from "./responses";
 
 const app = express();
 

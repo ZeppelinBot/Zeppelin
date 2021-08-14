@@ -1,9 +1,9 @@
-import { utilityCmd } from "../types";
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { messageLink } from "../../../utils";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
+import { messageLink } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
+import { utilityCmd } from "../types";
 
 export const ContextCmd = utilityCmd({
   trigger: "context",
@@ -35,12 +35,17 @@ export const ContextCmd = utilityCmd({
       return;
     }
 
-    const previousMessage = (await pluginData.client.getMessages(channel.id, 1, messageId))[0];
+    const previousMessage = (
+      await (pluginData.guild.channels.cache.get(channel.id) as TextChannel).messages.fetch({
+        limit: 1,
+        before: messageId as Snowflake,
+      })
+    )[0];
     if (!previousMessage) {
       sendErrorMessage(pluginData, msg.channel, "Message context not found");
       return;
     }
 
-    msg.channel.createMessage(messageLink(pluginData.guild.id, previousMessage.channel.id, previousMessage.id));
+    msg.channel.send(messageLink(pluginData.guild.id, previousMessage.channel.id, previousMessage.id));
   },
 });

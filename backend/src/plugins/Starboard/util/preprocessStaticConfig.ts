@@ -1,5 +1,5 @@
-import { PartialConfigSchema, defaultStarboardOpts } from "../types";
 import * as t from "io-ts";
+import { defaultStarboardOpts, PartialConfigSchema } from "../types";
 
 export function preprocessStaticConfig(config: t.TypeOf<typeof PartialConfigSchema>) {
   if (config.boards) {

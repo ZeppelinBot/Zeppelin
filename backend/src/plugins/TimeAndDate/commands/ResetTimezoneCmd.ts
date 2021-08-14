@@ -1,7 +1,6 @@
-import { timeAndDateCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { getGuildTz } from "../functions/getGuildTz";
+import { timeAndDateCmd } from "../types";
 
 export const ResetTimezoneCmd = timeAndDateCmd({
   trigger: "timezone reset",

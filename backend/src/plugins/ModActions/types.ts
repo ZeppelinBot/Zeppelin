@@ -1,16 +1,17 @@
+import { TextChannel } from "discord.js";
+import { EventEmitter } from "events";
 import * as t from "io-ts";
-import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildMutes } from "../../data/GuildMutes";
+import { Case } from "../../data/entities/Case";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
-import { Case } from "../../data/entities/Case";
-import { CaseArgs } from "../Cases/types";
-import { TextChannel } from "eris";
+import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import Timeout = NodeJS.Timeout;
-import { EventEmitter } from "events";
 import { Queue } from "../../Queue";
+import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
+import { CaseArgs } from "../Cases/types";
+
+import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,

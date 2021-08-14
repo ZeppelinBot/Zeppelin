@@ -1,8 +1,8 @@
-import { getRepository, In } from "typeorm";
 import moment from "moment-timezone";
-import { NicknameHistoryEntry } from "../entities/NicknameHistoryEntry";
+import { getRepository, In } from "typeorm";
 import { DAYS, DBDateFormat } from "../../utils";
 import { connection } from "../db";
+import { NicknameHistoryEntry } from "../entities/NicknameHistoryEntry";
 
 export const NICKNAME_RETENTION_PERIOD = 30 * DAYS;
 const CLEAN_PER_LOOP = 500;

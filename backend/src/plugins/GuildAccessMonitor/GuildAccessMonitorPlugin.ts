@@ -1,8 +1,8 @@
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
-import { BasePluginType, typedGlobalEventListener, GlobalPluginData } from "knub";
+import { Guild } from "discord.js";
 import * as t from "io-ts";
+import { BasePluginType, GlobalPluginData, typedGlobalEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { Guild } from "eris";
+import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   config: {};
@@ -28,7 +28,7 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
 
   events: [
     typedGlobalEventListener<GuildAccessMonitorPluginType>()({
-      event: "guildAvailable",
+      event: "guildCreate",
       listener({ pluginData, args: { guild } }) {
         checkGuild(pluginData, guild);
       },
@@ -40,7 +40,7 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
   },
 
   afterLoad(pluginData) {
-    for (const guild of pluginData.client.guilds.values()) {
+    for (const guild of pluginData.client.guilds.cache.values()) {
       checkGuild(pluginData, guild);
     }
   },

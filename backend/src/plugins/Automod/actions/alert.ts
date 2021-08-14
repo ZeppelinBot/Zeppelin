@@ -1,23 +1,18 @@
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
+import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { LogType } from "../../../data/LogType";
+import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import {
-  asyncMap,
   createChunkedMessage,
-  isDiscordRESTError,
   messageLink,
-  resolveMember,
   stripObjectToScalars,
   tAllowedMentions,
   tNormalizedNullOptional,
-  tNullable,
   verboseChannelMention,
 } from "../../../utils";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { TextChannel } from "eris";
-import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const AlertAction = automodAction({
   configType: t.type({
@@ -29,7 +24,7 @@ export const AlertAction = automodAction({
   defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
-    const channel = pluginData.guild.channels.get(actionConfig.channel);
+    const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
     if (channel && channel instanceof TextChannel) {
@@ -73,7 +68,11 @@ export const AlertAction = automodAction({
       }
 
       try {
-        await createChunkedMessage(channel, rendered, actionConfig.allowed_mentions);
+        await createChunkedMessage(
+          channel,
+          rendered,
+          erisAllowedMentionsToDjsMentionOptions(actionConfig.allowed_mentions),
+        );
       } catch (err) {
         if (err.code === 50001) {
           logs.log(LogType.BOT_ALERT, {

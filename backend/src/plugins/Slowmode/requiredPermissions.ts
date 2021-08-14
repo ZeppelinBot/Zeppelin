@@ -1,8 +1,8 @@
-import { Constants } from "eris";
+import { Permissions } from "discord.js";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
-export const NATIVE_SLOWMODE_PERMISSIONS = p.readMessages | p.manageChannels;
-export const BOT_SLOWMODE_PERMISSIONS = p.readMessages | p.manageRoles | p.manageMessages;
-export const BOT_SLOWMODE_CLEAR_PERMISSIONS = p.readMessages | p.manageRoles;
-export const BOT_SLOWMODE_DISABLE_PERMISSIONS = p.readMessages | p.manageRoles;
+export const NATIVE_SLOWMODE_PERMISSIONS = p.VIEW_CHANNEL | p.MANAGE_CHANNELS;
+export const BOT_SLOWMODE_PERMISSIONS = p.VIEW_CHANNEL | p.MANAGE_ROLES | p.MANAGE_MESSAGES;
+export const BOT_SLOWMODE_CLEAR_PERMISSIONS = p.VIEW_CHANNEL | p.MANAGE_ROLES;
+export const BOT_SLOWMODE_DISABLE_PERMISSIONS = p.VIEW_CHANNEL | p.MANAGE_ROLES;

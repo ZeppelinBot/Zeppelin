@@ -1,8 +1,5 @@
-import { typedGuildCommand, GuildPluginData } from "knub";
+import { typedGuildCommand } from "knub";
 import { AutomodPluginType } from "../types";
-import { setAntiraidLevel } from "../functions/setAntiraidLevel";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 
 export const ViewAntiraidCmd = typedGuildCommand<AutomodPluginType>()({
   trigger: "antiraid",
@@ -10,9 +7,9 @@ export const ViewAntiraidCmd = typedGuildCommand<AutomodPluginType>()({
 
   async run({ pluginData, message }) {
     if (pluginData.state.cachedAntiraidLevel) {
-      message.channel.createMessage(`Anti-raid is set to **${pluginData.state.cachedAntiraidLevel}**`);
+      message.channel.send(`Anti-raid is set to **${pluginData.state.cachedAntiraidLevel}**`);
     } else {
-      message.channel.createMessage(`Anti-raid is **off**`);
+      message.channel.send(`Anti-raid is **off**`);
     }
   },
 });

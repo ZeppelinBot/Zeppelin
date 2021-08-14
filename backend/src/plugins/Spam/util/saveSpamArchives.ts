@@ -1,7 +1,7 @@
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import moment from "moment-timezone";
-import { getBaseUrl } from "../../../pluginUtils";
 import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { getBaseUrl } from "../../../pluginUtils";
 import { SpamPluginType } from "../types";
 
 const SPAM_ARCHIVE_EXPIRY_DAYS = 90;

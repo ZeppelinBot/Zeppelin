@@ -1,8 +1,8 @@
-import { utilityCmd } from "../types";
+import { LoadedGuildPlugin } from "knub";
+import { PluginCommandDefinition } from "knub/dist/commands/commandUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { createChunkedMessage } from "../../../utils";
-import { PluginCommandDefinition } from "knub/dist/commands/commandUtils";
-import { LoadedGuildPlugin } from "knub";
+import { utilityCmd } from "../types";
 
 export const HelpCmd = utilityCmd({
   trigger: "help",
@@ -71,7 +71,7 @@ export const HelpCmd = utilityCmd({
     });
 
     if (totalResults === 0) {
-      msg.channel.createMessage("No matching commands found!");
+      msg.channel.send("No matching commands found!");
       return;
     }
 
@@ -80,7 +80,7 @@ export const HelpCmd = utilityCmd({
         ? `Results (${totalResults} total, showing first ${limitedResults.length}):\n\n`
         : "";
 
-    message += `${commandSnippets.join("\n\n")}`;
+    message += commandSnippets.join("\n\n");
     createChunkedMessage(msg.channel, message);
   },
 });

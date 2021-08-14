@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 
 export class GuildEvents extends BaseGuildRepository {
   private queuedEventEmitter: QueuedEventEmitter;

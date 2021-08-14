@@ -1,8 +1,8 @@
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { LogType } from "../../../data/LogType";
 import { stripObjectToScalars, unique } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const LogAction = automodAction({
   configType: t.boolean,

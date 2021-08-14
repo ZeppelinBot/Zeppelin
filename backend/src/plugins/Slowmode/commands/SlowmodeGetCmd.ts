@@ -1,7 +1,7 @@
+import { TextChannel } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
-import { TextChannel } from "eris";
-import humanizeDuration from "humanize-duration";
 
 export const SlowmodeGetCmd = slowmodeCmd({
   trigger: "slowmode",
@@ -27,11 +27,11 @@ export const SlowmodeGetCmd = slowmodeCmd({
     }
 
     if (currentSlowmode) {
-      const humanized = humanizeDuration(channel.rateLimitPerUser * 1000);
+      const humanized = humanizeDuration(currentSlowmode * 1000);
       const slowmodeType = isNative ? "native" : "bot-maintained";
-      msg.channel.createMessage(`The current slowmode of <#${channel.id}> is **${humanized}** (${slowmodeType})`);
+      msg.channel.send(`The current slowmode of <#${channel.id}> is **${humanized}** (${slowmodeType})`);
     } else {
-      msg.channel.createMessage("Channel is not on slowmode");
+      msg.channel.send("Channel is not on slowmode");
     }
   },
 });

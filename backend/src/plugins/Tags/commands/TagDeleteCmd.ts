@@ -1,6 +1,6 @@
-import { tagsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { tagsCmd } from "../types";
 
 export const TagDeleteCmd = tagsCmd({
   trigger: "tag delete",

@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { LogsPlugin } from "../plugins/Logs/LogsPlugin";
-import { findRelevantAuditLogEntry, isDiscordRESTError } from "../utils";
 import { LogType } from "../data/LogType";
+import { LogsPlugin } from "../plugins/Logs/LogsPlugin";
+import { findRelevantAuditLogEntry, isDiscordAPIError } from "../utils";
 
 /**
  * Wrapper for findRelevantAuditLogEntry() that handles permission errors gracefully.
@@ -17,7 +17,7 @@ export async function safeFindRelevantAuditLogEntry(
   try {
     return await findRelevantAuditLogEntry(pluginData.guild, actionType, userId, attempts, attemptDelay);
   } catch (e) {
-    if (isDiscordRESTError(e) && e.code === 50013) {
+    if (isDiscordAPIError(e) && e.code === 50013) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.log(LogType.BOT_ALERT, {
         body: "Missing permissions to read audit log",

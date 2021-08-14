@@ -1,6 +1,6 @@
-import { mutesCmd } from "../types";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { mutesCmd } from "../types";
 
 export const ClearMutesCmd = mutesCmd({
   trigger: "clear_mutes",

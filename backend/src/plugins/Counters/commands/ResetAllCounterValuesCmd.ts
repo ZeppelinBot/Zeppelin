@@ -1,14 +1,9 @@
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveChannel, waitForReply } from "knub/dist/helpers";
-import { TextChannel, User } from "eris";
-import { confirm, MINUTES, noop, resolveUser, trimMultilineString, UnknownUser } from "../../../utils";
-import { changeCounterValue } from "../functions/changeCounterValue";
-import { setCounterValue } from "../functions/setCounterValue";
+import { confirm, noop, trimMultilineString } from "../../../utils";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
-import { counterIdLock } from "../../../utils/lockNameHelpers";
+import { CountersPluginType } from "../types";
 
 export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],
@@ -33,28 +28,23 @@ export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()(
     }
 
     const counterName = counter.name || args.counterName;
-    const confirmed = await confirm(
-      pluginData.client,
-      message.channel,
-      message.author.id,
-      trimMultilineString(`
+    const confirmed = await confirm(message.channel, message.author.id, {
+      content: trimMultilineString(`
         Do you want to reset **ALL** values for counter **${counterName}**?
         This will reset the counter for **all** users and channels.
         **Note:** This will *not* trigger any triggers or counter triggers.
       `),
-    );
+    });
     if (!confirmed) {
       sendErrorMessage(pluginData, message.channel, "Cancelled");
       return;
     }
 
     const loadingMessage = await message.channel
-      .createMessage(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
+      .send(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
       .catch(() => null);
 
-    const lock = await pluginData.locks.acquire(counterIdLock(counterId), 10 * MINUTES);
     await resetAllCounterValues(pluginData, args.counterName);
-    lock.interrupt();
 
     loadingMessage?.delete().catch(noop);
     sendSuccessMessage(pluginData, message.channel, `All counter values for **${counterName}** have been reset`);

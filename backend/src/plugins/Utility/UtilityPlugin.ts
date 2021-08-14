@@ -1,43 +1,44 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, UtilityPluginType } from "./types";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildArchives } from "../../data/GuildArchives";
-import { Supporters } from "../../data/Supporters";
-import { ServerInfoCmd } from "./commands/ServerInfoCmd";
-import { RolesCmd } from "./commands/RolesCmd";
-import { LevelCmd } from "./commands/LevelCmd";
-import { SearchCmd } from "./commands/SearchCmd";
-import { BanSearchCmd } from "./commands/BanSearchCmd";
-import { UserInfoCmd } from "./commands/UserInfoCmd";
-import { NicknameResetCmd } from "./commands/NicknameResetCmd";
-import { NicknameCmd } from "./commands/NicknameCmd";
-import { PingCmd } from "./commands/PingCmd";
-import { SourceCmd } from "./commands/SourceCmd";
-import { ContextCmd } from "./commands/ContextCmd";
-import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
-import { HelpCmd } from "./commands/HelpCmd";
-import { AboutCmd } from "./commands/AboutCmd";
 import { PluginOptions } from "knub";
-import { activeReloads } from "./guildReloads";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { Supporters } from "../../data/Supporters";
 import { sendSuccessMessage } from "../../pluginUtils";
-import { ReloadGuildCmd } from "./commands/ReloadGuildCmd";
-import { JumboCmd } from "./commands/JumboCmd";
-import { AvatarCmd } from "./commands/AvatarCmd";
-import { CleanCmd } from "./commands/CleanCmd";
-import { InviteInfoCmd } from "./commands/InviteInfoCmd";
-import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
-import { MessageInfoCmd } from "./commands/MessageInfoCmd";
-import { InfoCmd } from "./commands/InfoCmd";
-import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
-import { refreshMembersIfNeeded } from "./refreshMembers";
-import { RoleInfoCmd } from "./commands/RoleInfoCmd";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { AboutCmd } from "./commands/AboutCmd";
+import { AvatarCmd } from "./commands/AvatarCmd";
+import { BanSearchCmd } from "./commands/BanSearchCmd";
+import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
+import { CleanArgs, cleanCmd, CleanCmd } from "./commands/CleanCmd";
+import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
+import { HelpCmd } from "./commands/HelpCmd";
+import { InfoCmd } from "./commands/InfoCmd";
+import { InviteInfoCmd } from "./commands/InviteInfoCmd";
+import { JumboCmd } from "./commands/JumboCmd";
+import { LevelCmd } from "./commands/LevelCmd";
+import { MessageInfoCmd } from "./commands/MessageInfoCmd";
+import { NicknameCmd } from "./commands/NicknameCmd";
+import { NicknameResetCmd } from "./commands/NicknameResetCmd";
+import { PingCmd } from "./commands/PingCmd";
+import { ReloadGuildCmd } from "./commands/ReloadGuildCmd";
+import { RoleInfoCmd } from "./commands/RoleInfoCmd";
+import { RolesCmd } from "./commands/RolesCmd";
+import { SearchCmd } from "./commands/SearchCmd";
+import { ServerInfoCmd } from "./commands/ServerInfoCmd";
+import { SnowflakeInfoCmd } from "./commands/SnowflakeInfoCmd";
+import { SourceCmd } from "./commands/SourceCmd";
+import { UserInfoCmd } from "./commands/UserInfoCmd";
+import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
+import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
+import { AutoJoinThreadEvt, AutoJoinThreadSyncEvt } from "./events/AutoJoinThreadEvt";
+import { activeReloads } from "./guildReloads";
+import { refreshMembersIfNeeded } from "./refreshMembers";
+import { ConfigSchema, UtilityPluginType } from "./types";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -67,6 +68,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     jumbo_size: 128,
     can_avatar: false,
     info_on_single_result: true,
+    autojoin_threads: true,
   },
   overrides: [
     {
@@ -147,6 +149,20 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     RoleInfoCmd,
     EmojiInfoCmd,
   ],
+
+  // prettier-ignore
+  events: [
+    AutoJoinThreadEvt,
+    AutoJoinThreadSyncEvt,
+  ],
+
+  public: {
+    clean(pluginData) {
+      return (args: CleanArgs, msg) => {
+        cleanCmd(pluginData, args, msg);
+      };
+    },
+  },
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

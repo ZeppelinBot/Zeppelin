@@ -1,9 +1,9 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, CustomEventsPluginType } from "./types";
-import { typedGuildCommand, parseSignature } from "knub";
+import { parseSignature, typedGuildCommand } from "knub";
 import { commandTypes } from "../../commandTypes";
 import { stripObjectToScalars } from "../../utils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { runEvent } from "./functions/runEvent";
+import { ConfigSchema, CustomEventsPluginType } from "./types";
 
 const defaultOptions = {
   config: {

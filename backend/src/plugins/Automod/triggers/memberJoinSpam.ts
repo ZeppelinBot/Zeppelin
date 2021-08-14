@@ -1,10 +1,10 @@
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
 import { convertDelayStringToMS, tDelayString } from "../../../utils";
-import { getMatchingRecentActions } from "../functions/getMatchingRecentActions";
 import { RecentActionType } from "../constants";
-import { sumRecentActionCounts } from "../functions/sumRecentActionCounts";
 import { findRecentSpam } from "../functions/findRecentSpam";
+import { getMatchingRecentActions } from "../functions/getMatchingRecentActions";
+import { sumRecentActionCounts } from "../functions/sumRecentActionCounts";
+import { automodTrigger } from "../helpers";
 
 export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
   configType: t.type({

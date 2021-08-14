@@ -1,5 +1,5 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
 import { PingableRole } from "./entities/PingableRole";
 
 export class GuildPingableRoles extends BaseGuildRepository {

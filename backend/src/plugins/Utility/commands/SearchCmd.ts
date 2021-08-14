@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { archiveSearch, displaySearch, SearchType } from "../search";
+import { utilityCmd } from "../types";
 
 // Separate from SearchCmd to avoid a circular reference from ./search.ts
 export const searchCmdSignature = {
@@ -8,14 +8,14 @@ export const searchCmdSignature = {
 
   page: ct.number({ option: true, shortcut: "p" }),
   role: ct.string({ option: true, shortcut: "r" }),
-  voice: ct.switchOption({ shortcut: "v" }),
-  bot: ct.switchOption({ shortcut: "b" }),
+  voice: ct.switchOption({ def: false, shortcut: "v" }),
+  bot: ct.switchOption({ def: false, shortcut: "b" }),
   sort: ct.string({ option: true }),
-  "case-sensitive": ct.switchOption({ shortcut: "cs" }),
-  export: ct.switchOption({ shortcut: "e" }),
+  "case-sensitive": ct.switchOption({ def: false, shortcut: "cs" }),
+  export: ct.switchOption({ def: false, shortcut: "e" }),
   ids: ct.switchOption(),
-  regex: ct.switchOption({ shortcut: "re" }),
-  "status-search": ct.switchOption({ shortcut: "ss" }),
+  regex: ct.switchOption({ def: false, shortcut: "re" }),
+  "status-search": ct.switchOption({ def: false, shortcut: "ss" }),
 };
 
 export const SearchCmd = utilityCmd({

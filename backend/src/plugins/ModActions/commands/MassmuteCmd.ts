@@ -1,13 +1,13 @@
-import { modActionsCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { stripObjectToScalars } from "../../../utils";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { TextChannel } from "eris";
+import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { modActionsCmd } from "../types";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
@@ -28,7 +28,7 @@ export const MassmuteCmd = modActionsCmd({
     }
 
     // Ask for mute reason
-    msg.channel.createMessage("Mute reason? `cancel` to cancel");
+    msg.channel.send("Mute reason? `cancel` to cancel");
     const muteReasonReceived = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
     if (
       !muteReasonReceived ||
@@ -39,11 +39,11 @@ export const MassmuteCmd = modActionsCmd({
       return;
     }
 
-    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, msg.attachments);
+    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, [...msg.attachments.values()]);
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {
-      const member = pluginData.guild.members.get(userId);
+      const member = pluginData.guild.members.cache.get(userId as Snowflake);
       if (member && !canActOn(pluginData, msg.member, member)) {
         sendErrorMessage(pluginData, msg.channel, "Cannot massmute one or more users: insufficient permissions");
         return;
@@ -58,7 +58,7 @@ export const MassmuteCmd = modActionsCmd({
     });
 
     // Show loading indicator
-    const loadingMsg = await msg.channel.createMessage("Muting...");
+    const loadingMsg = await msg.channel.send("Muting...");
 
     // Mute everyone and count fails
     const modId = msg.author.id;
@@ -87,7 +87,7 @@ export const MassmuteCmd = modActionsCmd({
     } else {
       // Success on all or some mutes
       pluginData.state.serverLogs.log(LogType.MASSMUTE, {
-        mod: stripObjectToScalars(msg.author),
+        mod: userToConfigAccessibleUser(msg.author),
         count: successfulMuteCount,
       });
 

@@ -1,32 +1,24 @@
-import "./loadEnv";
-
-import path from "path";
+import { Client, Intents, TextChannel } from "discord.js";
 import yaml from "js-yaml";
-
-import fs from "fs";
 import { Knub, PluginError } from "knub";
-import { SimpleError } from "./SimpleError";
-
-import { Configs } from "./data/Configs";
+import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
 // This is also enforced for the database in data/db.ts
 import moment from "moment-timezone";
-import { Client, DiscordHTTPError, TextChannel } from "eris";
-import { connect } from "./data/db";
-import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
-import { errorMessage, isDiscordHTTPError, isDiscordRESTError, MINUTES, successMessage } from "./utils";
-import { startUptimeCounter } from "./uptime";
 import { AllowedGuilds } from "./data/AllowedGuilds";
-import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
-import { RecoverablePluginError } from "./RecoverablePluginError";
+import { Configs } from "./data/Configs";
+import { connect } from "./data/db";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { DiscordJSError } from "./DiscordJSError";
+import "./loadEnv";
 import { logger } from "./logger";
-import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
-import { ErisError } from "./ErisError";
-
-const fsp = fs.promises;
+import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
+import { RecoverablePluginError } from "./RecoverablePluginError";
+import { SimpleError } from "./SimpleError";
+import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
+import { startUptimeCounter } from "./uptime";
+import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -86,7 +78,7 @@ function errorHandler(err) {
     return;
   }
 
-  if (err instanceof ErisError) {
+  if (err instanceof DiscordJSError) {
     if (err.code && SAFE_TO_IGNORE_ERIS_ERROR_CODES.includes(err.code)) {
       return;
     }
@@ -96,7 +88,7 @@ function errorHandler(err) {
     }
   }
 
-  if (err instanceof DiscordHTTPError && err.code >= 500) {
+  if (isDiscordHTTPError(err) && err.code >= 500) {
     // Don't need stack traces on HTTP 500 errors
     // These also shouldn't count towards RECENT_DISCORD_ERROR_EXIT_THRESHOLD because they don't indicate an error in our code
     console.error(err.message);
@@ -118,7 +110,7 @@ function errorHandler(err) {
       console.error(`Exiting after ${RECENT_PLUGIN_ERROR_EXIT_THRESHOLD} plugin errors`);
       process.exit(1);
     }
-  } else if (isDiscordRESTError(err) || isDiscordHTTPError(err)) {
+  } else if (isDiscordAPIError(err) || isDiscordHTTPError(err)) {
     // Discord API errors, usually safe to just log instead of crash
     // We still bail if we get a ton of them in a short amount of time
     if (++recentDiscordErrors >= RECENT_DISCORD_ERROR_EXIT_THRESHOLD) {
@@ -151,48 +143,42 @@ moment.tz.setDefault("UTC");
 
 logger.info("Connecting to database");
 connect().then(async () => {
-  const client = new Client(`Bot ${process.env.TOKEN}`, {
-    getAllUsers: false,
-    restMode: true,
-    compress: false,
-    guildCreateTimeout: 0,
-    rest: {
-      ratelimiterOffset: 150,
-    },
+  const client = new Client({
+    partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
+    restTimeOffset: 150,
+    restGlobalRateLimit: 50,
     // Disable mentions by default
     allowedMentions: {
-      everyone: false,
-      users: false,
-      roles: false,
+      parse: [],
+      users: [],
+      roles: [],
       repliedUser: false,
     },
     intents: [
       // Privileged
-      "guildMembers",
-      // "guildPresences",
-      "guildMessageTyping",
+      Intents.FLAGS.GUILD_MEMBERS,
+      // Intents.FLAGS.GUILD_PRESENCES,
+      Intents.FLAGS.GUILD_MESSAGE_TYPING,
 
       // Regular
-      "directMessages",
-      "guildBans",
-      "guildEmojis",
-      "guildInvites",
-      "guildMessageReactions",
-      "guildMessages",
-      "guilds",
-      "guildVoiceStates",
+      Intents.FLAGS.DIRECT_MESSAGES,
+      Intents.FLAGS.GUILD_BANS,
+      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+      Intents.FLAGS.GUILD_INVITES,
+      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+      Intents.FLAGS.GUILD_MESSAGES,
+      Intents.FLAGS.GUILDS,
+      Intents.FLAGS.GUILD_VOICE_STATES,
     ],
   });
   client.setMaxListeners(200);
 
-  client.on("debug", message => {
-    if (message.includes(" 429 ")) {
-      logger.info(`[429] ${message}`);
-    }
+  client.on("rateLimit", rateLimitData => {
+    logger.info(`[429] ${JSON.stringify(rateLimitData)}`);
   });
 
-  client.on("error", (err, shardId) => {
-    errorHandler(new ErisError(err.message, (err as any).code, shardId));
+  client.on("error", err => {
+    errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
   const allowedGuilds = new AllowedGuilds();
@@ -257,13 +243,13 @@ connect().then(async () => {
       sendSuccessMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
-        channel.createMessage(successMessage(body, emoji));
+        channel.send(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
         const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
-        channel.createMessage(errorMessage(body, emoji));
+        channel.send(errorMessage(body, emoji));
       },
     },
   });
@@ -272,6 +258,8 @@ connect().then(async () => {
     startUptimeCounter();
   });
 
-  logger.info("Starting the bot");
-  bot.run();
+  bot.initialize();
+  logger.info("Bot Initialized");
+  logger.info("Logging in...");
+  await client.login(process.env.TOKEN);
 });

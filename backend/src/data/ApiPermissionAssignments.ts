@@ -1,7 +1,7 @@
-import { getRepository, Repository } from "typeorm";
-import { ApiPermissionAssignment } from "./entities/ApiPermissionAssignment";
-import { BaseRepository } from "./BaseRepository";
 import { ApiPermissions } from "@shared/apiPermissions";
+import { getRepository, Repository } from "typeorm";
+import { BaseRepository } from "./BaseRepository";
+import { ApiPermissionAssignment } from "./entities/ApiPermissionAssignment";
 
 export enum ApiPermissionTypes {
   User = "USER",

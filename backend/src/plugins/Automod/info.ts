@@ -1,5 +1,5 @@
-import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
 import { trimPluginDescription } from "../../utils";
+import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
 
 export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   prettyName: "Automod",

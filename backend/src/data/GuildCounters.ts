@@ -1,18 +1,13 @@
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { FindConditions, getRepository, In, IsNull, LessThan, Not, Repository } from "typeorm";
-import { Counter } from "./entities/Counter";
-import { CounterValue } from "./entities/CounterValue";
-import {
-  CounterTrigger,
-  isValidCounterComparisonOp,
-  TRIGGER_COMPARISON_OPS,
-  TriggerComparisonOp,
-} from "./entities/CounterTrigger";
-import { CounterTriggerState } from "./entities/CounterTriggerState";
 import moment from "moment-timezone";
-import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
-import { connection } from "./db";
+import { FindConditions, getRepository, In, IsNull, Not, Repository } from "typeorm";
 import { Queue } from "../Queue";
+import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { connection } from "./db";
+import { Counter } from "./entities/Counter";
+import { CounterTrigger, isValidCounterComparisonOp, TriggerComparisonOp } from "./entities/CounterTrigger";
+import { CounterTriggerState } from "./entities/CounterTriggerState";
+import { CounterValue } from "./entities/CounterValue";
 
 const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
 const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;

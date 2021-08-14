@@ -1,10 +1,10 @@
-import { renderTemplate } from "../../../templateFormatter";
-import { GuildPluginData } from "knub";
-import { Tag, TagsPluginType } from "../types";
-import { renderRecursively, StrictMessageContent } from "../../../utils";
 import * as t from "io-ts";
-import { findTagByName } from "./findTagByName";
+import { GuildPluginData } from "knub";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { renderTemplate } from "../../../templateFormatter";
+import { renderRecursively, StrictMessageContent } from "../../../utils";
+import { Tag, TagsPluginType } from "../types";
+import { findTagByName } from "./findTagByName";
 
 export async function renderTagBody(
   pluginData: GuildPluginData<TagsPluginType>,

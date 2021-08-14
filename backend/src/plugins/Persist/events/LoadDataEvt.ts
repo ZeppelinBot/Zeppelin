@@ -1,15 +1,15 @@
-import { persistEvt } from "../types";
-import { Constants, MemberOptions } from "eris";
+import { GuildMemberEditData, Permissions } from "discord.js";
 import intersection from "lodash.intersection";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
-import { stripObjectToScalars } from "../../../utils";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { canAssignRole } from "../../../utils/canAssignRole";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { persistEvt } from "../types";
 
-const p = Constants.Permissions;
+const p = Permissions.FLAGS;
 
 export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
@@ -26,16 +26,16 @@ export const LoadDataEvt = persistEvt({
       return;
     }
 
-    const toRestore: MemberOptions = {};
+    const toRestore: GuildMemberEditData = {};
     const config = await pluginData.config.getForMember(member);
     const restoredData: string[] = [];
 
     // Check permissions
-    const me = pluginData.guild.members.get(pluginData.client.user.id)!;
+    const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     let requiredPermissions = 0n;
-    if (config.persist_nicknames) requiredPermissions |= p.manageNicknames;
-    if (config.persisted_roles) requiredPermissions |= p.manageRoles;
-    const missingPermissions = getMissingPermissions(me.permission, requiredPermissions);
+    if (config.persist_nicknames) requiredPermissions |= p.MANAGE_NICKNAMES;
+    if (config.persisted_roles) requiredPermissions |= p.MANAGE_ROLES;
+    const missingPermissions = getMissingPermissions(me.permissions, requiredPermissions);
     if (missingPermissions) {
       pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
         body: `Missing permissions for persist plugin: ${missingPermissionError(missingPermissions)}`,
@@ -61,7 +61,7 @@ export const LoadDataEvt = persistEvt({
 
       if (rolesToRestore.length) {
         restoredData.push("roles");
-        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles]));
+        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles.cache]));
       }
     }
 
@@ -75,7 +75,7 @@ export const LoadDataEvt = persistEvt({
       await pluginData.state.persistedData.clear(member.id);
 
       pluginData.state.logs.log(LogType.MEMBER_RESTORE, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member),
         restoredData: restoredData.join(", "),
       });
     }

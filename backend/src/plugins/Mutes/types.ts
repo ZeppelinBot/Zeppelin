@@ -1,16 +1,17 @@
-import * as t from "io-ts";
-import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
-import { Mute } from "../../data/entities/Mute";
-import { Member } from "eris";
-import { Case } from "../../data/entities/Case";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildMutes } from "../../data/GuildMutes";
-import { CaseArgs } from "../Cases/types";
-import Timeout = NodeJS.Timeout;
+import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
+import * as t from "io-ts";
+import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { Case } from "../../data/entities/Case";
+import { Mute } from "../../data/entities/Mute";
+import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildMutes } from "../../data/GuildMutes";
+import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
+import { CaseArgs } from "../Cases/types";
+
+import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
@@ -58,7 +59,7 @@ export interface MutesPluginType extends BasePluginType {
 }
 
 export interface IMuteWithDetails extends Mute {
-  member?: Member;
+  member?: GuildMember;
   banned?: boolean;
 }
 

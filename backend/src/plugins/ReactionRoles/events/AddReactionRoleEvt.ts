@@ -1,9 +1,7 @@
-import { reactionRolesEvt } from "../types";
+import { Message } from "discord.js";
 import { noop, resolveMember, sleep } from "../../../utils";
+import { reactionRolesEvt } from "../types";
 import { addMemberPendingRoleChange } from "../util/addMemberPendingRoleChange";
-import { DiscordRESTError, Message } from "eris";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -12,11 +10,11 @@ export const AddReactionRoleEvt = reactionRolesEvt({
 
   async listener(meta) {
     const pluginData = meta.pluginData;
-    const msg = meta.args.message as Message;
-    const emoji = meta.args.emoji;
-    const userId = meta.args.member.id;
+    const msg = meta.args.reaction.message as Message;
+    const emoji = meta.args.reaction.emoji;
+    const userId = meta.args.user.id;
 
-    if (userId === pluginData.client.user.id) {
+    if (userId === pluginData.client.user!.id) {
       // Don't act on own reactions
       // FIXME: This may not be needed? Knub currently requires the *member* to be found for the user to be resolved as well. Need to look into it more.
       return;
@@ -39,7 +37,7 @@ export const AddReactionRoleEvt = reactionRolesEvt({
       // User reacted with a reaction role emoji -> add the role
       const matchingReactionRole = await pluginData.state.reactionRoles.getByMessageAndEmoji(
         msg.id,
-        emoji.id || emoji.name,
+        emoji.id || emoji.name!,
       );
       if (!matchingReactionRole) return;
 
@@ -59,9 +57,8 @@ export const AddReactionRoleEvt = reactionRolesEvt({
     if (config.remove_user_reactions) {
       setTimeout(() => {
         pluginData.state.reactionRemoveQueue.add(async () => {
-          const reaction = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
           const wait = sleep(1500);
-          await msg.channel.removeMessageReaction(msg.id, reaction, userId).catch(noop);
+          await meta.args.reaction.users.remove(userId).catch(noop);
           await wait;
         });
       }, 1500);

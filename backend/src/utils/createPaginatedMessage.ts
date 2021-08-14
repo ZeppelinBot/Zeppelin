@@ -1,9 +1,19 @@
-import { Client, Emoji, MemberPartial, Message, MessageContent, TextableChannel } from "eris";
+import {
+  Client,
+  Message,
+  MessageEditOptions,
+  MessageOptions,
+  MessageReaction,
+  PartialMessageReaction,
+  PartialUser,
+  TextChannel,
+  User,
+} from "discord.js";
 import { Awaitable } from "knub/dist/utils";
 import { MINUTES, noop } from "../utils";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageContent>;
+export type LoadPageFn = (page: number) => Awaitable<MessageOptions & MessageEditOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;
@@ -17,19 +27,22 @@ const defaultOpts: PaginateMessageOpts = {
 
 export async function createPaginatedMessage(
   client: Client,
-  channel: TextableChannel,
+  channel: TextChannel | User,
   totalPages: number,
   loadPageFn: LoadPageFn,
   opts: Partial<PaginateMessageOpts> = {},
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
   const firstPageContent = await loadPageFn(1);
-  const message = await channel.createMessage(firstPageContent);
+  const message = await channel.send(firstPageContent);
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages
-  const reactionListener = async (reactionMessage: Message, emoji: Emoji, reactor: MemberPartial) => {
-    if (reactionMessage.id !== message.id) {
+  const reactionListener = async (
+    reactionMessage: MessageReaction | PartialMessageReaction,
+    reactor: User | PartialUser,
+  ) => {
+    if (reactionMessage.message.id !== message.id) {
       return;
     }
 
@@ -37,14 +50,14 @@ export async function createPaginatedMessage(
       return;
     }
 
-    if (reactor.id === client.user.id) {
+    if (reactor.id === client.user!.id) {
       return;
     }
 
     let pageDelta = 0;
-    if (emoji.name === "⬅️") {
+    if (reactionMessage.emoji.name === "⬅️") {
       pageDelta = -1;
-    } else if (emoji.name === "➡️") {
+    } else if (reactionMessage.emoji.name === "➡️") {
       pageDelta = 1;
     }
 
@@ -65,7 +78,7 @@ export async function createPaginatedMessage(
     }
 
     message.edit(newPageContent).catch(noop);
-    message.removeReaction(emoji.name, reactor.id);
+    reactionMessage.users.remove(reactor.id).catch(noop);
     refreshTimeout();
   };
   client.on("messageReactionAdd", reactionListener);
@@ -76,7 +89,7 @@ export async function createPaginatedMessage(
   const refreshTimeout = () => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      message.removeReactions().catch(noop);
+      message.reactions.removeAll().catch(noop);
       client.off("messageReactionAdd", reactionListener);
     }, fullOpts.timeout);
   };
@@ -84,8 +97,8 @@ export async function createPaginatedMessage(
   refreshTimeout();
 
   // Add reactions
-  message.addReaction("⬅️").catch(noop);
-  message.addReaction("➡️").catch(noop);
+  message.react("⬅️").catch(noop);
+  message.react("➡️").catch(noop);
 
   return message;
 }

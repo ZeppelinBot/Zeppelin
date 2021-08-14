@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { helpers } from "knub";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { utilityCmd } from "../types";
 
 const { getMemberLevel } = helpers;
 
@@ -17,6 +17,6 @@ export const LevelCmd = utilityCmd({
   run({ message, args, pluginData }) {
     const member = args.member || message.member;
     const level = getMemberLevel(pluginData, member);
-    message.channel.createMessage(`The permission level of ${member.username}#${member.discriminator} is **${level}**`);
+    message.channel.send(`The permission level of ${member.user.tag} is **${level}**`);
   },
 });

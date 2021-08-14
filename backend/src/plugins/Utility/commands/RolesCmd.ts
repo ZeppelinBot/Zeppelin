@@ -1,9 +1,9 @@
-import { utilityCmd } from "../types";
+import { Role, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Role, TextChannel } from "eris";
+import { sendErrorMessage } from "../../../pluginUtils";
 import { chunkArray, sorter, trimLines } from "../../../utils";
 import { refreshMembersIfNeeded } from "../refreshMembers";
-import { sendErrorMessage } from "../../../pluginUtils";
+import { utilityCmd } from "../types";
 
 export const RolesCmd = utilityCmd({
   trigger: "roles",
@@ -21,7 +21,9 @@ export const RolesCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const { guild } = pluginData;
 
-    let roles: Array<{ _memberCount?: number } & Role> = Array.from((msg.channel as TextChannel).guild.roles.values());
+    let roles: Array<{ _memberCount?: number } & Role> = Array.from(
+      (msg.channel as TextChannel).guild.roles.cache.values(),
+    );
     let sort = args.sort;
 
     if (args.search) {
@@ -32,13 +34,9 @@ export const RolesCmd = utilityCmd({
     if (args.counts) {
       await refreshMembersIfNeeded(guild);
 
-      // If the user requested role member counts as well, calculate them and sort the roles by their member count
-      const roleCounts: Map<string, number> = Array.from(guild.members.values()).reduce((map, member) => {
-        for (const roleId of member.roles) {
-          if (!map.has(roleId)) map.set(roleId, 0);
-          map.set(roleId, map.get(roleId) + 1);
-        }
-
+      // If the user requested role member counts as well, fetch them and sort the roles by their member count
+      const roleCounts: Map<string, number> = Array.from(guild.roles.cache.values()).reduce((map, role) => {
+        map.set(role.id, role.members.size);
         return map;
       }, new Map());
 
@@ -97,14 +95,14 @@ export const RolesCmd = utilityCmd({
       });
 
       if (i === 0) {
-        msg.channel.createMessage(
+        msg.channel.send(
           trimLines(`
           ${args.search ? "Total roles found" : "Total roles"}: ${roles.length}
           \`\`\`py\n${roleLines.join("\n")}\`\`\`
         `),
         );
       } else {
-        msg.channel.createMessage("```py\n" + roleLines.join("\n") + "```");
+        msg.channel.send("```py\n" + roleLines.join("\n") + "```");
       }
     }
   },

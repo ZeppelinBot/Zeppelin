@@ -1,17 +1,17 @@
-import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
-import { User, Message, Member } from "eris";
-import { UnknownUser, asSingleLine } from "../../../utils";
-import { sendErrorMessage, sendSuccessMessage, hasPermission } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { GuildMember, Message, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { asSingleLine, UnknownUser } from "../../../utils";
+import { ModActionsPluginType } from "../types";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   user: User | UnknownUser,
   msg: Message,
-  args: { time?: number; reason?: string; mod?: Member },
+  args: { time?: number; reason?: string; mod?: GuildMember },
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
   let mod = msg.author;
@@ -19,7 +19,7 @@ export async function actualUnmuteCmd(
 
   if (args.mod) {
     if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id }))) {
-      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+      sendErrorMessage(pluginData, msg.channel as TextChannel, "You don't have permission to use -mod");
       return;
     }
 
@@ -27,7 +27,7 @@ export async function actualUnmuteCmd(
     pp = msg.author;
   }
 
-  const reason = args.reason ? formatReasonWithAttachments(args.reason, msg.attachments) : undefined;
+  const reason = args.reason ? formatReasonWithAttachments(args.reason, [...msg.attachments.values()]) : undefined;
 
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
   const result = await mutesPlugin.unmuteUser(user.id, args.time, {
@@ -37,7 +37,7 @@ export async function actualUnmuteCmd(
   });
 
   if (!result) {
-    sendErrorMessage(pluginData, msg.channel, "User is not muted!");
+    sendErrorMessage(pluginData, msg.channel as TextChannel, "User is not muted!");
     return;
   }
 
@@ -46,18 +46,18 @@ export async function actualUnmuteCmd(
     const timeUntilUnmute = args.time && humanizeDuration(args.time);
     sendSuccessMessage(
       pluginData,
-      msg.channel,
+      msg.channel as TextChannel,
       asSingleLine(`
-        Unmuting **${user.username}#${user.discriminator}**
+        Unmuting **${user.tag}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
       `),
     );
   } else {
     sendSuccessMessage(
       pluginData,
-      msg.channel,
+      msg.channel as TextChannel,
       asSingleLine(`
-        Unmuted **${user.username}#${user.discriminator}**
+        Unmuted **${user.tag}**
         (Case #${result.case.case_number})
       `),
     );

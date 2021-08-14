@@ -1,21 +1,21 @@
-import { CaseArgs, CasesPluginType } from "../types";
-import { resolveUser } from "../../../utils";
 import { GuildPluginData } from "knub";
+import { logger } from "../../../logger";
+import { resolveUser } from "../../../utils";
+import { CaseArgs, CasesPluginType } from "../types";
 import { createCaseNote } from "./createCaseNote";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
-import { logger } from "../../../logger";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
   const user = await resolveUser(pluginData.client, args.userId);
-  const userName = `${user.username}#${user.discriminator}`;
+  const userName = user.tag;
 
   const mod = await resolveUser(pluginData.client, args.modId);
-  const modName = `${mod.username}#${mod.discriminator}`;
+  const modName = mod.tag;
 
   let ppName: string | null = null;
   if (args.ppId) {
     const pp = await resolveUser(pluginData.client, args.ppId);
-    ppName = `${pp.username}#${pp.discriminator}`;
+    ppName = pp.tag;
   }
 
   if (args.auditLogId) {

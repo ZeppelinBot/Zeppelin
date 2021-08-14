@@ -1,7 +1,7 @@
-import { utilityCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
+import { utilityCmd } from "../types";
 
 export const UserInfoCmd = utilityCmd({
   trigger: ["user", "userinfo", "whois"],
@@ -12,7 +12,7 @@ export const UserInfoCmd = utilityCmd({
   signature: {
     user: ct.resolvedUserLoose({ required: false }),
 
-    compact: ct.switchOption({ shortcut: "c" }),
+    compact: ct.switchOption({ def: false, shortcut: "c" }),
   },
 
   async run({ message, args, pluginData }) {
@@ -23,6 +23,6 @@ export const UserInfoCmd = utilityCmd({
       return;
     }
 
-    message.channel.createMessage({ embed });
+    message.channel.send({ embeds: [embed] });
   },
 });

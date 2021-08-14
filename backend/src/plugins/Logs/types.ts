@@ -1,12 +1,12 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildEventListener } from "knub";
-import { TRegex } from "../../validatorUtils";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
-import { tMessageContent, tNullable } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { RegExpRunner } from "../../RegExpRunner";
+import { tMessageContent, tNullable } from "../../utils";
+import { TRegex } from "../../validatorUtils";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;

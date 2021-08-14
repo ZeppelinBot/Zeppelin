@@ -1,12 +1,13 @@
-import { TagsPluginType } from "../types";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { convertDelayStringToMS, noop, resolveMember, tStrictMessageContent } from "../../../utils";
-import { validate } from "../../../validatorUtils";
+import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
-import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
+import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { validate } from "../../../validatorUtils";
+import { TagsPluginType } from "../types";
+import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -15,18 +16,18 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const channel = pluginData.guild.channels.get(msg.channel_id) as TextChannel;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
   if (!channel) return;
 
   const config = await pluginData.config.getMatchingConfig({
     member,
     channelId: msg.channel_id,
-    categoryId: channel.parentID,
+    categoryId: channel.parentId,
   });
 
   const tagResult = await matchAndRenderTagFromString(pluginData, msg.data.content, member, {
     channelId: msg.channel_id,
-    categoryId: channel.parentID,
+    categoryId: channel.parentId,
   });
 
   if (!tagResult) {
@@ -100,9 +101,9 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   }
 
   const allowMentions = tagResult.category?.allow_mentions ?? config.allow_mentions;
-  const responseMsg = await channel.createMessage({
+  const responseMsg = await channel.send({
     ...tagResult.renderedContent,
-    allowedMentions: { roles: allowMentions, users: allowMentions },
+    allowedMentions: erisAllowedMentionsToDjsMentionOptions({ roles: allowMentions, users: allowMentions }),
   });
 
   // Save the command-response message pair once the message is in our database
@@ -116,6 +117,8 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const deleteInvoke = tagResult.category?.auto_delete_command ?? config.auto_delete_command;
   if (!deleteWithCommand && deleteInvoke) {
     // Try deleting the invoking message, ignore errors silently
-    pluginData.client.deleteMessage(msg.channel_id, msg.id).catch(noop);
+    (pluginData.guild.channels.resolve(msg.channel_id as Snowflake) as TextChannel).messages.delete(
+      msg.id as Snowflake,
+    );
   }
 }

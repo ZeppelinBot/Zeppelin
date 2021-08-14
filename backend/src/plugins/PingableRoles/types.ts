@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
 import { PingableRole } from "../../data/entities/PingableRole";
+import { GuildPingableRoles } from "../../data/GuildPingableRoles";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,

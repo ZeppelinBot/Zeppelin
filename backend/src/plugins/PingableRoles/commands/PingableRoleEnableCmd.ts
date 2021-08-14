@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { pingableRolesCmd } from "../types";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { pingableRolesCmd } from "../types";
 
 export const PingableRoleEnableCmd = pingableRolesCmd({
   trigger: "pingable_role",

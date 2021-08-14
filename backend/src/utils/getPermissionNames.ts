@@ -1,18 +1,11 @@
-import { Constants } from "eris";
-
-const camelCaseToTitleCase = str =>
-  str
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .split(" ")
-    .map(w => w[0].toUpperCase() + w.slice(1))
-    .join(" ");
+import { Permissions } from "discord.js";
 
 const permissionNumberToName: Map<bigint, string> = new Map();
 const ignoredPermissionConstants = ["all", "allGuild", "allText", "allVoice"];
 
-for (const key in Constants.Permissions) {
+for (const key in Permissions.FLAGS) {
   if (ignoredPermissionConstants.includes(key)) continue;
-  permissionNumberToName.set(BigInt(Constants.Permissions[key]), camelCaseToTitleCase(key));
+  permissionNumberToName.set(BigInt(Permissions.FLAGS[key]), key);
 }
 
 /**

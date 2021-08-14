@@ -1,13 +1,13 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PluginOptions } from "knub";
-import { ConfigSchema, CensorPluginType } from "./types";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { CensorPluginType, ConfigSchema } from "./types";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageUpdate } from "./util/onMessageUpdate";
-import { trimPluginDescription } from "../../utils";
-import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<CensorPluginType> = {
   config: {

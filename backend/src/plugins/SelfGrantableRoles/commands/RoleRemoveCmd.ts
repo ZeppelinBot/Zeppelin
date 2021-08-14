@@ -1,11 +1,12 @@
-import { selfGrantableRolesCmd } from "../types";
+import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getApplyingEntries } from "../util/getApplyingEntries";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { splitRoleNames } from "../util/splitRoleNames";
-import { normalizeRoleNames } from "../util/normalizeRoleNames";
-import { findMatchingRoles } from "../util/findMatchingRoles";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
+import { selfGrantableRolesCmd } from "../types";
+import { findMatchingRoles } from "../util/findMatchingRoles";
+import { getApplyingEntries } from "../util/getApplyingEntries";
+import { normalizeRoleNames } from "../util/normalizeRoleNames";
+import { splitRoleNames } from "../util/splitRoleNames";
 
 export const RoleRemoveCmd = selfGrantableRolesCmd({
   trigger: "role remove",
@@ -27,12 +28,14 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
     const roleNames = normalizeRoleNames(splitRoleNames(args.roleNames));
     const matchedRoleIds = findMatchingRoles(roleNames, applyingEntries);
 
-    const rolesToRemove = Array.from(matchedRoleIds.values()).map(id => pluginData.guild.roles.get(id)!);
+    const rolesToRemove = Array.from(matchedRoleIds.values()).map(
+      id => pluginData.guild.roles.cache.get(id as Snowflake)!,
+    );
     const roleIdsToRemove = rolesToRemove.map(r => r.id);
 
     // Remove the roles
     if (rolesToRemove.length) {
-      const newRoleIds = msg.member.roles.filter(roleId => !roleIdsToRemove.includes(roleId));
+      const newRoleIds = msg.member.roles.cache.filter(role => !roleIdsToRemove.includes(role.id));
 
       try {
         await msg.member.edit({

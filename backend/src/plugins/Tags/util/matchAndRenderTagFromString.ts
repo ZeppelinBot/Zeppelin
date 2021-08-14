@@ -1,10 +1,10 @@
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { GuildMember } from "discord.js";
+import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
+import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { StrictMessageContent } from "../../../utils";
 import { TagsPluginType, TTagCategory } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
-import { convertDelayStringToMS, StrictMessageContent } from "../../../utils";
-import escapeStringRegexp from "escape-string-regexp";
-import { Member } from "eris";
 
 interface BaseResult {
   renderedContent: StrictMessageContent;
@@ -26,7 +26,7 @@ type Result = ResultWithCategory | ResultWithoutCategory;
 export async function matchAndRenderTagFromString(
   pluginData: GuildPluginData<TagsPluginType>,
   str: string,
-  member: Member,
+  member: GuildMember,
   extraMatchParams: ExtendedMatchParams = {},
 ): Promise<Result | null> {
   const config = await pluginData.config.getMatchingConfig({

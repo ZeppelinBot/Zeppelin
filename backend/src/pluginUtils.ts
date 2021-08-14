@@ -2,23 +2,28 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { AdvancedMessageContent, AllowedMentions, GuildTextableChannel, Member, Message, TextableChannel } from "eris";
-import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
-import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
-import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
-import { TZeppelinKnub } from "./types";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
+import { GuildMember, Message, MessageMentionOptions, MessageOptions, TextChannel } from "discord.js";
 import * as t from "io-ts";
+import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
-import { Tail } from "./utils/typeUtils";
+import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
 import { AnyPluginData } from "knub/dist/plugins/PluginData";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { logger } from "./logger";
+import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { TZeppelinKnub } from "./types";
+import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
+import { Tail } from "./utils/typeUtils";
+import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 
-export function canActOn(pluginData: GuildPluginData<any>, member1: Member, member2: Member, allowSameLevel = false) {
-  if (member2.id === pluginData.client.user.id) {
+export function canActOn(
+  pluginData: GuildPluginData<any>,
+  member1: GuildMember,
+  member2: GuildMember,
+  allowSameLevel = false,
+) {
+  if (member2.id === pluginData.client.user!.id) {
     return false;
   }
 
@@ -178,45 +183,43 @@ export function getPluginConfigPreprocessor(
   };
 }
 
-export function sendSuccessMessage(
+export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextableChannel,
+  channel: TextChannel,
   body: string,
-  allowedMentions?: AllowedMentions,
+  allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
-  const content: AdvancedMessageContent = allowedMentions
+  const content: MessageOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
+
   return channel
-    .createMessage(content) // Force line break
+    .send({ ...content }) // Force line break
     .catch(err => {
-      const channelInfo = (channel as GuildTextableChannel).guild
-        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
-        : `${channel.id}`;
+      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });
 }
 
-export function sendErrorMessage(
+export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextableChannel,
+  channel: TextChannel,
   body: string,
-  allowedMentions?: AllowedMentions,
+  allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
   const formattedBody = errorMessage(body, emoji);
-  const content: AdvancedMessageContent = allowedMentions
+  const content: MessageOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
+
   return channel
-    .createMessage(content) // Force line break
+    .send({ ...content }) // Force line break
     .catch(err => {
-      const channelInfo = (channel as GuildTextableChannel).guild
-        ? `${channel.id} (${(channel as GuildTextableChannel).guild.id})`
-        : `${channel.id}`;
+      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });

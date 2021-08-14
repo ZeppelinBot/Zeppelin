@@ -1,7 +1,8 @@
-import { GuildPluginData } from "knub";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { Permissions, Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
+import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
+import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),
@@ -24,18 +25,22 @@ export async function setChannelPermissionOverridesAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const channel = pluginData.guild.channels.get(action.channel);
+  const channel = pluginData.guild.channels.cache.get(action.channel as Snowflake) as TextChannel;
   if (!channel) {
     throw new ActionError(`Unknown channel: ${action.channel}`);
   }
 
   for (const override of action.overrides) {
-    await channel.editPermission(
-      override.id,
-      override.allow,
-      override.deny,
-      override.type,
+    channel.permissionOverwrites.create(
+      override.id as Snowflake,
+      new Permissions(BigInt(override.allow)).add(BigInt(override.deny)).serialize(),
+    );
+
+    /*
+    await channel.permissionOverwrites overwritePermissions(
+      [{ id: override.id, allow: BigInt(override.allow), deny: BigInt(override.deny), type: override.type }],
       `Custom event: ${event.name}`,
     );
+    */
   }
 }

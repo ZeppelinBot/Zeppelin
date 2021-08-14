@@ -1,8 +1,8 @@
 import { typedGuildCommand } from "knub";
-import { CountersPluginType } from "../types";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
+import { CountersPluginType } from "../types";
 
 export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
   trigger: ["counters list", "counter list", "counters"],
@@ -41,7 +41,7 @@ export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
       hintLines.push(`Use \`${getGuildPrefix(pluginData)}counters reset_all <name>\` to reset a counter entirely`);
     }
 
-    message.channel.createMessage(
+    message.channel.send(
       trimMultilineString(`
       ${counterLines.join("\n\n")}
       

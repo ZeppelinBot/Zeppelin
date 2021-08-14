@@ -1,37 +1,36 @@
-import { logsEvt } from "../types";
-import { stripObjectToScalars } from "../../../utils";
+import {
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+} from "../../../utils/configAccessibleObjects";
 import { LogType } from "../../../data/LogType";
+import { logsEvt } from "../types";
 
-export const LogsVoiceJoinEvt = logsEvt({
-  event: "voiceChannelJoin",
-
-  async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
-      member: stripObjectToScalars(meta.args.member, ["user", "roles"]),
-      channel: stripObjectToScalars(meta.args.newChannel),
-    });
-  },
-});
-
-export const LogsVoiceLeaveEvt = logsEvt({
-  event: "voiceChannelLeave",
+export const LogsVoiceStateUpdateEvt = logsEvt({
+  event: "voiceStateUpdate",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
-      member: stripObjectToScalars(meta.args.member, ["user", "roles"]),
-      channel: stripObjectToScalars(meta.args.oldChannel),
-    });
-  },
-});
+    const oldChannel = meta.args.oldState.channel;
+    const newChannel = meta.args.newState.channel;
+    const member = meta.args.newState.member ?? meta.args.oldState.member!;
 
-export const LogsVoiceSwitchEvt = logsEvt({
-  event: "voiceChannelSwitch",
-
-  async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
-      member: stripObjectToScalars(meta.args.member, ["user", "roles"]),
-      oldChannel: stripObjectToScalars(meta.args.oldChannel),
-      newChannel: stripObjectToScalars(meta.args.newChannel),
-    });
+    if (!newChannel && oldChannel) {
+      // Leave evt
+      meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_LEAVE, {
+        member: memberToConfigAccessibleMember(member),
+        channel: channelToConfigAccessibleChannel(oldChannel!),
+      });
+    } else if (!oldChannel && newChannel) {
+      // Join Evt
+      meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_JOIN, {
+        member: memberToConfigAccessibleMember(member),
+        channel: channelToConfigAccessibleChannel(newChannel),
+      });
+    } else {
+      meta.pluginData.state.guildLogs.log(LogType.VOICE_CHANNEL_MOVE, {
+        member: memberToConfigAccessibleMember(member),
+        oldChannel: channelToConfigAccessibleChannel(oldChannel!),
+        newChannel: channelToConfigAccessibleChannel(newChannel!),
+      });
+    }
   },
 });

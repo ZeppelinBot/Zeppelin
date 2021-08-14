@@ -1,12 +1,12 @@
+import { Util } from "discord.js";
 import * as t from "io-ts";
-import { automodTrigger } from "../helpers";
-import { disableInlineCode, verboseChannelMention } from "../../../utils";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { allowTimeout } from "../../../RegExpRunner";
-import { TRegex } from "../../../validatorUtils";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
+import { TRegex } from "../../../validatorUtils";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   pattern: string;
@@ -72,6 +72,6 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched regex \`${disableInlineCode(matchResult.extra.pattern)}\` in ${partialSummary}`;
+    return `Matched regex \`${Util.escapeInlineCode(matchResult.extra.pattern)}\` in ${partialSummary}`;
   },
 });

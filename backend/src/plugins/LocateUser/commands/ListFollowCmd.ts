@@ -1,7 +1,7 @@
-import { locateUserCmd } from "../types";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { createChunkedMessage, sorter } from "../../../utils";
+import { locateUserCmd } from "../types";
 
 export const ListFollowCmd = locateUserCmd({
   trigger: ["follows", "fs"],

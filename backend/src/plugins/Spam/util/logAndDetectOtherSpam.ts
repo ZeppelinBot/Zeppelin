@@ -1,15 +1,16 @@
 import { GuildPluginData } from "knub";
-import { SpamPluginType, RecentActionType } from "../types";
-import { addRecentAction } from "./addRecentAction";
-import { getRecentActionCount } from "./getRecentActionCount";
-import { resolveMember, convertDelayStringToMS, stripObjectToScalars } from "../../../utils";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { clearRecentUserActions } from "./clearRecentUserActions";
 import { LogType } from "../../../data/LogType";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { convertDelayStringToMS, resolveMember } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RecentActionType, SpamPluginType } from "../types";
+import { addRecentAction } from "./addRecentAction";
+import { clearRecentUserActions } from "./clearRecentUserActions";
+import { getRecentActionCount } from "./getRecentActionCount";
 
 export async function logAndDetectOtherSpam(
   pluginData: GuildPluginData<SpamPluginType>,
@@ -47,7 +48,7 @@ export async function logAndDetectOtherSpam(
             "Automatic spam detection",
             {
               caseArgs: {
-                modId: pluginData.client.user.id,
+                modId: pluginData.client.user!.id,
                 extraNotes: [`Details: ${details}`],
               },
             },
@@ -68,7 +69,7 @@ export async function logAndDetectOtherSpam(
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
         await casesPlugin.createCase({
           userId,
-          modId: pluginData.client.user.id,
+          modId: pluginData.client.user!.id,
           type: CaseTypes.Note,
           reason: `Automatic spam detection: ${details}`,
         });
@@ -78,7 +79,7 @@ export async function logAndDetectOtherSpam(
       clearRecentUserActions(pluginData, RecentActionType.VoiceChannelMove, userId, actionGroupId);
 
       logs.log(LogType.OTHER_SPAM_DETECTED, {
-        member: stripObjectToScalars(member, ["user", "roles"]),
+        member: memberToConfigAccessibleMember(member!),
         description,
         limit: spamConfig.count,
         interval: spamConfig.interval,

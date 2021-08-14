@@ -1,9 +1,9 @@
+import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
-import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/ApiUserInfo";
+import { DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
 import { connection } from "./db";
-import moment from "moment-timezone";
-import { DBDateFormat } from "../utils";
+import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/ApiUserInfo";
 
 export class ApiUserInfo extends BaseRepository {
   private apiUserInfo: Repository<ApiUserInfoEntity>;

@@ -1,11 +1,11 @@
-import * as t from "io-ts";
+import { Util } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { automodTrigger } from "../helpers";
-import { disableInlineCode, verboseChannelMention } from "../../../utils";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import * as t from "io-ts";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   word: string;
@@ -89,6 +89,6 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched word \`${disableInlineCode(matchResult.extra.word)}\` in ${partialSummary}`;
+    return `Matched word \`${Util.escapeInlineCode(matchResult.extra.word)}\` in ${partialSummary}`;
   },
 });

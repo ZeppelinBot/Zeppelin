@@ -1,4 +1,4 @@
-import { Guild } from "eris";
+import { Guild } from "discord.js";
 
 export enum ERRORS {
   NO_MUTE_ROLE_IN_CONFIG = 1,

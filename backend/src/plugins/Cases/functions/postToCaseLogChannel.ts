@@ -1,29 +1,31 @@
+import { FileOptions, Message, MessageOptions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CasesPluginType } from "../types";
-import { Message, MessageContent, MessageFile, TextChannel } from "eris";
-import { isDiscordRESTError } from "../../../utils";
-import { LogType } from "../../../data/LogType";
 import { Case } from "../../../data/entities/Case";
+import { LogType } from "../../../data/LogType";
+import { isDiscordAPIError } from "../../../utils";
+import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
-import { logger } from "../../../logger";
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
-  content: MessageContent,
-  file?: MessageFile,
+  content: MessageOptions,
+  file?: FileOptions[],
 ): Promise<Message | null> {
   const caseLogChannelId = pluginData.config.get().case_log_channel;
   if (!caseLogChannelId) return null;
 
-  const caseLogChannel = pluginData.guild.channels.get(caseLogChannelId);
+  const caseLogChannel = pluginData.guild.channels.cache.get(caseLogChannelId as Snowflake);
   if (!caseLogChannel || !(caseLogChannel instanceof TextChannel)) return null;
 
   let result;
   try {
-    result = await caseLogChannel.createMessage(content, file);
+    if (file != null) {
+      content.files = file;
+    }
+    result = await caseLogChannel.send({ ...content });
   } catch (e) {
-    if (isDiscordRESTError(e) && (e.code === 50013 || e.code === 50001)) {
+    if (isDiscordAPIError(e) && (e.code === 50013 || e.code === 50001)) {
       pluginData.state.logs.log(LogType.BOT_ALERT, {
         body: `Missing permissions to post mod cases in <#${caseLogChannel.id}>`,
       });
@@ -50,7 +52,8 @@ export async function postCaseToCaseLogChannel(
     const [channelId, messageId] = theCase.log_message_id.split("-");
 
     try {
-      await pluginData.client.editMessage(channelId, messageId, caseEmbed);
+      const channel = pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel;
+      await channel.messages.edit(messageId as Snowflake, caseEmbed);
       return null;
     } catch {} // tslint:disable-line:no-empty
   }

@@ -1,7 +1,7 @@
-import { messageSaverCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { saveMessagesToDB } from "../saveMessagesToDB";
 import { sendSuccessMessage } from "../../../pluginUtils";
+import { saveMessagesToDB } from "../saveMessagesToDB";
+import { messageSaverCmd } from "../types";
 
 export const SaveMessagesToDBCmd = messageSaverCmd({
   trigger: "save_messages_to_db",
@@ -14,7 +14,7 @@ export const SaveMessagesToDBCmd = messageSaverCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    await msg.channel.createMessage("Saving specified messages...");
+    await msg.channel.send("Saving specified messages...");
     const { savedCount, failed } = await saveMessagesToDB(pluginData, args.channel, args.ids.trim().split(" "));
 
     if (failed.length) {

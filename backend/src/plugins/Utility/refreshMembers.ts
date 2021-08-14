@@ -1,4 +1,4 @@
-import { Guild } from "eris";
+import { Guild } from "discord.js";
 import { HOURS, noop } from "../../utils";
 
 const MEMBER_REFRESH_FREQUENCY = 1 * HOURS; // How often to do a full member refresh when using commands that need it
@@ -10,7 +10,7 @@ export async function refreshMembersIfNeeded(guild: Guild) {
     return lastRefresh.promise;
   }
 
-  const loadPromise = guild.fetchAllMembers().then(noop);
+  const loadPromise = guild.members.fetch().then(noop);
   memberRefreshLog.set(guild.id, {
     time: Date.now(),
     promise: loadPromise,

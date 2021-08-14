@@ -1,16 +1,13 @@
-import { utilityCmd } from "../types";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { VoiceChannel } from "discord.js";
 import {
-  channelMentionRegex,
-  errorMessage,
-  isSnowflake,
-  simpleClosestStringMatch,
-  stripObjectToScalars,
-} from "../../../utils";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { VoiceChannel } from "eris";
+  channelToConfigAccessibleChannel,
+  memberToConfigAccessibleMember,
+  userToConfigAccessibleUser,
+} from "../../../utils/configAccessibleObjects";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
-import { resolveChannel } from "knub/dist/helpers";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { utilityCmd } from "../types";
 
 export const VcdisconnectCmd = utilityCmd({
   trigger: ["vcdisconnect", "vcdisc", "vcdc", "vckick", "vck"],
@@ -28,31 +25,25 @@ export const VcdisconnectCmd = utilityCmd({
       return;
     }
 
-    if (!args.member.voiceState || !args.member.voiceState.channelID) {
+    if (!args.member.voice?.channelId) {
       sendErrorMessage(pluginData, msg.channel, "Member is not in a voice channel");
       return;
     }
-    const channel = (await resolveChannel(pluginData.guild, args.member.voiceState.channelID)) as VoiceChannel;
+    const channel = pluginData.guild.channels.cache.get(args.member.voice.channelId) as VoiceChannel;
 
     try {
-      await args.member.edit({
-        channelID: null,
-      });
+      await args.member.voice.disconnect();
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to disconnect member");
       return;
     }
 
     pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_DISCONNECT, {
-      mod: stripObjectToScalars(msg.author),
-      member: stripObjectToScalars(args.member, ["user", "roles"]),
-      oldChannel: stripObjectToScalars(channel),
+      mod: userToConfigAccessibleUser(msg.author),
+      member: memberToConfigAccessibleMember(args.member),
+      oldChannel: channelToConfigAccessibleChannel(channel),
     });
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `**${args.member.user.username}#${args.member.user.discriminator}** disconnected from **${channel.name}**`,
-    );
+    sendSuccessMessage(pluginData, msg.channel, `**${args.member.user.tag}** disconnected from **${channel.name}**`);
   },
 });

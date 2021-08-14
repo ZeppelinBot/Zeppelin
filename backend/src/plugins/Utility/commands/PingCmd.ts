@@ -1,6 +1,6 @@
-import { utilityCmd } from "../types";
+import { Message } from "discord.js";
 import { noop, trimLines } from "../../../utils";
-import { Message } from "eris";
+import { utilityCmd } from "../types";
 
 const { performance } = require("perf_hooks");
 
@@ -16,12 +16,12 @@ export const PingCmd = utilityCmd({
 
     for (let i = 0; i < 4; i++) {
       const start = performance.now();
-      const message = await msg.channel.createMessage(`Calculating ping... ${i + 1}`);
+      const message = await msg.channel.send(`Calculating ping... ${i + 1}`);
       times.push(performance.now() - start);
       messages.push(message);
 
       if (msgToMsgDelay === undefined) {
-        msgToMsgDelay = message.timestamp - msg.timestamp;
+        msgToMsgDelay = message.createdTimestamp - msg.createdTimestamp;
       }
     }
 
@@ -29,25 +29,18 @@ export const PingCmd = utilityCmd({
     const lowest = Math.round(Math.min(...times));
     const mean = Math.round(times.reduce((total, ms) => total + ms, 0) / times.length);
 
-    const shard = pluginData.client.shards.get(pluginData.client.guildShardMap[pluginData.guild.id])!;
-
-    msg.channel.createMessage(
+    msg.channel.send(
       trimLines(`
       **Ping:**
       Lowest: **${lowest}ms**
       Highest: **${highest}ms**
       Mean: **${mean}ms**
       Time between ping command and first reply: **${msgToMsgDelay!}ms**
-      Shard latency: **${shard.latency}ms**
+      Shard latency: **${pluginData.client.ws.ping}ms**
     `),
     );
 
     // Clean up test messages
-    pluginData.client
-      .deleteMessages(
-        messages[0].channel.id,
-        messages.map(m => m.id),
-      )
-      .catch(noop);
+    msg.channel.bulkDelete(messages).catch(noop);
   },
 });

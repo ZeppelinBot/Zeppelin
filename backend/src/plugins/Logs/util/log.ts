@@ -1,11 +1,11 @@
+import { MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType, TLogChannelMap } from "../types";
-import { LogType } from "../../../data/LogType";
-import { TextChannel } from "eris";
-import { createChunkedMessage, get, noop } from "../../../utils";
-import { getLogMessage } from "./getLogMessage";
-import { allowTimeout } from "../../../RegExpRunner";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { allowTimeout } from "../../../RegExpRunner";
+import { createChunkedMessage, get, noop } from "../../../utils";
+import { LogsPluginType, TLogChannelMap } from "../types";
+import { getLogMessage } from "./getLogMessage";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
@@ -19,7 +19,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
   const typeStr = LogType[type];
 
   logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
-    const channel = pluginData.guild.channels.get(channelId);
+    const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
     if (!channel || !(channel instanceof TextChannel)) continue;
 
     if ((opts.include && opts.include.includes(typeStr)) || (opts.exclude && !opts.exclude.includes(typeStr))) {
@@ -45,9 +45,9 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (opts.excluded_roles) {
         for (const value of Object.values(data || {})) {
           if (value instanceof SavedMessage) {
-            const member = pluginData.guild.members.get(value.user_id);
-            for (const role of member?.roles || []) {
-              if (opts.excluded_roles.includes(role)) {
+            const member = pluginData.guild.members.cache.get(value.user_id as Snowflake);
+            for (const role of member?.roles.cache || []) {
+              if (opts.excluded_roles.includes(role[0])) {
                 continue logChannelLoop;
               }
             }
@@ -94,7 +94,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
           type === LogType.CENSOR ||
           type === LogType.CLEAN
         ) {
-          if (data.channel.parentID && opts.excluded_categories.includes(data.channel.parentID)) {
+          if (data.channel.parentId && opts.excluded_categories.includes(data.channel.parentId)) {
             continue logChannelLoop;
           }
         }
@@ -128,7 +128,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
       if (message) {
         // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
         if (typeof message !== "string") {
-          await channel.createMessage(message).catch(noop);
+          await channel.send(message).catch(noop);
           return;
         }
 
@@ -136,6 +136,7 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
         const batched = opts.batched ?? true;
         const batchTime = opts.batch_time ?? 1000;
         const cfg = pluginData.config.get();
+        const parse: MessageMentionTypes[] = cfg.allow_user_mentions ? ["users"] : [];
 
         if (batched) {
           // If we're batching log messages, gather all log messages within the set batch_time into a single message
@@ -144,14 +145,14 @@ export async function log(pluginData: GuildPluginData<LogsPluginType>, type: Log
             setTimeout(async () => {
               const batchedMessage = pluginData.state.batches.get(channel.id)!.join("\n");
               pluginData.state.batches.delete(channel.id);
-              createChunkedMessage(channel, batchedMessage, { users: cfg.allow_user_mentions }).catch(noop);
+              createChunkedMessage(channel, batchedMessage, { parse }).catch(noop);
             }, batchTime);
           }
 
           pluginData.state.batches.get(channel.id)!.push(message);
         } else {
           // If we're not batching log messages, just send them immediately
-          await createChunkedMessage(channel, message, { users: cfg.allow_user_mentions }).catch(noop);
+          await createChunkedMessage(channel, message, { parse }).catch(noop);
         }
       }
     }

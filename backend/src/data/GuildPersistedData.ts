@@ -1,6 +1,6 @@
-import { PersistedData } from "./entities/PersistedData";
-import { BaseGuildRepository } from "./BaseGuildRepository";
 import { getRepository, Repository } from "typeorm";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { PersistedData } from "./entities/PersistedData";
 
 export interface IPartialPersistData {
   roles?: string[];

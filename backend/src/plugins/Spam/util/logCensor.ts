@@ -1,10 +1,11 @@
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SpamPluginType, RecentActionType } from "../types";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { RecentActionType, SpamPluginType } from "../types";
 import { logAndDetectMessageSpam } from "./logAndDetectMessageSpam";
 
 export async function logCensor(pluginData: GuildPluginData<SpamPluginType>, savedMessage: SavedMessage) {
-  const member = pluginData.guild.members.get(savedMessage.user_id);
+  const member = pluginData.guild.members.cache.get(savedMessage.user_id as Snowflake);
   const config = await pluginData.config.getMatchingConfig({
     userId: savedMessage.user_id,
     channelId: savedMessage.channel_id,

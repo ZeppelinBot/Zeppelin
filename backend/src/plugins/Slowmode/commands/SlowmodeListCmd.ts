@@ -1,8 +1,8 @@
-import { slowmodeCmd } from "../types";
-import { GuildChannel, TextChannel } from "eris";
+import { GuildChannel, TextChannel } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { createChunkedMessage } from "knub/dist/helpers";
 import { errorMessage } from "../../../utils";
-import humanizeDuration from "humanize-duration";
+import { slowmodeCmd } from "../types";
 
 export const SlowmodeListCmd = slowmodeCmd({
   trigger: ["slowmode list", "slowmode l", "slowmodes"],
@@ -12,7 +12,7 @@ export const SlowmodeListCmd = slowmodeCmd({
     const channels = pluginData.guild.channels;
     const slowmodes: Array<{ channel: GuildChannel; seconds: number; native: boolean }> = [];
 
-    for (const channel of channels.values()) {
+    for (const channel of channels.cache.values()) {
       if (!(channel instanceof TextChannel)) continue;
 
       // Bot slowmode
@@ -40,7 +40,7 @@ export const SlowmodeListCmd = slowmodeCmd({
 
       createChunkedMessage(msg.channel, lines.join("\n"));
     } else {
-      msg.channel.createMessage(errorMessage("No active slowmodes!"));
+      msg.channel.send(errorMessage("No active slowmodes!"));
     }
   },
 });

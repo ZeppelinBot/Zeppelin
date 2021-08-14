@@ -1,10 +1,10 @@
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { tNullable } from "../../utils";
-import { TRegex } from "../../validatorUtils";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { RegExpRunner } from "../../RegExpRunner";
+import { tNullable } from "../../utils";
+import { TRegex } from "../../validatorUtils";
 
 export const ConfigSchema = t.type({
   filter_zalgo: t.boolean,

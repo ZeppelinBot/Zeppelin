@@ -1,10 +1,10 @@
-import { EmbedOptions, Role } from "eris";
-import { GuildPluginData } from "knub";
-import { UtilityPluginType } from "../types";
-import { trimLines, preEmbedPadding, EmbedWith } from "../../../utils";
-import moment from "moment-timezone";
+import { MessageEmbedOptions, Role } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { UtilityPluginType } from "../types";
 
 const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
 
@@ -12,7 +12,7 @@ export async function getRoleInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   role: Role,
   requestMemberId?: string,
-): Promise<EmbedOptions> {
+): Promise<MessageEmbedOptions> {
   const embed: EmbedWith<"fields"> = {
     fields: [],
   };
@@ -30,12 +30,12 @@ export async function getRoleInfoEmbed(
     ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
     : timeAndDate.inGuildTz(createdAt);
   const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const roleAge = humanizeDuration(Date.now() - role.createdAt, {
+  const roleAge = humanizeDuration(Date.now() - role.createdTimestamp, {
     largest: 2,
     round: true,
   });
 
-  const rolePerms = Object.keys(role.permissions.json).map(p =>
+  const rolePerms = Object.keys(role.permissions.toJSON()).map(p =>
     p
       // Voice channel related permission names start with 'voice'
       .replace(/^voice/i, "")
@@ -45,7 +45,7 @@ export async function getRoleInfoEmbed(
   );
 
   // -1 because of the @everyone role
-  const totalGuildRoles = pluginData.guild.roles.size - 1;
+  const totalGuildRoles = pluginData.guild.roles.cache.size - 1;
 
   embed.fields.push({
     name: preEmbedPadding + "Role information",

@@ -1,15 +1,15 @@
 import { PluginOptions } from "knub";
-import { ConfigSchema, LocateUserPluginType } from "./types";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
-import { outdatedAlertsLoop } from "./utils/outdatedLoop";
-import { fillActiveAlertsList } from "./utils/fillAlertsList";
-import { WhereCmd } from "./commands/WhereCmd";
+import { trimPluginDescription } from "../../utils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { FollowCmd } from "./commands/FollowCmd";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
-import { ChannelJoinAlertsEvt, ChannelLeaveAlertsEvt, ChannelSwitchAlertsEvt } from "./events/SendAlertsEvts";
+import { WhereCmd } from "./commands/WhereCmd";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
-import { trimPluginDescription } from "../../utils";
+import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
+import { ConfigSchema, LocateUserPluginType } from "./types";
+import { fillActiveAlertsList } from "./utils/fillAlertsList";
+import { outdatedAlertsLoop } from "./utils/outdatedLoop";
 import Timeout = NodeJS.Timeout;
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
@@ -53,9 +53,7 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
 
   // prettier-ignore
   events: [
-    ChannelJoinAlertsEvt,
-    ChannelSwitchAlertsEvt,
-    ChannelLeaveAlertsEvt,
+    VoiceStateUpdateAlertEvt,
     GuildBanRemoveAlertsEvt
   ],
 

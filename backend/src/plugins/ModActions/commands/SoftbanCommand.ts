@@ -1,7 +1,7 @@
-import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { trimPluginDescription } from "../../../utils";
 import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
+import { modActionsCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -28,7 +28,7 @@ export const SoftbanCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     await actualKickMemberCmd(pluginData, msg, { clean: true, ...args });
-    await msg.channel.createMessage(
+    await msg.channel.send(
       "Softban will be removed in the future - please use the kick command with the `-clean` argument instead!",
     );
   },

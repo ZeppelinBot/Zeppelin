@@ -1,8 +1,9 @@
+import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { convertDelayStringToMS, isDiscordRESTError, tDelayString, tNullable } from "../../../utils";
+import { ChannelTypeStrings } from "src/types";
 import { LogType } from "../../../data/LogType";
-import { Constants, TextChannel } from "eris";
+import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
+import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({
@@ -18,24 +19,23 @@ export const SetSlowmodeAction = automodAction({
     const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);
 
     for (const channelId of actionConfig.channels) {
-      const channel = pluginData.guild.channels.get(channelId);
+      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
 
       // Only text channels and text channels within categories support slowmodes
-      if (
-        !channel ||
-        !(channel.type === Constants.ChannelTypes.GUILD_TEXT || channel.type === Constants.ChannelTypes.GUILD_CATEGORY)
-      ) {
+      if (!channel || !(channel.type === ChannelTypeStrings.TEXT || ChannelTypeStrings.CATEGORY)) {
         continue;
       }
 
-      let channelsToSlowmode: TextChannel[] = [];
-      if (channel.type === Constants.ChannelTypes.GUILD_CATEGORY) {
+      const channelsToSlowmode: TextChannel[] = [];
+      if (channel.type === ChannelTypeStrings.CATEGORY) {
         // Find all text channels within the category
-        channelsToSlowmode = pluginData.guild.channels.filter(
-          ch => ch.parentID === channel.id && ch.type === Constants.ChannelTypes.GUILD_TEXT,
-        ) as TextChannel[];
+        for (const ch of pluginData.guild.channels.cache.values()) {
+          if (ch.parentId === channel.id && ch.type === ChannelTypeStrings.TEXT) {
+            channelsToSlowmode.push(ch as TextChannel);
+          }
+        }
       } else {
-        channelsToSlowmode.push(channel);
+        channelsToSlowmode.push(channel as TextChannel);
       }
 
       const slowmodeSeconds = Math.ceil(slowmodeMs / 1000);
@@ -49,7 +49,7 @@ export const SetSlowmodeAction = automodAction({
       } catch (e) {
         // Check for invalid form body -> indicates duration was too large
         const errorMessage =
-          isDiscordRESTError(e) && e.code === 50035
+          isDiscordAPIError(e) && e.code === 50035
             ? `Duration is greater than maximum native slowmode duration`
             : e.message;
 

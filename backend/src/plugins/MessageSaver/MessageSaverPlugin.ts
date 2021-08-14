@@ -1,10 +1,10 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, MessageSaverPluginType } from "./types";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { PluginOptions } from "knub";
-import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
+import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
+import { ConfigSchema, MessageSaverPluginType } from "./types";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {

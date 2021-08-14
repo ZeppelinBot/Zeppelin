@@ -1,15 +1,17 @@
-import { resolveUser, SECONDS, stripObjectToScalars } from "../../../utils";
+import { Snowflake } from "discord.js";
+import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
+import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
+import { logger } from "src/logger";
+import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { CaseTypes } from "../../../data/CaseTypes";
+import { resolveUser, SECONDS } from "../../../utils";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
-import { logger } from "src/logger";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CaseTypes } from "../../../data/CaseTypes";
-import moment from "moment-timezone";
-import humanizeDuration from "humanize-duration";
 
 const TEMPBAN_LOOP_TIME = 60 * SECONDS;
 
@@ -30,7 +32,7 @@ export async function outdatedTempbansLoop(pluginData: GuildPluginData<ModAction
     );
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, tempban.user_id);
-      await pluginData.guild.unbanMember(tempban.user_id, reason != null ? encodeURIComponent(reason) : undefined);
+      await pluginData.guild.bans.remove(tempban.user_id as Snowflake, reason ?? undefined);
     } catch (e) {
       pluginData.state.serverLogs.log(LogType.BOT_ALERT, {
         body: `Encountered an error trying to automatically unban ${tempban.user_id} after tempban timeout`,
@@ -53,7 +55,7 @@ export async function outdatedTempbansLoop(pluginData: GuildPluginData<ModAction
     // Log the unban
     const banTime = moment(tempban.created_at).diff(moment(tempban.expires_at));
     pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_UNBAN, {
-      mod: stripObjectToScalars(await resolveUser(pluginData.client, tempban.mod_id)),
+      mod: userToConfigAccessibleUser(await resolveUser(pluginData.client, tempban.mod_id)),
       userId: tempban.user_id,
       caseNumber: createdCase.case_number,
       reason,

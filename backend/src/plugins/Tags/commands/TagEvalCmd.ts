@@ -1,10 +1,9 @@
-import { tagsCmd } from "../types";
+import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { MessageContent } from "eris";
-import { TemplateParseError } from "../../../templateFormatter";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { TemplateParseError } from "../../../templateFormatter";
+import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
-import { stripObjectToScalars } from "../../../utils";
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",
@@ -21,8 +20,8 @@ export const TagEvalCmd = tagsCmd({
         args.body,
         [],
         {
-          member: stripObjectToScalars(msg.member, ["user"]),
-          user: stripObjectToScalars(msg.member.user),
+          member: memberToConfigAccessibleMember(msg.member),
+          user: userToConfigAccessibleUser(msg.member.user),
         },
         { member: msg.member },
       );
@@ -32,7 +31,7 @@ export const TagEvalCmd = tagsCmd({
         return;
       }
 
-      msg.channel.createMessage(rendered);
+      msg.channel.send(rendered);
     } catch (e) {
       if (e instanceof TemplateParseError) {
         sendErrorMessage(pluginData, msg.channel, `Failed to render tag: ${e.message}`);

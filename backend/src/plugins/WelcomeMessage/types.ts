@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildEventListener } from "knub";
-import { tNullable } from "../../utils";
 import { GuildLogs } from "../../data/GuildLogs";
+import { tNullable } from "../../utils";
 
 export const ConfigSchema = t.type({
   send_dm: t.boolean,

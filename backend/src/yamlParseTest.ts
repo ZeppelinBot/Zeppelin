@@ -1,5 +1,5 @@
-import YAML from "yawn-yaml/cjs";
 import { load } from "js-yaml";
+import YAML from "yawn-yaml/cjs";
 
 const src = `
 prefix: '!'

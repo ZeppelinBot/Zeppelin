@@ -1,14 +1,15 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { slowmodeCmd } from "../types";
-import { TextChannel } from "eris";
+import { Permissions, TextChannel, ThreadChannel, Util } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import { ChannelTypeStrings } from "src/types";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, DAYS, disableInlineCode, HOURS, MINUTES } from "../../../utils";
-import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
-import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
+import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
+import { slowmodeCmd } from "../types";
+import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
+import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
 
 const MAX_NATIVE_SLOWMODE = 6 * HOURS; // 6 hours
 const MAX_BOT_SLOWMODE = DAYS * 365 * 100; // 100 years
@@ -38,7 +39,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
   ],
 
   async run({ message: msg, args, pluginData }) {
-    const channel: TextChannel = args.channel || msg.channel;
+    const channel: TextChannel | ThreadChannel = args.channel || msg.channel;
 
     if (args.time === 0) {
       // Workaround until we can call SlowmodeDisableCmd from here
@@ -84,10 +85,13 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     // Verify permissions
-    const channelPermissions = channel.permissionsOf(pluginData.client.user.id);
+    const channelPermissions = channel.permissionsFor(pluginData.client.user!.id);
 
     if (mode === "native") {
-      const missingPermissions = getMissingPermissions(channelPermissions, NATIVE_SLOWMODE_PERMISSIONS);
+      const missingPermissions = getMissingPermissions(
+        channelPermissions ?? new Permissions(),
+        NATIVE_SLOWMODE_PERMISSIONS,
+      );
       if (missingPermissions) {
         sendErrorMessage(
           pluginData,
@@ -99,7 +103,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     if (mode === "bot") {
-      const missingPermissions = getMissingPermissions(channelPermissions, BOT_SLOWMODE_PERMISSIONS);
+      const missingPermissions = getMissingPermissions(
+        channelPermissions ?? new Permissions(),
+        BOT_SLOWMODE_PERMISSIONS,
+      );
       if (missingPermissions) {
         sendErrorMessage(
           pluginData,
@@ -116,7 +123,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
     if (mode === "native") {
       // If there is an existing bot-maintained slowmode, disable that first
       const existingBotSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
-      if (existingBotSlowmode) {
+      if (existingBotSlowmode && channel.type === ChannelTypeStrings.TEXT) {
         await disableBotSlowmodeForChannel(pluginData, channel);
       }
 
@@ -126,7 +133,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
           rateLimitPerUser: rateLimitSeconds,
         });
       } catch (e) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${disableInlineCode(e.message)}`);
+        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${Util.escapeInlineCode(e.message)}`);
         return;
       }
     } else {

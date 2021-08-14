@@ -1,11 +1,11 @@
-import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage } from "../../../pluginUtils";
-import { resolveUser, resolveMember, noop } from "../../../utils";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { canActOn, sendErrorMessage } from "../../../pluginUtils";
+import { resolveMember, resolveUser } from "../../../utils";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
 import { isBanned } from "../functions/isBanned";
-import { waitForReaction } from "knub/dist/helpers";
+import { modActionsCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -61,11 +61,13 @@ export const UnmuteCmd = modActionsCmd({
         return;
       } else {
         // Ask the mod if we should upgrade to a forceunmute as the user is not on the server
-        const notOnServerMsg = await msg.channel.createMessage("User not found on the server, forceunmute instead?");
-        const reply = await waitForReaction(pluginData.client, notOnServerMsg, ["✅", "❌"], msg.author.id);
+        const reply = await waitForButtonConfirm(
+          msg.channel,
+          { content: "User not on server, forceunmute instead?" },
+          { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
+        );
 
-        notOnServerMsg.delete().catch(noop);
-        if (!reply || reply.name === "❌") {
+        if (!reply) {
           sendErrorMessage(pluginData, msg.channel, "User not on server, unmute cancelled by moderator");
           return;
         }

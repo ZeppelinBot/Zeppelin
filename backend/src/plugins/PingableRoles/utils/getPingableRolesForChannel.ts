@@ -1,5 +1,5 @@
-import { PingableRole } from "../../../data/entities/PingableRole";
 import { GuildPluginData } from "knub";
+import { PingableRole } from "../../../data/entities/PingableRole";
 import { PingableRolesPluginType } from "../types";
 
 export async function getPingableRolesForChannel(

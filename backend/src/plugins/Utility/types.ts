@@ -1,9 +1,9 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildArchives } from "../../data/GuildArchives";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
 import { RegExpRunner } from "../../RegExpRunner";
 
@@ -34,6 +34,7 @@ export const ConfigSchema = t.type({
   jumbo_size: t.Integer,
   can_avatar: t.boolean,
   info_on_single_result: t.boolean,
+  autojoin_threads: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

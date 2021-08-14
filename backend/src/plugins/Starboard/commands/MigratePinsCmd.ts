@@ -1,7 +1,7 @@
+import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { starboardCmd } from "../types";
-import { sendSuccessMessage, sendErrorMessage } from "../../../pluginUtils";
-import { TextChannel } from "eris";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
 export const MigratePinsCmd = starboardCmd({
@@ -23,15 +23,15 @@ export const MigratePinsCmd = starboardCmd({
       return;
     }
 
-    const starboardChannel = pluginData.guild.channels.get(starboard.channel_id);
+    const starboardChannel = pluginData.guild.channels.cache.get(starboard.channel_id as Snowflake);
     if (!starboardChannel || !(starboardChannel instanceof TextChannel)) {
       sendErrorMessage(pluginData, msg.channel, "Starboard has an unknown/invalid channel id");
       return;
     }
 
-    msg.channel.createMessage(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
+    msg.channel.send(`Migrating pins from <#${args.pinChannel.id}> to <#${starboardChannel.id}>...`);
 
-    const pins = await args.pinChannel.getPins();
+    const pins = [...(await args.pinChannel.messages.fetchPinned().catch(() => [])).values()];
     pins.reverse(); // Migrate pins starting from the oldest message
 
     for (const pin of pins) {

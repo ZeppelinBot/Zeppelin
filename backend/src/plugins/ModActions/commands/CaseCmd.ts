@@ -1,7 +1,7 @@
-import { modActionsCmd } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { sendErrorMessage } from "../../../pluginUtils";
+import { modActionsCmd } from "../types";
 
 export const CaseCmd = modActionsCmd({
   trigger: "case",
@@ -24,6 +24,6 @@ export const CaseCmd = modActionsCmd({
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const embed = await casesPlugin.getCaseEmbed(theCase.id, msg.author.id);
-    msg.channel.createMessage(embed);
+    msg.channel.send(embed);
   },
 });

@@ -1,8 +1,8 @@
-import { connection } from "../db";
-import { getRepository, In } from "typeorm";
-import { Config } from "../entities/Config";
 import moment from "moment-timezone";
+import { getRepository, In } from "typeorm";
 import { DBDateFormat } from "../../utils";
+import { connection } from "../db";
+import { Config } from "../entities/Config";
 
 const CLEAN_PER_LOOP = 50;
 
