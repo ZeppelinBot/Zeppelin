@@ -20,8 +20,8 @@ import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
 import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
-import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/runAutomodOnJoinLeaveEvt";
-import { RunAutomodOnMemberUpdate } from "./events/runAutomodOnMemberUpdate";
+import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt";
+import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
 import {
