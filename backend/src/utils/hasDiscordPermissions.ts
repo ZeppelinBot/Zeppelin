@@ -1,4 +1,4 @@
-import { Permissions } from "discord.js";
+import { Permissions, PermissionString } from "discord.js";
 
 /**
  * @param resolvedPermissions A Permission object from e.g. GuildChannel#permissionsOf() or Member#permission
@@ -8,12 +8,14 @@ export function hasDiscordPermissions(
   resolvedPermissions: Permissions | Readonly<Permissions> | null,
   requiredPermissions: number | bigint,
 ) {
-  const allowedPermissions = resolvedPermissions;
-  const nRequiredPermissions = requiredPermissions;
+  if (resolvedPermissions == null) {
+    return false;
+  }
 
-  if (Boolean(allowedPermissions?.bitfield! & Permissions.FLAGS.ADMINISTRATOR)) {
+  if (resolvedPermissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
     return true;
   }
 
-  return Boolean((allowedPermissions?.bitfield! & BigInt(nRequiredPermissions)) === nRequiredPermissions);
+  const nRequiredPermissions = BigInt(requiredPermissions);
+  return Boolean((resolvedPermissions?.bitfield! & nRequiredPermissions) === nRequiredPermissions);
 }
