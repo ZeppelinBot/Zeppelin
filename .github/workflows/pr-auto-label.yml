@@ -1,0 +1,19 @@
+name: Automatic PR labels
+
+on:
+  push: {}
+
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+  workflow_dispatch: {}
+
+jobs:
+  needs-rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR needs rebase
+        uses: eps1lon/actions-label-merge-conflict@9023974d0f6f2c9664f51f519363e03d70857188
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          dirtyLabel: "needs-rebase"
