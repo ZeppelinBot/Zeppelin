@@ -43,7 +43,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
         pluginData,
         msg.channel,
         `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`,
-        { users: true },
+        { users: [msg.author.id] },
       );
       lock.unlock();
       return;
@@ -88,7 +88,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
         pluginData,
         msg.channel,
         `<@!${msg.author.id}> Got an error while trying to grant you the roles`,
-        { users: true },
+        { users: [msg.author.id] },
       );
       return;
     }
@@ -120,7 +120,9 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       messageParts.push("couldn't recognize some of the roles");
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `<@!${msg.author.id}> ${messageParts.join("; ")}`, { users: true });
+    sendSuccessMessage(pluginData, msg.channel, `<@!${msg.author.id}> ${messageParts.join("; ")}`, {
+      users: [msg.author.id],
+    });
 
     lock.unlock();
   },
