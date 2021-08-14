@@ -8,6 +8,7 @@ import {
   GuildChannel,
   GuildMember,
   Invite,
+  InviteGuild,
   LimitedCollection,
   Message,
   MessageAttachment,
@@ -248,9 +249,8 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
   return v != null;
 }
 
-export type InviteOpts = "withMetadata" | "withCount" | "withoutCount";
-export type GuildInvite<CT extends InviteOpts = "withMetadata"> = Invite & { guild: Guild };
-export type GroupDMInvite<CT extends InviteOpts = "withMetadata"> = Invite & {
+export type GuildInvite = Invite & { guild: InviteGuild | Guild };
+export type GroupDMInvite = Invite & {
   channel: PartialChannelData;
   type: typeof Constants.ChannelTypes.GROUP_DM;
 };
@@ -1480,11 +1480,11 @@ export function isFullMessage(msg: Message | PartialMessage): msg is Message {
   return (msg as Message).createdAt != null;
 }
 
-export function isGuildInvite<CT extends InviteOpts>(invite: Invite): invite is GuildInvite<CT> {
+export function isGuildInvite(invite: Invite): invite is GuildInvite {
   return invite.guild != null;
 }
 
-export function isGroupDMInvite<CT extends InviteOpts>(invite: Invite): invite is GroupDMInvite<CT> {
+export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
   return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
 }
 
