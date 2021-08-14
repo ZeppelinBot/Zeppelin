@@ -12,7 +12,9 @@ export const JoinVoiceChannelTrigger = automodTrigger<JoinVoiceChannelResult>()(
     include_moves: t.boolean,
   }),
 
-  defaultConfig: {},
+  defaultConfig: {
+    include_moves: false,
+  },
 
   async match({ triggerConfig, context }) {
     const matchedChannelId = context.voiceChannel?.joined?.id;
