@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbedOptions } from "discord.js";
+import { GuildMember, MessageEmbedOptions, Snowflake } from "discord.js";
 import { PluginOptions } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
