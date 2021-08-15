@@ -1,3 +1,4 @@
+import { ContextMenuInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
@@ -10,7 +11,11 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { ContextMenuPluginType } from "../types";
 
-export async function muteAction(pluginData: GuildPluginData<ContextMenuPluginType>, duration, interaction) {
+export async function muteAction(
+  pluginData: GuildPluginData<ContextMenuPluginType>,
+  duration: string | undefined,
+  interaction: ContextMenuInteraction,
+) {
   interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({

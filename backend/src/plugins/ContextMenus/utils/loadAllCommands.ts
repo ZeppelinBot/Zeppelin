@@ -14,7 +14,7 @@ export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPlu
   for (const [name, label] of Object.entries(hardcodedContext)) {
     if (!cfg[name]) continue;
 
-    const type = name.startsWith("user") ? 2 : 3;
+    const type = name.startsWith("user") ? 2 : 3; // 2 = User, 3 = Message (https://discord.com/developers/docs/interactions/application-commands#user-commands)
     const data: ApplicationCommandData = {
       type,
       name: label,
