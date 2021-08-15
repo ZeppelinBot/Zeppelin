@@ -183,7 +183,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     },
 
     hasMutePermission(pluginData) {
-      return (member: GuildMember, channelId: string) => {
+      return (member: GuildMember, channelId: Snowflake) => {
         return hasMutePermission(pluginData, member, channelId);
       };
     },

@@ -167,13 +167,13 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     },
 
     userInfo(pluginData) {
-      return (userId: string, requestMemberId?: string) => {
+      return (userId: Snowflake, requestMemberId?: Snowflake) => {
         return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
       };
     },
 
     hasPermission(pluginData) {
-      return (member: GuildMember, channelId: string, permission: string) => {
+      return (member: GuildMember, channelId: Snowflake, permission: string) => {
         return hasPermission(pluginData, member, channelId, permission);
       };
     },
