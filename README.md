@@ -32,20 +32,20 @@ These instructions are intended for bot development only, they are not recommend
 
 1. Go into the backend directory: `cd backend`
 
-2. Install dependencies: `npm ci`
+1. Install dependencies: `npm ci`
 
-3. Make a copy of `bot.env.example` and `api.env.example` (removing the `.example` suffix), fill in the values.
+1. Make a copy of `bot.env.example` and `api.env.example` (removing the `.example` suffix), fill in the values.
   There are defaults for your convenience, feel free to replace these.
 
-4. Setup the database: `npm run migrate-dev`
+1. Setup the database: `npm run migrate-dev`
 
-5. To start the backend, there are two alternatives:
+1. To start the backend, there are two alternatives:
     - **It is recommended** to use `npm run watch` for development. This will automatically restart on save
     - Run `npm run build` followed by the desired start script:
       - `npm run start-bot-dev` to start the bot.
       - `start-api-dev` to start the api server.
 
-6. On the first run the bot will attempt to add all IDs from `STAFF` in `api.env` into the database
+1. On the first run the bot will attempt to add all IDs from `STAFF` in `api.env` into the database
 
 ### Running the dashboard
 
