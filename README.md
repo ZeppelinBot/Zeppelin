@@ -45,20 +45,7 @@ These instructions are intended for bot development only, they are not recommend
       - `npm run start-bot-dev` to start the bot.
       - `start-api-dev` to start the api server.
 
-6. On the first run you need to add your guild to the `allowed_guilds` table, otherwise the bot leaves on next restart.
-  Use the following queries (replacing the all-caps variables):
-
-```sql
-INSERT INTO allowed_guilds (id, name, icon, owner_id) VALUES ("SERVER_ID", "SERVER_NAME", null, "OWNER_ID");
-```
-
-```sql
-INSERT INTO configs (id, `key`, config, is_active, edited_by)
-VALUES (1, "global", "{\"prefix\": \"!\", \"owners\": [\"YOUR_ID\"]}", true, "YOUR_ID");
-
-INSERT INTO configs (id, `key`, config, is_active, edited_by)
-VALUES (2, "guild-GUILD_ID", "{\"prefix\": \"!\", \"levels\": {\"YOUR_ID\": 100}, \"plugins\": { \"utility\": {}}}", true, "YOUR_ID");
-```
+6. On the first run the bot will attempt to add all IDs from `STAFF` in `api.env` into the database
 
 ### Running the dashboard
 
@@ -71,6 +58,21 @@ VALUES (2, "guild-GUILD_ID", "{\"prefix\": \"!\", \"levels\": {\"YOUR_ID\": 100}
 4. Run the desired start script:
     - `npm run watch` runs webpack's dev server that automatically reloads on save
     - `npm run build` compiles the dashboard's static files to `dist/` which can then be served with any web server
+
+### Adding configs
+
+There are commands to add new servers and dashboard users, by default the bot has the `!` prefix when
+first starting the bot (see [step 6](#Running-the-backend)). Mentioning the bot in a `@Bot` should also work.
+
+The commands do not work in DMs, see the following for how to use them:
+
+- `!add_server` followed by a server ID, and the first user to add as a dashboard user.
+  For example `!add_server 473085256233123841 106391128718245888`
+
+- `!add_dashboard_user` followed by a server ID and any amount of users to be added.
+  For example `!add_dashboard_user 473085256233123841 347727875266576395 108552944961454080`
+
+- Finally there is `!remove_dashboard_user`, the inverse of `!add_dashboard_user`
 
 ### Notes
 
