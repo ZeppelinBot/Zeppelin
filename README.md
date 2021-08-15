@@ -26,7 +26,7 @@ See <https://zeppelin.gg/> for more details.
 
 These instructions are intended for bot development only, they are not recommended for self-hosting.
 
-👉 **No support is guaranteed for self-hosting the bot!** 👈
+👉 **No support is offered for self-hosting the bot!** 👈
 
 ### Running the backend
 
@@ -37,12 +37,13 @@ These instructions are intended for bot development only, they are not recommend
 3. Make a copy of `bot.env.example` and `api.env.example` (removing the `.example` suffix), fill in the values.
   There are defaults for your convenience, feel free to replace these.
 
-4. Setup the database schema, use `npm run migrate-dev`.
+4. Setup the database: `npm run migrate-dev`
 
-5. Run `npm run build` followed by the desired start script:
-    - **Recommended** is to use `npm run watch`, this starts both the bot and api server and automatically restarts on save.
-    - `npm run start-bot-dev` to start the bot.
-    - `start-api-dev` to start the api server.
+5. To start the backend, there are two alternatives:
+    - **It is recommended** to use `npm run watch` for development. This will automatically restart on save
+    - Run `npm run build` followed by the desired start script:
+      - `npm run start-bot-dev` to start the bot.
+      - `start-api-dev` to start the api server.
 
 6. On the first run you need to add your guild to the `allowed_guilds` table, otherwise the bot leaves on next restart.
   Use the following queries (replacing the all-caps variables):
@@ -68,8 +69,8 @@ VALUES (2, "guild-GUILD_ID", "{\"prefix\": \"!\", \"levels\": {\"YOUR_ID\": 100}
 3. Make a copy of `.env.example` called `.env`, fill in the values.
 
 4. Run the desired start script:
-    - `npm run build` compiles the dashboard's static files to `dist/` which can then be served with any web server
     - `npm run watch` runs webpack's dev server that automatically reloads on save
+    - `npm run build` compiles the dashboard's static files to `dist/` which can then be served with any web server
 
 ### Notes
 
