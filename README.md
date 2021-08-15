@@ -51,11 +51,11 @@ These instructions are intended for bot development only, they are not recommend
 
 1. Go into the dashboard directory: `cd dashboard`
 
-2. Install dependencies for the dashboard: `npm ci`
+1. Install dependencies for the dashboard: `npm ci`
 
-3. Make a copy of `.env.example` called `.env`, fill in the values.
+1. Make a copy of `.env.example` called `.env`, fill in the values.
 
-4. Run the desired start script:
+1. Run the desired start script:
     - `npm run watch` runs webpack's dev server that automatically reloads on save
     - `npm run build` compiles the dashboard's static files to `dist/` which can then be served with any web server
 
