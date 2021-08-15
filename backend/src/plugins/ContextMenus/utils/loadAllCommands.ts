@@ -1,4 +1,4 @@
-import { ApplicationCommandData } from "discord.js";
+import { ApplicationCommandData, Constants } from "discord.js";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { GuildPluginData } from "knub";
@@ -14,7 +14,9 @@ export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPlu
   for (const [name, label] of Object.entries(hardcodedContext)) {
     if (!cfg[name]) continue;
 
-    const type = name.startsWith("user") ? 2 : 3; // 2 = User, 3 = Message (https://discord.com/developers/docs/interactions/application-commands#user-commands)
+    const type = name.startsWith("user")
+      ? Constants.ApplicationCommandTypes.USER
+      : Constants.ApplicationCommandTypes.MESSAGE;
     const data: ApplicationCommandData = {
       type,
       name: label,
