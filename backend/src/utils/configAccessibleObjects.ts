@@ -140,6 +140,7 @@ export interface IConfigAccessibleEmoji {
   createdAt?: number;
   animated: boolean;
   identifier: string;
+  mention: string;
 }
 
 export function emojiToConfigAccessibleEmoji(emoji: Emoji): IConfigAccessibleEmoji {
@@ -149,6 +150,7 @@ export function emojiToConfigAccessibleEmoji(emoji: Emoji): IConfigAccessibleEmo
     createdAt: emoji.createdTimestamp ?? undefined,
     animated: emoji.animated ?? false,
     identifier: emoji.identifier,
+    mention: emoji.animated ? `<a:${emoji.name}:${emoji.id}>` : `<:${emoji.name}:${emoji.id}>`,
   };
 
   return toReturn;
