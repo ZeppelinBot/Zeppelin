@@ -1,22 +1,27 @@
-import { ApplicationCommandData } from "discord.js";
-import { LogType } from "src/data/LogType";
-import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
+import { ApplicationCommandData, Constants } from "discord.js";
+import { LogType } from "../../../data/LogType";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { GuildPluginData } from "knub";
-import { ContextMenuPluginType, ContextMenuTypeNameToNumber } from "../types";
+import { ContextMenuPluginType } from "../types";
+import { hardcodedContext } from "./hardcodedContextOptions";
 
 export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPluginType>) {
   const comms = await pluginData.client.application!.commands;
-  const actions = pluginData.config.get().context_actions;
+  const cfg = pluginData.config.get();
   const newCommands: ApplicationCommandData[] = [];
   const addedNames: string[] = [];
 
-  for (const [name, configAction] of Object.entries(actions)) {
-    if (!configAction.enabled) continue;
+  for (const [name, label] of Object.entries(hardcodedContext)) {
+    if (!cfg[name]) continue;
 
+    const type = name.startsWith("user")
+      ? Constants.ApplicationCommandTypes.USER
+      : Constants.ApplicationCommandTypes.MESSAGE;
     const data: ApplicationCommandData = {
-      type: ContextMenuTypeNameToNumber[configAction.type],
-      name: configAction.label,
+      type,
+      name: label,
     };
+
     addedNames.push(name);
     newCommands.push(data);
   }

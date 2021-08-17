@@ -1,38 +1,34 @@
 import { PluginOptions } from "knub";
-import { StrictValidationError } from "src/validatorUtils";
-import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { availableTypes } from "./actions/availableActions";
 import { ContextClickedEvt } from "./events/ContextClickedEvt";
 import { ConfigSchema, ContextMenuPluginType } from "./types";
 import { loadAllCommands } from "./utils/loadAllCommands";
+import { UtilityPlugin } from "../Utility/UtilityPlugin";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {
-    context_actions: {},
+    can_use: false,
+
+    user_muteindef: false,
+    user_mute1d: false,
+    user_mute1h: false,
+    user_info: false,
+
+    message_clean10: false,
+    message_clean25: false,
+    message_clean50: false,
   },
-};
-
-const configPreprocessor: ConfigPreprocessorFn<ContextMenuPluginType> = options => {
-  if (options.config.context_actions) {
-    for (const [name, contextMenu] of Object.entries(options.config.context_actions)) {
-      if (Object.entries(contextMenu.action).length !== 1) {
-        throw new StrictValidationError([`Invalid value for context_actions/${name}: Must have exactly one action.`]);
-      }
-
-      const actionName = Object.entries(contextMenu.action)[0][0];
-      if (!availableTypes[actionName].includes(contextMenu.type)) {
-        throw new StrictValidationError([
-          `Invalid value for context_actions/${name}/${actionName}: ${actionName} is not allowed on type ${contextMenu.type}.`,
-        ]);
-      }
-    }
-  }
-
-  return options;
+  overrides: [
+    {
+      level: ">=50",
+      config: {
+        can_use: true,
+      },
+    },
+  ],
 };
 
 export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
@@ -40,7 +36,6 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
 
   configSchema: ConfigSchema,
   defaultOptions,
-  configPreprocessor,
 
   // prettier-ignore
   events: [
@@ -57,5 +52,5 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
     loadAllCommands(pluginData);
   },
 
-  dependencies: [MutesPlugin, LogsPlugin],
+  dependencies: [MutesPlugin, LogsPlugin, UtilityPlugin],
 });

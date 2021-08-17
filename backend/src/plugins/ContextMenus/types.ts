@@ -1,29 +1,17 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, typedGuildEventListener } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
-import { tNullable } from "../../utils";
-import { AvailableActions } from "./actions/availableActions";
-
-export enum ContextMenuTypes {
-  USER = 2,
-  MESSAGE = 3,
-}
-
-export const ContextMenuTypeNameToNumber: Record<string, number> = {
-  USER: 2,
-  MESSAGE: 3,
-};
-
-const ContextActionOpts = t.type({
-  enabled: tNullable(t.boolean),
-  label: t.string,
-  type: t.keyof(ContextMenuTypes),
-  action: t.partial(AvailableActions.props),
-});
-export type TContextActionOpts = t.TypeOf<typeof ContextActionOpts>;
 
 export const ConfigSchema = t.type({
-  context_actions: t.record(t.string, ContextActionOpts),
+  can_use: t.boolean,
+
+  user_muteindef: t.boolean,
+  user_mute1d: t.boolean,
+  user_mute1h: t.boolean,
+  user_info: t.boolean,
+  message_clean10: t.boolean,
+  message_clean25: t.boolean,
+  message_clean50: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -34,5 +22,4 @@ export interface ContextMenuPluginType extends BasePluginType {
   };
 }
 
-export const contextMenuCmd = typedGuildCommand<ContextMenuPluginType>();
 export const contextMenuEvt = typedGuildEventListener<ContextMenuPluginType>();
