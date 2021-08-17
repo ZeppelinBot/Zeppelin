@@ -56,7 +56,7 @@ export async function muteAction(
     interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Failed to mute <@!${userId}> in ContextMenu action \`mute\` because a mute role has not been specified in server config`,
       });
     } else {

@@ -70,7 +70,7 @@ export async function handleCompanionPermissions(
   } catch (e) {
     if (isDiscordAPIError(e) && e.code === 50001) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
       });
       pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);

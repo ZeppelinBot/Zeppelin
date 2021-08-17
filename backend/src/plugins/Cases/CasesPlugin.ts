@@ -16,6 +16,7 @@ import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
 import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions = {
   config: {
@@ -38,7 +39,7 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     `),
   },
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: [TimeAndDatePlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

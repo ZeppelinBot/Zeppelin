@@ -2,7 +2,7 @@ import { Channel, Message, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, errorMessage, MINUTES, StrictMessageContent } from "../../../utils";
@@ -10,6 +10,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
@@ -158,19 +159,19 @@ export async function actualPostCmd(
     });
 
     if (opts.repeat) {
-      pluginData.state.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
-        author: userToConfigAccessibleUser(msg.author),
-        channel: channelToConfigAccessibleChannel(targetChannel),
+      pluginData.getPlugin(LogsPlugin).logScheduledRepeatedMessage({
+        author: msg.author,
+        channel: targetChannel,
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
         repeatInterval: humanizeDuration(opts.repeat),
-        repeatDetails: repeatDetailsStr,
+        repeatDetails: repeatDetailsStr!,
       });
     } else {
-      pluginData.state.logs.log(LogType.SCHEDULED_MESSAGE, {
-        author: userToConfigAccessibleUser(msg.author),
-        channel: channelToConfigAccessibleChannel(targetChannel),
+      pluginData.getPlugin(LogsPlugin).logScheduledMessage({
+        author: msg.author,
+        channel: targetChannel,
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
@@ -184,9 +185,9 @@ export async function actualPostCmd(
   }
 
   if (opts.repeat) {
-    pluginData.state.logs.log(LogType.REPEATED_MESSAGE, {
-      author: userToConfigAccessibleUser(msg.author),
-      channel: channelToConfigAccessibleChannel(targetChannel),
+    pluginData.getPlugin(LogsPlugin).logRepeatedMessage({
+      author: msg.author,
+      channel: targetChannel,
       datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
       date: postAt.format(timeAndDate.getDateFormat("date")),
       time: postAt.format(timeAndDate.getDateFormat("time")),

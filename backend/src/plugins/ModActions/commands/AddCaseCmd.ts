@@ -1,4 +1,4 @@
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
@@ -8,6 +8,7 @@ import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from ".
 import { resolveMember, resolveUser } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -79,8 +80,8 @@ export const AddCaseCmd = modActionsCmd({
     }
 
     // Log the action
-    pluginData.state.serverLogs.log(LogType.CASE_CREATE, {
-      mod: userToConfigAccessibleUser(mod.user),
+    pluginData.getPlugin(LogsPlugin).logCaseCreate({
+      mod: mod.user,
       userId: user.id,
       caseNum: theCase.case_number,
       caseType: type.toUpperCase(),

@@ -34,6 +34,50 @@ function newTemplateVar(): ITemplateVar {
 
 type ParsedTemplate = Array<string | ITemplateVar>;
 
+export type TemplateSafeValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | ((...args: any[]) => TemplateSafeValue | Promise<TemplateSafeValue>)
+  | TemplateSafeValueContainer
+  | TemplateSafeValue[];
+
+function isTemplateSafeValue(value: unknown): value is TemplateSafeValue {
+  return (
+    value == null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "function" ||
+    (Array.isArray(value) && value.every(v => isTemplateSafeValue(v))) ||
+    value instanceof TemplateSafeValueContainer
+  );
+}
+
+export class TemplateSafeValueContainer {
+  [key: string]: TemplateSafeValue;
+
+  constructor(data: Record<string, TemplateSafeValue> = {}) {
+    for (const [key, value] of Object.entries(data)) {
+      if (!isTemplateSafeValue(value)) {
+        throw new Error(`Unsafe value for key "${key}" in SafeTemplateValueContainer`);
+      }
+
+      this[key] = value;
+    }
+  }
+}
+
+export type TypedTemplateSafeValueContainer<T> = TemplateSafeValueContainer & T;
+
+export function createTypedTemplateSafeValueContainer<T extends Record<string, TemplateSafeValue>>(
+  data: T,
+): TypedTemplateSafeValueContainer<T> {
+  return new TemplateSafeValueContainer(data) as TypedTemplateSafeValueContainer<T>;
+}
+
 function cleanUpParseResult(arr) {
   arr.forEach(item => {
     if (typeof item === "object") {
@@ -218,7 +262,14 @@ export function parseTemplate(str: string): ParsedTemplate {
   return result;
 }
 
-async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
+async function evaluateTemplateVariable(
+  theVar: ITemplateVar,
+  values: TemplateSafeValueContainer,
+): Promise<TemplateSafeValue> {
+  if (!(values instanceof TemplateSafeValueContainer)) {
+    throw new Error("evaluateTemplateVariable() called with unsafe values");
+  }
+
   const value = has(values, theVar.identifier) ? get(values, theVar.identifier) : undefined;
 
   if (typeof value === "function") {
@@ -238,13 +289,17 @@ async function evaluateTemplateVariable(theVar: ITemplateVar, values) {
     }
 
     const result = await value(...args);
+    if (!isTemplateSafeValue(result)) {
+      throw new Error(`Template function ${theVar.identifier} returned unsafe value`);
+    }
+
     return result == null ? "" : result;
   }
 
   return value == null ? "" : value;
 }
 
-export async function renderParsedTemplate(parsedTemplate: ParsedTemplate, values: any) {
+export async function renderParsedTemplate(parsedTemplate: ParsedTemplate, values: TemplateSafeValueContainer) {
   let result = "";
 
   for (const part of parsedTemplate) {
@@ -380,9 +435,13 @@ const baseValues = {
   },
 };
 
-export async function renderTemplate(template: string, values = {}, includeBaseValues = true) {
+export async function renderTemplate(
+  template: string,
+  values: TemplateSafeValueContainer = new TemplateSafeValueContainer(),
+  includeBaseValues = true,
+) {
   if (includeBaseValues) {
-    values = Object.assign({}, baseValues, values);
+    values = new TemplateSafeValueContainer(Object.assign({}, baseValues, values));
   }
 
   let parseResult: ParsedTemplate;

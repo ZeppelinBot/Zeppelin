@@ -8,6 +8,7 @@ import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { validate } from "../../../validatorUtils";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -87,14 +88,14 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
 
   const validationError = await validate(tStrictMessageContent, tagResult.renderedContent);
   if (validationError) {
-    pluginData.state.logs.log(LogType.BOT_ALERT, {
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Rendering tag ${tagResult.tagName} resulted in an invalid message: ${validationError.message}`,
     });
     return;
   }
 
   if (messageIsEmpty(tagResult.renderedContent)) {
-    pluginData.state.logs.log(LogType.BOT_ALERT, {
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Tag \`${tagResult.tagName}\` resulted in an empty message, so it couldn't be sent`,
     });
     return;

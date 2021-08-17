@@ -1,11 +1,12 @@
-import { MessageEmbed, Snowflake } from "discord.js";
+import { BaseGuildTextChannel, MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { resolveUser } from "../../../utils";
 import { LogsPluginType } from "../types";
+import { logMessageEdit } from "../logFunctions/logMessageEdit";
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,
@@ -48,11 +49,13 @@ export async function onMessageUpdate(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)!;
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as
+    | BaseGuildTextChannel
+    | ThreadChannel;
 
-  pluginData.state.guildLogs.log(LogType.MESSAGE_EDIT, {
-    user: userToConfigAccessibleUser(user),
-    channel: channelToConfigAccessibleChannel(channel),
+  logMessageEdit(pluginData, {
+    user,
+    channel,
     before: oldSavedMessage,
     after: savedMessage,
   });

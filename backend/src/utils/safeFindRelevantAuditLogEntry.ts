@@ -19,7 +19,7 @@ export async function safeFindRelevantAuditLogEntry(
   } catch (e) {
     if (isDiscordAPIError(e) && e.code === 50013) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: "Missing permissions to read audit log",
       });
       return;

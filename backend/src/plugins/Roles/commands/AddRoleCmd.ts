@@ -1,10 +1,11 @@
 import { GuildChannel } from "discord.js";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveRoleId, verboseUserMention } from "../../../utils";
 import { rolesCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const AddRoleCmd = rolesCmd({
   trigger: "addrole",
@@ -37,7 +38,7 @@ export const AddRoleCmd = rolesCmd({
     // Sanity check: make sure the role is configured properly
     const role = (msg.channel as GuildChannel).guild.roles.cache.get(roleId);
     if (!role) {
-      pluginData.state.logs.log(LogType.BOT_ALERT, {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
       sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
@@ -53,10 +54,10 @@ export const AddRoleCmd = rolesCmd({
 
     await args.member.roles.add(roleId);
 
-    pluginData.state.logs.log(LogType.MEMBER_ROLE_ADD, {
-      member: memberToConfigAccessibleMember(args.member),
+    pluginData.getPlugin(LogsPlugin).logMemberRoleAdd(LogType.MEMBER_ROLE_ADD, {
+      member: memberToTemplateSafeMember(args.member),
       roles: role.name,
-      mod: userToConfigAccessibleUser(msg.author),
+      mod: userToTemplateSafeUser(msg.author),
     });
 
     sendSuccessMessage(

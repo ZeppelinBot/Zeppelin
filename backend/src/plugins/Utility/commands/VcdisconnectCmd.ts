@@ -1,13 +1,14 @@
 import { VoiceChannel } from "discord.js";
 import {
-  channelToConfigAccessibleChannel,
-  memberToConfigAccessibleMember,
-  userToConfigAccessibleUser,
-} from "../../../utils/configAccessibleObjects";
+  channelToTemplateSafeChannel,
+  memberToTemplateSafeMember,
+  userToTemplateSafeUser,
+} from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { utilityCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const VcdisconnectCmd = utilityCmd({
   trigger: ["vcdisconnect", "vcdisc", "vcdc", "vckick", "vck"],
@@ -38,10 +39,10 @@ export const VcdisconnectCmd = utilityCmd({
       return;
     }
 
-    pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_DISCONNECT, {
-      mod: userToConfigAccessibleUser(msg.author),
-      member: memberToConfigAccessibleMember(args.member),
-      oldChannel: channelToConfigAccessibleChannel(channel),
+    pluginData.getPlugin(LogsPlugin).logVoiceChannelForceDisconnect({
+      mod: msg.author,
+      member: args.member,
+      oldChannel: channel,
     });
 
     sendSuccessMessage(pluginData, msg.channel, `**${args.member.user.tag}** disconnected from **${channel.name}**`);

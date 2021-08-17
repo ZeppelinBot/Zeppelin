@@ -45,9 +45,90 @@ export class GuildSavedMessages extends BaseGuildRepository {
       timestamp: msg.createdTimestamp,
     };
 
-    if (msg.attachments.size) data.attachments = [...msg.attachments.values()];
-    if (msg.embeds.length) data.embeds = msg.embeds;
-    if (msg.stickers?.size) data.stickers = [...msg.stickers.values()];
+    if (msg.attachments.size) {
+      data.attachments = Array.from(msg.attachments.values()).map(att => ({
+        id: att.id,
+        contentType: att.contentType,
+        name: att.name,
+        proxyURL: att.proxyURL,
+        size: att.size,
+        spoiler: att.spoiler,
+        url: att.url,
+        width: att.width,
+      }));
+    }
+
+    if (msg.embeds.length) {
+      data.embeds = msg.embeds.map(embed => ({
+        title: embed.title,
+        description: embed.description,
+        url: embed.url,
+        timestamp: embed.timestamp,
+        color: embed.color,
+
+        fields: embed.fields.map(field => ({
+          name: field.name,
+          value: field.value,
+          inline: field.inline,
+        })),
+
+        author: embed.author
+          ? {
+              name: embed.author.name,
+              url: embed.author.url,
+              iconURL: embed.author.iconURL,
+              proxyIconURL: embed.author.proxyIconURL,
+            }
+          : undefined,
+
+        thumbnail: embed.thumbnail
+          ? {
+              url: embed.thumbnail.url,
+              proxyURL: embed.thumbnail.proxyURL,
+              height: embed.thumbnail.height,
+              width: embed.thumbnail.width,
+            }
+          : undefined,
+
+        image: embed.image
+          ? {
+              url: embed.image.url,
+              proxyURL: embed.image.proxyURL,
+              height: embed.image.height,
+              width: embed.image.width,
+            }
+          : undefined,
+
+        video: embed.video
+          ? {
+              url: embed.video.url,
+              proxyURL: embed.video.proxyURL,
+              height: embed.video.height,
+              width: embed.video.width,
+            }
+          : undefined,
+
+        footer: embed.footer
+          ? {
+              text: embed.footer.text,
+              iconURL: embed.footer.iconURL,
+              proxyIconURL: embed.footer.proxyIconURL,
+            }
+          : undefined,
+      }));
+    }
+
+    if (msg.stickers?.size) {
+      data.stickers = Array.from(msg.stickers.values()).map(sticker => ({
+        format: sticker.format,
+        guildId: sticker.guildId,
+        id: sticker.id,
+        name: sticker.name,
+        description: sticker.description,
+        available: sticker.available,
+        type: sticker.type,
+      }));
+    }
 
     return data;
   }

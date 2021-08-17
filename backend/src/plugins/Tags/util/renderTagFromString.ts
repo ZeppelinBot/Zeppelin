@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { TemplateParseError } from "../../../templateFormatter";
 import { StrictMessageContent } from "../../../utils";
@@ -28,15 +28,15 @@ export async function renderTagFromString(
       tagBody,
       tagArgs,
       {
-        member: memberToConfigAccessibleMember(member),
-        user: userToConfigAccessibleUser(member.user),
+        member: memberToTemplateSafeMember(member),
+        user: userToTemplateSafeUser(member.user),
       },
       { member },
     );
   } catch (e) {
     if (e instanceof TemplateParseError) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Failed to render tag \`${prefix}${tagName}\`: ${e.message}`,
       });
       return null;

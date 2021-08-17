@@ -1,8 +1,9 @@
 import { Snowflake } from "discord.js";
-import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { mutesEvt } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 /**
  * Reapply active mutes on join
@@ -20,8 +21,8 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
         memberRoleLock.unlock();
       }
 
-      pluginData.state.serverLogs.log(LogType.MEMBER_MUTE_REJOIN, {
-        member: memberToConfigAccessibleMember(member),
+      pluginData.getPlugin(LogsPlugin).logMemberMuteRejoin({
+        member,
       });
     }
   },

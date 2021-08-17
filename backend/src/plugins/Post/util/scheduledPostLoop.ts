@@ -1,12 +1,13 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { DBDateFormat, SECONDS } from "../../../utils";
 import { PostPluginType } from "../types";
 import { postMessage } from "./postMessage";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const SCHEDULED_POST_CHECK_INTERVAL = 5 * SECONDS;
 
@@ -30,16 +31,16 @@ export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginTy
           post.attachments,
           post.enable_mentions,
         );
-        pluginData.state.logs.log(LogType.POSTED_SCHEDULED_MESSAGE, {
-          author: userToConfigAccessibleUser(author),
-          channel: channelToConfigAccessibleChannel(channel),
+        pluginData.getPlugin(LogsPlugin).logPostedScheduledMessage({
+          author,
+          channel,
           messageId: postedMessage.id,
         });
       } catch {
-        pluginData.state.logs.log(LogType.BOT_ALERT, {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
           body: `Failed to post scheduled message by {userMention(author)} to {channelMention(channel)}`,
-          channel: channelToConfigAccessibleChannel(channel),
-          author: userToConfigAccessibleUser(author),
+          channel,
+          author,
         });
         logger.warn(
           `Failed to post scheduled message to #${channel.name} (${channel.id}) on ${pluginData.guild.name} (${pluginData.guild.id})`,

@@ -26,7 +26,7 @@ export const AddReactionsEvt = autoReactionsEvt({
     );
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Cannot apply auto-reactions in <#${message.channel.id}>. ${missingPermissionError(missingPermissions)}`,
       });
       return;
@@ -39,11 +39,11 @@ export const AddReactionsEvt = autoReactionsEvt({
         if (isDiscordAPIError(e)) {
           const logs = pluginData.getPlugin(LogsPlugin);
           if (e.code === 10008) {
-            logs.log(LogType.BOT_ALERT, {
+            logs.logBotAlert({
               body: `Could not apply auto-reactions in <#${message.channel.id}> for message \`${message.id}\`. Make sure nothing is deleting the message before the reactions are applied.`,
             });
           } else {
-            logs.log(LogType.BOT_ALERT, {
+            logs.logBotAlert({
               body: `Could not apply auto-reactions in <#${message.channel.id}> for message \`${message.id}\`. Error code ${e.code}.`,
             });
           }

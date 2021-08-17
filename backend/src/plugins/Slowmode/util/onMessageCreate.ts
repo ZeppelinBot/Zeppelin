@@ -40,7 +40,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   const missingPermissions = getMissingChannelPermissions(me, channel, BOT_SLOWMODE_PERMISSIONS);
   if (missingPermissions) {
     const logs = pluginData.getPlugin(LogsPlugin);
-    logs.log(LogType.BOT_ALERT, {
+    logs.logBotAlert({
       body: `Unable to manage bot slowmode in <#${channel.id}>. ${missingPermissionError(missingPermissions)}`,
     });
     return;

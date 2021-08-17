@@ -27,7 +27,7 @@ export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPlu
   }
 
   const setCommands = await comms.set(newCommands, pluginData.guild.id).catch(e => {
-    pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, `Unable to overwrite context menus: ${e}`);
+    pluginData.getPlugin(LogsPlugin).logBotAlert({ body: `Unable to overwrite context menus: ${e}` });
     return undefined;
   });
   if (!setCommands) return;

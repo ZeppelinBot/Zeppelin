@@ -30,12 +30,12 @@ export async function applyReactionRoleReactionsToMessage(
     if (isDiscordAPIError(e)) {
       if (e.code === 10008) {
         // Unknown message, remove reaction roles from the message
-        logs.log(LogType.BOT_ALERT, {
+        logs.logBotAlert({
           body: `Removed reaction roles from unknown message ${channelId}/${messageId} (${pluginData.guild.id})`,
         });
         await pluginData.state.reactionRoles.removeFromMessage(messageId);
       } else {
-        logs.log(LogType.BOT_ALERT, {
+        logs.logBotAlert({
           body: `Error ${e.code} when applying reaction roles to message ${channelId}/${messageId}: ${e.message}`,
         });
       }
@@ -53,7 +53,7 @@ export async function applyReactionRoleReactionsToMessage(
   } catch (e) {
     if (isDiscordAPIError(e)) {
       errors.push(`Error ${e.code} while removing old reactions: ${e.message}`);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Error ${e.code} while removing old reaction role reactions from message ${channelId}/${messageId}: ${e.message}`,
       });
       return errors;
@@ -77,13 +77,13 @@ export async function applyReactionRoleReactionsToMessage(
         if (e.code === 10014) {
           pluginData.state.reactionRoles.removeFromMessage(messageId, rawEmoji);
           errors.push(`Unknown emoji: ${rawEmoji}`);
-          logs.log(LogType.BOT_ALERT, {
+          logs.logBotAlert({
             body: `Could not add unknown reaction role emoji ${rawEmoji} to message ${channelId}/${messageId}`,
           });
           continue;
         } else if (e.code === 50013) {
           errors.push(`Missing permissions to apply reactions`);
-          logs.log(LogType.BOT_ALERT, {
+          logs.logBotAlert({
             body: `Error ${e.code} while applying reaction role reactions to ${channelId}/${messageId}: ${e.message}`,
           });
           break;

@@ -1,7 +1,7 @@
 import { DiscordAPIError, Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -18,6 +18,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -128,14 +129,23 @@ export async function banUserId(
 
   // Log the action
   const mod = await resolveUser(pluginData.client, modId);
-  const logtype = banTime ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
-  pluginData.state.serverLogs.log(logtype, {
-    mod: userToConfigAccessibleUser(mod),
-    user: userToConfigAccessibleUser(user),
-    caseNumber: createdCase.case_number,
-    reason,
-    banTime: banTime ? humanizeDuration(banTime) : null,
-  });
+
+  if (banTime) {
+    pluginData.getPlugin(LogsPlugin).logMemberTimedBan({
+      mod,
+      user,
+      caseNumber: createdCase.case_number,
+      reason: reason ?? "",
+      banTime: humanizeDuration(banTime),
+    });
+  } else {
+    pluginData.getPlugin(LogsPlugin).logMemberBan({
+      mod,
+      user,
+      caseNumber: createdCase.case_number,
+      reason: reason ?? "",
+    });
+  }
 
   pluginData.state.events.emit("ban", user.id, reason, banOptions.isAutomodAction);
 

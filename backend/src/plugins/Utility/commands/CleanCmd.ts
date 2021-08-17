@@ -1,7 +1,7 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -11,6 +11,7 @@ import { allowTimeout } from "../../../RegExpRunner";
 import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
 import { boolean, number } from "io-ts";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -42,9 +43,9 @@ export async function cleanMessages(
   const baseUrl = getBaseUrl(pluginData);
   const archiveUrl = pluginData.state.archives.getUrl(baseUrl, archiveId);
 
-  pluginData.state.logs.log(LogType.CLEAN, {
-    mod: userToConfigAccessibleUser(mod),
-    channel: channelToConfigAccessibleChannel(channel),
+  pluginData.getPlugin(LogsPlugin).logClean({
+    mod,
+    channel,
     count: savedMessages.length,
     archiveUrl,
   });

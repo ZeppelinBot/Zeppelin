@@ -1,14 +1,17 @@
 import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { channelToConfigAccessibleChannel } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
 import { logsEvt } from "../types";
+import { logChannelCreate } from "../logFunctions/logChannelCreate";
+import { logChannelDelete } from "../logFunctions/logChannelDelete";
+import { logChannelUpdate } from "../logFunctions/logChannelUpdate";
 
 export const LogsChannelCreateEvt = logsEvt({
   event: "channelCreate",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.CHANNEL_CREATE, {
-      channel: channelToConfigAccessibleChannel(meta.args.channel),
+    logChannelCreate(meta.pluginData, {
+      channel: meta.args.channel,
     });
   },
 });
@@ -17,8 +20,8 @@ export const LogsChannelDeleteEvt = logsEvt({
   event: "channelDelete",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.CHANNEL_DELETE, {
-      channel: channelToConfigAccessibleChannel(meta.args.channel),
+    logChannelDelete(meta.pluginData, {
+      channel: meta.args.channel,
     });
   },
 });
@@ -30,14 +33,10 @@ export const LogsChannelUpdateEvt = logsEvt({
     const diff = getScalarDifference(meta.args.oldChannel, meta.args.newChannel);
     const differenceString = differenceToString(diff);
 
-    meta.pluginData.state.guildLogs.log(
-      LogType.CHANNEL_UPDATE,
-      {
-        oldChannel: channelToConfigAccessibleChannel(meta.args.oldChannel),
-        newChannel: channelToConfigAccessibleChannel(meta.args.newChannel),
-        differenceString,
-      },
-      meta.args.newChannel.id,
-    );
+    logChannelUpdate(meta.pluginData, {
+      oldChannel: meta.args.oldChannel,
+      newChannel: meta.args.newChannel,
+      differenceString,
+    });
   },
 });
