@@ -7,7 +7,6 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { CasesPlugin } from "../Cases/CasesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
@@ -140,7 +139,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     prettyName: "Logs",
   },
 
-  dependencies: [TimeAndDatePlugin, CasesPlugin],
+  dependencies: [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
