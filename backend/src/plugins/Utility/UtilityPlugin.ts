@@ -1,3 +1,4 @@
+import { GuildMember, MessageEmbedOptions, Snowflake } from "discord.js";
 import { PluginOptions } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -36,6 +37,8 @@ import { UserInfoCmd } from "./commands/UserInfoCmd";
 import { VcdisconnectCmd } from "./commands/VcdisconnectCmd";
 import { VcmoveAllCmd, VcmoveCmd } from "./commands/VcmoveCmd";
 import { AutoJoinThreadEvt, AutoJoinThreadSyncEvt } from "./events/AutoJoinThreadEvt";
+import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
+import { hasPermission } from "./functions/hasPermission";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
 import { ConfigSchema, UtilityPluginType } from "./types";
@@ -160,6 +163,18 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     clean(pluginData) {
       return (args: CleanArgs, msg) => {
         cleanCmd(pluginData, args, msg);
+      };
+    },
+
+    userInfo(pluginData) {
+      return (userId: Snowflake, requestMemberId?: Snowflake) => {
+        return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
+      };
+    },
+
+    hasPermission(pluginData) {
+      return (member: GuildMember, channelId: Snowflake, permission: string) => {
+        return hasPermission(pluginData, member, channelId, permission);
       };
     },
   },

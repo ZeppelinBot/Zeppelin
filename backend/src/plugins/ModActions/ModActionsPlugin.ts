@@ -1,4 +1,4 @@
-import { GuildMember, Message } from "discord.js";
+import { GuildMember, Message, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -38,6 +38,7 @@ import { CreateKickCaseOnManualKickEvt } from "./events/CreateKickCaseOnManualKi
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
 import { banUserId } from "./functions/banUserId";
+import { hasMutePermission } from "./functions/hasMutePerm";
 import { kickMember } from "./functions/kickMember";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
@@ -178,6 +179,12 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     updateCase(pluginData) {
       return (msg: Message, caseNumber: number | null, note: string) => {
         updateCase(pluginData, msg, { caseNumber, note });
+      };
+    },
+
+    hasMutePermission(pluginData) {
+      return (member: GuildMember, channelId: Snowflake) => {
+        return hasMutePermission(pluginData, member, channelId);
       };
     },
 
