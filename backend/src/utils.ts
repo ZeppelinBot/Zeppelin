@@ -37,7 +37,7 @@ import moment from "moment-timezone";
 import tlds from "tlds";
 import tmp from "tmp";
 import { URL } from "url";
-import { SavedMessage } from "./data/entities/SavedMessage";
+import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
 import { SimpleCache } from "./SimpleCache";
 import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
@@ -1332,7 +1332,7 @@ export function messageSummary(msg: SavedMessage) {
   if (msg.data.attachments) {
     result +=
       "Attachments:\n" +
-      msg.data.attachments.map((a: MessageAttachment) => disableLinkPreviews(a.url)).join("\n") +
+      msg.data.attachments.map((a: ISavedMessageAttachmentData) => disableLinkPreviews(a.url)).join("\n") +
       "\n";
   }
 
@@ -1355,7 +1355,7 @@ export function verboseUserName(user: User | UnknownUser): string {
   return `**${user.tag}** (\`${user.id}\`)`;
 }
 
-export function verboseChannelMention(channel: GuildChannel): string {
+export function verboseChannelMention(channel: GuildChannel | ThreadChannel): string {
   const plainTextName =
     channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
       ? channel.name
@@ -1498,6 +1498,11 @@ export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R
 
 export function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr));
+}
+
+// From https://github.com/microsoft/TypeScript/pull/29955#issuecomment-470062531
+export function isTruthy<T>(value: T): value is Exclude<T, false | null | undefined | "" | 0> {
+  return Boolean(value);
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";

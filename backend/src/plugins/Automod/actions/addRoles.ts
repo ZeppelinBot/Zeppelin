@@ -23,7 +23,7 @@ export const AddRolesAction = automodAction({
     const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Cannot add roles in Automod rule **${ruleName}**. ${missingPermissionError(missingPermissions)}`,
       });
       return;
@@ -44,7 +44,7 @@ export const AddRolesAction = automodAction({
         roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Unable to assign the following roles in Automod rule **${ruleName}**: **${roleNamesWeCannotAssign.join(
           "**, **",
         )}**`,

@@ -70,9 +70,8 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   configSchema: ConfigSchema,
-  defaultOptions,
-
   dependencies: [CasesPlugin, LogsPlugin],
+  defaultOptions,
 
   // prettier-ignore
   commands: [

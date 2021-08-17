@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -93,7 +93,7 @@ export async function muteUser(
         const actualMuteRole = pluginData.guild.roles.cache.get(muteRole as Snowflake);
         if (!actualMuteRole) {
           lock.unlock();
-          logs.log(LogType.BOT_ALERT, {
+          logs.logBotAlert({
             body: `Cannot mute users, specified mute role Id is invalid`,
           });
           throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
@@ -104,14 +104,14 @@ export async function muteUser(
         // If we have roles and one of them is above the muted role, throw generic error
         if (zepRoles.size >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
           lock.unlock();
-          logs.log(LogType.BOT_ALERT, {
+          logs.logBotAlert({
             body: `Cannot mute user ${member.id}: ${e}`,
           });
           throw e;
         } else {
           // Otherwise, throw error that mute role is above zeps roles
           lock.unlock();
-          logs.log(LogType.BOT_ALERT, {
+          logs.logBotAlert({
             body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
           });
           throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP);
@@ -156,7 +156,7 @@ export async function muteUser(
       reason: reason || "None",
       time: timeUntilUnmute,
       moderator: muteOptions.caseArgs?.modId
-        ? userToConfigAccessibleUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+        ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
         : "",
     }));
 
@@ -224,19 +224,19 @@ export async function muteUser(
   // Log the action
   const mod = await resolveUser(pluginData.client, muteOptions.caseArgs?.modId);
   if (muteTime) {
-    pluginData.state.serverLogs.log(LogType.MEMBER_TIMED_MUTE, {
-      mod: userToConfigAccessibleUser(mod),
-      user: userToConfigAccessibleUser(user),
+    pluginData.getPlugin(LogsPlugin).logMemberTimedMute({
+      mod,
+      user,
       time: timeUntilUnmute,
       caseNumber: theCase.case_number,
-      reason,
+      reason: reason ?? "",
     });
   } else {
-    pluginData.state.serverLogs.log(LogType.MEMBER_MUTE, {
-      mod: userToConfigAccessibleUser(mod),
-      user: userToConfigAccessibleUser(user),
+    pluginData.getPlugin(LogsPlugin).logMemberMute({
+      mod,
+      user,
       caseNumber: theCase.case_number,
-      reason,
+      reason: reason ?? "",
     });
   }
 

@@ -13,7 +13,7 @@ export async function isBanned(
 ): Promise<boolean> {
   const botMember = pluginData.guild.members.cache.get(pluginData.client.user!.id);
   if (botMember && !hasDiscordPermissions(botMember.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
-    pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Missing "Ban Members" permission to check for existing bans`,
     });
     return false;
@@ -37,7 +37,7 @@ export async function isBanned(
     }
 
     if (isDiscordAPIError(e) && e.code === 50013) {
-      pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Missing "Ban Members" permission to check for existing bans`,
       });
     }

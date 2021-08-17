@@ -1,6 +1,6 @@
 import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/dist/helpers";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -14,6 +14,7 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -108,14 +109,22 @@ export const BanCmd = modActionsCmd({
             reason,
             noteDetails: [`Ban updated to ${time ? humanizeDuration(time) : "indefinite"}`],
           });
-          const logtype = time ? LogType.MEMBER_TIMED_BAN : LogType.MEMBER_BAN;
-          pluginData.state.serverLogs.log(logtype, {
-            mod: userToConfigAccessibleUser(mod.user),
-            user: userToConfigAccessibleUser(user),
-            caseNumber: createdCase.case_number,
-            reason,
-            banTime: time ? humanizeDuration(time) : null,
-          });
+          if (time) {
+            pluginData.getPlugin(LogsPlugin).logMemberTimedBan({
+              mod: mod.user,
+              user,
+              caseNumber: createdCase.case_number,
+              reason,
+              banTime: humanizeDuration(time),
+            });
+          } else {
+            pluginData.getPlugin(LogsPlugin).logMemberBan({
+              mod,
+              user,
+              caseNumber: createdCase.case_number,
+              reason,
+            });
+          }
 
           sendSuccessMessage(
             pluginData,

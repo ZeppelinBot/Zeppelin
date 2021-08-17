@@ -1,11 +1,12 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { UnknownUser } from "../../../utils";
+import { UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { SlowmodePluginType } from "../types";
 import { clearBotSlowmodeFromUserId } from "./clearBotSlowmodeFromUserId";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function clearExpiredSlowmodes(pluginData: GuildPluginData<SlowmodePluginType>) {
   const expiredSlowmodeUsers = await pluginData.state.slowmodes.getExpiredSlowmodeUsers();
@@ -25,10 +26,10 @@ export async function clearExpiredSlowmodes(pluginData: GuildPluginData<Slowmode
         .users!.fetch(user.user_id as Snowflake)
         .catch(() => new UnknownUser({ id: user.user_id }));
 
-      pluginData.state.logs.log(LogType.BOT_ALERT, {
-        body: `Failed to clear slowmode permissions from {userMention(user)} in {channelMention(channel)}`,
-        user: userToConfigAccessibleUser(await realUser),
-        channel: channelToConfigAccessibleChannel(channel),
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: `Failed to clear slowmode permissions from ${verboseUserMention(
+          await realUser,
+        )} in ${verboseChannelMention(channel)}`,
       });
     }
   }

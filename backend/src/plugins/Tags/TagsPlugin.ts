@@ -21,6 +21,7 @@ import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -60,6 +61,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   configSchema: ConfigSchema,
+  dependencies: [LogsPlugin],
   defaultOptions,
 
   // prettier-ignore

@@ -41,7 +41,7 @@ export async function cleanAction(
     interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Failed to clean in <#${interaction.channelId}> in ContextMenu action \`clean\`:_ ${e}`,
       });
     } else {

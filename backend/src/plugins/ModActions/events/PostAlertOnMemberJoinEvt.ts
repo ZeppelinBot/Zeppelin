@@ -24,14 +24,14 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
     if (actions.length) {
       const alertChannel = pluginData.guild.channels.cache.get(alertChannelId as Snowflake);
       if (!alertChannel) {
-        logs.log(LogType.BOT_ALERT, {
+        logs.logBotAlert({
           body: `Unknown \`alert_channel\` configured for \`mod_actions\`: \`${alertChannelId}\``,
         });
         return;
       }
 
       if (!(alertChannel instanceof TextChannel)) {
-        logs.log(LogType.BOT_ALERT, {
+        logs.logBotAlert({
           body: `Non-text channel configured as \`alert_channel\` in \`mod_actions\`: \`${alertChannelId}\``,
         });
         return;
@@ -40,7 +40,7 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
       const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
       const botPerms = alertChannel.permissionsFor(botMember ?? pluginData.client.user!.id);
       if (!hasDiscordPermissions(botPerms, Permissions.FLAGS.SEND_MESSAGES)) {
-        logs.log(LogType.BOT_ALERT, {
+        logs.logBotAlert({
           body: `Missing "Send Messages" permissions for the \`alert_channel\` configured in \`mod_actions\`: \`${alertChannelId}\``,
         });
         return;

@@ -1,4 +1,4 @@
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -7,6 +7,7 @@ import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const NoteCmd = modActionsCmd({
   trigger: "note",
@@ -41,9 +42,9 @@ export const NoteCmd = modActionsCmd({
       reason,
     });
 
-    pluginData.state.serverLogs.log(LogType.MEMBER_NOTE, {
-      mod: userToConfigAccessibleUser(msg.author),
-      user: userToConfigAccessibleUser(user),
+    pluginData.getPlugin(LogsPlugin).logMemberNote({
+      mod: msg.author,
+      user,
       caseNumber: createdCase.case_number,
       reason,
     });

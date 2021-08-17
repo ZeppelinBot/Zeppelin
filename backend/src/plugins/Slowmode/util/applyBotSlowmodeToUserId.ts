@@ -1,10 +1,11 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { isDiscordAPIError, UnknownUser } from "../../../utils";
+import { isDiscordAPIError, UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { SlowmodePluginType } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
@@ -27,16 +28,14 @@ export async function applyBotSlowmodeToUserId(
       logger.warn(
         `Missing permissions to apply bot slowmode to user ${userId} on channel ${channel.name} (${channel.id}) on server ${pluginData.guild.name} (${pluginData.guild.id})`,
       );
-      pluginData.state.logs.log(LogType.BOT_ALERT, {
-        body: `Missing permissions to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
-        user: userToConfigAccessibleUser(user),
-        channel: channelToConfigAccessibleChannel(channel),
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: `Missing permissions to apply bot slowmode to ${verboseUserMention(user)} in ${verboseChannelMention(
+          channel,
+        )}`,
       });
     } else {
-      pluginData.state.logs.log(LogType.BOT_ALERT, {
-        body: `Failed to apply bot slowmode to {userMention(user)} in {channelMention(channel)}`,
-        user: userToConfigAccessibleUser(user),
-        channel: channelToConfigAccessibleChannel(channel),
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: `Failed to apply bot slowmode to ${verboseUserMention(user)} in ${verboseChannelMention(channel)}`,
       });
       throw e;
     }

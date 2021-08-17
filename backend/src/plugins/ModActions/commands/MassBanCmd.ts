@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
 import { performance } from "perf_hooks";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -12,6 +12,7 @@ import { MINUTES, noop } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",
@@ -129,8 +130,8 @@ export const MassbanCmd = modActionsCmd({
         sendErrorMessage(pluginData, msg.channel, "All bans failed. Make sure the IDs are valid.");
       } else {
         // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
-        pluginData.state.serverLogs.log(LogType.MASSBAN, {
-          mod: userToConfigAccessibleUser(msg.author),
+        pluginData.getPlugin(LogsPlugin).logMassBan({
+          mod: msg.author,
           count: successfulBanCount,
           reason: banReason,
         });

@@ -1,7 +1,11 @@
 import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { channelToConfigAccessibleChannel, stageToConfigAccessibleStage } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, stageToTemplateSafeStage } from "../../../utils/templateSafeObjects";
 import { logsEvt } from "../types";
+import { logStageInstanceCreate } from "../logFunctions/logStageInstanceCreate";
+import { StageChannel } from "discord.js";
+import { logStageInstanceDelete } from "../logFunctions/logStageInstanceDelete";
+import { logStageInstanceUpdate } from "../logFunctions/logStageInstanceUpdate";
 
 export const LogsStageInstanceCreateEvt = logsEvt({
   event: "stageInstanceCreate",
@@ -9,11 +13,11 @@ export const LogsStageInstanceCreateEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.stageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId))!;
+      ((await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId)) as StageChannel);
 
-    meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_CREATE, {
-      stageInstance: stageToConfigAccessibleStage(meta.args.stageInstance),
-      stageChannel: channelToConfigAccessibleChannel(stageChannel),
+    logStageInstanceCreate(meta.pluginData, {
+      stageInstance: meta.args.stageInstance,
+      stageChannel,
     });
   },
 });
@@ -24,11 +28,11 @@ export const LogsStageInstanceDeleteEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.stageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId))!;
+      ((await meta.pluginData.guild.channels.fetch(meta.args.stageInstance.channelId)) as StageChannel);
 
-    meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_DELETE, {
-      stageInstance: stageToConfigAccessibleStage(meta.args.stageInstance),
-      stageChannel: channelToConfigAccessibleChannel(stageChannel),
+    logStageInstanceDelete(meta.pluginData, {
+      stageInstance: meta.args.stageInstance,
+      stageChannel,
     });
   },
 });
@@ -39,15 +43,15 @@ export const LogsStageInstanceUpdateEvt = logsEvt({
   async listener(meta) {
     const stageChannel =
       meta.args.newStageInstance.channel ??
-      (await meta.pluginData.guild.channels.fetch(meta.args.newStageInstance.channelId))!;
+      ((await meta.pluginData.guild.channels.fetch(meta.args.newStageInstance.channelId)) as StageChannel);
 
     const diff = getScalarDifference(meta.args.oldStageInstance, meta.args.newStageInstance);
     const differenceString = differenceToString(diff);
 
-    meta.pluginData.state.guildLogs.log(LogType.STAGE_INSTANCE_UPDATE, {
-      oldStageInstance: stageToConfigAccessibleStage(meta.args.oldStageInstance),
-      newStageInstance: stageToConfigAccessibleStage(meta.args.newStageInstance),
-      stageChannel: channelToConfigAccessibleChannel(stageChannel),
+    logStageInstanceUpdate(meta.pluginData, {
+      oldStageInstance: meta.args.oldStageInstance,
+      newStageInstance: meta.args.newStageInstance,
+      stageChannel,
       differenceString,
     });
   },

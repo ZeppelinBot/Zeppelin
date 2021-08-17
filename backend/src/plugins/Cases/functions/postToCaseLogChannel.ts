@@ -6,6 +6,7 @@ import { isDiscordAPIError } from "../../../utils";
 import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
@@ -26,7 +27,7 @@ export async function postToCaseLogChannel(
     result = await caseLogChannel.send({ ...content });
   } catch (e) {
     if (isDiscordAPIError(e) && (e.code === 50013 || e.code === 50001)) {
-      pluginData.state.logs.log(LogType.BOT_ALERT, {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Missing permissions to post mod cases in <#${caseLogChannel.id}>`,
       });
       return null;
@@ -67,7 +68,7 @@ export async function postCaseToCaseLogChannel(
     }
     return postedMessage;
   } catch {
-    pluginData.state.logs.log(LogType.BOT_ALERT, {
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Failed to post case #${theCase.case_number} to the case log channel`,
     });
     return null;
