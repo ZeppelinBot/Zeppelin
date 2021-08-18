@@ -68,13 +68,24 @@ export async function handleCompanionPermissions(
       });
     }
   } catch (e) {
-    if (isDiscordAPIError(e) && e.code === 50001) {
+    if (isDiscordAPIError(e)) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.logBotAlert({
-        body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
-      });
-      pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
-      return;
+
+      if (e.code === 50001) {
+        logs.logBotAlert({
+          body: `One of the companion channels can't be accessed. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
+        });
+        pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
+        return;
+      }
+
+      if (e.code === 50013) {
+        logs.logBotAlert({
+          body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
+        });
+        pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
+        return;
+      }
     }
 
     throw e;
