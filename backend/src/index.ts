@@ -180,16 +180,23 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
+  client.on(Constants.Events.RATE_LIMIT, data => {
+    // tslint:disable-next-line:no-console
+    console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
+  });
+
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
   client.on(Constants.Events.DEBUG, errorText => {
     if (!errorText.indexOf("429")) {
+      // tslint:disable-next-line:no-console
+      console.debug(`[DEBUG] ${errorText}`);
       return;
     }
 
     // tslint:disable-next-line:no-console
-    console.warn(errorText);
+    console.warn(`[DEBUG] [WARN] [429] ${errorText}`);
 
     const value = safe429Counter.add(1);
     if (value > safe429MaxCount) {
