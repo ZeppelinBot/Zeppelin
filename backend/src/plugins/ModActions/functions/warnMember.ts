@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -21,13 +21,16 @@ export async function warnMember(
 
   let notifyResult: UserNotificationResult;
   if (config.warn_message) {
-    const warnMessage = await renderTemplate(config.warn_message, {
-      guildName: pluginData.guild.name,
-      reason,
-      moderator: warnOptions.caseArgs?.modId
-        ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
-        : {},
-    });
+    const warnMessage = await renderTemplate(
+      config.warn_message,
+      new TemplateSafeValueContainer({
+        guildName: pluginData.guild.name,
+        reason,
+        moderator: warnOptions.caseArgs?.modId
+          ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+          : null,
+      }),
+    );
     const contactMethods = warnOptions?.contactMethods
       ? warnOptions.contactMethods
       : getDefaultContactMethods(pluginData, "warn");

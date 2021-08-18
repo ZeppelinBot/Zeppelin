@@ -4,6 +4,7 @@ import { GuildPluginData } from "knub";
 import { convertDelayStringToMS, noop, tDelayString } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const MakeRoleMentionableAction = t.type({
   type: t.literal("make_role_mentionable"),
@@ -15,7 +16,7 @@ export type TMakeRoleMentionableAction = t.TypeOf<typeof MakeRoleMentionableActi
 export async function makeRoleMentionableAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TMakeRoleMentionableAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {

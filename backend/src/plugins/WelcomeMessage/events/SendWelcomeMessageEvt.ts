@@ -1,11 +1,12 @@
 import { Snowflake, TextChannel } from "discord.js";
 import {
   channelToTemplateSafeChannel,
+  guildToTemplateSafeGuild,
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate, TemplateParseError } from "../../../templateFormatter";
+import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createChunkedMessage, stripObjectToScalars, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { sendDM } from "../../../utils/sendDM";
 import { welcomeMessageEvt } from "../types";
@@ -32,12 +33,14 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
     let formatted;
 
     try {
-      const strippedMember = stripObjectToScalars(member, ["user", "guild"]);
-      formatted = await renderTemplate(config.message, {
-        member: strippedMember,
-        user: strippedMember["user"],
-        guild: strippedMember["guild"],
-      });
+      formatted = await renderTemplate(
+        config.message,
+        new TemplateSafeValueContainer({
+          member: memberToTemplateSafeMember(member),
+          user: userToTemplateSafeUser(member.user),
+          guild: guildToTemplateSafeGuild(member.guild),
+        }),
+      );
     } catch (e) {
       if (e instanceof TemplateParseError) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({

@@ -2,7 +2,7 @@ import { MessageOptions, Permissions, Snowflake, TextChannel, User } from "disco
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,
@@ -48,9 +48,12 @@ export const ReplyAction = automodAction({
       const user = users[0];
 
       const renderReplyText = async str =>
-        renderTemplate(str, {
-          user: userToTemplateSafeUser(user),
-        });
+        renderTemplate(
+          str,
+          new TemplateSafeValueContainer({
+            user: userToTemplateSafeUser(user),
+          }),
+        );
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)

@@ -3,6 +3,7 @@ import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),
@@ -21,7 +22,7 @@ export type TSetChannelPermissionOverridesAction = t.TypeOf<typeof SetChannelPer
 export async function setChannelPermissionOverridesAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TSetChannelPermissionOverridesAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {

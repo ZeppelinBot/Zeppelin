@@ -3,6 +3,7 @@ import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const MakeRoleUnmentionableAction = t.type({
   type: t.literal("make_role_unmentionable"),
@@ -13,7 +14,7 @@ export type TMakeRoleUnmentionableAction = t.TypeOf<typeof MakeRoleUnmentionable
 export async function makeRoleUnmentionableAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TMakeRoleUnmentionableAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {
