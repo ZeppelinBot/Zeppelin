@@ -19,7 +19,7 @@ export const LogAction = automodAction({
       user,
       users,
       actionsTaken,
-      matchSummary: matchResult.summary,
+      matchSummary: matchResult.summary ?? "",
     });
   },
 });

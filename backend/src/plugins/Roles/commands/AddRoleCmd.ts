@@ -54,10 +54,10 @@ export const AddRoleCmd = rolesCmd({
 
     await args.member.roles.add(roleId);
 
-    pluginData.getPlugin(LogsPlugin).logMemberRoleAdd(LogType.MEMBER_ROLE_ADD, {
-      member: memberToTemplateSafeMember(args.member),
-      roles: role.name,
-      mod: userToTemplateSafeUser(msg.author),
+    pluginData.getPlugin(LogsPlugin).logMemberRoleAdd({
+      mod: msg.author,
+      member: args.member,
+      roles: [role],
     });
 
     sendSuccessMessage(

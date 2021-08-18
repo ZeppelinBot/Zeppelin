@@ -4,7 +4,7 @@ import moment from "moment-timezone";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { DBDateFormat, SECONDS } from "../../../utils";
+import { DBDateFormat, SECONDS, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { PostPluginType } from "../types";
 import { postMessage } from "./postMessage";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -38,9 +38,9 @@ export async function scheduledPostLoop(pluginData: GuildPluginData<PostPluginTy
         });
       } catch {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
-          body: `Failed to post scheduled message by {userMention(author)} to {channelMention(channel)}`,
-          channel,
-          author,
+          body: `Failed to post scheduled message by ${verboseUserMention(author)} to ${verboseChannelMention(
+            channel,
+          )}`,
         });
         logger.warn(
           `Failed to post scheduled message to #${channel.name} (${channel.id}) on ${pluginData.guild.name} (${pluginData.guild.id})`,

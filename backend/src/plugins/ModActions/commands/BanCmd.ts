@@ -119,7 +119,7 @@ export const BanCmd = modActionsCmd({
             });
           } else {
             pluginData.getPlugin(LogsPlugin).logMemberBan({
-              mod,
+              mod: mod.user,
               user,
               caseNumber: createdCase.case_number,
               reason,

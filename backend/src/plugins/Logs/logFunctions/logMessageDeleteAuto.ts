@@ -31,7 +31,7 @@ export function logMessageDeleteAuto(pluginData: GuildPluginData<LogsPluginType>
     }),
     {
       userId: data.user.id,
-      bot: data.user.bot,
+      bot: data.user instanceof User ? data.user.bot : false,
       channel: data.channel.id,
       category: data.channel.parentId,
     },

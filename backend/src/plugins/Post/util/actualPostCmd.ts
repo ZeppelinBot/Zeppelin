@@ -192,7 +192,7 @@ export async function actualPostCmd(
       date: postAt.format(timeAndDate.getDateFormat("date")),
       time: postAt.format(timeAndDate.getDateFormat("time")),
       repeatInterval: humanizeDuration(opts.repeat),
-      repeatDetails: repeatDetailsStr,
+      repeatDetails: repeatDetailsStr ?? "",
     });
   }
 
