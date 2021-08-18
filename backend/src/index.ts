@@ -1,4 +1,4 @@
-import { Client, Intents, TextChannel } from "discord.js";
+import { Client, Intents, TextChannel, ThreadChannel } from "discord.js";
 import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
@@ -239,13 +239,15 @@ connect().then(async () => {
       },
 
       sendSuccessMessageFn(channel, body) {
-        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const guildId =
+          channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
         channel.send(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
-        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const guildId =
+          channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
         channel.send(errorMessage(body, emoji));
       },
