@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { renderRecursively, StrictMessageContent } from "../../../utils";
 import { Tag, TagsPluginType } from "../types";
 import { findTagByName } from "./findTagByName";
@@ -9,7 +9,7 @@ import { findTagByName } from "./findTagByName";
 export async function renderTagBody(
   pluginData: GuildPluginData<TagsPluginType>,
   body: t.TypeOf<typeof Tag>,
-  args: any[] = [],
+  args: unknown[] = [],
   extraData = {},
   subTagPermissionMatchParams?: ExtendedMatchParams,
 ): Promise<StrictMessageContent> {
@@ -17,7 +17,7 @@ export async function renderTagBody(
   const maxTagFnCalls = 25;
   let tagFnCalls = 0;
 
-  const data = {
+  const data = new TemplateSafeValueContainer({
     args,
     ...extraData,
     ...pluginData.state.tagFunctions,
@@ -51,7 +51,7 @@ export async function renderTagBody(
       const rendered = await renderTagBody(pluginData, subTagBody, subTagArgs, subTagPermissionMatchParams);
       return rendered.content!;
     },
-  };
+  });
 
   if (typeof body === "string") {
     // Plain text tag
