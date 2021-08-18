@@ -117,13 +117,13 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     RefreshReactionRolesCmd,
     ClearReactionRolesCmd,
     InitReactionRolesCmd,
-    PostButtonRolesCmd,
+    // PostButtonRolesCmd,
   ],
 
   // prettier-ignore
   events: [
     AddReactionRoleEvt,
-    ButtonInteractionEvt,
+    // ButtonInteractionEvt,
     MessageDeletedEvt,
   ],
   configPreprocessor,
