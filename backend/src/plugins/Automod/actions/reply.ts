@@ -62,7 +62,6 @@ export const ReplyAction = automodAction({
           ? await renderReplyText(actionConfig)
           : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageOptions);
 
-      console.log("formatted:", formatted);
       if (formatted) {
         const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
 
@@ -93,7 +92,6 @@ export const ReplyAction = automodAction({
         }
 
         const messageContent: MessageOptions = typeof formatted === "string" ? { content: formatted } : formatted;
-        console.log(`sending reply message to ${channel.id}`);
         const replyMsg = await channel.send({
           ...messageContent,
           allowedMentions: {
