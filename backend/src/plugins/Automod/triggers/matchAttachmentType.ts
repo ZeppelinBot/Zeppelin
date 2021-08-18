@@ -32,6 +32,12 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     const attachments: any[] = context.message.data.attachments;
 
     for (const attachment of attachments) {
+      // FIXME: Hotfix
+      if (!attachment.filename) {
+        console.warn("No attachment filename:", attachment);
+        continue;
+      }
+
       const attachmentType = attachment.filename
         .split(".")
         .pop()
