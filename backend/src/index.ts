@@ -1,4 +1,4 @@
-import { Client, Intents, TextChannel, ThreadChannel } from "discord.js";
+import { Client, Constants, Intents, TextChannel, ThreadChannel } from "discord.js";
 import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
@@ -178,8 +178,13 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
-  client.on("rateLimit", rateLimitData => {
-    logger.info(`[429] ${JSON.stringify(rateLimitData)}`);
+  client.on(Constants.Events.DEBUG, errorText => {
+    if (!errorText.indexOf("429")) {
+      return;
+    }
+
+    // tslint:disable-next-line:no-console
+    console.warn(errorText);
   });
 
   client.on("error", err => {
