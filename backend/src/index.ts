@@ -100,6 +100,12 @@ function errorHandler(err) {
     return;
   }
 
+  // FIXME: Hotfix
+  if (err.message && err.message.startsWith("Unknown override criteria")) {
+    console.warn(err.message);
+    return;
+  }
+
   // tslint:disable:no-console
   console.error(err);
 
