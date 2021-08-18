@@ -42,7 +42,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     prettyName: "Slowmode",
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -159,7 +159,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   info: pluginInfo,
 
   // prettier-ignore
-  dependencies: [
+  dependencies: () => [
     LogsPlugin,
     ModActionsPlugin,
     MutesPlugin,

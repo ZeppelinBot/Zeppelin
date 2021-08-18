@@ -61,7 +61,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   configSchema: ConfigSchema,
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   defaultOptions,
 
   // prettier-ignore

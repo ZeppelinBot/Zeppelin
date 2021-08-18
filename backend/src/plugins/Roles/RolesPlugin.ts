@@ -42,7 +42,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
   },
 
   configSchema: ConfigSchema,
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   defaultOptions,
 
   // prettier-ignore

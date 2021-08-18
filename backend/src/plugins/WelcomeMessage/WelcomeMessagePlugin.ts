@@ -21,7 +21,7 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
   },
 
   configSchema: ConfigSchema,
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   defaultOptions,
 
   // prettier-ignore

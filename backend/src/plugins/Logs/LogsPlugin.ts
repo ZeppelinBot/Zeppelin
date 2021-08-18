@@ -108,6 +108,10 @@ import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
 import { logMemberTimedUnban } from "./logFunctions/logMemberTimedUnban";
 import { logDmFailed } from "./logFunctions/logDmFailed";
+import { CasesPlugin } from "../Cases/CasesPlugin";
+
+// Workaround for circular dependency
+const AnyTypedCasesPlugin = CasesPlugin as any;
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -139,7 +143,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     prettyName: "Logs",
   },
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: () => [TimeAndDatePlugin, AnyTypedCasesPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

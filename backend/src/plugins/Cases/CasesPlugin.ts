@@ -18,6 +18,9 @@ import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 
+// Workaround for circular dependency
+const AnyTypedLogsPlugin = LogsPlugin as any;
+
 const defaultOptions = {
   config: {
     log_automatic_actions: true,
@@ -39,7 +42,7 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     `),
   },
 
-  dependencies: [TimeAndDatePlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, AnyTypedLogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

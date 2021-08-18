@@ -25,7 +25,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
     configurationGuide: "Maximum deletion delay is currently 5 minutes",
   },
 
-  dependencies: [TimeAndDatePlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -52,5 +52,5 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
     loadAllCommands(pluginData);
   },
 
-  dependencies: [MutesPlugin, LogsPlugin, UtilityPlugin],
+  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
 });

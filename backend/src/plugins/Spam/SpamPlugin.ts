@@ -54,7 +54,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
     legacy: true,
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
 
   configSchema: ConfigSchema,
   defaultOptions,
