@@ -5,6 +5,7 @@ import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescripti
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { reactionRolesCmd, TReactionRolePair } from "../types";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
+import { hotfixMessageFetch } from "../../../utils/hotfixMessageFetch";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -40,7 +41,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage;
     try {
-      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(noop);
+      targetMessage = await hotfixMessageFetch(args.message.channel, args.message.messageId);
     } catch (e) {
       if (isDiscordAPIError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
