@@ -49,13 +49,6 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
       }
 
       if (!skip) {
-        const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
-          pluginData,
-          GuildAuditLogs.Actions.MEMBER_ROLE_UPDATE as number,
-          member.id,
-        );
-        const mod = relevantAuditLogEntry?.executor ?? null;
-
         if (addedRoles.length && removedRoles.length) {
           // Roles added *and* removed
           logMemberRoleChanges(pluginData, {
@@ -66,7 +59,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             removedRoles: removedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name),
-            mod,
+            mod: null,
           });
         } else if (addedRoles.length) {
           // Roles added
@@ -75,7 +68,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             roles: addedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name),
-            mod,
+            mod: null,
           });
         } else if (removedRoles.length && !addedRoles.length) {
           // Roles removed
@@ -84,7 +77,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             roles: removedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
               .map(r => r.name),
-            mod,
+            mod: null,
           });
         }
       }
