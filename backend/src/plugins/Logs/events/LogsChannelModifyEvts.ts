@@ -30,6 +30,10 @@ export const LogsChannelUpdateEvt = logsEvt({
   event: "channelUpdate",
 
   async listener(meta) {
+    if (meta.args.oldChannel?.partial) {
+      return;
+    }
+
     const diff = getScalarDifference(meta.args.oldChannel, meta.args.newChannel);
     const differenceString = differenceToString(diff);
 
