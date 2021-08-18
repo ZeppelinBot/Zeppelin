@@ -18,7 +18,9 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
     const oldMember = meta.args.oldMember;
     const member = meta.args.newMember;
 
-    if (!oldMember) return;
+    if (!oldMember || oldMember.partial) {
+      return;
+    }
 
     if (member.nickname !== oldMember.nickname) {
       logMemberNickChange(pluginData, {
