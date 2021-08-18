@@ -238,7 +238,14 @@ export class GuildSavedMessages extends BaseGuildRepository {
       posted_at: postedAt,
     };
 
-    return this.create({ ...data, ...overrides });
+    return this.create({ ...data, ...overrides }).catch(err => {
+      if (err?.code === "ER_DUP_ENTRY") {
+        console.warn(`Tried to insert duplicate message ID: ${msg.id}`);
+        return;
+      }
+
+      throw err;
+    });
   }
 
   async createFromMessages(messages: Message[], overrides = {}) {
