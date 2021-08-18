@@ -225,6 +225,11 @@ export class GuildSavedMessages extends BaseGuildRepository {
     const existingSavedMsg = await this.find(msg.id);
     if (existingSavedMsg) return;
 
+    // FIXME: Hotfix
+    if (!msg.channel) {
+      return;
+    }
+
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
