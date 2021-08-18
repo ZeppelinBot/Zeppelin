@@ -10,6 +10,9 @@ export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
 
   async listener(meta) {
+    // FIXME: Temporarily disabled
+    return;
+
     const pluginData = meta.pluginData;
 
     let msg = meta.args.reaction.message as Message;
