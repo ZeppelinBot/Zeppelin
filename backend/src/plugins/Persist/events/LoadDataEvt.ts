@@ -61,7 +61,7 @@ export const LoadDataEvt = persistEvt({
 
       if (rolesToRestore.length) {
         restoredData.push("roles");
-        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles.cache]));
+        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles.cache.keys()]));
       }
     }
 
