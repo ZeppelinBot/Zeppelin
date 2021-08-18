@@ -18,8 +18,9 @@ import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
+import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
+import { DecayingCounter } from "./utils/DecayingCounter";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -178,6 +179,9 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
+  const safe429DecayInterval = 5 * SECONDS;
+  const safe429MaxCount = 5;
+  const safe429Counter = new DecayingCounter(safe429DecayInterval);
   client.on(Constants.Events.DEBUG, errorText => {
     if (!errorText.indexOf("429")) {
       return;
@@ -185,6 +189,13 @@ connect().then(async () => {
 
     // tslint:disable-next-line:no-console
     console.warn(errorText);
+
+    const value = safe429Counter.add(1);
+    if (value > safe429MaxCount) {
+      // tslint:disable-next-line:no-console
+      console.error(`Too many 429s (over ${safe429MaxCount} in ${safe429MaxCount * safe429DecayInterval}ms), exiting`);
+      process.exit(1);
+    }
   });
 
   client.on("error", err => {
