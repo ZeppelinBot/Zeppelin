@@ -7,6 +7,8 @@ const queue = new Queue();
 export function hotfixMessageFetch(channel: TextChannel | ThreadChannel, messageId: string): Promise<Message> {
   return queue.add(async () => {
     await sleep(3000);
+    // tslint:disable-next-line:no-console
+    console.trace(`Fetching message id ${messageId} from channel ${channel.id}`);
     return channel.messages.fetch(messageId);
   });
 }
