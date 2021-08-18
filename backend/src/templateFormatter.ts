@@ -57,6 +57,9 @@ function isTemplateSafeValue(value: unknown): value is TemplateSafeValue {
 }
 
 export class TemplateSafeValueContainer {
+  // Fake property used for stricter type checks since TypeScript uses structural typing
+  _isTemplateSafeValueContainer: true;
+
   [key: string]: TemplateSafeValue;
 
   constructor(data: Record<string, TemplateSafeValue> = {}) {
