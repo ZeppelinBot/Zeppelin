@@ -28,19 +28,14 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
       return;
     }
 
-    if (!context.message.data.attachments) return null;
-    const attachments: any[] = context.message.data.attachments;
+    if (!context.message.data.attachments) {
+      return null;
+    }
 
-    for (const attachment of attachments) {
-      // FIXME: Hotfix
-      if (!attachment.filename) {
-        console.warn("No attachment filename:", attachment);
-        continue;
-      }
-
-      const attachmentType = attachment.filename
+    for (const attachment of context.message.data.attachments) {
+      const attachmentType = attachment.url
         .split(".")
-        .pop()
+        .pop()!
         .toLowerCase();
 
       const blacklist = trigger.blacklist_enabled
