@@ -12,6 +12,11 @@ export const MessageCreateEvt = messageSaverEvt({
       return;
     }
 
+    // Don't save partial messages
+    if (meta.args.message.partial) {
+      return;
+    }
+
     await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },
 });
@@ -23,6 +28,10 @@ export const MessageUpdateEvt = messageSaverEvt({
 
   async listener(meta) {
     if (meta.args.newMessage.type !== "DEFAULT" && meta.args.newMessage.type !== "REPLY") {
+      return;
+    }
+
+    if (meta.args.oldMessage?.partial) {
       return;
     }
 
