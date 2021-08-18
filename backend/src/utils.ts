@@ -1,6 +1,7 @@
 import {
   Client,
   Constants,
+  DiscordAPIError,
   Emoji,
   Guild,
   GuildAuditLogs,
@@ -84,8 +85,8 @@ export function isDiscordHTTPError(err: Error | string) {
   return typeof err === "object" && err.constructor?.name === DISCORD_HTTP_ERROR_NAME;
 }
 
-export function isDiscordAPIError(err: Error | string) {
-  return typeof err === "object" && err.constructor?.name === DISCORD_REST_ERROR_NAME;
+export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
+  return err instanceof DiscordAPIError;
 }
 
 export function tNullable<T extends t.Type<any, any>>(type: T) {
