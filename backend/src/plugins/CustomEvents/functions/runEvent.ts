@@ -10,12 +10,13 @@ import { messageAction } from "../actions/messageAction";
 import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
 import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export async function runEvent(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   event: TCustomEvent,
   eventData: any,
-  values: any,
+  values: TemplateSafeValueContainer,
 ) {
   try {
     for (const action of event.actions) {

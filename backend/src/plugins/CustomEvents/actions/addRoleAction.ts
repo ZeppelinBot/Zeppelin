@@ -2,7 +2,7 @@ import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
@@ -17,7 +17,7 @@ export type TAddRoleAction = t.TypeOf<typeof AddRoleAction>;
 export async function addRoleAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TAddRoleAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {

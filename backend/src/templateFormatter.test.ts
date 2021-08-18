@@ -1,5 +1,5 @@
 import test from "ava";
-import { parseTemplate, renderParsedTemplate, renderTemplate } from "./templateFormatter";
+import { parseTemplate, renderParsedTemplate, renderTemplate, TemplateSafeValueContainer } from "./templateFormatter";
 
 test("Parses plain string templates correctly", t => {
   const result = parseTemplate("foo bar baz");
@@ -75,7 +75,7 @@ test("Parses function variables with function variable arguments correctly", t =
 
 test("Renders a parsed template correctly", async t => {
   const parseResult = parseTemplate('foo {bar("str", 5.07, deeply(nested(8)))} baz');
-  const values = {
+  const values = new TemplateSafeValueContainer({
     bar(strArg, numArg, varArg) {
       return `${strArg} ${numArg} !${varArg}!`;
     },
@@ -85,7 +85,7 @@ test("Renders a parsed template correctly", async t => {
     nested(numArg) {
       return `?${numArg}?`;
     },
-  };
+  });
 
   const renderResult = await renderParsedTemplate(parseResult, values);
   t.is(renderResult, "foo str 5.07 !<?8?>! baz");

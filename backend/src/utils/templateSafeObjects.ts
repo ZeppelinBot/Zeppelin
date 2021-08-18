@@ -3,6 +3,7 @@ import {
   Guild,
   GuildChannel,
   GuildMember,
+  Message,
   PartialGuildMember,
   Role,
   Snowflake,
@@ -23,15 +24,18 @@ import {
 } from "../data/entities/SavedMessage";
 import { Case } from "../data/entities/Case";
 
-type Props<T> = {
-  [K in keyof T]: T[K];
-};
+type InputProps<T> = Omit<
+  {
+    [K in keyof T]: T[K];
+  },
+  "_isTemplateSafeValueContainer"
+>;
 
 export class TemplateSafeGuild extends TemplateSafeValueContainer {
   id: Snowflake;
   name: string;
 
-  constructor(data: Props<TemplateSafeGuild>) {
+  constructor(data: InputProps<TemplateSafeGuild>) {
     super(data);
   }
 }
@@ -46,7 +50,7 @@ export class TemplateSafeUser extends TemplateSafeValueContainer {
   bot?: boolean;
   createdAt?: number;
 
-  constructor(data: Props<TemplateSafeUser>) {
+  constructor(data: InputProps<TemplateSafeUser>) {
     super(data);
   }
 }
@@ -56,7 +60,7 @@ export class TemplateSafeUnknownUser extends TemplateSafeValueContainer {
   username: string;
   discriminator: string;
 
-  constructor(data: Props<TemplateSafeUnknownUser>) {
+  constructor(data: InputProps<TemplateSafeUnknownUser>) {
     super(data);
   }
 }
@@ -68,7 +72,7 @@ export class TemplateSafeRole extends TemplateSafeValueContainer {
   hexColor: string;
   hoist: boolean;
 
-  constructor(data: Props<TemplateSafeRole>) {
+  constructor(data: InputProps<TemplateSafeRole>) {
     super(data);
   }
 }
@@ -81,7 +85,7 @@ export class TemplateSafeMember extends TemplateSafeUser {
   // guildAvatarURL: string, Once DJS supports per-server avatars
   guildName: string;
 
-  constructor(data: Props<TemplateSafeMember>) {
+  constructor(data: InputProps<TemplateSafeMember>) {
     super(data);
   }
 }
@@ -89,7 +93,7 @@ export class TemplateSafeMember extends TemplateSafeUser {
 export class TemplateSafeUnknownMember extends TemplateSafeUnknownUser {
   user: TemplateSafeUnknownUser;
 
-  constructor(data: Props<TemplateSafeUnknownMember>) {
+  constructor(data: InputProps<TemplateSafeUnknownMember>) {
     super(data);
   }
 }
@@ -100,7 +104,7 @@ export class TemplateSafeChannel extends TemplateSafeValueContainer {
   mention: string;
   parentId?: Snowflake;
 
-  constructor(data: Props<TemplateSafeChannel>) {
+  constructor(data: InputProps<TemplateSafeChannel>) {
     super(data);
   }
 }
@@ -112,7 +116,7 @@ export class TemplateSafeStage extends TemplateSafeValueContainer {
   discoverable: boolean;
   topic: string;
 
-  constructor(data: Props<TemplateSafeStage>) {
+  constructor(data: InputProps<TemplateSafeStage>) {
     super(data);
   }
 }
@@ -125,7 +129,7 @@ export class TemplateSafeEmoji extends TemplateSafeValueContainer {
   identifier: string;
   mention: string;
 
-  constructor(data: Props<TemplateSafeEmoji>) {
+  constructor(data: InputProps<TemplateSafeEmoji>) {
     super(data);
   }
 }
@@ -141,7 +145,7 @@ export class TemplateSafeSticker extends TemplateSafeValueContainer {
   animated: boolean;
   url: string;
 
-  constructor(data: Props<TemplateSafeSticker>) {
+  constructor(data: InputProps<TemplateSafeSticker>) {
     super(data);
   }
 }
@@ -154,7 +158,7 @@ export class TemplateSafeSavedMessage extends TemplateSafeValueContainer {
   is_bot: boolean;
   data: TemplateSafeSavedMessageData;
 
-  constructor(data: Props<TemplateSafeSavedMessage>) {
+  constructor(data: InputProps<TemplateSafeSavedMessage>) {
     super(data);
   }
 }
@@ -170,7 +174,7 @@ export class TemplateSafeSavedMessageData extends TemplateSafeValueContainer {
   stickers?: Array<TypedTemplateSafeValueContainer<ISavedMessageStickerData>>;
   timestamp: number;
 
-  constructor(data: Props<TemplateSafeSavedMessageData>) {
+  constructor(data: InputProps<TemplateSafeSavedMessageData>) {
     super(data);
   }
 }
@@ -191,7 +195,18 @@ export class TemplateSafeCase extends TemplateSafeValueContainer {
   pp_name: string | null;
   log_message_id: string | null;
 
-  constructor(data: Props<TemplateSafeCase>) {
+  constructor(data: InputProps<TemplateSafeCase>) {
+    super(data);
+  }
+}
+
+export class TemplateSafeMessage extends TemplateSafeValueContainer {
+  id: string;
+  content: string;
+  author: TemplateSafeUser;
+  channel: TemplateSafeChannel;
+
+  constructor(data: InputProps<TemplateSafeMessage>) {
     super(data);
   }
 }
@@ -425,6 +440,15 @@ export function caseToTemplateSafeCase(theCase: Case): TemplateSafeCase {
     pp_id: theCase.pp_id,
     pp_name: theCase.pp_name,
     log_message_id: theCase.log_message_id,
+  });
+}
+
+export function messageToTemplateSafeMessage(message: Message): TemplateSafeMessage {
+  return new TemplateSafeMessage({
+    id: message.id,
+    content: message.content,
+    author: userToTemplateSafeUser(message.author),
+    channel: channelToTemplateSafeChannel(message.channel as GuildChannel | ThreadChannel),
   });
 }
 

@@ -36,7 +36,11 @@ import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 import { Util } from "discord.js";
-import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
+import {
+  createTypedTemplateSafeValueContainer,
+  TemplateSafeValueContainer,
+  TypedTemplateSafeValueContainer,
+} from "../../templateFormatter";
 import { mapToPublicFn } from "../../pluginUtils";
 
 import { logAutomodAction } from "./logFunctions/logAutomodAction";
@@ -284,15 +288,19 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
 
     state.regexRunnerRepeatedTimeoutListener = (regexSource, timeoutMs, failedTimes) => {
       logger.warn(`Disabled heavy regex temporarily: ${regexSource}`);
-      log(pluginData, LogType.BOT_ALERT, {
-        body:
-          `
+      log(
+        pluginData,
+        LogType.BOT_ALERT,
+        createTypedTemplateSafeValueContainer({
+          body:
+            `
             The following regex has taken longer than ${timeoutMs}ms for ${failedTimes} times and has been temporarily disabled:
           `.trim() +
-          "\n```" +
-          Util.escapeCodeBlock(regexSource) +
-          "```",
-      });
+            "\n```" +
+            Util.escapeCodeBlock(regexSource) +
+            "```",
+        }),
+      );
     };
     state.regexRunner.on("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
   },

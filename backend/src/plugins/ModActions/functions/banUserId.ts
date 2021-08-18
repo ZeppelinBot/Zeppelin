@@ -5,7 +5,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   createUserNotificationError,
   notifyUser,
@@ -48,24 +48,30 @@ export async function banUserId(
 
     if (contactMethods.length) {
       if (!banTime && config.ban_message) {
-        const banMessage = await renderTemplate(config.ban_message, {
-          guildName: pluginData.guild.name,
-          reason,
-          moderator: banOptions.caseArgs?.modId
-            ? stripObjectToScalars(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
-            : {},
-        });
+        const banMessage = await renderTemplate(
+          config.ban_message,
+          new TemplateSafeValueContainer({
+            guildName: pluginData.guild.name,
+            reason,
+            moderator: banOptions.caseArgs?.modId
+              ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+              : null,
+          }),
+        );
 
         notifyResult = await notifyUser(user, banMessage, contactMethods);
       } else if (banTime && config.tempban_message) {
-        const banMessage = await renderTemplate(config.tempban_message, {
-          guildName: pluginData.guild.name,
-          reason,
-          moderator: banOptions.caseArgs?.modId
-            ? stripObjectToScalars(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
-            : {},
-          banTime: humanizeDuration(banTime),
-        });
+        const banMessage = await renderTemplate(
+          config.tempban_message,
+          new TemplateSafeValueContainer({
+            guildName: pluginData.guild.name,
+            reason,
+            moderator: banOptions.caseArgs?.modId
+              ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+              : null,
+            banTime: humanizeDuration(banTime),
+          }),
+        );
 
         notifyResult = await notifyUser(user, banMessage, contactMethods);
       } else {

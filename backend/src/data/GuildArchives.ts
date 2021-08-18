@@ -109,9 +109,12 @@ export class GuildArchives extends BaseGuildRepository {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
 
-    const headerStr = await renderTemplate(MESSAGE_ARCHIVE_HEADER_FORMAT, {
-      guild: guildToTemplateSafeGuild(guild),
-    });
+    const headerStr = await renderTemplate(
+      MESSAGE_ARCHIVE_HEADER_FORMAT,
+      new TemplateSafeValueContainer({
+        guild: guildToTemplateSafeGuild(guild),
+      }),
+    );
     const msgLines = await this.renderLinesFromSavedMessages(savedMessages, guild);
     const messagesStr = msgLines.join("\n");
 

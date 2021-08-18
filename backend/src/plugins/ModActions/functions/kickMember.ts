@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
@@ -31,13 +31,16 @@ export async function kickMember(
 
     if (contactMethods.length) {
       if (config.kick_message) {
-        const kickMessage = await renderTemplate(config.kick_message, {
-          guildName: pluginData.guild.name,
-          reason,
-          moderator: kickOptions.caseArgs?.modId
-            ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
-            : {},
-        });
+        const kickMessage = await renderTemplate(
+          config.kick_message,
+          new TemplateSafeValueContainer({
+            guildName: pluginData.guild.name,
+            reason,
+            moderator: kickOptions.caseArgs?.modId
+              ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+              : null,
+          }),
+        );
 
         notifyResult = await notifyUser(member.user, kickMessage, contactMethods);
       } else {

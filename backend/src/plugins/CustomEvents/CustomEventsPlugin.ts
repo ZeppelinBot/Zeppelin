@@ -1,9 +1,18 @@
 import { parseSignature, typedGuildCommand } from "knub";
 import { commandTypes } from "../../commandTypes";
-import { stripObjectToScalars } from "../../utils";
+import { stripObjectToScalars, UnknownUser } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { runEvent } from "./functions/runEvent";
 import { ConfigSchema, CustomEventsPluginType } from "./types";
+import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
+import { Channel, GuildChannel, GuildMember, ThreadChannel, User } from "discord.js";
+import {
+  channelToTemplateSafeChannel,
+  memberToTemplateSafeMember,
+  messageToTemplateSafeMessage,
+  userToTemplateSafeUser,
+} from "../../utils/templateSafeObjects";
+import { isScalar } from "../../utils/isScalar";
 
 const defaultOptions = {
   config: {
@@ -28,8 +37,25 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
           permission: `events.${key}.trigger.can_use`,
           signature,
           run({ message, args }) {
-            const strippedMsg = stripObjectToScalars(message, ["channel", "author"]);
-            runEvent(pluginData, event, { msg: message, args }, { args, msg: strippedMsg });
+            const safeArgs = new TemplateSafeValueContainer();
+            for (const [argKey, argValue] of Object.entries(args as Record<string, unknown>)) {
+              if (argValue instanceof User || argValue instanceof UnknownUser) {
+                safeArgs[argKey] = userToTemplateSafeUser(argValue);
+              } else if (argValue instanceof GuildMember) {
+                safeArgs[argKey] = memberToTemplateSafeMember(argValue);
+              } else if (argValue instanceof GuildChannel || argValue instanceof ThreadChannel) {
+                safeArgs[argKey] = channelToTemplateSafeChannel(argValue);
+              } else if (isScalar(argValue)) {
+                safeArgs[argKey] = argValue;
+              }
+            }
+
+            const values = createTypedTemplateSafeValueContainer({
+              ...args,
+              msg: messageToTemplateSafeMessage(message),
+            });
+
+            runEvent(pluginData, event, { msg: message, args }, values);
           },
         });
         pluginData.commands.add(eventCommand);

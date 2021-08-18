@@ -19,7 +19,10 @@ export function logMemberMuteExpired(pluginData: GuildPluginData<LogsPluginType>
   const member =
     data.member instanceof GuildMember
       ? memberToTemplateSafeMember(data.member)
-      : new TemplateSafeUnknownMember({ ...data.member, user: new TemplateSafeUnknownUser({ ...data.member }) });
+      : new TemplateSafeUnknownMember({
+          ...data.member,
+          user: new TemplateSafeUnknownUser({ ...data.member }),
+        });
 
   const roles = data.member instanceof GuildMember ? Array.from(data.member.roles.cache.keys()) : [];
 

@@ -7,7 +7,7 @@ import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   notifyUser,
   resolveMember,
@@ -151,14 +151,17 @@ export async function muteUser(
 
   const muteMessage =
     template &&
-    (await renderTemplate(template, {
-      guildName: pluginData.guild.name,
-      reason: reason || "None",
-      time: timeUntilUnmute,
-      moderator: muteOptions.caseArgs?.modId
-        ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
-        : "",
-    }));
+    (await renderTemplate(
+      template,
+      new TemplateSafeValueContainer({
+        guildName: pluginData.guild.name,
+        reason: reason || "None",
+        time: timeUntilUnmute,
+        moderator: muteOptions.caseArgs?.modId
+          ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))
+          : null,
+      }),
+    ));
 
   if (muteMessage && user instanceof User) {
     let contactMethods: UserNotificationMethod[] = [];
