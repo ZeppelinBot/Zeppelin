@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
@@ -19,7 +19,7 @@ export function resolveActionContactMethods(
     }
 
     const channel = pluginData.guild.channels.cache.get(actionConfig.notifyChannel as Snowflake);
-    if (!(channel instanceof TextChannel)) {
+    if (!(channel instanceof TextChannel || channel instanceof ThreadChannel)) {
       throw new RecoverablePluginError(ERRORS.INVALID_USER_NOTIFICATION_CHANNEL);
     }
 

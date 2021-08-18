@@ -871,7 +871,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextChannel | User,
+  channel: TextChannel | ThreadChannel | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1329,7 +1329,7 @@ export function messageSummary(msg: SavedMessage) {
   if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
-  if (msg.data.attachments) {
+  if (msg.data.attachments && msg.data.attachments.length) {
     result +=
       "Attachments:\n" +
       msg.data.attachments.map((a: ISavedMessageAttachmentData) => disableLinkPreviews(a.url)).join("\n") +
