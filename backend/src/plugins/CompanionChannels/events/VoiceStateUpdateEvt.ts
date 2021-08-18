@@ -6,7 +6,12 @@ export const VoiceStateUpdateEvt = companionChannelsEvt({
   listener({ pluginData, args: { oldState, newState } }) {
     const oldChannel = oldState.channel;
     const newChannel = newState.channel;
-    const memberId = newState.member ? newState.member.id : oldState.member!.id;
+
+    const memberId = newState.member?.id ?? oldState.member?.id;
+    if (!memberId) {
+      return;
+    }
+
     handleCompanionPermissions(pluginData, memberId, newChannel, oldChannel);
   },
 });
