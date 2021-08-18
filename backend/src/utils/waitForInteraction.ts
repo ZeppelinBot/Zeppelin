@@ -1,6 +1,7 @@
 import { MessageActionRow, MessageButton, MessageComponentInteraction, MessageOptions, TextChannel } from "discord.js";
 import { noop } from "knub/dist/utils";
 import moment from "moment";
+import uuidv4 from "uuid/v4";
 
 export async function waitForButtonConfirm(
   channel: TextChannel,
@@ -13,12 +14,12 @@ export async function waitForButtonConfirm(
       new MessageButton()
         .setStyle("SUCCESS")
         .setLabel(options?.confirmText || "Confirm")
-        .setCustomId(`confirmButton:${idMod}`),
+        .setCustomId(`confirmButton:${idMod}:${uuidv4()}`),
 
       new MessageButton()
         .setStyle("DANGER")
         .setLabel(options?.cancelText || "Cancel")
-        .setCustomId(`cancelButton:${idMod}`),
+        .setCustomId(`cancelButton:${idMod}:${uuidv4()}`),
     ]);
     const message = await channel.send({ ...toPost, components: [row] });
 
@@ -28,10 +29,10 @@ export async function waitForButtonConfirm(
       if (options?.restrictToId && options.restrictToId !== interaction.user.id) {
         interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
       } else {
-        if (interaction.customId === `confirmButton:${idMod}`) {
+        if (interaction.customId.startsWith(`confirmButton:${idMod}:`)) {
           message.delete();
           resolve(true);
-        } else if (interaction.customId === `cancelButton:${idMod}`) {
+        } else if (interaction.customId.startsWith(`cancelButton:${idMod}:`)) {
           message.delete();
           resolve(false);
         }
