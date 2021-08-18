@@ -5,10 +5,11 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { GuildMember, User } from "discord.js";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { UnknownUser } from "../../../utils";
 
 interface LogMemberUnmuteData {
-  mod: GuildMember;
-  user: User;
+  mod: User;
+  user: User | UnknownUser;
   caseNumber: number;
   reason: string;
 }
@@ -18,14 +19,14 @@ export function logMemberUnmute(pluginData: GuildPluginData<LogsPluginType>, dat
     pluginData,
     LogType.MEMBER_UNMUTE,
     createTypedTemplateSafeValueContainer({
-      mod: memberToTemplateSafeMember(data.mod),
+      mod: userToTemplateSafeUser(data.mod),
       user: userToTemplateSafeUser(data.user),
       caseNumber: data.caseNumber,
       reason: data.reason,
     }),
     {
       userId: data.user.id,
-      bot: data.user.bot,
+      bot: data.user instanceof User ? data.user.bot : false,
     },
   );
 }

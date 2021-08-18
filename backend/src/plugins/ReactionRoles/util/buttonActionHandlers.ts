@@ -18,12 +18,9 @@ export async function handleOpenMenu(
       content: `A configuration error was encountered, please contact the Administrators!`,
       ephemeral: true,
     });
-    pluginData
-      .getPlugin(LogsPlugin)
-      .log(
-        LogType.BOT_ALERT,
-        `**A configuration error occurred** on buttons for message ${int.message.id}, no menus found in config`,
-      );
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
+      body: `**A configuration error occurred** on buttons for message ${int.message.id}, no menus found in config`,
+    });
     return;
   }
 
@@ -48,12 +45,9 @@ export async function handleOpenMenu(
       content: `A configuration error was encountered, please contact the Administrators!`,
       ephemeral: true,
     });
-    pluginData
-      .getPlugin(LogsPlugin)
-      .log(
-        LogType.BOT_ALERT,
-        `**A configuration error occurred** on buttons for message ${int.message.id}, menu **${context.roleOrMenu}** not found in config`,
-      );
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
+      body: `**A configuration error occurred** on buttons for message ${int.message.id}, menu **${context.roleOrMenu}** not found in config`,
+    });
     return;
   }
   const rows = splitButtonsIntoRows(menuButtons, Object.values(group.button_menus[context.roleOrMenu])); // new MessageActionRow().addComponents(menuButtons);
@@ -73,12 +67,9 @@ export async function handleModifyRole(
       content: `A configuration error was encountered, please contact the Administrators!`,
       ephemeral: true,
     });
-    pluginData
-      .getPlugin(LogsPlugin)
-      .log(
-        LogType.BOT_ALERT,
-        `**A configuration error occurred** on buttons for message ${int.message.id}, role **${context.roleOrMenu}** not found on server`,
-      );
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
+      body: `**A configuration error occurred** on buttons for message ${int.message.id}, role **${context.roleOrMenu}** not found on server`,
+    });
     return;
   }
 
@@ -96,11 +87,8 @@ export async function handleModifyRole(
       content: "A configuration error was encountered, please contact the Administrators!",
       ephemeral: true,
     });
-    pluginData
-      .getPlugin(LogsPlugin)
-      .log(
-        LogType.BOT_ALERT,
-        `**A configuration error occurred** on buttons for message ${int.message.id}, error: ${e}. We might be missing permissions!`,
-      );
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
+      body: `**A configuration error occurred** on buttons for message ${int.message.id}, error: ${e}. We might be missing permissions!`,
+    });
   }
 }

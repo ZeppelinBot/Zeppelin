@@ -23,7 +23,7 @@ export function logAutomodAction(pluginData: GuildPluginData<LogsPluginType>, da
       user: userToTemplateSafeUser(data.user),
       users: data.users.map(user => userToTemplateSafeUser(user)),
       actionsTaken: data.actionsTaken,
-      matchSummary: data.matchSummary,
+      matchSummary: data.matchSummary ?? "",
     }),
     {
       userId: data.user.id,

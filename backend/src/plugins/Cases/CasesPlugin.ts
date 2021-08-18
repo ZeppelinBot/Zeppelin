@@ -16,10 +16,6 @@ import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
 import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-
-// Workaround for circular dependency
-const AnyTypedLogsPlugin = LogsPlugin as any;
 
 const defaultOptions = {
   config: {
@@ -42,7 +38,11 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     `),
   },
 
-  dependencies: () => [TimeAndDatePlugin, AnyTypedLogsPlugin],
+  dependencies: async () => [
+    TimeAndDatePlugin,
+    // The `as any` cast here is to prevent TypeScript from locking up from the circular dependency
+    ((await import("../Logs/LogsPlugin")) as any).LogsPlugin,
+  ],
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -17,7 +17,7 @@ export function logMemberRoleAdd(pluginData: GuildPluginData<LogsPluginType>, da
     pluginData,
     LogType.MEMBER_ROLE_ADD,
     createTypedTemplateSafeValueContainer({
-      mod: userToTemplateSafeUser(data.mod),
+      mod: data.mod ? userToTemplateSafeUser(data.mod) : null,
       member: memberToTemplateSafeMember(data.member),
       roles: data.roles.map(r => r.name).join(", "),
     }),

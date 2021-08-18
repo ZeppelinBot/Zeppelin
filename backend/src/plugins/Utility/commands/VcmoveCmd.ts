@@ -69,7 +69,7 @@ export const VcmoveCmd = utilityCmd({
       return;
     }
 
-    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelId);
+    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelId) as VoiceChannel;
 
     try {
       await args.member.edit({
@@ -83,7 +83,7 @@ export const VcmoveCmd = utilityCmd({
     pluginData.getPlugin(LogsPlugin).logVoiceChannelForceMove({
       mod: msg.author,
       member: args.member,
-      oldChannel: oldVoiceChannel!,
+      oldChannel: oldVoiceChannel,
       newChannel: channel,
     });
 

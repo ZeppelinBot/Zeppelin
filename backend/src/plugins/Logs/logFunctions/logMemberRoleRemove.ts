@@ -17,7 +17,7 @@ export function logMemberRoleRemove(pluginData: GuildPluginData<LogsPluginType>,
     pluginData,
     LogType.MEMBER_ROLE_REMOVE,
     createTypedTemplateSafeValueContainer({
-      mod: userToTemplateSafeUser(data.mod),
+      mod: data.mod ? userToTemplateSafeUser(data.mod) : null,
       member: memberToTemplateSafeMember(data.member),
       roles: data.roles.map(r => r.name).join(", "),
     }),

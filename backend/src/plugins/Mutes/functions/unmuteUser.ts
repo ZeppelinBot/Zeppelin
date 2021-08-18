@@ -93,14 +93,14 @@ export async function unmuteUser(
       user,
       caseNumber: createdCase.case_number,
       time: timeUntilUnmute,
-      reason: caseArgs.reason,
+      reason: caseArgs.reason ?? "",
     });
   } else {
     pluginData.getPlugin(LogsPlugin).logMemberUnmute({
       mod,
       user,
       caseNumber: createdCase.case_number,
-      reason: caseArgs.reason,
+      reason: caseArgs.reason ?? "",
     });
   }
 
