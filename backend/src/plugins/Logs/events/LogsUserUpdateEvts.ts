@@ -53,30 +53,30 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           // Roles added *and* removed
           logMemberRoleChanges(pluginData, {
             member,
-            addedRoles: addedRoles
-              .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name),
-            removedRoles: removedRoles
-              .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name),
+            addedRoles: addedRoles.map(
+              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
+            removedRoles: removedRoles.map(
+              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
             mod: null,
           });
         } else if (addedRoles.length) {
           // Roles added
           logMemberRoleAdd(pluginData, {
             member,
-            roles: addedRoles
-              .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name),
+            roles: addedRoles.map(
+              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
             mod: null,
           });
         } else if (removedRoles.length && !addedRoles.length) {
           // Roles removed
           logMemberRoleRemove(pluginData, {
             member,
-            roles: removedRoles
-              .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name),
+            roles: removedRoles.map(
+              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
             mod: null,
           });
         }

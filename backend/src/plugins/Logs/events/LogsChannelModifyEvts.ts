@@ -33,6 +33,10 @@ export const LogsChannelUpdateEvt = logsEvt({
     const diff = getScalarDifference(meta.args.oldChannel, meta.args.newChannel);
     const differenceString = differenceToString(diff);
 
+    if (differenceString.trim() === "") {
+      return;
+    }
+
     logChannelUpdate(meta.pluginData, {
       oldChannel: meta.args.oldChannel,
       newChannel: meta.args.newChannel,
