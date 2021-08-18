@@ -519,6 +519,9 @@ export async function findRelevantAuditLogEntry(
     return null;
   }
 
+  // FIXME: Temp hotfix
+  return null;
+
   let auditLogs: GuildAuditLogs | null = null;
   try {
     auditLogs = await guild.fetchAuditLogs({ limit: 5, type: actionType });
