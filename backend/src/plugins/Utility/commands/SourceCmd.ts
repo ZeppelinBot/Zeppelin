@@ -4,6 +4,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { utilityCmd } from "../types";
+import { hotfixMessageFetch } from "../../../utils/hotfixMessageFetch";
 
 export const SourceCmd = utilityCmd({
   trigger: "source",
@@ -21,7 +22,7 @@ export const SourceCmd = utilityCmd({
       return;
     }
 
-    const message = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(() => null);
+    const message = await hotfixMessageFetch(args.message.channel, args.message.messageId);
     if (!message) {
       sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;
