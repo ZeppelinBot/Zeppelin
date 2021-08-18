@@ -212,8 +212,12 @@ export class GuildSavedMessages extends BaseGuildRepository {
     try {
       await this.messages.insert(data);
     } catch (e) {
-      console.warn(e); // tslint:disable-line
-      return;
+      if (e?.code === "ER_DUP_ENTRY") {
+        console.warn(`Tried to insert duplicate message ID: ${data.id}`);
+        return;
+      }
+
+      throw e;
     }
 
     const inserted = await this.messages.findOne(data.id);
@@ -243,14 +247,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
       posted_at: postedAt,
     };
 
-    return this.create({ ...data, ...overrides }).catch(err => {
-      if (err?.code === "ER_DUP_ENTRY") {
-        console.warn(`Tried to insert duplicate message ID: ${msg.id}`);
-        return;
-      }
-
-      throw err;
-    });
+    return this.create({ ...data, ...overrides });
   }
 
   async createFromMessages(messages: Message[], overrides = {}) {
