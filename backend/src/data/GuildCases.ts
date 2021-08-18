@@ -1,4 +1,4 @@
-import { getRepository, In, Repository } from "typeorm";
+import { getRepository, In, InsertResult, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { CaseTypes } from "./CaseTypes";
 import { connection } from "./db";
@@ -116,13 +116,30 @@ export class GuildCases extends BaseGuildRepository {
     );
   }
 
-  async create(data): Promise<Case> {
-    const result = await this.cases.insert({
-      ...data,
-      guild_id: this.guildId,
-      case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
-    });
+  async createInternal(data): Promise<InsertResult> {
+    return this.cases
+      .insert({
+        ...data,
+        guild_id: this.guildId,
+        case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
+      })
+      .catch(err => {
+        if (err?.code === "ER_DUP_ENTRY") {
+          if (data.audit_log_id) {
+            console.warn(`Tried to insert case with duplicate audit_log_id`);
+            return this.createInternal({
+              ...data,
+              audit_log_id: undefined,
+            });
+          }
+        }
 
+        throw err;
+      });
+  }
+
+  async create(data): Promise<Case> {
+    const result = await this.createInternal(data);
     return (await this.find(result.identifiers[0].id))!;
   }
 
