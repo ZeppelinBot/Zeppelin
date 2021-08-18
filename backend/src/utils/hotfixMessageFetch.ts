@@ -9,11 +9,13 @@ export function hotfixMessageFetch(channel: TextChannel | ThreadChannel, message
   const thisN = ++n;
 
   // tslint:disable-next-line:no-console
-  console.log(`[${thisN}] Queueing to fetch message id ${messageId} from channel ${channel.id}`);
+  console.trace(
+    `[${thisN}] Queueing to fetch message id ${messageId} from channel ${channel.id} (queue size: ${queue.length})`,
+  );
   return queue.add(async () => {
     await sleep(3000);
     // tslint:disable-next-line:no-console
-    console.trace(`[${thisN}] Fetching message id ${messageId} from channel ${channel.id}`);
+    console.log(`[${thisN}] Fetching message id ${messageId} from channel ${channel.id}`);
     return channel.messages.fetch(messageId);
   });
 }
