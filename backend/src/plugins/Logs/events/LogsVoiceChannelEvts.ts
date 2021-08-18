@@ -11,7 +11,11 @@ export const LogsVoiceStateUpdateEvt = logsEvt({
   async listener(meta) {
     const oldChannel = meta.args.oldState.channel;
     const newChannel = meta.args.newState.channel;
-    const member = meta.args.newState.member ?? meta.args.oldState.member!;
+    const member = meta.args.newState.member ?? meta.args.oldState.member;
+
+    if (!member) {
+      return;
+    }
 
     if (!newChannel && oldChannel) {
       // Leave evt
