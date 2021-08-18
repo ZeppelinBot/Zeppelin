@@ -144,8 +144,8 @@ logger.info("Connecting to database");
 connect().then(async () => {
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
-    restTimeOffset: 150,
-    restGlobalRateLimit: 50,
+    // restTimeOffset: 150,
+    // restGlobalRateLimit: 50,
     // Disable mentions by default
     allowedMentions: {
       parse: [],
