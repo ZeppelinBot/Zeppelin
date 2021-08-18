@@ -33,8 +33,10 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
 
 export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
+  showInDocs: false,
 
   configSchema: ConfigSchema,
+  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
   defaultOptions,
 
   // prettier-ignore
@@ -51,6 +53,4 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   afterLoad(pluginData) {
     loadAllCommands(pluginData);
   },
-
-  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
 });
