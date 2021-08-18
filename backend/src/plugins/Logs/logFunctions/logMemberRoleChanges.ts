@@ -3,15 +3,15 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { GuildMember, User } from "discord.js";
+import { GuildMember, Role, User } from "discord.js";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { UnknownUser } from "../../../utils";
 
 interface LogMemberRoleChangesData {
   mod: User | UnknownUser | null;
   member: GuildMember;
-  addedRoles: string;
-  removedRoles: string;
+  addedRoles: Role[];
+  removedRoles: Role[];
 }
 
 export function logMemberRoleChanges(pluginData: GuildPluginData<LogsPluginType>, data: LogMemberRoleChangesData) {
@@ -21,8 +21,8 @@ export function logMemberRoleChanges(pluginData: GuildPluginData<LogsPluginType>
     createTypedTemplateSafeValueContainer({
       mod: data.mod ? userToTemplateSafeUser(data.mod) : null,
       member: memberToTemplateSafeMember(data.member),
-      addedRoles: data.addedRoles,
-      removedRoles: data.removedRoles,
+      addedRoles: data.addedRoles.map(r => r.name).join(", "),
+      removedRoles: data.removedRoles.map(r => r.name).join(", "),
     }),
     {
       userId: data.member.id,
