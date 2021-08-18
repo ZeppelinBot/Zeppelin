@@ -62,12 +62,10 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             member,
             addedRoles: addedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
+              .map(r => r.name),
             removedRoles: removedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
+              .map(r => r.name),
             mod,
           });
         } else if (addedRoles.length) {
@@ -76,8 +74,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             member,
             roles: addedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
+              .map(r => r.name),
             mod,
           });
         } else if (removedRoles.length && !addedRoles.length) {
@@ -86,8 +83,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
             member,
             roles: removedRoles
               .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-              .map(r => r.name)
-              .join(", "),
+              .map(r => r.name),
             mod,
           });
         }
