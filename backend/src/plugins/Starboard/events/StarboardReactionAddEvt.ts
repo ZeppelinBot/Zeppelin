@@ -30,7 +30,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     }
 
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
-    if (!member || member.user.bot) return;
+    if (!member || member!.user.bot) return;
 
     const config = await pluginData.config.getMatchingConfig({
       member,
