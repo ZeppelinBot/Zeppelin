@@ -239,7 +239,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     discriminator: user.discriminator,
     mention: `<@${user.id}>`,
     tag: user.tag,
-    avatarURL: user.displayAvatarURL({ dynamic: true }),
+    avatarURL: user.displayAvatarURL?.({ dynamic: true }),
     bot: user.bot,
     createdAt: user.createdTimestamp,
   });
