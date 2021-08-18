@@ -15,16 +15,13 @@ async function getBufferFromUrl(url: string): Promise<Buffer> {
 }
 
 function bufferToPhotonImage(input: Buffer): photon.PhotonImage {
-  const base64 = input
-    .toString("base64")
-    .replace(/^data:image\/\w+;base64,/, "");
+  const base64 = input.toString("base64").replace(/^data:image\/\w+;base64,/, "");
 
   return photon.PhotonImage.new_from_base64(base64);
 }
 
 function photonImageToBuffer(image: photon.PhotonImage): Buffer {
-  const base64 = image.get_base64()
-    .replace(/^data:image\/\w+;base64,/, "");
+  const base64 = image.get_base64().replace(/^data:image\/\w+;base64,/, "");
   return Buffer.from(base64, "base64");
 }
 
