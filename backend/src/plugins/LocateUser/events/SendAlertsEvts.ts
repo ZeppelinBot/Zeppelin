@@ -6,7 +6,10 @@ export const VoiceStateUpdateAlertEvt = locateUserEvt({
   event: "voiceStateUpdate",
 
   async listener(meta) {
-    const memberId = meta.args.oldState.member ? meta.args.oldState.member.id : meta.args.newState.member!.id;
+    const memberId = meta.args.oldState.member?.id ?? meta.args.newState.member?.id;
+    if (!memberId) {
+      return;
+    }
 
     if (meta.args.newState.channel != null) {
       if (meta.pluginData.state.usersWithAlerts.includes(memberId)) {
