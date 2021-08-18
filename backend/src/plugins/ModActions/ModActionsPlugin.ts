@@ -122,7 +122,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     `),
   },
 
-  dependencies: [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

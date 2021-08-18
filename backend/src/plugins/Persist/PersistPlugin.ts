@@ -27,7 +27,7 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
     `),
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -29,7 +29,7 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     prettyName: "Reminders",
   },
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: () => [TimeAndDatePlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

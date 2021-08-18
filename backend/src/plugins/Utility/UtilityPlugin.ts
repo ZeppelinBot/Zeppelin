@@ -119,7 +119,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     prettyName: "Utility",
   },
 
-  dependencies: [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

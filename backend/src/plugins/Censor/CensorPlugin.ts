@@ -55,7 +55,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
     legacy: true,
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

@@ -36,7 +36,7 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
     prettyName: "Post",
   },
 
-  dependencies: [TimeAndDatePlugin, LogsPlugin],
+  dependencies: () => [TimeAndDatePlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
