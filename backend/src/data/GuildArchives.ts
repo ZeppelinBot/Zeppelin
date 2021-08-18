@@ -82,20 +82,23 @@ export class GuildArchives extends BaseGuildRepository {
       const channel = guild.channels.cache.get(msg.channel_id as Snowflake);
       const partialUser = new TemplateSafeValueContainer({ ...msg.data.author, id: msg.user_id });
 
-      const values = new TemplateSafeValueContainer({
-        id: msg.id,
-        timestamp: moment.utc(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
-        content: msg.data.content,
-        attachments: msg.data.attachments?.map(att => {
-          return JSON.stringify({ name: att.name, url: att.url, type: att.contentType });
+      const line = await renderTemplate(
+        MESSAGE_ARCHIVE_MESSAGE_FORMAT,
+        new TemplateSafeValueContainer({
+          id: msg.id,
+          timestamp: moment.utc(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
+          content: msg.data.content,
+          attachments: msg.data.attachments?.map(att => {
+            return JSON.stringify({ name: att.name, url: att.url, type: att.contentType });
+          }),
+          stickers: msg.data.stickers?.map(sti => {
+            return JSON.stringify({ name: sti.name, id: sti.id, isDefault: isDefaultSticker(sti.id) });
+          }),
+          user: partialUser,
+          channel: channel ? channelToTemplateSafeChannel(channel) : null,
         }),
-        stickers: msg.data.stickers?.map(sti => {
-          return JSON.stringify({ name: sti.name, id: sti.id, isDefault: isDefaultSticker(sti.id) });
-        }),
-        user: partialUser,
-        channel: channel ? channelToTemplateSafeChannel(channel) : null,
-      });
-      const line = await renderTemplate(MESSAGE_ARCHIVE_MESSAGE_FORMAT, {});
+      );
+
       msgLines.push(line);
     }
     return msgLines;
