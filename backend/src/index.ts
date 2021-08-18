@@ -152,7 +152,8 @@ connect().then(async () => {
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
 
-    restGlobalRateLimit: 50,
+    restGlobalRateLimit: 5,
+    restTimeOffset: 1000,
 
     // Disable mentions by default
     allowedMentions: {
