@@ -152,7 +152,7 @@ connect().then(async () => {
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
 
-    restGlobalRateLimit: 5,
+    restGlobalRateLimit: 10,
     restTimeOffset: 1000,
 
     // Disable mentions by default
@@ -183,7 +183,7 @@ connect().then(async () => {
 
   client.on(Constants.Events.RATE_LIMIT, data => {
     // tslint:disable-next-line:no-console
-    console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
+    // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
   });
 
   const safe429DecayInterval = 5 * SECONDS;
