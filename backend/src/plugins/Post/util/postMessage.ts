@@ -38,7 +38,12 @@ export async function postMessage(
     };
   }
 
-  const createdMsg = await channel.send({ ...content, files: [file] });
+  let createdMsg;
+  if (file) {
+    createdMsg = await channel.send({ ...content, files: [file.file] });
+  } else {
+    createdMsg = await channel.send(content);
+  }
   pluginData.state.savedMessages.setPermanent(createdMsg.id);
 
   if (downloadedAttachment) {
