@@ -30,6 +30,7 @@ export async function postMessage(
       name: attachments[0].name,
       file: await fsp.readFile(downloadedAttachment.path),
     };
+    content.files = [file.file];
   }
 
   if (enableMentions) {
@@ -38,7 +39,7 @@ export async function postMessage(
     };
   }
 
-  const createdMsg = await channel.send({ ...content, files: [file] });
+  const createdMsg = await channel.send(content);
   pluginData.state.savedMessages.setPermanent(createdMsg.id);
 
   if (downloadedAttachment) {
