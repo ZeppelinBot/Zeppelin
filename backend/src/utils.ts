@@ -1392,8 +1392,8 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   // Role name
   const roleList = (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
   const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
-  if (role[0]) {
-    return role[0].id;
+  if (role.size >= 1) {
+    return role.firstKey();
   }
 
   // Role ID
