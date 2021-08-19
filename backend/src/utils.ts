@@ -409,6 +409,7 @@ export const tStrictMessageContent = t.type({
   content: tNullable(t.string),
   tts: tNullable(t.boolean),
   disableEveryone: tNullable(t.boolean),
+  embed: tNullable(tEmbed),
   embeds: tNullable(t.array(tEmbed)),
 });
 

@@ -11,6 +11,7 @@ import {
   tMessageContent,
   tNullable,
   unique,
+  validateAndParseMessageContent,
   verboseChannelMention,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
@@ -57,6 +58,7 @@ export const ReplyAction = automodAction({
             user: userToTemplateSafeUser(user),
           }),
         );
+
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)
@@ -91,7 +93,7 @@ export const ReplyAction = automodAction({
           continue;
         }
 
-        const messageContent: MessageOptions = typeof formatted === "string" ? { content: formatted } : formatted;
+        const messageContent = validateAndParseMessageContent(formatted);
         const replyMsg = await channel.send({
           ...messageContent,
           allowedMentions: {
