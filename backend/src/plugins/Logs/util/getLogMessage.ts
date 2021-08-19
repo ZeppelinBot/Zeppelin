@@ -133,8 +133,17 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
     if (timestamp) {
       formatted = `\`[${timestamp}]\` ${formatted}`;
     }
-  } else if (formatted != null && formatted.embed && includeEmbedTimestamp) {
-    formatted.embed.timestamp = isoTimestamp;
+  } else if (formatted != null) {
+    if (formatted.embed) {
+      formatted.embeds = [formatted.embed];
+      delete formatted.embed;
+    }
+
+    if (formatted.embeds && Array.isArray(formatted.embeds) && includeEmbedTimestamp) {
+      for (const embed of formatted.embeds) {
+        embed.timestamp = isoTimestamp;
+      }
+    }
   }
 
   return formatted;
