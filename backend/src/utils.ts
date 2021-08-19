@@ -430,7 +430,34 @@ export function validateAndParseMessageContent(input: unknown): StrictMessageCon
     delete (input as any).embed;
   }
 
+  dropNullValuesRecursively(input);
+
   return (zStrictMessageContent.parse(input) as unknown) as StrictMessageContent;
+}
+
+function dropNullValuesRecursively(obj: any) {
+  if (obj == null) {
+    return;
+  }
+
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      dropNullValuesRecursively(item);
+    }
+  }
+
+  if (typeof obj !== "object") {
+    return;
+  }
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (value == null) {
+      delete obj[key];
+      continue;
+    }
+
+    dropNullValuesRecursively(value);
+  }
 }
 
 /**
