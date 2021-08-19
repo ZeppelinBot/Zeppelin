@@ -7,6 +7,7 @@ import { GuildTags } from "../../data/GuildTags";
 import { tEmbed, tNullable } from "../../utils";
 
 export const Tag = t.union([t.string, tEmbed]);
+export type TTag = t.TypeOf<typeof Tag>;
 
 export const TagCategory = t.type({
   prefix: tNullable(t.string),
