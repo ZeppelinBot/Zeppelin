@@ -117,7 +117,7 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
   while (messagesToClean.length < args.count) {
     const potentialMessages = await targetChannel.messages.fetch({
       before: beforeId,
-      limit: args.count,
+      limit: Math.min(args.count, 100),
     });
     if (potentialMessages.size === 0) break;
 
