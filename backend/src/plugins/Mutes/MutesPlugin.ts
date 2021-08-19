@@ -59,8 +59,6 @@ const defaultOptions = {
 };
 
 const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
-let FIRST_CHECK_TIME = Date.now();
-const FIRST_CHECK_INCREMENT = 5 * 1000;
 
 export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   name: "mutes",
@@ -115,17 +113,11 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   afterLoad(pluginData) {
-    // Check for expired mutes every 5s
-    const firstCheckTime = Math.max(Date.now(), FIRST_CHECK_TIME) + FIRST_CHECK_INCREMENT;
-    FIRST_CHECK_TIME = firstCheckTime;
-
-    setTimeout(() => {
-      clearExpiredMutes(pluginData);
-      pluginData.state.muteClearIntervalId = setInterval(
-        () => clearExpiredMutes(pluginData),
-        EXPIRED_MUTE_CHECK_INTERVAL,
-      );
-    }, firstCheckTime - Date.now());
+    clearExpiredMutes(pluginData);
+    pluginData.state.muteClearIntervalId = setInterval(
+      () => clearExpiredMutes(pluginData),
+      EXPIRED_MUTE_CHECK_INTERVAL,
+    );
   },
 
   beforeUnload(pluginData) {
