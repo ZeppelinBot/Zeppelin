@@ -51,12 +51,16 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   const values = new TemplateSafeValueContainer({
     ...data,
     timestamp,
-    userMention: async (
-      inputUserOrMember: TemplateSafeUser | TemplateSafeMember | TemplateSafeUser[] | TemplateSafeMember[],
-    ) => {
-      if (!inputUserOrMember) return "";
+    userMention: async (inputUserOrMember: unknown) => {
+      if (!inputUserOrMember) {
+        return "";
+      }
 
-      const usersOrMembers = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
+      const inputArray = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
+      // TODO: Resolve IDs to users/members
+      const usersOrMembers = inputArray.filter(
+        v => v instanceof TemplateSafeUser || v instanceof TemplateSafeMember,
+      ) as Array<TemplateSafeUser | TemplateSafeMember>;
 
       const mentions: string[] = [];
       for (const userOrMember of usersOrMembers) {
