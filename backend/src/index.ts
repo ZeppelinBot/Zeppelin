@@ -22,6 +22,26 @@ import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMe
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
 
+// === START REST DEBUG ===
+import fs from "fs";
+import path from "path";
+const APIRequest = require("discord.js/src/rest/APIRequest.js");
+
+const dateStr = new Date().toISOString().replace(/[:.]/g, "-");
+const restDebugFile = path.join("../debug", `rest_${dateStr}.log`);
+fs.writeFileSync(restDebugFile, "");
+
+const originalMake = APIRequest.prototype.make;
+// tslint:disable-next-line:only-arrow-functions
+APIRequest.prototype.make = function(...args) {
+  const debugInfo = `${new Date().toISOString()} ${this.method.toUpperCase()} ${this.route}`;
+  fs.appendFileSync(restDebugFile, debugInfo + "\n", { encoding: "utf8" });
+  // tslint:disable-next-line:no-console
+  console.log(`[API REQUEST] ${this.method} ${this.route}`);
+  return originalMake.call(this, ...args);
+};
+// === END REST DEBUG ===
+
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
   console.error("Project root .env with KEY is required!");
@@ -152,8 +172,8 @@ connect().then(async () => {
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
 
-    restGlobalRateLimit: 20,
-    restTimeOffset: 1000,
+    restGlobalRateLimit: 50,
+    // restTimeOffset: 1000,
 
     // Disable mentions by default
     allowedMentions: {
