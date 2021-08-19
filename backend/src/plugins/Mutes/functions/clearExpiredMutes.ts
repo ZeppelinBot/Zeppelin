@@ -42,7 +42,7 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
     await pluginData.state.mutes.clear(mute.user_id);
 
     pluginData.getPlugin(LogsPlugin).logMemberMuteExpired({
-      member: member ? memberToTemplateSafeMember(member) : new UnknownUser({ id: mute.user_id }),
+      member: member || new UnknownUser({ id: mute.user_id }),
     });
 
     pluginData.state.events.emit("unmute", mute.user_id);
