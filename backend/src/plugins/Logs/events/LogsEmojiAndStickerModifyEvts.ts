@@ -34,6 +34,10 @@ export const LogsEmojiUpdateEvt = logsEvt({
     const diff = getScalarDifference(meta.args.oldEmoji, meta.args.newEmoji);
     const differenceString = differenceToString(diff);
 
+    if (differenceString === "") {
+      return;
+    }
+
     logEmojiUpdate(meta.pluginData, {
       oldEmoji: meta.args.oldEmoji,
       newEmoji: meta.args.newEmoji,
@@ -68,6 +72,10 @@ export const LogsStickerUpdateEvt = logsEvt({
   async listener(meta) {
     const diff = getScalarDifference(meta.args.oldSticker, meta.args.newSticker);
     const differenceString = differenceToString(diff);
+
+    if (differenceString === "") {
+      return;
+    }
 
     logStickerUpdate(meta.pluginData, {
       oldSticker: meta.args.oldSticker,
