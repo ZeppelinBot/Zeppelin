@@ -1,13 +1,11 @@
 import { GuildMember } from "discord.js";
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { TemplateParseError } from "../../../templateFormatter";
-import { StrictMessageContent } from "../../../utils";
+import { StrictMessageContent, validateAndParseMessageContent } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Tag, TagsPluginType } from "../types";
+import { TagsPluginType, TTag } from "../types";
 import { renderTagBody } from "./renderTagBody";
 
 export async function renderTagFromString(
@@ -15,7 +13,7 @@ export async function renderTagFromString(
   str: string,
   prefix: string,
   tagName: string,
-  tagBody: t.TypeOf<typeof Tag>,
+  tagBody: TTag,
   member: GuildMember,
 ): Promise<StrictMessageContent | null> {
   const variableStr = str.slice(prefix.length + tagName.length).trim();
@@ -23,7 +21,7 @@ export async function renderTagFromString(
 
   // Format the string
   try {
-    return renderTagBody(
+    const rendered = await renderTagBody(
       pluginData,
       tagBody,
       tagArgs,
@@ -33,6 +31,8 @@ export async function renderTagFromString(
       },
       { member },
     );
+
+    return validateAndParseMessageContent(rendered);
   } catch (e) {
     if (e instanceof TemplateParseError) {
       const logs = pluginData.getPlugin(LogsPlugin);

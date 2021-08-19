@@ -13,6 +13,7 @@ import {
   messageSummary,
   renderRecursively,
   resolveMember,
+  validateAndParseMessageContent,
   verboseChannelMention,
   verboseUserMention,
   verboseUserName,
@@ -134,10 +135,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
       formatted = `\`[${timestamp}]\` ${formatted}`;
     }
   } else if (formatted != null) {
-    if (formatted.embed) {
-      formatted.embeds = [formatted.embed];
-      delete formatted.embed;
-    }
+    formatted = validateAndParseMessageContent(formatted);
 
     if (formatted.embeds && Array.isArray(formatted.embeds) && includeEmbedTimestamp) {
       for (const embed of formatted.embeds) {

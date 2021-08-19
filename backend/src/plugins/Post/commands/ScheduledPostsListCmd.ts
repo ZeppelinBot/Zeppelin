@@ -22,8 +22,7 @@ export const ScheduledPostsListCmd = postCmd({
 
     let i = 1;
     const postLines = scheduledPosts.map(p => {
-      let previewText =
-        p.content.content || (p.content.embed && (p.content.embed.description || p.content.embed.title)) || "";
+      let previewText = p.content.content || p.content.embeds?.[0]?.description || p.content.embeds?.[0]?.title || "";
 
       const isTruncated = previewText.length > SCHEDULED_POST_PREVIEW_TEXT_LENGTH;
 
@@ -37,7 +36,7 @@ export const ScheduledPostsListCmd = postCmd({
         .format(timeAndDate.getDateFormat("pretty_datetime"));
       const parts = [`\`#${i++}\` \`[${prettyPostAt}]\` ${previewText}${isTruncated ? "..." : ""}`];
       if (p.attachments.length) parts.push("*(with attachment)*");
-      if (p.content.embed) parts.push("*(embed)*");
+      if (p.content.embeds?.length) parts.push("*(embed)*");
       if (p.repeat_until) {
         parts.push(`*(repeated every ${humanizeDuration(p.repeat_interval)} until ${p.repeat_until})*`);
       }
