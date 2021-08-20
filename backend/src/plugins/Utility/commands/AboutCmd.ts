@@ -47,8 +47,8 @@ export const AboutCmd = utilityCmd({
 
     const basicInfoRows = [
       ["Uptime", prettyUptime],
-      ["Last reload", `${lastReload} ago`],
-      ["Last update", lastUpdate],
+      ["Last config reload", `${lastReload} ago`],
+      ["Last bot update", lastUpdate],
       ["Version", version],
       ["API latency", `${pluginData.client.ws.ping}ms`],
       ["Server timezone", timeAndDate.getGuildTz()],
