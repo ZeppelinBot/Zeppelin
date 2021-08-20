@@ -5,16 +5,17 @@ import { renderRecursively, StrictMessageContent } from "../../../utils";
 import { TagsPluginType, TTag } from "../types";
 import { findTagByName } from "./findTagByName";
 
+const MAX_TAG_FN_CALLS = 25;
+
 export async function renderTagBody(
   pluginData: GuildPluginData<TagsPluginType>,
   body: TTag,
   args: TemplateSafeValue[] = [],
   extraData = {},
   subTagPermissionMatchParams?: ExtendedMatchParams,
+  tagFnCallsObj = { calls: 0 },
 ): Promise<StrictMessageContent> {
   const dynamicVars = {};
-  const maxTagFnCalls = 25;
-  let tagFnCalls = 0;
 
   const data = new TemplateSafeValueContainer({
     args,
@@ -33,7 +34,7 @@ export async function renderTagBody(
       return dynamicVars[name] == null ? "" : dynamicVars[name];
     },
     tag: async (name, ...subTagArgs) => {
-      if (tagFnCalls++ > maxTagFnCalls) return "\\_recursion\\_";
+      if (++tagFnCallsObj.calls > MAX_TAG_FN_CALLS) return "";
       if (typeof name !== "string") return "";
       if (name === "") return "";
 
@@ -47,7 +48,14 @@ export async function renderTagBody(
         return "<embed>";
       }
 
-      const rendered = await renderTagBody(pluginData, subTagBody, subTagArgs, extraData, subTagPermissionMatchParams);
+      const rendered = await renderTagBody(
+        pluginData,
+        subTagBody,
+        subTagArgs,
+        extraData,
+        subTagPermissionMatchParams,
+        tagFnCallsObj,
+      );
       return rendered.content!;
     },
   });
