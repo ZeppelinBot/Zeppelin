@@ -1,4 +1,4 @@
-import { Message, Snowflake } from "discord.js";
+import { Constants, Message, MessageType, Snowflake } from "discord.js";
 import { messageSaverEvt } from "../types";
 import { SECONDS } from "../../../utils";
 
@@ -12,14 +12,15 @@ setInterval(() => {
   }
 }, 60 * SECONDS);
 
+const AFFECTED_MESSAGE_TYPES: MessageType[] = ["DEFAULT", "REPLY", "APPLICATION_COMMAND"];
+
 export const MessageCreateEvt = messageSaverEvt({
   event: "messageCreate",
   allowBots: true,
   allowSelf: true,
 
   async listener(meta) {
-    // Only save regular chat messages
-    if (meta.args.message.type !== "DEFAULT" && meta.args.message.type !== "REPLY") {
+    if (!AFFECTED_MESSAGE_TYPES.includes(meta.args.message.type)) {
       return;
     }
 
