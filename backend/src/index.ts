@@ -96,13 +96,13 @@ function errorHandler(err) {
 
   // FIXME: Hotfix
   if (err.message && err.message.startsWith("Unknown custom override criteria")) {
-    console.warn(err.message);
+    // console.warn(err.message);
     return;
   }
 
   // FIXME: Hotfix
   if (err.message && err.message.startsWith("Unknown override criteria")) {
-    console.warn(err.message);
+    // console.warn(err.message);
     return;
   }
 
