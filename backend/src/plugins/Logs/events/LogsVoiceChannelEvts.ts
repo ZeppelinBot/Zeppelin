@@ -30,6 +30,7 @@ export const LogsVoiceStateUpdateEvt = logsEvt({
         channel: newChannel,
       });
     } else if (oldChannel && newChannel) {
+      if (oldChannel.id === newChannel.id) return;
       logVoiceChannelMove(meta.pluginData, {
         member,
         oldChannel,
