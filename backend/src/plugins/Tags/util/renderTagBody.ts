@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValue, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { renderRecursively, StrictMessageContent } from "../../../utils";
 import { TagsPluginType, TTag } from "../types";
 import { findTagByName } from "./findTagByName";
@@ -8,7 +8,7 @@ import { findTagByName } from "./findTagByName";
 export async function renderTagBody(
   pluginData: GuildPluginData<TagsPluginType>,
   body: TTag,
-  args: unknown[] = [],
+  args: TemplateSafeValue[] = [],
   extraData = {},
   subTagPermissionMatchParams?: ExtendedMatchParams,
 ): Promise<StrictMessageContent> {
