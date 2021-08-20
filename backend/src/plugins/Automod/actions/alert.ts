@@ -16,10 +16,12 @@ import {
   tNormalizedNullOptional,
   isTruthy,
   verboseChannelMention,
+  validateAndParseMessageContent,
 } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 import { TemplateSafeUser, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
 export const AlertAction = automodAction({
   configType: t.type({
@@ -66,7 +68,7 @@ export const AlertAction = automodAction({
             actionsTaken,
             matchSummary: matchResult.summary,
             messageLink: theMessageLink,
-            logMessage: logMessage?.content,
+            logMessage: validateAndParseMessageContent(logMessage)?.content,
           }),
         );
       } catch (err) {
@@ -78,6 +80,13 @@ export const AlertAction = automodAction({
         }
 
         throw err;
+      }
+
+      if (messageIsEmpty(rendered)) {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
+          body: `Tried to send alert with an empty message for automod rule ${ruleName}`,
+        });
+        return;
       }
 
       try {
