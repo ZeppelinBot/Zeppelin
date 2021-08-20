@@ -101,9 +101,7 @@ export async function getUserInfoEmbed(
       largest: 2,
       round: true,
     });
-    const roles = member.roles.cache
-      .map(role => pluginData.guild.roles.cache.get(role.id))
-      .filter((r): r is Role => !!r);
+    const roles = Array.from(member.roles.cache.values()).filter(r => r.id !== pluginData.guild.id);
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
