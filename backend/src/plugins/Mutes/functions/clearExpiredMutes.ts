@@ -10,7 +10,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginType>) {
   const expiredMutes = await pluginData.state.mutes.getExpiredMutes();
   for (const mute of expiredMutes) {
-    const member = await resolveMember(pluginData.client, pluginData.guild, mute.user_id);
+    const member = await resolveMember(pluginData.client, pluginData.guild, mute.user_id, true);
 
     if (member) {
       try {
