@@ -24,7 +24,6 @@
                @init="editorInit"
                lang="yaml"
                theme="tomorrow_night"
-               :width="editorWidth"
                :height="editorHeight"
                ref="aceEditor" />
   </div>
@@ -38,6 +37,7 @@
   import AceEditor from "vue2-ace-editor";
 
   let editorKeybindListener;
+  let windowResizeListener;
 
   export default {
     components: {
@@ -69,6 +69,12 @@
         window.removeEventListener("keydown", editorKeybindListener);
         editorKeybindListener = null;
       }
+
+      if (windowResizeListener) {
+        window.removeEventListener("resize", windowResizeListener);
+        windowResizeListener = null;
+      }
+
       next();
     },
     data() {
@@ -105,6 +111,7 @@
           tabSize: 2
         });
 
+        // Add Ctrl+S/Cmd+S save shortcut
         const isMac = /mac/i.test(navigator.platform);
         const modKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.metaKey : ev.ctrlKey);
         const nonModKeyPressed = (ev: KeyboardEvent) => (isMac ? ev.ctrlKey : ev.metaKey);
@@ -130,7 +137,24 @@
         };
         window.addEventListener("keydown", editorKeybindListener);
 
+        // Auto-fit editor to window
         this.fitEditorToWindow();
+
+        if (windowResizeListener) {
+          window.removeEventListener("resize", windowResizeListener);
+        }
+
+        let debounceTimeout;
+        windowResizeListener = (ev: UIEvent) => {
+          if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+          }
+
+          debounceTimeout = setTimeout(() => {
+            this.fitEditorToWindow();
+          }, 350);
+        };
+        window.addEventListener("resize", windowResizeListener);
       },
       fitEditorToWindow() {
         const mainContainer = document.querySelector('.dashboard');
