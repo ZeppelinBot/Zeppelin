@@ -5,6 +5,7 @@ import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
 import { ConfigSchema, MessageSaverPluginType } from "./types";
+import { Queue } from "../../Queue";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {
@@ -44,5 +45,6 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.queue = new Queue();
   },
 });
