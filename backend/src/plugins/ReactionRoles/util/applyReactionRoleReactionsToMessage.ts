@@ -5,7 +5,6 @@ import { LogType } from "../../../data/LogType";
 import { isDiscordAPIError, sleep } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ReactionRolesPluginType } from "../types";
-import { hotfixMessageFetch } from "../../../utils/hotfixMessageFetch";
 
 const CLEAR_ROLES_EMOJI = "❌";
 
@@ -26,7 +25,7 @@ export async function applyReactionRoleReactionsToMessage(
 
   let targetMessage;
   try {
-    targetMessage = await hotfixMessageFetch(channel, messageId as Snowflake);
+    targetMessage = channel.messages.fetch(messageId);
   } catch (e) {
     if (isDiscordAPIError(e)) {
       if (e.code === 10008) {

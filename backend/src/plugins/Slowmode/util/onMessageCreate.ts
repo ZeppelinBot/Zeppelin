@@ -11,7 +11,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { SlowmodePluginType } from "../types";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
-import { hotfixMessageFetch } from "../../../utils/hotfixMessageFetch";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -50,7 +49,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
-    const message = await hotfixMessageFetch(channel, msg.id);
+    const message = await channel.messages.fetch(msg.id);
     if (message) {
       message.delete();
       return thisMsgLock.interrupt();

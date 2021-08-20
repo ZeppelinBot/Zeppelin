@@ -4,7 +4,6 @@ import { allStarboardsLock } from "../../../utils/lockNameHelpers";
 import { starboardEvt } from "../types";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
-import { hotfixMessageFetch } from "../../../utils/hotfixMessageFetch";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",
@@ -22,7 +21,7 @@ export const StarboardReactionAddEvt = starboardEvt({
     if (!msg.author) {
       // Message is not cached, fetch it
       try {
-        msg = await hotfixMessageFetch(msg.channel as TextChannel, msg.id);
+        msg = await msg.channel.messages.fetch(msg.id);
       } catch {
         // Sometimes we get this event for messages we can't fetch with getMessage; ignore silently
         return;
@@ -83,7 +82,7 @@ export const StarboardReactionAddEvt = starboardEvt({
             const channel = pluginData.guild.channels.cache.get(
               starboardMessage.starboard_channel_id as Snowflake,
             ) as TextChannel;
-            const realStarboardMessage = await hotfixMessageFetch(channel, starboardMessage.starboard_message_id);
+            const realStarboardMessage = await channel.messages.fetch(starboardMessage.starboard_message_id);
             await updateStarboardMessageStarCount(
               starboard,
               msg,
