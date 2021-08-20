@@ -458,7 +458,7 @@ export const LogTypeData = z.object({
 
   [LogType.AUTOMOD_ACTION]: z.object({
     rule: z.string(),
-    user: z.instanceof(TemplateSafeUser),
+    user: z.instanceof(TemplateSafeUser).nullable(),
     users: z.array(z.instanceof(TemplateSafeUser)),
     actionsTaken: z.string(),
     matchSummary: z.string(),
