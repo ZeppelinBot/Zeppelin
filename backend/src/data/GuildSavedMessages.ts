@@ -213,7 +213,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
       await this.messages.insert(data);
     } catch (e) {
       if (e?.code === "ER_DUP_ENTRY") {
-        console.warn(`Tried to insert duplicate message ID: ${data.id}`);
+        console.trace(`Tried to insert duplicate message ID: ${data.id}`);
         return;
       }
 
