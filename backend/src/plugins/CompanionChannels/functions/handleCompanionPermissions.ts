@@ -5,6 +5,7 @@ import { isDiscordAPIError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
+import { filterObject } from "../../../utils/filterObject";
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;
@@ -63,7 +64,9 @@ export async function handleCompanionPermissions(
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
       pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channelId, 3 * 1000);
-      await channel.permissionOverwrites.create(userId as Snowflake, new Permissions(BigInt(permissions)).serialize(), {
+      const fullSerialized = new Permissions(BigInt(permissions)).serialize();
+      const onlyAllowed = filterObject(fullSerialized, v => v === true);
+      await channel.permissionOverwrites.create(userId, onlyAllowed, {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
       });
     }
