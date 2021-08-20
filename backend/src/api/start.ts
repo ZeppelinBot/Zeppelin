@@ -14,7 +14,11 @@ app.use(
     origin: process.env.DASHBOARD_URL,
   }),
 );
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "10mb",
+  }),
+);
 
 initAuth(app);
 initGuildsAPI(app);
