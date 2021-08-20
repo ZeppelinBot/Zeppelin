@@ -1,7 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { hasPermission } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
@@ -49,13 +48,14 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
-    const message = await channel.messages.fetch(msg.id);
-    if (message) {
-      message.delete();
-      return thisMsgLock.interrupt();
+    try {
+      await channel.messages.delete(msg.id);
+      thisMsgLock.interrupt();
+    } catch (err) {
+      thisMsgLock.unlock();
     }
 
-    return thisMsgLock.unlock();
+    return;
   }
 
   await applyBotSlowmodeToUserId(pluginData, channel, msg.user_id);
