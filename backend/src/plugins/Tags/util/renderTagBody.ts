@@ -47,7 +47,7 @@ export async function renderTagBody(
         return "<embed>";
       }
 
-      const rendered = await renderTagBody(pluginData, subTagBody, subTagArgs, subTagPermissionMatchParams);
+      const rendered = await renderTagBody(pluginData, subTagBody, subTagArgs, extraData, subTagPermissionMatchParams);
       return rendered.content!;
     },
   });
