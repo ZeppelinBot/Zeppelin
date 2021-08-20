@@ -1,7 +1,6 @@
 import { Message, Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { MessageSaverPluginType } from "./types";
-import { hotfixMessageFetch } from "../../utils/hotfixMessageFetch";
 
 export async function saveMessagesToDB(
   pluginData: GuildPluginData<MessageSaverPluginType>,
@@ -16,7 +15,7 @@ export async function saveMessagesToDB(
     let thisMsg: Message;
 
     try {
-      thisMsg = await hotfixMessageFetch(channel, id as Snowflake);
+      thisMsg = await channel.messages.fetch(id);
 
       if (!thisMsg) {
         failed.push(id);
