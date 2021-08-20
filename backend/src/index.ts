@@ -1,5 +1,4 @@
 import { Client, Constants, Intents, TextChannel, ThreadChannel } from "discord.js";
-import yaml from "js-yaml";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
@@ -21,26 +20,6 @@ import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
-
-// === START REST DEBUG ===
-import fs from "fs";
-import path from "path";
-const APIRequest = require("discord.js/src/rest/APIRequest.js");
-
-const dateStr = new Date().toISOString().replace(/[:.]/g, "-");
-const restDebugFile = path.join("../debug", `rest_${dateStr}.log`);
-fs.writeFileSync(restDebugFile, "");
-
-const originalMake = APIRequest.prototype.make;
-// tslint:disable-next-line:only-arrow-functions
-APIRequest.prototype.make = function(...args) {
-  const debugInfo = `${new Date().toISOString()} ${this.method.toUpperCase()} ${this.route}`;
-  fs.appendFileSync(restDebugFile, debugInfo + "\n", { encoding: "utf8" });
-  // tslint:disable-next-line:no-console
-  console.log(`[API REQUEST] ${this.method} ${this.route}`);
-  return originalMake.call(this, ...args);
-};
-// === END REST DEBUG ===
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
