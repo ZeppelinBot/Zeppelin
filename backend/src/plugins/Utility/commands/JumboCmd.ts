@@ -64,7 +64,7 @@ export const JumboCmd = utilityCmd({
       }
       url += `${results[2]}${extension}`;
       if (extension === ".png") {
-        const image = await resizeBuffer(await getBufferFromUrl(url), size, size);
+        const image = resizeBuffer(await getBufferFromUrl(url), size, size);
         file = new MessageAttachment(image, `emoji${extension}`);
       } else {
         const image = await getBufferFromUrl(url);
@@ -74,7 +74,7 @@ export const JumboCmd = utilityCmd({
       let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
       let image: Buffer | undefined;
       try {
-        image = await resizeBuffer(await getBufferFromUrl(url), size, size);
+        image = resizeBuffer(await getBufferFromUrl(url), size, size);
       } catch {
         if (url.toLocaleLowerCase().endsWith("fe0f.svg")) {
           url = url.slice(0, url.lastIndexOf("-fe0f")) + ".svg";
