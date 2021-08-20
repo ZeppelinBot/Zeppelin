@@ -34,7 +34,7 @@ export async function setChannelPermissionOverridesAction(
   for (const override of action.overrides) {
     channel.permissionOverwrites.create(
       override.id as Snowflake,
-      new Permissions(BigInt(override.allow)).add(BigInt(override.deny)).serialize(),
+      new Permissions(BigInt(override.allow)).remove(BigInt(override.deny)).serialize(),
     );
 
     /*
