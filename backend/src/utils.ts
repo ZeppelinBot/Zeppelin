@@ -44,7 +44,7 @@ import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 const fsp = fs.promises;
 
@@ -432,7 +432,16 @@ export function validateAndParseMessageContent(input: unknown): StrictMessageCon
 
   dropNullValuesRecursively(input);
 
-  return (zStrictMessageContent.parse(input) as unknown) as StrictMessageContent;
+  try {
+    return (zStrictMessageContent.parse(input) as unknown) as StrictMessageContent;
+  } catch (err) {
+    if (err instanceof ZodError) {
+      // TODO: Allow error to be thrown and handle at use location
+      return {};
+    }
+
+    throw err;
+  }
 }
 
 function dropNullValuesRecursively(obj: any) {
