@@ -15,6 +15,11 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const channel = channelId ? (pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel) : null;
   const categoryId = channel?.parentId;
 
+  // Don't apply Automod on Zeppelin itself
+  if (userId && userId === pluginData.client.user?.id) {
+    return;
+  }
+
   const config = await pluginData.config.getMatchingConfig({
     channelId,
     categoryId,
