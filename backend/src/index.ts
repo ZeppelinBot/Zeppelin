@@ -20,6 +20,7 @@ import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
+import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -103,6 +104,13 @@ function errorHandler(err) {
   // FIXME: Hotfix
   if (err.message && err.message.startsWith("Unknown override criteria")) {
     // console.warn(err.message);
+    return;
+  }
+
+  if (err instanceof PluginNotLoadedError) {
+    // We don't want to crash the bot here, although this *should not happen*
+    // TODO: Proper system for preventing plugin load/unload race conditions
+    console.error(err);
     return;
   }
 
