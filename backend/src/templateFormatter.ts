@@ -65,6 +65,13 @@ export class TemplateSafeValueContainer {
   constructor(data: Record<string, TemplateSafeValue> = {}) {
     for (const [key, value] of Object.entries(data)) {
       if (!isTemplateSafeValue(value)) {
+        // tslint:disable:no-console
+        console.error("=== CONTEXT FOR UNSAFE VALUE ===");
+        console.error("stringified:", JSON.stringify(value));
+        console.error("typeof:", typeof value);
+        console.error("constructor name:", (value as any)?.constructor?.name);
+        console.error("=== /CONTEXT FOR UNSAFE VALUE ===");
+        // tslint:enable:no-console
         throw new Error(`Unsafe value for key "${key}" in SafeTemplateValueContainer`);
       }
 
