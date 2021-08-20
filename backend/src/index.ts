@@ -190,8 +190,6 @@ connect().then(async () => {
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
   client.on(Constants.Events.DEBUG, errorText => {
     if (!errorText.includes("429")) {
-      // tslint:disable-next-line:no-console
-      console.debug(`[DEBUG] ${errorText}`);
       return;
     }
 
