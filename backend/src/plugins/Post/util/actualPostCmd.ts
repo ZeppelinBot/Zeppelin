@@ -1,4 +1,4 @@
-import { Channel, Message, TextChannel } from "discord.js";
+import { Channel, Message, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -29,8 +29,12 @@ export async function actualPostCmd(
     "repeat-times"?: number;
   } = {},
 ) {
-  if (!(targetChannel instanceof TextChannel)) {
-    msg.channel.send(errorMessage("Channel is not a text channel"));
+  if (
+    !(targetChannel instanceof TextChannel) &&
+    !(targetChannel instanceof NewsChannel) &&
+    !(targetChannel instanceof ThreadChannel)
+  ) {
+    msg.channel.send(errorMessage("Specified channel is not a text channel, announcement channel, or thread"));
     return;
   }
 
