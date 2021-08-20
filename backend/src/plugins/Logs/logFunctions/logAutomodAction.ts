@@ -8,7 +8,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 
 interface LogAutomodActionData {
   rule: string;
-  user: User;
+  user?: User | null;
   users: User[];
   actionsTaken: string;
   matchSummary: string;
@@ -20,14 +20,14 @@ export function logAutomodAction(pluginData: GuildPluginData<LogsPluginType>, da
     LogType.AUTOMOD_ACTION,
     createTypedTemplateSafeValueContainer({
       rule: data.rule,
-      user: userToTemplateSafeUser(data.user),
+      user: data.user ? userToTemplateSafeUser(data.user) : null,
       users: data.users.map(user => userToTemplateSafeUser(user)),
       actionsTaken: data.actionsTaken,
       matchSummary: data.matchSummary ?? "",
     }),
     {
-      userId: data.user.id,
-      bot: data.user.bot,
+      userId: data.user ? data.user.id : null,
+      bot: data.user ? data.user.bot : false,
     },
   );
 }
