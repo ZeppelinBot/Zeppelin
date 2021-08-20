@@ -49,6 +49,11 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
     try {
+      // FIXME: Debug
+      // tslint:disable-next-line:no-console
+      console.log(
+        `[DEBUG] [SLOWMODE] Deleting message ${msg.id} from channel ${channel.id} in guild ${pluginData.guild.id}`,
+      );
       await channel.messages.delete(msg.id);
       thisMsgLock.interrupt();
     } catch (err) {
