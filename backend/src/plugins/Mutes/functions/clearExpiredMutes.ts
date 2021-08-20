@@ -18,17 +18,17 @@ export async function clearExpiredMutes(pluginData: GuildPluginData<MutesPluginT
 
         const muteRole = pluginData.config.get().mute_role;
         if (muteRole) {
-          await member.roles.remove(muteRole as Snowflake);
+          await member.roles.remove(muteRole);
         }
         if (mute.roles_to_restore) {
           const guildRoles = pluginData.guild.roles.cache;
-          let newRoles = [...member.roles.cache.keys()];
-          newRoles =
-            muteRole && newRoles.includes(muteRole) ? newRoles.splice(newRoles.indexOf(muteRole), 1) : newRoles;
+          const newRoles = [...member.roles.cache.keys()].filter(roleId => roleId !== muteRole);
           for (const toRestore of mute.roles_to_restore) {
-            if (guildRoles.has(toRestore as Snowflake) && toRestore !== muteRole) newRoles.push(toRestore);
+            if (guildRoles.has(toRestore) && toRestore !== muteRole && !newRoles.includes(toRestore)) {
+              newRoles.push(toRestore);
+            }
           }
-          await member.roles.set(newRoles as Snowflake[]);
+          await member.roles.set(newRoles);
         }
 
         lock.unlock();
