@@ -51,7 +51,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
             }
 
             const values = createTypedTemplateSafeValueContainer({
-              ...args,
+              ...safeArgs,
               msg: messageToTemplateSafeMessage(message),
             });
 
