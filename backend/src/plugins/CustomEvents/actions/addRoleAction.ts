@@ -28,8 +28,7 @@ export async function addRoleAction(
   if (event.trigger.type === "command" && !canActOn(pluginData, eventData.msg.member, target)) {
     throw new ActionError("Missing permissions");
   }
-  const targetRoles = [...target.roles.cache.keys()];
-  const rolesToAdd = (Array.isArray(action.role) ? action.role : [action.role]).filter(id => !targetRoles.includes(id));
+  const rolesToAdd = (Array.isArray(action.role) ? action.role : [action.role]).filter(id => !target.roles.cache.has(id));
   if (rolesToAdd.length === 0) {
     throw new ActionError("Target already has the role(s) specified");
   }
