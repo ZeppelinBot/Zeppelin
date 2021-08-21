@@ -33,7 +33,5 @@ export async function addRoleAction(
   if (rolesToAdd.length === 0) {
     throw new ActionError("Target already has the role(s) specified");
   }
-  await target.edit({
-    roles: Array.from(new Set([...targetRoles, ...rolesToAdd])) as Snowflake[],
-  });
+  await target.roles.add(rolesToAdd);
 }
