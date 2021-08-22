@@ -1,4 +1,5 @@
 import {
+  Formatters,
   GuildMember,
   Message,
   MessageActionRow,
@@ -33,6 +34,15 @@ const SEARCH_EXPORT_LIMIT = 1_000_000;
 export enum SearchType {
   MemberSearch,
   BanSearch,
+}
+
+interface SearchResult<T> {
+  results: T[];
+  totalResults: number;
+  page: number;
+  lastPage: number;
+  from: number;
+  to: number;
 }
 
 class SearchError extends Error {}
@@ -90,7 +100,7 @@ export async function displaySearch(
 
   const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
 
-  const loadSearchPage = async (page) => {
+  const loadSearchPage = async (page: number) => {
     if (searching) return;
     searching = true;
 
@@ -146,11 +156,9 @@ export async function displaySearch(
       : formatSearchResultList(searchResult.results);
 
     const result = trimLines(`
-        ${headerText}
-        \`\`\`js
-        ${resultList}
-        \`\`\`
-      `);
+      ${headerText}
+      ${Formatters.codeBlock("js", resultList)}
+    `);
 
     const searchMsg = await searchMsgPromise;
 
@@ -298,7 +306,7 @@ async function performMemberSearch(
   args: MemberSearchParams,
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
-): Promise<{ results: GuildMember[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+): Promise<SearchResult<GuildMember>> {
   await refreshMembersIfNeeded(pluginData.guild);
 
   let matchingMembers = Array.from(pluginData.guild.members.cache.values());
@@ -426,7 +434,7 @@ async function performBanSearch(
   args: BanSearchParams,
   page = 1,
   perPage = SEARCH_RESULTS_PER_PAGE,
-): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
+): Promise<SearchResult<User>> {
   const member = pluginData.guild.members.cache.get(pluginData.client.user!.id);
   if (member && !hasDiscordPermissions(member.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
@@ -454,7 +462,7 @@ async function performBanSearch(
     });
   }
 
-  const [, sortDir, sortBy] = (args.sort && args.sort.match(/^(-?)(.*)$/)) ?? [null, "ASC", "name"];
+  const [, sortDir, sortBy] = args.sort?.match(/^(-?)(.*)$/) ?? [null, "ASC", "name"];
   const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
   if (sortBy === "id") {

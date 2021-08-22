@@ -43,7 +43,6 @@ export const CasesModCmd = modActionsCmd({
     const prefix = getGuildPrefix(pluginData);
 
     createPaginatedMessage(
-      pluginData.client,
       msg.channel,
       totalPages,
       async (page) => {
