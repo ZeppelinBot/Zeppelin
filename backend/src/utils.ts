@@ -744,7 +744,7 @@ export function isNotNull(value): value is Exclude<typeof value, null> {
 // discord.gg/invite/<code>
 // discord.gg/<code>
 // discord.com/friend-invite/<code>
-const quickInviteDetection = /(?:discord.com|discordapp.com)\/(?:invite|friend-invite)\/([a-z0-9\-]+)|discord.gg\/(?:\S+\/)?([a-z0-9\-]+)/gi;
+const quickInviteDetection = /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9\-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9\-]+)/gi;
 
 const isInviteHostRegex = /(?:^|\.)(?:discord.gg|discord.com|discordapp.com)$/i;
 const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9\-]+)$/i;
