@@ -1,4 +1,3 @@
-import { Message, MessageOptions } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
