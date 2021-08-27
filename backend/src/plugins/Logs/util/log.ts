@@ -1,7 +1,7 @@
-import { MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
+import { MessageEmbed, MessageMentionTypes, MessageOptions, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { allowTimeout } from "../../../RegExpRunner";
-import { createChunkedMessage, get, noop } from "../../../utils";
+import { createChunkedEmbedMessage, createChunkedMessage, noop } from "../../../utils";
 import { ILogTypeData, LogsPluginType, ParsedMessageType, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
 import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
@@ -79,7 +79,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
         }
       }
       // its resolving to "any" without this, idk why
-      const message: ParsedMessageType | string | null = await getLogMessage(pluginData, type, data, {
+      const message = await getLogMessage(pluginData, type, data, {
         format: opts.format,
         include_embed_timestamp: opts.include_embed_timestamp,
         timestamp_format: opts.timestamp_format,
@@ -103,9 +103,42 @@ export async function log<TLogType extends keyof ILogTypeData>(
           if (!pluginData.state.batches.has(channel.id)) {
             pluginData.state.batches.set(channel.id, []);
             setTimeout(async () => {
-              const batchedMessage = pluginData.state.batches.get(channel.id)!.join("\n");
+              const batch = pluginData.state.batches.get(channel.id);
+              if (!batch) return;
+              const chunks: ParsedMessageType[] = [];
+              // this is gonna be messy, i dont know how to write this algo any cleaner, sorry
+              for (const msg of batch) {
+                if (typeof msg === "string") {
+                  // check if our latest log is still a string, if not, we need to make a new one
+                  if (typeof chunks[chunks.length - 1] === "string") {
+                    chunks[chunks.length - 1] += `\n${msg}`;
+                  } else {
+                    chunks.push(msg);
+                  }
+                } else {
+                  const embedMsg: MessageEmbed[] | undefined = <any>msg.embeds; // wtb fix
+                  const lastEntry: MessageOptions | undefined = <any>chunks[chunks.length - 1]; // wtb fix
+
+                  if (!embedMsg || embedMsg.length === 0) continue;
+                  // check if our latest log is still a embed, if not, we need to make a new one
+                  if (lastEntry && lastEntry.embeds && typeof lastEntry !== "string") {
+                    // @ts-ignore
+                    chunks[chunks.length - 1].embeds.push(...embedMsg); // wtb fix
+                  } else {
+                    chunks.push({ embeds: embedMsg });
+                  }
+                }
+              }
+              for (const chunk of chunks) {
+                if (typeof chunk === "string") {
+                  await createChunkedMessage(channel, chunk, { parse });
+                } else {
+                  // @ts-ignore
+                  await createChunkedEmbedMessage(channel, chunk.embeds, { parse }); // wtb fix
+                }
+              }
+
               pluginData.state.batches.delete(channel.id);
-              createChunkedMessage(channel, batchedMessage, { parse }).catch(noop);
             }, batchTime);
           }
 
@@ -115,7 +148,6 @@ export async function log<TLogType extends keyof ILogTypeData>(
           if (typeof message === "string") {
             await createChunkedMessage(channel, message, { parse }).catch(noop);
           } else {
-            // why is TS being weird here with the type?
             await channel.send({ embeds: message.embeds, allowedMentions: { parse } });
           }
         }
