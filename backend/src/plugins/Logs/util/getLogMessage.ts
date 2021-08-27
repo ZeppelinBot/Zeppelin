@@ -116,7 +116,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
 
   const renderLogString = str => renderTemplate(str, values);
 
-  let formatted: ParsedMessageType;
+  let formatted;
   try {
     formatted =
       typeof format === "string" ? await renderLogString(format) : await renderRecursively(format, renderLogString);

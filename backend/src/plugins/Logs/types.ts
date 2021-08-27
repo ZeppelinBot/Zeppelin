@@ -22,7 +22,7 @@ import {
   TemplateSafeUnknownUser,
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import { MessageOptions } from "child_process";
+import { MessageOptions } from "discord.js";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;
