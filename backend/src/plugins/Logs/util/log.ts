@@ -1,11 +1,10 @@
 import { MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { allowTimeout } from "../../../RegExpRunner";
 import { createChunkedMessage, get, noop } from "../../../utils";
-import { ILogTypeData, LogsPluginType, LogTypeData, TLogChannelMap } from "../types";
+import { ILogTypeData, LogsPluginType, ParsedMessageType, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
-import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { LogType } from "../../../data/LogType";
 
 const excludedUserProps = ["user", "member", "mod"];
@@ -79,8 +78,8 @@ export async function log<TLogType extends keyof ILogTypeData>(
           }
         }
       }
-
-      const message = await getLogMessage(pluginData, type, data, {
+      // its resolving to "any" without this, idk why
+      const message: ParsedMessageType | string | null = await getLogMessage(pluginData, type, data, {
         format: opts.format,
         include_embed_timestamp: opts.include_embed_timestamp,
         timestamp_format: opts.timestamp_format,
@@ -88,10 +87,10 @@ export async function log<TLogType extends keyof ILogTypeData>(
 
       if (message) {
         // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
-        if (typeof message !== "string") {
+        /*if (typeof message !== "string") {
           await channel.send(message).catch(noop);
           return;
-        }
+        }*/
 
         // Default to batched unless explicitly disabled
         const batched = opts.batched ?? true;
@@ -113,7 +112,12 @@ export async function log<TLogType extends keyof ILogTypeData>(
           pluginData.state.batches.get(channel.id)!.push(message);
         } else {
           // If we're not batching log messages, just send them immediately
-          await createChunkedMessage(channel, message, { parse }).catch(noop);
+          if (typeof message === "string") {
+            await createChunkedMessage(channel, message, { parse }).catch(noop);
+          } else {
+            // why is TS being weird here with the type?
+            await channel.send({ embeds: message.embeds, allowedMentions: { parse } });
+          }
         }
       }
     }

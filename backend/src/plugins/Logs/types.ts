@@ -9,7 +9,6 @@ import { RegExpRunner } from "../../RegExpRunner";
 import { tMessageContent, tNullable } from "../../utils";
 import { TRegex } from "../../validatorUtils";
 import { LogType } from "../../data/LogType";
-import { GuildMember } from "discord.js";
 import {
   TemplateSafeCase,
   TemplateSafeChannel,
@@ -23,14 +22,12 @@ import {
   TemplateSafeUnknownUser,
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import {
-  TemplateSafeValue,
-  TemplateSafeValueContainer,
-  TypedTemplateSafeValueContainer,
-} from "../../templateFormatter";
+import { MessageOptions } from "child_process";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;
+
+export type ParsedMessageType = MessageOptions | string;
 
 const LogChannel = t.partial({
   include: t.array(t.string),
@@ -85,7 +82,7 @@ export interface LogsPluginType extends BasePluginType {
 
     logListener;
 
-    batches: Map<string, string[]>;
+    batches: Map<string, ParsedMessageType[]>;
 
     onMessageDeleteFn;
     onMessageDeleteBulkFn;

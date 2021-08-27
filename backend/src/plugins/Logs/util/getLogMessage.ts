@@ -1,4 +1,4 @@
-import { MessageOptions } from "discord.js";
+import { Message, MessageOptions } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -19,7 +19,7 @@ import {
   verboseUserName,
 } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types";
+import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, ParsedMessageType, TLogChannel } from "../types";
 import {
   getTemplateSafeMemberLevel,
   TemplateSafeMember,
@@ -32,7 +32,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   type: TLogType,
   data: TypedTemplateSafeValueContainer<ILogTypeData[TLogType]>,
   opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
-): Promise<MessageOptions | null> {
+): Promise<ParsedMessageType | null> {
   const config = pluginData.config.get();
   const format = opts?.format?.[LogType[type]] || config.format[LogType[type]] || "";
   if (format === "" || format == null) return null;
@@ -116,7 +116,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
 
   const renderLogString = str => renderTemplate(str, values);
 
-  let formatted;
+  let formatted: ParsedMessageType;
   try {
     formatted =
       typeof format === "string" ? await renderLogString(format) : await renderRecursively(format, renderLogString);
