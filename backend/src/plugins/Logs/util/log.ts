@@ -78,7 +78,6 @@ export async function log<TLogType extends keyof ILogTypeData>(
           }
         }
       }
-      // its resolving to "any" without this, idk why
       const message = await getLogMessage(pluginData, type, data, {
         format: opts.format,
         include_embed_timestamp: opts.include_embed_timestamp,
@@ -86,12 +85,6 @@ export async function log<TLogType extends keyof ILogTypeData>(
       });
 
       if (message) {
-        // For non-string log messages (i.e. embeds) batching or chunking is not possible, so send them immediately
-        /*if (typeof message !== "string") {
-          await channel.send(message).catch(noop);
-          return;
-        }*/
-
         // Default to batched unless explicitly disabled
         const batched = opts.batched ?? true;
         const batchTime = opts.batch_time ?? 1000;
