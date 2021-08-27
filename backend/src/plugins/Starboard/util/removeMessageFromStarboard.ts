@@ -16,7 +16,7 @@ export async function removeMessageFromStarboard(
     chan => chan.id === msg.starboard_channel_id,
   );
   if (!channel?.isText()) return;
-  const message = await channel.messages.fetch(msg.starboard_message_id);
+  const message = await channel.messages.fetch(msg.starboard_message_id).catch(noop);
   if (!message?.deletable) return;
   await message.delete().catch(noop);
 }
