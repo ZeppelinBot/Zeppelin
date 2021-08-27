@@ -30,7 +30,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
       });
     }
 
-    if (!isEqual(oldMember.roles, member.roles)) {
+    if (!isEqual([...oldMember.roles.cache.keys()], [...member.roles.cache.keys()])) {
       const addedRoles = diff([...member.roles.cache.keys()], [...oldMember.roles.cache.keys()]);
       const removedRoles = diff([...oldMember.roles.cache.keys()], [...member.roles.cache.keys()]);
       let skip = false;
