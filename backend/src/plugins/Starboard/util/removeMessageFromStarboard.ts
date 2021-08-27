@@ -12,9 +12,7 @@ export async function removeMessageFromStarboard(
   await pluginData.state.starboardReactions.deleteAllStarboardReactionsForMessageId(msg.message_id).catch(noop);
 
   // just re-do the deletion, i know this isnt clean but i dont care
-  const channel: Channel | undefined = pluginData.client.channels.cache.find(
-    chan => chan.id === msg.starboard_channel_id,
-  );
+  const channel = pluginData.client.channels.cache.find(c => c.id === msg.starboard_channel_id);
   if (!channel?.isText()) return;
   const message = await channel.messages.fetch(msg.starboard_message_id).catch(noop);
   if (!message?.deletable) return;
