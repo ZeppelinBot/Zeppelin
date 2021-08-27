@@ -15,7 +15,7 @@ export async function removeMessageFromStarboard(
   const channel: Channel | undefined = pluginData.client.channels.cache.find(
     chan => chan.id === msg.starboard_channel_id,
   );
-  if (!channel || (!(channel instanceof TextChannel) && !(channel instanceof NewsChannel))) return;
+  if (!channel?.isText()) return;
   const message = await channel.messages.fetch(msg.starboard_message_id);
   if (!message || !message.deletable) return;
   await message.delete().catch(noop);
