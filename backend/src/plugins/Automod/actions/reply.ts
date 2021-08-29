@@ -1,7 +1,6 @@
-import { Message, MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
+import { MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
@@ -95,7 +94,6 @@ export const ReplyAction = automodAction({
         }
 
         const messageContent = validateAndParseMessageContent(formatted);
-        let replyMsg: Message;
 
         const messageOpts: MessageOptions = {
           ...messageContent,
@@ -105,11 +103,13 @@ export const ReplyAction = automodAction({
         };
 
         if (typeof actionConfig !== "string" && actionConfig.use_inline_reply) {
-          const originalMsg = await channel.messages.fetch(_contexts[0].message!.id);
-          replyMsg = await originalMsg.reply(messageOpts);
-        } else {
-          replyMsg = await channel.send(messageOpts);
+          messageOpts.reply = {
+            failIfNotExists: false,
+            messageReference: _contexts[0].message!.id,
+          };
         }
+
+        const replyMsg = await channel.send(messageOpts);
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
