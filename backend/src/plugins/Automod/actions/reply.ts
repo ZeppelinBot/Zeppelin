@@ -97,21 +97,18 @@ export const ReplyAction = automodAction({
         const messageContent = validateAndParseMessageContent(formatted);
         let replyMsg: Message;
 
+        const messageOpts: MessageOptions = {
+          ...messageContent,
+          allowedMentions: {
+            users: [user.id],
+          },
+        };
+
         if (typeof actionConfig !== "string" && actionConfig.use_inline_reply) {
           const originalMsg = await channel.messages.fetch(_contexts[0].message!.id);
-          replyMsg = await originalMsg.reply({
-            ...messageContent,
-            allowedMentions: {
-              users: [user.id],
-            },
-          });
+          replyMsg = await originalMsg.reply(messageOpts);
         } else {
-          replyMsg = await channel.send({
-            ...messageContent,
-            allowedMentions: {
-              users: [user.id],
-            },
-          });
+          replyMsg = await channel.send(messageOpts);
         }
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
