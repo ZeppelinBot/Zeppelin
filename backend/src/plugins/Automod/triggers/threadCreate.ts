@@ -7,6 +7,8 @@ import { automodTrigger } from "../helpers";
 interface ThreadCreateResult {
   matchedThreadId: Snowflake;
   matchedThreadName: string;
+  matchedThreadParentId: Snowflake;
+  matchedThreadParentName: string;
   matchedThreadOwner: User | undefined;
 }
 
@@ -33,6 +35,8 @@ export const ThreadCreateTrigger = automodTrigger<ThreadCreateResult>()({
       extra: {
         matchedThreadId: thread.id,
         matchedThreadName: thread.name,
+        matchedThreadParentId: thread.parentId ?? "Unknown",
+        matchedThreadParentName: thread.parent?.name ?? "Unknown",
         matchedThreadOwner: context.user,
       },
     };
@@ -42,11 +46,12 @@ export const ThreadCreateTrigger = automodTrigger<ThreadCreateResult>()({
     const threadId = matchResult.extra.matchedThreadId;
     const threadName = matchResult.extra.matchedThreadName;
     const threadOwner = matchResult.extra.matchedThreadOwner;
+    const parentId = matchResult.extra.matchedThreadParentId;
+    const parentName = matchResult.extra.matchedThreadParentName;
+    const base = `Thread **#${threadName}** (\`${threadId}\`) has been created in the **#${parentName}** (\`${parentId}\`) channel`;
     if (threadOwner) {
-      return `Thread **#${Util.escapeBold(threadName)}** (\`${threadId}\`) has been created by **${
-        threadOwner.tag
-      }** (\`${threadOwner.id}\`)`;
+      return `${base} by **${Util.escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
     }
-    return `Thread **#${Util.escapeBold(threadName)}** (\`${threadId}\`) has been created`;
+    return base;
   },
 });

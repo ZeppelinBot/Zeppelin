@@ -7,6 +7,8 @@ import { automodTrigger } from "../helpers";
 interface ThreadDeleteResult {
   matchedThreadId: Snowflake;
   matchedThreadName: string;
+  matchedThreadParentId: Snowflake;
+  matchedThreadParentName: string;
   matchedThreadOwner: User | undefined;
 }
 
@@ -33,6 +35,8 @@ export const ThreadDeleteTrigger = automodTrigger<ThreadDeleteResult>()({
       extra: {
         matchedThreadId: thread.id,
         matchedThreadName: thread.name,
+        matchedThreadParentId: thread.parentId ?? "Unknown",
+        matchedThreadParentName: thread.parent?.name ?? "Unknown",
         matchedThreadOwner: context.user,
       },
     };
@@ -40,13 +44,16 @@ export const ThreadDeleteTrigger = automodTrigger<ThreadDeleteResult>()({
 
   renderMatchInformation({ matchResult }) {
     const threadId = matchResult.extra.matchedThreadId;
-    const threadName = matchResult.extra.matchedThreadName;
     const threadOwner = matchResult.extra.matchedThreadOwner;
+    const threadName = matchResult.extra.matchedThreadName;
+    const parentId = matchResult.extra.matchedThreadParentId;
+    const parentName = matchResult.extra.matchedThreadParentName;
     if (threadOwner) {
-      return `Thread **${Util.escapeBold(threadName ?? "Unknown")}** (\`${threadId}\`) created by **${Util.escapeBold(
+      return `Thread **#${threadName ?? "Unknown"}** (\`${threadId}\`) created by **${Util.escapeBold(
         threadOwner.tag,
-      )}** (\`${threadOwner.id}\`) has been deleted`;
+      )}** (\`${threadOwner.id}\`) in the **#${parentName}** (\`${parentId}\`) channel has been deleted`;
     }
-    return `Thread **${Util.escapeBold(threadName ?? "Unknown")}** (\`${threadId}\`) has been deleted`;
+    return `Thread **#${threadName ??
+      "Unknown"}** (\`${threadId}\`) from the **#${parentName}** (\`${parentId}\`) channel has been deleted`;
   },
 });
