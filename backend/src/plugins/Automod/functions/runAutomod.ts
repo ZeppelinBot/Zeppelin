@@ -44,7 +44,10 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     ) {
       continue;
     }
+<<<<<<< HEAD
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
+=======
+>>>>>>> added thread_create and thread_delete automod triggers
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
       continue;
