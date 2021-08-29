@@ -24,7 +24,7 @@ export const ReplyAction = automodAction({
     t.type({
       text: tMessageContent,
       auto_delete: tNullable(t.union([tDelayString, t.number])),
-      use_inline_reply: t.boolean,
+      use_inline_reply: tNullable(t.boolean),
     }),
   ]),
 
