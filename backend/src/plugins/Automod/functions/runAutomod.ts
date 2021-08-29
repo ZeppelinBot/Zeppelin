@@ -33,7 +33,15 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
-    if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger && !context.antiraid) continue;
+    if (
+      !rule.affects_bots &&
+      (!user || user.bot) &&
+      !context.counterTrigger &&
+      !context.antiraid &&
+      !context.threadChange?.deleted
+    ) {
+      continue;
+    }
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
