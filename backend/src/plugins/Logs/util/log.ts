@@ -98,36 +98,34 @@ export async function log<TLogType extends keyof ILogTypeData>(
             setTimeout(async () => {
               const batch = pluginData.state.batches.get(channel.id);
               if (!batch) return;
+
               const chunks: ParsedMessageType[] = [];
-              // this is gonna be messy, i dont know how to write this algo any cleaner, sorry
               for (const msg of batch) {
                 if (typeof msg === "string") {
-                  // check if our latest log is still a string, if not, we need to make a new one
+                  // check if the latest chunk is a string, if not, make it one
                   if (typeof chunks[chunks.length - 1] === "string") {
                     chunks[chunks.length - 1] += `\n${msg}`;
                   } else {
                     chunks.push(msg);
                   }
                 } else {
-                  const embedMsg: MessageEmbed[] | undefined = <any>msg.embeds; // wtb fix
-                  const lastEntry: MessageOptions | undefined = <any>chunks[chunks.length - 1]; // wtb fix
+                  const msgEmbeds = msg.embeds;
+                  const lastEntry = chunks[chunks.length - 1];
 
-                  if (!embedMsg || embedMsg.length === 0) continue;
-                  // check if our latest log is still a embed, if not, we need to make a new one
-                  if (lastEntry && lastEntry.embeds && typeof lastEntry !== "string") {
-                    // @ts-ignore
-                    chunks[chunks.length - 1].embeds.push(...embedMsg); // wtb fix
+                  if (!msgEmbeds || msgEmbeds.length === 0) continue;
+                  // check if the latest chunk is an embed, if not, make it one
+                  if (typeof lastEntry !== "string" && lastEntry.embeds) {
+                    (chunks[chunks.length - 1] as MessageOptions).embeds!.push(...msgEmbeds);
                   } else {
-                    chunks.push({ embeds: embedMsg });
+                    chunks.push({ embeds: msgEmbeds });
                   }
                 }
               }
               for (const chunk of chunks) {
                 if (typeof chunk === "string") {
                   await createChunkedMessage(channel, chunk, { parse });
-                } else {
-                  // @ts-ignore
-                  await createChunkedEmbedMessage(channel, chunk.embeds, { parse }); // wtb fix
+                } else if (chunk.embeds) {
+                  await createChunkedEmbedMessage(channel, chunk.embeds, { parse });
                 }
               }
 
