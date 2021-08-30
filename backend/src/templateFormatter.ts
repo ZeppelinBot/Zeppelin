@@ -390,7 +390,7 @@ const baseValues = {
   },
   strlen(arg) {
     if (typeof arg !== "string") return 0;
-    return arg.length;
+    return [...arg].length;
   },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
