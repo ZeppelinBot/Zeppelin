@@ -114,7 +114,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
 
                   if (!msgEmbeds || msgEmbeds.length === 0) continue;
                   // check if the latest chunk is an embed, if not, make it one
-                  if (typeof lastEntry !== "string" && lastEntry!.embeds) {
+                  if (typeof lastEntry !== "string" && lastEntry?.embeds) {
                     (chunks[chunks.length - 1] as MessageOptions).embeds!.push(...msgEmbeds);
                   } else {
                     chunks.push({ embeds: msgEmbeds });
