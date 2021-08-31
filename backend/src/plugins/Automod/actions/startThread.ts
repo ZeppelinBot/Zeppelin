@@ -13,9 +13,12 @@ export const StartThreadAction = automodAction({
     auto_archive: tNullable(t.number),
     private: tNullable(t.boolean),
     slowmode: tNullable(tDelayString),
+    limit_per_channel: tNullable(t.number),
   }),
 
-  defaultConfig: {},
+  defaultConfig: {
+    limit_per_channel: 5,
+  },
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     // check if the message still exists, we don't want to create threads for deleted messages
@@ -23,6 +26,17 @@ export const StartThreadAction = automodAction({
       if (!c.message || !c.user) return false;
       const channel = pluginData.guild.channels.cache.get(c.message.channel_id);
       if (channel?.type !== "GUILD_TEXT" || !channel.isText()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
+      // check against max threads per channel
+      if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
+        const threadCount = [
+          ...channel.threads.cache
+            .filter(
+              tr => tr.ownerId === pluginData.client.application!.id && !tr.archived && tr.parentId === channel.id,
+            )
+            .keys(),
+        ].length; // very short line, yes yes
+        if (threadCount >= actionConfig.limit_per_channel) return false;
+      }
       return channel.messages.cache.has(c.message.id);
     });
     let autoArchive: ThreadAutoArchiveDuration;
@@ -54,11 +68,10 @@ export const StartThreadAction = automodAction({
           startMessage: !actionConfig.private ? c.message!.id : undefined,
         })
         .catch(noop);
-      console.log(thread?.ownerId);
       if (actionConfig.slowmode && thread) {
         const dur = Math.ceil(Math.max(convertDelayStringToMS(actionConfig.slowmode) ?? 0, 0) / 1000);
         if (dur > 0) {
-          await thread.edit({ rateLimitPerUser: dur }).catch(noop);
+          await thread.setRateLimitPerUser(dur).catch(noop);
         }
       }
     }
