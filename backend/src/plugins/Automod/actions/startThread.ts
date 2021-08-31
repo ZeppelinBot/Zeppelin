@@ -2,7 +2,7 @@ import { ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
-import { tDelayString, tNullable } from "src/utils";
+import { convertDelayStringToMS, tDelayString, tNullable } from "src/utils";
 import { userToTemplateSafeUser } from "src/utils/templateSafeObjects";
 import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
@@ -46,7 +46,7 @@ export const StartThreadAction = automodAction({
           }),
         );
       const threadName = await renderThreadName(actionConfig.name ?? "{user.username}#{user.discriminator}s thread");
-      await channel.threads
+      const thread = await channel.threads
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,
@@ -54,6 +54,13 @@ export const StartThreadAction = automodAction({
           startMessage: !actionConfig.private ? c.message!.id : undefined,
         })
         .catch(noop);
+      console.log(thread?.ownerId);
+      if (actionConfig.slowmode && thread) {
+        const dur = Math.ceil(Math.max(convertDelayStringToMS(actionConfig.slowmode) ?? 0, 0) / 1000);
+        if (dur > 0) {
+          await thread.edit({ rateLimitPerUser: dur }).catch(noop);
+        }
+      }
     }
   },
 });
