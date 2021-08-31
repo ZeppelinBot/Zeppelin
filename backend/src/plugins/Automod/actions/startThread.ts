@@ -1,9 +1,9 @@
-import { ThreadAutoArchiveDuration } from "discord-api-types";
+import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
 import { convertDelayStringToMS, tDelayString, tNullable } from "src/utils";
-import { userToTemplateSafeUser } from "src/utils/templateSafeObjects";
+import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "src/utils/templateSafeObjects";
 import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
 
@@ -39,12 +39,14 @@ export const StartThreadAction = automodAction({
       }
       return channel.messages.cache.has(c.message.id);
     });
+
+    const guild = await pluginData.guild;
     let autoArchive: ThreadAutoArchiveDuration;
     if (actionConfig.auto_archive === 1440) {
       autoArchive = ThreadAutoArchiveDuration.OneDay;
-    } else if (actionConfig.auto_archive === 4320) {
+    } else if (actionConfig.auto_archive === 4320 && guild.features.includes(GuildFeature.ThreeDayThreadArchive)) {
       autoArchive = ThreadAutoArchiveDuration.ThreeDays;
-    } else if (actionConfig.auto_archive === 10080) {
+    } else if (actionConfig.auto_archive === 10080 && guild.features.includes(GuildFeature.SevenDayThreadArchive)) {
       autoArchive = ThreadAutoArchiveDuration.OneWeek;
     } else {
       autoArchive = ThreadAutoArchiveDuration.OneHour;
@@ -57,6 +59,7 @@ export const StartThreadAction = automodAction({
           str,
           new TemplateSafeValueContainer({
             user: userToTemplateSafeUser(c.user!),
+            msg: savedMessageToTemplateSafeSavedMessage(c.message!),
           }),
         );
       const threadName = await renderThreadName(actionConfig.name ?? "{user.username}#{user.discriminator}s thread");
@@ -64,8 +67,12 @@ export const StartThreadAction = automodAction({
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,
-          type: actionConfig.private ? "GUILD_PRIVATE_THREAD" : "GUILD_PUBLIC_THREAD",
-          startMessage: !actionConfig.private ? c.message!.id : undefined,
+          type:
+            actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
+              ? "GUILD_PRIVATE_THREAD"
+              : "GUILD_PUBLIC_THREAD",
+          startMessage:
+            !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads) ? c.message!.id : undefined,
         })
         .catch(noop);
       if (actionConfig.slowmode && thread) {
