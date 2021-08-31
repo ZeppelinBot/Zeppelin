@@ -31,7 +31,11 @@ export const StartThreadAction = automodAction({
         const threadCount = [
           ...channel.threads.cache
             .filter(
-              tr => tr.ownerId === pluginData.client.application!.id && !tr.archived && tr.parentId === channel.id,
+              tr =>
+                tr.ownerId === pluginData.client.application!.id &&
+                !tr.deleted &&
+                !tr.archived &&
+                tr.parentId === channel.id,
             )
             .keys(),
         ].length; // very short line, yes yes
