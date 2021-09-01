@@ -1,14 +1,13 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "src/types";
-import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({
-    channels: t.array(t.string),
+    channels: tNullable(t.array(t.string)),
     duration: tNullable(tDelayString),
   }),
 
@@ -16,18 +15,30 @@ export const SetSlowmodeAction = automodAction({
     duration: "10s",
   },
 
-  async apply({ pluginData, actionConfig }) {
+  async apply({ pluginData, actionConfig, contexts }) {
     const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);
-
-    for (const channelId of actionConfig.channels) {
+    const channels = actionConfig.channels ?? new Array();
+    if (channels.length === 0) {
+      channels.push(...contexts.filter(c => c.message?.channel_id).map(c => c.message!.channel_id));
+    }
+    for (const channelId of channels) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
 
       // Only text channels and text channels within categories support slowmodes
-      if (!channel || !(channel.type === ChannelTypeStrings.TEXT || ChannelTypeStrings.CATEGORY)) {
+      if (
+        !channel ||
+        !(
+          channel.type === ChannelTypeStrings.TEXT ||
+          ChannelTypeStrings.CATEGORY ||
+          ChannelTypeStrings.PUBLIC_THREAD ||
+          ChannelTypeStrings.NEWS_THREAD ||
+          ChannelTypeStrings.PRIVATE_THREAD
+        )
+      ) {
         continue;
       }
 
-      const channelsToSlowmode: TextChannel[] = [];
+      const channelsToSlowmode: Array<TextChannel | ThreadChannel> = [];
       if (channel.type === ChannelTypeStrings.CATEGORY) {
         // Find all text channels within the category
         for (const ch of pluginData.guild.channels.cache.values()) {
