@@ -25,6 +25,23 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     this.toBePermanent = new Set();
   }
 
+  public msgToSavedMessage(message: Message): SavedMessage {
+    const postedAt = moment.utc(message.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
+
+    return {
+      data: this.msgToSavedMessageData(message),
+      id: message.id,
+      guild_id: (message.channel as GuildChannel).guildId,
+      channel_id: message.channelId,
+      user_id: message.author.id,
+      is_bot: message.author.bot,
+      posted_at: postedAt,
+      // @ts-expect-error
+      deleted_at: null,
+      is_permanent: false,
+    };
+  }
+
   protected msgToSavedMessageData(msg: Message): ISavedMessageData {
     const data: ISavedMessageData = {
       author: {
@@ -206,8 +223,12 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     await this.insertBulk(items);
   }
 
+<<<<<<< HEAD
   protected async msgToInsertReadyEntity(msg: Message): Promise<Partial<SavedMessage>> {
     const savedMessageData = this.msgToSavedMessageData(msg);
+=======
+    const savedMessageData = GuildSavedMessages.msgToSavedMessageData(msg);
+>>>>>>> 95a0ce8c (clean up)
     const postedAt = moment.utc(msg.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
     return {
@@ -307,9 +328,15 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     this.events.emit(`update:${id}`, [newMessage, oldMessage]);
   }
 
+<<<<<<< HEAD
   async saveEditFromMsg(msg: Message): Promise<void> {
     const newData = this.msgToSavedMessageData(msg);
     await this.saveEdit(msg.id, newData);
+=======
+  async saveEditFromMsg(msg: Message) {
+    const newData = GuildSavedMessages.msgToSavedMessageData(msg);
+    return this.saveEdit(msg.id, newData);
+>>>>>>> 95a0ce8c (clean up)
   }
 
   async setPermanent(id: string): Promise<void> {

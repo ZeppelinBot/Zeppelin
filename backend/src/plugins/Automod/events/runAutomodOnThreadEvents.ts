@@ -1,4 +1,5 @@
 import { typedGuildEventListener } from "knub";
+import { GuildSavedMessages } from "../../../data/GuildSavedMessages";
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
 
@@ -17,18 +18,18 @@ export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginTyp
       user,
       channel: thread,
     };
-    const sourceChannel = pluginData.client.channels.cache.find((c) => c.id === thread.parentId);
-    if (sourceChannel?.isText()) {
+
+    // This is a hack to make this trigger compatible with the reply action
+    const sourceChannel = thread.parent ?? pluginData.client.channels.cache.find((c) => c.id === thread.parentId);
+    messageBlock: if (sourceChannel?.isText()) {
       const sourceMessage = sourceChannel.messages.cache.find(
         (m) => m.thread?.id === thread.id || m.reference?.channelId === thread.id,
       );
-      if (sourceMessage) {
-        const message = await pluginData.state.savedMessages.find(sourceMessage.id);
-        if (message) {
-          message.channel_id = thread.id;
-          context.message = message;
-        }
-      }
+      if (!sourceMessage) break messageBlock;
+
+      const savedMessage = pluginData.state.savedMessages.msgToSavedMessage(sourceMessage);
+      savedMessage.channel_id = thread.id;
+      context.message = savedMessage;
     }
 
     pluginData.state.queue.add(() => {
