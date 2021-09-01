@@ -28,11 +28,13 @@ export const SetSlowmodeAction = automodAction({
       if (
         !channel ||
         !(
-          channel.type === ChannelTypeStrings.TEXT ||
-          ChannelTypeStrings.CATEGORY ||
-          ChannelTypeStrings.PUBLIC_THREAD ||
-          ChannelTypeStrings.NEWS_THREAD ||
-          ChannelTypeStrings.PRIVATE_THREAD
+          [
+            ChannelTypeStrings.TEXT,
+            ChannelTypeStrings.CATEGORY,
+            ChannelTypeStrings.PUBLIC_THREAD,
+            ChannelTypeStrings.NEWS_THREAD,
+            ChannelTypeStrings.PRIVATE_THREAD,
+          ].includes(channel.type)
         )
       ) {
         continue;
