@@ -23,22 +23,8 @@ export const SetSlowmodeAction = automodAction({
     }
     for (const channelId of channels) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
-
       // Only text channels and text channels within categories support slowmodes
-      if (
-        !channel ||
-        !(
-          [
-            ChannelTypeStrings.TEXT,
-            ChannelTypeStrings.CATEGORY,
-            ChannelTypeStrings.PUBLIC_THREAD,
-            ChannelTypeStrings.NEWS_THREAD,
-            ChannelTypeStrings.PRIVATE_THREAD,
-          ].includes(channel.type)
-        )
-      ) {
-        continue;
-      }
+      if (!channel?.isText() && channel?.type !== ChannelTypeStrings.CATEGORY) continue;
 
       const channelsToSlowmode: Array<TextChannel | ThreadChannel> = [];
       if (channel.type === ChannelTypeStrings.CATEGORY) {
