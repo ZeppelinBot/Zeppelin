@@ -26,11 +26,11 @@ export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginTyp
       const sourceMessage = sourceChannel.messages.cache.find(
         (m) => m.thread?.id === thread.id || m.reference?.channelId === thread.id,
       );
-      if (!sourceMessage) break messageBlock;
-
-      const savedMessage = GuildSavedMessages.msgToSavedMessage(sourceMessage);
-      savedMessage.channel_id = thread.id;
-      context.message = savedMessage;
+      if (sourceMessage) {
+        const savedMessage = GuildSavedMessages.msgToSavedMessage(sourceMessage);
+        savedMessage.channel_id = thread.id;
+        context.message = savedMessage;
+      }
     }
 
     pluginData.state.queue.add(() => {
