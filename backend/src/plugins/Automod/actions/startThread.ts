@@ -2,7 +2,7 @@ import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
-import { convertDelayStringToMS, tDelayString, tNullable } from "src/utils";
+import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "src/utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "src/utils/templateSafeObjects";
 import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
@@ -10,7 +10,7 @@ import { automodAction } from "../helpers";
 export const StartThreadAction = automodAction({
   configType: t.type({
     name: tNullable(t.string),
-    auto_archive: tNullable(t.number),
+    auto_archive: tDelayString,
     private: tNullable(t.boolean),
     slowmode: tNullable(tDelayString),
     limit_per_channel: tNullable(t.number),
@@ -45,12 +45,15 @@ export const StartThreadAction = automodAction({
     });
 
     const guild = await pluginData.guild;
+    const archiveSet = actionConfig.auto_archive
+      ? Math.ceil(Math.max(convertDelayStringToMS(actionConfig.auto_archive) ?? 0, 0) / MINUTES)
+      : 1400;
     let autoArchive: ThreadAutoArchiveDuration;
-    if (actionConfig.auto_archive === 1440) {
+    if (archiveSet === 1440) {
       autoArchive = ThreadAutoArchiveDuration.OneDay;
-    } else if (actionConfig.auto_archive === 4320 && guild.features.includes(GuildFeature.ThreeDayThreadArchive)) {
+    } else if (archiveSet === 4320 && guild.features.includes(GuildFeature.ThreeDayThreadArchive)) {
       autoArchive = ThreadAutoArchiveDuration.ThreeDays;
-    } else if (actionConfig.auto_archive === 10080 && guild.features.includes(GuildFeature.SevenDayThreadArchive)) {
+    } else if (archiveSet === 10080 && guild.features.includes(GuildFeature.SevenDayThreadArchive)) {
       autoArchive = ThreadAutoArchiveDuration.OneWeek;
     } else {
       autoArchive = ThreadAutoArchiveDuration.OneHour;
