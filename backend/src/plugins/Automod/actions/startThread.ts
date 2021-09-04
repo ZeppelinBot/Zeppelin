@@ -69,7 +69,7 @@ export const StartThreadAction = automodAction({
             msg: savedMessageToTemplateSafeSavedMessage(c.message!),
           }),
         );
-      const threadName = await renderThreadName(actionConfig.name ?? "{user.username}#{user.discriminator}s thread");
+      const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
       const thread = await channel.threads
         .create({
           name: threadName,
