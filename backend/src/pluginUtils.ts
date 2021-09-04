@@ -232,7 +232,7 @@ export function getBaseUrl(pluginData: AnyPluginData<any>) {
 
 export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
-  const owners = knub.getGlobalConfig().owners;
+  const owners = knub.getGlobalConfig()?.owners;
   if (!owners) {
     return false;
   }
