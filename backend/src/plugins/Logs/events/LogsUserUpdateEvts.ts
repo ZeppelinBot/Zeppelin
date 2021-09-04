@@ -17,6 +17,8 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
     const pluginData = meta.pluginData;
     const oldMember = meta.args.oldMember;
     const member = meta.args.newMember;
+    const oldRoles = [...oldMember.roles.cache.keys()];
+    const currentRoles = [...member.roles.cache.keys()];
 
     if (!oldMember || oldMember.partial) {
       return;
@@ -30,9 +32,9 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
       });
     }
 
-    if (!isEqual(oldMember.roles, member.roles)) {
-      const addedRoles = diff([...member.roles.cache.keys()], [...oldMember.roles.cache.keys()]);
-      const removedRoles = diff([...oldMember.roles.cache.keys()], [...member.roles.cache.keys()]);
+    if (!isEqual(oldRoles, currentRoles)) {
+      const addedRoles = diff(currentRoles, oldRoles);
+      const removedRoles = diff(oldRoles, currentRoles);
       let skip = false;
 
       if (
