@@ -29,17 +29,20 @@ export const MessageCreateEvt = messageSaverEvt({
       return;
     }
 
-    meta.pluginData.state.queue.add(async () => {
-      if (recentlyCreatedMessages.includes(meta.args.message.id)) {
-        console.warn(
-          `Tried to save duplicate message from messageCreate event: ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`,
-        );
-        return;
-      }
-      recentlyCreatedMessages.push(meta.args.message.id);
+    // Don't save the bot's own messages
+    if (meta.args.message.author.id === meta.pluginData.client.user?.id) {
+      return;
+    }
 
-      await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
-    });
+    if (recentlyCreatedMessages.includes(meta.args.message.id)) {
+      console.warn(
+        `Tried to save duplicate message from messageCreate event: ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`,
+      );
+      return;
+    }
+    recentlyCreatedMessages.push(meta.args.message.id);
+
+    await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },
 });
 
@@ -57,9 +60,7 @@ export const MessageUpdateEvt = messageSaverEvt({
       return;
     }
 
-    meta.pluginData.state.queue.add(async () => {
-      await meta.pluginData.state.savedMessages.saveEditFromMsg(meta.args.newMessage as Message);
-    });
+    await meta.pluginData.state.savedMessages.saveEditFromMsg(meta.args.newMessage as Message);
   },
 });
 
@@ -74,9 +75,7 @@ export const MessageDeleteEvt = messageSaverEvt({
       return;
     }
 
-    meta.pluginData.state.queue.add(async () => {
-      await meta.pluginData.state.savedMessages.markAsDeleted(msg.id);
-    });
+    await meta.pluginData.state.savedMessages.markAsDeleted(msg.id);
   },
 });
 
@@ -87,8 +86,6 @@ export const MessageDeleteBulkEvt = messageSaverEvt({
 
   async listener(meta) {
     const ids = meta.args.messages.map(m => m.id);
-    meta.pluginData.state.queue.add(async () => {
-      await meta.pluginData.state.savedMessages.markBulkAsDeleted(ids);
-    });
+    await meta.pluginData.state.savedMessages.markBulkAsDeleted(ids);
   },
 });

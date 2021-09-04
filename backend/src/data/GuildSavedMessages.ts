@@ -226,9 +226,6 @@ export class GuildSavedMessages extends BaseGuildRepository {
   }
 
   async createFromMsg(msg: Message, overrides = {}) {
-    const existingSavedMsg = await this.find(msg.id);
-    if (existingSavedMsg) return;
-
     // FIXME: Hotfix
     if (!msg.channel) {
       return;
