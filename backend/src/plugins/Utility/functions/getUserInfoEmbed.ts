@@ -36,7 +36,7 @@ export async function getUserInfoEmbed(
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
-    name: `User:  ${user.tag}`,
+    name: `${user.bot ? "Bot" : "User"}:  ${user.tag}`,
   };
 
   const avatarURL = user.displayAvatarURL();
@@ -54,7 +54,7 @@ export async function getUserInfoEmbed(
 
   if (compact) {
     embed.fields.push({
-      name: preEmbedPadding + "User information",
+      name: preEmbedPadding + `${user.bot ? "Bot" : "User"} information`,
       value: trimLines(`
           Profile: <@!${user.id}>
           Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
@@ -70,11 +70,12 @@ export async function getUserInfoEmbed(
         largest: 2,
         round: true,
       });
-      embed.fields[0].value += `\nJoined: **${joinAge} ago** (\`${prettyJoinedAt}\`)`;
+
+      embed.fields[0].value += `\n${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)`;
     } else {
       embed.fields.push({
         name: preEmbedPadding + "!! NOTE !!",
-        value: "User is not on the server",
+        value: `${user.bot ? "Bot" : "User"} is not on the server`,
       });
     }
 
@@ -82,7 +83,7 @@ export async function getUserInfoEmbed(
   }
 
   embed.fields.push({
-    name: preEmbedPadding + "User information",
+    name: preEmbedPadding + `${user.bot ? "Bot" : "User"} information`,
     value: trimLines(`
         Name: **${user.tag}**
         ID: \`${user.id}\`
@@ -107,7 +108,7 @@ export async function getUserInfoEmbed(
     embed.fields.push({
       name: preEmbedPadding + "Member information",
       value: trimLines(`
-          Joined: **${joinAge} ago** (\`${prettyJoinedAt}\`)
+          ${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)
           ${roles.length > 0 ? "Roles: " + roles.map(r => `<@&${r.id}>`).join(", ") : ""}
         `),
     });
@@ -126,7 +127,7 @@ export async function getUserInfoEmbed(
   } else {
     embed.fields.push({
       name: preEmbedPadding + "Member information",
-      value: "⚠ User is not on the server",
+      value: `⚠ ${user.bot ? "Bot" : "User"} is not on the server`,
     });
   }
   const cases = (await pluginData.state.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
