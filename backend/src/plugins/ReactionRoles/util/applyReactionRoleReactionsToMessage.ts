@@ -25,7 +25,7 @@ export async function applyReactionRoleReactionsToMessage(
 
   let targetMessage;
   try {
-    targetMessage = channel.messages.fetch(messageId, { force: true });
+    targetMessage = await channel.messages.fetch(messageId, { force: true });
   } catch (e) {
     if (isDiscordAPIError(e)) {
       if (e.code === 10008) {
