@@ -1,14 +1,21 @@
 import { Constants, Message, MessageType, Snowflake } from "discord.js";
 import { messageSaverEvt } from "../types";
 import { SECONDS } from "../../../utils";
+import moment from "moment-timezone";
 
-const recentlyCreatedMessages: Snowflake[] = [];
+const recentlyCreatedMessages: Map<Snowflake, number> = new Map();
 const recentlyCreatedMessagesToKeep = 100;
 
 setInterval(() => {
-  const toDelete = recentlyCreatedMessages.length - recentlyCreatedMessagesToKeep;
-  if (toDelete > 0) {
-    recentlyCreatedMessages.splice(0, toDelete);
+  let toDelete = recentlyCreatedMessages.size - recentlyCreatedMessagesToKeep;
+  for (const key of recentlyCreatedMessages.keys()) {
+    if (toDelete === 0) {
+      break;
+    }
+
+    recentlyCreatedMessages.delete(key);
+
+    toDelete--;
   }
 }, 60 * SECONDS);
 
@@ -34,13 +41,15 @@ export const MessageCreateEvt = messageSaverEvt({
       return;
     }
 
-    if (recentlyCreatedMessages.includes(meta.args.message.id)) {
-      console.warn(
-        `Tried to save duplicate message from messageCreate event: ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`,
-      );
+    // FIXME: Remove debug code
+    if (recentlyCreatedMessages.has(meta.args.message.id)) {
+      const context = `${meta.pluginData.state.debugId} / ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`;
+      const timestamp = moment(recentlyCreatedMessages.get(meta.args.message.id)!).format("HH:mm:ss.SSS");
+      // tslint:disable-next-line:no-console
+      console.warn(`Tried to save duplicate message from messageCreate event: ${context} / saved at: ${timestamp}`);
       return;
     }
-    recentlyCreatedMessages.push(meta.args.message.id);
+    recentlyCreatedMessages.set(meta.args.message.id, Date.now());
 
     await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },

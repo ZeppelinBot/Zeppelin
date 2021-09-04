@@ -21,6 +21,8 @@ const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   ],
 };
 
+let debugId = 0;
+
 export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()({
   name: "message_saver",
   showInDocs: false,
@@ -45,5 +47,6 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.debugId = ++debugId;
   },
 });
