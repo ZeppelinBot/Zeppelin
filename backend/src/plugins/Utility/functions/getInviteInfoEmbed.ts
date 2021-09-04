@@ -65,32 +65,33 @@ export async function getInviteInfoEmbed(
       `),
       inline: true,
     });
+    if (invite.channel) {
+      const channelName =
+        invite.channel.type === ChannelTypeStrings.VOICE ? `🔉 ${invite.channel.name}` : `#${invite.channel.name}`;
 
-    const channelName =
-      invite.channel.type === ChannelTypeStrings.VOICE ? `🔉 ${invite.channel.name}` : `#${invite.channel.name}`;
+      const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
+      const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
+      const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
+        largest: 2,
+        round: true,
+      });
 
-    const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-    const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
-    const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
-      largest: 2,
-      round: true,
-    });
-
-    let channelInfo = trimLines(`
+      let channelInfo = trimLines(`
         Name: **${channelName}**
         ID: \`${invite.channel.id}\`
         Created: **${channelAge} ago**
     `);
 
-    if (invite.channel.type !== ChannelTypeStrings.VOICE) {
-      channelInfo += `\nMention: <#${invite.channel.id}>`;
-    }
+      if (invite.channel.type !== ChannelTypeStrings.VOICE) {
+        channelInfo += `\nMention: <#${invite.channel.id}>`;
+      }
 
-    embed.fields.push({
-      name: preEmbedPadding + "Channel information",
-      value: channelInfo,
-      inline: true,
-    });
+      embed.fields.push({
+        name: preEmbedPadding + "Channel information",
+        value: channelInfo,
+        inline: true,
+      });
+    }
 
     if (invite.inviter) {
       embed.fields.push({
