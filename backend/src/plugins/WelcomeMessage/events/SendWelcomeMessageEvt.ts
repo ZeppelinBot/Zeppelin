@@ -68,7 +68,9 @@ export const SendWelcomeMessageEvt = welcomeMessageEvt({
       if (!channel || !(channel instanceof TextChannel)) return;
 
       try {
-        await createChunkedMessage(channel, formatted);
+        await createChunkedMessage(channel, formatted, {
+          parse: ["users"],
+        });
       } catch {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
           body: `Failed send a welcome message for ${verboseUserMention(member.user)} to ${verboseChannelMention(
