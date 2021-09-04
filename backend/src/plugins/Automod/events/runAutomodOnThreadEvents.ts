@@ -1,5 +1,4 @@
 import { typedGuildEventListener } from "knub";
-import { GuildSavedMessages } from "../../../data/GuildSavedMessages";
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
 
