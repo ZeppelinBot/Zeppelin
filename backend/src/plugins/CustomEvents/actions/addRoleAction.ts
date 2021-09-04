@@ -28,9 +28,11 @@ export async function addRoleAction(
   if (event.trigger.type === "command" && !canActOn(pluginData, eventData.msg.member, target)) {
     throw new ActionError("Missing permissions");
   }
-
-  const rolesToAdd = Array.isArray(action.role) ? action.role : [action.role];
-  await target.edit({
-    roles: Array.from(new Set([...target.roles.cache.values(), ...rolesToAdd])) as Snowflake[],
-  });
+  const rolesToAdd = (Array.isArray(action.role) ? action.role : [action.role]).filter(
+    id => !target.roles.cache.has(id),
+  );
+  if (rolesToAdd.length === 0) {
+    throw new ActionError("Target already has the role(s) specified");
+  }
+  await target.roles.add(rolesToAdd);
 }
