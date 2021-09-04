@@ -1,7 +1,6 @@
 import { MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
@@ -25,6 +24,7 @@ export const ReplyAction = automodAction({
     t.type({
       text: tMessageContent,
       auto_delete: tNullable(t.union([tDelayString, t.number])),
+      use_inline_reply: tNullable(t.boolean),
     }),
   ]),
 
@@ -51,7 +51,7 @@ export const ReplyAction = automodAction({
       const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean)))) as User[];
       const user = users[0];
 
-      const renderReplyText = async str =>
+      const renderReplyText = async (str: string) =>
         renderTemplate(
           str,
           new TemplateSafeValueContainer({
@@ -94,16 +94,26 @@ export const ReplyAction = automodAction({
         }
 
         const messageContent = validateAndParseMessageContent(formatted);
-        const replyMsg = await channel.send({
+
+        const messageOpts: MessageOptions = {
           ...messageContent,
           allowedMentions: {
             users: [user.id],
           },
-        });
+        };
+
+        if (typeof actionConfig !== "string" && actionConfig.use_inline_reply) {
+          messageOpts.reply = {
+            failIfNotExists: false,
+            messageReference: _contexts[0].message!.id,
+          };
+        }
+
+        const replyMsg = await channel.send(messageOpts);
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
-          setTimeout(() => replyMsg.delete().catch(noop), delay);
+          setTimeout(() => !replyMsg.deleted && replyMsg.delete().catch(noop), delay);
         }
       }
     }
