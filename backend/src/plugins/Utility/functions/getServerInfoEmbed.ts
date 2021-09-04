@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, Snowflake } from "discord.js";
+import { MessageEmbedOptions, PremiumTier, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -18,6 +18,13 @@ import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
+
+const PremiumTiers: Record<PremiumTier, number> = {
+  NONE: 0,
+  TIER_1: 1,
+  TIER_2: 2,
+  TIER_3: 3,
+};
 
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
@@ -179,20 +186,22 @@ export async function getServerInfoEmbed(
   }
 
   if (restGuild) {
+    const premiumTierValue = PremiumTiers[restGuild.premiumTier];
+
     const maxEmojis =
       {
         0: 50,
         1: 100,
         2: 150,
         3: 250,
-      }[restGuild.premiumTier] || 50;
+      }[premiumTierValue] ?? 50;
     const maxStickers =
       {
         0: 0,
         1: 15,
         2: 30,
         3: 60,
-      }[restGuild.premiumTier] || 0;
+      }[premiumTierValue] ?? 0;
 
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
@@ -202,7 +211,9 @@ export async function getServerInfoEmbed(
   }
 
   if (thisServer) {
-    otherStats.push(`Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${thisServer.premiumTier})`);
+    otherStats.push(
+      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${PremiumTiers[thisServer.premiumTier]})`,
+    );
   }
 
   embed.fields.push({
