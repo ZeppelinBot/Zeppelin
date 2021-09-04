@@ -51,13 +51,15 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
     state.debugId = ++debugId;
 
     if (debugGuilds.includes(pluginData.guild.id)) {
-      console.log(`MessageSaverPlugin::beforeLoad (${state.debugId}): ${pluginData.guild.id}`);
+      console.log(`[!! DEBUG !!] MessageSaverPlugin::beforeLoad (${state.debugId}): ${pluginData.guild.id}`);
     }
   },
 
   beforeUnload(pluginData) {
     if (debugGuilds.includes(pluginData.guild.id)) {
-      console.log(`MessageSaverPlugin::beforeUnload (${pluginData.state.debugId}): ${pluginData.guild.id}`);
+      console.log(
+        `[!! DEBUG !!] MessageSaverPlugin::beforeUnload (${pluginData.state.debugId}): ${pluginData.guild.id}`,
+      );
     }
   },
 });

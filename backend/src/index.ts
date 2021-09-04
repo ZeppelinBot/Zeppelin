@@ -300,6 +300,22 @@ connect().then(async () => {
     startUptimeCounter();
   });
 
+  const debugGuilds = ["877581055920603238", "348468156597010432", "134286179121102848"];
+  bot.on("guildLoaded", guildId => {
+    if (!debugGuilds.includes(guildId)) {
+      return;
+    }
+
+    console.log(`[!! DEBUG !!] LOADED GUILD ${guildId}`);
+  });
+  bot.on("guildUnloaded", guildId => {
+    if (!debugGuilds.includes(guildId)) {
+      return;
+    }
+
+    console.log(`[!! DEBUG !!] UNLOADED GUILD ${guildId}`);
+  });
+
   bot.initialize();
   logger.info("Bot Initialized");
   logger.info("Logging in...");
