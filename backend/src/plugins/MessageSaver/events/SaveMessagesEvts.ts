@@ -45,7 +45,7 @@ export const MessageCreateEvt = messageSaverEvt({
     if (recentlyCreatedMessages.has(meta.args.message.id)) {
       const ourDebugId = meta.pluginData.state.debugId;
       const oldDebugId = recentlyCreatedMessages.get(meta.args.message.id)![0];
-      const context = `${ourDebugId} : ${oldDebugId} / ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`;
+      const context = `${ourDebugId} : ${oldDebugId} / ${meta.pluginData.guild.id} : ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`;
       const timestamp = moment(recentlyCreatedMessages.get(meta.args.message.id)![1]).format("HH:mm:ss.SSS");
       // tslint:disable-next-line:no-console
       console.warn(`Tried to save duplicate message from messageCreate event: ${context} / saved at: ${timestamp}`);
