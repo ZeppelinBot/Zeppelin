@@ -62,6 +62,8 @@ const PluginOverrideCriteriaType: t.Type<PluginOverrideCriteria<unknown>> = t.re
 const validTopLevelOverrideKeys = [
   "channel",
   "category",
+  "thread",
+  "is_thread",
   "level",
   "user",
   "role",
