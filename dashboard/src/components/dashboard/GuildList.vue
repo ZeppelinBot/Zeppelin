@@ -17,9 +17,8 @@
               <div class="text-gray-600 text-sm leading-tight">{{ guild.id }}</div>
             </div>
             <div class="pt-1">
-              <span class="inline-block bg-gray-700 rounded px-1 opacity-50 select-none">Info</span>
               <router-link class="inline-block bg-gray-700 rounded px-1 hover:bg-gray-800" :to="'/dashboard/guilds/' + guild.id + '/config'">Config</router-link>
-              <span class="inline-block bg-gray-700 rounded px-1 opacity-50 select-none">Access</span>
+              <router-link v-if="canManageAccess(guild.id)" class="inline-block bg-gray-700 rounded px-1 hover:bg-gray-800" :to="'/dashboard/guilds/' + guild.id + '/access'">Access</router-link>
             </div>
           </div>
         </div>
@@ -28,12 +27,15 @@
 	</div>
 </template>
 
-<script>
-  import {mapState} from "vuex";
+<script lang="ts">
+  import { mapState } from "vuex";
+  import { ApiPermissions, hasPermission } from "@shared/apiPermissions";
+  import { AuthState, GuildState } from "../../store/types";
 
   export default {
     async mounted() {
       await this.$store.dispatch("guilds/loadAvailableGuilds");
+      await this.$store.dispatch("guilds/loadMyPermissionAssignments");
       this.loading = false;
     },
     data() {
@@ -41,7 +43,7 @@
     },
     computed: {
       ...mapState('guilds', {
-        guilds: state => {
+        guilds: (state: GuildState) => {
           const guilds = Array.from(state.available.values());
           guilds.sort((a, b) => {
             if (a.name > b.name) return 1;
@@ -52,7 +54,20 @@
           });
           return guilds;
         },
+
+        guildPermissionAssignments: (state: GuildState) => state.guildPermissionAssignments,
       }),
+
+      ...mapState('auth', {
+        userId: (state: AuthState) => state.userId!,
+      }),
+    },
+    methods: {
+      canManageAccess(guildId: string) {
+        const guildPermissions = this.guildPermissionAssignments[guildId] || [];
+        const myPermissions = guildPermissions.find(p => p.type === "USER" && p.target_id === this.userId) || null;
+        return myPermissions && hasPermission(new Set(myPermissions.permissions), ApiPermissions.ManageAccess);
+      },
     },
   };
 </script>

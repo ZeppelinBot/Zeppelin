@@ -5,7 +5,7 @@ export class AddExpiresAtToApiPermissions1630837386329 implements MigrationInter
     await queryRunner.addColumns("api_permissions", [
       new TableColumn({
         name: "expires_at",
-        type: "boolean",
+        type: "datetime",
         isNullable: true,
         default: null,
       }),

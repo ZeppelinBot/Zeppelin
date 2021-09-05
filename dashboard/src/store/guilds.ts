@@ -11,7 +11,6 @@ export const GuildStore: Module<GuildState, RootState> = {
     availableGuildsLoadStatus: LoadStatus.None,
     available: new Map(),
     configs: {},
-    myPermissions: {},
     guildPermissionAssignments: {},
   },
 
@@ -48,9 +47,14 @@ export const GuildStore: Module<GuildState, RootState> = {
       await post(`guilds/${guildId}/config`, { config });
     },
 
-    async checkPermission({ commit }, { guildId, permission }) {
-      const result = await post(`guilds/${guildId}/check-permission`, { permission });
-      commit("setMyPermission", { guildId, permission, value: result.result });
+    async loadMyPermissionAssignments({ commit }) {
+      const myPermissionAssignments = await get(`guilds/my-permissions`);
+      for (const permissionAssignment of myPermissionAssignments) {
+        commit("setGuildPermissionAssignments", {
+          guildId: permissionAssignment.guild_id,
+          permissionAssignments: [permissionAssignment],
+        });
+      }
     },
 
     async loadGuildPermissionAssignments({ commit }, guildId) {
@@ -58,8 +62,9 @@ export const GuildStore: Module<GuildState, RootState> = {
       commit("setGuildPermissionAssignments", { guildId, permissionAssignments });
     },
 
-    async setTargetPermissions({ commit }, { guildId, targetId, type, permissions }) {
-      commit("setTargetPermissions", { guildId, targetId, type, permissions });
+    async setTargetPermissions({ commit }, { guildId, targetId, type, permissions, expiresAt }) {
+      await post(`guilds/${guildId}/set-target-permissions`, { guildId, targetId, type, permissions, expiresAt });
+      commit("setTargetPermissions", { guildId, targetId, type, permissions, expiresAt });
     },
   },
 
@@ -77,12 +82,11 @@ export const GuildStore: Module<GuildState, RootState> = {
       Vue.set(state.configs, guildId, config);
     },
 
-    setMyPermission(state: GuildState, { guildId, permission, value }) {
-      Vue.set(state.myPermissions, guildId, state.myPermissions[guildId] || {});
-      Vue.set(state.myPermissions[guildId], permission, value);
-    },
-
     setGuildPermissionAssignments(state: GuildState, { guildId, permissionAssignments }) {
+      if (!state.guildPermissionAssignments) {
+        Vue.set(state, "guildPermissionAssignments", {});
+      }
+
       Vue.set(
         state.guildPermissionAssignments,
         guildId,
@@ -93,12 +97,29 @@ export const GuildStore: Module<GuildState, RootState> = {
       );
     },
 
-    setTargetPermissions(state: GuildState, { guildId, targetId, type, permissions }) {
+    setTargetPermissions(state: GuildState, { guildId, targetId, type, permissions, expiresAt }) {
       const guildPermissionAssignments = state.guildPermissionAssignments[guildId] || [];
-      const itemToEdit = guildPermissionAssignments.find(p => p.target_id === targetId && p.type === type);
-      if (!itemToEdit) return;
+      if (permissions.length === 0) {
+        // No permissions -> remove permission assignment
+        guildPermissionAssignments.splice(
+          guildPermissionAssignments.findIndex(p => p.target_id === targetId && p.type === type),
+          1,
+        );
+      } else {
+        // Update/add permission assignment
+        const itemToEdit = guildPermissionAssignments.find(p => p.target_id === targetId && p.type === type);
+        if (itemToEdit) {
+          itemToEdit.permissions = new Set(permissions);
+        } else {
+          state.guildPermissionAssignments[guildId].push({
+            type,
+            target_id: targetId,
+            permissions: new Set(permissions),
+            expires_at: expiresAt,
+          });
+        }
+      }
 
-      itemToEdit.permissions = permissions;
       state.guildPermissionAssignments = { ...state.guildPermissionAssignments };
     },
   },

@@ -8,7 +8,7 @@ export class ApiPermissionAssignment {
   @PrimaryColumn()
   guild_id: string;
 
-  @Column({ type: "string" })
+  @Column({ type: String })
   @PrimaryColumn()
   type: ApiPermissionTypes;
 
@@ -19,8 +19,8 @@ export class ApiPermissionAssignment {
   @Column("simple-array")
   permissions: string[];
 
-  @Column()
-  expires_at: string;
+  @Column({ type: String, nullable: true })
+  expires_at: string | null;
 
   @ManyToOne(
     type => ApiUserInfo,
