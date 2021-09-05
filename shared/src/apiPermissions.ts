@@ -13,27 +13,26 @@ const reverseApiPermissions = Object.entries(ApiPermissions).reduce((map, [key, 
 
 export const permissionNames = {
   [ApiPermissions.Owner]: "Server owner",
-  [ApiPermissions.ManageAccess]: "Manage dashboard access",
-  [ApiPermissions.EditConfig]: "Edit config",
+  [ApiPermissions.ManageAccess]: "Bot manager",
+  [ApiPermissions.EditConfig]: "Bot operator",
   [ApiPermissions.ReadConfig]: "Read config",
   [ApiPermissions.ViewGuild]: "View server",
 };
 
 export type TPermissionHierarchy = Array<ApiPermissions | [ApiPermissions, TPermissionHierarchy]>;
 
-// prettier-ignore-start
+// prettier-ignore
 export const permissionHierarchy: TPermissionHierarchy = [
-  [
-    ApiPermissions.Owner,
-    [
-      [
-        ApiPermissions.ManageAccess,
-        [[ApiPermissions.EditConfig, [[ApiPermissions.ReadConfig, [ApiPermissions.ViewGuild]]]]],
-      ],
-    ],
-  ],
+  [ApiPermissions.Owner, [
+    [ApiPermissions.ManageAccess, [
+      [ApiPermissions.EditConfig, [
+        [ApiPermissions.ReadConfig, [
+          ApiPermissions.ViewGuild,
+        ]],
+      ]],
+    ]],
+  ]],
 ];
-// prettier-ignore-end
 
 export function permissionArrToSet(permissions: string[]): Set<ApiPermissions> {
   return new Set(permissions.filter(p => reverseApiPermissions[p])) as Set<ApiPermissions>;
