@@ -55,4 +55,12 @@ export class ApiPermissionAssignments extends BaseRepository {
   removeUser(guildId, userId) {
     return this.apiPermissions.delete({ guild_id: guildId, type: ApiPermissionTypes.User, target_id: userId });
   }
+
+  async clearExpiredPermissions() {
+    await this.apiPermissions
+      .createQueryBuilder()
+      .where("expires_at IS NOT NULL")
+      .andWhere("expires_at <= NOW()")
+      .delete();
+  }
 }

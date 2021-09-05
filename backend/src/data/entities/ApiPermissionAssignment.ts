@@ -18,6 +18,9 @@ export class ApiPermissionAssignment {
   @Column("simple-array")
   permissions: string[];
 
+  @Column()
+  expires_at: string;
+
   @ManyToOne(
     type => ApiUserInfo,
     userInfo => userInfo.permissionAssignments,
