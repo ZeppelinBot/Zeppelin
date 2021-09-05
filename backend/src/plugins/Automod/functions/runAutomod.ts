@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { availableActions } from "../actions/availableActions";
 import { CleanAction } from "../actions/clean";
@@ -11,8 +11,14 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
   const user = context.user || (userId && pluginData.client.users!.cache.get(userId as Snowflake));
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
-  const channelId = context.message?.channel_id;
-  const channel = channelId ? (pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel) : null;
+
+  const channelIdOrThreadId = context.message?.channel_id;
+  const channelOrThread = channelIdOrThreadId
+    ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
+    : null;
+  const channelId = channelOrThread?.isThread() ? channelOrThread.parent?.id : channelIdOrThreadId;
+  const threadId = channelOrThread?.isThread() ? channelOrThread.id : null;
+  const channel = channelOrThread?.isThread() ? channelOrThread.parent : channelOrThread;
   const categoryId = channel?.parentId;
 
   // Don't apply Automod on Zeppelin itself
@@ -23,6 +29,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const config = await pluginData.config.getMatchingConfig({
     channelId,
     categoryId,
+    threadId,
     userId,
     member,
   });
