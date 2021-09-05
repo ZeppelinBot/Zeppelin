@@ -20,7 +20,7 @@ export const NicknameCmd = utilityCmd({
       if (!args.member.nickname) {
         msg.channel.send(`<@!${args.member.id}> does not have a nickname`);
       } else {
-        msg.channel.send(`The nickname of <@!${args.member.id}> is **${Util.escapeBold(args.nickname)}**`);
+        msg.channel.send(`The nickname of <@!${args.member.id}> is **${Util.escapeBold(args.member.nickname)}**`);
       }
       return;
     }
