@@ -27,7 +27,12 @@ export async function actualUnmuteCmd(
     pp = msg.author;
   }
 
+  const config = pluginData.config.get();
   const reason = args.reason ? formatReasonWithAttachments(args.reason, [...msg.attachments.values()]) : undefined;
+  if (!reason && config.require_reason.includes("unmute")) {
+    sendErrorMessage(pluginData, msg.channel as TextChannel, "You must include a reason in your unmute");
+    return;
+  }
 
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
   const result = await mutesPlugin.unmuteUser(user.id, args.time, {

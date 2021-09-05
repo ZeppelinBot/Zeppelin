@@ -84,6 +84,7 @@ const defaultOptions = {
     can_deletecase: false,
     can_act_as_other: false,
     create_cases_for_manual_actions: true,
+    require_reason: ["warn"],
   },
   overrides: [
     {

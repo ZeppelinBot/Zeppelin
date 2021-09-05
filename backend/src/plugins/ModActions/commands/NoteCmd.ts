@@ -32,7 +32,12 @@ export const NoteCmd = modActionsCmd({
     }
 
     const userName = user.tag;
-    const reason = formatReasonWithAttachments(args.note, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    if (!reason && config.require_reason.includes("note")) {
+      sendErrorMessage(pluginData, msg.channel, "You must include a reason in your note");
+      return;
+    }
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const createdCase = await casesPlugin.createCase({
