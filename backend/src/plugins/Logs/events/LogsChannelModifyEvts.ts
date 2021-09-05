@@ -5,6 +5,8 @@ import { logsEvt } from "../types";
 import { logChannelCreate } from "../logFunctions/logChannelCreate";
 import { logChannelDelete } from "../logFunctions/logChannelDelete";
 import { logChannelUpdate } from "../logFunctions/logChannelUpdate";
+import { TextChannel, VoiceChannel } from "discord.js";
+import { filterObject } from "../../../utils/filterObject";
 
 export const LogsChannelCreateEvt = logsEvt({
   event: "channelCreate",
@@ -26,6 +28,15 @@ export const LogsChannelDeleteEvt = logsEvt({
   },
 });
 
+const validChannelDiffProps: Set<keyof TextChannel | keyof VoiceChannel> = new Set([
+  "name",
+  "parentId",
+  "nsfw",
+  "rateLimitPerUser",
+  "topic",
+  "bitrate",
+]);
+
 export const LogsChannelUpdateEvt = logsEvt({
   event: "channelUpdate",
 
@@ -34,7 +45,9 @@ export const LogsChannelUpdateEvt = logsEvt({
       return;
     }
 
-    const diff = getScalarDifference(meta.args.oldChannel, meta.args.newChannel);
+    const oldChannelDiffProps = filterObject(meta.args.oldChannel || {}, (v, k) => validChannelDiffProps.has(k));
+    const newChannelDiffProps = filterObject(meta.args.newChannel, (v, k) => validChannelDiffProps.has(k));
+    const diff = getScalarDifference(oldChannelDiffProps, newChannelDiffProps);
     const differenceString = differenceToString(diff);
 
     if (differenceString.trim() === "") {
