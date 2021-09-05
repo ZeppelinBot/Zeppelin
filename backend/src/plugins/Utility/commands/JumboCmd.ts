@@ -31,7 +31,7 @@ function resizeBuffer(input: Buffer, width: number, height: number): Buffer {
   return photonImageToBuffer(photonImage);
 }
 
-const CDN_URL = "https://twemoji.maxcdn.com/2/svg";
+const CDN_URL = "https://twemoji.maxcdn.com/";
 
 export const JumboCmd = utilityCmd({
   trigger: "jumbo",
@@ -71,18 +71,19 @@ export const JumboCmd = utilityCmd({
         file = new MessageAttachment(image, `emoji${extension}`);
       }
     } else {
-      let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
+      let url = `${twemoji.base}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
       let image: Buffer | undefined;
       try {
+        const downloadedBuffer = await getBufferFromUrl(url);
         image = resizeBuffer(await getBufferFromUrl(url), size, size);
-      } catch {
-        if (url.toLocaleLowerCase().endsWith("fe0f.svg")) {
-          url = url.slice(0, url.lastIndexOf("-fe0f")) + ".svg";
+      } catch (err) {
+        if (url.toLocaleLowerCase().endsWith("fe0f.png")) {
+          url = url.slice(0, url.lastIndexOf("-fe0f")) + ".png";
           image = await resizeBuffer(await getBufferFromUrl(url), size, size);
         }
       }
       if (!image) {
-        sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
+        sendErrorMessage(pluginData, msg.channel, "Error occurred while jumboing default emoji");
         return;
       }
 
