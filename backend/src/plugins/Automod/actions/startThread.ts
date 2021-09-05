@@ -2,6 +2,7 @@ import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
+import { ChannelTypeStrings } from "src/types";
 import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "src/utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "src/utils/templateSafeObjects";
 import { noop } from "../../../utils";
@@ -25,17 +26,14 @@ export const StartThreadAction = automodAction({
     const threads = contexts.filter(c => {
       if (!c.message || !c.user) return false;
       const channel = pluginData.guild.channels.cache.get(c.message.channel_id);
-      if (channel?.type !== "GUILD_TEXT" || !channel.isText()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
+      if (channel?.type !== ChannelTypeStrings.TEXT || !channel.isText()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
       // check against max threads per channel
       if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
         const threadCount = [
           ...channel.threads.cache
             .filter(
               tr =>
-                tr.ownerId === pluginData.client.application!.id &&
-                !tr.deleted &&
-                !tr.archived &&
-                tr.parentId === channel.id,
+                tr.ownerId === pluginData.client.user!.id && !tr.deleted && !tr.archived && tr.parentId === channel.id,
             )
             .keys(),
         ].length; // very short line, yes yes
@@ -44,29 +42,35 @@ export const StartThreadAction = automodAction({
       return channel.messages.cache.has(c.message.id);
     });
 
-    const guild = await pluginData.guild;
+    const guild = pluginData.guild;
     const archiveSet = actionConfig.auto_archive
       ? Math.ceil(Math.max(convertDelayStringToMS(actionConfig.auto_archive) ?? 0, 0) / MINUTES)
       : 1400;
     let autoArchive: ThreadAutoArchiveDuration;
-    if (archiveSet === 1440) {
+    if (archiveSet === ThreadAutoArchiveDuration.OneDay) {
       autoArchive = ThreadAutoArchiveDuration.OneDay;
-    } else if (archiveSet === 4320 && guild.features.includes(GuildFeature.ThreeDayThreadArchive)) {
+    } else if (
+      archiveSet === ThreadAutoArchiveDuration.ThreeDays &&
+      guild.features.includes(GuildFeature.ThreeDayThreadArchive)
+    ) {
       autoArchive = ThreadAutoArchiveDuration.ThreeDays;
-    } else if (archiveSet === 10080 && guild.features.includes(GuildFeature.SevenDayThreadArchive)) {
+    } else if (
+      archiveSet === ThreadAutoArchiveDuration.OneWeek &&
+      guild.features.includes(GuildFeature.SevenDayThreadArchive)
+    ) {
       autoArchive = ThreadAutoArchiveDuration.OneWeek;
     } else {
       autoArchive = ThreadAutoArchiveDuration.OneHour;
     }
 
-    for (const c of threads) {
-      const channel = pluginData.guild.channels.cache.get(c.message!.channel_id) as TextChannel;
-      const renderThreadName = async str =>
+    for (const threadContext of threads) {
+      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as TextChannel;
+      const renderThreadName = async (str: string) =>
         renderTemplate(
           str,
           new TemplateSafeValueContainer({
-            user: userToTemplateSafeUser(c.user!),
-            msg: savedMessageToTemplateSafeSavedMessage(c.message!),
+            user: userToTemplateSafeUser(threadContext.user!),
+            msg: savedMessageToTemplateSafeSavedMessage(threadContext.message!),
           }),
         );
       const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
@@ -76,10 +80,12 @@ export const StartThreadAction = automodAction({
           autoArchiveDuration: autoArchive,
           type:
             actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-              ? "GUILD_PRIVATE_THREAD"
-              : "GUILD_PUBLIC_THREAD",
+              ? ChannelTypeStrings.PRIVATE_THREAD
+              : ChannelTypeStrings.PUBLIC_THREAD,
           startMessage:
-            !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads) ? c.message!.id : undefined,
+            !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
+              ? threadContext.message!.id
+              : undefined,
         })
         .catch(noop);
       if (actionConfig.slowmode && thread) {
