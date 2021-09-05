@@ -11,5 +11,8 @@ git pull
 nvm use
 npm ci
 npm run build
-rm -r "$TARGET_DIR/*"
-cp -R dist/* "$TARGET_DIR"
+rm -r $TARGET_DIR/*
+cp -R dist/* $TARGET_DIR
+
+# Return
+cd ..
