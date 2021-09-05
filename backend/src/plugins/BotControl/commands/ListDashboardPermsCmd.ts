@@ -7,11 +7,8 @@ import { resolveUser } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const ListDashboardPermsCmd = botControlCmd({
-  trigger: ["list_dashboard_permissions", "list_dashboard_perms", "list_dash_permissionss", "list_dash_perms"],
-  permission: null,
-  config: {
-    preFilters: [isOwnerPreFilter],
-  },
+  trigger: ["list_dashboard_permissions", "list_dashboard_perms", "list_dash_permissions", "list_dash_perms"],
+  permission: "can_list_dashboard_perms",
 
   signature: {
     guildId: ct.string({ option: true, shortcut: "g" }),

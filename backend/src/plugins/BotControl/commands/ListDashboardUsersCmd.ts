@@ -6,10 +6,7 @@ import { botControlCmd } from "../types";
 
 export const ListDashboardUsersCmd = botControlCmd({
   trigger: ["list_dashboard_users"],
-  permission: null,
-  config: {
-    preFilters: [isOwnerPreFilter],
-  },
+  permission: "can_list_dashboard_perms",
 
   signature: {
     guildId: ct.string(),
@@ -23,13 +20,21 @@ export const ListDashboardUsersCmd = botControlCmd({
     }
 
     const dashboardUsers = await pluginData.state.apiPermissionAssignments.getByGuildId(guild.id);
-    const users = await Promise.all(dashboardUsers.map(perm => resolveUser(pluginData.client, perm.target_id)));
-    const userNameList = users.map(user => `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`);
+    const users = await Promise.all(
+      dashboardUsers.map(async perm => ({
+        user: await resolveUser(pluginData.client, perm.target_id),
+        permission: perm,
+      })),
+    );
+    const userNameList = users.map(
+      ({ user, permission }) =>
+        `<@!${user.id}> (**${user.tag}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
+    );
 
     sendSuccessMessage(
       pluginData,
       msg.channel as TextChannel,
-      `The following users have dashboard access for **${guild.name}**:\n\n${userNameList}`,
+      `The following users have dashboard access for **${guild.name}**:\n\n${userNameList.join("\n")}`,
       {},
     );
   },

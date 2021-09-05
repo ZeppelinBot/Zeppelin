@@ -27,6 +27,7 @@ const defaultOptions = {
     can_eligible: false,
     can_performance: false,
     can_add_server_from_invite: false,
+    can_list_dashboard_perms: false,
     update_cmd: null,
   },
 };
