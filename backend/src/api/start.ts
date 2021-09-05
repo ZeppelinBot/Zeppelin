@@ -6,6 +6,7 @@ import { initAuth } from "./auth";
 import { initDocs } from "./docs";
 import { initGuildsAPI } from "./guilds";
 import { clientError, error, notFound } from "./responses";
+import { startBackgroundTasks } from "./tasks";
 
 const app = express();
 
@@ -47,3 +48,5 @@ app.use((req, res, next) => {
 
 const port = (process.env.PORT && parseInt(process.env.PORT, 10)) || 3000;
 app.listen(port, "0.0.0.0", () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
+
+startBackgroundTasks();
