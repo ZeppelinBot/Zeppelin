@@ -19,12 +19,14 @@ import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
 import { PerformanceCmd } from "./commands/PerformanceCmd";
+import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
 
 const defaultOptions = {
   config: {
     can_use: false,
     can_eligible: false,
     can_performance: false,
+    can_add_server_from_invite: false,
     update_cmd: null,
   },
 };
@@ -48,6 +50,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
     ListDashboardPermsCmd,
     EligibleCmd,
     PerformanceCmd,
+    AddServerFromInviteCmd,
   ],
 
   async afterLoad(pluginData) {

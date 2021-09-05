@@ -250,6 +250,13 @@ connect().then(async () => {
 
       async getConfig(id) {
         const key = id === "global" ? "global" : `guild-${id}`;
+        if (id !== "global") {
+          const allowedGuild = await allowedGuilds.find(id);
+          if (!allowedGuild) {
+            return {};
+          }
+        }
+
         const row = await guildConfigs.getActiveByKey(key);
         if (row) {
           try {
