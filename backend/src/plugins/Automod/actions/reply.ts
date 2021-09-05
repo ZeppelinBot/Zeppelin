@@ -24,7 +24,7 @@ export const ReplyAction = automodAction({
     t.type({
       text: tMessageContent,
       auto_delete: tNullable(t.union([tDelayString, t.number])),
-      use_inline_reply: tNullable(t.boolean),
+      inline: tNullable(t.boolean),
     }),
   ]),
 
@@ -102,7 +102,7 @@ export const ReplyAction = automodAction({
           },
         };
 
-        if (typeof actionConfig !== "string" && actionConfig.use_inline_reply) {
+        if (typeof actionConfig !== "string" && actionConfig.inline) {
           messageOpts.reply = {
             failIfNotExists: false,
             messageReference: _contexts[0].message!.id,
