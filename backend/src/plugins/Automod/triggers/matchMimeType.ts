@@ -30,7 +30,8 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
     if (!attachments) return null;
 
     for (const attachment of attachments) {
-      const { contentType } = attachment;
+      const { contentType: rawContentType } = attachment;
+      const contentType = (rawContentType || "").split(";")[0]; // Remove "; charset=utf8" and similar from the end
 
       const blacklist = trigger.blacklist_enabled
         ? (trigger.mime_type_blacklist ?? []).map(_t => _t.toLowerCase())
