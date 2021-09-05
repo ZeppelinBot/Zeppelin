@@ -1,9 +1,11 @@
 import * as t from "io-ts";
-import { GuildPluginData } from "knub";
+import { GuildPluginData, typedGuildEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { MINUTES } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildInfoSaverPluginType } from "./types";
+import { Guild } from "discord.js";
+import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 
 export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
   name: "guild_info_saver",
@@ -11,13 +13,18 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
 
   configSchema: t.type({}),
 
-  beforeLoad(pluginData) {
-    pluginData.state.allowedGuilds = new AllowedGuilds();
-  },
+  events: [
+    typedGuildEventListener({
+      event: "guildUpdate",
+      listener({ args }) {
+        void updateGuildInfo(args.newGuild);
+      },
+    }),
+  ],
 
   afterLoad(pluginData) {
-    updateGuildInfo(pluginData);
-    pluginData.state.updateInterval = setInterval(() => updateGuildInfo(pluginData), 60 * MINUTES);
+    void updateGuildInfo(pluginData.guild);
+    pluginData.state.updateInterval = setInterval(() => updateGuildInfo(pluginData.guild), 60 * MINUTES);
   },
 
   beforeUnload(pluginData) {
@@ -25,11 +32,13 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
   },
 });
 
-function updateGuildInfo(pluginData: GuildPluginData<GuildInfoSaverPluginType>) {
-  pluginData.state.allowedGuilds.updateInfo(
-    pluginData.guild.id,
-    pluginData.guild.name,
-    pluginData.guild.iconURL(),
-    pluginData.guild.ownerId,
-  );
+async function updateGuildInfo(guild: Guild) {
+  const allowedGuilds = new AllowedGuilds();
+  const existingData = (await allowedGuilds.find(guild.id))!;
+  allowedGuilds.updateInfo(guild.id, guild.name, guild.iconURL(), guild.ownerId);
+
+  if (existingData.owner_id !== guild.ownerId || existingData.created_at === existingData.updated_at) {
+    const apiPermissions = new ApiPermissionAssignments();
+    apiPermissions.applyOwnerChange(guild.id, guild.ownerId);
+  }
 }

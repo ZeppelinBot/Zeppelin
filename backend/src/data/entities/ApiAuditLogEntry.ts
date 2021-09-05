@@ -14,7 +14,7 @@ export class ApiAuditLogEntry<TEventType extends AuditLogEventType> {
   @Column()
   author_id: string;
 
-  @Column()
+  @Column({ type: String })
   event_type: TEventType;
 
   @Column("simple-json")
