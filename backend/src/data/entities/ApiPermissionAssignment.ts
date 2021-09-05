@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { ApiUserInfo } from "./ApiUserInfo";
+import { ApiPermissionTypes } from "../ApiPermissionAssignments";
 
 @Entity("api_permissions")
 export class ApiPermissionAssignment {
@@ -7,9 +8,9 @@ export class ApiPermissionAssignment {
   @PrimaryColumn()
   guild_id: string;
 
-  @Column()
+  @Column({ type: "string" })
   @PrimaryColumn()
-  type: string;
+  type: ApiPermissionTypes;
 
   @Column()
   @PrimaryColumn()
