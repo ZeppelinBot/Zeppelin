@@ -16,8 +16,8 @@ export const authGuard: NavigationGuard = async (to, from, next) => {
 
 export const loginCallbackGuard: NavigationGuard = async (to, from, next) => {
   if (to.query.apiKey) {
-    await RootStore.dispatch("auth/setApiKey", to.query.apiKey);
-    next("/dashboard");
+    await RootStore.dispatch("auth/setApiKey", { key: to.query.apiKey });
+    window.location.href = "/dashboard";
   } else {
     window.location.href = `/?error=noAccess`;
   }
