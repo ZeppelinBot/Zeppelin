@@ -388,6 +388,10 @@ const baseValues = {
   ucfirst(arg) {
     return baseValues.upperFirst(arg);
   },
+  strlen(arg) {
+    if (typeof arg !== "string") return 0;
+    return [...arg].length;
+  },
   rand(from, to, seed = null) {
     if (isNaN(from)) return 0;
 
@@ -405,6 +409,10 @@ const baseValues = {
     const randValue = seed != null ? new seedrandom(seed)() : Math.random();
 
     return Math.round(randValue * (to - from) + from);
+  },
+  round(arg, decimals = 0) {
+    if (isNaN(arg)) return 0;
+    return decimals === 0 ? Math.round(arg) : arg.toFixed(decimals);
   },
   add(...args) {
     return args.reduce((result, arg) => {

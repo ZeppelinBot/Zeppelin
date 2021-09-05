@@ -3,6 +3,7 @@ import { AutomodActionBlueprint } from "../helpers";
 import { AddRolesAction } from "./addRoles";
 import { AddToCounterAction } from "./addToCounter";
 import { AlertAction } from "./alert";
+import { ArchiveThreadAction } from "./archiveThread";
 import { BanAction } from "./ban";
 import { ChangeNicknameAction } from "./changeNickname";
 import { CleanAction } from "./clean";
@@ -34,6 +35,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   set_counter: SetCounterAction,
   set_slowmode: SetSlowmodeAction,
   start_thread: StartThreadAction,
+  archive_thread: ArchiveThreadAction,
 };
 
 export const AvailableActions = t.type({
@@ -53,4 +55,5 @@ export const AvailableActions = t.type({
   set_counter: SetCounterAction.configType,
   set_slowmode: SetSlowmodeAction.configType,
   start_thread: StartThreadAction.configType,
+  archive_thread: ArchiveThreadAction.configType,
 });

@@ -114,6 +114,21 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
                 ]);
               }
             }
+
+            if (triggerObj[triggerName].match_mime_type) {
+              const white = triggerObj[triggerName].match_mime_type.whitelist_enabled;
+              const black = triggerObj[triggerName].match_mime_type.blacklist_enabled;
+
+              if (white && black) {
+                throw new StrictValidationError([
+                  `Cannot have both blacklist and whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                ]);
+              } else if (!white && !black) {
+                throw new StrictValidationError([
+                  `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                ]);
+              }
+            }
           }
         }
       }
