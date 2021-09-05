@@ -1,5 +1,4 @@
 import { ApiPermissions } from "@shared/apiPermissions";
-import { ApiPermissionTypes } from "../../../backend/src/data/ApiPermissionAssignments";
 
 export enum LoadStatus {
   None = 1,
@@ -14,6 +13,14 @@ export interface AuthState {
   apiKey: string | null;
   loadedInitialAuth: boolean;
   authRefreshInterval: IntervalType | null;
+  userId: string | null;
+}
+
+export interface GuildPermissionAssignment {
+  type: string;
+  target_id: string;
+  permissions: Set<ApiPermissions>;
+  expires_at: string | null;
 }
 
 export interface GuildState {
@@ -29,17 +36,8 @@ export interface GuildState {
   configs: {
     [key: string]: string;
   };
-  myPermissions: {
-    [guildId: string]: {
-      [K in ApiPermissions]?: boolean;
-    };
-  };
   guildPermissionAssignments: {
-    [guildId: string]: Array<{
-      target_id: string;
-      type: ApiPermissionTypes;
-      permissions: Set<ApiPermissions>;
-    }>;
+    [guildId: string]: GuildPermissionAssignment[];
   };
 }
 

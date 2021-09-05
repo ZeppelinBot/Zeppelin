@@ -12,6 +12,7 @@ export const AuthStore: Module<AuthState, RootState> = {
     apiKey: null,
     loadedInitialAuth: false,
     authRefreshInterval: null,
+    userId: null,
   },
 
   actions: {
@@ -23,7 +24,7 @@ export const AuthStore: Module<AuthState, RootState> = {
         try {
           const result = await post("auth/validate-key", { key: storedKey });
           if (result.valid) {
-            await dispatch("setApiKey", storedKey);
+            await dispatch("setApiKey", { key: storedKey, userId: result.userId });
             return;
           }
         } catch {} // tslint:disable-line
@@ -35,9 +36,9 @@ export const AuthStore: Module<AuthState, RootState> = {
       commit("markInitialAuthLoaded");
     },
 
-    setApiKey({ commit, state, dispatch }, newKey: string) {
-      localStorage.setItem("apiKey", newKey);
-      commit("setApiKey", newKey);
+    setApiKey({ commit, state, dispatch }, { key, userId }) {
+      localStorage.setItem("apiKey", key);
+      commit("setApiKey", { key, userId });
 
       dispatch("startAuthAutoRefresh");
     },
@@ -64,7 +65,7 @@ export const AuthStore: Module<AuthState, RootState> = {
       await dispatch("endAuthAutoRefresh");
 
       localStorage.removeItem("apiKey");
-      commit("setApiKey", null);
+      commit("setApiKey", { key: null, userId: null });
     },
 
     async logout({ dispatch }) {
@@ -79,8 +80,9 @@ export const AuthStore: Module<AuthState, RootState> = {
   },
 
   mutations: {
-    setApiKey(state: AuthState, key) {
+    setApiKey(state: AuthState, { key, userId }) {
       state.apiKey = key;
+      state.userId = userId;
     },
 
     setAuthRefreshInterval(state: AuthState, interval: IntervalType | null) {
