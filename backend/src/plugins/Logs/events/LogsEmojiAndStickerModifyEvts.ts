@@ -6,6 +6,8 @@ import { logEmojiUpdate } from "../logFunctions/logEmojiUpdate";
 import { logStickerCreate } from "../logFunctions/logStickerCreate";
 import { logStickerDelete } from "../logFunctions/logStickerDelete";
 import { logStickerUpdate } from "../logFunctions/logStickerUpdate";
+import { Emoji, GuildEmoji, Sticker, ThreadChannel } from "discord.js";
+import { filterObject } from "../../../utils/filterObject";
 
 export const LogsEmojiCreateEvt = logsEvt({
   event: "emojiCreate",
@@ -27,11 +29,15 @@ export const LogsEmojiDeleteEvt = logsEvt({
   },
 });
 
+const validEmojiDiffProps: Set<keyof GuildEmoji> = new Set(["name"]);
+
 export const LogsEmojiUpdateEvt = logsEvt({
   event: "emojiUpdate",
 
   async listener(meta) {
-    const diff = getScalarDifference(meta.args.oldEmoji, meta.args.newEmoji);
+    const oldEmojiDiffProps = filterObject(meta.args.oldEmoji || {}, (v, k) => validEmojiDiffProps.has(k));
+    const newEmojiDiffProps = filterObject(meta.args.newEmoji, (v, k) => validEmojiDiffProps.has(k));
+    const diff = getScalarDifference(oldEmojiDiffProps, newEmojiDiffProps);
     const differenceString = differenceToString(diff);
 
     if (differenceString === "") {
@@ -66,11 +72,15 @@ export const LogsStickerDeleteEvt = logsEvt({
   },
 });
 
+const validStickerDiffProps: Set<keyof Sticker> = new Set(["name"]);
+
 export const LogsStickerUpdateEvt = logsEvt({
   event: "stickerUpdate",
 
   async listener(meta) {
-    const diff = getScalarDifference(meta.args.oldSticker, meta.args.newSticker);
+    const oldStickerDiffProps = filterObject(meta.args.oldSticker || {}, (v, k) => validStickerDiffProps.has(k));
+    const newStickerDiffProps = filterObject(meta.args.newSticker, (v, k) => validStickerDiffProps.has(k));
+    const diff = getScalarDifference(oldStickerDiffProps, newStickerDiffProps);
     const differenceString = differenceToString(diff);
 
     if (differenceString === "") {
