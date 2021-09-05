@@ -29,9 +29,9 @@ export const StarboardReactionAddEvt = starboardEvt({
     if (!member || member!.user.bot) return;
 
     const config = await pluginData.config.getMatchingConfig({
+      userId,
       member,
-      channelId: msg.channel.id,
-      categoryId: (msg.channel as TextChannel).parentId,
+      message: msg,
     });
 
     const boardLock = await pluginData.locks.acquire(allStarboardsLock());
