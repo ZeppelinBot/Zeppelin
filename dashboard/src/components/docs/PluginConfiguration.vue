@@ -54,6 +54,14 @@
                 - channel: "109672661671505920"
                   config:
                     can_kick: false
+                # Don't allow kicking on any trhead
+                - is_thread: true
+                  config:
+                    can_kick: false
+                # Don't allow kicking on a specific thread
+                - thread_id: "109672661671505920"
+                  config:
+                    can_kick: false
                 # Same as above, but for a full category
                 - category: "360735466737369109"
                   config:
