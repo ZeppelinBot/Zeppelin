@@ -1,6 +1,7 @@
 import { TemplateFunction } from "./types";
 
-export const functions: TemplateFunction[] = [
+// TODO: Generate this dynamically, lmao
+export const TemplateFunctions: TemplateFunction[] = [
   {
     name: "info",
     description: "Checks if a condition is true or false and returns the corresponding ifTrue or ifFalse",
@@ -77,5 +78,89 @@ export const functions: TemplateFunction[] = [
     returnValue: "boolean",
     arguments: ["argument1", "argument2"],
     examples: ["lte(2, 2)"],
+  },
+  {
+    name: "slice",
+    description: "Slices a string argument at start and end",
+    returnValue: "string",
+    arguments: ["string", "start", "end"],
+    examples: ['slice("Hello World", 0, 5)'],
+  },
+  {
+    name: "lower",
+    description: "Converts a string argument to lowercase",
+    returnValue: "string",
+    arguments: ["string"],
+    examples: ['lower("Hello World")'],
+  },
+  {
+    name: "upper",
+    description: "Converts a string argument to uppercase",
+    returnValue: "string",
+    arguments: ["string"],
+    examples: ['upper("Hello World")'],
+  },
+  {
+    name: "upperFirst",
+    description: "Converts the first character of a string argument to uppercase",
+    returnValue: "string",
+    arguments: ["string"],
+    examples: ['upperFirst("hello World")'],
+  },
+  {
+    name: "rand",
+    description: "Returns a random number between from and to, optionally using seed",
+    returnValue: "number",
+    arguments: ["from", "to", "seed"],
+    examples: ["rand(1, 10)"],
+  },
+  {
+    name: "round",
+    description: "Rounds a number to the given decimal places",
+    returnValue: "number",
+    arguments: ["number", "decimalPlaces"],
+    examples: ["round(1.2345, 2)"],
+  },
+  {
+    name: "add",
+    description: "Adds two or more numbers",
+    returnValue: "number",
+    arguments: ["number1", "number2", "..."],
+    examples: ["add(1, 2)"],
+  },
+  {
+    name: "sub",
+    description: "Subtracts two or more numbers",
+    returnValue: "number",
+    arguments: ["number1", "number2", "..."],
+    examples: ["sub(3, 1)"],
+  },
+  {
+    name: "mul",
+    description: "Multiplies two or more numbers",
+    returnValue: "number",
+    arguments: ["number1", "number2", "..."],
+    examples: ["mul(2, 3)"],
+  },
+  {
+    name: "div",
+    description: "Divides two or more numbers",
+    returnValue: "number",
+    arguments: ["number1", "number2", "..."],
+    examples: ["div(6, 2)"],
+  },
+  {
+    name: "cases",
+    description: "Returns the argument at position",
+    returnValue: "any",
+    arguments: ["position", "argument1", "argument2", "..."],
+    examples: ['cases(1, "Hello", "World")'],
+  },
+  {
+    name: "choose",
+    description: "Returns a random argument",
+    returnValue: "any",
+    arguments: ["argument1", "argument2", "..."],
+    examples: ['choose("Hello", "World", "!")'],
   },
 ];
