@@ -7,7 +7,7 @@ export function generateTemplateMarkdown(definitions: TemplateFunction[]): strin
       const exampl = def.examples ? def.examples.map(ex => `> ${ex}`).join("\n") : "";
       return `
             #### ${def.name}
-            \`{${usage}}\`
+            \`{${def.name}${usage}}\`
             **${def.description}**
             ${exampl}
         `;
