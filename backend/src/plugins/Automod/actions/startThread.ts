@@ -2,7 +2,7 @@ import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { ChannelTypeStrings } from "src/types";
+import { ChannelTypeStrings } from "../../../types";
 import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { noop } from "../../../utils";
