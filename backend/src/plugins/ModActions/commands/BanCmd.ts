@@ -15,7 +15,6 @@ import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { TextChannel } from "discord.js";
 
 const opts = {
   mod: ct.member({ option: true }),
