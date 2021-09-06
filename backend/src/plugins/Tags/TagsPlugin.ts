@@ -70,6 +70,8 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       You use them by adding a \`{}\` on your tag.
 
       ### Available Functions
+      Here are the functions you can use in your tags:
+      
       ${generateTemplateMarkdown(TemplateFunctions)}
     `),
   },
