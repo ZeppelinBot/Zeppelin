@@ -1,10 +1,10 @@
 import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ChannelTypeStrings } from "src/types";
-import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "src/utils";
-import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "src/utils/templateSafeObjects";
+import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "../../../utils";
+import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
 
