@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import * as t from "io-ts";
-import { ChannelTypeStrings } from "src/types";
+import { ChannelTypeStrings } from "../../../types";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
