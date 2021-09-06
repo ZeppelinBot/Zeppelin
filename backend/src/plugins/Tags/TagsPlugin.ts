@@ -69,7 +69,6 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       You can use these functions to render dynamic content, or to access information from the message and/or user calling the tag.
       You use them by adding a \`{}\` on your tag.
 
-      ### Available Functions
       Here are the functions you can use in your tags:
       
       ${generateTemplateMarkdown(TemplateFunctions)}
