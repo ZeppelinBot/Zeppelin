@@ -3,9 +3,8 @@ import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ChannelTypeStrings } from "src/types";
-import { convertDelayStringToMS, MINUTES, tDelayString, tNullable } from "../../../utils";
+import { convertDelayStringToMS, MINUTES, tDelayString, tNullable, noop } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
 
 export const StartThreadAction = automodAction({
@@ -29,14 +28,9 @@ export const StartThreadAction = automodAction({
       if (channel?.type !== ChannelTypeStrings.TEXT || !channel.isText()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
       // check against max threads per channel
       if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
-        const threadCount = [
-          ...channel.threads.cache
-            .filter(
-              tr =>
-                tr.ownerId === pluginData.client.user!.id && !tr.deleted && !tr.archived && tr.parentId === channel.id,
-            )
-            .keys(),
-        ].length; // very short line, yes yes
+        const threadCount = channel.threads.cache.filter(
+          tr => tr.ownerId === pluginData.client.user!.id && !tr.deleted && !tr.archived && tr.parentId === channel.id,
+        ).size;
         if (threadCount >= actionConfig.limit_per_channel) return false;
       }
       return channel.messages.cache.has(c.message.id);
