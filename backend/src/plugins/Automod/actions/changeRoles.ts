@@ -54,7 +54,7 @@ export const ChangeRolesAction = automodAction({
 
     if (rolesWeCannotAssign.length) {
       const roleNamesWeCannotAssign = rolesWeCannotAssign.map(
-        roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
+        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
