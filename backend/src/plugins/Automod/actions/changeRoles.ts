@@ -66,7 +66,7 @@ export const ChangeRolesAction = automodAction({
 
     if (rolesWeCannotRemove.length) {
       const roleNamesWeCannotRemove = rolesWeCannotRemove.map(
-        roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
+        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
