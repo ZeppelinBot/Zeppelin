@@ -33,10 +33,10 @@ export const ChangeRolesAction = automodAction({
       return;
     }
 
-    const rolesToAssign: string[] = [];
-    const rolesWeCannotAssign: string[] = [];
-    const rolesToRemove: string[] = [];
-    const rolesWeCannotRemove: string[] = [];
+    const rolesToAssign: Snowflake[] = [];
+    const rolesWeCannotAssign: Snowflake[] = [];
+    const rolesToRemove: Snowflake[] = [];
+    const rolesWeCannotRemove: Snowflake[] = [];
     for (const roleId of actionConfig.add) {
       if (canAssignRole(pluginData.guild, me, roleId)) {
         rolesToAssign.push(roleId);
