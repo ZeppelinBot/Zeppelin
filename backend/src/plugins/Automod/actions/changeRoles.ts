@@ -74,7 +74,6 @@ export const ChangeRolesAction = automodAction({
           "**, **",
         )}**`,
       });
-      return;
     }
 
     await Promise.all(
