@@ -8,7 +8,7 @@ export const CrosspostMessageAction = automodAction({
   configType: t.type({}),
   defaultConfig: {},
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts }) {
     const messages = contexts
       .filter(c => c.message?.id)
       .map(c => {
