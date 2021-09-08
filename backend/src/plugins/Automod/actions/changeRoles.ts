@@ -24,7 +24,7 @@ export const ChangeRolesAction = automodAction({
     const members = unique(contexts.map(c => c.member).filter(nonNullish));
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
-    const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
+    const missingPermissions = getMissingPermissions(me.permissions, Permissions.FLAGS.MANAGE_ROLES);
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
