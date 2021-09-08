@@ -84,7 +84,7 @@ export const ChangeRolesAction = automodAction({
           ignoreRoleChange(pluginData, member.id, roleId);
         }
         for (const roleId of rolesToRemove) {
-          memberRoles.delete(roleId as Snowflake);
+          memberRoles.delete(roleId);
           ignoreRoleChange(pluginData, member.id, roleId);
         }
 
