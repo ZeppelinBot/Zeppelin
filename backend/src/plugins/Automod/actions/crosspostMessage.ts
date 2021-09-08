@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "src/types";
+import { noop } from "src/utils";
 import { automodAction } from "../helpers";
 
 export const CrosspostMessageAction = automodAction({
@@ -23,7 +24,7 @@ export const CrosspostMessageAction = automodAction({
     );
 
     for (const msg of messages) {
-      await msg?.crosspost();
+      await msg?.crosspost().catch(noop);
     }
   },
 });
