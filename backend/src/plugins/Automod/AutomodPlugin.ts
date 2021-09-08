@@ -139,11 +139,13 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
             `Can't use both 'change_roles' and 'add_roles'/'remove_roles' at rule '${rule.name}'`,
           ]);
         }
+
         if (rule["actions"].add_roles && rule["actions"].remove_roles) {
           throw new StrictValidationError([
             `Can't use both 'add_roles' and 'remove_roles' at rule '${rule.name}', use 'change_roles' instead`,
           ]);
         }
+
         for (const actionName in rule["actions"]) {
           if (!availableActions[actionName]) {
             throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule.name}'`]);
