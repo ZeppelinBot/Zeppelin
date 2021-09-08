@@ -1,4 +1,3 @@
-import { Message } from "discord.js";
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "src/types";
 import { noop } from "src/utils";
