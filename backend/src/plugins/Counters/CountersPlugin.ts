@@ -55,7 +55,7 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
   ],
 };
 
-const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = (options) => {
   for (const [counterName, counter] of Object.entries(options.config?.counters || {})) {
     counter.name = counterName;
     counter.per_user = counter.per_user ?? false;

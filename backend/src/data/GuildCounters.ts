@@ -17,19 +17,11 @@ const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
 const decayQueue = new Queue();
 
 async function deleteCountersMarkedToBeDeleted(): Promise<void> {
-  await getRepository(Counter)
-    .createQueryBuilder()
-    .where("delete_at <= NOW()")
-    .delete()
-    .execute();
+  await getRepository(Counter).createQueryBuilder().where("delete_at <= NOW()").delete().execute();
 }
 
 async function deleteTriggersMarkedToBeDeleted(): Promise<void> {
-  await getRepository(CounterTrigger)
-    .createQueryBuilder()
-    .where("delete_at <= NOW()")
-    .delete()
-    .execute();
+  await getRepository(CounterTrigger).createQueryBuilder().where("delete_at <= NOW()").delete().execute();
 }
 
 setInterval(deleteCountersMarkedToBeDeleted, 1 * HOURS);
@@ -97,10 +89,7 @@ export class GuildCounters extends BaseGuildRepository {
       criteria.id = Not(In(idsToKeep));
     }
 
-    const deleteAt = moment
-      .utc()
-      .add(DELETE_UNUSED_COUNTERS_AFTER, "ms")
-      .format(DBDateFormat);
+    const deleteAt = moment.utc().add(DELETE_UNUSED_COUNTERS_AFTER, "ms").format(DBDateFormat);
 
     await this.counters.update(criteria, {
       delete_at: deleteAt,
@@ -108,11 +97,7 @@ export class GuildCounters extends BaseGuildRepository {
   }
 
   async deleteCountersMarkedToBeDeleted(): Promise<void> {
-    await this.counters
-      .createQueryBuilder()
-      .where("delete_at <= NOW()")
-      .delete()
-      .execute();
+    await this.counters.createQueryBuilder().where("delete_at <= NOW()").delete().execute();
   }
 
   async changeCounterValue(
@@ -230,14 +215,11 @@ export class GuildCounters extends BaseGuildRepository {
     const triggersToMark = await triggersToMarkQuery.getMany();
 
     if (triggersToMark.length) {
-      const deleteAt = moment
-        .utc()
-        .add(DELETE_UNUSED_COUNTER_TRIGGERS_AFTER, "ms")
-        .format(DBDateFormat);
+      const deleteAt = moment.utc().add(DELETE_UNUSED_COUNTER_TRIGGERS_AFTER, "ms").format(DBDateFormat);
 
       await this.counterTriggers.update(
         {
-          id: In(triggersToMark.map(t => t.id)),
+          id: In(triggersToMark.map((t) => t.id)),
         },
         {
           delete_at: deleteAt,
@@ -247,11 +229,7 @@ export class GuildCounters extends BaseGuildRepository {
   }
 
   async deleteTriggersMarkedToBeDeleted(): Promise<void> {
-    await this.counterTriggers
-      .createQueryBuilder()
-      .where("delete_at <= NOW()")
-      .delete()
-      .execute();
+    await this.counterTriggers.createQueryBuilder().where("delete_at <= NOW()").delete().execute();
   }
 
   async initCounterTrigger(
@@ -278,7 +256,7 @@ export class GuildCounters extends BaseGuildRepository {
       throw new Error(`Invalid comparison value: ${reverseComparisonValue}`);
     }
 
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const existing = await entityManager.findOne(CounterTrigger, {
         counter_id: counterId,
         name: triggerName,
@@ -330,7 +308,7 @@ export class GuildCounters extends BaseGuildRepository {
     channelId = channelId || "0";
     userId = userId || "0";
 
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const previouslyTriggered = await entityManager.findOne(CounterTriggerState, {
         trigger_id: counterTrigger.id,
         user_id: userId!,
@@ -378,7 +356,7 @@ export class GuildCounters extends BaseGuildRepository {
   async checkAllValuesForTrigger(
     counterTrigger: CounterTrigger,
   ): Promise<Array<{ channelId: string; userId: string }>> {
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const matchingValues = await entityManager
         .createQueryBuilder(CounterValue, "cv")
         .leftJoin(
@@ -395,7 +373,7 @@ export class GuildCounters extends BaseGuildRepository {
       if (matchingValues.length) {
         await entityManager.insert(
           CounterTriggerState,
-          matchingValues.map(row => ({
+          matchingValues.map((row) => ({
             trigger_id: counterTrigger.id,
             channel_id: row.channel_id,
             user_id: row.user_id,
@@ -403,7 +381,7 @@ export class GuildCounters extends BaseGuildRepository {
         );
       }
 
-      return matchingValues.map(row => ({
+      return matchingValues.map((row) => ({
         channelId: row.channel_id,
         userId: row.user_id,
       }));
@@ -429,7 +407,7 @@ export class GuildCounters extends BaseGuildRepository {
     channelId = channelId || "0";
     userId = userId || "0";
 
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const matchingValue = await entityManager
         .createQueryBuilder(CounterValue, "cv")
         .innerJoin(
@@ -468,7 +446,7 @@ export class GuildCounters extends BaseGuildRepository {
   async checkAllValuesForReverseTrigger(
     counterTrigger: CounterTrigger,
   ): Promise<Array<{ channelId: string; userId: string }>> {
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const matchingValues: Array<{
         id: string;
         triggerStateId: string;
@@ -496,11 +474,11 @@ export class GuildCounters extends BaseGuildRepository {
 
       if (matchingValues.length) {
         await entityManager.delete(CounterTriggerState, {
-          id: In(matchingValues.map(v => v.triggerStateId)),
+          id: In(matchingValues.map((v) => v.triggerStateId)),
         });
       }
 
-      return matchingValues.map(row => ({
+      return matchingValues.map((row) => ({
         channelId: row.channel_id,
         userId: row.user_id,
       }));

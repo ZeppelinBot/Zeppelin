@@ -8,7 +8,7 @@ export async function waitForButtonConfirm(
   toPost: MessageOptions,
   options?: WaitForOptions,
 ): Promise<boolean> {
-  return new Promise(async resolve => {
+  return new Promise(async (resolve) => {
     const idMod = `${channel.guild.id}-${moment.utc().valueOf()}`;
     const row = new MessageActionRow().addComponents([
       new MessageButton()

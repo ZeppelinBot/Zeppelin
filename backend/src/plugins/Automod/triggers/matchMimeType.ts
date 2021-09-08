@@ -34,7 +34,7 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
       const contentType = (rawContentType || "").split(";")[0]; // Remove "; charset=utf8" and similar from the end
 
       const blacklist = trigger.blacklist_enabled
-        ? (trigger.mime_type_blacklist ?? []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_blacklist ?? []).map((_t) => _t.toLowerCase())
         : null;
 
       if (contentType && blacklist?.includes(contentType)) {
@@ -47,7 +47,7 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
       }
 
       const whitelist = trigger.whitelist_enabled
-        ? (trigger.mime_type_whitelist ?? []).map(_t => _t.toLowerCase())
+        ? (trigger.mime_type_whitelist ?? []).map((_t) => _t.toLowerCase())
         : null;
 
       if (whitelist && (!contentType || !whitelist.includes(contentType))) {

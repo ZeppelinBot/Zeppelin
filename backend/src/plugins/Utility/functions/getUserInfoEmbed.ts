@@ -102,14 +102,14 @@ export async function getUserInfoEmbed(
       largest: 2,
       round: true,
     });
-    const roles = Array.from(member.roles.cache.values()).filter(r => r.id !== pluginData.guild.id);
+    const roles = Array.from(member.roles.cache.values()).filter((r) => r.id !== pluginData.guild.id);
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
       name: preEmbedPadding + "Member information",
       value: trimLines(`
           ${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)
-          ${roles.length > 0 ? "Roles: " + roles.map(r => `<@&${r.id}>`).join(", ") : ""}
+          ${roles.length > 0 ? "Roles: " + roles.map((r) => `<@&${r.id}>`).join(", ") : ""}
         `),
     });
 
@@ -130,14 +130,14 @@ export async function getUserInfoEmbed(
       value: `⚠ ${user.bot ? "Bot" : "User"} is not on the server`,
     });
   }
-  const cases = (await pluginData.state.cases.getByUserId(user.id)).filter(c => !c.is_hidden);
+  const cases = (await pluginData.state.cases.getByUserId(user.id)).filter((c) => !c.is_hidden);
 
   if (cases.length > 0) {
     cases.sort((a, b) => {
       return a.created_at < b.created_at ? 1 : -1;
     });
 
-    const caseSummary = cases.slice(0, 3).map(c => {
+    const caseSummary = cases.slice(0, 3).map((c) => {
       const summaryText = `${CaseTypes[c.type]} (#${c.case_number})`;
 
       if (c.log_message_id) {

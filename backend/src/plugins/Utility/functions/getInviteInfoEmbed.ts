@@ -120,9 +120,7 @@ export async function getInviteInfoEmbed(
 
     /*if (invite.channel.icon) {
       embed.author.icon_url = `https://cdn.discordapp.com/channel-icons/${invite.channel.id}/${invite.channel.icon}.png?size=256`;
-    }*/ const channelCreatedAtTimestamp = snowflakeToTimestamp(
-      invite.channel.id,
-    );
+    }*/ const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
     const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
     const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
       largest: 2,

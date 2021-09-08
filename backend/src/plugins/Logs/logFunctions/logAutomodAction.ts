@@ -21,7 +21,7 @@ export function logAutomodAction(pluginData: GuildPluginData<LogsPluginType>, da
     createTypedTemplateSafeValueContainer({
       rule: data.rule,
       user: data.user ? userToTemplateSafeUser(data.user) : null,
-      users: data.users.map(user => userToTemplateSafeUser(user)),
+      users: data.users.map((user) => userToTemplateSafeUser(user)),
       actionsTaken: data.actionsTaken,
       matchSummary: data.matchSummary ?? "",
     }),

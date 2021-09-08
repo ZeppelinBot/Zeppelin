@@ -19,7 +19,7 @@ Vue.directive("trim-indents", {
 
     el.innerHTML = withoutStartEndWhitespace
       .split("\n")
-      .map(line => line.slice(spacesToTrim))
+      .map((line) => line.slice(spacesToTrim))
       .join("\n");
   },
 });

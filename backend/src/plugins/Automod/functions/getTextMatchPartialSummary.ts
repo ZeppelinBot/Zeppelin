@@ -29,6 +29,6 @@ export function getTextMatchPartialSummary(
     const visibleName = context.member?.nickname || context.user!.username;
     return `visible name: ${visibleName}`;
   } else if (type === "customstatus") {
-    return `custom status: ${context.member!.presence?.activities.find(a => a.type === "CUSTOM")?.name}`;
+    return `custom status: ${context.member!.presence?.activities.find((a) => a.type === "CUSTOM")?.name}`;
   }
 }

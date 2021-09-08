@@ -6,7 +6,7 @@ export function clearRecentActionsForMessage(pluginData: GuildPluginData<Automod
   const globalIdentifier = message.user_id;
   const perChannelIdentifier = `${message.channel_id}-${message.user_id}`;
 
-  pluginData.state.recentActions = pluginData.state.recentActions.filter(act => {
+  pluginData.state.recentActions = pluginData.state.recentActions.filter((act) => {
     return act.identifier !== globalIdentifier && act.identifier !== perChannelIdentifier;
   });
 }

@@ -6,5 +6,5 @@ export function isEventIgnored(
   type: IgnoredEventType,
   userId: string,
 ) {
-  return pluginData.state.ignoredEvents.some(info => type === info.type && userId === info.userId);
+  return pluginData.state.ignoredEvents.some((info) => type === info.type && userId === info.userId);
 }

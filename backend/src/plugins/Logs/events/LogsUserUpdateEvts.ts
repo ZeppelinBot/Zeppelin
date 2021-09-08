@@ -58,10 +58,10 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           logMemberRoleChanges(pluginData, {
             member,
             addedRoles: addedRoles.map(
-              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
             ),
             removedRoles: removedRoles.map(
-              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
             ),
             mod: null,
           });
@@ -70,7 +70,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           logMemberRoleAdd(pluginData, {
             member,
             roles: addedRoles.map(
-              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
             ),
             mod: null,
           });
@@ -79,7 +79,7 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
           logMemberRoleRemove(pluginData, {
             member,
             roles: removedRoles.map(
-              roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
             ),
             mod: null,
           });

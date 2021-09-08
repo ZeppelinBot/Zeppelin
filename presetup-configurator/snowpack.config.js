@@ -1,8 +1,6 @@
 module.exports = {
   mount: {
-    "src": "/",
+    src: "/",
   },
-  plugins: [
-    '@snowpack/plugin-typescript',
-  ],
+  plugins: ["@snowpack/plugin-typescript"],
 };

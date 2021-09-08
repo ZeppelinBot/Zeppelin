@@ -41,7 +41,7 @@ export function zeppelinGuildPlugin<TBlueprint extends ZeppelinGuildPluginBluepr
 ): TBlueprint & { configPreprocessor: ZeppelinGuildPluginBlueprint["configPreprocessor"] };
 
 export function zeppelinGuildPlugin<TPluginType extends BasePluginType>(): <
-  TBlueprint extends ZeppelinGuildPluginBlueprint<GuildPluginData<TPluginType>>
+  TBlueprint extends ZeppelinGuildPluginBlueprint<GuildPluginData<TPluginType>>,
 >(
   blueprint: TBlueprint,
 ) => TBlueprint & {
@@ -50,9 +50,9 @@ export function zeppelinGuildPlugin<TPluginType extends BasePluginType>(): <
 
 export function zeppelinGuildPlugin(...args) {
   if (args.length) {
-    const blueprint = (typedGuildPlugin(
+    const blueprint = typedGuildPlugin(
       ...(args as Parameters<typeof typedGuildPlugin>),
-    ) as unknown) as ZeppelinGuildPluginBlueprint;
+    ) as unknown as ZeppelinGuildPluginBlueprint;
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
   } else {
@@ -75,7 +75,7 @@ export function zeppelinGlobalPlugin<TBlueprint extends ZeppelinGlobalPluginBlue
 ): TBlueprint & { configPreprocessor: ZeppelinGlobalPluginBlueprint["configPreprocessor"] };
 
 export function zeppelinGlobalPlugin<TPluginType extends BasePluginType>(): <
-  TBlueprint extends ZeppelinGlobalPluginBlueprint<TPluginType>
+  TBlueprint extends ZeppelinGlobalPluginBlueprint<TPluginType>,
 >(
   blueprint: TBlueprint,
 ) => TBlueprint & {
@@ -84,9 +84,9 @@ export function zeppelinGlobalPlugin<TPluginType extends BasePluginType>(): <
 
 export function zeppelinGlobalPlugin(...args) {
   if (args.length) {
-    const blueprint = (typedGlobalPlugin(
+    const blueprint = typedGlobalPlugin(
       ...(args as Parameters<typeof typedGlobalPlugin>),
-    ) as unknown) as ZeppelinGlobalPluginBlueprint;
+    ) as unknown as ZeppelinGlobalPluginBlueprint;
     // @ts-ignore FIXME: Check the types here
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;

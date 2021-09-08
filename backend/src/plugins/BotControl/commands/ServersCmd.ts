@@ -22,7 +22,7 @@ export const ServersCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     const showList = Boolean(args.all || args.initialized || args.uninitialized || args.search);
-    const search = args.search ? new RegExp([...args.search].map(s => escapeStringRegexp(s)).join(".*"), "i") : null;
+    const search = args.search ? new RegExp([...args.search].map((s) => escapeStringRegexp(s)).join(".*"), "i") : null;
 
     const joinedGuilds = Array.from(pluginData.client.guilds.cache.values());
     const loadedGuilds = pluginData.getKnubInstance().getLoadedGuilds();
@@ -32,21 +32,21 @@ export const ServersCmd = botControlCmd({
       let filteredGuilds = Array.from(joinedGuilds);
 
       if (args.initialized) {
-        filteredGuilds = filteredGuilds.filter(g => loadedGuildsMap.has(g.id));
+        filteredGuilds = filteredGuilds.filter((g) => loadedGuildsMap.has(g.id));
       }
 
       if (args.uninitialized) {
-        filteredGuilds = filteredGuilds.filter(g => !loadedGuildsMap.has(g.id));
+        filteredGuilds = filteredGuilds.filter((g) => !loadedGuildsMap.has(g.id));
       }
 
       if (args.search) {
-        filteredGuilds = filteredGuilds.filter(g => search!.test(`${g.id} ${g.name}`));
+        filteredGuilds = filteredGuilds.filter((g) => search!.test(`${g.id} ${g.name}`));
       }
 
       if (filteredGuilds.length) {
-        filteredGuilds.sort(sorter(g => g.name.toLowerCase()));
+        filteredGuilds.sort(sorter((g) => g.name.toLowerCase()));
         const longestId = filteredGuilds.reduce((longest, guild) => Math.max(longest, guild.id.length), 0);
-        const lines = filteredGuilds.map(g => {
+        const lines = filteredGuilds.map((g) => {
           const paddedId = g.id.padEnd(longestId, " ");
           const owner = getUser(pluginData.client, g.ownerId);
           return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.tag}** \`${owner.id}\`)`;
@@ -57,7 +57,7 @@ export const ServersCmd = botControlCmd({
       }
     } else {
       const total = joinedGuilds.length;
-      const initialized = joinedGuilds.filter(g => loadedGuildsMap.has(g.id)).length;
+      const initialized = joinedGuilds.filter((g) => loadedGuildsMap.has(g.id)).length;
       const unInitialized = total - initialized;
 
       msg.channel.send(

@@ -13,7 +13,7 @@ export const PerformanceCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const stats = pluginData.getKnubInstance().getPluginPerformanceStats();
     const averageLoadTimeEntries = Object.entries(stats.averageLoadTimes);
-    averageLoadTimeEntries.sort(sorter(v => v[1].time, "DESC"));
+    averageLoadTimeEntries.sort(sorter((v) => v[1].time, "DESC"));
     const lines = averageLoadTimeEntries.map(
       ([pluginName, { time }]) => `${pluginName}: **${formatNumber(Math.round(time))}ms**`,
     );

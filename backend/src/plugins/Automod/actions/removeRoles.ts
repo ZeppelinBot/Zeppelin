@@ -18,7 +18,7 @@ export const RemoveRolesAction = automodAction({
   defaultConfig: [],
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
-    const members = unique(contexts.map(c => c.member).filter(nonNullish));
+    const members = unique(contexts.map((c) => c.member).filter(nonNullish));
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
     const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
@@ -42,7 +42,7 @@ export const RemoveRolesAction = automodAction({
 
     if (rolesWeCannotRemove.length) {
       const roleNamesWeCannotRemove = rolesWeCannotRemove.map(
-        roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
+        (roleId) => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
@@ -53,7 +53,7 @@ export const RemoveRolesAction = automodAction({
     }
 
     await Promise.all(
-      members.map(async member => {
+      members.map(async (member) => {
         const memberRoles = new Set(member.roles.cache.keys());
         for (const roleId of rolesToRemove) {
           memberRoles.delete(roleId as Snowflake);

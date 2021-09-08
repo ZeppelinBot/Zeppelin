@@ -31,7 +31,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     const hasUnknownRoles = matchedRoleIds.length !== roleNames.length;
 
     const rolesToAdd: Map<string, Role> = Array.from(matchedRoleIds.values())
-      .map(id => pluginData.guild.roles.cache.get(id as Snowflake)!)
+      .map((id) => pluginData.guild.roles.cache.get(id as Snowflake)!)
       .filter(Boolean)
       .reduce((map, role) => {
         map.set(role.id, role);
@@ -94,7 +94,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
     }
 
     const mentionRoles = pluginData.config.get().mention_roles;
-    const addedRolesStr = Array.from(rolesToAdd.values()).map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`));
+    const addedRolesStr = Array.from(rolesToAdd.values()).map((r) => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`));
     const addedRolesWord = rolesToAdd.size === 1 ? "role" : "roles";
 
     const messageParts: string[] = [];
@@ -104,11 +104,11 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       const skippedRolesStr = skipped.size
         ? "skipped " +
           Array.from(skipped.values())
-            .map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
+            .map((r) => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
             .join(",")
         : null;
       const removedRolesStr = removed.size
-        ? "removed " + Array.from(removed.values()).map(r => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
+        ? "removed " + Array.from(removed.values()).map((r) => (mentionRoles ? `<@&${r.id}>` : `**${r.name}**`))
         : null;
 
       const skippedRemovedStr = [skippedRolesStr, removedRolesStr].filter(Boolean).join(" and ");

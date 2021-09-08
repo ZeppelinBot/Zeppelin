@@ -26,9 +26,9 @@ export const NamesCmd = nameHistoryCmd({
     }
 
     const nicknameRows = nicknames.map(
-      r => `\`[${r.timestamp}]\` ${r.nickname ? `**${disableCodeBlocks(r.nickname)}**` : "*None*"}`,
+      (r) => `\`[${r.timestamp}]\` ${r.nickname ? `**${disableCodeBlocks(r.nickname)}**` : "*None*"}`,
     );
-    const usernameRows = usernames.map(r => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
+    const usernameRows = usernames.map((r) => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
     const user = await pluginData.client.users.fetch(args.userId as Snowflake).catch(() => null);
     const currentUsername = user ? user.tag : args.userId;

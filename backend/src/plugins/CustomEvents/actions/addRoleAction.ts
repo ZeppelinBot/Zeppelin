@@ -29,7 +29,7 @@ export async function addRoleAction(
     throw new ActionError("Missing permissions");
   }
   const rolesToAdd = (Array.isArray(action.role) ? action.role : [action.role]).filter(
-    id => !target.roles.cache.has(id),
+    (id) => !target.roles.cache.has(id),
   );
   if (rolesToAdd.length === 0) {
     throw new ActionError("Target already has the role(s) specified");

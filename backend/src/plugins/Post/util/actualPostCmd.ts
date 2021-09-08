@@ -147,18 +147,10 @@ export async function actualPostCmd(
       channel_id: targetChannel.id,
       content,
       attachments: [...msg.attachments.values()],
-      post_at: postAt
-        .clone()
-        .tz("Etc/UTC")
-        .format(DBDateFormat),
+      post_at: postAt.clone().tz("Etc/UTC").format(DBDateFormat),
       enable_mentions: opts["enable-mentions"],
       repeat_interval: opts.repeat,
-      repeat_until: repeatUntil
-        ? repeatUntil
-            .clone()
-            .tz("Etc/UTC")
-            .format(DBDateFormat)
-        : null,
+      repeat_until: repeatUntil ? repeatUntil.clone().tz("Etc/UTC").format(DBDateFormat) : null,
       repeat_times: repeatTimes ?? null,
     });
 

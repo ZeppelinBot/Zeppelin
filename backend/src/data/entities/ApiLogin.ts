@@ -19,10 +19,7 @@ export class ApiLogin {
   @Column()
   expires_at: string;
 
-  @ManyToOne(
-    type => ApiUserInfo,
-    userInfo => userInfo.logins,
-  )
+  @ManyToOne((type) => ApiUserInfo, (userInfo) => userInfo.logins)
   @JoinColumn({ name: "user_id" })
   userInfo: ApiUserInfo;
 }

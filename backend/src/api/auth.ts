@@ -33,21 +33,21 @@ function simpleDiscordAPIRequest(bearerToken, path): Promise<any> {
           Authorization: `Bearer ${bearerToken}`,
         },
       },
-      res => {
+      (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Discord API error ${res.statusCode}`));
           return;
         }
 
         let rawData = "";
-        res.on("data", data => (rawData += data));
+        res.on("data", (data) => (rawData += data));
         res.on("end", () => {
           resolve(JSON.parse(rawData));
         });
       },
     );
 
-    request.on("error", err => reject(err));
+    request.on("error", (err) => reject(err));
   });
 }
 

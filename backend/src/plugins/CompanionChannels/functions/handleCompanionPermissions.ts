@@ -65,7 +65,7 @@ export async function handleCompanionPermissions(
       if (!channel || !(channel instanceof TextChannel)) continue;
       pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channelId, 3 * 1000);
       const fullSerialized = new Permissions(BigInt(permissions)).serialize();
-      const onlyAllowed = filterObject(fullSerialized, v => v === true);
+      const onlyAllowed = filterObject(fullSerialized, (v) => v === true);
       await channel.permissionOverwrites.create(userId, onlyAllowed, {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
       });

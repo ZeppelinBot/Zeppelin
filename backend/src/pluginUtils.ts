@@ -85,7 +85,7 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
   return new ConfigValidationError(
     err
       .getErrors()
-      .map(e => e.toString())
+      .map((e) => e.toString())
       .join("\n"),
   );
 }
@@ -199,7 +199,7 @@ export async function sendSuccessMessage(
 
   return channel
     .send({ ...content }) // Force line break
-    .catch(err => {
+    .catch((err) => {
       const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
@@ -220,7 +220,7 @@ export async function sendErrorMessage(
 
   return channel
     .send({ ...content }) // Force line break
-    .catch(err => {
+    .catch((err) => {
       const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
@@ -252,7 +252,7 @@ type AnyFn = (...args: any[]) => any;
  * Creates a public plugin function out of a function with pluginData as the first parameter
  */
 export function mapToPublicFn<T extends AnyFn>(inputFn: T) {
-  return pluginData => {
+  return (pluginData) => {
     return (...args: Tail<Parameters<typeof inputFn>>): ReturnType<typeof inputFn> => {
       return inputFn(pluginData, ...args);
     };

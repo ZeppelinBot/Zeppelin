@@ -13,7 +13,7 @@ export const TagListCmd = tagsCmd({
     }
 
     const prefix = (await pluginData.config.getForMessage(msg)).prefix;
-    const tagNames = tags.map(tag => tag.tag).sort();
+    const tagNames = tags.map((tag) => tag.tag).sort();
 
     createChunkedMessage(msg.channel, `Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\``);
   },

@@ -144,8 +144,8 @@ if (process.env.NODE_ENV === "production") {
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "14.0.0";
-const requiredParts = REQUIRED_NODE_VERSION.split(".").map(v => parseInt(v, 10));
-const actualVersionParts = process.versions.node.split(".").map(v => parseInt(v, 10));
+const requiredParts = REQUIRED_NODE_VERSION.split(".").map((v) => parseInt(v, 10));
+const actualVersionParts = process.versions.node.split(".").map((v) => parseInt(v, 10));
 for (const [i, part] of actualVersionParts.entries()) {
   if (part > requiredParts[i]) break;
   if (part === requiredParts[i]) continue;
@@ -188,7 +188,7 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
-  client.on(Constants.Events.RATE_LIMIT, data => {
+  client.on(Constants.Events.RATE_LIMIT, (data) => {
     // tslint:disable-next-line:no-console
     // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
   });
@@ -196,7 +196,7 @@ connect().then(async () => {
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
-  client.on(Constants.Events.DEBUG, errorText => {
+  client.on(Constants.Events.DEBUG, (errorText) => {
     if (!errorText.includes("429")) {
       return;
     }
@@ -212,7 +212,7 @@ connect().then(async () => {
     }
   });
 
-  client.on("error", err => {
+  client.on("error", (err) => {
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
@@ -240,9 +240,9 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const basePluginNames = baseGuildPlugins.map(p => p.name);
+        const basePluginNames = baseGuildPlugins.map((p) => p.name);
 
-        return Array.from(plugins.keys()).filter(pluginName => {
+        return Array.from(plugins.keys()).filter((pluginName) => {
           if (basePluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
@@ -308,14 +308,14 @@ connect().then(async () => {
   });
 
   const debugGuilds = ["877581055920603238", "348468156597010432", "134286179121102848"];
-  bot.on("guildLoaded", guildId => {
+  bot.on("guildLoaded", (guildId) => {
     if (!debugGuilds.includes(guildId)) {
       return;
     }
 
     console.log(`[!! DEBUG !!] LOADED GUILD ${guildId}`);
   });
-  bot.on("guildUnloaded", guildId => {
+  bot.on("guildUnloaded", (guildId) => {
     if (!debugGuilds.includes(guildId)) {
       return;
     }

@@ -4,14 +4,14 @@
   "description": "",
   "private": true,
   "scripts": {
-    "format": "prettier --write \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
+    "format": "prettier --write \"./{backend,dashboard,presetup-configurator}/**/*.{css,html,js,json,ts,tsx}\"",
     "lint": "tslint \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
-    "codestyle-check": "prettier --check \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\""
+    "codestyle-check": "prettier --check \"./{backend,dashboard,presetup-configurator}/**/*.{css,html,js,json,ts,tsx}\""
   },
   "devDependencies": {
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
-    "prettier": "^1.19.1",
+    "prettier": "^2.3.2",
     "tslint": "^5.13.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.4"

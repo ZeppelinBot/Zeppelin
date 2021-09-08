@@ -53,7 +53,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Ignore automatic mute cases and logs for these users
     // We'll create our own cases below and post a single "mass muted" log instead
-    args.userIds.forEach(userId => {
+    args.userIds.forEach((userId) => {
       // Use longer timeouts since this can take a while
       pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_MUTE, userId, 120 * 1000);
     });

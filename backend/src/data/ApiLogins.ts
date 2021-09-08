@@ -68,10 +68,7 @@ export class ApiLogins extends BaseRepository {
       token: hashedToken,
       user_id: userId,
       logged_in_at: moment.utc().format(DBDateFormat),
-      expires_at: moment
-        .utc()
-        .add(LOGIN_EXPIRY_TIME, "ms")
-        .format(DBDateFormat),
+      expires_at: moment.utc().add(LOGIN_EXPIRY_TIME, "ms").format(DBDateFormat),
     });
 
     return `${loginId}.${token}`;
@@ -96,10 +93,7 @@ export class ApiLogins extends BaseRepository {
     await this.apiLogins.update(
       { id: loginId },
       {
-        expires_at: moment()
-          .utc()
-          .add(LOGIN_EXPIRY_TIME, "ms")
-          .format(DBDateFormat),
+        expires_at: moment().utc().add(LOGIN_EXPIRY_TIME, "ms").format(DBDateFormat),
       },
     );
   }

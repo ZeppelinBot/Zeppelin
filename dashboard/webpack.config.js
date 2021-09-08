@@ -1,42 +1,40 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const DotenvPlugin = require('dotenv-webpack');
-const merge = require('webpack-merge');
+const path = require("path");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const DotenvPlugin = require("dotenv-webpack");
+const merge = require("webpack-merge");
 
-const targetDir = path.normalize(path.join(__dirname, 'dist'));
+const targetDir = path.normalize(path.join(__dirname, "dist"));
 
-if (! process.env.NODE_ENV) {
-  console.error('Please set NODE_ENV');
+if (!process.env.NODE_ENV) {
+  console.error("Please set NODE_ENV");
   process.exit(1);
 }
 
 const babelOpts = {
-  presets: [
-    '@babel/preset-env',
-  ],
+  presets: ["@babel/preset-env"],
 };
 
-const tsconfig = require('./tsconfig.json');
+const tsconfig = require("./tsconfig.json");
 const pathAliases = Object.entries(tsconfig.compilerOptions.paths || []).reduce((aliases, pair) => {
   let alias = pair[0];
-  if (alias.endsWith('/*')) alias = alias.slice(0, -2);
+  if (alias.endsWith("/*")) alias = alias.slice(0, -2);
 
   let aliasPath = pair[1][0];
-  if (aliasPath.endsWith('/*')) aliasPath = aliasPath.slice(0, -2);
+  if (aliasPath.endsWith("/*")) aliasPath = aliasPath.slice(0, -2);
 
   aliases[alias] = path.resolve(__dirname, aliasPath);
   return aliases;
 }, {});
 
 let config = {
-  entry: './src/main.ts',
+  entry: "./src/main.ts",
   output: {
-    filename: '[name].[hash].js',
+    filename: "[name].[hash].js",
     path: targetDir,
-    publicPath: '/',
+    publicPath: "/",
   },
   module: {
     rules: [
@@ -50,11 +48,11 @@ let config = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: babelOpts,
           },
           {
-            loader: 'ts-loader',
+            loader: "ts-loader",
             options: {
               appendTsSuffixTo: [/\.vue$/],
             },
@@ -65,7 +63,7 @@ let config = {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: babelOpts,
         },
       },
@@ -90,26 +88,23 @@ let config = {
             loader: "postcss-loader",
             options: {
               ident: "postcss",
-              plugins: loader => {
+              plugins: (loader) => {
                 const plugins = [
-                  require('postcss-import')({
+                  require("postcss-import")({
                     resolve(id, base, options) {
                       // Since WebStorm doesn't resolve imports from node_modules without a tilde (~) prefix,
                       // strip the tilde here to get the best of both worlds (webstorm support + postcss-import support)
-                      if (id[0] === '~') id = id.slice(1);
+                      if (id[0] === "~") id = id.slice(1);
                       // Call the original resolver after stripping the tilde
-                      return require('postcss-import/lib/resolve-id')(id, base, options);
+                      return require("postcss-import/lib/resolve-id")(id, base, options);
                     },
                   }),
-                  require('postcss-nesting')(),
-                  require('tailwindcss')(),
+                  require("postcss-nesting")(),
+                  require("tailwindcss")(),
                 ];
 
                 if (process.env.NODE_ENV === "production") {
-                  plugins.push(
-                    require('postcss-preset-env')(),
-                    require('cssnano')(),
-                  );
+                  plugins.push(require("postcss-preset-env")(), require("cssnano")());
                 }
 
                 return plugins;
@@ -137,9 +132,9 @@ let config = {
           {
             loader: "html-loader",
             options: {
-              root: path.resolve(__dirname, 'src'),
-              attrs: ['img:src', 'link:href'],
-              ...(process.env.NODE_ENV === 'production' && {
+              root: path.resolve(__dirname, "src"),
+              attrs: ["img:src", "link:href"],
+              ...(process.env.NODE_ENV === "production" && {
                 minimize: true,
                 removeComments: true,
                 collapseWhitespace: true,
@@ -153,29 +148,29 @@ let config = {
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: 'src/index.html',
+      template: "src/index.html",
       files: {
-        "css": ["./src/style/initial.pcss"],
-        "js": ["./src/main.ts"],
+        css: ["./src/style/initial.pcss"],
+        js: ["./src/main.ts"],
       },
     }),
     new DotenvPlugin(),
   ],
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.mjs', '.vue'],
+    extensions: [".ts", ".tsx", ".js", ".mjs", ".vue"],
     alias: pathAliases,
   },
 };
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   config = merge(config, {
-    mode: 'production',
-    devtool: 'source-map',
+    mode: "production",
+    devtool: "source-map",
   });
 } else {
   config = merge(config, {
-    mode: 'development',
-    devtool: 'eval',
+    mode: "development",
+    devtool: "eval",
     devServer: {
       ...(process.env.DEV_HOST ? { host: process.env.DEV_HOST } : undefined),
       historyApiFallback: true,

@@ -28,10 +28,10 @@ export async function cleanMessages(
 
   // Delete & archive in ID order
   savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-  const idsToDelete = savedMessages.map(m => m.id) as Snowflake[];
+  const idsToDelete = savedMessages.map((m) => m.id) as Snowflake[];
 
   // Make sure the deletions aren't double logged
-  idsToDelete.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+  idsToDelete.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
   // Actually delete the messages
@@ -122,9 +122,9 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
     if (potentialMessages.size === 0) break;
 
     const existingStored = await pluginData.state.savedMessages.getMultiple([...potentialMessages.keys()]);
-    const alreadyStored = existingStored.map(stored => stored.id);
+    const alreadyStored = existingStored.map((stored) => stored.id);
     const messagesToStore = [
-      ...potentialMessages.filter(potentialMsg => !alreadyStored.includes(potentialMsg.id)).values(),
+      ...potentialMessages.filter((potentialMsg) => !alreadyStored.includes(potentialMsg.id)).values(),
     ];
     await pluginData.state.savedMessages.createFromMessages(messagesToStore);
 
@@ -136,7 +136,7 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       const contentString = message.data.content || "";
       if (args.user && message.user_id !== args.user) continue;
       if (args.bots && !message.is_bot) continue;
-      if (!deletePins && pins.find(x => x.id === message.id) != null) continue;
+      if (!deletePins && pins.find((x) => x.id === message.id) != null) continue;
       if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
       if (upToMsgId != null && message.id < upToMsgId) {
         foundId = true;

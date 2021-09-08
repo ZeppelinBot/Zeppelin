@@ -25,7 +25,7 @@ export const TRegex = new t.Type<RegExp, string>(
   "TRegex",
   (s): s is RegExp => s instanceof RegExp,
   (from, to) =>
-    either.chain(t.string.validate(from, to), s => {
+    either.chain(t.string.validate(from, to), (s) => {
       try {
         return t.success(inputPatternToRegExp(s));
       } catch (err) {
@@ -36,7 +36,7 @@ export const TRegex = new t.Type<RegExp, string>(
         throw err;
       }
     }),
-  s => `/${s.source}/${s.flags}`,
+  (s) => `/${s.source}/${s.flags}`,
 );
 
 // From io-ts/lib/PathReporter
@@ -57,7 +57,7 @@ function stringify(v) {
 // tslint:disable
 function getContextPath(context) {
   return context
-    .map(function(_a) {
+    .map(function (_a) {
       var key = _a.key,
         type = _a.type;
       return key + ": " + type.name;
@@ -80,8 +80,8 @@ export class StrictValidationError extends Error {
 }
 
 const report = fold((errors: any): StrictValidationError | void => {
-  const errorStrings = errors.map(err => {
-    const context = err.context.map(c => c.key).filter(k => k && !k.startsWith("{"));
+  const errorStrings = errors.map((err) => {
+    const context = err.context.map((c) => c.key).filter((k) => k && !k.startsWith("{"));
     while (context.length > 0 && !isNaN(context[context.length - 1])) context.splice(-1);
 
     const value = stringify(err.value);
@@ -99,8 +99,8 @@ export function validate(schema: t.Type<any>, value: any): StrictValidationError
     pipe(
       validationResult,
       fold(
-        err => report(validationResult),
-        result => null,
+        (err) => report(validationResult),
+        (result) => null,
       ),
     ) || null
   );
@@ -119,8 +119,8 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
   return pipe(
     validationResult,
     fold(
-      err => report(validationResult),
-      result => {
+      (err) => report(validationResult),
+      (result) => {
         // Make sure there are no extra properties
         if (debug) {
           console.log(
@@ -133,7 +133,7 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
         }
         if (JSON.stringify(value) !== JSON.stringify(result)) {
           const diff = deepDiff(result, value);
-          const errors = diff.filter(d => d.kind === "N").map(d => `Unknown property <${d.path.join(".")}>`);
+          const errors = diff.filter((d) => d.kind === "N").map((d) => `Unknown property <${d.path.join(".")}>`);
           if (errors.length) return new StrictValidationError(errors);
         }
 

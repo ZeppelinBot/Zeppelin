@@ -90,7 +90,7 @@ export async function displaySearch(
 
   const perPage = args.ids ? SEARCH_ID_RESULTS_PER_PAGE : SEARCH_RESULTS_PER_PAGE;
 
-  const loadSearchPage = async page => {
+  const loadSearchPage = async (page) => {
     if (searching) return;
     searching = true;
 
@@ -101,7 +101,7 @@ export async function displaySearch(
       searchMsgPromise = originalSearchMsg.edit("Searching...");
     } else {
       searchMsgPromise = msg.channel.send("Searching...");
-      searchMsgPromise.then(m => (originalSearchMsg = m));
+      searchMsgPromise.then((m) => (originalSearchMsg = m));
     }
 
     let searchResult;
@@ -182,10 +182,7 @@ export async function displaySearch(
           .setEmoji("➡")
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
-        new MessageButton()
-          .setStyle("SECONDARY")
-          .setEmoji("🔄")
-          .setCustomId(`reloadButton:${idMod}`),
+        new MessageButton().setStyle("SECONDARY").setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
       );
 
       const row = new MessageActionRow().addComponents(buttons);
@@ -308,7 +305,7 @@ async function performMemberSearch(
 
   if (args.role) {
     const roleIds = args.role.split(",");
-    matchingMembers = matchingMembers.filter(member => {
+    matchingMembers = matchingMembers.filter((member) => {
       for (const role of roleIds) {
         if (!member.roles.cache.has(role as Snowflake)) return false;
       }
@@ -318,11 +315,11 @@ async function performMemberSearch(
   }
 
   if (args.voice) {
-    matchingMembers = matchingMembers.filter(m => m.voice.channelId);
+    matchingMembers = matchingMembers.filter((m) => m.voice.channelId);
   }
 
   if (args.bot) {
-    matchingMembers = matchingMembers.filter(m => m.user.bot);
+    matchingMembers = matchingMembers.filter((m) => m.user.bot);
   }
 
   if (args.query) {
@@ -379,7 +376,7 @@ async function performMemberSearch(
       });
     } else {
     */
-    matchingMembers = await asyncFilter(matchingMembers, async member => {
+    matchingMembers = await asyncFilter(matchingMembers, async (member) => {
       if (member.nickname && (await execRegExp(queryRegex, member.nickname).catch(allowTimeout))) {
         return true;
       }
@@ -396,12 +393,12 @@ async function performMemberSearch(
   const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
   if (sortBy === "id") {
-    matchingMembers.sort(sorter(m => BigInt(m.id), realSortDir));
+    matchingMembers.sort(sorter((m) => BigInt(m.id), realSortDir));
   } else {
     matchingMembers.sort(
       multiSorter([
-        [m => m.user.username.toLowerCase(), realSortDir],
-        [m => m.discriminator, realSortDir],
+        [(m) => m.user.username.toLowerCase(), realSortDir],
+        [(m) => m.discriminator, realSortDir],
       ]),
     );
   }
@@ -435,7 +432,7 @@ async function performBanSearch(
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
   }
 
-  let matchingBans = (await pluginData.guild.bans.fetch({ cache: false })).map(x => x.user);
+  let matchingBans = (await pluginData.guild.bans.fetch({ cache: false })).map((x) => x.user);
 
   if (args.query) {
     let isSafeRegex = true;
@@ -450,7 +447,7 @@ async function performBanSearch(
     }
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
-    matchingBans = await asyncFilter(matchingBans, async user => {
+    matchingBans = await asyncFilter(matchingBans, async (user) => {
       const fullUsername = user.tag;
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
@@ -461,12 +458,12 @@ async function performBanSearch(
   const realSortDir = sortDir === "-" ? "DESC" : "ASC";
 
   if (sortBy === "id") {
-    matchingBans.sort(sorter(m => BigInt(m.id), realSortDir));
+    matchingBans.sort(sorter((m) => BigInt(m.id), realSortDir));
   } else {
     matchingBans.sort(
       multiSorter([
-        [m => m.username.toLowerCase(), realSortDir],
-        [m => m.discriminator, realSortDir],
+        [(m) => m.username.toLowerCase(), realSortDir],
+        [(m) => m.discriminator, realSortDir],
       ]),
     );
   }
@@ -491,7 +488,7 @@ async function performBanSearch(
 
 function formatSearchResultList(members: Array<GuildMember | User>): string {
   const longestId = members.reduce((longest, member) => Math.max(longest, member.id.length), 0);
-  const lines = members.map(member => {
+  const lines = members.map((member) => {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
     if (member instanceof GuildMember) {
@@ -506,5 +503,5 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
 }
 
 function formatSearchResultIdList(members: Array<GuildMember | User>): string {
-  return members.map(m => m.id).join(" ");
+  return members.map((m) => m.id).join(" ");
 }

@@ -17,7 +17,7 @@ export const AddRolesAction = automodAction({
   defaultConfig: [],
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
-    const members = unique(contexts.map(c => c.member).filter(nonNullish));
+    const members = unique(contexts.map((c) => c.member).filter(nonNullish));
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
     const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
@@ -41,7 +41,7 @@ export const AddRolesAction = automodAction({
 
     if (rolesWeCannotAssign.length) {
       const roleNamesWeCannotAssign = rolesWeCannotAssign.map(
-        roleId => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
+        (roleId) => pluginData.guild.roles.cache.get(roleId as Snowflake)?.name || roleId,
       );
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
@@ -52,7 +52,7 @@ export const AddRolesAction = automodAction({
     }
 
     await Promise.all(
-      members.map(async member => {
+      members.map(async (member) => {
         const memberRoles = new Set(member.roles.cache.keys());
         for (const roleId of rolesToAssign) {
           memberRoles.add(roleId as Snowflake);

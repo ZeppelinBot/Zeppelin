@@ -405,10 +405,7 @@ export const LogTypeData = z.object({
   }),
 
   [LogType.MEMBER_ROLE_CHANGES]: z.object({
-    mod: z
-      .instanceof(TemplateSafeUser)
-      .or(z.instanceof(TemplateSafeUnknownUser))
-      .or(z.null()),
+    mod: z.instanceof(TemplateSafeUser).or(z.instanceof(TemplateSafeUnknownUser)).or(z.null()),
     member: z.instanceof(TemplateSafeMember),
     addedRoles: z.string(),
     removedRoles: z.string(),

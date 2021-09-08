@@ -96,8 +96,8 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE) {
     const voiceMembers = Array.from((channel as VoiceChannel | StageChannel).members.values());
-    const muted = voiceMembers.filter(vm => vm.voice.mute || vm.voice.selfMute);
-    const deafened = voiceMembers.filter(vm => vm.voice.deaf || vm.voice.selfDeaf);
+    const muted = voiceMembers.filter((vm) => vm.voice.mute || vm.voice.selfMute);
+    const deafened = voiceMembers.filter((vm) => vm.voice.deaf || vm.voice.selfDeaf);
     const voiceOrStage = channel.type === ChannelTypeStrings.VOICE ? "Voice" : "Stage";
 
     embed.fields.push({
@@ -112,10 +112,10 @@ export async function getChannelInfoEmbed(
 
   if (channel.type === ChannelTypeStrings.CATEGORY) {
     const textChannels = pluginData.guild.channels.cache.filter(
-      ch => ch.parentId === channel.id && ch.type !== ChannelTypeStrings.VOICE,
+      (ch) => ch.parentId === channel.id && ch.type !== ChannelTypeStrings.VOICE,
     );
     const voiceChannels = pluginData.guild.channels.cache.filter(
-      ch =>
+      (ch) =>
         ch.parentId === channel.id && (ch.type === ChannelTypeStrings.VOICE || ch.type === ChannelTypeStrings.STAGE),
     );
 

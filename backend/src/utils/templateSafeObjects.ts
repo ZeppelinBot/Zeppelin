@@ -262,7 +262,7 @@ export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMem
     ...templateSafeUser,
     user: templateSafeUser,
     nick: member.nickname ?? "*None*",
-    roles: [...member.roles.cache.mapValues(r => roleToTemplateSafeRole(r)).values()],
+    roles: [...member.roles.cache.mapValues((r) => roleToTemplateSafeRole(r)).values()],
     joinedAt: member.joinedTimestamp ?? undefined,
     guildName: member.guild.name,
   });
@@ -322,7 +322,7 @@ export function savedMessageToTemplateSafeSavedMessage(savedMessage: SavedMessag
 
     data: new TemplateSafeSavedMessageData({
       attachments: (savedMessage.data.attachments ?? []).map(
-        att =>
+        (att) =>
           new TemplateSafeValueContainer({
             id: att.id,
             contentType: att.contentType,
@@ -343,7 +343,7 @@ export function savedMessageToTemplateSafeSavedMessage(savedMessage: SavedMessag
       content: savedMessage.data.content,
 
       embeds: (savedMessage.data.embeds ?? []).map(
-        embed =>
+        (embed) =>
           new TemplateSafeValueContainer({
             title: embed.title,
             description: embed.description,
@@ -352,7 +352,7 @@ export function savedMessageToTemplateSafeSavedMessage(savedMessage: SavedMessag
             color: embed.color,
 
             fields: (embed.fields ?? []).map(
-              field =>
+              (field) =>
                 new TemplateSafeValueContainer({
                   name: field.name,
                   value: field.value,
@@ -407,7 +407,7 @@ export function savedMessageToTemplateSafeSavedMessage(savedMessage: SavedMessag
       ),
 
       stickers: (savedMessage.data.stickers ?? []).map(
-        sticker =>
+        (sticker) =>
           new TemplateSafeValueContainer({
             format: sticker.format,
             guildId: sticker.guildId,
@@ -459,7 +459,7 @@ export function getTemplateSafeMemberLevel(pluginData: GuildPluginData<any>, mem
 
   const levels = pluginData.fullConfig.levels ?? {};
   for (const [id, level] of Object.entries(levels)) {
-    if (member.id === id || member.roles?.find(r => r.id === id)) {
+    if (member.id === id || member.roles?.find((r) => r.id === id)) {
       return level as number;
     }
   }

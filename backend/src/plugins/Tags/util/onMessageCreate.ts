@@ -79,7 +79,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     }
   }
 
-  const isOnCooldown = cooldowns.some(cd => pluginData.cooldowns.isOnCooldown(cd[0]));
+  const isOnCooldown = cooldowns.some((cd) => pluginData.cooldowns.isOnCooldown(cd[0]));
   if (isOnCooldown) return;
 
   for (const cd of cooldowns) {
