@@ -48,7 +48,6 @@ export const AddRolesAction = automodAction({
           "**, **",
         )}**`,
       });
-      return;
     }
 
     await Promise.all(
