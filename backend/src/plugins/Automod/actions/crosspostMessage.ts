@@ -1,6 +1,6 @@
 import * as t from "io-ts";
-import { ChannelTypeStrings } from "src/types";
-import { noop } from "src/utils";
+import { ChannelTypeStrings } from "../../../types";
+import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
 
 export const CrosspostMessageAction = automodAction({
