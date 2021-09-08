@@ -22,7 +22,7 @@ export const ChangeRolesAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const members = unique(contexts.map(c => c.member).filter(nonNullish));
-    const me = pluginData.guild.me ?? await pluginData.guild.members.fetch(pluginData.client.user!.id);
+    const me = pluginData.guild.me ?? (await pluginData.guild.members.fetch(pluginData.client.user!.id));
 
     const missingPermissions = getMissingPermissions(me.permissions, Permissions.FLAGS.MANAGE_ROLES);
     if (missingPermissions) {
@@ -88,7 +88,7 @@ export const ChangeRolesAction = automodAction({
           ignoreRoleChange(pluginData, member.id, roleId);
         }
 
-        if (isEqual(memberRoles, member.roles.cache.keys())) {
+        if (isEqual(Array.from(memberRoles), Array.from(member.roles.cache.keys()))) {
           // No role changes
           return;
         }
