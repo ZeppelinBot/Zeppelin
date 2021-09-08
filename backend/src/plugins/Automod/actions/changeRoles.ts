@@ -52,28 +52,15 @@ export const ChangeRolesAction = automodAction({
       }
     }
 
-    if (rolesWeCannotAssign.length) {
-      const roleNamesWeCannotAssign = rolesWeCannotAssign.map(
-        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
-      );
+    if (rolesWeCannotAssign.length || rolesWeCannotRemove.length) {
+      const mapFn = (roleId: Snowflake) => pluginData.guild.roles.cache.get(roleId)?.name || roleId;
+      const roleNamesWeCannotAssign = rolesWeCannotAssign.map(mapFn);
+      const roleNamesWeCannotRemove = rolesWeCannotRemove.map(mapFn);
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.logBotAlert({
-        body: `Unable to assign the following roles in Automod rule **${ruleName}**: **${roleNamesWeCannotAssign.join(
-          "**, **",
-        )}**`,
-      });
-    }
-
-    if (rolesWeCannotRemove.length) {
-      const roleNamesWeCannotRemove = rolesWeCannotRemove.map(
-        roleId => pluginData.guild.roles.cache.get(roleId)?.name || roleId,
-      );
-      const logs = pluginData.getPlugin(LogsPlugin);
-      logs.logBotAlert({
-        body: `Unable to remove the following roles in Automod rule **${ruleName}**: **${roleNamesWeCannotRemove.join(
-          "**, **",
-        )}**`,
-      });
+      let body = `Unable to change roles in Automod rule **${ruleName}**:`;
+      if (roleNamesWeCannotAssign.length) body += `\n**Add:** ${roleNamesWeCannotAssign.join("**, **")}}`;
+      if (roleNamesWeCannotRemove.length) body += `\n**Remove:** ${roleNamesWeCannotRemove.join("**, **")}}`;
+      logs.logBotAlert({ body });
     }
 
     await Promise.all(
