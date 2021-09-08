@@ -1,6 +1,5 @@
 import { Permissions, Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
@@ -49,6 +48,7 @@ export const AddRolesAction = automodAction({
           "**, **",
         )}**`,
       });
+      return;
     }
 
     await Promise.all(

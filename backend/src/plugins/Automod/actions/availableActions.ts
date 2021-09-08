@@ -6,6 +6,7 @@ import { AlertAction } from "./alert";
 import { ArchiveThreadAction } from "./archiveThread";
 import { BanAction } from "./ban";
 import { ChangeNicknameAction } from "./changeNickname";
+import { ChangeRolesAction } from "./changeRoles";
 import { CleanAction } from "./clean";
 import { KickAction } from "./kick";
 import { LogAction } from "./log";
@@ -34,6 +35,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   set_counter: SetCounterAction,
   set_slowmode: SetSlowmodeAction,
   archive_thread: ArchiveThreadAction,
+  change_roles: ChangeRolesAction,
 };
 
 export const AvailableActions = t.type({
@@ -53,4 +55,5 @@ export const AvailableActions = t.type({
   set_counter: SetCounterAction.configType,
   set_slowmode: SetSlowmodeAction.configType,
   archive_thread: ArchiveThreadAction.configType,
+  change_roles: ChangeRolesAction.configType,
 });
