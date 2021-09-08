@@ -66,24 +66,24 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
         continue;
       }
 
-      rule["name"] = name;
+      rule.name = name;
 
       // If the rule doesn't have an explicitly set "enabled" property, set it to true
-      if (rule["enabled"] == null) {
-        rule["enabled"] = true;
+      if (rule.enabled == null) {
+        rule.enabled = true;
       }
 
-      if (rule["allow_further_rules"] == null) {
-        rule["allow_further_rules"] = false;
+      if (rule.allow_further_rules == null) {
+        rule.allow_further_rules = false;
       }
 
-      if (rule["affects_bots"] == null) {
-        rule["affects_bots"] = false;
+      if (rule.affects_bots == null) {
+        rule.affects_bots = false;
       }
 
       // Loop through the rule's triggers
-      if (rule["triggers"]) {
-        for (const triggerObj of rule["triggers"]) {
+      if (rule.triggers) {
+        for (const triggerObj of rule.triggers) {
           for (const triggerName in triggerObj) {
             if (!availableTriggers[triggerName]) {
               throw new StrictValidationError([`Unknown trigger '${triggerName}' in rule '${rule.name}'`]);
@@ -152,26 +152,26 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
           }
 
           const actionBlueprint = availableActions[actionName];
-          const actionConfig = rule["actions"][actionName];
+          const actionConfig = rule.actions[actionName];
 
           if (typeof actionConfig !== "object" || Array.isArray(actionConfig) || actionConfig == null) {
-            rule["actions"][actionName] = actionConfig;
+            rule.actions[actionName] = actionConfig;
           } else {
-            rule["actions"][actionName] = configUtils.mergeConfig(actionBlueprint.defaultConfig, actionConfig);
+            rule.actions[actionName] = configUtils.mergeConfig(actionBlueprint.defaultConfig, actionConfig);
           }
         }
       }
 
       // Enable logging of automod actions by default
-      if (rule["actions"]) {
+      if (rule.actions) {
         for (const actionName in rule.actions) {
           if (!availableActions[actionName]) {
             throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule.name}'`]);
           }
         }
 
-        if (rule["actions"]["log"] == null) {
-          rule["actions"]["log"] = true;
+        if (rule.actions.log == null) {
+          rule.actions.log = true;
         }
       }
     }
