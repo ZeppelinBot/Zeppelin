@@ -10,8 +10,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 import { automodAction } from "../helpers";
 
-const p = Permissions.FLAGS;
-
 export const ChangeRolesAction = automodAction({
   configType: t.type({
     add: t.array(t.string),
