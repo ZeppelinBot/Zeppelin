@@ -49,7 +49,6 @@ export const RemoveRolesAction = automodAction({
           "**, **",
         )}**`,
       });
-      return;
     }
 
     await Promise.all(
