@@ -4,8 +4,8 @@ import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { createChunkedMessage, formatNumber, resolveInvite, sorter, verboseUserMention } from "../../../utils";
 import { botControlCmd } from "../types";
 
-export const PerformanceCmd = botControlCmd({
-  trigger: ["performance"],
+export const PluginPerformanceCmd = botControlCmd({
+  trigger: ["plugin_performance"],
   permission: "can_performance",
 
   signature: {},
