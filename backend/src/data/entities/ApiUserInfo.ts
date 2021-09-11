@@ -20,15 +20,9 @@ export class ApiUserInfo {
   @Column()
   updated_at: string;
 
-  @OneToMany(
-    type => ApiLogin,
-    login => login.userInfo,
-  )
+  @OneToMany((type) => ApiLogin, (login) => login.userInfo)
   logins: ApiLogin[];
 
-  @OneToMany(
-    type => ApiPermissionAssignment,
-    p => p.userInfo,
-  )
+  @OneToMany((type) => ApiPermissionAssignment, (p) => p.userInfo)
   permissionAssignments: ApiPermissionAssignment[];
 }

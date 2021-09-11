@@ -5,9 +5,7 @@
 
 const childProcess = require("child_process");
 
-const cmd = process.platform === "win32"
-  ? "npm.cmd"
-  : "npm";
+const cmd = process.platform === "win32" ? "npm.cmd" : "npm";
 
 childProcess.spawn(cmd, ["run", "start-bot-dev"], {
   stdio: [process.stdin, process.stdout, process.stderr],

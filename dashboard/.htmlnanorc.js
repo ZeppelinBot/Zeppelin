@@ -1,3 +1,3 @@
 module.exports = {
-  collapseWhitespace: false
+  collapseWhitespace: false,
 };

@@ -64,7 +64,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
         // When performing loose matching, allow any amount of whitespace or up to looseMatchingThreshold number of other
         // characters between the matched characters. E.g. if we're matching banana, a loose match could also match b a n a n a
         let pattern = trigger.loose_matching
-          ? [...word].map(c => escapeStringRegexp(c)).join(`(?:\\s*|.{0,${looseMatchingThreshold})`)
+          ? [...word].map((c) => escapeStringRegexp(c)).join(`(?:\\s*|.{0,${looseMatchingThreshold})`)
           : escapeStringRegexp(word);
 
         if (trigger.only_full_words) {

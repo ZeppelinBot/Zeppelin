@@ -25,8 +25,8 @@ export async function decayCounter(
   const triggers = pluginData.state.counterTriggersByCounterId.get(counterId);
   if (triggers) {
     const triggersArr = Array.from(triggers.values());
-    await Promise.all(triggersArr.map(trigger => checkAllValuesForTrigger(pluginData, counterName, trigger)));
-    await Promise.all(triggersArr.map(trigger => checkAllValuesForReverseTrigger(pluginData, counterName, trigger)));
+    await Promise.all(triggersArr.map((trigger) => checkAllValuesForTrigger(pluginData, counterName, trigger)));
+    await Promise.all(triggersArr.map((trigger) => checkAllValuesForReverseTrigger(pluginData, counterName, trigger)));
   }
 
   lock.unlock();

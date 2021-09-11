@@ -82,7 +82,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
     const { state } = pluginData;
 
     state.expiryInterval = setInterval(() => clearOldRecentActions(pluginData), 1000 * 60);
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
   },
 

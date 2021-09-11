@@ -35,7 +35,7 @@ export const permissionHierarchy: TPermissionHierarchy = [
 ];
 
 export function permissionArrToSet(permissions: string[]): Set<ApiPermissions> {
-  return new Set(permissions.filter(p => reverseApiPermissions[p])) as Set<ApiPermissions>;
+  return new Set(permissions.filter((p) => reverseApiPermissions[p])) as Set<ApiPermissions>;
 }
 
 /**

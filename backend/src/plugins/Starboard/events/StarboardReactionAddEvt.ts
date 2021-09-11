@@ -37,11 +37,11 @@ export const StarboardReactionAddEvt = starboardEvt({
     const boardLock = await pluginData.locks.acquire(allStarboardsLock());
 
     const applicableStarboards = Object.values(config.boards)
-      .filter(board => board.enabled)
+      .filter((board) => board.enabled)
       // Can't star messages in the starboard channel itself
-      .filter(board => board.channel_id !== msg.channel.id)
+      .filter((board) => board.channel_id !== msg.channel.id)
       // Matching emoji
-      .filter(board => {
+      .filter((board) => {
         return board.star_emoji!.some((boardEmoji: string) => {
           if (emoji.id) {
             // Custom emoji

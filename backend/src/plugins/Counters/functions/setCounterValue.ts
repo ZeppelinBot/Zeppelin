@@ -35,10 +35,10 @@ export async function setCounterValue(
   if (triggers) {
     const triggersArr = Array.from(triggers.values());
     await Promise.all(
-      triggersArr.map(trigger => checkCounterTrigger(pluginData, counterName, trigger, channelId, userId)),
+      triggersArr.map((trigger) => checkCounterTrigger(pluginData, counterName, trigger, channelId, userId)),
     );
     await Promise.all(
-      triggersArr.map(trigger => checkReverseCounterTrigger(pluginData, counterName, trigger, channelId, userId)),
+      triggersArr.map((trigger) => checkReverseCounterTrigger(pluginData, counterName, trigger, channelId, userId)),
     );
   }
 

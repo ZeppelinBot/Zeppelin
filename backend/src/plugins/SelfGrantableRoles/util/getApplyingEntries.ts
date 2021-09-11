@@ -11,5 +11,5 @@ export async function getApplyingEntries(
       ([k, e]) =>
         e.can_use && !(!e.can_ignore_cooldown && pluginData.state.cooldowns.isOnCooldown(`${k}:${msg.author.id}`)),
     )
-    .map(pair => pair[1]);
+    .map((pair) => pair[1]);
 }

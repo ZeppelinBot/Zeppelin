@@ -3,7 +3,7 @@ import * as t from "io-ts";
 import { tDeepPartial } from "./utils";
 import * as validatorUtils from "./validatorUtils";
 
-test("tDeepPartial works", ava => {
+test("tDeepPartial works", (ava) => {
   const originalSchema = t.type({
     listOfThings: t.record(
       t.string,

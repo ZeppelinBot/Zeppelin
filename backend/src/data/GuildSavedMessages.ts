@@ -46,7 +46,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     };
 
     if (msg.attachments.size) {
-      data.attachments = Array.from(msg.attachments.values()).map(att => ({
+      data.attachments = Array.from(msg.attachments.values()).map((att) => ({
         id: att.id,
         contentType: att.contentType,
         name: att.name,
@@ -59,14 +59,14 @@ export class GuildSavedMessages extends BaseGuildRepository {
     }
 
     if (msg.embeds.length) {
-      data.embeds = msg.embeds.map(embed => ({
+      data.embeds = msg.embeds.map((embed) => ({
         title: embed.title,
         description: embed.description,
         url: embed.url,
         timestamp: embed.timestamp,
         color: embed.color,
 
-        fields: embed.fields.map(field => ({
+        fields: embed.fields.map((field) => ({
           name: field.name,
           value: field.value,
           inline: field.inline,
@@ -119,7 +119,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
     }
 
     if (msg.stickers?.size) {
-      data.stickers = Array.from(msg.stickers.values()).map(sticker => ({
+      data.stickers = Array.from(msg.stickers.values()).map((sticker) => ({
         format: sticker.format,
         guildId: sticker.guildId,
         id: sticker.id,

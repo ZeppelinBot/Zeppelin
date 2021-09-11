@@ -29,7 +29,7 @@ export class Queue<TQueueFunction extends AnyFn = AnyFn> {
   }
 
   public add(fn: TQueueFunction): Promise<any> {
-    const promise = new Promise<any>(resolve => {
+    const promise = new Promise<any>((resolve) => {
       this.queue.push(async () => {
         const result = await fn();
         resolve(result);
@@ -50,7 +50,7 @@ export class Queue<TQueueFunction extends AnyFn = AnyFn> {
     }
 
     const fn = this.queue.shift()!;
-    new Promise(resolve => {
+    new Promise((resolve) => {
       // Either fn() completes or the timeout is reached
       void fn().then(resolve);
       setTimeout(resolve, this._timeout);

@@ -27,7 +27,7 @@ const INITIAL_REGEX_TIMEOUT = 5 * SECONDS;
 const INITIAL_REGEX_TIMEOUT_DURATION = 30 * SECONDS;
 const FINAL_REGEX_TIMEOUT = 5 * SECONDS;
 
-const regexTimeoutUpgradePromise = new Promise(resolve => setTimeout(resolve, INITIAL_REGEX_TIMEOUT_DURATION));
+const regexTimeoutUpgradePromise = new Promise((resolve) => setTimeout(resolve, INITIAL_REGEX_TIMEOUT_DURATION));
 
 let newWorkerTimeout = INITIAL_REGEX_TIMEOUT;
 regexTimeoutUpgradePromise.then(() => (newWorkerTimeout = FINAL_REGEX_TIMEOUT));

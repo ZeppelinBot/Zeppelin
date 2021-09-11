@@ -60,7 +60,7 @@ export const MassAddRoleCmd = rolesCmd({
       return;
     }
 
-    const membersWithoutTheRole = members.filter(m => !m.roles.cache.has(roleId));
+    const membersWithoutTheRole = members.filter((m) => !m.roles.cache.has(roleId));
     let assigned = 0;
     const failed: string[] = [];
     const alreadyHadRole = members.length - membersWithoutTheRole.length;

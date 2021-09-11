@@ -48,10 +48,7 @@ export const AllowServerCmd = botControlCmd({
         args.guildId,
         msg.author.id,
         [ApiPermissions.ManageAccess],
-        moment
-          .utc()
-          .add(1, "hour")
-          .format(DBDateFormat),
+        moment.utc().add(1, "hour").format(DBDateFormat),
       );
     }
 

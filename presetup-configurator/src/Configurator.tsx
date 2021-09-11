@@ -5,7 +5,7 @@ import yaml from "js-yaml";
 import "./Configurator.css";
 
 export function Configurator() {
-  const [prefix, setPrefix] = useState('!');
+  const [prefix, setPrefix] = useState("!");
   const [levels, setLevels] = useState<LevelEntry[]>([]);
 
   const [withModCommands, setWithModCommands] = useState(false);
@@ -42,7 +42,7 @@ export function Configurator() {
         resultObj.plugins.mutes = {
           config: {
             mute_role: muteRoleId,
-          }
+          },
         };
 
         if (dmModActionReasons) {
@@ -108,7 +108,7 @@ export function Configurator() {
     setCopied(true);
   }
 
-  const [copyResetTimeout, setCopyResetTimeout] = useState<number|null>(null);
+  const [copyResetTimeout, setCopyResetTimeout] = useState<number | null>(null);
   useEffect(() => {
     if (!copied) {
       return;
@@ -129,8 +129,9 @@ export function Configurator() {
         <h2>Prefix</h2>
         <div className="control">
           <label>
-            Bot prefix<br />
-            <input value={prefix} onChange={e => setPrefix(e.target.value)} />
+            Bot prefix
+            <br />
+            <input value={prefix} onChange={(e) => setPrefix(e.target.value)} />
           </label>
         </div>
 
@@ -142,24 +143,30 @@ export function Configurator() {
         <h2>Mod commands</h2>
         <div className="control">
           <label>
-            <input type="checkbox" checked={withModCommands} onChange={e => setWithModCommands(e.target.checked)} />
+            <input type="checkbox" checked={withModCommands} onChange={(e) => setWithModCommands(e.target.checked)} />
             Start with a basic mod command setup
           </label>
 
           {withModCommands && (
             <div>
               <label>
-                Mute role ID<br />
-                <input value={muteRoleId} onChange={e => setMuteRoleId(e.target.value)} />
+                Mute role ID
+                <br />
+                <input value={muteRoleId} onChange={(e) => setMuteRoleId(e.target.value)} />
               </label>
 
               <label>
-                Case channel ID<br />
-                <input value={caseChannelId} onChange={e => setCaseChannelId(e.target.value)} />
+                Case channel ID
+                <br />
+                <input value={caseChannelId} onChange={(e) => setCaseChannelId(e.target.value)} />
               </label>
 
               <label>
-                <input type="checkbox" checked={dmModActionReasons} onChange={e => setDmModActionReasons(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={dmModActionReasons}
+                  onChange={(e) => setDmModActionReasons(e.target.checked)}
+                />
                 DM reason with mod actions
               </label>
             </div>
@@ -169,21 +176,23 @@ export function Configurator() {
         <h2>Logs</h2>
         <div className="control">
           <label>
-            <input type="checkbox" checked={withLogs} onChange={e => setWithLogs(e.target.checked)} />
+            <input type="checkbox" checked={withLogs} onChange={(e) => setWithLogs(e.target.checked)} />
             Start with a basic logging setup
           </label>
 
-          {withLogs && (
-            <LogChannels logChannels={logChannels} setLogChannels={setLogChannels} />
-          )}
+          {withLogs && <LogChannels logChannels={logChannels} setLogChannels={setLogChannels} />}
         </div>
       </div>
 
       {/* Result */}
-      <textarea className="result" rows={resultRows} readOnly={true} value={formattedResult} onClick={e => copyResultText(e.target as HTMLTextAreaElement)} />
-      {copied
-        ? <em>Copied!</em>
-        : <em>Click textarea to copy</em>}
+      <textarea
+        className="result"
+        rows={resultRows}
+        readOnly={true}
+        value={formattedResult}
+        onClick={(e) => copyResultText(e.target as HTMLTextAreaElement)}
+      />
+      {copied ? <em>Copied!</em> : <em>Click textarea to copy</em>}
     </div>
   );
 }

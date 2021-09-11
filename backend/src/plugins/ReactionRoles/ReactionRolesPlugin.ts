@@ -42,7 +42,7 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
 
 const MAXIMUM_COMPONENT_ROWS = 5;
 
-const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = (options) => {
   if (options.config.button_groups) {
     for (const [groupName, group] of Object.entries(options.config.button_groups)) {
       const defaultButtonNames = Object.keys(group.default_buttons);

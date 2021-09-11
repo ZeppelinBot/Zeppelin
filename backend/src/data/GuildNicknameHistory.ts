@@ -70,7 +70,7 @@ export class GuildNicknameHistory extends BaseGuildRepository {
 
     if (toDelete.length > 0) {
       await this.nicknameHistory.delete({
-        id: In(toDelete.map(v => v.id)),
+        id: In(toDelete.map((v) => v.id)),
       });
     }
   }

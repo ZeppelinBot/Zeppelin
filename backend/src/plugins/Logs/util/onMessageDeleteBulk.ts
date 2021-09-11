@@ -17,7 +17,7 @@ export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPlugin
     | ThreadChannel;
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
   const archiveUrl = pluginData.state.archives.getUrl(getBaseUrl(pluginData), archiveId);
-  const authorIds = Array.from(new Set(savedMessages.map(item => `\`${item.user_id}\``)));
+  const authorIds = Array.from(new Set(savedMessages.map((item) => `\`${item.user_id}\``)));
 
   logMessageDeleteBulk(pluginData, {
     count: savedMessages.length,

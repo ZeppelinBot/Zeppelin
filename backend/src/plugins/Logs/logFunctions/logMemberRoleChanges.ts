@@ -21,8 +21,8 @@ export function logMemberRoleChanges(pluginData: GuildPluginData<LogsPluginType>
     createTypedTemplateSafeValueContainer({
       mod: data.mod ? userToTemplateSafeUser(data.mod) : null,
       member: memberToTemplateSafeMember(data.member),
-      addedRoles: data.addedRoles.map(r => r.name).join(", "),
-      removedRoles: data.removedRoles.map(r => r.name).join(", "),
+      addedRoles: data.addedRoles.map((r) => r.name).join(", "),
+      removedRoles: data.removedRoles.map((r) => r.name).join(", "),
     }),
     {
       userId: data.member.id,

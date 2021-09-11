@@ -58,10 +58,7 @@ export const HelpCmd = utilityCmd({
 
       const description = command.config!.extra!.blueprint.description;
       const usage = command.config!.extra!.blueprint.usage;
-      const commandSlug = trigger
-        .trim()
-        .toLowerCase()
-        .replace(/\s/g, "-");
+      const commandSlug = trigger.trim().toLowerCase().replace(/\s/g, "-");
 
       let snippet = `**${prefix}${trigger}**`;
       if (description) snippet += `\n${description}`;

@@ -59,10 +59,7 @@ export function createStarboardEmbedFromMessage(
   // If there are no embeds, add the first image attachment explicitly
   else if (msg.attachments.size) {
     for (const attachment of msg.attachments) {
-      const ext = path
-        .extname(attachment[1].name!)
-        .slice(1)
-        .toLowerCase();
+      const ext = path.extname(attachment[1].name!).slice(1).toLowerCase();
 
       if (imageAttachmentExtensions.includes(ext)) {
         embed.image = { url: attachment[1].url };

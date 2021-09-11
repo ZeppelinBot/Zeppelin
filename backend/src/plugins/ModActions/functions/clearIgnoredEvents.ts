@@ -7,7 +7,7 @@ export function clearIgnoredEvents(
   userId: string,
 ) {
   pluginData.state.ignoredEvents.splice(
-    pluginData.state.ignoredEvents.findIndex(info => type === info.type && userId === info.userId),
+    pluginData.state.ignoredEvents.findIndex((info) => type === info.type && userId === info.userId),
     1,
   );
 }

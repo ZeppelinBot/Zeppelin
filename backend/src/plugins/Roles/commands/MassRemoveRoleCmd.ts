@@ -60,7 +60,7 @@ export const MassRemoveRoleCmd = rolesCmd({
       return;
     }
 
-    const membersWithTheRole = members.filter(m => m.roles.cache.has(roleId));
+    const membersWithTheRole = members.filter((m) => m.roles.cache.has(roleId));
     let assigned = 0;
     const failed: string[] = [];
     const didNotHaveRole = members.length - membersWithTheRole.length;

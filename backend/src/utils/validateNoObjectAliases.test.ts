@@ -1,7 +1,7 @@
 import test from "ava";
 import { ObjectAliasError, validateNoObjectAliases } from "./validateNoObjectAliases";
 
-test("validateNoObjectAliases() disallows object aliases at top level", t => {
+test("validateNoObjectAliases() disallows object aliases at top level", (t) => {
   const obj: any = {
     objectRef: {
       foo: "bar",
@@ -12,7 +12,7 @@ test("validateNoObjectAliases() disallows object aliases at top level", t => {
   t.throws(() => validateNoObjectAliases(obj), { instanceOf: ObjectAliasError });
 });
 
-test("validateNoObjectAliases() disallows aliases to nested objects", t => {
+test("validateNoObjectAliases() disallows aliases to nested objects", (t) => {
   const obj: any = {
     nested: {
       objectRef: {
@@ -25,7 +25,7 @@ test("validateNoObjectAliases() disallows aliases to nested objects", t => {
   t.throws(() => validateNoObjectAliases(obj), { instanceOf: ObjectAliasError });
 });
 
-test("validateNoObjectAliases() disallows nested object aliases", t => {
+test("validateNoObjectAliases() disallows nested object aliases", (t) => {
   const obj: any = {
     nested: {
       objectRef: {

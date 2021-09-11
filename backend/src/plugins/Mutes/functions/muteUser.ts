@@ -67,12 +67,12 @@ export async function muteUser(
     if (!Array.isArray(removeRoles)) {
       if (removeRoles) {
         // exclude managed roles from being removed
-        const managedRoles = pluginData.guild.roles.cache.filter(x => x.managed).map(y => y.id);
-        newRoles = currentUserRoles.filter(r => !managedRoles.includes(r));
+        const managedRoles = pluginData.guild.roles.cache.filter((x) => x.managed).map((y) => y.id);
+        newRoles = currentUserRoles.filter((r) => !managedRoles.includes(r));
         await member.roles.set(newRoles as Snowflake[]);
       }
     } else {
-      newRoles = currentUserRoles.filter(x => !(<string[]>removeRoles).includes(x));
+      newRoles = currentUserRoles.filter((x) => !(<string[]>removeRoles).includes(x));
       await member.roles.set(newRoles as Snowflake[]);
     }
 
@@ -82,7 +82,7 @@ export async function muteUser(
         rolesToRestore = currentUserRoles;
       }
     } else {
-      rolesToRestore = currentUserRoles.filter(x => (<string[]>restoreRoles).includes(x));
+      rolesToRestore = currentUserRoles.filter((x) => (<string[]>restoreRoles).includes(x));
     }
 
     // Apply mute role if it's missing
@@ -100,9 +100,9 @@ export async function muteUser(
         }
 
         const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-        const zepRoles = pluginData.guild.roles.cache.filter(x => zep!.roles.cache.has(x.id));
+        const zepRoles = pluginData.guild.roles.cache.filter((x) => zep!.roles.cache.has(x.id));
         // If we have roles and one of them is above the muted role, throw generic error
-        if (zepRoles.size >= 0 && zepRoles.some(zepRole => zepRole.position > actualMuteRole.position)) {
+        if (zepRoles.size >= 0 && zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
           lock.unlock();
           logs.logBotAlert({
             body: `Cannot mute user ${member.id}: ${e}`,

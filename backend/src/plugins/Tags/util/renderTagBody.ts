@@ -65,6 +65,6 @@ export async function renderTagBody(
     return { content: await renderTemplate(body, data) };
   } else {
     // Embed
-    return renderRecursively(body, str => renderTemplate(str, data));
+    return renderRecursively(body, (str) => renderTemplate(str, data));
   }
 }

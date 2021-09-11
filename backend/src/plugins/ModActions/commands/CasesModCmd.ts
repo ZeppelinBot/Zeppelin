@@ -46,9 +46,9 @@ export const CasesModCmd = modActionsCmd({
       pluginData.client,
       msg.channel,
       totalPages,
-      async page => {
+      async (page) => {
         const cases = await casesPlugin.getRecentCasesByMod(modId, casesPerPage, (page - 1) * casesPerPage);
-        const lines = await asyncMap(cases, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
+        const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
         const firstCaseNum = (page - 1) * casesPerPage + 1;
         const lastCaseNum = page * casesPerPage;

@@ -31,9 +31,7 @@ export const PostButtonRolesCmd = reactionRolesCmd({
     const buttons: MessageButton[] = [];
     const toInsert: Array<{ customId; buttonGroup; buttonName }> = [];
     for (const [buttonName, button] of Object.entries(group.default_buttons)) {
-      const customId = createHash("md5")
-        .update(`${buttonName}${moment.utc().valueOf()}`)
-        .digest("hex");
+      const customId = createHash("md5").update(`${buttonName}${moment.utc().valueOf()}`).digest("hex");
 
       const btn = new MessageButton()
         .setLabel(button.label ?? "")

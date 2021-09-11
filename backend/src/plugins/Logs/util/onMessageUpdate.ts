@@ -17,12 +17,12 @@ export async function onMessageUpdate(
   let logUpdate = false;
 
   const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as MessageEmbed[])
-    .map(e => cloneDeep(e))
-    .filter(e => (e as MessageEmbed).type === "rich");
+    .map((e) => cloneDeep(e))
+    .filter((e) => (e as MessageEmbed).type === "rich");
 
   const newEmbedsToCompare = ((savedMessage.data.embeds || []) as MessageEmbed[])
-    .map(e => cloneDeep(e))
-    .filter(e => (e as MessageEmbed).type === "rich");
+    .map((e) => cloneDeep(e))
+    .filter((e) => (e as MessageEmbed).type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {

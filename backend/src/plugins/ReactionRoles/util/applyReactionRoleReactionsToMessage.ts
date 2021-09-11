@@ -65,7 +65,7 @@ export async function applyReactionRoleReactionsToMessage(
   await sleep(1500);
 
   // Add reaction role reactions
-  const emojisToAdd = reactionRoles.map(rr => rr.emoji);
+  const emojisToAdd = reactionRoles.map((rr) => rr.emoji);
   emojisToAdd.push(CLEAR_ROLES_EMOJI);
 
   for (const rawEmoji of emojisToAdd) {
