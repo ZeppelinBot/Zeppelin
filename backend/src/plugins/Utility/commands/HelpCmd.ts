@@ -34,6 +34,7 @@ export const HelpCmd = utilityCmd({
               plugin,
               command: registeredCommand,
             });
+            break;
           }
         }
       }
