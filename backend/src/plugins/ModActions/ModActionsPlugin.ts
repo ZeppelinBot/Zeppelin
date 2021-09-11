@@ -126,12 +126,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   configSchema: ConfigSchema,
   defaultOptions,
 
-  events: [
-    CreateBanCaseOnManualBanEvt,
-    CreateUnbanCaseOnManualUnbanEvt,
-    CreateKickCaseOnManualKickEvt,
-    PostAlertOnMemberJoinEvt,
-  ],
+  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt],
 
   commands: [
     UpdateCmd,
