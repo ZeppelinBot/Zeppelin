@@ -3,22 +3,6 @@ import { messageSaverEvt } from "../types";
 import { SECONDS } from "../../../utils";
 import moment from "moment-timezone";
 
-const recentlyCreatedMessages: Map<Snowflake, [debugId: number, timestamp: number, guildId: string]> = new Map();
-const recentlyCreatedMessagesToKeep = 100;
-
-setInterval(() => {
-  let toDelete = recentlyCreatedMessages.size - recentlyCreatedMessagesToKeep;
-  for (const key of recentlyCreatedMessages.keys()) {
-    if (toDelete === 0) {
-      break;
-    }
-
-    recentlyCreatedMessages.delete(key);
-
-    toDelete--;
-  }
-}, 60 * SECONDS);
-
 const AFFECTED_MESSAGE_TYPES: MessageType[] = ["DEFAULT", "REPLY", "APPLICATION_COMMAND"];
 
 export const MessageCreateEvt = messageSaverEvt({
@@ -40,23 +24,6 @@ export const MessageCreateEvt = messageSaverEvt({
     if (meta.args.message.author.id === meta.pluginData.client.user?.id) {
       return;
     }
-
-    // FIXME: Remove debug code
-    if (recentlyCreatedMessages.has(meta.args.message.id)) {
-      const ourDebugId = meta.pluginData.state.debugId;
-      const oldDebugId = recentlyCreatedMessages.get(meta.args.message.id)![0];
-      const oldGuildId = recentlyCreatedMessages.get(meta.args.message.id)![2];
-      const context = `${ourDebugId} : ${oldDebugId} / ${meta.pluginData.guild.id} : ${oldGuildId} : ${meta.args.message.guildId} / ${meta.args.message.channelId} / ${meta.args.message.id}`;
-      const timestamp = moment(recentlyCreatedMessages.get(meta.args.message.id)![1]).format("HH:mm:ss.SSS");
-      // tslint:disable-next-line:no-console
-      console.warn(`Tried to save duplicate message from messageCreate event: ${context} / saved at: ${timestamp}`);
-      return;
-    }
-    recentlyCreatedMessages.set(meta.args.message.id, [
-      meta.pluginData.state.debugId,
-      Date.now(),
-      meta.pluginData.guild.id,
-    ]);
 
     await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },
