@@ -20,6 +20,7 @@ import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
 import { PerformanceCmd } from "./commands/PerformanceCmd";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
+import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
 
 const defaultOptions = {
   config: {
@@ -52,6 +53,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
     EligibleCmd,
     PerformanceCmd,
     AddServerFromInviteCmd,
+    ChannelToServerCmd,
   ],
 
   async afterLoad(pluginData) {
