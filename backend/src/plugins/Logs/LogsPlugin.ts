@@ -266,7 +266,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.cases = GuildCases.getGuildInstance(guild.id);
 
-    state.batches = new Map();
+    state.buffers = new Map();
 
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
   },
