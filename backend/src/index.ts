@@ -21,6 +21,7 @@ import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMe
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
+import { logRestCall } from "./restCallStats";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -156,6 +157,15 @@ moment.tz.setDefault("UTC");
 
 logger.info("Connecting to database");
 connect().then(async () => {
+  const RequestHandler = require("discord.js/src/rest/RequestHandler.js");
+  const originalPush = RequestHandler.prototype.push;
+  // tslint:disable-next-line:only-arrow-functions
+  RequestHandler.prototype.push = function (...args) {
+    const request = args[0];
+    logRestCall(request.method, request.path);
+    return originalPush.call(this, ...args);
+  };
+
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
 
