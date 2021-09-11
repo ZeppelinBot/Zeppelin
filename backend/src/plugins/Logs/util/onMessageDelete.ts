@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, Snowflake, ThreadChannel } from "discord.js";
+import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -10,9 +10,14 @@ import { logMessageDeleteBare } from "../logFunctions/logMessageDeleteBare";
 
 export async function onMessageDelete(pluginData: GuildPluginData<LogsPluginType>, savedMessage: SavedMessage) {
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as
-    | BaseGuildTextChannel
-    | ThreadChannel;
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake) as
+    | TextChannel
+    | ThreadChannel
+    | null;
+
+  if (channel == null) {
+    return;
+  }
 
   if (isLogIgnored(pluginData, LogType.MESSAGE_DELETE, savedMessage.id)) {
     return;
