@@ -1,5 +1,6 @@
 import { StrictMessageContent } from "../utils";
 import Timeout = NodeJS.Timeout;
+import { calculateEmbedSize } from "./calculateEmbedSize";
 
 type ConsumeFn = (part: StrictMessageContent) => void;
 
@@ -18,6 +19,7 @@ export interface MessageBufferOpts {
 }
 
 const MAX_CHARS_PER_MESSAGE = 2000;
+const MAX_EMBED_LENGTH_PER_MESSAGE = 6000;
 const MAX_EMBEDS_PER_MESSAGE = 10;
 
 /**
@@ -76,8 +78,16 @@ export class MessageBuffer {
     }
 
     if (content.embeds) {
-      if (chunk.content.embeds && chunk.content.embeds.length + content.embeds.length > MAX_EMBEDS_PER_MESSAGE) {
-        this.startNewChunk(contentType);
+      if (chunk.content.embeds) {
+        if (chunk.content.embeds.length + content.embeds.length > MAX_EMBEDS_PER_MESSAGE) {
+          this.startNewChunk(contentType);
+        } else {
+          const existingEmbedsLength = chunk.content.embeds.reduce((sum, embed) => sum + calculateEmbedSize(embed), 0);
+          const embedsLength = content.embeds.reduce((sum, embed) => sum + calculateEmbedSize(embed), 0);
+          if (existingEmbedsLength + embedsLength > MAX_EMBED_LENGTH_PER_MESSAGE) {
+            this.startNewChunk(contentType);
+          }
+        }
       }
 
       if (chunk.content.embeds == null) chunk.content.embeds = [];
