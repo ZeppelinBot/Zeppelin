@@ -22,6 +22,7 @@ import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
 import { logRestCall } from "./restCallStats";
+import { logRateLimit } from "./rateLimitStats";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -315,6 +316,10 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
+  });
+
+  client.on(Constants.Events.RATE_LIMIT, (data) => {
+    logRateLimit(data);
   });
 
   bot.initialize();
