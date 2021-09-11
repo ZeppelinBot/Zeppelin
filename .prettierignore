@@ -1,6 +1,5 @@
 .github
 .idea
-dist
 node_modules
-assets
-debug
+/assets
+/debug
