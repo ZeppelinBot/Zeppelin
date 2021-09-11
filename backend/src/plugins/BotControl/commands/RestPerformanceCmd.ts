@@ -11,9 +11,12 @@ export const RestPerformanceCmd = botControlCmd({
   trigger: ["rest_performance"],
   permission: "can_performance",
 
-  signature: {},
+  signature: {
+    count: ct.number({ required: false }),
+  },
 
   async run({ pluginData, message: msg, args }) {
+    const count = Math.max(1, Math.min(25, args.count || 5));
     const stats = getTopRestCallStats(5);
     const formatted = stats.map((callStats) => {
       const cleanSource = callStats.source.replace(leadingPathRegex, "");
