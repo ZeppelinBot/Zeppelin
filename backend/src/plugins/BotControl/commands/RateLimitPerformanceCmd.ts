@@ -21,9 +21,13 @@ export const RateLimitPerformanceCmd = botControlCmd({
     logItems.reverse();
     const formatted = logItems.map((item) => {
       const formattedTime = moment.utc(item.timestamp).format("YYYY-MM-DD HH:mm:ss.SSS");
-      return `${item.data.global ? "GLOBAL " : ""}${item.data.method} ${item.data.route} stalled for ${
-        item.data.timeout
-      }ms`;
+      const items: string[] = [`[${formattedTime}]`];
+      if (item.data.global) items.push("GLOBAL");
+      items.push(item.data.method.toUpperCase());
+      items.push(item.data.route);
+      items.push(`stalled for ${item.data.timeout}ms`);
+      items.push(`(max requests ${item.data.limit})`);
+      return items.join(" ");
     });
 
     const fullText = `Last ${logItems.length} rate limits hit:\n\n${formatted.join("\n")}`;
