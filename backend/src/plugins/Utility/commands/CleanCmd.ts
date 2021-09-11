@@ -12,10 +12,12 @@ import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
 import { boolean, number } from "io-ts";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
-const CLEAN_COMMAND_DELETE_DELAY = 5 * SECONDS;
+const MAX_CLEAN_API_REQUESTS = 20;
+const CLEAN_COMMAND_DELETE_DELAY = 10 * SECONDS;
 
 export async function cleanMessages(
   pluginData: GuildPluginData<UtilityPluginType>,
@@ -102,47 +104,41 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
 
   const cleaningMessage = msg.channel.send("Cleaning...");
 
-  const messagesToClean: SavedMessage[] = [];
+  const messagesToClean: Message[] = [];
   let beforeId = msg.id;
   const timeCutoff = msg.createdTimestamp - MAX_CLEAN_TIME;
   const upToMsgId = args["to-id"];
   let foundId = false;
 
   const deletePins = args["delete-pins"] != null ? args["delete-pins"] : false;
-  let pins: Message[] = [];
+  let pinIds: Set<Snowflake> = new Set();
   if (!deletePins) {
-    pins = [...(await msg.channel.messages.fetchPinned().catch(() => [])).values()];
+    pinIds = new Set((await msg.channel.messages.fetchPinned()).keys());
   }
 
+  let note: string | null = null;
+  let requests = 0;
   while (messagesToClean.length < args.count) {
     const potentialMessages = await targetChannel.messages.fetch({
       before: beforeId,
-      limit: Math.min(args.count, 100),
+      limit: 100,
     });
     if (potentialMessages.size === 0) break;
 
-    const existingStored = await pluginData.state.savedMessages.getMultiple([...potentialMessages.keys()]);
-    const alreadyStored = existingStored.map(stored => stored.id);
-    const messagesToStore = [
-      ...potentialMessages.filter(potentialMsg => !alreadyStored.includes(potentialMsg.id)).values(),
-    ];
-    await pluginData.state.savedMessages.createFromMessages(messagesToStore);
+    requests++;
 
-    const potentialMessagesToClean = await pluginData.state.savedMessages.getMultiple([...potentialMessages.keys()]);
-    if (potentialMessagesToClean.length === 0) break;
-
-    const filtered: SavedMessage[] = [];
-    for (const message of potentialMessagesToClean) {
-      const contentString = message.data.content || "";
-      if (args.user && message.user_id !== args.user) continue;
-      if (args.bots && !message.is_bot) continue;
-      if (!deletePins && pins.find(x => x.id === message.id) != null) continue;
+    const filtered: Message[] = [];
+    for (const message of potentialMessages.values()) {
+      const contentString = message.content || "";
+      if (args.user && message.author.id !== args.user) continue;
+      if (args.bots && !message.author.bot) continue;
+      if (!deletePins && pinIds.has(message.id)) continue;
       if (args["has-invites"] && getInviteCodesInString(contentString).length === 0) continue;
       if (upToMsgId != null && message.id < upToMsgId) {
         foundId = true;
         break;
       }
-      if (moment.utc(message.posted_at).valueOf() < timeCutoff) continue;
+      if (message.createdTimestamp < timeCutoff) continue;
       if (args.match && !(await pluginData.state.regexRunner.exec(args.match, contentString).catch(allowTimeout))) {
         continue;
       }
@@ -155,16 +151,38 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
 
     beforeId = potentialMessages.lastKey()!;
 
-    if (foundId || moment.utc(potentialMessages.last()!.createdTimestamp).valueOf() < timeCutoff) {
+    if (foundId) {
       break;
+    }
+
+    if (messagesToClean.length < args.count) {
+      if (potentialMessages.last()!.createdTimestamp < timeCutoff) {
+        note = `stopped looking after reaching ${humanizeDurationShort(MAX_CLEAN_TIME)} old messages`;
+        break;
+      }
+
+      if (requests >= MAX_CLEAN_API_REQUESTS) {
+        note = `stopped looking after ${requests * 100} messages`;
+        break;
+      }
     }
   }
 
   let responseMsg: Message | undefined;
   if (messagesToClean.length > 0) {
-    const cleanResult = await cleanMessages(pluginData, targetChannel, messagesToClean, msg.author);
+    // Save to-be-deleted messages that were missing from the database
+    const existingStored = await pluginData.state.savedMessages.getMultiple(messagesToClean.map(m => m.id));
+    const alreadyStored = existingStored.map(stored => stored.id);
+    const messagesToStore = messagesToClean.filter(potentialMsg => !alreadyStored.includes(potentialMsg.id));
+    await pluginData.state.savedMessages.createFromMessages(messagesToStore);
+
+    const savedMessagesToClean = await pluginData.state.savedMessages.getMultiple(messagesToClean.map(m => m.id));
+    const cleanResult = await cleanMessages(pluginData, targetChannel, savedMessagesToClean, msg.author);
 
     let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;
+    if (note) {
+      responseText += ` (${note})`;
+    }
     if (targetChannel.id !== msg.channel.id) {
       responseText += ` in <#${targetChannel.id}>: ${cleanResult.archiveUrl}`;
     }
@@ -184,7 +202,8 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
 
     responseMsg = await sendSuccessMessage(pluginData, msg.channel, responseText);
   } else {
-    responseMsg = await sendErrorMessage(pluginData, msg.channel, `Found no messages to clean!`);
+    const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
+    responseMsg = await sendErrorMessage(pluginData, msg.channel, responseText);
   }
 
   await (await cleaningMessage).delete();
