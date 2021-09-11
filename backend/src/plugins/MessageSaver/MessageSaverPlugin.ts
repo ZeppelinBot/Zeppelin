@@ -21,9 +21,6 @@ const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   ],
 };
 
-let debugId = 0;
-const debugGuilds = ["877581055920603238", "348468156597010432", "134286179121102848"];
-
 export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()({
   name: "message_saver",
   showInDocs: false,
@@ -48,18 +45,5 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
-    state.debugId = ++debugId;
-
-    if (debugGuilds.includes(pluginData.guild.id)) {
-      console.log(`[!! DEBUG !!] MessageSaverPlugin::beforeLoad (${state.debugId}): ${pluginData.guild.id}`);
-    }
-  },
-
-  beforeUnload(pluginData) {
-    if (debugGuilds.includes(pluginData.guild.id)) {
-      console.log(
-        `[!! DEBUG !!] MessageSaverPlugin::beforeUnload (${pluginData.state.debugId}): ${pluginData.guild.id}`,
-      );
-    }
   },
 });

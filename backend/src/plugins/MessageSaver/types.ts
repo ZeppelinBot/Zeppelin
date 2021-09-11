@@ -12,7 +12,6 @@ export interface MessageSaverPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
     savedMessages: GuildSavedMessages;
-    debugId: number;
   };
 }
 
