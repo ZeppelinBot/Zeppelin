@@ -1,4 +1,4 @@
-import { PluginOptions } from "knub";
+import { CooldownManager, PluginOptions } from "knub";
 import DefaultLogMessages from "../../data/DefaultLogMessages.json";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -267,6 +267,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     state.cases = GuildCases.getGuildInstance(guild.id);
 
     state.buffers = new Map();
+    state.channelCooldowns = new CooldownManager();
 
     state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
   },
