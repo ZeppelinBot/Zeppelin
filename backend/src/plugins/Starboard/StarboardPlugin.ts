@@ -157,7 +157,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
   afterLoad(pluginData) {
     const { state } = pluginData;
 
-    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
   },
 

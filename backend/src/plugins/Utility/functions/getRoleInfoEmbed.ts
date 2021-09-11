@@ -35,13 +35,13 @@ export async function getRoleInfoEmbed(
     round: true,
   });
 
-  const rolePerms = Object.keys(role.permissions.toJSON()).map(p =>
+  const rolePerms = Object.keys(role.permissions.toJSON()).map((p) =>
     p
       // Voice channel related permission names start with 'voice'
       .replace(/^voice/i, "")
       .replace(/([a-z])([A-Z])/g, "$1 $2")
       .toLowerCase()
-      .replace(/(^\w{1})|(\s{1}\w{1})/g, l => l.toUpperCase()),
+      .replace(/(^\w{1})|(\s{1}\w{1})/g, (l) => l.toUpperCase()),
   );
 
   // -1 because of the @everyone role
@@ -54,10 +54,7 @@ export async function getRoleInfoEmbed(
       ID: \`${role.id}\`
       Created: **${roleAge} ago** (\`${prettyCreatedAt}\`)
       Position: **${role.position} / ${totalGuildRoles}**
-      Color: **#${role.color
-        .toString(16)
-        .toUpperCase()
-        .padStart(6, "0")}**
+      Color: **#${role.color.toString(16).toUpperCase().padStart(6, "0")}**
       Mentionable: **${role.mentionable ? "Yes" : "No"}**
       Hoisted: **${role.hoist ? "Yes" : "No"}**
       Permissions: \`${rolePerms.length ? rolePerms.join(", ") : "None"}\`

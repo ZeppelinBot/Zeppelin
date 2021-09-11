@@ -68,9 +68,9 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
       for (const message of messages.values()) {
         const ts = moment.utc(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss");
-        let content = `[${ts}] [${message.author.id}] [${message.author.username}#${
-          message.author.discriminator
-        }]: ${message.content || "<no text content>"}`;
+        let content = `[${ts}] [${message.author.id}] [${message.author.username}#${message.author.discriminator}]: ${
+          message.content || "<no text content>"
+        }`;
 
         if (message.attachments.size) {
           if (args["attachment-channel"]) {

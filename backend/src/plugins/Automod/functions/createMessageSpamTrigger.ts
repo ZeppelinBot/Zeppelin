@@ -60,7 +60,7 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
 
       if (matchedSpam) {
         const messages = matchedSpam.recentActions
-          .map(action => action.context.message)
+          .map((action) => action.context.message)
           .filter(Boolean)
           .sort(sorter("posted_at")) as SavedMessage[];
 
@@ -75,8 +75,8 @@ export function createMessageSpamTrigger(spamType: RecentActionType, prettyName:
 
         return {
           extraContexts: matchedSpam.recentActions
-            .map(action => action.context)
-            .filter(_context => _context !== context),
+            .map((action) => action.context)
+            .filter((_context) => _context !== context),
 
           extra: {
             archiveId,

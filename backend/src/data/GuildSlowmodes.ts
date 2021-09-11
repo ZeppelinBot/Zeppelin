@@ -67,10 +67,7 @@ export class GuildSlowmodes extends BaseGuildRepository {
     const slowmode = await this.getChannelSlowmode(channelId);
     if (!slowmode) return;
 
-    const expiresAt = moment
-      .utc()
-      .add(slowmode.slowmode_seconds, "seconds")
-      .format("YYYY-MM-DD HH:mm:ss");
+    const expiresAt = moment.utc().add(slowmode.slowmode_seconds, "seconds").format("YYYY-MM-DD HH:mm:ss");
 
     if (await this.userHasSlowmode(channelId, userId)) {
       // Update existing

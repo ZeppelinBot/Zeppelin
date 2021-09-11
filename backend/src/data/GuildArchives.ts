@@ -88,10 +88,10 @@ export class GuildArchives extends BaseGuildRepository {
           id: msg.id,
           timestamp: moment.utc(msg.posted_at).format("YYYY-MM-DD HH:mm:ss"),
           content: msg.data.content,
-          attachments: msg.data.attachments?.map(att => {
+          attachments: msg.data.attachments?.map((att) => {
             return JSON.stringify({ name: att.name, url: att.url, type: att.contentType });
           }),
-          stickers: msg.data.stickers?.map(sti => {
+          stickers: msg.data.stickers?.map((sti) => {
             return JSON.stringify({ name: sti.name, id: sti.id, isDefault: isDefaultSticker(sti.id) });
           }),
           user: partialUser,

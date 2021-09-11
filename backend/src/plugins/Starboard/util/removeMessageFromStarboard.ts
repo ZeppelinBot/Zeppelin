@@ -11,7 +11,7 @@ export async function removeMessageFromStarboard(
   await pluginData.state.starboardReactions.deleteAllStarboardReactionsForMessageId(msg.message_id).catch(noop);
 
   // this code is now Almeida-certified and no longer ugly :ok_hand: :cake:
-  const channel = pluginData.client.channels.cache.find(c => c.id === msg.starboard_channel_id);
+  const channel = pluginData.client.channels.cache.find((c) => c.id === msg.starboard_channel_id);
   if (!channel?.isText()) return;
   const message = await channel.messages.fetch(msg.starboard_message_id).catch(noop);
   if (!message?.deletable) return;

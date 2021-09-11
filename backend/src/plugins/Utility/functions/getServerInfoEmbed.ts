@@ -134,7 +134,7 @@ export async function getServerInfoEmbed(
   }
 
   if (!onlineMemberCount && thisServer) {
-    onlineMemberCount = thisServer.members.cache.filter(m => m.presence?.status !== "offline").size; // Extremely inaccurate fallback
+    onlineMemberCount = thisServer.members.cache.filter((m) => m.presence?.status !== "offline").size; // Extremely inaccurate fallback
   }
 
   const offlineMemberCount = totalMembers - onlineMemberCount;
@@ -162,9 +162,9 @@ export async function getServerInfoEmbed(
   // CHANNEL COUNTS
   if (thisServer) {
     const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.CATEGORY);
-    const textChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.TEXT);
-    const voiceChannels = thisServer.channels.cache.filter(channel => channel.type === ChannelTypeStrings.VOICE);
+    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.CATEGORY);
+    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.TEXT);
+    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.VOICE);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",

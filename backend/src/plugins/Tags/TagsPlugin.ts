@@ -114,10 +114,10 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
 
-    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
     const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
@@ -167,10 +167,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         }
 
         const delayMS = convertDelayStringToMS(delay) ?? 0;
-        return moment
-          .utc(reference, "x")
-          .add(delayMS)
-          .valueOf();
+        return moment.utc(reference, "x").add(delayMS).valueOf();
       },
 
       timeSub(...args) {
@@ -189,10 +186,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         }
 
         const delayMS = convertDelayStringToMS(delay) ?? 0;
-        return moment
-          .utc(reference, "x")
-          .subtract(delayMS)
-          .valueOf();
+        return moment.utc(reference, "x").subtract(delayMS).valueOf();
       },
 
       timeAgo(delay) {
@@ -210,7 +204,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         return timeAndDate.inGuildTz(parsed).format("YYYY-MM-DD");
       },
 
-      mention: input => {
+      mention: (input) => {
         if (typeof input !== "string") {
           return "";
         }
@@ -233,7 +227,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         return "";
       },
 
-      isMention: input => {
+      isMention: (input) => {
         if (typeof input !== "string") {
           return false;
         }

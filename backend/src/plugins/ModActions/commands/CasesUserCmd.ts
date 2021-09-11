@@ -53,13 +53,13 @@ export const CasesUserCmd = modActionsCmd({
 
     if (typesToShow.length > 0) {
       // Reversed: Hide specified types
-      if (args.reverseFilters) cases = cases.filter(c => !typesToShow.includes(c.type));
+      if (args.reverseFilters) cases = cases.filter((c) => !typesToShow.includes(c.type));
       // Normal: Show only specified types
-      else cases = cases.filter(c => typesToShow.includes(c.type));
+      else cases = cases.filter((c) => typesToShow.includes(c.type));
     }
 
-    const normalCases = cases.filter(c => !c.is_hidden);
-    const hiddenCases = cases.filter(c => c.is_hidden);
+    const normalCases = cases.filter((c) => !c.is_hidden);
+    const hiddenCases = cases.filter((c) => c.is_hidden);
 
     const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : user.tag;
 
@@ -83,7 +83,7 @@ export const CasesUserCmd = modActionsCmd({
       } else {
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        const lines = await asyncMap(casesToDisplay, c => casesPlugin.getCaseSummary(c, true, msg.author.id));
+        const lines = await asyncMap(casesToDisplay, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
         const prefix = getGuildPrefix(pluginData);
         const linesPerChunk = 10;

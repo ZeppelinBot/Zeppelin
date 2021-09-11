@@ -90,7 +90,7 @@ export const GuildStore: Module<GuildState, RootState> = {
       Vue.set(
         state.guildPermissionAssignments,
         guildId,
-        permissionAssignments.map(p => ({
+        permissionAssignments.map((p) => ({
           ...p,
           permissions: new Set(p.permissions),
         })),
@@ -102,12 +102,12 @@ export const GuildStore: Module<GuildState, RootState> = {
       if (permissions.length === 0) {
         // No permissions -> remove permission assignment
         guildPermissionAssignments.splice(
-          guildPermissionAssignments.findIndex(p => p.target_id === targetId && p.type === type),
+          guildPermissionAssignments.findIndex((p) => p.target_id === targetId && p.type === type),
           1,
         );
       } else {
         // Update/add permission assignment
-        const itemToEdit = guildPermissionAssignments.find(p => p.target_id === targetId && p.type === type);
+        const itemToEdit = guildPermissionAssignments.find((p) => p.target_id === targetId && p.type === type);
         if (itemToEdit) {
           itemToEdit.permissions = new Set(permissions);
         } else {

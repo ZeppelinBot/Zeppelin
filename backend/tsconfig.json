@@ -7,17 +7,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2020",
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "./dist",
     "paths": {
-      "@shared/*": [
-        "../shared/src/*"
-      ]
+      "@shared/*": ["../shared/src/*"]
     },
     "sourceMap": true,
     "alwaysStrict": true,
@@ -26,7 +22,5 @@
     "strict": true,
     "strictPropertyInitialization": false
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

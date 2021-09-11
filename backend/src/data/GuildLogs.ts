@@ -46,12 +46,12 @@ export class GuildLogs extends events.EventEmitter {
   }
 
   isLogIgnored(type: LogType, ignoreId: any) {
-    return this.ignoredLogs.some(info => type === info.type && ignoreId === info.ignoreId);
+    return this.ignoredLogs.some((info) => type === info.type && ignoreId === info.ignoreId);
   }
 
   clearIgnoredLog(type: LogType, ignoreId: any) {
     this.ignoredLogs.splice(
-      this.ignoredLogs.findIndex(info => type === info.type && ignoreId === info.ignoreId),
+      this.ignoredLogs.findIndex((info) => type === info.type && ignoreId === info.ignoreId),
       1,
     );
   }

@@ -123,7 +123,7 @@ export class GuildCases extends BaseGuildRepository {
         guild_id: this.guildId,
         case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
       })
-      .catch(err => {
+      .catch((err) => {
         if (err?.code === "ER_DUP_ENTRY") {
           if (data.audit_log_id) {
             console.trace(`Tried to insert case with duplicate audit_log_id`);
@@ -148,7 +148,7 @@ export class GuildCases extends BaseGuildRepository {
   }
 
   async softDelete(id: number, deletedById: string, deletedByName: string, deletedByText: string) {
-    return connection.transaction(async entityManager => {
+    return connection.transaction(async (entityManager) => {
       const cases = entityManager.getRepository(Case);
       const caseNotes = entityManager.getRepository(CaseNote);
 

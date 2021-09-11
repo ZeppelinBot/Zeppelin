@@ -60,7 +60,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
       const inputArray = Array.isArray(inputUserOrMember) ? inputUserOrMember : [inputUserOrMember];
       // TODO: Resolve IDs to users/members
       const usersOrMembers = inputArray.filter(
-        v => v instanceof TemplateSafeUser || v instanceof TemplateSafeMember,
+        (v) => v instanceof TemplateSafeUser || v instanceof TemplateSafeMember,
       ) as Array<TemplateSafeUser | TemplateSafeMember>;
 
       const mentions: string[] = [];
@@ -83,7 +83,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
         const memberConfig =
           (await pluginData.config.getMatchingConfig({
             level,
-            memberRoles: member ? member.roles.map(r => r.id) : [],
+            memberRoles: member ? member.roles.map((r) => r.id) : [],
             userId: user.id,
           })) || ({} as any);
 
@@ -97,7 +97,7 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
 
       return mentions.join(", ");
     },
-    channelMention: channel => {
+    channelMention: (channel) => {
       if (!channel) return "";
       return verboseChannelMention(channel);
     },
@@ -109,12 +109,12 @@ export async function getLogMessage<TLogType extends keyof ILogTypeData>(
 
   if (type === LogType.BOT_ALERT) {
     const valuesWithoutTmplEval = { ...values };
-    values.tmplEval = str => {
+    values.tmplEval = (str) => {
       return renderTemplate(str, valuesWithoutTmplEval);
     };
   }
 
-  const renderLogString = str => renderTemplate(str, values);
+  const renderLogString = (str) => renderTemplate(str, values);
 
   let formatted;
   try {

@@ -22,10 +22,7 @@ export class ApiPermissionAssignment {
   @Column({ type: String, nullable: true })
   expires_at: string | null;
 
-  @ManyToOne(
-    type => ApiUserInfo,
-    userInfo => userInfo.permissionAssignments,
-  )
+  @ManyToOne((type) => ApiUserInfo, (userInfo) => userInfo.permissionAssignments)
   @JoinColumn({ name: "target_id" })
   userInfo: ApiUserInfo;
 }

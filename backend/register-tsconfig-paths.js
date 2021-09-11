@@ -6,9 +6,9 @@
  * https://github.com/TypeStrong/ts-node/pull/254
  */
 
-const path = require('path');
-const tsconfig = require('./tsconfig.json');
-const tsconfigPaths = require('tsconfig-paths');
+const path = require("path");
+const tsconfig = require("./tsconfig.json");
+const tsconfigPaths = require("tsconfig-paths");
 
 // E.g. ./dist/backend
 const baseUrl = path.resolve(tsconfig.compilerOptions.outDir, path.basename(__dirname));

@@ -30,10 +30,10 @@ export async function cleanMessages(
 
   // Delete & archive in ID order
   savedMessages = Array.from(savedMessages).sort((a, b) => (a.id > b.id ? 1 : -1));
-  const idsToDelete = savedMessages.map(m => m.id) as Snowflake[];
+  const idsToDelete = savedMessages.map((m) => m.id) as Snowflake[];
 
   // Make sure the deletions aren't double logged
-  idsToDelete.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+  idsToDelete.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
   // Actually delete the messages
@@ -171,12 +171,12 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
   let responseMsg: Message | undefined;
   if (messagesToClean.length > 0) {
     // Save to-be-deleted messages that were missing from the database
-    const existingStored = await pluginData.state.savedMessages.getMultiple(messagesToClean.map(m => m.id));
-    const alreadyStored = existingStored.map(stored => stored.id);
-    const messagesToStore = messagesToClean.filter(potentialMsg => !alreadyStored.includes(potentialMsg.id));
+    const existingStored = await pluginData.state.savedMessages.getMultiple(messagesToClean.map((m) => m.id));
+    const alreadyStored = existingStored.map((stored) => stored.id);
+    const messagesToStore = messagesToClean.filter((potentialMsg) => !alreadyStored.includes(potentialMsg.id));
     await pluginData.state.savedMessages.createFromMessages(messagesToStore);
 
-    const savedMessagesToClean = await pluginData.state.savedMessages.getMultiple(messagesToClean.map(m => m.id));
+    const savedMessagesToClean = await pluginData.state.savedMessages.getMultiple(messagesToClean.map((m) => m.id));
     const cleanResult = await cleanMessages(pluginData, targetChannel, savedMessagesToClean, msg.author);
 
     let responseText = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"}`;

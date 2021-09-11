@@ -106,7 +106,7 @@ export const tNormalizedNullOrUndefined = new t.Type<undefined, null | undefined
   "tNormalizedNullOrUndefined",
   (v): v is undefined => typeof v === "undefined",
   (v, c) => (v == null ? t.success(undefined) : t.failure(v, c, "Value must be null or undefined")),
-  s => undefined,
+  (s) => undefined,
 );
 
 /**
@@ -154,10 +154,10 @@ export function tDeepPartial<T>(type: T): TDeepPartial<T> {
   } else if (type instanceof t.DictionaryType) {
     return t.record(type.domain, tDeepPartial(type.codomain)) as TDeepPartial<T>;
   } else if (type instanceof t.UnionType) {
-    return t.union(type.types.map(unionType => tDeepPartial(unionType))) as TDeepPartial<T>;
+    return t.union(type.types.map((unionType) => tDeepPartial(unionType))) as TDeepPartial<T>;
   } else if (type instanceof t.IntersectionType) {
-    const types = type.types.map(intersectionType => tDeepPartial(intersectionType));
-    return (t.intersection(types as [t.Mixed, t.Mixed]) as unknown) as TDeepPartial<T>;
+    const types = type.types.map((intersectionType) => tDeepPartial(intersectionType));
+    return t.intersection(types as [t.Mixed, t.Mixed]) as unknown as TDeepPartial<T>;
   } else if (type instanceof t.ArrayType) {
     return t.array(tDeepPartial(type.type)) as TDeepPartial<T>;
   } else {
@@ -433,7 +433,7 @@ export function validateAndParseMessageContent(input: unknown): StrictMessageCon
   dropNullValuesRecursively(input);
 
   try {
-    return (zStrictMessageContent.parse(input) as unknown) as StrictMessageContent;
+    return zStrictMessageContent.parse(input) as unknown as StrictMessageContent;
   } catch (err) {
     if (err instanceof ZodError) {
       // TODO: Allow error to be thrown and handle at use location
@@ -492,34 +492,34 @@ export const tAlphanumeric = new t.Type<string, string>(
   "tAlphanumeric",
   (s): s is string => typeof s === "string",
   (from, to) =>
-    either.chain(t.string.validate(from, to), s => {
+    either.chain(t.string.validate(from, to), (s) => {
       return s.match(/\W/) ? t.failure(from, to, "String must be alphanumeric") : t.success(s);
     }),
-  s => s,
+  (s) => s,
 );
 
 export const tDateTime = new t.Type<string, string>(
   "tDateTime",
   (s): s is string => typeof s === "string",
   (from, to) =>
-    either.chain(t.string.validate(from, to), s => {
+    either.chain(t.string.validate(from, to), (s) => {
       const parsed =
         s.length === 10 ? moment.utc(s, "YYYY-MM-DD") : s.length === 19 ? moment.utc(s, "YYYY-MM-DD HH:mm:ss") : null;
 
       return parsed && parsed.isValid() ? t.success(s) : t.failure(from, to, "Invalid datetime");
     }),
-  s => s,
+  (s) => s,
 );
 
 export const tDelayString = new t.Type<string, string>(
   "tDelayString",
   (s): s is string => typeof s === "string",
   (from, to) =>
-    either.chain(t.string.validate(from, to), s => {
+    either.chain(t.string.validate(from, to), (s) => {
       const ms = convertDelayStringToMS(s);
       return ms === null ? t.failure(from, to, "Invalid delay string") : t.success(s);
     }),
-  s => s,
+  (s) => s,
 );
 
 // To avoid running into issues with the JS max date vaLue, we cap maximum delay strings *far* below that.
@@ -608,8 +608,8 @@ export function stripObjectToScalars(obj, includedNested: string[] = []) {
     } else if (typeof obj[key] === "object") {
       const prefix = `${key}.`;
       const nestedNested = includedNested
-        .filter(p => p === key || p.startsWith(prefix))
-        .map(p => (p === key ? p : p.slice(prefix.length)));
+        .filter((p) => p === key || p.startsWith(prefix))
+        .map((p) => (p === key ? p : p.slice(prefix.length)));
 
       if (nestedNested.length) {
         result[key] = stripObjectToScalars(obj[key], nestedNested);
@@ -628,7 +628,7 @@ export function isSnowflake(v: string): boolean {
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
@@ -676,7 +676,7 @@ export async function findRelevantAuditLogEntry(
 
   const cutoffTS = Date.now() - 1000 * 60 * 2;
 
-  const relevantEntry = entries.find(entry => {
+  const relevantEntry = entries.find((entry) => {
     return (entry.target as { id }).id === userId && entry.createdTimestamp >= cutoffTS;
   });
 
@@ -744,7 +744,8 @@ export function isNotNull(value): value is Exclude<typeof value, null> {
 // discord.gg/invite/<code>
 // discord.gg/<code>
 // discord.com/friend-invite/<code>
-const quickInviteDetection = /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9\-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9\-]+)/gi;
+const quickInviteDetection =
+  /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9\-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9\-]+)/gi;
 
 const isInviteHostRegex = /(?:^|\.)(?:discord.gg|discord.com|discordapp.com)$/i;
 const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9\-]+)$/i;
@@ -758,19 +759,19 @@ export function getInviteCodesInString(str: string): string[] {
   // Quick detection
   const quickDetectionMatch = str.matchAll(quickInviteDetection);
   if (quickDetectionMatch) {
-    inviteCodes.push(...[...quickDetectionMatch].map(m => m[1] || m[2]));
+    inviteCodes.push(...[...quickDetectionMatch].map((m) => m[1] || m[2]));
   }
 
   // Deep detection via URL parsing
   const linksInString = getUrlsInString(str, true);
-  const potentialInviteLinks = linksInString.filter(url => isInviteHostRegex.test(url.hostname));
-  const withNormalizedPaths = potentialInviteLinks.map(url => {
+  const potentialInviteLinks = linksInString.filter((url) => isInviteHostRegex.test(url.hostname));
+  const withNormalizedPaths = potentialInviteLinks.map((url) => {
     url.pathname = url.pathname.replace(/\/{2,}/g, "/").replace(/\/+$/g, "");
     return url;
   });
 
   const codesFromInviteLinks = withNormalizedPaths
-    .map(url => {
+    .map((url) => {
       // discord.gg/[anything/]<code>
       if (url.hostname === "discord.gg") {
         const parts = url.pathname.split("/").filter(Boolean);
@@ -816,7 +817,7 @@ export function trimLines(str: string) {
   return str
     .trim()
     .split("\n")
-    .map(l => l.trim())
+    .map((l) => l.trim())
     .join("\n")
     .trim();
 }
@@ -824,7 +825,7 @@ export function trimLines(str: string) {
 export function trimEmptyLines(str: string) {
   return str
     .split("\n")
-    .filter(l => l.trim() !== "")
+    .filter((l) => l.trim() !== "")
     .join("\n");
 }
 
@@ -860,7 +861,7 @@ export function trimIndents(str: string, indentLength: number) {
   const regex = new RegExp(`^\\s{0,${indentLength}}`, "g");
   return str
     .split("\n")
-    .map(line => line.replace(regex, ""))
+    .map((line) => line.replace(regex, ""))
     .join("\n");
 }
 
@@ -871,7 +872,7 @@ export function indentLine(str: string, indentLength: number) {
 export function indentLines(str: string, indentLength: number) {
   return str
     .split("\n")
-    .map(line => indentLine(line, indentLength))
+    .map((line) => indentLine(line, indentLength))
     .join("\n");
 }
 
@@ -977,7 +978,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
   const chunks = chunkLines(str, maxChunkLength);
   let openCodeBlock = false;
 
-  return chunks.map(chunk => {
+  return chunks.map((chunk) => {
     // If the chunk starts with a newline, add an invisible unicode char so Discord doesn't strip it away
     if (chunk[0] === "\n") chunk = "\u200b" + chunk;
     // If the chunk ends with a newline, add an invisible unicode char so Discord doesn't strip it away
@@ -1019,14 +1020,14 @@ export async function createChunkedMessage(
  * Downloads the file from the given URL to a temporary file, with retry support
  */
 export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path: string; deleteFn: () => void }> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     tmp.file((err, path, fd, deleteFn) => {
       if (err) throw err;
 
       const writeStream = fs.createWriteStream(path);
 
       https
-        .get(attachmentUrl, res => {
+        .get(attachmentUrl, (res) => {
           res.pipe(writeStream);
           writeStream.on("finish", () => {
             writeStream.end();
@@ -1036,7 +1037,7 @@ export function downloadFile(attachmentUrl: string, retries = 3): Promise<{ path
             });
           });
         })
-        .on("error", httpsErr => {
+        .on("error", (httpsErr) => {
           fsp.unlink(path);
 
           if (retries === 0) {
@@ -1061,7 +1062,7 @@ export function simpleClosestStringMatch(searchStr, haystack, getter?) {
   const normalizedSearchStr = searchStr.toLowerCase();
 
   // See if any haystack item contains a part of the search string
-  const itemsWithRankings: Array<ItemWithRanking<any>> = haystack.map(item => {
+  const itemsWithRankings: Array<ItemWithRanking<any>> = haystack.map((item) => {
     const itemStr: string = getter ? getter(item) : item;
     const normalizedItemStr = itemStr.toLowerCase();
 
@@ -1100,14 +1101,14 @@ type sorterFn = (a: any, b: any) => number;
 
 function resolveGetter(getter: sorterGetterResolvable): sorterGetterFn {
   if (typeof getter === "string") {
-    return obj => obj[getter];
+    return (obj) => obj[getter];
   }
 
   return getter;
 }
 
 export function multiSorter(getters: Array<sorterGetterResolvable | sorterGetterResolvableWithDirection>): sorterFn {
-  const resolvedGetters: sorterGetterFnWithDirection[] = getters.map(getter => {
+  const resolvedGetters: sorterGetterFnWithDirection[] = getters.map((getter) => {
     if (Array.isArray(getter)) {
       return [resolveGetter(getter[0]), getter[1]] as sorterGetterFnWithDirection;
     } else {
@@ -1288,7 +1289,7 @@ export function resolveUserId(bot: Client, value: string) {
   // A non-mention, full username?
   const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
   if (usernameMatch) {
-    const user = bot.users.cache.find(u => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    const user = bot.users.cache.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
     if (user) return user.id;
   }
 
@@ -1403,7 +1404,7 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
 
   // Role name
   const roleList = (await bot.guilds.fetch(guildId as Snowflake)).roles.cache;
-  const role = roleList.filter(x => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
+  const role = roleList.filter((x) => x.name.toLocaleLowerCase() === value.toLocaleLowerCase());
   if (role.size >= 1) {
     return role.firstKey();
   }
@@ -1459,7 +1460,7 @@ export function messageSummary(msg: SavedMessage) {
   let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find(e => (e as MessageEmbed).type === "rich");
+  const richEmbed = (msg.data.embeds || []).find((e) => (e as MessageEmbed).type === "rich");
   if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
@@ -1587,7 +1588,7 @@ export function canUseEmoji(client: Client, emoji: string): boolean {
     return true;
   } else if (isSnowflake(emoji)) {
     for (const guild of client.guilds.cache) {
-      if (guild[1].emojis.cache.some(e => (e as any).id === emoji)) {
+      if (guild[1].emojis.cache.some((e) => (e as any).id === emoji)) {
         return true;
       }
     }

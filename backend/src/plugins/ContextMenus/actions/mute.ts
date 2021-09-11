@@ -48,8 +48,9 @@ export async function muteAction(
 
     const muteMessage = `Muted **${result.case.user_name}** ${
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number}) (user notified via ${result.notifyResult.method ??
-      "dm"})\nPlease update the new case with the \`update\` command`;
+    } (Case #${result.case.case_number}) (user notified via ${
+      result.notifyResult.method ?? "dm"
+    })\nPlease update the new case with the \`update\` command`;
 
     interaction.followUp({ ephemeral: true, content: muteMessage });
   } catch (e) {

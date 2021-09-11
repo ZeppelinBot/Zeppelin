@@ -21,7 +21,7 @@ export const ScheduledPostsListCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
 
     let i = 1;
-    const postLines = scheduledPosts.map(p => {
+    const postLines = scheduledPosts.map((p) => {
       let previewText = p.content.content || p.content.embeds?.[0]?.description || p.content.embeds?.[0]?.title || "";
 
       const isTruncated = previewText.length > SCHEDULED_POST_PREVIEW_TEXT_LENGTH;

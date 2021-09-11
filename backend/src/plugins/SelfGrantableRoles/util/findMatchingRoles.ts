@@ -11,5 +11,5 @@ export function findMatchingRoles(roleNames: string[], entries: TSelfGrantableRo
     return map;
   }, new Map());
 
-  return roleNames.map(roleName => aliasToRoleId.get(roleName)).filter(Boolean);
+  return roleNames.map((roleName) => aliasToRoleId.get(roleName)).filter(Boolean);
 }

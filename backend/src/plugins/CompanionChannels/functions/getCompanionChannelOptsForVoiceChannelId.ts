@@ -14,9 +14,9 @@ export async function getCompanionChannelOptsForVoiceChannelId(
   const config = await pluginData.config.getMatchingConfig({ userId, channelId: voiceChannel.id });
   return Object.values(config.entries)
     .filter(
-      opts =>
+      (opts) =>
         opts.voice_channel_ids.includes(voiceChannel.id) ||
         (voiceChannel.parentId && opts.voice_channel_ids.includes(voiceChannel.parentId)),
     )
-    .map(opts => Object.assign({}, defaultCompanionChannelOpts, opts));
+    .map((opts) => Object.assign({}, defaultCompanionChannelOpts, opts));
 }

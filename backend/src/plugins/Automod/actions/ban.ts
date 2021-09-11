@@ -35,7 +35,7 @@ export const BanAction = automodAction({
       hide: Boolean(actionConfig.hide_case),
     };
 
-    const userIdsToBan = unique(contexts.map(c => c.user?.id).filter(nonNullish));
+    const userIdsToBan = unique(contexts.map((c) => c.user?.id).filter(nonNullish));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const userId of userIdsToBan) {

@@ -52,7 +52,11 @@ export const MessageCreateEvt = messageSaverEvt({
       console.warn(`Tried to save duplicate message from messageCreate event: ${context} / saved at: ${timestamp}`);
       return;
     }
-    recentlyCreatedMessages.set(meta.args.message.id, [meta.pluginData.state.debugId, Date.now(), meta.pluginData.guild.id]);
+    recentlyCreatedMessages.set(meta.args.message.id, [
+      meta.pluginData.state.debugId,
+      Date.now(),
+      meta.pluginData.guild.id,
+    ]);
 
     await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },
@@ -97,7 +101,7 @@ export const MessageDeleteBulkEvt = messageSaverEvt({
   allowSelf: true,
 
   async listener(meta) {
-    const ids = meta.args.messages.map(m => m.id);
+    const ids = meta.args.messages.map((m) => m.id);
     await meta.pluginData.state.savedMessages.markBulkAsDeleted(ids);
   },
 });

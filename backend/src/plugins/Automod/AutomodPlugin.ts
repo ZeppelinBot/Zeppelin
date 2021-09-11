@@ -57,7 +57,7 @@ const defaultOptions = {
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
  */
-const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
@@ -232,10 +232,10 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
       30 * SECONDS,
     );
 
-    pluginData.state.onMessageCreateFn = message => runAutomodOnMessage(pluginData, message, false);
+    pluginData.state.onMessageCreateFn = (message) => runAutomodOnMessage(pluginData, message, false);
     pluginData.state.savedMessages.events.on("create", pluginData.state.onMessageCreateFn);
 
-    pluginData.state.onMessageUpdateFn = message => runAutomodOnMessage(pluginData, message, true);
+    pluginData.state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
 
     const countersPlugin = pluginData.getPlugin(CountersPlugin);

@@ -100,14 +100,14 @@ export async function log<TLogType extends keyof ILogTypeData>(
         channelId,
         new MessageBuffer({
           timeout: batchTime,
-          consume: part => {
+          consume: (part) => {
             const parse: MessageMentionTypes[] = pluginData.config.get().allow_user_mentions ? ["users"] : [];
             channel
               .send({
                 ...part,
                 allowedMentions: { parse },
               })
-              .catch(err => {
+              .catch((err) => {
                 // tslint:disable-next-line:no-console
                 console.warn(
                   `Error while sending ${typeStr} log to ${pluginData.guild.id}/${channelId}: ${err.message}`,

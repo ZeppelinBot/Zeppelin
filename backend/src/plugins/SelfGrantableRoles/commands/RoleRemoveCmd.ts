@@ -29,20 +29,20 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
     const matchedRoleIds = findMatchingRoles(roleNames, applyingEntries);
 
     const rolesToRemove = Array.from(matchedRoleIds.values()).map(
-      id => pluginData.guild.roles.cache.get(id as Snowflake)!,
+      (id) => pluginData.guild.roles.cache.get(id as Snowflake)!,
     );
-    const roleIdsToRemove = rolesToRemove.map(r => r.id);
+    const roleIdsToRemove = rolesToRemove.map((r) => r.id);
 
     // Remove the roles
     if (rolesToRemove.length) {
-      const newRoleIds = msg.member.roles.cache.filter(role => !roleIdsToRemove.includes(role.id));
+      const newRoleIds = msg.member.roles.cache.filter((role) => !roleIdsToRemove.includes(role.id));
 
       try {
         await msg.member.edit({
           roles: newRoleIds,
         });
 
-        const removedRolesStr = rolesToRemove.map(r => `**${r.name}**`);
+        const removedRolesStr = rolesToRemove.map((r) => `**${r.name}**`);
         const removedRolesWord = rolesToRemove.length === 1 ? "role" : "roles";
 
         if (rolesToRemove.length !== roleNames.length) {

@@ -51,7 +51,7 @@ function isTemplateSafeValue(value: unknown): value is TemplateSafeValue {
     typeof value === "number" ||
     typeof value === "boolean" ||
     typeof value === "function" ||
-    (Array.isArray(value) && value.every(v => isTemplateSafeValue(v))) ||
+    (Array.isArray(value) && value.every((v) => isTemplateSafeValue(v))) ||
     value instanceof TemplateSafeValueContainer
   );
 }
@@ -89,7 +89,7 @@ export function createTypedTemplateSafeValueContainer<T extends Record<string, T
 }
 
 function cleanUpParseResult(arr) {
-  arr.forEach(item => {
+  arr.forEach((item) => {
     if (typeof item === "object") {
       delete item._state;
       delete item._parent;

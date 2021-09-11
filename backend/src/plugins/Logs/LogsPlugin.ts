@@ -177,7 +177,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   ],
 
   public: {
-    getLogMessage: pluginData => {
+    getLogMessage: (pluginData) => {
       return <TLogType extends keyof ILogTypeData>(
         type: TLogType,
         data: TypedTemplateSafeValueContainer<ILogTypeData[TLogType]>,
@@ -277,10 +277,10 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     state.logListener = ({ type, data }) => log(pluginData, type, data);
     state.guildLogs.on("log", state.logListener);
 
-    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
-    state.onMessageDeleteBulkFn = msg => onMessageDeleteBulk(pluginData, msg);
+    state.onMessageDeleteBulkFn = (msg) => onMessageDeleteBulk(pluginData, msg);
     state.savedMessages.events.on("deleteBulk", state.onMessageDeleteBulkFn);
 
     state.onMessageUpdateFn = (newMsg, oldMsg) => onMessageUpdate(pluginData, newMsg, oldMsg);

@@ -13,13 +13,13 @@ export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
   async run({ pluginData, message, args }) {
     const config = await pluginData.config.getForMessage(message);
 
-    const countersToShow = Array.from(Object.values(config.counters)).filter(c => c.can_view !== false);
+    const countersToShow = Array.from(Object.values(config.counters)).filter((c) => c.can_view !== false);
     if (!countersToShow.length) {
       sendErrorMessage(pluginData, message.channel, "No counters are configured for this server");
       return;
     }
 
-    const counterLines = countersToShow.map(counter => {
+    const counterLines = countersToShow.map((counter) => {
       const title = counter.pretty_name ? `**${counter.pretty_name}** (\`${counter.name}\`)` : `\`${counter.name}\``;
 
       const types: string[] = [];
