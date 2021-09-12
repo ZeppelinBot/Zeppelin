@@ -1,20 +1,14 @@
-import { Snowflake } from "discord.js";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
+import { banLock } from "../../../utils/lockNameHelpers";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { banUserId } from "../functions/banUserId";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
-import { IgnoredEventType, modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { LogType } from "../../../data/LogType";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { banLock } from "../../../utils/lockNameHelpers";
+import { BanResult, IgnoredEventType, modActionsCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -72,9 +66,11 @@ export const ForcebanCmd = modActionsCmd({
     ignoreEvent(pluginData, IgnoredEventType.Ban, user.id);
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
 
+    let banResult: BanResult;
     try {
-      const deleteMessageDays = args["delete-days"] ?? pluginData.config.getForMessage(msg).ban_delete_message_days;
-      const banResult = await banUserId(pluginData, user.id, reason, {
+      const deleteMessageDays =
+        args["delete-days"] ?? (await pluginData.config.getForMessage(msg)).ban_delete_message_days;
+      banResult = await banUserId(pluginData, user.id, reason, {
         contactMethods: [],
         caseArgs: {
           modId: mod.id,
@@ -94,25 +90,15 @@ export const ForcebanCmd = modActionsCmd({
       return;
     }
 
-    // Create a case
-    const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    const createdCase = await casesPlugin.createCase({
-      userId: user.id,
-      modId: mod.id,
-      type: CaseTypes.Ban,
-      reason,
-      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
-    });
-
     // Confirm the action
-    sendSuccessMessage(pluginData, msg.channel, `Member forcebanned (Case #${createdCase.case_number})`);
+    sendSuccessMessage(pluginData, msg.channel, `Member forcebanned (Case #${banResult.case.case_number})`);
     lock.unlock();
 
     // Log the action
     pluginData.getPlugin(LogsPlugin).logMemberForceban({
       mod,
       userId: user.id,
-      caseNumber: createdCase.case_number,
+      caseNumber: banResult.case.case_number,
       reason,
     });
 
