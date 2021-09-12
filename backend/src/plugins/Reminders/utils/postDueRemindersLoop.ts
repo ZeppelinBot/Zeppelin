@@ -13,7 +13,7 @@ export async function postDueRemindersLoop(pluginData: GuildPluginData<Reminders
   const pendingReminders = await pluginData.state.reminders.getDueReminders();
   for (const reminder of pendingReminders) {
     const channel = pluginData.guild.channels.cache.get(reminder.channel_id as Snowflake);
-    if (channel && channel instanceof TextChannel) {
+    if (channel && channel.isText()) {
       try {
         // Only show created at date if one exists
         if (moment.utc(reminder.created_at).isValid()) {
