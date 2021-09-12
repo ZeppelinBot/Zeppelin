@@ -102,6 +102,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
         channelId,
         new MessageBuffer({
           timeout: batchTime,
+          textSeparator: "\n",
           consume: (part) => {
             const parse: MessageMentionTypes[] = pluginData.config.get().allow_user_mentions ? ["users"] : [];
             const promise =

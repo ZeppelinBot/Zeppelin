@@ -16,6 +16,7 @@ type Chunk = {
 export interface MessageBufferOpts {
   consume?: ConsumeFn;
   timeout?: number;
+  textSeparator?: string;
 }
 
 const MAX_CHARS_PER_MESSAGE = 2000;
@@ -30,6 +31,8 @@ export class MessageBuffer {
 
   protected timeoutMs: number | null = null;
 
+  protected textSeparator: string = "";
+
   protected chunk: Chunk | null = null;
 
   protected chunkTimeout: Timeout | null = null;
@@ -43,6 +46,10 @@ export class MessageBuffer {
 
     if (opts.timeout) {
       this.timeoutMs = opts.timeout;
+    }
+
+    if (opts.textSeparator) {
+      this.textSeparator = opts.textSeparator;
     }
   }
 
@@ -73,8 +80,11 @@ export class MessageBuffer {
         this.startNewChunk(contentType);
       }
 
-      if (chunk.content.content == null) chunk.content.content = "";
-      chunk.content.content += content.content;
+      if (chunk.content.content == null || chunk.content.content === "") {
+        chunk.content.content = content.content;
+      } else {
+        chunk.content.content += this.textSeparator + content.content;
+      }
     }
 
     if (content.embeds) {
