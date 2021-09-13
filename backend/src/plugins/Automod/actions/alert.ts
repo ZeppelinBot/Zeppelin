@@ -36,12 +36,12 @@ export const AlertAction = automodAction({
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
-    if (channel && (channel instanceof TextChannel || channel instanceof ThreadChannel)) {
+    if (channel?.isText()) {
       const text = actionConfig.text;
       const theMessageLink =
         contexts[0].message && messageLink(pluginData.guild.id, contexts[0].message.channel_id, contexts[0].message.id);
 
-      const safeUsers = contexts.map((c) => (c.user ? userToTemplateSafeUser(c.user) : null)).filter(isTruthy);
+      const safeUsers = contexts.map(c => (c.user ? userToTemplateSafeUser(c.user) : null)).filter(isTruthy);
       const safeUser = safeUsers[0];
       const actionsTaken = Object.keys(pluginData.config.get().rules[ruleName].actions).join(", ");
 
