@@ -120,4 +120,8 @@ export const AvailableTriggers = t.type({
 
   thread_create: ThreadCreateTrigger.configType,
   thread_delete: ThreadDeleteTrigger.configType,
+  thread_archive: ThreadArchiveTrigger.configType,
+  thread_unarchive: ThreadUnarchiveTrigger.configType,
+  thread_lock: ThreadLockTrigger.configType,
+  thread_unlock: ThreadUnlockTrigger.configType,
 });
