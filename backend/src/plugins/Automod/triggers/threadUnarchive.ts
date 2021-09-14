@@ -15,12 +15,19 @@ interface ThreadUnarchiveResult {
 export const ThreadUnarchiveTrigger = automodTrigger<ThreadUnarchiveResult>()({
   configType: t.type({
     parent: tNullable(t.union([t.string, t.array(t.string)])),
+    locked: tNullable(t.boolean),
   }),
 
   defaultConfig: {},
 
   async match({ context, triggerConfig }) {
     if (!context.threadChange?.unarchived) {
+      return;
+    }
+
+    if (triggerConfig.locked && !context.threadChange.locked) {
+      return;
+    } else if (triggerConfig.locked === false && !context.threadChange.unlocked) {
       return;
     }
 
