@@ -15,12 +15,13 @@ export const ArchiveThreadAction = automodAction({
     const threads = contexts
       .filter((c) => c.message?.channel_id)
       .map((c) => pluginData.guild.channels.cache.get(c.message!.channel_id))
-      .filter((c): c is ThreadChannel => (c?.isThread() && !c.archived) ?? false);
+      .filter((c): c is ThreadChannel => c?.isThread() ?? false);
 
     for (const thread of threads) {
-      if (actionConfig.lock) {
+      if (actionConfig.lock && !thread.locked) {
         await thread.setLocked().catch(noop);
       }
+      if (thread.archived) continue;
       await thread.setArchived().catch(noop);
     }
   },
