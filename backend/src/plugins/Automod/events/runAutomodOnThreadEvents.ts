@@ -2,6 +2,7 @@ import { typedGuildEventListener } from "knub";
 import { RecentActionType } from "../constants";
 import { GuildSavedMessages } from "../../../data/GuildSavedMessages";
 import { runAutomod } from "../functions/runAutomod";
+import diff from "lodash.difference";
 import { AutomodContext, AutomodPluginType } from "../types";
 
 export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginType>()({
@@ -60,6 +61,34 @@ export const RunAutomodOnThreadDelete = typedGuildEventListener<AutomodPluginTyp
       },
       user,
       channel: thread,
+    };
+
+    pluginData.state.queue.add(() => {
+      runAutomod(pluginData, context);
+    });
+  },
+});
+
+export const RunAutomodOnThreadUpdate = typedGuildEventListener<AutomodPluginType>()({
+  event: "threadUpdate",
+  async listener({ pluginData, args: { oldThread, newThread: thread } }) {
+    const user = thread.ownerId ? await pluginData.client.users.fetch(thread.ownerId).catch(() => void 0) : void 0;
+    const changes: AutomodContext["threadChange"] = {};
+    if (oldThread.archived !== thread.archived) {
+      changes.archived = thread.archived ? thread : void 0;
+      changes.unarchived = !thread.archived ? thread : void 0;
+    }
+    if (oldThread.locked !== thread.locked) {
+      changes.locked = thread.locked ? thread : void 0;
+      changes.unlocked = !thread.locked ? thread : void 0;
+    }
+
+    if (Object.keys(changes).length === 0) return;
+
+    const context: AutomodContext = {
+      timestamp: Date.now(),
+      threadChange: changes,
+      user,
     };
 
     pluginData.state.queue.add(() => {

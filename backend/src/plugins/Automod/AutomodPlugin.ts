@@ -24,7 +24,11 @@ import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOn
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
-import { RunAutomodOnThreadCreate, RunAutomodOnThreadDelete } from "./events/runAutomodOnThreadEvents";
+import {
+  RunAutomodOnThreadCreate,
+  RunAutomodOnThreadDelete,
+  RunAutomodOnThreadUpdate,
+} from "./events/runAutomodOnThreadEvents";
 import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges";
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
@@ -208,6 +212,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     RunAutomodOnLeaveEvt,
     RunAutomodOnThreadCreate,
     RunAutomodOnThreadDelete,
+    RunAutomodOnThreadUpdate
     // Messages use message events from SavedMessages, see onLoad below
   ],
 

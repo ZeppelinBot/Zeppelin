@@ -32,6 +32,10 @@ import { ThreadDeleteTrigger } from "./threadDelete";
 import { UnbanTrigger } from "./unban";
 import { UnmuteTrigger } from "./unmute";
 import { WarnTrigger } from "./warn";
+import { ThreadArchiveTrigger } from "./threadArchive";
+import { ThreadUnarchiveTrigger } from "./threadUnarchive";
+import { ThreadLockTrigger } from "./threadLock";
+import { ThreadUnlockTrigger } from "./threadUnlock";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   any_message: AnyMessageTrigger,
@@ -71,6 +75,10 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
 
   thread_create: ThreadCreateTrigger,
   thread_delete: ThreadDeleteTrigger,
+  thread_archive: ThreadArchiveTrigger,
+  thread_unarchive: ThreadUnarchiveTrigger,
+  thread_lock: ThreadLockTrigger,
+  thread_unlock: ThreadUnlockTrigger,
 };
 
 export const AvailableTriggers = t.type({
