@@ -25,13 +25,11 @@ export const ThreadUnarchiveTrigger = automodTrigger<ThreadUnarchiveResult>()({
       return;
     }
 
-    if (triggerConfig.locked && !context.threadChange.locked) {
-      return;
-    } else if (triggerConfig.locked === false && !context.threadChange.unlocked) {
+    const thread = context.threadChange.unarchived;
+
+    if (typeof triggerConfig.locked === "boolean" && thread.locked !== triggerConfig.locked) {
       return;
     }
-
-    const thread = context.threadChange.unarchived;
 
     if (triggerConfig.parent) {
       const parentIds = Array.isArray(triggerConfig.parent) ? triggerConfig.parent : [triggerConfig.parent];

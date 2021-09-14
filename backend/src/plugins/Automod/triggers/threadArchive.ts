@@ -26,18 +26,16 @@ export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
     }
 
     const thread = context.threadChange.archived;
-    console.log("matching thread_archive");
 
     if (typeof triggerConfig.locked === "boolean" && thread.locked !== triggerConfig.locked) {
       return;
     }
-    console.log("locked pass");
 
     if (triggerConfig.parent) {
       const parentIds = Array.isArray(triggerConfig.parent) ? triggerConfig.parent : [triggerConfig.parent];
       if (thread.parentId && !parentIds.includes(thread.parentId)) return;
     }
-    console.log("parent pass");
+
     return {
       extra: {
         matchedThreadId: thread.id,
