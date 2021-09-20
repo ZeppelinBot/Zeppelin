@@ -19,6 +19,8 @@ import {
 import { muteLock } from "../../../utils/lockNameHelpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { MuteOptions, MutesPluginType } from "../types";
+import { addTimer, removeTimer } from "./clearExpiredMutes";
+import moment from "moment";
 
 export async function muteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -139,8 +141,14 @@ export async function muteUser(
       rolesToRestore = Array.from(new Set([...existingMute.roles_to_restore, ...rolesToRestore]));
     }
     await pluginData.state.mutes.updateExpiryTime(user.id, muteTime, rolesToRestore);
+    removeTimer(pluginData, existingMute);
+    addTimer(pluginData, {
+      ...existingMute,
+      expires_at: moment().utc().add(muteTime, "ms").format("YYYY-MM-DD HH:mm:ss"),
+    });
   } else {
-    await pluginData.state.mutes.addMute(user.id, muteTime, rolesToRestore);
+    const mute = await pluginData.state.mutes.addMute(user.id, muteTime, rolesToRestore);
+    addTimer(pluginData, mute);
   }
 
   const template = existingMute

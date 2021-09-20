@@ -19,6 +19,8 @@ import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from ".
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { addTimer, removeTimer } from "./outdatedTempbansLoop";
+import moment from "moment";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -109,8 +111,14 @@ export async function banUserId(
     const selfId = pluginData.client.user!.id;
     if (existingTempban) {
       pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
+      removeTimer(pluginData, existingTempban);
+      addTimer(pluginData, {
+        ...existingTempban,
+        expires_at: moment().utc().add(banTime, "ms").format("YYYY-MM-DD HH:mm:ss"),
+      });
     } else {
-      pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
+      const tempban = await pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
+      addTimer(pluginData, tempban);
     }
   }
 

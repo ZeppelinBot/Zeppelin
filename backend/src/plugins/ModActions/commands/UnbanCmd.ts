@@ -10,6 +10,7 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { removeTimerByUserId } from "../functions/outdatedTempbansLoop";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -69,7 +70,7 @@ export const UnbanCmd = modActionsCmd({
     });
     // Delete the tempban, if one exists
     pluginData.state.tempbans.clear(user.id);
-
+    removeTimerByUserId(pluginData, user.id);
     // Confirm the action
     sendSuccessMessage(pluginData, msg.channel, `Member unbanned (Case #${createdCase.case_number})`);
 

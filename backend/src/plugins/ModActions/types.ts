@@ -2,6 +2,7 @@ import { TextChannel } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { ExpiringTimer } from "src/utils/timers";
 import { Case } from "../../data/entities/Case";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -70,9 +71,9 @@ export interface ModActionsPluginType extends BasePluginType {
     cases: GuildCases;
     tempbans: GuildTempbans;
     serverLogs: GuildLogs;
-
+    banClearIntervalId: Timeout;
+    timers: ExpiringTimer[];
     unloaded: boolean;
-    outdatedTempbansTimeout: Timeout | null;
     ignoredEvents: IIgnoredEvent[];
     massbanQueue: Queue;
 

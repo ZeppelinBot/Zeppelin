@@ -11,6 +11,14 @@ export class GuildMutes extends BaseGuildRepository {
     this.mutes = getRepository(Mute);
   }
 
+  async getAllTemporaryMutes(): Promise<Mute[]> {
+    return this.mutes
+      .createQueryBuilder("mutes")
+      .where("guild_id = :guild_id", { guild_id: this.guildId })
+      .andWhere("expires_at IS NOT NULL")
+      .getMany();
+  }
+
   async getExpiredMutes(): Promise<Mute[]> {
     return this.mutes
       .createQueryBuilder("mutes")

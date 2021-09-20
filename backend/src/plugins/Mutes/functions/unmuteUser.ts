@@ -11,6 +11,8 @@ import { CaseArgs } from "../../Cases/types";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { memberHasMutedRole } from "./memberHasMutedRole";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { addTimer, removeTimer } from "./clearExpiredMutes";
+import moment from "moment";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -28,9 +30,15 @@ export async function unmuteUser(
   if (unmuteTime) {
     // Schedule timed unmute (= just set the mute's duration)
     if (!existingMute) {
-      await pluginData.state.mutes.addMute(userId, unmuteTime);
+      const mute = await pluginData.state.mutes.addMute(userId, unmuteTime);
+      addTimer(pluginData, mute);
     } else {
       await pluginData.state.mutes.updateExpiryTime(userId, unmuteTime);
+      removeTimer(pluginData, existingMute);
+      addTimer(pluginData, {
+        ...existingMute,
+        expires_at: moment().utc().add(unmuteTime, "ms").format("YYYY-MM-DD HH:mm:ss"),
+      });
     }
   } else {
     // Unmute immediately
@@ -60,6 +68,7 @@ export async function unmuteUser(
       );
     }
     if (existingMute) {
+      removeTimer(pluginData, existingMute);
       await pluginData.state.mutes.clear(userId);
     }
   }

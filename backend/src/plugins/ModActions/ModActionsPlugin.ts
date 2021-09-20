@@ -42,7 +42,7 @@ import { hasMutePermission } from "./functions/hasMutePerm";
 import { kickMember } from "./functions/kickMember";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
-import { outdatedTempbansLoop } from "./functions/outdatedTempbansLoop";
+import { loadExpiringTimers } from "./functions/outdatedTempbansLoop";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
@@ -111,6 +111,8 @@ const defaultOptions = {
     },
   ],
 };
+
+const EXPIRED_BANS_CHECK_INTERVAL = 30 * MINUTES;
 
 export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   name: "mod_actions",
@@ -200,8 +202,8 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     state.serverLogs = new GuildLogs(guild.id);
 
     state.unloaded = false;
-    state.outdatedTempbansTimeout = null;
     state.ignoredEvents = [];
+    pluginData.state.timers = [];
     // Massbans can take a while depending on rate limits,
     // so we're giving each massban 15 minutes to complete before launching the next massban
     state.massbanQueue = new Queue(15 * MINUTES);
@@ -210,11 +212,17 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   },
 
   afterLoad(pluginData) {
-    outdatedTempbansLoop(pluginData);
+    loadExpiringTimers(pluginData);
+    pluginData.state.banClearIntervalId = setInterval(
+      () => loadExpiringTimers(pluginData),
+      EXPIRED_BANS_CHECK_INTERVAL,
+    );
   },
 
   beforeUnload(pluginData) {
+    clearInterval(pluginData.state.banClearIntervalId);
     pluginData.state.unloaded = true;
     pluginData.state.events.removeAllListeners();
+    pluginData.state.timers = [];
   },
 });
