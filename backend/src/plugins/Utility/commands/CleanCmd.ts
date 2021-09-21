@@ -1,7 +1,5 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -10,7 +8,6 @@ import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../plugi
 import { allowTimeout } from "../../../RegExpRunner";
 import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
-import { boolean, number } from "io-ts";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 
