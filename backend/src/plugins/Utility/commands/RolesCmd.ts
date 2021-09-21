@@ -34,17 +34,18 @@ export const RolesCmd = utilityCmd({
     if (args.counts) {
       await refreshMembersIfNeeded(guild);
 
-      // If the user requested role member counts as well, fetch them and sort the roles by their member count
-      const roleCounts: Map<string, number> = Array.from(guild.roles.cache.values()).reduce((map, role) => {
-        map.set(role.id, role.members.size);
-        return map;
-      }, new Map());
+      const roleCounts = new Map<string, number>();
+      for (const member of guild.members.cache.values()) {
+        for (const id of member.roles.cache.keys()) {
+          roleCounts.set(id, (roleCounts.get(id) ?? 0) + 1);
+        }
+      }
 
       // The "everyone" role always has all members in it
       roleCounts.set(guild.id, guild.memberCount);
 
       for (const role of roles) {
-        role._memberCount = roleCounts.has(role.id) ? roleCounts.get(role.id) : 0;
+        role._memberCount = roleCounts.get(role.id) ?? 0;
       }
 
       if (!sort) sort = "-memberCount";
