@@ -6,21 +6,15 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import {
-  createUserNotificationError,
-  notifyUser,
-  resolveUser,
-  stripObjectToScalars,
-  ucfirst,
-  UserNotificationResult,
-} from "../../../utils";
+import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { addTimer, removeTimer } from "./outdatedTempbansLoop";
+import { clearTempBan } from "./outdatedTempbansLoop";
 import moment from "moment";
+import { addTimer, removeTimer } from "src/utils/timers";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -112,13 +106,18 @@ export async function banUserId(
     if (existingTempban) {
       pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
       removeTimer(pluginData, existingTempban);
-      addTimer(pluginData, {
+      const newBanObj = {
         ...existingTempban,
         expires_at: moment().utc().add(banTime, "ms").format("YYYY-MM-DD HH:mm:ss"),
+      };
+      addTimer(pluginData, newBanObj, async () => {
+        await clearTempBan(pluginData, newBanObj);
       });
     } else {
       const tempban = await pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
-      addTimer(pluginData, tempban);
+      addTimer(pluginData, tempban, async () => {
+        await clearTempBan(pluginData, tempban);
+      });
     }
   }
 

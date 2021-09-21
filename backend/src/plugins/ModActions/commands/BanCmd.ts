@@ -16,7 +16,8 @@ import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromA
 import { modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import moment from "moment";
-import { addTimer, removeTimer, removeTimerByUserId } from "../functions/outdatedTempbansLoop";
+import { clearTempBan } from "../functions/outdatedTempbansLoop";
+import { addTimer, removeTimer, removeTimerByUserId } from "src/utils/timers";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -96,13 +97,18 @@ export const BanCmd = modActionsCmd({
             if (existingTempban) {
               pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
               removeTimer(pluginData, existingTempban);
-              addTimer(pluginData, {
+              const newBanObj = {
                 ...existingTempban,
                 expires_at: moment().utc().add(time, "ms").format("YYYY-MM-DD HH:mm:ss"),
+              };
+              addTimer(pluginData, newBanObj, async () => {
+                await clearTempBan(pluginData, newBanObj);
               });
             } else {
               const tempban = await pluginData.state.tempbans.addTempban(user.id, time, mod.id);
-              addTimer(pluginData, tempban);
+              addTimer(pluginData, tempban, async () => {
+                await clearTempBan(pluginData, tempban);
+              });
             }
           } else if (existingTempban) {
             pluginData.state.tempbans.clear(user.id);

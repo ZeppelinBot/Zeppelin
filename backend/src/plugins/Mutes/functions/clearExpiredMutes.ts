@@ -3,42 +3,11 @@ import { MINUTES, resolveMember, UnknownUser, verboseUserMention } from "../../.
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { MutesPluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ExpiringTimer } from "src/utils/timers";
 import { Mute } from "src/data/entities/Mute";
 import moment from "moment";
+import { addTimer } from "src/utils/timers";
 
 const LOAD_LESS_THAN_MIN_COUNT = 60 * MINUTES;
-
-export function addTimer(pluginData: GuildPluginData<MutesPluginType>, mute: Mute) {
-  const existingMute = pluginData.state.timers.find(
-    (tm) => tm.options.key === mute.user_id && tm.options.guildId === mute.guild_id && !tm.done,
-  ); // for future-proof when you do global events
-  if (!existingMute && mute.expires_at) {
-    const exp = moment(mute.expires_at!).toDate().getTime() - moment.utc().toDate().getTime();
-    const newTimer = new ExpiringTimer({
-      key: mute.user_id,
-      guildId: mute.guild_id,
-      plugin: "mutes",
-      expiry: exp,
-      callback: async () => {
-        await clearExpiredMute(pluginData, mute);
-      },
-    });
-    pluginData.state.timers.push(newTimer);
-  }
-}
-
-export function removeTimer(pluginData: GuildPluginData<MutesPluginType>, mute: Mute) {
-  const existingMute = pluginData.state.timers.findIndex(
-    (tm) => tm.options.key === mute.user_id && tm.options.guildId === mute.guild_id && !tm.done,
-  );
-  if (existingMute) {
-    const tm = pluginData.state.timers[existingMute];
-    tm.clear();
-    tm.done = true;
-    pluginData.state.timers.splice(existingMute, 1);
-  }
-}
 
 export async function loadExpiringTimers(pluginData: GuildPluginData<MutesPluginType>) {
   const now = moment.utc().toDate().getTime();
@@ -54,7 +23,9 @@ export async function loadExpiringTimers(pluginData: GuildPluginData<MutesPlugin
     if (expires <= now) continue; // exclude expired mutes, just in case
     if (expires > now + LOAD_LESS_THAN_MIN_COUNT) continue; // exclude timers that are expiring in over 180 mins
 
-    addTimer(pluginData, mute);
+    addTimer(pluginData, mute, async () => {
+      await clearExpiredMute(pluginData, mute);
+    });
   }
 
   for (const mute of expiredMutes) {

@@ -1,9 +1,7 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { resolveMember, resolveUser } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -11,8 +9,9 @@ import { CaseArgs } from "../../Cases/types";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { memberHasMutedRole } from "./memberHasMutedRole";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { addTimer, removeTimer } from "./clearExpiredMutes";
+import { clearExpiredMute } from "./clearExpiredMutes";
 import moment from "moment";
+import { addTimer, removeTimer } from "src/utils/timers";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -31,13 +30,18 @@ export async function unmuteUser(
     // Schedule timed unmute (= just set the mute's duration)
     if (!existingMute) {
       const mute = await pluginData.state.mutes.addMute(userId, unmuteTime);
-      addTimer(pluginData, mute);
+      addTimer(pluginData, mute, async () => {
+        await clearExpiredMute(pluginData, mute);
+      });
     } else {
       await pluginData.state.mutes.updateExpiryTime(userId, unmuteTime);
       removeTimer(pluginData, existingMute);
-      addTimer(pluginData, {
+      const newMuteObj = {
         ...existingMute,
         expires_at: moment().utc().add(unmuteTime, "ms").format("YYYY-MM-DD HH:mm:ss"),
+      };
+      addTimer(pluginData, newMuteObj, async () => {
+        await clearExpiredMute(pluginData, newMuteObj);
       });
     }
   } else {

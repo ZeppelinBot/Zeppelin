@@ -13,50 +13,9 @@ import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Tempban } from "src/data/entities/Tempban";
-import { ExpiringTimer } from "src/utils/timers";
+import { addTimer } from "src/utils/timers";
 
 const LOAD_LESS_THAN_MIN_COUNT = 60 * MINUTES;
-
-export function addTimer(pluginData: GuildPluginData<ModActionsPluginType>, tempban: Tempban) {
-  const existingMute = pluginData.state.timers.find(
-    (tm) => tm.options.key === tempban.user_id && tm.options.guildId === tempban.guild_id && !tm.done,
-  ); // for future-proof when you do global events
-  if (!existingMute && tempban.expires_at) {
-    const exp = moment(tempban.expires_at!).toDate().getTime() - moment.utc().toDate().getTime();
-    const newTimer = new ExpiringTimer({
-      key: tempban.user_id,
-      guildId: tempban.guild_id,
-      plugin: "tempban",
-      expiry: exp,
-      callback: async () => {
-        await clearTempBan(pluginData, tempban);
-      },
-    });
-    pluginData.state.timers.push(newTimer);
-  }
-}
-
-export function removeTimer(pluginData: GuildPluginData<ModActionsPluginType>, tempban: Tempban) {
-  const existingMute = pluginData.state.timers.findIndex(
-    (tm) => tm.options.key === tempban.user_id && tm.options.guildId === tempban.guild_id && !tm.done,
-  );
-  if (existingMute) {
-    const tm = pluginData.state.timers[existingMute];
-    tm.clear();
-    tm.done = true;
-    pluginData.state.timers.splice(existingMute, 1);
-  }
-}
-
-export function removeTimerByUserId(pluginData: GuildPluginData<ModActionsPluginType>, user_id: Snowflake) {
-  const existingMute = pluginData.state.timers.findIndex((tm) => tm.options.key === user_id && !tm.done);
-  if (existingMute) {
-    const tm = pluginData.state.timers[existingMute];
-    tm.clear();
-    tm.done = true;
-    pluginData.state.timers.splice(existingMute, 1);
-  }
-}
 
 export async function loadExpiringTimers(pluginData: GuildPluginData<ModActionsPluginType>) {
   const now = moment.utc().toDate().getTime();
@@ -72,7 +31,9 @@ export async function loadExpiringTimers(pluginData: GuildPluginData<ModActionsP
     if (expires <= now) continue; // exclude expired mutes, just in case
     if (expires > now + LOAD_LESS_THAN_MIN_COUNT) continue; // exclude timers that are expiring in over 180 mins
 
-    addTimer(pluginData, tempban);
+    addTimer(pluginData, tempban, async () => {
+      await clearTempBan(pluginData, tempban);
+    });
   }
 
   for (const tempban of expiredBans) {
