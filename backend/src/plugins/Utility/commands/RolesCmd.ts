@@ -34,19 +34,17 @@ export const RolesCmd = utilityCmd({
     if (args.counts) {
       await refreshMembersIfNeeded(guild);
 
-      const roleCounts = new Map<string, number>();
       for (const member of guild.members.cache.values()) {
-        for (const id of member.roles.cache.keys()) {
-          roleCounts.set(id, (roleCounts.get(id) ?? 0) + 1);
+        for (const role of member.roles.cache.values()) {
+          // @ts-expect-error
+          role._memberCount ??= 0;
+          // @ts-expect-error
+          role._memberCount++;
         }
       }
 
-      // The "everyone" role always has all members in it
-      roleCounts.set(guild.id, guild.memberCount);
-
-      for (const role of roles) {
-        role._memberCount = roleCounts.get(role.id) ?? 0;
-      }
+      // The "@everyone" role always has all members in it
+      roles.find((r) => r.id === guild.id)!._memberCount = guild.memberCount;
 
       if (!sort) sort = "-memberCount";
       roles.sort((a, b) => {
