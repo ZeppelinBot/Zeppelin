@@ -1,6 +1,7 @@
-import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
+import { GuildMember, Message, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/dist/helpers";
+import { GuildMessage } from "knub/dist/types";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { errorMessage, resolveMember, resolveUser } from "../../../utils";
@@ -14,7 +15,7 @@ import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 
 export async function actualKickMemberCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  msg,
+  msg: Message,
   args: {
     user: string;
     reason: string;
@@ -25,8 +26,9 @@ export async function actualKickMemberCmd(
   },
 ) {
   const user = await resolveUser(pluginData.client, args.user);
-  if (!user.id) {
-    sendErrorMessage(pluginData, msg.channel, `User not found`);
+  const channel = msg.channel as TextChannel;
+  if (!user.id || !msg.member) {
+    sendErrorMessage(pluginData, channel, `User not found`);
     return;
   }
 
@@ -35,9 +37,9 @@ export async function actualKickMemberCmd(
   if (!memberToKick) {
     const banned = await isBanned(pluginData, user.id);
     if (banned) {
-      sendErrorMessage(pluginData, msg.channel, `User is banned`);
+      sendErrorMessage(pluginData, channel, `User is banned`);
     } else {
-      sendErrorMessage(pluginData, msg.channel, `User not found on the server`);
+      sendErrorMessage(pluginData, channel, `User not found on the server`);
     }
 
     return;
@@ -45,7 +47,7 @@ export async function actualKickMemberCmd(
 
   // Make sure we're allowed to kick this member
   if (!canActOn(pluginData, msg.member, memberToKick)) {
-    sendErrorMessage(pluginData, msg.channel, "Cannot kick: insufficient permissions");
+    sendErrorMessage(pluginData, channel, "Cannot kick: insufficient permissions");
     return;
   }
 
@@ -53,7 +55,7 @@ export async function actualKickMemberCmd(
   let mod = msg.member;
   if (args.mod) {
     if (!(await hasPermission(await pluginData.config.getForMessage(msg), "can_act_as_other"))) {
-      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+      sendErrorMessage(pluginData, channel, "You don't have permission to use -mod");
       return;
     }
 
@@ -64,18 +66,18 @@ export async function actualKickMemberCmd(
   try {
     contactMethods = readContactMethodsFromArgs(args);
   } catch (e) {
-    sendErrorMessage(pluginData, msg.channel, e.message);
+    sendErrorMessage(pluginData, channel, e.message);
     return;
   }
 
   const config = pluginData.config.get();
-  const reason = parseReason(config, formatReasonWithAttachments(args.reason, msg.attachments));
+  const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]));
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,
     caseArgs: {
       modId: mod.id,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     },
   });
 
@@ -86,7 +88,7 @@ export async function actualKickMemberCmd(
     try {
       await memberToKick.ban({ days: 1, reason: "kick -clean" });
     } catch {
-      sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
+      sendErrorMessage(pluginData, channel, "Failed to ban the user to clean messages (-clean)");
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToKick.id);
@@ -95,7 +97,7 @@ export async function actualKickMemberCmd(
     try {
       await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
-      sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
+      sendErrorMessage(pluginData, channel, "Failed to unban the user after banning them (-clean)");
     }
   }
 
@@ -108,5 +110,5 @@ export async function actualKickMemberCmd(
   let response = `Kicked **${memberToKick.user.tag}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
-  sendSuccessMessage(pluginData, msg.channel, response);
+  sendSuccessMessage(pluginData, channel, response);
 }
