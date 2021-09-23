@@ -60,7 +60,7 @@ export const AddCaseCmd = modActionsCmd({
       return;
     }
     const config = pluginData.config.get();
-    const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]))!;
+    const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]));
 
     // Create the case
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
