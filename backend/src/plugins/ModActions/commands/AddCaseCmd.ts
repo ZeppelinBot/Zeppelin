@@ -1,14 +1,13 @@
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { parseReason } from "../functions/parseReason";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -60,8 +59,8 @@ export const AddCaseCmd = modActionsCmd({
       sendErrorMessage(pluginData, msg.channel, "Cannot add case: invalid case type");
       return;
     }
-
-    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]))!;
 
     // Create the case
     const casesPlugin = pluginData.getPlugin(CasesPlugin);

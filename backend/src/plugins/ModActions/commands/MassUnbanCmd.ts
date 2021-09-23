@@ -1,6 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -11,6 +10,7 @@ import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
 import { IgnoredEventType, modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { parseReason } from "../functions/parseReason";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
@@ -37,8 +37,11 @@ export const MassunbanCmd = modActionsCmd({
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;
     }
-
-    const unbanReason = formatReasonWithAttachments(unbanReasonReply.content, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const unbanReason = parseReason(
+      config,
+      formatReasonWithAttachments(unbanReasonReply.content, [...msg.attachments.values()]),
+    )!;
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead

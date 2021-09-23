@@ -1,6 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -9,6 +8,7 @@ import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginU
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { parseReason } from "../functions/parseReason";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
@@ -40,7 +40,11 @@ export const MassmuteCmd = modActionsCmd({
       return;
     }
 
-    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const muteReason = parseReason(
+      config,
+      formatReasonWithAttachments(muteReasonReceived.content, [...msg.attachments.values()]),
+    );
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {

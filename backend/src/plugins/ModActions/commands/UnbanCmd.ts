@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -11,6 +10,7 @@ import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { clearExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
+import { parseReason } from "../functions/parseReason";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -49,7 +49,8 @@ export const UnbanCmd = modActionsCmd({
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
-    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]));
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);

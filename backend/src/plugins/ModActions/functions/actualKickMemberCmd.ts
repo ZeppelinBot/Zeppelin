@@ -9,6 +9,7 @@ import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
 import { kickMember } from "./kickMember";
+import { parseReason } from "./parseReason";
 import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 
 export async function actualKickMemberCmd(
@@ -67,7 +68,8 @@ export async function actualKickMemberCmd(
     return;
   }
 
-  const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  const config = pluginData.config.get();
+  const reason = parseReason(config, formatReasonWithAttachments(args.reason, msg.attachments));
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,
