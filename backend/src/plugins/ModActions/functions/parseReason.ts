@@ -8,7 +8,7 @@ export function parseReason(config: TConfigSchema, reason: string): string {
     reason = config.reason_aliases![reason.toLowerCase()] ?? reason;
   }
   if (reason!.length > MAX_REASON_LENGTH) {
-    reason = reason!.substring(0, MAX_REASON_LENGTH - 6) + " [...]";
+    reason = reason!.substring(0, MAX_REASON_LENGTH - 4) + " […]";
   }
   return reason;
 }
