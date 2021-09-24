@@ -55,7 +55,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
     legacy: true,
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -71,10 +71,10 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
   afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
 
-    state.onMessageUpdateFn = msg => onMessageUpdate(pluginData, msg);
+    state.onMessageUpdateFn = (msg) => onMessageUpdate(pluginData, msg);
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
   },
 

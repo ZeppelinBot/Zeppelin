@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { runAutomodOnAntiraidLevel } from "../events/runAutomodOnAntiraidLevel";
@@ -19,12 +19,12 @@ export async function setAntiraidLevel(
   const logs = pluginData.getPlugin(LogsPlugin);
 
   if (user) {
-    logs.log(LogType.SET_ANTIRAID_USER, {
+    logs.logSetAntiraidUser({
       level: newLevel ?? "off",
-      user: userToConfigAccessibleUser(user),
+      user,
     });
   } else {
-    logs.log(LogType.SET_ANTIRAID_AUTO, {
+    logs.logSetAntiraidAuto({
       level: newLevel ?? "off",
     });
   }

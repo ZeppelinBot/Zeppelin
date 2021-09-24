@@ -70,7 +70,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
     `),
   },
 
-  configPreprocessor: options => {
+  configPreprocessor: (options) => {
     const config = options.config;
     for (const [key, entry] of Object.entries(config.entries)) {
       // Apply default entry config
@@ -79,7 +79,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
       // Normalize alias names
       if (entry.roles) {
         for (const [roleId, aliases] of Object.entries(entry.roles)) {
-          entry.roles[roleId] = aliases.map(a => a.toLowerCase());
+          entry.roles[roleId] = aliases.map((a) => a.toLowerCase());
         }
       }
     }

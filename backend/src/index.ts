@@ -1,5 +1,4 @@
-import { Client, Intents, TextChannel } from "discord.js";
-import yaml from "js-yaml";
+import { Client, Constants, Intents, TextChannel, ThreadChannel } from "discord.js";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
@@ -18,8 +17,12 @@ import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordAPIError, isDiscordHTTPError, successMessage } from "./utils";
+import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
+import { DecayingCounter } from "./utils/DecayingCounter";
+import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
+import { logRestCall } from "./restCallStats";
+import { logRateLimit } from "./rateLimitStats";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -94,6 +97,25 @@ function errorHandler(err) {
     return;
   }
 
+  // FIXME: Hotfix
+  if (err.message && err.message.startsWith("Unknown custom override criteria")) {
+    // console.warn(err.message);
+    return;
+  }
+
+  // FIXME: Hotfix
+  if (err.message && err.message.startsWith("Unknown override criteria")) {
+    // console.warn(err.message);
+    return;
+  }
+
+  if (err instanceof PluginNotLoadedError) {
+    // We don't want to crash the bot here, although this *should not happen*
+    // TODO: Proper system for preventing plugin load/unload race conditions
+    console.error(err);
+    return;
+  }
+
   // tslint:disable:no-console
   console.error(err);
 
@@ -124,8 +146,8 @@ if (process.env.NODE_ENV === "production") {
 
 // Verify required Node.js version
 const REQUIRED_NODE_VERSION = "14.0.0";
-const requiredParts = REQUIRED_NODE_VERSION.split(".").map(v => parseInt(v, 10));
-const actualVersionParts = process.versions.node.split(".").map(v => parseInt(v, 10));
+const requiredParts = REQUIRED_NODE_VERSION.split(".").map((v) => parseInt(v, 10));
+const actualVersionParts = process.versions.node.split(".").map((v) => parseInt(v, 10));
 for (const [i, part] of actualVersionParts.entries()) {
   if (part > requiredParts[i]) break;
   if (part === requiredParts[i]) continue;
@@ -136,10 +158,21 @@ moment.tz.setDefault("UTC");
 
 logger.info("Connecting to database");
 connect().then(async () => {
+  const RequestHandler = require("discord.js/src/rest/RequestHandler.js");
+  const originalPush = RequestHandler.prototype.push;
+  // tslint:disable-next-line:only-arrow-functions
+  RequestHandler.prototype.push = function (...args) {
+    const request = args[0];
+    logRestCall(request.method, request.path);
+    return originalPush.call(this, ...args);
+  };
+
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
-    restTimeOffset: 150,
+
     restGlobalRateLimit: 50,
+    // restTimeOffset: 1000,
+
     // Disable mentions by default
     allowedMentions: {
       parse: [],
@@ -166,11 +199,31 @@ connect().then(async () => {
   });
   client.setMaxListeners(200);
 
-  client.on("rateLimit", rateLimitData => {
-    logger.info(`[429] ${JSON.stringify(rateLimitData)}`);
+  client.on(Constants.Events.RATE_LIMIT, (data) => {
+    // tslint:disable-next-line:no-console
+    // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
   });
 
-  client.on("error", err => {
+  const safe429DecayInterval = 5 * SECONDS;
+  const safe429MaxCount = 5;
+  const safe429Counter = new DecayingCounter(safe429DecayInterval);
+  client.on(Constants.Events.DEBUG, (errorText) => {
+    if (!errorText.includes("429")) {
+      return;
+    }
+
+    // tslint:disable-next-line:no-console
+    console.warn(`[DEBUG] [WARN] [429] ${errorText}`);
+
+    const value = safe429Counter.add(1);
+    if (value > safe429MaxCount) {
+      // tslint:disable-next-line:no-console
+      console.error(`Too many 429s (over ${safe429MaxCount} in ${safe429MaxCount * safe429DecayInterval}ms), exiting`);
+      process.exit(1);
+    }
+  });
+
+  client.on("error", (err) => {
     errorHandler(new DiscordJSError(err.message, (err as any).code, 0));
   });
 
@@ -198,9 +251,9 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const basePluginNames = baseGuildPlugins.map(p => p.name);
+        const basePluginNames = baseGuildPlugins.map((p) => p.name);
 
-        return Array.from(plugins.keys()).filter(pluginName => {
+        return Array.from(plugins.keys()).filter((pluginName) => {
           if (basePluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
         });
@@ -208,6 +261,13 @@ connect().then(async () => {
 
       async getConfig(id) {
         const key = id === "global" ? "global" : `guild-${id}`;
+        if (id !== "global") {
+          const allowedGuild = await allowedGuilds.find(id);
+          if (!allowedGuild) {
+            return {};
+          }
+        }
+
         const row = await guildConfigs.getActiveByKey(key);
         if (row) {
           try {
@@ -239,13 +299,15 @@ connect().then(async () => {
       },
 
       sendSuccessMessageFn(channel, body) {
-        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const guildId =
+          channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
         channel.send(successMessage(body, emoji));
       },
 
       sendErrorMessageFn(channel, body) {
-        const guildId = channel instanceof TextChannel ? channel.guild.id : undefined;
+        const guildId =
+          channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
         channel.send(errorMessage(body, emoji));
       },
@@ -254,6 +316,10 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
+  });
+
+  client.on(Constants.Events.RATE_LIMIT, (data) => {
+    logRateLimit(data);
   });
 
   bot.initialize();

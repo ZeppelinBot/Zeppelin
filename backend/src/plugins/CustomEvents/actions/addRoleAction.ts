@@ -2,7 +2,7 @@ import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
@@ -17,7 +17,7 @@ export type TAddRoleAction = t.TypeOf<typeof AddRoleAction>;
 export async function addRoleAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TAddRoleAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {
@@ -28,9 +28,11 @@ export async function addRoleAction(
   if (event.trigger.type === "command" && !canActOn(pluginData, eventData.msg.member, target)) {
     throw new ActionError("Missing permissions");
   }
-
-  const rolesToAdd = Array.isArray(action.role) ? action.role : [action.role];
-  await target.edit({
-    roles: Array.from(new Set([...target.roles.cache.values(), ...rolesToAdd])) as Snowflake[],
-  });
+  const rolesToAdd = (Array.isArray(action.role) ? action.role : [action.role]).filter(
+    (id) => !target.roles.cache.has(id),
+  );
+  if (rolesToAdd.length === 0) {
+    throw new ActionError("Target already has the role(s) specified");
+  }
+  await target.roles.add(rolesToAdd);
 }

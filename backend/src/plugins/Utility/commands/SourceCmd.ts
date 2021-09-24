@@ -21,7 +21,7 @@ export const SourceCmd = utilityCmd({
       return;
     }
 
-    const message = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(() => null);
+    const message = await args.message.channel.messages.fetch(args.message.messageId);
     if (!message) {
       sendErrorMessage(pluginData, cmdMessage.channel, "Unknown message");
       return;

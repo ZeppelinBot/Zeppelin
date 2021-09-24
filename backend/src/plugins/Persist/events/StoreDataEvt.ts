@@ -16,7 +16,7 @@ export const StoreDataEvt = persistEvt({
 
     const persistedRoles = config.persisted_roles;
     if (persistedRoles.length && member.roles) {
-      const rolesToPersist = intersection(persistedRoles, member.roles);
+      const rolesToPersist = intersection(persistedRoles, [...member.roles.cache.keys()]);
       if (rolesToPersist.length) {
         persist = true;
         persistData.roles = rolesToPersist;

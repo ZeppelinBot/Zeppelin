@@ -53,12 +53,12 @@ export const MutesCmd = mutesCmd({
 
     if (args.manual) {
       // Show only manual mutes (i.e. "Muted" role added without a logged mute)
-      const muteUserIds = new Set(activeMutes.map(m => m.user_id));
+      const muteUserIds = new Set(activeMutes.map((m) => m.user_id));
       const manuallyMutedMembers: GuildMember[] = [];
       const muteRole = pluginData.config.get().mute_role;
 
       if (muteRole) {
-        pluginData.guild.members.cache.forEach(member => {
+        pluginData.guild.members.cache.forEach((member) => {
           if (muteUserIds.has(member.id)) return;
           if (member.roles.cache.has(muteRole as Snowflake)) manuallyMutedMembers.push(member);
         });
@@ -66,7 +66,7 @@ export const MutesCmd = mutesCmd({
 
       totalMutes = manuallyMutedMembers.length;
 
-      lines = manuallyMutedMembers.map(member => {
+      lines = manuallyMutedMembers.map((member) => {
         return `<@!${member.id}> (**${member.user.tag}**, \`${member.id}\`)   🔧 Manual mute`;
       });
     } else {
@@ -76,11 +76,8 @@ export const MutesCmd = mutesCmd({
 
       // Filter: mute age
       if (args.age) {
-        const cutoff = moment
-          .utc()
-          .subtract(args.age, "ms")
-          .format(DBDateFormat);
-        filteredMutes = filteredMutes.filter(m => m.created_at <= cutoff);
+        const cutoff = moment.utc().subtract(args.age, "ms").format(DBDateFormat);
+        filteredMutes = filteredMutes.filter((m) => m.created_at <= cutoff);
         hasFilters = true;
       }
 
@@ -93,7 +90,7 @@ export const MutesCmd = mutesCmd({
         if (!member) {
           if (!bannedIds) {
             const bans = await pluginData.guild.bans.fetch({ cache: true });
-            bannedIds = bans.map(u => u.user.id);
+            bannedIds = bans.map((u) => u.user.id);
           }
 
           muteWithDetails.banned = bannedIds.includes(mute.user_id);
@@ -106,18 +103,18 @@ export const MutesCmd = mutesCmd({
 
       // Filter: left the server
       if (args.left != null) {
-        filteredMutes = filteredMutes.filter(m => (args.left && !m.member) || (!args.left && m.member));
+        filteredMutes = filteredMutes.filter((m) => (args.left && !m.member) || (!args.left && m.member));
         hasFilters = true;
       }
 
       totalMutes = filteredMutes.length;
 
       // Create a message line for each mute
-      const caseIds = filteredMutes.map(m => m.case_id).filter(v => !!v);
+      const caseIds = filteredMutes.map((m) => m.case_id).filter((v) => !!v);
       const muteCases = caseIds.length ? await pluginData.state.cases.get(caseIds) : [];
       const muteCasesById = muteCases.reduce((map, c) => map.set(c.id, c), new Map());
 
-      lines = filteredMutes.map(mute => {
+      lines = filteredMutes.map((mute) => {
         const user = pluginData.client.users.resolve(mute.user_id as Snowflake);
         const username = user ? user.tag : "Unknown#0000";
         const theCase = muteCasesById.get(mute.case_id);
@@ -152,7 +149,7 @@ export const MutesCmd = mutesCmd({
     let currentPage = 1;
     const totalPages = Math.ceil(lines.length / mutesPerPage);
 
-    const drawListPage = async page => {
+    const drawListPage = async (page) => {
       page = Math.max(1, Math.min(totalPages, page));
       currentPage = page;
 
@@ -197,19 +194,9 @@ export const MutesCmd = mutesCmd({
         const idMod = `${listMessage.id}:muteList`;
         const buttons: MessageButton[] = [];
 
-        buttons.push(
-          new MessageButton()
-            .setStyle("SECONDARY")
-            .setEmoji("⬅")
-            .setCustomId(`previousButton:${idMod}`),
-        );
+        buttons.push(new MessageButton().setStyle("SECONDARY").setEmoji("⬅").setCustomId(`previousButton:${idMod}`));
 
-        buttons.push(
-          new MessageButton()
-            .setStyle("SECONDARY")
-            .setEmoji("➡")
-            .setCustomId(`nextButton:${idMod}`),
-        );
+        buttons.push(new MessageButton().setStyle("SECONDARY").setEmoji("➡").setCustomId(`nextButton:${idMod}`));
 
         const row = new MessageActionRow().addComponents(buttons);
         await listMessage.edit({ components: [row] });

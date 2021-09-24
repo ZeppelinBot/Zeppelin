@@ -42,7 +42,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     prettyName: "Slowmode",
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -69,7 +69,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     state.serverLogs = new GuildLogs(pluginData.guild.id);
     state.clearInterval = setInterval(() => clearExpiredSlowmodes(pluginData), BOT_SLOWMODE_CLEAR_INTERVAL);
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
   },
 

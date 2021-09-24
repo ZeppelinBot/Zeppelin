@@ -33,21 +33,21 @@ function simpleDiscordAPIRequest(bearerToken, path): Promise<any> {
           Authorization: `Bearer ${bearerToken}`,
         },
       },
-      res => {
+      (res) => {
         if (res.statusCode !== 200) {
           reject(new Error(`Discord API error ${res.statusCode}`));
           return;
         }
 
         let rawData = "";
-        res.on("data", data => (rawData += data));
+        res.on("data", (data) => (rawData += data));
         res.on("end", () => {
           resolve(JSON.parse(rawData));
         });
       },
     );
 
-    request.on("error", err => reject(err));
+    request.on("error", (err) => reject(err));
   });
 }
 
@@ -149,7 +149,7 @@ export function initAuth(app: express.Express) {
       return res.json({ valid: false });
     }
 
-    res.json({ valid: true });
+    res.json({ valid: true, userId });
   });
   app.post("/auth/logout", ...apiTokenAuthHandlers(), async (req: Request, res: Response) => {
     await apiLogins.expireApiKey(req.user!.apiKey);

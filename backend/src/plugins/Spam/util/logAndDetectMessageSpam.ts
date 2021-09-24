@@ -1,10 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import {
-  channelToConfigAccessibleChannel,
-  memberToConfigAccessibleMember,
-} from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -95,7 +92,7 @@ export async function logAndDetectMessageSpam(
             );
           } catch (e) {
             if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-              logs.log(LogType.BOT_ALERT, {
+              logs.logBotAlert({
                 body: `Failed to mute <@!${member.id}> in \`spam\` plugin because a mute role has not been specified in server config`,
               });
             } else {
@@ -106,8 +103,8 @@ export async function logAndDetectMessageSpam(
 
         // Get the offending message IDs
         // We also get the IDs of any messages after the last offending message, to account for lag before detection
-        const savedMessages = recentActions.map(a => a.extraData as SavedMessage);
-        const msgIds = savedMessages.map(m => m.id);
+        const savedMessages = recentActions.map((a) => a.extraData as SavedMessage);
+        const msgIds = savedMessages.map((m) => m.id);
         const lastDetectedMsgId = msgIds[msgIds.length - 1];
 
         const additionalMessages = await pluginData.state.savedMessages.getUserMessagesByChannelAfterId(
@@ -115,11 +112,11 @@ export async function logAndDetectMessageSpam(
           savedMessage.channel_id,
           lastDetectedMsgId,
         );
-        additionalMessages.forEach(m => msgIds.push(m.id));
+        additionalMessages.forEach((m) => msgIds.push(m.id));
 
         // Then, if enabled, remove the spam messages
         if (spamConfig.clean !== false) {
-          msgIds.forEach(id => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
+          msgIds.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
           (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake)! as TextChannel | undefined)
             ?.bulkDelete(msgIds as Snowflake[])
             .catch(noop);
@@ -129,7 +126,7 @@ export async function logAndDetectMessageSpam(
         const uniqueMessages = Array.from(new Set([...savedMessages, ...additionalMessages]));
         uniqueMessages.sort((a, b) => (a.id > b.id ? 1 : -1));
         const lastHandledMsgId = uniqueMessages
-          .map(m => m.id)
+          .map((m) => m.id)
           .reduce((last, id): string => {
             return id > last ? id : last;
           });
@@ -181,9 +178,9 @@ export async function logAndDetectMessageSpam(
         }
 
         // Create a log entry
-        logs.log(LogType.MESSAGE_SPAM_DETECTED, {
-          member: memberToConfigAccessibleMember(member!),
-          channel: channelToConfigAccessibleChannel(channel!),
+        logs.logMessageSpamDetected({
+          member: member!,
+          channel: channel!,
           description,
           limit: spamConfig.count,
           interval: spamConfig.interval,
@@ -191,7 +188,7 @@ export async function logAndDetectMessageSpam(
         });
       }
     },
-    err => {
+    (err) => {
       logger.error(`Error while detecting spam:\n${err}`);
     },
   );

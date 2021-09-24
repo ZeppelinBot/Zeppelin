@@ -40,7 +40,7 @@ export const MuteAction = automodAction({
       hide: Boolean(actionConfig.hide_case),
     };
 
-    const userIdsToMute = unique(contexts.map(c => c.user?.id).filter(nonNullish));
+    const userIdsToMute = unique(contexts.map((c) => c.user?.id).filter(nonNullish));
 
     const mutes = pluginData.getPlugin(MutesPlugin);
     for (const userId of userIdsToMute) {
@@ -55,7 +55,7 @@ export const MuteAction = automodAction({
         );
       } catch (e) {
         if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-          pluginData.getPlugin(LogsPlugin).log(LogType.BOT_ALERT, {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Failed to mute <@!${userId}> in Automod rule \`${ruleName}\` because a mute role has not been specified in server config`,
           });
         } else {

@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -10,6 +10,7 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
 import { IgnoredEventType, modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
@@ -41,7 +42,7 @@ export const MassunbanCmd = modActionsCmd({
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
-    args.userIds.forEach(userId => {
+    args.userIds.forEach((userId) => {
       // Use longer timeouts since this can take a while
       ignoreEvent(pluginData, IgnoredEventType.Unban, userId, 120 * 1000);
       pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, userId, 120 * 1000);
@@ -83,26 +84,26 @@ export const MassunbanCmd = modActionsCmd({
       sendErrorMessage(pluginData, msg.channel, "All unbans failed. Make sure the IDs are valid and banned.");
     } else {
       // Some or all unbans were successful. Create a log entry for the mass unban and notify the user.
-      pluginData.state.serverLogs.log(LogType.MASSUNBAN, {
-        mod: userToConfigAccessibleUser(msg.author),
+      pluginData.getPlugin(LogsPlugin).logMassUnban({
+        mod: msg.author,
         count: successfulUnbanCount,
         reason: unbanReason,
       });
 
       if (failedUnbans.length) {
-        const notBanned = failedUnbans.filter(x => x.reason === UnbanFailReasons.NOT_BANNED);
-        const unbanFailed = failedUnbans.filter(x => x.reason === UnbanFailReasons.UNBAN_FAILED);
+        const notBanned = failedUnbans.filter((x) => x.reason === UnbanFailReasons.NOT_BANNED);
+        const unbanFailed = failedUnbans.filter((x) => x.reason === UnbanFailReasons.UNBAN_FAILED);
 
         let failedMsg = "";
         if (notBanned.length > 0) {
           failedMsg += `${notBanned.length}x ${UnbanFailReasons.NOT_BANNED}:`;
-          notBanned.forEach(fail => {
+          notBanned.forEach((fail) => {
             failedMsg += " " + fail.userId;
           });
         }
         if (unbanFailed.length > 0) {
           failedMsg += `\n${unbanFailed.length}x ${UnbanFailReasons.UNBAN_FAILED}:`;
-          unbanFailed.forEach(fail => {
+          unbanFailed.forEach((fail) => {
             failedMsg += " " + fail.userId;
           });
         }

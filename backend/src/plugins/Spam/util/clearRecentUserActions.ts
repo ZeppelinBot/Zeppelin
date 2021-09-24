@@ -7,7 +7,7 @@ export function clearRecentUserActions(
   userId: string,
   actionGroupId: string,
 ) {
-  pluginData.state.recentActions = pluginData.state.recentActions.filter(action => {
+  pluginData.state.recentActions = pluginData.state.recentActions.filter((action) => {
     return action.type !== type || action.userId !== userId || action.actionGroupId !== actionGroupId;
   });
 }

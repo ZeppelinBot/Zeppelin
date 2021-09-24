@@ -1,10 +1,14 @@
 import { GuildAuditLogs } from "discord.js";
 import diff from "lodash.difference";
 import isEqual from "lodash.isequal";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
+import { logMemberNickChange } from "../logFunctions/logMemberNickChange";
+import { logMemberRoleChanges } from "../logFunctions/logMemberRoleChanges";
+import { logMemberRoleAdd } from "../logFunctions/logMemberRoleAdd";
+import { logMemberRoleRemove } from "../logFunctions/logMemberRoleRemove";
 
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",
@@ -13,22 +17,24 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
     const pluginData = meta.pluginData;
     const oldMember = meta.args.oldMember;
     const member = meta.args.newMember;
+    const oldRoles = [...oldMember.roles.cache.keys()];
+    const currentRoles = [...member.roles.cache.keys()];
 
-    if (!oldMember) return;
-
-    const logMember = memberToConfigAccessibleMember(member);
+    if (!oldMember || oldMember.partial) {
+      return;
+    }
 
     if (member.nickname !== oldMember.nickname) {
-      pluginData.state.guildLogs.log(LogType.MEMBER_NICK_CHANGE, {
-        member: logMember,
+      logMemberNickChange(pluginData, {
+        member,
         oldNick: oldMember.nickname != null ? oldMember.nickname : "<none>",
         newNick: member.nickname != null ? member.nickname : "<none>",
       });
     }
 
-    if (!isEqual(oldMember.roles, member.roles)) {
-      const addedRoles = diff([...member.roles.cache.keys()], [...oldMember.roles.cache.keys()]);
-      const removedRoles = diff([...oldMember.roles.cache.keys()], [...member.roles.cache.keys()]);
+    if (!isEqual(oldRoles, currentRoles)) {
+      const addedRoles = diff(currentRoles, oldRoles);
+      const removedRoles = diff(oldRoles, currentRoles);
       let skip = false;
 
       if (
@@ -47,59 +53,36 @@ export const LogsGuildMemberUpdateEvt = logsEvt({
       }
 
       if (!skip) {
-        const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
-          pluginData,
-          GuildAuditLogs.Actions.MEMBER_ROLE_UPDATE as number,
-          member.id,
-        );
-        const mod = relevantAuditLogEntry?.executor ?? null;
-
         if (addedRoles.length && removedRoles.length) {
           // Roles added *and* removed
-          pluginData.state.guildLogs.log(
-            LogType.MEMBER_ROLE_CHANGES,
-            {
-              member: logMember,
-              addedRoles: addedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-                .map(r => r.name)
-                .join(", "),
-              removedRoles: removedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-                .map(r => r.name)
-                .join(", "),
-              mod: mod ? userToConfigAccessibleUser(mod) : {},
-            },
-            member.id,
-          );
+          logMemberRoleChanges(pluginData, {
+            member,
+            addedRoles: addedRoles.map(
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
+            removedRoles: removedRoles.map(
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
+            mod: null,
+          });
         } else if (addedRoles.length) {
           // Roles added
-          pluginData.state.guildLogs.log(
-            LogType.MEMBER_ROLE_ADD,
-            {
-              member: logMember,
-              roles: addedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-                .map(r => r.name)
-                .join(", "),
-              mod: mod ? userToConfigAccessibleUser(mod) : {},
-            },
-            member.id,
-          );
+          logMemberRoleAdd(pluginData, {
+            member,
+            roles: addedRoles.map(
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
+            mod: null,
+          });
         } else if (removedRoles.length && !addedRoles.length) {
           // Roles removed
-          pluginData.state.guildLogs.log(
-            LogType.MEMBER_ROLE_REMOVE,
-            {
-              member: logMember,
-              roles: removedRoles
-                .map(roleId => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` })
-                .map(r => r.name)
-                .join(", "),
-              mod: mod ? userToConfigAccessibleUser(mod) : {},
-            },
-            member.id,
-          );
+          logMemberRoleRemove(pluginData, {
+            member,
+            roles: removedRoles.map(
+              (roleId) => pluginData.guild.roles.cache.get(roleId) ?? { id: roleId, name: `Unknown (${roleId})` },
+            ),
+            mod: null,
+          });
         }
       }
     }

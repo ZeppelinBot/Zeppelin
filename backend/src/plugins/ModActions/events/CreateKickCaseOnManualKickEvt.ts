@@ -1,5 +1,5 @@
 import { GuildAuditLogs, User } from "discord.js";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -10,6 +10,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 /**
  * Create a KICK case automatically when a user is kicked manually.
@@ -58,9 +59,9 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt({
         }
       }
 
-      pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-        user: userToConfigAccessibleUser(member.user!),
-        mod: mod ? userToConfigAccessibleUser(mod) : null,
+      pluginData.getPlugin(LogsPlugin).logMemberKick({
+        user: member.user!,
+        mod,
         caseNumber: createdCase?.case_number ?? 0,
         reason: kickAuditLogEntry.reason || "",
       });

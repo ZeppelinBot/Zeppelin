@@ -15,7 +15,7 @@ export async function saveMessagesToDB(
     let thisMsg: Message;
 
     try {
-      thisMsg = await channel.messages.fetch(id as Snowflake);
+      thisMsg = await channel.messages.fetch(id);
 
       if (!thisMsg) {
         failed.push(id);

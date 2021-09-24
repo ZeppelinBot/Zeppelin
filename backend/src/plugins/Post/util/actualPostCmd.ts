@@ -1,8 +1,8 @@
-import { Channel, Message, TextChannel } from "discord.js";
+import { Channel, Message, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToConfigAccessibleChannel, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, errorMessage, MINUTES, StrictMessageContent } from "../../../utils";
@@ -10,6 +10,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
@@ -28,8 +29,12 @@ export async function actualPostCmd(
     "repeat-times"?: number;
   } = {},
 ) {
-  if (!(targetChannel instanceof TextChannel)) {
-    msg.channel.send(errorMessage("Channel is not a text channel"));
+  if (
+    !(targetChannel instanceof TextChannel) &&
+    !(targetChannel instanceof NewsChannel) &&
+    !(targetChannel instanceof ThreadChannel)
+  ) {
+    msg.channel.send(errorMessage("Specified channel is not a text channel, announcement channel, or thread"));
     return;
   }
 
@@ -142,35 +147,27 @@ export async function actualPostCmd(
       channel_id: targetChannel.id,
       content,
       attachments: [...msg.attachments.values()],
-      post_at: postAt
-        .clone()
-        .tz("Etc/UTC")
-        .format(DBDateFormat),
+      post_at: postAt.clone().tz("Etc/UTC").format(DBDateFormat),
       enable_mentions: opts["enable-mentions"],
       repeat_interval: opts.repeat,
-      repeat_until: repeatUntil
-        ? repeatUntil
-            .clone()
-            .tz("Etc/UTC")
-            .format(DBDateFormat)
-        : null,
+      repeat_until: repeatUntil ? repeatUntil.clone().tz("Etc/UTC").format(DBDateFormat) : null,
       repeat_times: repeatTimes ?? null,
     });
 
     if (opts.repeat) {
-      pluginData.state.logs.log(LogType.SCHEDULED_REPEATED_MESSAGE, {
-        author: userToConfigAccessibleUser(msg.author),
-        channel: channelToConfigAccessibleChannel(targetChannel),
+      pluginData.getPlugin(LogsPlugin).logScheduledRepeatedMessage({
+        author: msg.author,
+        channel: targetChannel,
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
         repeatInterval: humanizeDuration(opts.repeat),
-        repeatDetails: repeatDetailsStr,
+        repeatDetails: repeatDetailsStr!,
       });
     } else {
-      pluginData.state.logs.log(LogType.SCHEDULED_MESSAGE, {
-        author: userToConfigAccessibleUser(msg.author),
-        channel: channelToConfigAccessibleChannel(targetChannel),
+      pluginData.getPlugin(LogsPlugin).logScheduledMessage({
+        author: msg.author,
+        channel: targetChannel,
         datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
         date: postAt.format(timeAndDate.getDateFormat("date")),
         time: postAt.format(timeAndDate.getDateFormat("time")),
@@ -184,14 +181,14 @@ export async function actualPostCmd(
   }
 
   if (opts.repeat) {
-    pluginData.state.logs.log(LogType.REPEATED_MESSAGE, {
-      author: userToConfigAccessibleUser(msg.author),
-      channel: channelToConfigAccessibleChannel(targetChannel),
+    pluginData.getPlugin(LogsPlugin).logRepeatedMessage({
+      author: msg.author,
+      channel: targetChannel,
       datetime: postAt.format(timeAndDate.getDateFormat("pretty_datetime")),
       date: postAt.format(timeAndDate.getDateFormat("date")),
       time: postAt.format(timeAndDate.getDateFormat("time")),
       repeatInterval: humanizeDuration(opts.repeat),
-      repeatDetails: repeatDetailsStr,
+      repeatDetails: repeatDetailsStr ?? "",
     });
   }
 

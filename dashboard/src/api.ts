@@ -22,13 +22,13 @@ function buildQueryString(params: QueryParamObject) {
   return (
     "?" +
     Array.from(Object.entries(params))
-      .map(pair => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1] || "")}`)
+      .map((pair) => `${encodeURIComponent(pair[0])}=${encodeURIComponent(pair[1] || "")}`)
       .join("&")
   );
 }
 
 export function request(resource, fetchOpts: RequestInit = {}) {
-  return fetch(`${apiUrl}/${resource}`, fetchOpts).then(async res => {
+  return fetch(`${apiUrl}/${resource}`, fetchOpts).then(async (res) => {
     if (!res.ok) {
       if (res.status === 401) {
         RootStore.dispatch("auth/expiredLogin");

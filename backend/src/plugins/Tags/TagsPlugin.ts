@@ -21,6 +21,7 @@ import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -60,6 +61,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   configSchema: ConfigSchema,
+  dependencies: () => [LogsPlugin],
   defaultOptions,
 
   // prettier-ignore
@@ -112,10 +114,10 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.onMessageCreateFn = msg => onMessageCreate(pluginData, msg);
+    state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
 
-    state.onMessageDeleteFn = msg => onMessageDelete(pluginData, msg);
+    state.onMessageDeleteFn = (msg) => onMessageDelete(pluginData, msg);
     state.savedMessages.events.on("delete", state.onMessageDeleteFn);
 
     const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
@@ -129,6 +131,10 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
         if (typeof str !== "string") {
           return Date.now();
+        }
+
+        if (!Number.isNaN(Number(str))) {
+          return Number(str); // Unix timestamp as a string
         }
 
         return moment.tz(str, "YYYY-MM-DD HH:mm:ss", tz).valueOf();
@@ -154,6 +160,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         let reference;
         let delay;
 
+        for (const [i, arg] of args.entries()) {
+          if (typeof arg === "number") {
+            args[i] = String(arg);
+          } else if (typeof arg !== "string") {
+            args[i] = "";
+          }
+        }
+
         if (args.length >= 2) {
           // (time, delay)
           reference = this.parseDateTime(args[0]);
@@ -165,10 +179,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         }
 
         const delayMS = convertDelayStringToMS(delay) ?? 0;
-        return moment
-          .utc(reference, "x")
-          .add(delayMS)
-          .valueOf();
+        return moment.utc(reference, "x").add(delayMS).valueOf();
       },
 
       timeSub(...args) {
@@ -176,6 +187,14 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         let reference;
         let delay;
 
+        for (const [i, arg] of args.entries()) {
+          if (typeof arg === "number") {
+            args[i] = String(arg);
+          } else if (typeof arg !== "string") {
+            args[i] = "";
+          }
+        }
+
         if (args.length >= 2) {
           // (time, delay)
           reference = this.parseDateTime(args[0]);
@@ -187,10 +206,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         }
 
         const delayMS = convertDelayStringToMS(delay) ?? 0;
-        return moment
-          .utc(reference, "x")
-          .subtract(delayMS)
-          .valueOf();
+        return moment.utc(reference, "x").subtract(delayMS).valueOf();
       },
 
       timeAgo(delay) {
@@ -208,7 +224,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         return timeAndDate.inGuildTz(parsed).format("YYYY-MM-DD");
       },
 
-      mention: input => {
+      mention: (input) => {
         if (typeof input !== "string") {
           return "";
         }
@@ -231,7 +247,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
         return "";
       },
 
-      isMention: input => {
+      isMention: (input) => {
         if (typeof input !== "string") {
           return false;
         }

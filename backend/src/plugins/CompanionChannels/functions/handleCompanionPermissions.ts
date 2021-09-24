@@ -5,6 +5,7 @@ import { isDiscordAPIError, MINUTES } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
+import { filterObject } from "../../../utils/filterObject";
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;
@@ -63,18 +64,31 @@ export async function handleCompanionPermissions(
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!channel || !(channel instanceof TextChannel)) continue;
       pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channelId, 3 * 1000);
-      await channel.permissionOverwrites.create(userId as Snowflake, new Permissions(BigInt(permissions)).serialize(), {
+      const fullSerialized = new Permissions(BigInt(permissions)).serialize();
+      const onlyAllowed = filterObject(fullSerialized, (v) => v === true);
+      await channel.permissionOverwrites.create(userId, onlyAllowed, {
         reason: `Companion Channel for ${voiceChannel!.id} | User Joined`,
       });
     }
   } catch (e) {
-    if (isDiscordAPIError(e) && e.code === 50001) {
+    if (isDiscordAPIError(e)) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
-        body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
-      });
-      pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
-      return;
+
+      if (e.code === 50001) {
+        logs.logBotAlert({
+          body: `One of the companion channels can't be accessed. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
+        });
+        pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
+        return;
+      }
+
+      if (e.code === 50013) {
+        logs.logBotAlert({
+          body: `Missing permissions to handle companion channels. Pausing companion channels for 5 minutes or until the bot is reloaded on this server.`,
+        });
+        pluginData.state.errorCooldownManager.setCooldown(ERROR_COOLDOWN_KEY, ERROR_COOLDOWN);
+        return;
+      }
     }
 
     throw e;

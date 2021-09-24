@@ -9,10 +9,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strict": false,
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,

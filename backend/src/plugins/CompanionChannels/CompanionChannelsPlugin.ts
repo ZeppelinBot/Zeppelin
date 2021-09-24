@@ -24,7 +24,7 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
     `),
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 

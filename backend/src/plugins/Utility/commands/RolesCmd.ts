@@ -28,7 +28,7 @@ export const RolesCmd = utilityCmd({
 
     if (args.search) {
       const searchStr = args.search.toLowerCase();
-      roles = roles.filter(r => r.name.toLowerCase().includes(searchStr) || r.id === searchStr);
+      roles = roles.filter((r) => r.name.toLowerCase().includes(searchStr) || r.id === searchStr);
     }
 
     if (args.counts) {
@@ -75,7 +75,7 @@ export const RolesCmd = utilityCmd({
     } else if (sort === "memberCount" && args.counts) {
       roles.sort(sorter("_memberCount", sortDir));
     } else if (sort === "name") {
-      roles.sort(sorter(r => r.name.toLowerCase(), sortDir));
+      roles.sort(sorter((r) => r.name.toLowerCase(), sortDir));
     } else {
       sendErrorMessage(pluginData, msg.channel, "Unknown sorting method");
       return;
@@ -85,7 +85,7 @@ export const RolesCmd = utilityCmd({
 
     const chunks = chunkArray(roles, 20);
     for (const [i, chunk] of chunks.entries()) {
-      const roleLines = chunk.map(role => {
+      const roleLines = chunk.map((role) => {
         const paddedId = role.id.padEnd(longestId, " ");
         let line = `${paddedId} ${role.name}`;
         if (role._memberCount != null) {

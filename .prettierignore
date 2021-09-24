@@ -1,0 +1,5 @@
+.github
+.idea
+node_modules
+/assets
+/debug

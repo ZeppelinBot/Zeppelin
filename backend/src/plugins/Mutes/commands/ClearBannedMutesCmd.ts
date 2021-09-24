@@ -13,7 +13,7 @@ export const ClearBannedMutesCmd = mutesCmd({
     const activeMutes = await pluginData.state.mutes.getActiveMutes();
 
     const bans = await pluginData.guild.bans.fetch({ cache: true });
-    const bannedIds = bans.map(b => b.user.id);
+    const bannedIds = bans.map((b) => b.user.id);
 
     await msg.channel.send(`Found ${activeMutes.length} mutes and ${bannedIds.length} bans, cross-referencing...`);
 

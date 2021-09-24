@@ -11,7 +11,7 @@ export function getMatchingRecentActions(
 ) {
   to = to || Date.now();
 
-  return pluginData.state.recentActions.filter(action => {
+  return pluginData.state.recentActions.filter((action) => {
     return (
       action.type === type &&
       (!identifier || action.identifier === identifier) &&

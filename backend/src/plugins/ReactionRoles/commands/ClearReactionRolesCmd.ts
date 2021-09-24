@@ -23,7 +23,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage: Message;
     try {
-      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     } catch (err) {
       if (isDiscordAPIError(err) && err.code === 50001) {
         sendErrorMessage(pluginData, msg.channel, "Missing access to the specified message");

@@ -42,7 +42,7 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
 
 const MAXIMUM_COMPONENT_ROWS = 5;
 
-const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<ReactionRolesPluginType> = (options) => {
   if (options.config.button_groups) {
     for (const [groupName, group] of Object.entries(options.config.button_groups)) {
       const defaultButtonNames = Object.keys(group.default_buttons);
@@ -108,7 +108,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     prettyName: "Reaction roles",
   },
 
-  dependencies: [LogsPlugin],
+  dependencies: () => [LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -117,13 +117,13 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
     RefreshReactionRolesCmd,
     ClearReactionRolesCmd,
     InitReactionRolesCmd,
-    PostButtonRolesCmd,
+    // PostButtonRolesCmd,
   ],
 
   // prettier-ignore
   events: [
     AddReactionRoleEvt,
-    ButtonInteractionEvt,
+    // ButtonInteractionEvt,
     MessageDeletedEvt,
   ],
   configPreprocessor,
@@ -141,11 +141,11 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   },
 
   afterLoad(pluginData) {
-    let autoRefreshInterval = pluginData.config.get().auto_refresh_interval;
-    if (autoRefreshInterval != null) {
-      autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
-      autoRefreshLoop(pluginData, autoRefreshInterval);
-    }
+    // let autoRefreshInterval = pluginData.config.get().auto_refresh_interval;
+    // if (autoRefreshInterval != null) {
+    //   autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
+    //   autoRefreshLoop(pluginData, autoRefreshInterval);
+    // }
   },
 
   beforeUnload(pluginData) {

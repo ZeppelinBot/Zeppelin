@@ -1,15 +1,16 @@
 import { Snowflake, VoiceChannel } from "discord.js";
 import {
-  channelToConfigAccessibleChannel,
-  memberToConfigAccessibleMember,
-  userToConfigAccessibleUser,
-} from "../../../utils/configAccessibleObjects";
+  channelToTemplateSafeChannel,
+  memberToTemplateSafeMember,
+  userToTemplateSafeUser,
+} from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { channelMentionRegex, isSnowflake, simpleClosestStringMatch } from "../../../utils";
 import { utilityCmd } from "../types";
 import { ChannelTypeStrings } from "../../../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
@@ -49,7 +50,7 @@ export const VcmoveCmd = utilityCmd({
       const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
         (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
       );
-      const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
+      const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {
         sendErrorMessage(pluginData, msg.channel, "No matching voice channels");
         return;
@@ -68,7 +69,7 @@ export const VcmoveCmd = utilityCmd({
       return;
     }
 
-    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelId);
+    const oldVoiceChannel = pluginData.guild.channels.cache.get(args.member.voice.channelId) as VoiceChannel;
 
     try {
       await args.member.edit({
@@ -79,11 +80,11 @@ export const VcmoveCmd = utilityCmd({
       return;
     }
 
-    pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
-      mod: userToConfigAccessibleUser(msg.author),
-      member: memberToConfigAccessibleMember(args.member),
-      oldChannel: channelToConfigAccessibleChannel(oldVoiceChannel!),
-      newChannel: channelToConfigAccessibleChannel(channel),
+    pluginData.getPlugin(LogsPlugin).logVoiceChannelForceMove({
+      mod: msg.author,
+      member: args.member,
+      oldChannel: oldVoiceChannel,
+      newChannel: channel,
     });
 
     sendSuccessMessage(pluginData, msg.channel, `**${args.member.user.tag}** moved to **${channel.name}**`);
@@ -128,7 +129,7 @@ export const VcmoveAllCmd = utilityCmd({
       const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
         (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
       );
-      const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, ch => ch.name);
+      const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {
         sendErrorMessage(pluginData, msg.channel, "No matching voice channels");
         return;
@@ -179,11 +180,11 @@ export const VcmoveAllCmd = utilityCmd({
         continue;
       }
 
-      pluginData.state.logs.log(LogType.VOICE_CHANNEL_FORCE_MOVE, {
-        mod: userToConfigAccessibleUser(msg.author),
-        member: memberToConfigAccessibleMember(currMember),
-        oldChannel: channelToConfigAccessibleChannel(args.oldChannel),
-        newChannel: channelToConfigAccessibleChannel(channel),
+      pluginData.getPlugin(LogsPlugin).logVoiceChannelForceMove({
+        mod: msg.author,
+        member: currMember,
+        oldChannel: args.oldChannel,
+        newChannel: channel,
       });
     }
 

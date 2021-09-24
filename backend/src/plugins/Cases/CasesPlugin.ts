@@ -38,7 +38,11 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     `),
   },
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: async () => [
+    TimeAndDatePlugin,
+    // The `as any` cast here is to prevent TypeScript from locking up from the circular dependency
+    ((await import("../Logs/LogsPlugin")) as any).LogsPlugin,
+  ],
   configSchema: ConfigSchema,
   defaultOptions,
 

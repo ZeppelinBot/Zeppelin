@@ -1,7 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { hasPermission } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
@@ -40,7 +39,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   const missingPermissions = getMissingChannelPermissions(me, channel, BOT_SLOWMODE_PERMISSIONS);
   if (missingPermissions) {
     const logs = pluginData.getPlugin(LogsPlugin);
-    logs.log(LogType.BOT_ALERT, {
+    logs.logBotAlert({
       body: `Unable to manage bot slowmode in <#${channel.id}>. ${missingPermissionError(missingPermissions)}`,
     });
     return;
@@ -49,13 +48,19 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   // Delete any extra messages sent after a slowmode was already applied
   const userHasSlowmode = await pluginData.state.slowmodes.userHasSlowmode(channel.id, msg.user_id);
   if (userHasSlowmode) {
-    const message = await channel.messages.fetch(msg.id as Snowflake);
-    if (message) {
-      message.delete();
-      return thisMsgLock.interrupt();
+    try {
+      // FIXME: Debug
+      // tslint:disable-next-line:no-console
+      console.log(
+        `[DEBUG] [SLOWMODE] Deleting message ${msg.id} from channel ${channel.id} in guild ${pluginData.guild.id}`,
+      );
+      await channel.messages.delete(msg.id);
+      thisMsgLock.interrupt();
+    } catch (err) {
+      thisMsgLock.unlock();
     }
 
-    return thisMsgLock.unlock();
+    return;
   }
 
   await applyBotSlowmodeToUserId(pluginData, channel, msg.user_id);

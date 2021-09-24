@@ -2,7 +2,7 @@ import { Snowflake, VoiceChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
@@ -17,7 +17,7 @@ export type TMoveToVoiceChannelAction = t.TypeOf<typeof MoveToVoiceChannelAction
 export async function moveToVoiceChannelAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TMoveToVoiceChannelAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {

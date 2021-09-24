@@ -1,13 +1,11 @@
 import { GuildMember } from "discord.js";
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
-import { LogType } from "../../../data/LogType";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { TemplateParseError } from "../../../templateFormatter";
-import { StrictMessageContent } from "../../../utils";
+import { StrictMessageContent, validateAndParseMessageContent } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Tag, TagsPluginType } from "../types";
+import { TagsPluginType, TTag } from "../types";
 import { renderTagBody } from "./renderTagBody";
 
 export async function renderTagFromString(
@@ -15,28 +13,30 @@ export async function renderTagFromString(
   str: string,
   prefix: string,
   tagName: string,
-  tagBody: t.TypeOf<typeof Tag>,
+  tagBody: TTag,
   member: GuildMember,
 ): Promise<StrictMessageContent | null> {
   const variableStr = str.slice(prefix.length + tagName.length).trim();
-  const tagArgs = parseArguments(variableStr).map(v => v.value);
+  const tagArgs = parseArguments(variableStr).map((v) => v.value);
 
   // Format the string
   try {
-    return renderTagBody(
+    const rendered = await renderTagBody(
       pluginData,
       tagBody,
       tagArgs,
       {
-        member: memberToConfigAccessibleMember(member),
-        user: userToConfigAccessibleUser(member.user),
+        member: memberToTemplateSafeMember(member),
+        user: userToTemplateSafeUser(member.user),
       },
       { member },
     );
+
+    return validateAndParseMessageContent(rendered);
   } catch (e) {
     if (e instanceof TemplateParseError) {
       const logs = pluginData.getPlugin(LogsPlugin);
-      logs.log(LogType.BOT_ALERT, {
+      logs.logBotAlert({
         body: `Failed to render tag \`${prefix}${tagName}\`: ${e.message}`,
       });
       return null;

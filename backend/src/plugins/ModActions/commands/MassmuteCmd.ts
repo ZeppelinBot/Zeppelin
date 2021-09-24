@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -8,6 +8,7 @@ import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",
@@ -52,7 +53,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Ignore automatic mute cases and logs for these users
     // We'll create our own cases below and post a single "mass muted" log instead
-    args.userIds.forEach(userId => {
+    args.userIds.forEach((userId) => {
       // Use longer timeouts since this can take a while
       pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_MUTE, userId, 120 * 1000);
     });
@@ -86,8 +87,8 @@ export const MassmuteCmd = modActionsCmd({
       sendErrorMessage(pluginData, msg.channel, "All mutes failed. Make sure the IDs are valid.");
     } else {
       // Success on all or some mutes
-      pluginData.state.serverLogs.log(LogType.MASSMUTE, {
-        mod: userToConfigAccessibleUser(msg.author),
+      pluginData.getPlugin(LogsPlugin).logMassMute({
+        mod: msg.author,
         count: successfulMuteCount,
       });
 

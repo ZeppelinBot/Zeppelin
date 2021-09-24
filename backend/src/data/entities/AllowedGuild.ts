@@ -14,4 +14,10 @@ export class AllowedGuild {
 
   @Column()
   owner_id: string;
+
+  @Column()
+  created_at: string;
+
+  @Column()
+  updated_at: string;
 }

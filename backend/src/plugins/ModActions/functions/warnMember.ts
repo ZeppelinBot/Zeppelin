@@ -1,14 +1,15 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToConfigAccessibleMember, userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -20,13 +21,16 @@ export async function warnMember(
 
   let notifyResult: UserNotificationResult;
   if (config.warn_message) {
-    const warnMessage = await renderTemplate(config.warn_message, {
-      guildName: pluginData.guild.name,
-      reason,
-      moderator: warnOptions.caseArgs?.modId
-        ? userToConfigAccessibleUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
-        : {},
-    });
+    const warnMessage = await renderTemplate(
+      config.warn_message,
+      new TemplateSafeValueContainer({
+        guildName: pluginData.guild.name,
+        reason,
+        moderator: warnOptions.caseArgs?.modId
+          ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+          : null,
+      }),
+    );
     const contactMethods = warnOptions?.contactMethods
       ? warnOptions.contactMethods
       : getDefaultContactMethods(pluginData, "warn");
@@ -70,11 +74,11 @@ export async function warnMember(
   });
 
   const mod = await pluginData.guild.members.fetch(modId as Snowflake);
-  pluginData.state.serverLogs.log(LogType.MEMBER_WARN, {
-    mod: memberToConfigAccessibleMember(mod),
-    member: memberToConfigAccessibleMember(member),
+  pluginData.getPlugin(LogsPlugin).logMemberWarn({
+    mod,
+    member,
     caseNumber: createdCase.case_number,
-    reason,
+    reason: reason ?? "",
   });
 
   pluginData.state.events.emit("warn", member.id, reason, warnOptions.isAutomodAction);

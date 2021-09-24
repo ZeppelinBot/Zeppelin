@@ -26,22 +26,22 @@ export const StarboardReactionAddEvt = starboardEvt({
     }
 
     const member = await resolveMember(pluginData.client, pluginData.guild, userId);
-    if (!member || member.user.bot) return;
+    if (!member || member!.user.bot) return;
 
     const config = await pluginData.config.getMatchingConfig({
+      userId,
       member,
-      channelId: msg.channel.id,
-      categoryId: (msg.channel as TextChannel).parentId,
+      message: msg,
     });
 
     const boardLock = await pluginData.locks.acquire(allStarboardsLock());
 
     const applicableStarboards = Object.values(config.boards)
-      .filter(board => board.enabled)
+      .filter((board) => board.enabled)
       // Can't star messages in the starboard channel itself
-      .filter(board => board.channel_id !== msg.channel.id)
+      .filter((board) => board.channel_id !== msg.channel.id)
       // Matching emoji
-      .filter(board => {
+      .filter((board) => {
         return board.star_emoji!.some((boardEmoji: string) => {
           if (emoji.id) {
             // Custom emoji
@@ -79,9 +79,7 @@ export const StarboardReactionAddEvt = starboardEvt({
             const channel = pluginData.guild.channels.cache.get(
               starboardMessage.starboard_channel_id as Snowflake,
             ) as TextChannel;
-            const realStarboardMessage = await channel.messages.fetch(
-              starboardMessage.starboard_message_id as Snowflake,
-            );
+            const realStarboardMessage = await channel.messages.fetch(starboardMessage.starboard_message_id);
             await updateStarboardMessageStarCount(
               starboard,
               msg,

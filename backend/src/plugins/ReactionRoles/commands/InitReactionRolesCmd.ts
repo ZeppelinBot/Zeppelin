@@ -40,7 +40,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
     let targetMessage;
     try {
-      targetMessage = await args.message.channel.messages.fetch(args.message.messageId as Snowflake).catch(noop);
+      targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     } catch (e) {
       if (isDiscordAPIError(e)) {
         sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
@@ -58,17 +58,15 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     const emojiRolePairs: TReactionRolePair[] = args.reactionRolePairs
       .trim()
       .split("\n")
-      .map(v => v.split(/[\s=,]+/).map(v => v.trim())) // tslint:disable-line
-      .map(
-        (pair): TReactionRolePair => {
-          const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
-          if (customEmojiMatch) {
-            return [customEmojiMatch[2], pair[1], customEmojiMatch[1]];
-          } else {
-            return pair as TReactionRolePair;
-          }
-        },
-      );
+      .map((v) => v.split(/[\s=,]+/).map((v) => v.trim())) // tslint:disable-line
+      .map((pair): TReactionRolePair => {
+        const customEmojiMatch = pair[0].match(/^<a?:(.*?):(\d+)>$/);
+        if (customEmojiMatch) {
+          return [customEmojiMatch[2], pair[1], customEmojiMatch[1]];
+        } else {
+          return pair as TReactionRolePair;
+        }
+      });
 
     // Verify the specified emojis and roles are valid and usable
     for (const pair of emojiRolePairs) {

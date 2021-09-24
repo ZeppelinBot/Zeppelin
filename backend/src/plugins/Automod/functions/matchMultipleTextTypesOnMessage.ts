@@ -1,4 +1,4 @@
-import { Constants } from "discord.js";
+import { Constants, MessageEmbed } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
@@ -32,9 +32,9 @@ export async function* matchMultipleTextTypesOnMessage(
     yield ["message", msg.data.content];
   }
 
-  if (trigger.match_embeds && msg.data.embeds && msg.data.embeds.length) {
-    const copiedEmbed = JSON.parse(JSON.stringify(msg.data.embeds[0]));
-    if (copiedEmbed.type === "video") {
+  if (trigger.match_embeds && msg.data.embeds?.length) {
+    const copiedEmbed: MessageEmbed = JSON.parse(JSON.stringify(msg.data.embeds[0]));
+    if (copiedEmbed.video) {
       copiedEmbed.description = ""; // The description is not rendered, hence it doesn't need to be matched
     }
     yield ["embed", JSON.stringify(copiedEmbed)];

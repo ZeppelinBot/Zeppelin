@@ -8,11 +8,11 @@ export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginTy
   name: "channel_archiver",
   showInDocs: false,
 
-  dependencies: [TimeAndDatePlugin],
+  dependencies: () => [TimeAndDatePlugin],
   configSchema: t.type({}),
 
   // prettier-ignore
   commands: [
       ArchiveChannelCmd,
-  ]
+  ],
 });

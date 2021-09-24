@@ -31,8 +31,8 @@ export const KickAction = automodAction({
       hide: Boolean(actionConfig.hide_case),
     };
 
-    const userIdsToKick = unique(contexts.map(c => c.user?.id).filter(nonNullish));
-    const membersToKick = await asyncMap(userIdsToKick, id => resolveMember(pluginData.client, pluginData.guild, id));
+    const userIdsToKick = unique(contexts.map((c) => c.user?.id).filter(nonNullish));
+    const membersToKick = await asyncMap(userIdsToKick, (id) => resolveMember(pluginData.client, pluginData.guild, id));
 
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const member of membersToKick) {

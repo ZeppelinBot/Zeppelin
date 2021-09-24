@@ -1,5 +1,9 @@
-import { Message } from "discord.js";
+import { Constants, Message, MessageType, Snowflake } from "discord.js";
 import { messageSaverEvt } from "../types";
+import { SECONDS } from "../../../utils";
+import moment from "moment-timezone";
+
+const AFFECTED_MESSAGE_TYPES: MessageType[] = ["DEFAULT", "REPLY", "APPLICATION_COMMAND"];
 
 export const MessageCreateEvt = messageSaverEvt({
   event: "messageCreate",
@@ -7,8 +11,17 @@ export const MessageCreateEvt = messageSaverEvt({
   allowSelf: true,
 
   async listener(meta) {
-    // Only save regular chat messages
-    if (meta.args.message.type !== "DEFAULT" && meta.args.message.type !== "REPLY") {
+    if (!AFFECTED_MESSAGE_TYPES.includes(meta.args.message.type)) {
+      return;
+    }
+
+    // Don't save partial messages
+    if (meta.args.message.partial) {
+      return;
+    }
+
+    // Don't save the bot's own messages
+    if (meta.args.message.author.id === meta.pluginData.client.user?.id) {
       return;
     }
 
@@ -23,6 +36,10 @@ export const MessageUpdateEvt = messageSaverEvt({
 
   async listener(meta) {
     if (meta.args.newMessage.type !== "DEFAULT" && meta.args.newMessage.type !== "REPLY") {
+      return;
+    }
+
+    if (meta.args.oldMessage?.partial) {
       return;
     }
 
@@ -51,7 +68,7 @@ export const MessageDeleteBulkEvt = messageSaverEvt({
   allowSelf: true,
 
   async listener(meta) {
-    const ids = meta.args.messages.map(m => m.id);
+    const ids = meta.args.messages.map((m) => m.id);
     await meta.pluginData.state.savedMessages.markBulkAsDeleted(ids);
   },
 });

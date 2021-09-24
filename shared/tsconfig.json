@@ -7,15 +7,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "es2018",
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "baseUrl": "src",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "outDir": "./dist"
   },
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

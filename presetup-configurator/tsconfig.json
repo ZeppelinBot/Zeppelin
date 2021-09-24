@@ -10,14 +10,12 @@
     "alwaysStrict": true,
     "noImplicitThis": true,
     "strictPropertyInitialization": false,
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "jsx": "react"
+    "jsx": "react",
+    "skipLibCheck": true
   }
 }

@@ -1,18 +1,20 @@
-import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import {
-  channelToConfigAccessibleChannel,
-  emojiToConfigAccessibleEmoji,
-  stickerToConfigAccessibleSticker,
-} from "../../../utils/configAccessibleObjects";
 import { logsEvt } from "../types";
+import { logEmojiCreate } from "../logFunctions/logEmojiCreate";
+import { logEmojiDelete } from "../logFunctions/logEmojiDelete";
+import { logEmojiUpdate } from "../logFunctions/logEmojiUpdate";
+import { logStickerCreate } from "../logFunctions/logStickerCreate";
+import { logStickerDelete } from "../logFunctions/logStickerDelete";
+import { logStickerUpdate } from "../logFunctions/logStickerUpdate";
+import { Emoji, GuildEmoji, Sticker, ThreadChannel } from "discord.js";
+import { filterObject } from "../../../utils/filterObject";
 
 export const LogsEmojiCreateEvt = logsEvt({
   event: "emojiCreate",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.EMOJI_CREATE, {
-      emoji: emojiToConfigAccessibleEmoji(meta.args.emoji),
+    logEmojiCreate(meta.pluginData, {
+      emoji: meta.args.emoji,
     });
   },
 });
@@ -21,22 +23,30 @@ export const LogsEmojiDeleteEvt = logsEvt({
   event: "emojiDelete",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.EMOJI_DELETE, {
-      emoji: emojiToConfigAccessibleEmoji(meta.args.emoji),
+    logEmojiDelete(meta.pluginData, {
+      emoji: meta.args.emoji,
     });
   },
 });
+
+const validEmojiDiffProps: Set<keyof GuildEmoji> = new Set(["name"]);
 
 export const LogsEmojiUpdateEvt = logsEvt({
   event: "emojiUpdate",
 
   async listener(meta) {
-    const diff = getScalarDifference(meta.args.oldEmoji, meta.args.newEmoji);
+    const oldEmojiDiffProps = filterObject(meta.args.oldEmoji || {}, (v, k) => validEmojiDiffProps.has(k));
+    const newEmojiDiffProps = filterObject(meta.args.newEmoji, (v, k) => validEmojiDiffProps.has(k));
+    const diff = getScalarDifference(oldEmojiDiffProps, newEmojiDiffProps);
     const differenceString = differenceToString(diff);
 
-    meta.pluginData.state.guildLogs.log(LogType.EMOJI_UPDATE, {
-      oldEmoji: emojiToConfigAccessibleEmoji(meta.args.oldEmoji),
-      newEmoji: emojiToConfigAccessibleEmoji(meta.args.newEmoji),
+    if (differenceString === "") {
+      return;
+    }
+
+    logEmojiUpdate(meta.pluginData, {
+      oldEmoji: meta.args.oldEmoji,
+      newEmoji: meta.args.newEmoji,
       differenceString,
     });
   },
@@ -46,8 +56,8 @@ export const LogsStickerCreateEvt = logsEvt({
   event: "stickerCreate",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.STICKER_CREATE, {
-      sticker: stickerToConfigAccessibleSticker(meta.args.sticker),
+    logStickerCreate(meta.pluginData, {
+      sticker: meta.args.sticker,
     });
   },
 });
@@ -56,27 +66,31 @@ export const LogsStickerDeleteEvt = logsEvt({
   event: "stickerDelete",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.STICKER_DELETE, {
-      sticker: stickerToConfigAccessibleSticker(meta.args.sticker),
+    logStickerDelete(meta.pluginData, {
+      sticker: meta.args.sticker,
     });
   },
 });
+
+const validStickerDiffProps: Set<keyof Sticker> = new Set(["name"]);
 
 export const LogsStickerUpdateEvt = logsEvt({
   event: "stickerUpdate",
 
   async listener(meta) {
-    const diff = getScalarDifference(meta.args.oldSticker, meta.args.newSticker);
+    const oldStickerDiffProps = filterObject(meta.args.oldSticker || {}, (v, k) => validStickerDiffProps.has(k));
+    const newStickerDiffProps = filterObject(meta.args.newSticker, (v, k) => validStickerDiffProps.has(k));
+    const diff = getScalarDifference(oldStickerDiffProps, newStickerDiffProps);
     const differenceString = differenceToString(diff);
 
-    meta.pluginData.state.guildLogs.log(
-      LogType.STICKER_UPDATE,
-      {
-        oldSticker: stickerToConfigAccessibleSticker(meta.args.oldSticker),
-        newSticker: stickerToConfigAccessibleSticker(meta.args.newSticker),
-        differenceString,
-      },
-      meta.args.newSticker.id,
-    );
+    if (differenceString === "") {
+      return;
+    }
+
+    logStickerUpdate(meta.pluginData, {
+      oldSticker: meta.args.oldSticker,
+      newSticker: meta.args.newSticker,
+      differenceString,
+    });
   },
 });

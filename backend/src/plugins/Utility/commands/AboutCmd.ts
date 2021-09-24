@@ -7,6 +7,7 @@ import { getCurrentUptime } from "../../../uptime";
 import { multiSorter, resolveMember, sorter } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { utilityCmd } from "../types";
+import { shuffle } from "lodash";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -46,18 +47,15 @@ export const AboutCmd = utilityCmd({
 
     const basicInfoRows = [
       ["Uptime", prettyUptime],
-      ["Last reload", `${lastReload} ago`],
-      ["Last update", lastUpdate],
+      ["Last config reload", `${lastReload} ago`],
+      ["Last bot update", lastUpdate],
       ["Version", version],
       ["API latency", `${pluginData.client.ws.ping}ms`],
       ["Server timezone", timeAndDate.getGuildTz()],
     ];
 
     const loadedPlugins = Array.from(
-      pluginData
-        .getKnubInstance()
-        .getLoadedGuild(pluginData.guild.id)!
-        .loadedPlugins.keys(),
+      pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!.loadedPlugins.keys(),
     );
     loadedPlugins.sort();
 
@@ -80,26 +78,28 @@ export const AboutCmd = utilityCmd({
     };
 
     const supporters = await pluginData.state.supporters.getAll();
-    supporters.sort(
-      multiSorter([
-        [r => r.amount, "DESC"],
-        [r => r.name.toLowerCase(), "ASC"],
-      ]),
-    );
+    const shuffledSupporters = shuffle(supporters);
 
     if (supporters.length) {
+      const formattedSupporters = shuffledSupporters
+        // Bold every other supporter to make them easy to recognize from each other
+        .map((s, i) => (i % 2 === 0 ? `**${s.name}**` : `__${s.name}__`))
+        .join(" ");
+
       aboutContent.embeds![0].fields!.push({
         name: "Zeppelin supporters 🎉",
-        value: supporters.map(s => `**${s.name}** ${s.amount ? `${s.amount}€/mo` : ""}`.trim()).join("\n"),
+        value:
+          "These amazing people have supported Zeppelin development by pledging on [Patreon](https://www.patreon.com/zeppelinbot):\n\n" +
+          formattedSupporters,
         inline: false,
       });
     }
 
     // For the embed color, find the highest colored role the bot has - this is their color on the server as well
     const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-    let botRoles = botMember?.roles.cache.map(r => (msg.channel as GuildChannel).guild.roles.cache.get(r.id)!) || [];
-    botRoles = botRoles.filter(r => !!r); // Drop any unknown roles
-    botRoles = botRoles.filter(r => r.color); // Filter to those with a color
+    let botRoles = botMember?.roles.cache.map((r) => (msg.channel as GuildChannel).guild.roles.cache.get(r.id)!) || [];
+    botRoles = botRoles.filter((r) => !!r); // Drop any unknown roles
+    botRoles = botRoles.filter((r) => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
     if (botRoles.length) {
       aboutContent.embeds![0].color = botRoles[0].color;

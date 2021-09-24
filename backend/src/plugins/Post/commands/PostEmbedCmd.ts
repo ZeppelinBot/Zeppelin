@@ -82,6 +82,6 @@ export const PostEmbedCmd = postCmd({
       );
     }
 
-    actualPostCmd(pluginData, msg, args.channel, { embed }, args);
+    actualPostCmd(pluginData, msg, args.channel, { embeds: [embed] }, args);
   },
 });

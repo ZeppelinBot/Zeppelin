@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { memberToConfigAccessibleMember } from "../../../utils/configAccessibleObjects";
+import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
@@ -57,7 +57,7 @@ export async function logAndDetectOtherSpam(
           );
         } catch (e) {
           if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-            logs.log(LogType.BOT_ALERT, {
+            logs.logBotAlert({
               body: `Failed to mute <@!${member.id}> in \`spam\` plugin because a mute role has not been specified in server config`,
             });
           } else {
@@ -78,8 +78,8 @@ export async function logAndDetectOtherSpam(
       // Clear recent cases
       clearRecentUserActions(pluginData, RecentActionType.VoiceChannelMove, userId, actionGroupId);
 
-      logs.log(LogType.OTHER_SPAM_DETECTED, {
-        member: memberToConfigAccessibleMember(member!),
+      logs.logOtherSpamDetected({
+        member: member!,
         description,
         limit: spamConfig.count,
         interval: spamConfig.interval,

@@ -57,7 +57,7 @@ const defaultOptions = {
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
  */
-const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
+const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
@@ -114,6 +114,21 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = options => {
                 ]);
               }
             }
+
+            if (triggerObj[triggerName].match_mime_type) {
+              const white = triggerObj[triggerName].match_mime_type.whitelist_enabled;
+              const black = triggerObj[triggerName].match_mime_type.blacklist_enabled;
+
+              if (white && black) {
+                throw new StrictValidationError([
+                  `Cannot have both blacklist and whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                ]);
+              } else if (!white && !black) {
+                throw new StrictValidationError([
+                  `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                ]);
+              }
+            }
           }
         }
       }
@@ -159,7 +174,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   info: pluginInfo,
 
   // prettier-ignore
-  dependencies: [
+  dependencies: () => [
     LogsPlugin,
     ModActionsPlugin,
     MutesPlugin,
@@ -217,10 +232,10 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
       30 * SECONDS,
     );
 
-    pluginData.state.onMessageCreateFn = message => runAutomodOnMessage(pluginData, message, false);
+    pluginData.state.onMessageCreateFn = (message) => runAutomodOnMessage(pluginData, message, false);
     pluginData.state.savedMessages.events.on("create", pluginData.state.onMessageCreateFn);
 
-    pluginData.state.onMessageUpdateFn = message => runAutomodOnMessage(pluginData, message, true);
+    pluginData.state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
 
     const countersPlugin = pluginData.getPlugin(CountersPlugin);

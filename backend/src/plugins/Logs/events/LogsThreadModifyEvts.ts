@@ -1,14 +1,19 @@
 import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { channelToConfigAccessibleChannel } from "../../../utils/configAccessibleObjects";
+import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
 import { logsEvt } from "../types";
+import { logThreadCreate } from "../logFunctions/logThreadCreate";
+import { logThreadDelete } from "../logFunctions/logThreadDelete";
+import { logThreadUpdate } from "../logFunctions/logThreadUpdate";
+import { TextChannel, ThreadChannel, VoiceChannel } from "discord.js";
+import { filterObject } from "../../../utils/filterObject";
 
 export const LogsThreadCreateEvt = logsEvt({
   event: "threadCreate",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.THREAD_CREATE, {
-      thread: channelToConfigAccessibleChannel(meta.args.thread),
+    logThreadCreate(meta.pluginData, {
+      thread: meta.args.thread,
     });
   },
 });
@@ -17,27 +22,27 @@ export const LogsThreadDeleteEvt = logsEvt({
   event: "threadDelete",
 
   async listener(meta) {
-    meta.pluginData.state.guildLogs.log(LogType.THREAD_DELETE, {
-      thread: channelToConfigAccessibleChannel(meta.args.thread),
+    logThreadDelete(meta.pluginData, {
+      thread: meta.args.thread,
     });
   },
 });
+
+const validThreadDiffProps: Set<keyof ThreadChannel> = new Set(["name", "autoArchiveDuration", "rateLimitPerUser"]);
 
 export const LogsThreadUpdateEvt = logsEvt({
   event: "threadUpdate",
 
   async listener(meta) {
-    const diff = getScalarDifference(meta.args.oldThread, meta.args.newThread, ["messageCount", "archiveTimestamp"]);
+    const oldThreadDiffProps = filterObject(meta.args.oldThread || {}, (v, k) => validThreadDiffProps.has(k));
+    const newThreadDiffProps = filterObject(meta.args.newThread, (v, k) => validThreadDiffProps.has(k));
+    const diff = getScalarDifference(oldThreadDiffProps, newThreadDiffProps);
     const differenceString = differenceToString(diff);
 
-    meta.pluginData.state.guildLogs.log(
-      LogType.THREAD_UPDATE,
-      {
-        oldThread: channelToConfigAccessibleChannel(meta.args.oldThread),
-        newThread: channelToConfigAccessibleChannel(meta.args.newThread),
-        differenceString,
-      },
-      meta.args.newThread.id,
-    );
+    logThreadUpdate(meta.pluginData, {
+      oldThread: meta.args.oldThread,
+      newThread: meta.args.newThread,
+      differenceString,
+    });
   },
 });

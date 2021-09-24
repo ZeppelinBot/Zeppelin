@@ -22,7 +22,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
 
   // Add note details to the beginning of the note
   if (args.noteDetails && args.noteDetails.length) {
-    body = args.noteDetails.map(d => `__[${d}]__`).join(" ") + " " + body;
+    body = args.noteDetails.map((d) => `__[${d}]__`).join(" ") + " " + body;
   }
 
   await pluginData.state.cases.createNote(theCase.id, {

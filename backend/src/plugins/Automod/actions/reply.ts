@@ -1,8 +1,7 @@
-import { MessageOptions, Permissions, Snowflake, TextChannel, User } from "discord.js";
+import { MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
 import * as t from "io-ts";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
-import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,
@@ -11,11 +10,13 @@ import {
   tMessageContent,
   tNullable,
   unique,
+  validateAndParseMessageContent,
   verboseChannelMention,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const ReplyAction = automodAction({
   configType: t.union([
@@ -23,6 +24,7 @@ export const ReplyAction = automodAction({
     t.type({
       text: tMessageContent,
       auto_delete: tNullable(t.union([tDelayString, t.number])),
+      inline: tNullable(t.boolean),
     }),
   ]),
 
@@ -30,8 +32,11 @@ export const ReplyAction = automodAction({
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const contextsWithTextChannels = contexts
-      .filter(c => c.message?.channel_id)
-      .filter(c => pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake) instanceof TextChannel);
+      .filter((c) => c.message?.channel_id)
+      .filter((c) => {
+        const channel = pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake);
+        return channel instanceof TextChannel || channel instanceof ThreadChannel;
+      });
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
       if (!map.has(context.message!.channel_id)) {
@@ -43,13 +48,17 @@ export const ReplyAction = automodAction({
     }, new Map());
 
     for (const [channelId, _contexts] of contextsByChannelId.entries()) {
-      const users = unique(Array.from(new Set(_contexts.map(c => c.user).filter(Boolean)))) as User[];
+      const users = unique(Array.from(new Set(_contexts.map((c) => c.user).filter(Boolean)))) as User[];
       const user = users[0];
 
-      const renderReplyText = async str =>
-        renderTemplate(str, {
-          user: userToConfigAccessibleUser(user),
-        });
+      const renderReplyText = async (str: string) =>
+        renderTemplate(
+          str,
+          new TemplateSafeValueContainer({
+            user: userToTemplateSafeUser(user),
+          }),
+        );
+
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)
@@ -65,7 +74,7 @@ export const ReplyAction = automodAction({
             Permissions.FLAGS.SEND_MESSAGES | Permissions.FLAGS.VIEW_CHANNEL,
           )
         ) {
-          pluginData.state.logs.log(LogType.BOT_ALERT, {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Missing permissions to reply in ${verboseChannelMention(channel)} in Automod rule \`${ruleName}\``,
           });
           continue;
@@ -76,7 +85,7 @@ export const ReplyAction = automodAction({
           typeof formatted !== "string" &&
           !hasDiscordPermissions(channel.permissionsFor(pluginData.client.user!.id), Permissions.FLAGS.EMBED_LINKS)
         ) {
-          pluginData.state.logs.log(LogType.BOT_ALERT, {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Missing permissions to reply **with an embed** in ${verboseChannelMention(
               channel,
             )} in Automod rule \`${ruleName}\``,
@@ -84,17 +93,27 @@ export const ReplyAction = automodAction({
           continue;
         }
 
-        const messageContent: MessageOptions = typeof formatted === "string" ? { content: formatted } : formatted;
-        const replyMsg = await channel.send({
+        const messageContent = validateAndParseMessageContent(formatted);
+
+        const messageOpts: MessageOptions = {
           ...messageContent,
           allowedMentions: {
             users: [user.id],
           },
-        });
+        };
+
+        if (typeof actionConfig !== "string" && actionConfig.inline) {
+          messageOpts.reply = {
+            failIfNotExists: false,
+            messageReference: _contexts[0].message!.id,
+          };
+        }
+
+        const replyMsg = await channel.send(messageOpts);
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
-          setTimeout(() => replyMsg.delete().catch(noop), delay);
+          setTimeout(() => !replyMsg.deleted && replyMsg.delete().catch(noop), delay);
         }
       }
     }

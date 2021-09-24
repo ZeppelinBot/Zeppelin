@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,

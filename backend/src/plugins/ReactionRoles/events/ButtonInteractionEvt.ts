@@ -49,24 +49,18 @@ export const ButtonInteractionEvt = reactionRolesEvt({
     const group = cfg.button_groups[context.groupName];
     if (!group) {
       await sendEphemeralReply(int, `A configuration error was encountered, please contact the Administrators!`);
-      meta.pluginData
-        .getPlugin(LogsPlugin)
-        .log(
-          LogType.BOT_ALERT,
-          `**A configuration error occurred** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
-        );
+      meta.pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: `**A configuration error occurred** on buttons for message ${int.message.id}, group **${context.groupName}** not found in config`,
+      });
       return;
     }
 
     // Verify that detected action is known by us
     if (!(<any>Object).values(ButtonMenuActions).includes(context.action)) {
       await sendEphemeralReply(int, `A internal error was encountered, please contact the Administrators!`);
-      meta.pluginData
-        .getPlugin(LogsPlugin)
-        .log(
-          LogType.BOT_ALERT,
-          `**A internal error occurred** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
-        );
+      meta.pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: `**A internal error occurred** on buttons for message ${int.message.id}, action **${context.action}** is not known`,
+      });
       return;
     }
 

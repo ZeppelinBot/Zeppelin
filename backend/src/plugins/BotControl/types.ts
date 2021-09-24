@@ -9,6 +9,9 @@ import { tNullable } from "../../utils";
 export const ConfigSchema = t.type({
   can_use: t.boolean,
   can_eligible: t.boolean,
+  can_performance: t.boolean,
+  can_add_server_from_invite: t.boolean,
+  can_list_dashboard_perms: t.boolean,
   update_cmd: tNullable(t.string),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

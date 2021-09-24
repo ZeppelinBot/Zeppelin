@@ -1,14 +1,15 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { userToConfigAccessibleUser } from "../../../utils/configAccessibleObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate } from "../../../templateFormatter";
+import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 /**
  * Kick the specified server member. Generates a case.
@@ -30,13 +31,16 @@ export async function kickMember(
 
     if (contactMethods.length) {
       if (config.kick_message) {
-        const kickMessage = await renderTemplate(config.kick_message, {
-          guildName: pluginData.guild.name,
-          reason,
-          moderator: kickOptions.caseArgs?.modId
-            ? userToConfigAccessibleUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
-            : {},
-        });
+        const kickMessage = await renderTemplate(
+          config.kick_message,
+          new TemplateSafeValueContainer({
+            guildName: pluginData.guild.name,
+            reason,
+            moderator: kickOptions.caseArgs?.modId
+              ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+              : null,
+          }),
+        );
 
         notifyResult = await notifyUser(member.user, kickMessage, contactMethods);
       } else {
@@ -72,11 +76,11 @@ export async function kickMember(
 
   // Log the action
   const mod = await resolveUser(pluginData.client, modId);
-  pluginData.state.serverLogs.log(LogType.MEMBER_KICK, {
-    mod: userToConfigAccessibleUser(mod),
-    user: userToConfigAccessibleUser(member.user),
+  pluginData.getPlugin(LogsPlugin).logMemberKick({
+    mod,
+    user: member.user,
     caseNumber: createdCase.case_number,
-    reason,
+    reason: reason ?? "",
   });
 
   pluginData.state.events.emit("kick", member.id, reason, kickOptions.isAutomodAction);

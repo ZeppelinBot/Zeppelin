@@ -1,8 +1,9 @@
-import { Permissions, Snowflake, TextChannel } from "discord.js";
+import { Permissions, Snowflake, TextChannel, PermissionString } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),
@@ -21,7 +22,7 @@ export type TSetChannelPermissionOverridesAction = t.TypeOf<typeof SetChannelPer
 export async function setChannelPermissionOverridesAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TSetChannelPermissionOverridesAction,
-  values: any,
+  values: TemplateSafeValueContainer,
   event: TCustomEvent,
   eventData: any,
 ) {
@@ -31,10 +32,17 @@ export async function setChannelPermissionOverridesAction(
   }
 
   for (const override of action.overrides) {
-    channel.permissionOverwrites.create(
-      override.id as Snowflake,
-      new Permissions(BigInt(override.allow)).add(BigInt(override.deny)).serialize(),
-    );
+    const allow = new Permissions(BigInt(override.allow)).serialize();
+    const deny = new Permissions(BigInt(override.deny)).serialize();
+    const perms: Partial<Record<PermissionString, boolean | null>> = {};
+    for (const key in allow) {
+      if (allow[key]) {
+        perms[key] = true;
+      } else if (deny[key]) {
+        perms[key] = false;
+      }
+    }
+    channel.permissionOverwrites.create(override.id as Snowflake, perms);
 
     /*
     await channel.permissionOverwrites overwritePermissions(

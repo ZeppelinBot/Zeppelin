@@ -15,16 +15,13 @@ async function getBufferFromUrl(url: string): Promise<Buffer> {
 }
 
 function bufferToPhotonImage(input: Buffer): photon.PhotonImage {
-  const base64 = input
-    .toString("base64")
-    .replace(/^data:image\/\w+;base64,/, "");
+  const base64 = input.toString("base64").replace(/^data:image\/\w+;base64,/, "");
 
   return photon.PhotonImage.new_from_base64(base64);
 }
 
 function photonImageToBuffer(image: photon.PhotonImage): Buffer {
-  const base64 = image.get_base64()
-    .replace(/^data:image\/\w+;base64,/, "");
+  const base64 = image.get_base64().replace(/^data:image\/\w+;base64,/, "");
   return Buffer.from(base64, "base64");
 }
 
@@ -34,7 +31,7 @@ function resizeBuffer(input: Buffer, width: number, height: number): Buffer {
   return photonImageToBuffer(photonImage);
 }
 
-const CDN_URL = "https://twemoji.maxcdn.com/2/svg";
+const CDN_URL = "https://twemoji.maxcdn.com/";
 
 export const JumboCmd = utilityCmd({
   trigger: "jumbo",
@@ -67,25 +64,26 @@ export const JumboCmd = utilityCmd({
       }
       url += `${results[2]}${extension}`;
       if (extension === ".png") {
-        const image = await resizeBuffer(await getBufferFromUrl(url), size, size);
+        const image = resizeBuffer(await getBufferFromUrl(url), size, size);
         file = new MessageAttachment(image, `emoji${extension}`);
       } else {
         const image = await getBufferFromUrl(url);
         file = new MessageAttachment(image, `emoji${extension}`);
       }
     } else {
-      let url = CDN_URL + `/${twemoji.convert.toCodePoint(args.emoji)}.svg`;
+      let url = `${twemoji.base}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
       let image: Buffer | undefined;
       try {
-        image = await resizeBuffer(await getBufferFromUrl(url), size, size);
-      } catch {
-        if (url.toLocaleLowerCase().endsWith("fe0f.svg")) {
-          url = url.slice(0, url.lastIndexOf("-fe0f")) + ".svg";
+        const downloadedBuffer = await getBufferFromUrl(url);
+        image = resizeBuffer(await getBufferFromUrl(url), size, size);
+      } catch (err) {
+        if (url.toLocaleLowerCase().endsWith("fe0f.png")) {
+          url = url.slice(0, url.lastIndexOf("-fe0f")) + ".png";
           image = await resizeBuffer(await getBufferFromUrl(url), size, size);
         }
       }
       if (!image) {
-        sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
+        sendErrorMessage(pluginData, msg.channel, "Error occurred while jumboing default emoji");
         return;
       }
 
