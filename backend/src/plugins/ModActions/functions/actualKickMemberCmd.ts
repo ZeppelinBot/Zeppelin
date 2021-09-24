@@ -71,7 +71,7 @@ export async function actualKickMemberCmd(
   }
 
   const config = pluginData.config.get();
-  const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]));
+  const reason = formatReasonWithAttachments(parseReason(config, args.reason), [...msg.attachments.values()]);
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,
