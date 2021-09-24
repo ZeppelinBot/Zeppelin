@@ -1,7 +1,6 @@
 import { GuildMember, Message, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/dist/helpers";
-import { GuildMessage } from "knub/dist/types";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { errorMessage, resolveMember, resolveUser } from "../../../utils";
