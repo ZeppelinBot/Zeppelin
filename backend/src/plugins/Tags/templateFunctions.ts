@@ -3,7 +3,7 @@ import { TemplateFunction } from "./types";
 // TODO: Generate this dynamically, lmao
 export const TemplateFunctions: TemplateFunction[] = [
   {
-    name: "info",
+    name: "if",
     description: "Checks if a condition is true or false and returns the corresponding ifTrue or ifFalse",
     returnValue: "boolean",
     arguments: ["condition", "ifTrue", "ifFalse"],
