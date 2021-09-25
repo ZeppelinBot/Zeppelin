@@ -23,6 +23,11 @@ import { DecayingCounter } from "./utils/DecayingCounter";
 import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
 import { logRestCall } from "./restCallStats";
 import { logRateLimit } from "./rateLimitStats";
+import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
+import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
+import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
+import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
+import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -320,6 +325,14 @@ connect().then(async () => {
 
   client.on(Constants.Events.RATE_LIMIT, (data) => {
     logRateLimit(data);
+  });
+
+  bot.on("loadingFinished", () => {
+    runExpiringMutesLoop();
+    runExpiringTempbansLoop();
+    runExpiringVCAlertsLoop();
+    runUpcomingRemindersLoop();
+    runUpcomingScheduledPostsLoop();
   });
 
   bot.initialize();

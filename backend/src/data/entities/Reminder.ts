@@ -1,9 +1,8 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("reminders")
 export class Reminder {
-  @Column()
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column() guild_id: string;

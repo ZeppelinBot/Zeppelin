@@ -11,6 +11,7 @@ import { CaseArgs } from "../../Cases/types";
 import { MutesPluginType, UnmuteResult } from "../types";
 import { memberHasMutedRole } from "./memberHasMutedRole";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { clearMute } from "./clearMute";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -34,34 +35,7 @@ export async function unmuteUser(
     }
   } else {
     // Unmute immediately
-    if (member) {
-      const lock = await pluginData.locks.acquire(memberRolesLock(member));
-
-      const muteRole = pluginData.config.get().mute_role;
-      if (muteRole && member.roles.cache.has(muteRole as Snowflake)) {
-        await member.roles.remove(muteRole as Snowflake);
-      }
-      if (existingMute?.roles_to_restore) {
-        const guildRoles = pluginData.guild.roles.cache;
-        const newRoles = [...member.roles.cache.keys()].filter((roleId) => roleId !== muteRole);
-        for (const toRestore of existingMute.roles_to_restore) {
-          if (guildRoles.has(toRestore) && toRestore !== muteRole && !newRoles.includes(toRestore)) {
-            newRoles.push(toRestore);
-          }
-        }
-        await member.roles.set(newRoles);
-      }
-
-      lock.unlock();
-    } else {
-      // tslint:disable-next-line:no-console
-      console.warn(
-        `Member ${userId} not found in guild ${pluginData.guild.name} (${pluginData.guild.id}) when attempting to unmute`,
-      );
-    }
-    if (existingMute) {
-      await pluginData.state.mutes.clear(userId);
-    }
+    clearMute(pluginData, existingMute);
   }
 
   const timeUntilUnmute = unmuteTime && humanizeDuration(unmuteTime);

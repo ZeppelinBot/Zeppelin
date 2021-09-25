@@ -22,6 +22,10 @@ export class GuildScheduledPosts extends BaseGuildRepository {
       .getMany();
   }
 
+  find(id: number) {
+    return this.scheduledPosts.findOne({ id });
+  }
+
   async delete(id) {
     await this.scheduledPosts.delete({
       guild_id: this.guildId,
@@ -30,10 +34,12 @@ export class GuildScheduledPosts extends BaseGuildRepository {
   }
 
   async create(data: Partial<ScheduledPost>) {
-    await this.scheduledPosts.insert({
+    const result = await this.scheduledPosts.insert({
       ...data,
       guild_id: this.guildId,
     });
+
+    return (await this.find(result.identifiers[0].id))!;
   }
 
   async update(id: number, data: Partial<ScheduledPost>) {

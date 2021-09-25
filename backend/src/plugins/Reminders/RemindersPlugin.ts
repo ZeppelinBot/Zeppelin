@@ -6,7 +6,8 @@ import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
 import { ConfigSchema, RemindersPluginType } from "./types";
-import { postDueRemindersLoop } from "./utils/postDueRemindersLoop";
+import { onGuildEvent } from "../../data/GuildEvents";
+import { postReminder } from "./functions/postReminder";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {
@@ -46,16 +47,16 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     state.reminders = GuildReminders.getGuildInstance(guild.id);
     state.tries = new Map();
     state.unloaded = false;
-
-    state.postRemindersTimeout = null;
   },
 
   afterLoad(pluginData) {
-    postDueRemindersLoop(pluginData);
+    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "reminder", (reminder) =>
+      postReminder(pluginData, reminder),
+    );
   },
 
   beforeUnload(pluginData) {
-    clearTimeout(pluginData.state.postRemindersTimeout);
+    pluginData.state.unregisterGuildEventListener();
     pluginData.state.unloaded = true;
   },
 });

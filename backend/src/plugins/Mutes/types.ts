@@ -52,7 +52,7 @@ export interface MutesPluginType extends BasePluginType {
     serverLogs: GuildLogs;
     archives: GuildArchives;
 
-    muteClearIntervalId: Timeout;
+    unregisterGuildEventListener: () => void;
 
     events: MutesEventEmitter;
   };

@@ -2,6 +2,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { sorter } from "../../../utils";
 import { remindersCmd } from "../types";
+import { clearUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop";
 
 export const RemindersDeleteCmd = remindersCmd({
   trigger: ["reminders delete", "reminders d"],
@@ -21,6 +22,7 @@ export const RemindersDeleteCmd = remindersCmd({
     }
 
     const toDelete = reminders[args.num - 1];
+    clearUpcomingReminder(toDelete);
     await pluginData.state.reminders.delete(toDelete.id);
 
     sendSuccessMessage(pluginData, msg.channel, "Reminder deleted");

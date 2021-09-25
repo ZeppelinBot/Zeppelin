@@ -72,7 +72,7 @@ export interface ModActionsPluginType extends BasePluginType {
     serverLogs: GuildLogs;
 
     unloaded: boolean;
-    outdatedTempbansTimeout: Timeout | null;
+    unregisterGuildEventListener: () => void;
     ignoredEvents: IIgnoredEvent[];
     massbanQueue: Queue;
 

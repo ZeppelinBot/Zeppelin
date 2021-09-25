@@ -1,11 +1,15 @@
 import { Mute } from "./entities/Mute";
 import { ScheduledPost } from "./entities/ScheduledPost";
 import { Reminder } from "./entities/Reminder";
+import { Tempban } from "./entities/Tempban";
+import { VCAlert } from "./entities/VCAlert";
 
 interface GuildEventArgs extends Record<string, unknown[]> {
-  expiredMutes: [Mute[]];
-  scheduledPosts: [ScheduledPost[]];
-  reminders: [Reminder[]];
+  expiredMute: [Mute];
+  scheduledPost: [ScheduledPost];
+  reminder: [Reminder];
+  expiredTempban: [Tempban];
+  expiredVCAlert: [VCAlert];
 }
 
 type GuildEvent = keyof GuildEventArgs;
@@ -51,4 +55,15 @@ export function emitGuildEvent<K extends GuildEvent>(guildId: string, eventName:
   for (const listener of listenerMap[eventName]!) {
     listener(...args);
   }
+}
+
+export function hasGuildEventListener<K extends GuildEvent>(guildId: string, eventName: K): boolean {
+  if (!guildListeners.has(guildId)) {
+    return false;
+  }
+  const listenerMap = guildListeners.get(guildId)!;
+  if (listenerMap[eventName] == null || listenerMap[eventName]!.length === 0) {
+    return false;
+  }
+  return true;
 }

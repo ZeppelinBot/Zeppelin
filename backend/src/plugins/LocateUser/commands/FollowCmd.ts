@@ -4,6 +4,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { MINUTES, SECONDS } from "../../../utils";
 import { locateUserCmd } from "../types";
+import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 
 export const FollowCmd = locateUserCmd({
   trigger: ["follow", "f"],
@@ -30,7 +31,7 @@ export const FollowCmd = locateUserCmd({
       return;
     }
 
-    await pluginData.state.alerts.add(
+    const alert = await pluginData.state.alerts.add(
       msg.author.id,
       args.member.id,
       msg.channel.id,
@@ -38,6 +39,8 @@ export const FollowCmd = locateUserCmd({
       body,
       active,
     );
+    registerExpiringVCAlert(alert);
+
     if (!pluginData.state.usersWithAlerts.includes(args.member.id)) {
       pluginData.state.usersWithAlerts.push(args.member.id);
     }

@@ -16,7 +16,7 @@ export interface PostPluginType extends BasePluginType {
     scheduledPosts: GuildScheduledPosts;
     logs: GuildLogs;
 
-    scheduledPostLoopTimeout: NodeJS.Timeout;
+    unregisterGuildEventListener: () => void;
   };
 }
 

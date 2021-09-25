@@ -9,8 +9,8 @@ import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { ConfigSchema, LocateUserPluginType } from "./types";
 import { fillActiveAlertsList } from "./utils/fillAlertsList";
-import { outdatedAlertsLoop } from "./utils/outdatedLoop";
-import Timeout = NodeJS.Timeout;
+import { onGuildEvent } from "../../data/GuildEvents";
+import { clearExpiredAlert } from "./utils/clearExpiredAlert";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {
@@ -61,18 +61,17 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
     const { state, guild } = pluginData;
 
     state.alerts = GuildVCAlerts.getGuildInstance(guild.id);
-    state.outdatedAlertsTimeout = null;
     state.usersWithAlerts = [];
-    state.unloaded = false;
   },
 
   afterLoad(pluginData) {
-    outdatedAlertsLoop(pluginData);
+    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredVCAlert", (alert) =>
+      clearExpiredAlert(pluginData, alert),
+    );
     fillActiveAlertsList(pluginData);
   },
 
   beforeUnload(pluginData) {
-    clearTimeout(pluginData.state.outdatedAlertsTimeout as Timeout);
-    pluginData.state.unloaded = true;
+    pluginData.state.unregisterGuildEventListener();
   },
 });

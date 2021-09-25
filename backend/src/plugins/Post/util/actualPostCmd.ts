@@ -11,6 +11,7 @@ import { PostPluginType } from "../types";
 import { parseScheduleTime } from "./parseScheduleTime";
 import { postMessage } from "./postMessage";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 
 const MIN_REPEAT_TIME = 5 * MINUTES;
 const MAX_REPEAT_TIME = Math.pow(2, 32);
@@ -141,7 +142,7 @@ export async function actualPostCmd(
       return;
     }
 
-    await pluginData.state.scheduledPosts.create({
+    const post = await pluginData.state.scheduledPosts.create({
       author_id: msg.author.id,
       author_name: msg.author.tag,
       channel_id: targetChannel.id,
@@ -153,6 +154,7 @@ export async function actualPostCmd(
       repeat_until: repeatUntil ? repeatUntil.clone().tz("Etc/UTC").format(DBDateFormat) : null,
       repeat_times: repeatTimes ?? null,
     });
+    registerUpcomingScheduledPost(post);
 
     if (opts.repeat) {
       pluginData.getPlugin(LogsPlugin).logScheduledRepeatedMessage({
