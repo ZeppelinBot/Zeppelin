@@ -20,11 +20,6 @@ export const MessageCreateEvt = messageSaverEvt({
       return;
     }
 
-    // Don't save the bot's own messages
-    if (meta.args.message.author.id === meta.pluginData.client.user?.id) {
-      return;
-    }
-
     await meta.pluginData.state.savedMessages.createFromMsg(meta.args.message);
   },
 });
