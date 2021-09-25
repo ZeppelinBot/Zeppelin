@@ -58,7 +58,7 @@ export const RolesCmd = utilityCmd({
     if (sort === "position" || sort === "order") {
       roles.sort(sorter("position", sortDir));
     } else if (sort === "memberCount" && args.counts) {
-      roles.sort((first, second) => (roleCounts!.get(second.id) ?? 0) - (roleCounts!.get(first.id) ?? 0));
+      roles.sort((first, second) => roleCounts!.get(second.id)! - roleCounts!.get(first.id)!);
     } else if (sort === "name") {
       roles.sort(sorter((r) => r.name.toLowerCase(), sortDir));
     } else {
@@ -80,15 +80,16 @@ export const RolesCmd = utilityCmd({
         return line;
       });
 
+      const codeBlock = "```py\n" + roleLines.join("\n") + "```";
       if (i === 0) {
         msg.channel.send(
           trimLines(`
           ${args.search ? "Total roles found" : "Total roles"}: ${roles.length}
-          \`\`\`py\n${roleLines.join("\n")}\`\`\`
+          ${codeBlock}
         `),
         );
       } else {
-        msg.channel.send("```py\n" + roleLines.join("\n") + "```");
+        msg.channel.send(codeBlock);
       }
     }
   },
