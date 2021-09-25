@@ -1,4 +1,4 @@
-import { Role, TextChannel } from "discord.js";
+import { Role } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { chunkArray, sorter, trimLines } from "../../../utils";
@@ -21,9 +21,7 @@ export const RolesCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const { guild } = pluginData;
 
-    let roles: Array<{ _memberCount?: number } & Role> = Array.from(
-      (msg.channel as TextChannel).guild.roles.cache.values(),
-    );
+    let roles: Role[] = Array.from(guild.roles.cache.values());
     let sort = args.sort;
 
     if (args.search) {
@@ -31,40 +29,28 @@ export const RolesCmd = utilityCmd({
       roles = roles.filter((r) => r.name.toLowerCase().includes(searchStr) || r.id === searchStr);
     }
 
+    let roleCounts: Map<string, number> | null = null;
     if (args.counts) {
       await refreshMembersIfNeeded(guild);
 
+      roleCounts = new Map<string, number>(guild.roles.cache.map((r) => [r.id, 0]));
+
       for (const member of guild.members.cache.values()) {
-        for (const role of member.roles.cache.values()) {
-          // @ts-expect-error
-          role._memberCount ??= 0;
-          // @ts-expect-error
-          role._memberCount++;
+        for (const id of member.roles.cache.keys()) {
+          roleCounts.set(id, (roleCounts.get(id) ?? 0) + 1);
         }
       }
 
       // The "@everyone" role always has all members in it
-      roles.find((r) => r.id === guild.id)!._memberCount = guild.memberCount;
+      roleCounts.set(guild.id, guild.memberCount);
 
       if (!sort) sort = "-memberCount";
-      roles.sort((a, b) => {
-        if (a._memberCount! > b._memberCount!) return -1;
-        if (a._memberCount! < b._memberCount!) return 1;
-        return 0;
-      });
-    } else {
-      // Otherwise sort by name
-      roles.sort((a, b) => {
-        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-        return 0;
-      });
     }
 
     if (!sort) sort = "name";
 
     let sortDir: "ASC" | "DESC" = "ASC";
-    if (sort && sort[0] === "-") {
+    if (sort[0] === "-") {
       sort = sort.slice(1);
       sortDir = "DESC";
     }
@@ -72,7 +58,7 @@ export const RolesCmd = utilityCmd({
     if (sort === "position" || sort === "order") {
       roles.sort(sorter("position", sortDir));
     } else if (sort === "memberCount" && args.counts) {
-      roles.sort(sorter("_memberCount", sortDir));
+      roles.sort((first, second) => (roleCounts!.get(second.id) ?? 0) - (roleCounts!.get(first.id) ?? 0));
     } else if (sort === "name") {
       roles.sort(sorter((r) => r.name.toLowerCase(), sortDir));
     } else {
@@ -87,8 +73,9 @@ export const RolesCmd = utilityCmd({
       const roleLines = chunk.map((role) => {
         const paddedId = role.id.padEnd(longestId, " ");
         let line = `${paddedId} ${role.name}`;
-        if (role._memberCount != null) {
-          line += role._memberCount === 1 ? ` (${role._memberCount} member)` : ` (${role._memberCount} members)`;
+        const memberCount = roleCounts?.get(role.id);
+        if (memberCount !== undefined) {
+          line += ` (${memberCount} ${memberCount === 1 ? "member" : "members"})`;
         }
         return line;
       });
