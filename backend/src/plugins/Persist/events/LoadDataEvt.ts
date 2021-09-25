@@ -43,10 +43,12 @@ export const LoadDataEvt = persistEvt({
       return;
     }
 
+    const guildRoles = Array.from(pluginData.guild.roles.cache.keys());
+
     // Check specific role permissions
     if (config.persisted_roles) {
       for (const roleId of config.persisted_roles) {
-        if (!canAssignRole(pluginData.guild, me, roleId)) {
+        if (!canAssignRole(pluginData.guild, me, roleId) && guildRoles.includes(roleId)) {
           pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Missing permissions to assign role \`${roleId}\` in persist plugin`,
           });
@@ -57,7 +59,7 @@ export const LoadDataEvt = persistEvt({
 
     const persistedRoles = config.persisted_roles;
     if (persistedRoles.length) {
-      const rolesToRestore = intersection(persistedRoles, persistedData.roles);
+      const rolesToRestore = intersection(persistedRoles, persistedData.roles, guildRoles);
 
       if (rolesToRestore.length) {
         restoredData.push("roles");
