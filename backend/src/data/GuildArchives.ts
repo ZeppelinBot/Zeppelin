@@ -27,20 +27,6 @@ export class GuildArchives extends BaseGuildRepository {
   constructor(guildId) {
     super(guildId);
     this.archives = getRepository(ArchiveEntry);
-
-    // Clean expired archives at start and then every hour
-    this.deleteExpiredArchives();
-    setInterval(() => this.deleteExpiredArchives(), 1000 * 60 * 60);
-  }
-
-  private deleteExpiredArchives() {
-    this.archives
-      .createQueryBuilder()
-      .where("guild_id = :guild_id", { guild_id: this.guildId })
-      .andWhere("expires_at IS NOT NULL")
-      .andWhere("expires_at <= NOW()")
-      .delete()
-      .execute();
   }
 
   async find(id: string): Promise<ArchiveEntry | undefined> {
