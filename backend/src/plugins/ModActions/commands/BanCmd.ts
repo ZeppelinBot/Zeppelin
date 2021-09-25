@@ -15,6 +15,7 @@ import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { modActionsCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -92,11 +93,14 @@ export const BanCmd = modActionsCmd({
           // Update or add new tempban / remove old tempban
           if (time && time > 0) {
             if (existingTempban) {
-              pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
+              await pluginData.state.tempbans.updateExpiryTime(user.id, time, mod.id);
             } else {
-              pluginData.state.tempbans.addTempban(user.id, time, mod.id);
+              await pluginData.state.tempbans.addTempban(user.id, time, mod.id);
             }
+            const tempban = (await pluginData.state.tempbans.findExistingTempbanForUserId(user.id))!;
+            registerExpiringTempban(tempban);
           } else if (existingTempban) {
+            clearExpiringTempban(existingTempban);
             pluginData.state.tempbans.clear(user.id);
           }
 
