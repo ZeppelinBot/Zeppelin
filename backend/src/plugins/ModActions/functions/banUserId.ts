@@ -109,9 +109,9 @@ export async function banUserId(
   if (banTime && banTime > 0) {
     const selfId = pluginData.client.user!.id;
     if (existingTempban) {
-      pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
+      await pluginData.state.tempbans.updateExpiryTime(user.id, banTime, banOptions.modId ?? selfId);
     } else {
-      pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
+      await pluginData.state.tempbans.addTempban(user.id, banTime, banOptions.modId ?? selfId);
     }
     const tempban = (await pluginData.state.tempbans.findExistingTempbanForUserId(user.id))!;
     registerExpiringTempban(tempban);
