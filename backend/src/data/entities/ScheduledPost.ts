@@ -1,11 +1,10 @@
 import { MessageAttachment } from "discord.js";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { StrictMessageContent } from "../../utils";
 
 @Entity("scheduled_posts")
 export class ScheduledPost {
-  @Column()
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column() guild_id: string;

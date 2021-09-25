@@ -2,6 +2,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { createChunkedMessage, sorter } from "../../../utils";
 import { locateUserCmd } from "../types";
+import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 
 export const ListFollowCmd = locateUserCmd({
   trigger: ["follows", "fs"],
@@ -50,6 +51,7 @@ export const DeleteFollowCmd = locateUserCmd({
     }
 
     const toDelete = alerts[args.num - 1];
+    clearExpiringVCAlert(toDelete);
     await pluginData.state.alerts.delete(toDelete.id);
 
     sendSuccessMessage(pluginData, msg.channel, "Alert deleted");

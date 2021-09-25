@@ -14,7 +14,8 @@ export interface RemindersPluginType extends BasePluginType {
     reminders: GuildReminders;
     tries: Map<number, number>;
 
-    postRemindersTimeout;
+    unregisterGuildEventListener: () => void;
+
     unloaded: boolean;
   };
 }

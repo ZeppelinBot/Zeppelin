@@ -27,6 +27,10 @@ export class GuildReminders extends BaseGuildRepository {
     });
   }
 
+  find(id: number) {
+    return this.reminders.findOne({ id });
+  }
+
   async delete(id) {
     await this.reminders.delete({
       guild_id: this.guildId,
@@ -35,7 +39,7 @@ export class GuildReminders extends BaseGuildRepository {
   }
 
   async add(userId: string, channelId: string, remindAt: string, body: string, created_at: string) {
-    await this.reminders.insert({
+    const result = await this.reminders.insert({
       guild_id: this.guildId,
       user_id: userId,
       channel_id: channelId,
@@ -43,5 +47,7 @@ export class GuildReminders extends BaseGuildRepository {
       body,
       created_at,
     });
+
+    return (await this.find(result.identifiers[0].id))!;
   }
 }

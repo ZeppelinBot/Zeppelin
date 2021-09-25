@@ -8,12 +8,13 @@ import { EditCmd } from "./commands/EditCmd";
 import { EditEmbedCmd } from "./commands/EditEmbedCmd";
 import { PostCmd } from "./commands/PostCmd";
 import { PostEmbedCmd } from "./commands/PostEmbedCmd";
-import { ScheduledPostsDeleteCmd } from "./commands/SchedluedPostsDeleteCmd";
+import { ScheduledPostsDeleteCmd } from "./commands/ScheduledPostsDeleteCmd";
 import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
 import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
 import { ConfigSchema, PostPluginType } from "./types";
-import { scheduledPostLoop } from "./util/scheduledPostLoop";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { onGuildEvent } from "../../data/GuildEvents";
+import { postScheduledPost } from "./util/postScheduledPost";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
   config: {
@@ -60,10 +61,12 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   },
 
   afterLoad(pluginData) {
-    scheduledPostLoop(pluginData);
+    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "scheduledPost", (post) =>
+      postScheduledPost(pluginData, post),
+    );
   },
 
   beforeUnload(pluginData) {
-    clearTimeout(pluginData.state.scheduledPostLoopTimeout);
+    pluginData.state.unregisterGuildEventListener();
   },
 });

@@ -15,12 +15,13 @@ import { MutesCmd } from "./commands/MutesCmd";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ClearActiveMuteOnRoleRemovalEvt } from "./events/ClearActiveMuteOnRoleRemovalEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
-import { clearExpiredMutes } from "./functions/clearExpiredMutes";
 import { muteUser } from "./functions/muteUser";
 import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { unmuteUser } from "./functions/unmuteUser";
 import { ConfigSchema, MutesPluginType } from "./types";
+import { onGuildEvent } from "../../data/GuildEvents";
+import { clearMute } from "./functions/clearMute";
 
 const defaultOptions = {
   config: {
@@ -113,15 +114,13 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   afterLoad(pluginData) {
-    clearExpiredMutes(pluginData);
-    pluginData.state.muteClearIntervalId = setInterval(
-      () => clearExpiredMutes(pluginData),
-      EXPIRED_MUTE_CHECK_INTERVAL,
+    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredMute", (mute) =>
+      clearMute(pluginData, mute),
     );
   },
 
   beforeUnload(pluginData) {
-    clearInterval(pluginData.state.muteClearIntervalId);
+    pluginData.state.unregisterGuildEventListener();
     pluginData.state.events.removeAllListeners();
   },
 });

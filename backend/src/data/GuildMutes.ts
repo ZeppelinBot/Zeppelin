@@ -47,11 +47,11 @@ export class GuildMutes extends BaseGuildRepository {
     return (await this.mutes.findOne({ where: result.identifiers[0] }))!;
   }
 
-  async updateExpiryTime(userId, newExpiryTime, rolesToRestore?: string[]) {
+  async updateExpiryTime(userId, newExpiryTime, rolesToRestore?: string[]): Promise<void> {
     const expiresAt = newExpiryTime ? moment.utc().add(newExpiryTime, "ms").format("YYYY-MM-DD HH:mm:ss") : null;
 
     if (rolesToRestore && rolesToRestore.length) {
-      return this.mutes.update(
+      await this.mutes.update(
         {
           guild_id: this.guildId,
           user_id: userId,
@@ -62,7 +62,7 @@ export class GuildMutes extends BaseGuildRepository {
         },
       );
     } else {
-      return this.mutes.update(
+      await this.mutes.update(
         {
           guild_id: this.guildId,
           user_id: userId,
