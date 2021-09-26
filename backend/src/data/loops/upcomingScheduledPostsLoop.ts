@@ -47,8 +47,12 @@ export async function runUpcomingScheduledPostsLoop() {
 export function registerUpcomingScheduledPost(post: ScheduledPost) {
   clearUpcomingScheduledPost(post);
 
+  if (post.post_at === null) {
+    return;
+  }
+
   console.log("[SCHEDULED POSTS LOOP] Registering new upcoming scheduled post");
-  const remaining = Math.max(0, moment.utc(post.post_at!).diff(moment.utc()));
+  const remaining = Math.max(0, moment.utc(post.post_at).diff(moment.utc()));
   if (remaining > LOOP_INTERVAL) {
     return;
   }

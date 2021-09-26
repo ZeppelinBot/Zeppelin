@@ -49,7 +49,7 @@ export function registerExpiringVCAlert(alert: VCAlert) {
   clearExpiringVCAlert(alert);
 
   console.log("[EXPIRING VCALERTS LOOP] Registering new expiring vcalert");
-  const remaining = Math.max(0, moment.utc(alert.expires_at!).diff(moment.utc()));
+  const remaining = Math.max(0, moment.utc(alert.expires_at).diff(moment.utc()));
   if (remaining > LOOP_INTERVAL) {
     return;
   }

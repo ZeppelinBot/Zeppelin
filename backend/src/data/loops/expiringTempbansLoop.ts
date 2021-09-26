@@ -53,7 +53,7 @@ export function registerExpiringTempban(tempban: Tempban) {
   clearExpiringTempban(tempban);
 
   console.log("[EXPIRING TEMPBANS LOOP] Registering new expiring tempban");
-  const remaining = Math.max(0, moment.utc(tempban.expires_at!).diff(moment.utc()));
+  const remaining = Math.max(0, moment.utc(tempban.expires_at).diff(moment.utc()));
   if (remaining > LOOP_INTERVAL) {
     return;
   }

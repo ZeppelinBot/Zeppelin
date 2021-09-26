@@ -52,8 +52,12 @@ export async function runExpiringMutesLoop() {
 export function registerExpiringMute(mute: Mute) {
   clearExpiringMute(mute);
 
+  if (mute.expires_at === null) {
+    return;
+  }
+
   console.log("[EXPIRING MUTES LOOP] Registering new expiring mute");
-  const remaining = Math.max(0, moment.utc(mute.expires_at!).diff(moment.utc()));
+  const remaining = Math.max(0, moment.utc(mute.expires_at).diff(moment.utc()));
   if (remaining > LOOP_INTERVAL) {
     return;
   }

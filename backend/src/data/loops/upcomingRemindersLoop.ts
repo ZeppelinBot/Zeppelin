@@ -48,7 +48,7 @@ export function registerUpcomingReminder(reminder: Reminder) {
   clearUpcomingReminder(reminder);
 
   console.log("[REMINDERS LOOP] Registering new upcoming reminder");
-  const remaining = Math.max(0, moment.utc(reminder.remind_at!).diff(moment.utc()));
+  const remaining = Math.max(0, moment.utc(reminder.remind_at).diff(moment.utc()));
   if (remaining > LOOP_INTERVAL) {
     return;
   }
