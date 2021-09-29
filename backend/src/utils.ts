@@ -573,7 +573,7 @@ export function successMessage(str, emoji = process.env.EMOJI_CHECK || "<:zep_ch
   return emoji ? `${emoji} ${str}` : str;
 }
 
-export function errorMessage(str, emoji = "⚠") {
+export function errorMessage(str, emoji = process.env.EMOJI_ERROR || "⚠") {
   return emoji ? `${emoji} ${str}` : str;
 }
 
