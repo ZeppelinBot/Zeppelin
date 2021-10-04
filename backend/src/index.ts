@@ -1,4 +1,4 @@
-import { Client, Constants, Intents, TextChannel, ThreadChannel } from "discord.js";
+import { Client, Constants, Intents, Options, TextChannel, ThreadChannel } from "discord.js";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
@@ -175,6 +175,14 @@ connect().then(async () => {
 
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
+
+    makeCache: Options.cacheWithLimits({
+      ...Options.defaultMakeCacheSettings,
+      MessageManager: 0,
+      GuildMemberManager: 5000,
+      BaseGuildEmojiManager: 1000,
+      GuildInviteManager: 0,
+    }),
 
     restGlobalRateLimit: 50,
     // restTimeOffset: 1000,
