@@ -13,8 +13,6 @@ interface MatchResultType {
   type: MatchableTextType;
 }
 
-const combinedRegexCache: WeakMap<any, RegExp> = new WeakMap();
-
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
     patterns: t.array(TRegex),
@@ -46,20 +44,6 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
       return;
     }
 
-    if (trigger.patterns.length === 0) {
-      return;
-    }
-
-    if (!combinedRegexCache.has(trigger)) {
-      const combinedPattern = trigger.patterns.map((p) => `(?:${p.source})`).join("|");
-      const combinedRegex = new RegExp(combinedPattern, trigger.case_sensitive ? "" : "i");
-      if (trigger.patterns.some((r) => r.source === "。")) {
-        console.log("!! COMBINED PATTERN !!", combinedPattern);
-      }
-      combinedRegexCache.set(trigger, combinedRegex);
-    }
-    const regex = combinedRegexCache.get(trigger)!;
-
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       if (trigger.strip_markdown) {
         str = stripMarkdown(str);
@@ -69,14 +53,17 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
         str = normalizeText(str);
       }
 
-      const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
-      if (matches?.length) {
-        return {
-          extra: {
-            pattern: "<temporarily hidden>",
-            type,
-          },
-        };
+      for (const sourceRegex of trigger.patterns) {
+        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive && !sourceRegex.ignoreCase ? "" : "i");
+        const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
+        if (matches?.length) {
+          return {
+            extra: {
+              pattern: sourceRegex.source,
+              type,
+            },
+          };
+        }
       }
     }
 
