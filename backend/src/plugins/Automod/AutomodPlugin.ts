@@ -193,15 +193,15 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
 
   // prettier-ignore
   events: [
-    RunAutomodOnJoinEvt,
-    RunAutomodOnMemberUpdate,
-    RunAutomodOnLeaveEvt,
+    // RunAutomodOnJoinEvt,
+    // RunAutomodOnMemberUpdate,
+    // RunAutomodOnLeaveEvt,
     // Messages use message events from SavedMessages, see onLoad below
   ],
 
   commands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
 
-  async beforeLoad(pluginData) {
+  async __beforeLoad(pluginData) {
     pluginData.state.queue = new Queue();
 
     pluginData.state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
@@ -224,7 +224,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
   },
 
-  async afterLoad(pluginData) {
+  async __afterLoad(pluginData) {
     pluginData.state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
     pluginData.state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
     pluginData.state.clearRecentNicknameChangesInterval = setInterval(
@@ -289,7 +289,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     registerEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
   },
 
-  async beforeUnload(pluginData) {
+  async __beforeUnload(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
     countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
