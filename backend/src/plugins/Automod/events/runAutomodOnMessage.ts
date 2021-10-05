@@ -6,6 +6,7 @@ import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMe
 import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage";
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
+import { performance } from "perf_hooks";
 
 export function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,
@@ -23,11 +24,16 @@ export function runAutomodOnMessage(
   };
 
   pluginData.state.queue.add(async () => {
+    const startTime = performance.now();
+
     if (isEdit) {
       clearRecentActionsForMessage(pluginData, context);
     }
 
     addRecentActionsFromMessage(pluginData, context);
+
     await runAutomod(pluginData, context);
+
+    pluginData.getKnubInstance().profiler.addDataPoint(`automod:${pluginData.guild.id}`, performance.now() - startTime);
   });
 }
