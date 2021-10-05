@@ -341,7 +341,7 @@ connect().then(async () => {
     (time, stack) => {
       console.error(`Blocked for ${time}ms, operation started here:`, stack);
     },
-    { threshold: 750 },
+    { threshold: 250 },
   );
 
   bot.on("loadingFinished", async () => {
