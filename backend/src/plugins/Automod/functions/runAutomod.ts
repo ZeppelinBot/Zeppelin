@@ -7,6 +7,7 @@ import { availableTriggers } from "../triggers/availableTriggers";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
 import { performance } from "perf_hooks";
+import { calculateBlocking } from "../../../utils/easyProfiler";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
@@ -53,12 +54,20 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         const triggerStartTime = performance.now();
 
         const trigger = availableTriggers[triggerName];
+        const getBlockingTime = calculateBlocking();
         matchResult = await trigger.match({
           ruleName,
           pluginData,
           context,
           triggerConfig,
         });
+        const blockingTime = getBlockingTime();
+        pluginData
+          .getKnubInstance()
+          .profiler.addDataPoint(
+            `automod:${pluginData.guild.id}:${ruleName}:triggers:${triggerName}:blocking`,
+            blockingTime,
+          );
 
         if (matchResult) {
           contexts = [context, ...(matchResult.extraContexts || [])];
