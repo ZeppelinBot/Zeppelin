@@ -29,6 +29,7 @@ import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPos
 import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
 import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
+import blockedAt from "blocked-at";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -335,6 +336,13 @@ connect().then(async () => {
   client.on(Constants.Events.RATE_LIMIT, (data) => {
     logRateLimit(data);
   });
+
+  blockedAt(
+    (time, stack) => {
+      console.error(`Blocked for ${time}ms, operation started here:`, stack);
+    },
+    { threshold: 750 },
+  );
 
   bot.on("loadingFinished", async () => {
     runExpiringMutesLoop();
