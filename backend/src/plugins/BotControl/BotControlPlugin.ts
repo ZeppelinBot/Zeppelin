@@ -18,7 +18,7 @@ import { ReloadServerCmd } from "./commands/ReloadServerCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
-import { PluginPerformanceCmd } from "./commands/PluginPerformanceCmd";
+import { ProfilerDataCmd } from "./commands/ProfilerDataCmd";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
 import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
 import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
@@ -53,7 +53,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
     ListDashboardUsersCmd,
     ListDashboardPermsCmd,
     EligibleCmd,
-    PluginPerformanceCmd,
+    ProfilerDataCmd,
     RestPerformanceCmd,
     RateLimitPerformanceCmd,
     AddServerFromInviteCmd,
