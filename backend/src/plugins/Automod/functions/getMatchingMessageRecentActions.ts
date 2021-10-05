@@ -4,6 +4,7 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { RecentActionType } from "../constants";
 import { AutomodPluginType } from "../types";
 import { getMatchingRecentActions } from "./getMatchingRecentActions";
+import { startProfiling } from "../../../utils/easyProfiler";
 
 export function getMatchingMessageRecentActions(
   pluginData: GuildPluginData<AutomodPluginType>,
@@ -13,11 +14,16 @@ export function getMatchingMessageRecentActions(
   count: number,
   within: number,
 ) {
+  const stopProfiling = startProfiling(
+    pluginData.getKnubInstance().profiler,
+    "automod:fns:getMatchingMessageRecentActions",
+  );
   const since = moment.utc(message.posted_at).valueOf() - within;
   const to = moment.utc(message.posted_at).valueOf();
   const recentActions = getMatchingRecentActions(pluginData, type, identifier, since, to);
   const totalCount = recentActions.reduce((total, action) => total + action.count, 0);
 
+  stopProfiling();
   if (totalCount >= count) {
     return {
       recentActions,
