@@ -46,6 +46,17 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
       return;
     }
 
+    if (trigger.patterns.length === 0) {
+      return;
+    }
+
+    if (!combinedRegexCache.has(trigger)) {
+      const combinedPattern = trigger.patterns.map((p) => `(?:${p.source})`).join("|");
+      const combinedRegex = new RegExp(combinedPattern, trigger.case_sensitive ? "" : "i");
+      combinedRegexCache.set(trigger, combinedRegex);
+    }
+    const regex = combinedRegexCache.get(trigger)!;
+
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       if (trigger.strip_markdown) {
         str = stripMarkdown(str);
@@ -55,13 +66,6 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
         str = normalizeText(str);
       }
 
-      if (!combinedRegexCache.has(trigger)) {
-        const combinedPattern = trigger.patterns.map((p) => `(?:${p.source})`).join("|");
-        const combinedRegex = new RegExp(combinedPattern, trigger.case_sensitive ? "" : "i");
-        combinedRegexCache.set(trigger, combinedRegex);
-      }
-
-      const regex = combinedRegexCache.get(trigger)!;
       const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
       if (matches?.length) {
         return {
