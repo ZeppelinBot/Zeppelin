@@ -97,7 +97,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
             performance.now() - triggerStartTime,
           );
 
-        if (matchResult && !rule.allow_further_rules) {
+        if (matchResult) {
           break triggerLoop;
         }
       }
