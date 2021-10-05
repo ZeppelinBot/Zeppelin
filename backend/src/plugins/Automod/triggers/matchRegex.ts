@@ -53,6 +53,9 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
     if (!combinedRegexCache.has(trigger)) {
       const combinedPattern = trigger.patterns.map((p) => `(?:${p.source})`).join("|");
       const combinedRegex = new RegExp(combinedPattern, trigger.case_sensitive ? "" : "i");
+      if (trigger.patterns.some((r) => r.source === "。")) {
+        console.log("!! COMBINED PATTERN !!", combinedPattern);
+      }
       combinedRegexCache.set(trigger, combinedRegex);
     }
     const regex = combinedRegexCache.get(trigger)!;
