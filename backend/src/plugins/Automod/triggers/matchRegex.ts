@@ -13,6 +13,8 @@ interface MatchResultType {
   type: MatchableTextType;
 }
 
+const combinedRegexCache: WeakMap<any, RegExp> = new WeakMap();
+
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
     patterns: t.array(TRegex),
@@ -53,17 +55,21 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
         str = normalizeText(str);
       }
 
-      for (const sourceRegex of trigger.patterns) {
-        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive && !sourceRegex.ignoreCase ? "" : "i");
-        const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
-        if (matches?.length) {
-          return {
-            extra: {
-              pattern: sourceRegex.source,
-              type,
-            },
-          };
-        }
+      if (!combinedRegexCache.has(trigger)) {
+        const combinedPattern = trigger.patterns.map((p) => `(?:${p.source})`).join("|");
+        const combinedRegex = new RegExp(combinedPattern, trigger.case_sensitive ? "" : "i");
+        combinedRegexCache.set(trigger, combinedRegex);
+      }
+
+      const regex = combinedRegexCache.get(trigger)!;
+      const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
+      if (matches?.length) {
+        return {
+          extra: {
+            pattern: "<temporarily hidden>",
+            type,
+          },
+        };
       }
     }
 
