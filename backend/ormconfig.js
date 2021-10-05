@@ -34,7 +34,7 @@ module.exports = {
   connectTimeout: 2000,
 
   logging: ["error", "warn"],
-  maxQueryExecutionTime: 500,
+  maxQueryExecutionTime: 1000,
 
   // Entities
   entities: [entities],
