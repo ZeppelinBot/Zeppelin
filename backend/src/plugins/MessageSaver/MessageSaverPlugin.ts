@@ -30,16 +30,16 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
 
   // prettier-ignore
   commands: [
-    SaveMessagesToDBCmd,
-    SavePinsToDBCmd,
+    // SaveMessagesToDBCmd,
+    // SavePinsToDBCmd,
   ],
 
   // prettier-ignore
   events: [
-    MessageCreateEvt,
-    MessageUpdateEvt,
-    MessageDeleteEvt,
-    MessageDeleteBulkEvt,
+    // MessageCreateEvt,
+    // MessageUpdateEvt,
+    // MessageDeleteEvt,
+    // MessageDeleteBulkEvt,
   ],
 
   beforeLoad(pluginData) {
