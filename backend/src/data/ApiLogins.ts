@@ -90,10 +90,21 @@ export class ApiLogins extends BaseRepository {
     const [loginId, token] = apiKey.split(".");
     if (!loginId || !token) return;
 
+    const updated_time =  moment().utc().add(LOGIN_EXPIRY_TIME, "ms");
+
+    const login = await this.apiLogins
+      .createQueryBuilder()
+      .where("id = :id", { id: loginId })
+      .getOne();
+    
+     if(!login) return;
+
+    if(moment.utc(login.expires_at).isSameOrAfter(updated_time)) return;
+
     await this.apiLogins.update(
       { id: loginId },
       {
-        expires_at: moment().utc().add(LOGIN_EXPIRY_TIME, "ms").format(DBDateFormat),
+        expires_at: updated_time.format(DBDateFormat)
       },
     );
   }
