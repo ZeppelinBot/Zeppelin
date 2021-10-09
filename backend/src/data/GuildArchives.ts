@@ -11,8 +11,8 @@ import {
   guildToTemplateSafeGuild,
   userToTemplateSafeUser,
 } from "../utils/templateSafeObjects";
-import { decryptJson, encryptJson } from "../utils/cryptHelpers";
 import { SavedMessage } from "./entities/SavedMessage";
+import { decrypt, encrypt } from "../utils/crypt";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
@@ -35,13 +35,13 @@ export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
       return entity;
     }
 
-    entity.body = await decryptJson(entity.body as unknown as string);
+    entity.body = await decrypt(entity.body);
     return entity;
   }
 
   protected async _processEntityToDB(entity: Partial<ArchiveEntry>) {
     if (entity.body) {
-      entity.body = (await encryptJson(entity.body)) as any;
+      entity.body = await encrypt(entity.body);
     }
     return entity;
   }
