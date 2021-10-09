@@ -7,10 +7,28 @@ import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
+import { categorize } from "../../../utils/categorize";
 
 interface MatchResultType {
   pattern: string;
   type: MatchableTextType;
+}
+
+const regexCache = new WeakMap<any, RegExp[]>();
+const hasBackreference = /(?:^|[^\\]|[\\]{2})\\\d+/;
+
+function buildCacheableRegexes(sourceRegexes: RegExp[], flags: string) {
+  const categories = categorize(sourceRegexes, {
+    hasBackreferences: (regex) => hasBackreference.exec(regex.source) !== null,
+    safeToMerge: () => true,
+  });
+  const regexes: RegExp[] = [];
+  if (categories.safeToMerge.length) {
+    const merged = categories.safeToMerge.map((r) => `(?:${r.source})`).join("|");
+    regexes.push(new RegExp(merged, flags));
+  }
+  regexes.push(...categories.hasBackreferences);
+  return regexes;
 }
 
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
@@ -44,6 +62,13 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
       return;
     }
 
+    if (!regexCache.has(trigger)) {
+      const flags = trigger.case_sensitive ? "" : "i";
+      const toCache = buildCacheableRegexes(trigger.patterns, flags);
+      regexCache.set(trigger, toCache);
+    }
+    const regexes = regexCache.get(trigger)!;
+
     for await (let [type, str] of matchMultipleTextTypesOnMessage(pluginData, trigger, context.message)) {
       if (trigger.strip_markdown) {
         str = stripMarkdown(str);
@@ -53,13 +78,12 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
         str = normalizeText(str);
       }
 
-      for (const sourceRegex of trigger.patterns) {
-        const regex = new RegExp(sourceRegex.source, trigger.case_sensitive && !sourceRegex.ignoreCase ? "" : "i");
+      for (const regex of regexes) {
         const matches = await pluginData.state.regexRunner.exec(regex, str).catch(allowTimeout);
         if (matches?.length) {
           return {
             extra: {
-              pattern: sourceRegex.source,
+              pattern: regex.source,
               type,
             },
           };
@@ -72,6 +96,6 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched regex \`${Util.escapeInlineCode(matchResult.extra.pattern)}\` in ${partialSummary}`;
+    return `Matched regex in ${partialSummary}`;
   },
 });
