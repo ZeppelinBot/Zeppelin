@@ -6,12 +6,13 @@ import { renderTemplate, TemplateSafeValueContainer } from "../templateFormatter
 import { trimLines } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
-import { SavedMessage } from "./entities/SavedMessage";
 import {
   channelToTemplateSafeChannel,
   guildToTemplateSafeGuild,
   userToTemplateSafeUser,
 } from "../utils/templateSafeObjects";
+import { decryptJson, encryptJson } from "../utils/cryptHelpers";
+import { SavedMessage } from "./entities/SavedMessage";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
@@ -21,7 +22,7 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
   "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}{stickers}";
 
-export class GuildArchives extends BaseGuildRepository {
+export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
   protected archives: Repository<ArchiveEntry>;
 
   constructor(guildId) {
@@ -29,11 +30,28 @@ export class GuildArchives extends BaseGuildRepository {
     this.archives = getRepository(ArchiveEntry);
   }
 
+  protected async _processEntityFromDB(entity: ArchiveEntry | undefined) {
+    if (entity == null) {
+      return entity;
+    }
+
+    entity.body = await decryptJson(entity.body as unknown as string);
+    return entity;
+  }
+
+  protected async _processEntityToDB(entity: Partial<ArchiveEntry>) {
+    if (entity.body) {
+      entity.body = (await encryptJson(entity.body)) as any;
+    }
+    return entity;
+  }
+
   async find(id: string): Promise<ArchiveEntry | undefined> {
-    return this.archives.findOne({
+    const result = await this.archives.findOne({
       where: { id },
       relations: this.getRelations(),
     });
+    return this.processEntityFromDB(result);
   }
 
   async makePermanent(id: string): Promise<void> {
@@ -46,23 +64,24 @@ export class GuildArchives extends BaseGuildRepository {
   }
 
   /**
-   * @returns ID of the created entry
+   * @return - ID of the created archive
    */
   async create(body: string, expiresAt?: moment.Moment): Promise<string> {
     if (!expiresAt) {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
 
-    const result = await this.archives.insert({
+    const data = await this.processEntityToDB({
       guild_id: this.guildId,
       body,
       expires_at: expiresAt.format("YYYY-MM-DD HH:mm:ss"),
     });
+    const result = await this.archives.insert(data);
 
     return result.identifiers[0].id;
   }
 
-  protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild) {
+  protected async renderLinesFromSavedMessages(savedMessages: SavedMessage[], guild: Guild): Promise<string[]> {
     const msgLines: string[] = [];
     for (const msg of savedMessages) {
       const channel = guild.channels.cache.get(msg.channel_id as Snowflake);
@@ -90,7 +109,14 @@ export class GuildArchives extends BaseGuildRepository {
     return msgLines;
   }
 
-  async createFromSavedMessages(savedMessages: SavedMessage[], guild: Guild, expiresAt?: moment.Moment) {
+  /**
+   * @return - ID of the created archive
+   */
+  async createFromSavedMessages(
+    savedMessages: SavedMessage[],
+    guild: Guild,
+    expiresAt?: moment.Moment,
+  ): Promise<string> {
     if (expiresAt == null) {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
@@ -111,12 +137,13 @@ export class GuildArchives extends BaseGuildRepository {
     const msgLines = await this.renderLinesFromSavedMessages(savedMessages, guild);
     const messagesStr = msgLines.join("\n");
 
-    const archive = await this.find(archiveId);
+    let archive = await this.find(archiveId);
     if (archive == null) {
       throw new Error("Archive not found");
     }
 
     archive.body += "\n" + messagesStr;
+    archive = await this.processEntityToDB(archive);
 
     await this.archives.update({ id: archiveId }, { body: archive.body });
   }

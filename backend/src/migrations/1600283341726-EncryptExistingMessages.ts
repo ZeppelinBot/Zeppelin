@@ -9,7 +9,7 @@ export class EncryptExistingMessages1600283341726 implements MigrationInterface 
     // 2. Encrypt all permanent messages
     const messages = await queryRunner.query("SELECT id, data FROM messages");
     for (const message of messages) {
-      const encryptedData = encrypt(message.data);
+      const encryptedData = await encrypt(message.data);
       await queryRunner.query("UPDATE messages SET data = ? WHERE id = ?", [encryptedData, message.id]);
     }
   }
@@ -18,7 +18,7 @@ export class EncryptExistingMessages1600283341726 implements MigrationInterface 
     // Decrypt all messages
     const messages = await queryRunner.query("SELECT id, data FROM messages");
     for (const message of messages) {
-      const decryptedData = decrypt(message.data);
+      const decryptedData = await decrypt(message.data);
       await queryRunner.query("UPDATE messages SET data = ? WHERE id = ?", [decryptedData, message.id]);
     }
   }

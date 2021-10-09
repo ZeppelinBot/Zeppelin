@@ -1,6 +1,6 @@
 import { BaseRepository } from "./BaseRepository";
 
-export class BaseGuildRepository extends BaseRepository {
+export class BaseGuildRepository<TEntity extends unknown = unknown> extends BaseRepository<TEntity> {
   private static guildInstances: Map<string, any>;
 
   protected guildId: string;
