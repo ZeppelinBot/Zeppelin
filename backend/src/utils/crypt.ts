@@ -1,4 +1,4 @@
-import { spawn, Worker } from "threads";
+import { spawn, Worker, Pool } from "threads";
 import "../loadEnv";
 import type { CryptFns } from "./cryptWorker";
 
@@ -9,19 +9,12 @@ if (!process.env.KEY) {
 }
 
 const KEY = process.env.KEY;
-let workerPromise: Promise<CryptFns> | null = null;
-
-async function getWorker(): Promise<CryptFns> {
-  if (workerPromise == null) {
-    workerPromise = spawn(new Worker("./cryptWorker")) as unknown as Promise<CryptFns>;
-  }
-  return workerPromise;
-}
+const pool = Pool(() => spawn(new Worker("./cryptWorker")), 8);
 
 export async function encrypt(data: string) {
-  return (await getWorker()).encrypt(data, KEY);
+  return pool.queue((w) => w.encrypt(data, KEY));
 }
 
 export async function decrypt(data: string) {
-  return (await getWorker()).decrypt(data, KEY);
+  return pool.queue((w) => w.decrypt(data, KEY));
 }
