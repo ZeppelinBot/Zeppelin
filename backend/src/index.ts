@@ -181,7 +181,6 @@ connect().then(async () => {
       ...Options.defaultMakeCacheSettings,
       MessageManager: 0,
       GuildMemberManager: 5000,
-      BaseGuildEmojiManager: 1000,
       GuildInviteManager: 0,
     }),
 
