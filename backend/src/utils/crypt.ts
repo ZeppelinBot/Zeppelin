@@ -1,5 +1,6 @@
-import crypto from "crypto";
+import { spawn, Worker } from "threads";
 import "../loadEnv";
+import type { CryptFns } from "./cryptWorker";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -8,27 +9,19 @@ if (!process.env.KEY) {
 }
 
 const KEY = process.env.KEY;
-const ALGORITHM = "aes-256-gcm";
+let workerPromise: Promise<CryptFns> | null = null;
 
-export function encrypt(str) {
-  // Based on https://gist.github.com/rjz/15baffeab434b8125ca4d783f4116d81
-
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
-
-  let encrypted = cipher.update(str, "utf8", "base64");
-  encrypted += cipher.final("base64");
-  return `${iv.toString("base64")}.${cipher.getAuthTag().toString("base64")}.${encrypted}`;
+async function getWorker(): Promise<CryptFns> {
+  if (workerPromise == null) {
+    workerPromise = spawn(new Worker("./cryptWorker")) as unknown as Promise<CryptFns>;
+  }
+  return workerPromise;
 }
 
-export function decrypt(encrypted) {
-  // Based on https://gist.github.com/rjz/15baffeab434b8125ca4d783f4116d81
+export async function encrypt(data: string) {
+  return (await getWorker()).encrypt(data, KEY);
+}
 
-  const [iv, authTag, encryptedStr] = encrypted.split(".");
-  const decipher = crypto.createDecipheriv(ALGORITHM, KEY, Buffer.from(iv, "base64"));
-  decipher.setAuthTag(Buffer.from(authTag, "base64"));
-
-  let decrypted = decipher.update(encryptedStr, "base64", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
+export async function decrypt(data: string) {
+  return (await getWorker()).decrypt(data, KEY);
 }

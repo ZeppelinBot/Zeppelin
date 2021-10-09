@@ -1,6 +1,5 @@
 import { Snowflake } from "discord.js";
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { createEncryptedJsonTransformer } from "../encryptedJsonTransformer";
 
 export interface ISavedMessageAttachmentData {
   id: Snowflake;
@@ -93,7 +92,6 @@ export class SavedMessage {
 
   @Column({
     type: "mediumtext",
-    transformer: createEncryptedJsonTransformer<ISavedMessageData>(),
   })
   data: ISavedMessageData;
 
