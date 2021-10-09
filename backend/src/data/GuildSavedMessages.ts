@@ -6,6 +6,7 @@ import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { buildEntity } from "./buildEntity";
+import { noop } from "../utils";
 
 export class GuildSavedMessages extends BaseGuildRepository {
   private messages: Repository<SavedMessage>;
@@ -225,7 +226,7 @@ export class GuildSavedMessages extends BaseGuildRepository {
       }
     }
 
-    await this.messages.createQueryBuilder().insert().orIgnore().values(items).execute();
+    await this.messages.createQueryBuilder().insert().values(items).execute().catch(noop);
 
     for (const item of items) {
       // perf: save a db lookup and message content decryption by building the entity manually
