@@ -203,7 +203,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
-    return this.processEntityToDB({
+    return {
       id: msg.id,
       guild_id: (msg.channel as GuildChannel).guild.id,
       channel_id: msg.channel.id,
@@ -211,7 +211,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       is_bot: msg.author.bot,
       data: savedMessageData,
       posted_at: postedAt,
-    });
+    };
   }
 
   protected async insertBulk(items: Array<Partial<SavedMessage>>): Promise<void> {
@@ -222,7 +222,8 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       }
     }
 
-    await this.messages.createQueryBuilder().insert().values(items).execute().catch(noop);
+    const itemsToInsert = await asyncMap(items, (item) => this.processEntityToDB({ ...item }));
+    await this.messages.createQueryBuilder().insert().values(itemsToInsert).execute().catch(noop);
 
     for (const item of items) {
       // perf: save a db lookup and message content decryption by building the entity manually
