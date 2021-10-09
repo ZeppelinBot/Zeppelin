@@ -8,6 +8,7 @@ import { MINUTES, SECONDS } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { cleanupMessages } from "./cleanup/messages";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
+import { buildEntity } from "./buildEntity";
 
 if (!isAPI()) {
   const CLEANUP_INTERVAL = 5 * MINUTES;
@@ -220,7 +221,8 @@ export class GuildSavedMessages extends BaseGuildRepository {
       throw e;
     }
 
-    const inserted = await this.messages.findOne(data.id);
+    // perf: save a db lookup and message content decryption by building the entity manually
+    const inserted = buildEntity(SavedMessage, data);
     this.events.emit("create", [inserted]);
     this.events.emit(`create:${data.id}`, [inserted]);
   }
