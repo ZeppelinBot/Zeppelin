@@ -203,40 +203,25 @@ export class GuildSavedMessages extends BaseGuildRepository {
       .getMany();
   }
 
-  async create(data) {
-    const isPermanent = this.toBePermanent.has(data.id);
-    if (isPermanent) {
-      data.is_permanent = true;
-      this.toBePermanent.delete(data.id);
-    }
-
-    try {
-      await this.messages.insert(data);
-    } catch (e) {
-      if (e?.code === "ER_DUP_ENTRY") {
-        console.trace(`Tried to insert duplicate message ID: ${data.id}`);
-        return;
-      }
-
-      throw e;
-    }
-
-    // perf: save a db lookup and message content decryption by building the entity manually
-    const inserted = buildEntity(SavedMessage, data);
-    this.events.emit("create", [inserted]);
-    this.events.emit(`create:${data.id}`, [inserted]);
-  }
-
-  async createFromMsg(msg: Message, overrides = {}) {
+  async createFromMsg(msg: Message, overrides = {}): Promise<void> {
     // FIXME: Hotfix
     if (!msg.channel) {
       return;
     }
 
+    await this.createFromMessages([msg], overrides);
+  }
+
+  async createFromMessages(messages: Message[], overrides = {}): Promise<void> {
+    const items = messages.map((msg) => ({ ...this.msgToInsertReadyEntity(msg), ...overrides }));
+    await this.insertBulk(items);
+  }
+
+  protected msgToInsertReadyEntity(msg: Message): Partial<SavedMessage> {
     const savedMessageData = this.msgToSavedMessageData(msg);
     const postedAt = moment.utc(msg.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
 
-    const data = {
+    return {
       id: msg.id,
       guild_id: (msg.channel as GuildChannel).guild.id,
       channel_id: msg.channel.id,
@@ -245,17 +230,27 @@ export class GuildSavedMessages extends BaseGuildRepository {
       data: savedMessageData,
       posted_at: postedAt,
     };
-
-    return this.create({ ...data, ...overrides });
   }
 
-  async createFromMessages(messages: Message[], overrides = {}) {
-    for (const msg of messages) {
-      await this.createFromMsg(msg, overrides);
+  protected async insertBulk(items: Array<Partial<SavedMessage>>): Promise<void> {
+    for (const item of items) {
+      if (this.toBePermanent.has(item.id!)) {
+        item.is_permanent = true;
+        this.toBePermanent.delete(item.id!);
+      }
+    }
+
+    await this.messages.createQueryBuilder().insert().orIgnore().values(items).execute();
+
+    for (const item of items) {
+      // perf: save a db lookup and message content decryption by building the entity manually
+      const inserted = buildEntity(SavedMessage, item);
+      this.events.emit("create", [inserted]);
+      this.events.emit(`create:${item.id}`, [inserted]);
     }
   }
 
-  async markAsDeleted(id) {
+  async markAsDeleted(id): Promise<void> {
     await this.messages
       .createQueryBuilder("messages")
       .update()
