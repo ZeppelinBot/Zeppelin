@@ -2,25 +2,10 @@ import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { isAPI } from "../globals";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { MINUTES, SECONDS } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { cleanupMessages } from "./cleanup/messages";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { buildEntity } from "./buildEntity";
-
-if (!isAPI()) {
-  const CLEANUP_INTERVAL = 5 * MINUTES;
-
-  async function cleanup() {
-    await cleanupMessages();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
-  // Start first cleanup 30 seconds after startup
-  setTimeout(cleanup, 30 * SECONDS);
-}
 
 export class GuildSavedMessages extends BaseGuildRepository {
   private messages: Repository<SavedMessage>;
