@@ -13,8 +13,8 @@ export async function runAutomodOnMessage(
   message: SavedMessage,
   isEdit: boolean,
 ) {
-  const member = await pluginData.guild.members.fetch(message.user_id).catch(() => undefined);
-  const user = await pluginData.client.users.fetch(message.user_id).catch(() => undefined);
+  const member = pluginData.guild.members.resolve(message.user_id) ?? undefined;
+  const user = pluginData.client.users.resolve(message.user_id) ?? undefined;
 
   const context: AutomodContext = {
     timestamp: moment.utc(message.posted_at).valueOf(),
