@@ -188,6 +188,13 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       return;
     }
 
+    // Don't actually save bot messages. Just pass them through as if they were saved.
+    if (msg.author.bot) {
+      const fakeSavedMessage = buildEntity(SavedMessage, await this.msgToInsertReadyEntity(msg));
+      this.fireCreateEvents(fakeSavedMessage);
+      return;
+    }
+
     await this.createFromMessages([msg], overrides);
   }
 
@@ -228,9 +235,13 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     for (const item of items) {
       // perf: save a db lookup and message content decryption by building the entity manually
       const inserted = buildEntity(SavedMessage, item);
-      this.events.emit("create", [inserted]);
-      this.events.emit(`create:${item.id}`, [inserted]);
+      this.fireCreateEvents(inserted);
     }
+  }
+
+  protected async fireCreateEvents(message: SavedMessage) {
+    this.events.emit("create", [message]);
+    this.events.emit(`create:${message.id}`, [message]);
   }
 
   async markAsDeleted(id): Promise<void> {
