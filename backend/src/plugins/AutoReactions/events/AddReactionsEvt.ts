@@ -19,17 +19,21 @@ export const AddReactionsEvt = autoReactionsEvt({
     if (!autoReaction) return;
 
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
-    const missingPermissions = getMissingChannelPermissions(
-      me,
-      message.channel as GuildChannel,
-      readChannelPermissions | p.ADD_REACTIONS,
-    );
-    if (missingPermissions) {
-      const logs = pluginData.getPlugin(LogsPlugin);
-      logs.logBotAlert({
-        body: `Cannot apply auto-reactions in <#${message.channel.id}>. ${missingPermissionError(missingPermissions)}`,
-      });
-      return;
+    if (me) {
+      const missingPermissions = getMissingChannelPermissions(
+        me,
+        message.channel as GuildChannel,
+        readChannelPermissions | p.ADD_REACTIONS,
+      );
+      if (missingPermissions) {
+        const logs = pluginData.getPlugin(LogsPlugin);
+        logs.logBotAlert({
+          body: `Cannot apply auto-reactions in <#${message.channel.id}>. ${missingPermissionError(
+            missingPermissions,
+          )}`,
+        });
+        return;
+      }
     }
 
     for (const reaction of autoReaction.reactions) {
