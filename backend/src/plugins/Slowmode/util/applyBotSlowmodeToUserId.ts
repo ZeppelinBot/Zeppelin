@@ -19,7 +19,7 @@ export async function applyBotSlowmodeToUserId(
     if (existingOverride) {
       await existingOverride.edit({ SEND_MESSAGES: false });
     } else {
-      await channel.permissionOverwrites.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
+      await channel.permissionOverwrites?.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
     }
   } catch (e) {
     const user = await pluginData.client.users.fetch(userId as Snowflake).catch(() => new UnknownUser({ id: userId }));
