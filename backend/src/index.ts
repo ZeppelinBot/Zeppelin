@@ -65,7 +65,7 @@ function errorHandler(err) {
     // Log it in the console as a warning and post a warning to the guild's log.
 
     // tslint:disable:no-console
-    console.warn(`${guildName}: [${err.code}] ${err.message}`);
+    console.warn(`${guildId} ${guildName}: [${err.code}] ${err.message}`);
 
     if (err.guild) {
       const logs = new GuildLogs(err.guild.id);
