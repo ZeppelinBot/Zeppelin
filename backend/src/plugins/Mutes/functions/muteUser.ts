@@ -118,7 +118,7 @@ export async function muteUser(
           logs.logBotAlert({
             body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
           });
-          throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild.id);
+          throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
         }
       }
     }
