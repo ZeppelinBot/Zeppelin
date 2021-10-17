@@ -23,11 +23,6 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const channel = channelOrThread?.isThread() ? channelOrThread.parent : channelOrThread;
   const categoryId = channel?.parentId;
 
-  // Don't apply Automod on Zeppelin itself
-  if (userId && userId === pluginData.client.user?.id) {
-    return;
-  }
-
   const config = await pluginData.config.getMatchingConfig({
     channelId,
     categoryId,
@@ -39,6 +34,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
     if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger && !context.antiraid) continue;
+    if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
       continue;

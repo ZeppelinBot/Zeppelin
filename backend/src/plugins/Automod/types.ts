@@ -23,6 +23,7 @@ export const Rule = t.type({
   name: t.string,
   presets: tNullable(t.array(t.string)),
   affects_bots: t.boolean,
+  affects_self: t.boolean,
   triggers: t.array(t.partial(AvailableTriggers.props)),
   actions: t.partial(AvailableActions.props),
   cooldown: tNullable(t.string),
