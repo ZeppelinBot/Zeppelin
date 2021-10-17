@@ -110,9 +110,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   // Save the command-response message pair once the message is in our database
   const deleteWithCommand = tagResult.category?.delete_with_command ?? config.delete_with_command;
   if (deleteWithCommand) {
-    pluginData.state.savedMessages.onceMessageAvailable(responseMsg.id, async () => {
-      await pluginData.state.tags.addResponse(msg.id, responseMsg.id);
-    });
+    await pluginData.state.tags.addResponse(msg.id, responseMsg.id);
   }
 
   const deleteInvoke = tagResult.category?.auto_delete_command ?? config.auto_delete_command;

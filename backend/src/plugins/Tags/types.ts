@@ -54,7 +54,6 @@ export interface TagsPluginType extends BasePluginType {
     logs: GuildLogs;
 
     onMessageCreateFn;
-    onMessageDeleteFn;
 
     tagFunctions: any;
   };

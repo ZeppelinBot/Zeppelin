@@ -86,4 +86,18 @@ export class GuildTags extends BaseGuildRepository {
       response_message_id: responseMessageId,
     });
   }
+
+  async deleteResponseByCommandMessageId(messageId: string): Promise<void> {
+    await this.tagResponses.delete({
+      guild_id: this.guildId,
+      command_message_id: messageId,
+    });
+  }
+
+  async deleteResponseByResponseMessageId(messageId: string): Promise<void> {
+    await this.tagResponses.delete({
+      guild_id: this.guildId,
+      response_message_id: messageId,
+    });
+  }
 }
