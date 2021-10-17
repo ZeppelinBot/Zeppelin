@@ -8,13 +8,17 @@ import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { performance } from "perf_hooks";
 
-export function runAutomodOnMessage(
+export async function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,
   message: SavedMessage,
   isEdit: boolean,
 ) {
-  const user = pluginData.client.users.cache.get(message.user_id as Snowflake);
-  const member = pluginData.guild.members.cache.get(message.user_id as Snowflake);
+  const member =
+    pluginData.guild.members.cache.get(message.user_id) ??
+    (await pluginData.guild.members.fetch(message.user_id).catch(() => undefined));
+  const user =
+    pluginData.client.users.cache.get(message.user_id) ??
+    (await pluginData.client.users.fetch(message.user_id).catch(() => undefined));
 
   const context: AutomodContext = {
     timestamp: moment.utc(message.posted_at).valueOf(),
