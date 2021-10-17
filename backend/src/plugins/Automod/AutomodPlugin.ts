@@ -81,6 +81,10 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) =>
         rule["affects_bots"] = false;
       }
 
+      if (rule["affects_self"] == null) {
+        rule["affects_self"] = false;
+      }
+
       // Loop through the rule's triggers
       if (rule["triggers"]) {
         for (const triggerObj of rule["triggers"]) {
