@@ -15,7 +15,6 @@ export const EditCmd = postCmd({
 
   async run({ message: msg, args, pluginData }) {
     const targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
-    console.log({ targetMessage });
     if (!targetMessage) {
       sendErrorMessage(pluginData, msg.channel, "Unknown message");
       return;
