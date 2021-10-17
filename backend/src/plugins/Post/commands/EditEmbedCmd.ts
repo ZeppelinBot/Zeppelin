@@ -23,12 +23,6 @@ export const EditEmbedCmd = postCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const savedMessage = await pluginData.state.savedMessages.find(args.message.messageId);
-    if (!savedMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
-      return;
-    }
-
     const content = args.content || args.maincontent;
 
     let color: number | null = null;
@@ -42,17 +36,20 @@ export const EditEmbedCmd = postCmd({
       }
     }
 
-    const embed: MessageEmbed = savedMessage.data.embeds![0] as MessageEmbed;
+    const targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
+    if (!targetMessage) {
+      sendErrorMessage(pluginData, msg.channel, "Unknown message");
+      return;
+    }
+
+    const embed = (targetMessage.embeds![0] ?? { fields: [] }) as MessageEmbed;
     if (args.title) embed.title = args.title;
     if (content) embed.description = formatContent(content);
     if (color) embed.color = color;
 
-    (pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake) as TextChannel).messages.edit(
-      savedMessage.id as Snowflake,
-      {
-        embeds: [embed],
-      },
-    );
+    args.message.channel.messages.edit(targetMessage.id, {
+      embeds: [embed],
+    });
     await sendSuccessMessage(pluginData, msg.channel, "Embed edited");
 
     if (args.content) {
