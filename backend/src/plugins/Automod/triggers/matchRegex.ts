@@ -1,4 +1,3 @@
-import { Util } from "discord.js";
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
 import { normalizeText } from "../../../utils/normalizeText";
@@ -7,7 +6,7 @@ import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
-import { categorize } from "../../../utils/categorize";
+import { mergeRegexes } from "../../../utils/mergeRegexes";
 
 interface MatchResultType {
   pattern: string;
@@ -15,21 +14,6 @@ interface MatchResultType {
 }
 
 const regexCache = new WeakMap<any, RegExp[]>();
-const hasBackreference = /(?:^|[^\\]|[\\]{2})\\\d+/;
-
-function buildCacheableRegexes(sourceRegexes: RegExp[], flags: string) {
-  const categories = categorize(sourceRegexes, {
-    hasBackreferences: (regex) => hasBackreference.exec(regex.source) !== null,
-    safeToMerge: () => true,
-  });
-  const regexes: RegExp[] = [];
-  if (categories.safeToMerge.length) {
-    const merged = categories.safeToMerge.map((r) => `(?:${r.source})`).join("|");
-    regexes.push(new RegExp(merged, flags));
-  }
-  regexes.push(...categories.hasBackreferences);
-  return regexes;
-}
 
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
   configType: t.type({
@@ -64,7 +48,7 @@ export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
 
     if (!regexCache.has(trigger)) {
       const flags = trigger.case_sensitive ? "" : "i";
-      const toCache = buildCacheableRegexes(trigger.patterns, flags);
+      const toCache = mergeRegexes(trigger.patterns, flags);
       regexCache.set(trigger, toCache);
     }
     const regexes = regexCache.get(trigger)!;
