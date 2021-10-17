@@ -35,6 +35,9 @@ export async function runExpiringMutesLoop() {
     clearTimeout(timeout);
   }
 
+  console.log("[EXPIRING MUTES LOOP] Clearing old expired mutes");
+  await getMutesRepository().clearOldExpiredMutes();
+
   console.log("[EXPIRING MUTES LOOP] Setting timeouts for expiring mutes");
   const expiringMutes = await getMutesRepository().getSoonExpiringMutes(LOOP_INTERVAL);
   for (const mute of expiringMutes) {
