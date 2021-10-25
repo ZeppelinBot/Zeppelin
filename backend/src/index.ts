@@ -30,6 +30,7 @@ import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
 import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
 import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
+import { performance } from "perf_hooks";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -163,6 +164,25 @@ for (const [i, part] of actualVersionParts.entries()) {
 
 moment.tz.setDefault("UTC");
 
+// Blocking check
+let avgTotal = 0;
+let avgCount = 0;
+let lastCheck = performance.now();
+setInterval(() => {
+  const now = performance.now();
+  let diff = Math.max(0, now - lastCheck);
+  if (diff < 5) diff = 0;
+  avgTotal += diff;
+  avgCount++;
+  lastCheck = now;
+}, 500);
+setInterval(() => {
+  const avgBlocking = avgTotal / (avgCount || 1);
+  console.log(`Average blocking in the last 5min: ${avgBlocking / avgTotal}ms`);
+  avgTotal = 0;
+  avgCount = 0;
+}, 5 * 60 * 1000);
+
 logger.info("Connecting to database");
 connect().then(async () => {
   const RequestHandler = require("discord.js/src/rest/RequestHandler.js");
@@ -173,6 +193,31 @@ connect().then(async () => {
     logRestCall(request.method, request.path);
     return originalPush.call(this, ...args);
   };
+
+  let globalRateLimits = 0;
+  const rateLimitsByType: Record<string, number> = {};
+
+  const originalOnRateLimit = RequestHandler.prototype.onRateLimit;
+  // tslint:disable-next-line:only-arrow-functions
+  RequestHandler.prototype.onRateLimit = function (...args) {
+    const [request, limit, timeout, isGlobal] = args;
+    if (isGlobal) {
+      globalRateLimits++;
+    } else {
+      const name = `${request.method} ${request.route}`;
+      rateLimitsByType[name] = rateLimitsByType[name] ?? 0;
+      rateLimitsByType[name]++;
+    }
+    return originalOnRateLimit.call(this, ...args);
+  };
+
+  setInterval(() => {
+    const topSortedEntries = Object.entries(rateLimitsByType)
+      .sort((a, b) => (a[1] > b[1] ? -1 : 1))
+      .slice(0, 5);
+    console.log(`[RATE LIMIT DEBUG] Total global rate limit (50/s) hits: ${globalRateLimits}`);
+    console.log(`[RATE LIMIT DEBUG] Top non-global rate limit hits: ${JSON.stringify(topSortedEntries, null, 2)}`);
+  }, 5 * 60 * 1000);
 
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
