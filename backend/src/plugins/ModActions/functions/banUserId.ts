@@ -105,6 +105,7 @@ export async function banUserId(
     };
   }
 
+  const tempbanLock = await pluginData.locks.acquire(`tempban-${user.id}`);
   const existingTempban = await pluginData.state.tempbans.findExistingTempbanForUserId(user.id);
   if (banTime && banTime > 0) {
     const selfId = pluginData.client.user!.id;
@@ -116,6 +117,7 @@ export async function banUserId(
     const tempban = (await pluginData.state.tempbans.findExistingTempbanForUserId(user.id))!;
     registerExpiringTempban(tempban);
   }
+  tempbanLock.unlock();
 
   // Create a case for this action
   const modId = banOptions.caseArgs?.modId || pluginData.client.user!.id;
