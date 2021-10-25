@@ -38,8 +38,9 @@ export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>(
 
   // prettier-ignore
   events: [
-    TypingEnablePingableEvt,
-    MessageCreateDisablePingableEvt,
+    // FIXME: Temporarily disabled for performance. This is very buggy anyway, so consider removing in the future.
+    // TypingEnablePingableEvt,
+    // MessageCreateDisablePingableEvt,
   ],
 
   beforeLoad(pluginData) {
