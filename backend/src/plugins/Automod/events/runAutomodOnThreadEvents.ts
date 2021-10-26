@@ -8,6 +8,7 @@ export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginTyp
     const user = thread.ownerId
       ? await pluginData.client.users.fetch(thread.ownerId).catch(() => undefined)
       : undefined;
+
     const context: AutomodContext = {
       timestamp: Date.now(),
       threadChange: {
