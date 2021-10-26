@@ -5,12 +5,12 @@ import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { resolveUser, UnknownUser } from "../../../utils";
-import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
 
 /**
  * Create a KICK case automatically when a user is kicked manually.
@@ -24,11 +24,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt({
       return;
     }
 
-    const kickAuditLogEntry = await safeFindRelevantAuditLogEntry(
-      pluginData,
-      GuildAuditLogs.Actions.MEMBER_KICK as number,
-      member.id,
-    );
+    const kickAuditLogEntry = await findMatchingAuditLogEntry(pluginData.guild, "MEMBER_KICK", member.id);
 
     let mod: User | UnknownUser | null = null;
     let createdCase: Case | null = null;

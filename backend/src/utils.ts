@@ -635,63 +635,6 @@ export function sleep(ms: number): Promise<void> {
   });
 }
 
-/**
- * Attempts to find a relevant audit log entry for the given user and action
- */
-const auditLogNextAttemptAfterFail: Map<string, number> = new Map();
-const AUDIT_LOG_FAIL_COOLDOWN = 2 * MINUTES;
-
-export async function findRelevantAuditLogEntry(
-  guild: Guild,
-  actionType: number,
-  userId: string,
-  attempts: number = 3,
-  attemptDelay: number = 3000,
-): Promise<GuildAuditLogsEntry | null> {
-  if (auditLogNextAttemptAfterFail.has(guild.id) && auditLogNextAttemptAfterFail.get(guild.id)! > Date.now()) {
-    return null;
-  }
-
-  let auditLogs: GuildAuditLogs | null = null;
-  try {
-    auditLogs = await guild.fetchAuditLogs({ limit: 5, type: actionType });
-  } catch (e) {
-    if (isDiscordAPIError(e) && e.code === 50013) {
-      // If we don't have permission to read audit log, set audit log requests on cooldown
-      auditLogNextAttemptAfterFail.set(guild.id, Date.now() + AUDIT_LOG_FAIL_COOLDOWN);
-    } else if (isDiscordHTTPError(e) && e.code === 500) {
-      // Ignore internal server errors which seem to be pretty common with audit log requests
-    } else if (e.message.startsWith("Request timed out")) {
-      // Ignore timeouts, try again next loop
-    } else {
-      throw e;
-    }
-  }
-
-  const entries = auditLogs ? [...auditLogs.entries.values()] : [];
-
-  entries.sort((a, b) => {
-    if (a.createdAt > b.createdAt) return -1;
-    if (a.createdAt > b.createdAt) return 1;
-    return 0;
-  });
-
-  const cutoffTS = Date.now() - 1000 * 60 * 2;
-
-  const relevantEntry = entries.find((entry) => {
-    return (entry.target as { id }).id === userId && entry.createdTimestamp >= cutoffTS;
-  });
-
-  if (relevantEntry) {
-    return relevantEntry;
-  } else if (attempts > 0) {
-    await sleep(attemptDelay);
-    return findRelevantAuditLogEntry(guild, actionType, userId, attempts - 1, attemptDelay);
-  } else {
-    return null;
-  }
-}
-
 const realLinkRegex = /https?:\/\/\S+/; // http://anything or https://anything
 const plainLinkRegex = /((?!https?:\/\/)\S)+\.\S+/; // anything.anything, without http:// or https:// preceding it
 // Both of the above, with precedence on the first one
