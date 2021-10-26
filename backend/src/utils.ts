@@ -1280,6 +1280,11 @@ export function resolveUserId(bot: Client, value: string) {
     return null;
   }
 
+  // Just a user ID?
+  if (isValidSnowflake(value)) {
+    return value;
+  }
+
   // A user mention?
   const mentionMatch = value.match(/^<@!?(\d+)>$/);
   if (mentionMatch) {
@@ -1291,11 +1296,6 @@ export function resolveUserId(bot: Client, value: string) {
   if (usernameMatch) {
     const user = bot.users.cache.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
     if (user) return user.id;
-  }
-
-  // Just a user ID?
-  if (isValidSnowflake(value)) {
-    return value;
   }
 
   return null;
