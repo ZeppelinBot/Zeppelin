@@ -4,12 +4,12 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
 import { resolveUser, UnknownUser } from "../../../utils";
-import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
 
 /**
  * Create a BAN case automatically when a user is banned manually.
@@ -24,11 +24,7 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
       return;
     }
 
-    const relevantAuditLogEntry = await safeFindRelevantAuditLogEntry(
-      pluginData,
-      GuildAuditLogs.Actions.MEMBER_BAN_ADD as number,
-      user.id,
-    );
+    const relevantAuditLogEntry = await findMatchingAuditLogEntry(pluginData.guild, "MEMBER_BAN_ADD", user.id);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
 

@@ -3,7 +3,6 @@ import diff from "lodash.difference";
 import isEqual from "lodash.isequal";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
-import { safeFindRelevantAuditLogEntry } from "../../../utils/safeFindRelevantAuditLogEntry";
 import { logsEvt } from "../types";
 import { logMemberNickChange } from "../logFunctions/logMemberNickChange";
 import { logMemberRoleChanges } from "../logFunctions/logMemberRoleChanges";
