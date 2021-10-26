@@ -30,7 +30,7 @@
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
     "discord-api-types": "^0.22.0",
-    "discord.js": "^13.1.0",
+    "discord.js": "^13.2.0",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "erlpack": "github:almeidx/erlpack#f0c535f73817fd914806d6ca26a7730c14e0fb7c",
