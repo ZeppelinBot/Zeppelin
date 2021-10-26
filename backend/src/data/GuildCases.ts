@@ -5,6 +5,7 @@ import { connection } from "./db";
 import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
 import moment = require("moment-timezone");
+import { Queue } from "../Queue";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 
@@ -12,10 +13,13 @@ export class GuildCases extends BaseGuildRepository {
   private cases: Repository<Case>;
   private caseNotes: Repository<CaseNote>;
 
+  protected createQueue: Queue;
+
   constructor(guildId) {
     super(guildId);
     this.cases = getRepository(Case);
     this.caseNotes = getRepository(CaseNote);
+    this.createQueue = new Queue();
   }
 
   async get(ids: number[]): Promise<Case[]> {
@@ -117,25 +121,34 @@ export class GuildCases extends BaseGuildRepository {
   }
 
   async createInternal(data): Promise<InsertResult> {
-    return this.cases
-      .insert({
-        ...data,
-        guild_id: this.guildId,
-        case_number: () => `(SELECT IFNULL(MAX(case_number)+1, 1) FROM cases AS ma2 WHERE guild_id = ${this.guildId})`,
-      })
-      .catch((err) => {
-        if (err?.code === "ER_DUP_ENTRY") {
-          if (data.audit_log_id) {
-            console.trace(`Tried to insert case with duplicate audit_log_id`);
-            return this.createInternal({
-              ...data,
-              audit_log_id: undefined,
-            });
-          }
-        }
+    return this.createQueue.add(async () => {
+      const lastCaseNumberRow = await this.cases
+        .createQueryBuilder()
+        .select(["MAX(case_number) AS last_case_number"])
+        .where("guild_id = :guildId", { guildId: this.guildId })
+        .getRawOne();
+      const lastCaseNumber = lastCaseNumberRow?.last_case_number || 0;
 
-        throw err;
-      });
+      return this.cases
+        .insert({
+          case_number: lastCaseNumber + 1,
+          ...data,
+          guild_id: this.guildId,
+        })
+        .catch((err) => {
+          if (err?.code === "ER_DUP_ENTRY") {
+            if (data.audit_log_id) {
+              console.trace(`Tried to insert case with duplicate audit_log_id`);
+              return this.createInternal({
+                ...data,
+                audit_log_id: undefined,
+              });
+            }
+          }
+
+          throw err;
+        });
+    });
   }
 
   async create(data): Promise<Case> {
