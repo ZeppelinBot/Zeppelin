@@ -45,6 +45,8 @@ import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 import { z, ZodError } from "zod";
+import { getProfiler } from "./profiler";
+import { performance } from "perf_hooks";
 
 const fsp = fs.promises;
 
@@ -1294,8 +1296,13 @@ export function resolveUserId(bot: Client, value: string) {
   // A non-mention, full username?
   const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
   if (usernameMatch) {
+    const profiler = getProfiler();
+    const start = performance.now();
     const user = bot.users.cache.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
-    if (user) return user.id;
+    profiler?.addDataPoint("utils:resolveUserId:usernameMatch", performance.now() - start);
+    if (user) {
+      return user.id;
+    }
   }
 
   return null;
