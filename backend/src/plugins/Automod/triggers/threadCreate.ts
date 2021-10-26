@@ -1,7 +1,6 @@
 import { Snowflake } from "discord-api-types";
-import { ThreadChannel, User, Util } from "discord.js";
+import { User, Util } from "discord.js";
 import * as t from "io-ts";
-import { tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface ThreadCreateResult {
@@ -13,23 +12,15 @@ interface ThreadCreateResult {
 }
 
 export const ThreadCreateTrigger = automodTrigger<ThreadCreateResult>()({
-  configType: t.type({
-    parent: tNullable(t.union([t.string, t.array(t.string)])),
-  }),
-
+  configType: t.type({}),
   defaultConfig: {},
 
-  async match({ context, triggerConfig }) {
+  async match({ context }) {
     if (!context.threadChange?.created) {
       return;
     }
 
     const thread = context.threadChange.created;
-
-    if (triggerConfig.parent) {
-      const parentIds = Array.isArray(triggerConfig.parent) ? triggerConfig.parent : [triggerConfig.parent];
-      if (thread.parentId && !parentIds.includes(thread.parentId)) return;
-    }
 
     return {
       extra: {

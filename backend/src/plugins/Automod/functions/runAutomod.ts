@@ -15,9 +15,11 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
 
   const channelIdOrThreadId = context.message?.channel_id;
-  const channelOrThread = channelIdOrThreadId
-    ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
-    : null;
+  const channelOrThread =
+    context.channel ??
+    (channelIdOrThreadId
+      ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
+      : null);
   const channelId = channelOrThread?.isThread() ? channelOrThread.parent?.id : channelIdOrThreadId;
   const threadId = channelOrThread?.isThread() ? channelOrThread.id : null;
   const channel = channelOrThread?.isThread() ? channelOrThread.parent : channelOrThread;
