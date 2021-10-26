@@ -25,23 +25,6 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     this.toBePermanent = new Set();
   }
 
-  public msgToSavedMessage(message: Message): SavedMessage {
-    const postedAt = moment.utc(message.createdTimestamp, "x").format("YYYY-MM-DD HH:mm:ss");
-
-    return {
-      data: this.msgToSavedMessageData(message),
-      id: message.id,
-      guild_id: (message.channel as GuildChannel).guildId,
-      channel_id: message.channelId,
-      user_id: message.author.id,
-      is_bot: message.author.bot,
-      posted_at: postedAt,
-      // @ts-expect-error
-      deleted_at: null,
-      is_permanent: false,
-    };
-  }
-
   protected msgToSavedMessageData(msg: Message): ISavedMessageData {
     const data: ISavedMessageData = {
       author: {
