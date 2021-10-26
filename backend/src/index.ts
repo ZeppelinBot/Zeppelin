@@ -185,40 +185,6 @@ setInterval(() => {
 
 logger.info("Connecting to database");
 connect().then(async () => {
-  const RequestHandler = require("discord.js/src/rest/RequestHandler.js");
-  const originalPush = RequestHandler.prototype.push;
-  // tslint:disable-next-line:only-arrow-functions
-  RequestHandler.prototype.push = function (...args) {
-    const request = args[0];
-    logRestCall(request.method, request.path);
-    return originalPush.call(this, ...args);
-  };
-
-  let globalRateLimits = 0;
-  const rateLimitsByType: Record<string, number> = {};
-
-  const originalOnRateLimit = RequestHandler.prototype.onRateLimit;
-  // tslint:disable-next-line:only-arrow-functions
-  RequestHandler.prototype.onRateLimit = function (...args) {
-    const [request, limit, timeout, isGlobal] = args;
-    if (isGlobal) {
-      globalRateLimits++;
-    } else {
-      const name = `${request.method} ${request.route}`;
-      rateLimitsByType[name] = rateLimitsByType[name] ?? 0;
-      rateLimitsByType[name]++;
-    }
-    return originalOnRateLimit.call(this, ...args);
-  };
-
-  setInterval(() => {
-    const topSortedEntries = Object.entries(rateLimitsByType)
-      .sort((a, b) => (a[1] > b[1] ? -1 : 1))
-      .slice(0, 5);
-    console.log(`[RATE LIMIT DEBUG] Total global rate limit (50/s) hits: ${globalRateLimits}`);
-    console.log(`[RATE LIMIT DEBUG] Top non-global rate limit hits: ${JSON.stringify(topSortedEntries, null, 2)}`);
-  }, 5 * 60 * 1000);
-
   const client = new Client({
     partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
 
