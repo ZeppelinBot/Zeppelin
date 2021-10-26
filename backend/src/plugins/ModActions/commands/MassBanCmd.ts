@@ -91,8 +91,8 @@ export const MassbanCmd = modActionsCmd({
         try {
           // Ignore automatic ban cases and logs
           // We create our own cases below and post a single "mass banned" log instead
-          ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 120 * 1000);
-          pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 120 * 1000);
+          ignoreEvent(pluginData, IgnoredEventType.Ban, userId, 30 * MINUTES);
+          pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId, 30 * MINUTES);
 
           await pluginData.guild.bans.create(userId as Snowflake, {
             days: deleteDays,
