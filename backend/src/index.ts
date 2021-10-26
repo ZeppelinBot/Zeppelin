@@ -31,6 +31,7 @@ import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
 import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
 import { performance } from "perf_hooks";
+import { setProfiler } from "./profiler";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -362,6 +363,8 @@ connect().then(async () => {
     await sleep(10 * SECONDS);
     runSavedMessageCleanupLoop();
   });
+
+  setProfiler(bot.profiler);
 
   bot.initialize();
   logger.info("Bot Initialized");
