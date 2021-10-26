@@ -190,7 +190,7 @@ connect().then(async () => {
 
     makeCache: Options.cacheWithLimits({
       ...Options.defaultMakeCacheSettings,
-      MessageManager: 0,
+      MessageManager: 1,
       // GuildMemberManager: 15000,
       GuildInviteManager: 0,
     }),
