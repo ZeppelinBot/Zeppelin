@@ -1,8 +1,26 @@
 import { Profiler } from "knub/dist/Profiler";
 import { performance } from "perf_hooks";
-import { SECONDS } from "../utils";
+import { SECONDS, noop } from "../utils";
+
+let _profilingEnabled = false;
+
+export const profilingEnabled = () => {
+  return _profilingEnabled;
+};
+
+export const enableProfiling = () => {
+  _profilingEnabled = true;
+};
+
+export const disableProfiling = () => {
+  _profilingEnabled = false;
+};
 
 export const startProfiling = (profiler: Profiler, key: string) => {
+  if (!profilingEnabled()) {
+    return noop;
+  }
+
   const startTime = performance.now();
   return () => {
     profiler.addDataPoint(key, performance.now() - startTime);
@@ -10,6 +28,10 @@ export const startProfiling = (profiler: Profiler, key: string) => {
 };
 
 export const calculateBlocking = (coarseness = 10) => {
+  if (!profilingEnabled()) {
+    return () => 0;
+  }
+
   let last = performance.now();
   let result = 0;
   const interval = setInterval(() => {
