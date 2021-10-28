@@ -370,6 +370,15 @@ connect().then(async () => {
     enableProfiling();
   }
 
+  let lowestGlobalRemaining = Infinity;
+  setInterval(() => {
+    lowestGlobalRemaining = Math.min(lowestGlobalRemaining, (client as any).rest.globalRemaining);
+  }, 100);
+  setInterval(() => {
+    console.log("Lowest global remaining in the past 5 seconds:", lowestGlobalRemaining);
+    lowestGlobalRemaining = Infinity;
+  }, 5000);
+
   bot.initialize();
   logger.info("Bot Initialized");
   logger.info("Logging in...");
