@@ -7,6 +7,7 @@ import { clearRecentActionsForMessage } from "../functions/clearRecentActionsFor
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
 import { performance } from "perf_hooks";
+import { profilingEnabled } from "../../../utils/easyProfiler";
 
 export async function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,
@@ -34,6 +35,10 @@ export async function runAutomodOnMessage(
 
     await runAutomod(pluginData, context);
 
-    pluginData.getKnubInstance().profiler.addDataPoint(`automod:${pluginData.guild.id}`, performance.now() - startTime);
+    if (profilingEnabled()) {
+      pluginData
+        .getKnubInstance()
+        .profiler.addDataPoint(`automod:${pluginData.guild.id}`, performance.now() - startTime);
+    }
   });
 }

@@ -32,6 +32,7 @@ import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeleti
 import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
 import { performance } from "perf_hooks";
 import { setProfiler } from "./profiler";
+import { enableProfiling } from "./utils/easyProfiler";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -365,6 +366,9 @@ connect().then(async () => {
   });
 
   setProfiler(bot.profiler);
+  if (process.env.PROFILING === "true") {
+    enableProfiling();
+  }
 
   bot.initialize();
   logger.info("Bot Initialized");
