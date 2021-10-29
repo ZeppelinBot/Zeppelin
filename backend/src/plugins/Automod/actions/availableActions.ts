@@ -15,6 +15,7 @@ import { ReplyAction } from "./reply";
 import { SetAntiraidLevelAction } from "./setAntiraidLevel";
 import { SetCounterAction } from "./setCounter";
 import { SetSlowmodeAction } from "./setSlowmode";
+import { UnArchiveThreadAction } from "./unArchiveThread";
 import { WarnAction } from "./warn";
 
 export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
@@ -34,6 +35,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   set_counter: SetCounterAction,
   set_slowmode: SetSlowmodeAction,
   archive_thread: ArchiveThreadAction,
+  unarchive_thread: UnArchiveThreadAction,
 };
 
 export const AvailableActions = t.type({
@@ -53,4 +55,5 @@ export const AvailableActions = t.type({
   set_counter: SetCounterAction.configType,
   set_slowmode: SetSlowmodeAction.configType,
   archive_thread: ArchiveThreadAction.configType,
+  unarchive_thread: UnArchiveThreadAction.configType,
 });

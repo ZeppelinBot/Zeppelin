@@ -3,12 +3,12 @@ import * as t from "io-ts";
 import { noop, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
 
-export const ArchiveThreadAction = automodAction({
+export const UnArchiveThreadAction = automodAction({
   configType: t.type({
-    lock: tNullable(t.boolean),
+    unlock: tNullable(t.boolean),
   }),
   defaultConfig: {
-    lock: false,
+    unlock: false,
   },
 
   async apply({ pluginData, contexts, actionConfig }) {
@@ -18,11 +18,11 @@ export const ArchiveThreadAction = automodAction({
       .filter((c): c is ThreadChannel => c?.isThread() ?? false);
 
     for (const thread of threads) {
-      if (actionConfig.lock && !thread.locked) {
-        await thread.setLocked().catch(noop);
+      if (actionConfig.unlock && thread.locked) {
+        await thread.setLocked(false).catch(noop);
       }
-      if (thread.archived) continue;
-      await thread.setArchived().catch(noop);
+      if (!thread.archived) continue;
+      await thread.setArchived(false).catch(noop);
     }
   },
 });
