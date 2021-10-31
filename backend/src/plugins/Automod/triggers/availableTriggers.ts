@@ -27,6 +27,7 @@ import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
 import { ThreadCreateTrigger } from "./threadCreate";
+import { ThreadCreateSpamTrigger } from "./threadCreateSpam";
 import { ThreadDeleteTrigger } from "./threadDelete";
 import { UnbanTrigger } from "./unban";
 import { UnmuteTrigger } from "./unmute";
@@ -54,6 +55,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   character_spam: CharacterSpamTrigger,
   member_join_spam: MemberJoinSpamTrigger,
   sticker_spam: StickerSpamTrigger,
+  thread_create_spam: ThreadCreateSpamTrigger,
 
   counter_trigger: CounterTrigger,
 
@@ -94,6 +96,7 @@ export const AvailableTriggers = t.type({
   character_spam: CharacterSpamTrigger.configType,
   member_join_spam: MemberJoinSpamTrigger.configType,
   sticker_spam: StickerSpamTrigger.configType,
+  thread_create_spam: ThreadCreateSpamTrigger.configType,
 
   counter_trigger: CounterTrigger.configType,
 

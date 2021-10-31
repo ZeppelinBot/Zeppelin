@@ -16,4 +16,5 @@ export enum RecentActionType {
   MemberJoin,
   Sticker,
   MemberLeave,
+  ThreadCreate,
 }
