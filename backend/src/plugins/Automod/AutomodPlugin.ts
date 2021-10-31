@@ -167,6 +167,9 @@ const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) =>
         if (rule["actions"]["log"] == null) {
           rule["actions"]["log"] = true;
         }
+        if (rule["actions"]["clean"] && rule["actions"]["start_thread"]) {
+          throw new StrictValidationError([`Cannot have both clean and start_thread at rule '${rule.name}'`]);
+        }
       }
     }
   }
