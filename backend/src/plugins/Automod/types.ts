@@ -117,7 +117,6 @@ export interface AutomodContext {
   user?: User;
   message?: SavedMessage;
   member?: GuildMember;
-  thread?: ThreadChannel;
   partialMember?: GuildMember | PartialGuildMember;
   joined?: boolean;
   rolesChanged?: {
