@@ -30,6 +30,7 @@ import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { pluginInfo } from "./info";
 import { availableTriggers } from "./triggers/availableTriggers";
 import { AutomodPluginType, ConfigSchema } from "./types";
+import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin";
 
 const defaultOptions = {
   config: {
@@ -183,6 +184,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     ModActionsPlugin,
     MutesPlugin,
     CountersPlugin,
+    PhishermanPlugin,
   ],
 
   configSchema: ConfigSchema,

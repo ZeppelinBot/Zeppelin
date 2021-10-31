@@ -33,6 +33,8 @@ import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop
 import { performance } from "perf_hooks";
 import { setProfiler } from "./profiler";
 import { enableProfiling } from "./utils/easyProfiler";
+import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
+import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -363,6 +365,13 @@ connect().then(async () => {
     runExpiredArchiveDeletionLoop();
     await sleep(10 * SECONDS);
     runSavedMessageCleanupLoop();
+
+    if (hasPhishermanMasterAPIKey()) {
+      await sleep(10 * SECONDS);
+      runPhishermanCacheCleanupLoop();
+      await sleep(10 * SECONDS);
+      runPhishermanReportingLoop();
+    }
   });
 
   setProfiler(bot.profiler);

@@ -9,10 +9,13 @@ import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions
 import { automodTrigger } from "../helpers";
 import { mergeRegexes } from "../../../utils/mergeRegexes";
 import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
+import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
+import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 
 interface MatchResultType {
   type: MatchableTextType;
   link: string;
+  details?: string;
 }
 
 const regexCache = new WeakMap<any, RegExp[]>();
@@ -28,6 +31,12 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
     exclude_words: tNullable(t.array(t.string)),
     include_regex: tNullable(t.array(TRegex)),
     exclude_regex: tNullable(t.array(TRegex)),
+    phisherman: tNullable(
+      t.type({
+        include_suspected: tNullable(t.boolean),
+        include_verified: tNullable(t.boolean),
+      }),
+    ),
     only_real_links: t.boolean,
     match_messages: t.boolean,
     match_embeds: t.boolean,
@@ -150,6 +159,25 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
             }
           }
         }
+
+        if (trigger.phisherman) {
+          const phishermanResult = await pluginData.getPlugin(PhishermanPlugin).getDomainInfo(normalizedHostname);
+          if (phishermanResult != null && !phishermanDomainIsSafe(phishermanResult)) {
+            if (
+              (trigger.phisherman.include_suspected && !phishermanResult.verifiedPhish) ||
+              (trigger.phisherman.include_verified && phishermanResult.verifiedPhish)
+            ) {
+              const suspectedVerified = phishermanResult.verifiedPhish ? "verified" : "suspected";
+              return {
+                extra: {
+                  type,
+                  link: link.input,
+                  details: `using Phisherman (${suspectedVerified})`,
+                },
+              };
+            }
+          }
+        }
       }
     }
 
@@ -158,6 +186,11 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    return `Matched link \`${Util.escapeInlineCode(matchResult.extra.link)}\` in ${partialSummary}`;
+    let information = `Matched link \`${Util.escapeInlineCode(matchResult.extra.link)}\``;
+    if (matchResult.extra.details) {
+      information += ` ${matchResult.extra.details}`;
+    }
+    information += ` in ${partialSummary}`;
+    return information;
   },
 });
