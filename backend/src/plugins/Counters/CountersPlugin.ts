@@ -212,8 +212,10 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    for (const interval of pluginData.state.decayTimers) {
-      clearInterval(interval);
+    if (pluginData.state.decayTimers) {
+      for (const interval of pluginData.state.decayTimers) {
+        clearInterval(interval);
+      }
     }
 
     pluginData.state.events.removeAllListeners();

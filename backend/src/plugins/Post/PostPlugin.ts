@@ -67,6 +67,6 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener();
+    pluginData.state.unregisterGuildEventListener?.();
   },
 });
