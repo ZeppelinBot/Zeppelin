@@ -120,7 +120,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener();
+    pluginData.state.unregisterGuildEventListener?.();
     pluginData.state.events.removeAllListeners();
   },
 });

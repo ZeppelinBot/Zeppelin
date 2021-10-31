@@ -307,13 +307,23 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.guildLogs.removeListener("log", pluginData.state.logListener);
+    if (pluginData.state.logListener) {
+      pluginData.state.guildLogs.removeListener("log", pluginData.state.logListener);
+    }
 
-    pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
-    pluginData.state.savedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
-    pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    if (pluginData.state.onMessageDeleteFn) {
+      pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
+    }
+    if (pluginData.state.onMessageDeleteBulkFn) {
+      pluginData.state.savedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
+    }
+    if (pluginData.state.onMessageUpdateFn) {
+      pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    }
 
-    pluginData.state.regexRunner.off("repeatedTimeout", pluginData.state.regexRunnerRepeatedTimeoutListener);
+    if (pluginData.state.regexRunnerRepeatedTimeoutListener) {
+      pluginData.state.regexRunner.off("repeatedTimeout", pluginData.state.regexRunnerRepeatedTimeoutListener);
+    }
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
 });
