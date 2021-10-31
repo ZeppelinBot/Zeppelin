@@ -15,9 +15,11 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const member = context.member || (userId && pluginData.guild.members.cache.get(userId as Snowflake)) || null;
 
   const channelIdOrThreadId = context.message?.channel_id;
-  const channelOrThread = channelIdOrThreadId
-    ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
-    : null;
+  const channelOrThread =
+    context.channel ??
+    (channelIdOrThreadId
+      ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
+      : null);
   const channelId = channelOrThread?.isThread() ? channelOrThread.parent?.id : channelIdOrThreadId;
   const threadId = channelOrThread?.isThread() ? channelOrThread.id : null;
   const channel = channelOrThread?.isThread() ? channelOrThread.parent : channelOrThread;
@@ -33,7 +35,15 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
     if (rule.enabled === false) continue;
-    if (!rule.affects_bots && (!user || user.bot) && !context.counterTrigger && !context.antiraid) continue;
+    if (
+      !rule.affects_bots &&
+      (!user || user.bot) &&
+      !context.counterTrigger &&
+      !context.antiraid &&
+      !context.threadChange?.deleted
+    ) {
+      continue;
+    }
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
