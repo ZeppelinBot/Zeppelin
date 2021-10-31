@@ -26,6 +26,8 @@ import { NoteTrigger } from "./note";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
+import { ThreadCreateTrigger } from "./threadCreate";
+import { ThreadDeleteTrigger } from "./threadDelete";
 import { UnbanTrigger } from "./unban";
 import { UnmuteTrigger } from "./unmute";
 import { WarnTrigger } from "./warn";
@@ -64,6 +66,9 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   unban: UnbanTrigger,
 
   antiraid_level: AntiraidLevelTrigger,
+
+  thread_create: ThreadCreateTrigger,
+  thread_delete: ThreadDeleteTrigger,
 };
 
 export const AvailableTriggers = t.type({
@@ -101,4 +106,7 @@ export const AvailableTriggers = t.type({
   unban: UnbanTrigger.configType,
 
   antiraid_level: AntiraidLevelTrigger.configType,
+
+  thread_create: ThreadCreateTrigger.configType,
+  thread_delete: ThreadDeleteTrigger.configType,
 });
