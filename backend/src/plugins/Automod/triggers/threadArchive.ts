@@ -14,7 +14,6 @@ interface ThreadArchiveResult {
 
 export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
   configType: t.type({
-    parent: tNullable(t.union([t.string, t.array(t.string)])),
     locked: tNullable(t.boolean),
   }),
 
@@ -29,11 +28,6 @@ export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
 
     if (typeof triggerConfig.locked === "boolean" && thread.locked !== triggerConfig.locked) {
       return;
-    }
-
-    if (triggerConfig.parent) {
-      const parentIds = Array.isArray(triggerConfig.parent) ? triggerConfig.parent : [triggerConfig.parent];
-      if (thread.parentId && !parentIds.includes(thread.parentId)) return;
     }
 
     return {
