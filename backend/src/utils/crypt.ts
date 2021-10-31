@@ -1,6 +1,7 @@
 import { spawn, Worker, Pool } from "threads";
 import "../loadEnv";
 import type { CryptFns } from "./cryptWorker";
+import { MINUTES } from "../utils";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -9,7 +10,7 @@ if (!process.env.KEY) {
 }
 
 const KEY = process.env.KEY;
-const pool = Pool(() => spawn(new Worker("./cryptWorker")), 8);
+const pool = Pool(() => spawn(new Worker("./cryptWorker"), { timeout: 10 * MINUTES }), 8);
 
 export async function encrypt(data: string) {
   return pool.queue((w) => w.encrypt(data, KEY));
