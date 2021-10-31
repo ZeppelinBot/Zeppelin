@@ -44,7 +44,6 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     ) {
       continue;
     }
-
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
     if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
