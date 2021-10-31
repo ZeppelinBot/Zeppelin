@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "node12",
     "module": "commonjs",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
