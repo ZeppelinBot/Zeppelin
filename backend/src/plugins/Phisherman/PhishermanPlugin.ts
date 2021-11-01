@@ -37,13 +37,20 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
 
     if (!hasPhishermanMasterAPIKey()) {
       // tslint:disable-next-line:no-console
-      console.warn("Could not load Phisherman plugin: master API key is missing");
+      console.warn("[PHISHERMAN] Could not load Phisherman plugin: master API key is missing");
       return;
     }
 
     const apiKey = pluginData.config.get().api_key;
-    if (apiKey && (await phishermanApiKeyIsValid(apiKey).catch(() => false))) {
-      pluginData.state.validApiKey = apiKey;
+    if (apiKey) {
+      const isValid = await phishermanApiKeyIsValid(apiKey).catch((err) => {
+        // tslint:disable-next-line:no-console
+        console.warn(`[PHISHERMAN] Error checking user API key validity:\n${err.toString()}`);
+        return false;
+      });
+      if (isValid) {
+        pluginData.state.validApiKey = apiKey;
+      }
     }
   },
 });

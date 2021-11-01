@@ -53,10 +53,19 @@ function getKeyCacheRepository(): Repository<PhishermanKeyCacheEntry> {
 }
 
 class PhishermanApiError extends Error {
+  method: string;
+  url: string;
   status: number;
-  constructor(status: number, message: string) {
+
+  constructor(method: string, url: string, status: number, message: string) {
     super(message);
+    this.method = method;
+    this.url = url;
     this.status = status;
+  }
+
+  toString() {
+    return `Error ${this.status} in ${this.method} ${this.url}: ${this.message}`;
   }
 }
 
@@ -92,7 +101,7 @@ async function apiCall<T>(
     return pendingApiRequests.get(key)! as Promise<T>;
   }
 
-  const requestPromise = (async () => {
+  let requestPromise = (async () => {
     const response = await fetch(url, {
       method,
       headers: new Headers({
@@ -104,11 +113,11 @@ async function apiCall<T>(
     });
     const data = await response.json().catch(() => null);
     if (!response.ok || (data as any)?.success === false) {
-      throw new PhishermanApiError(response.status, (data as any)?.message ?? "");
+      throw new PhishermanApiError(method, url, response.status, (data as any)?.message ?? "");
     }
     return data;
   })();
-  requestPromise.finally(() => {
+  requestPromise = requestPromise.finally(() => {
     pendingApiRequests.delete(key);
   });
   pendingApiRequests.set(key, requestPromise);
