@@ -4,6 +4,7 @@ import { InternalPosterPluginType } from "../types";
 import { getOrCreateWebhookForChannel } from "./getOrCreateWebhookForChannel";
 import { APIMessage } from "discord-api-types";
 import { isDiscordAPIError } from "../../../utils";
+import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel";
 
 export type InternalPosterMessageResult = {
   id: string;
@@ -29,47 +30,34 @@ export async function sendMessage(
   content: MessageOptions,
 ): Promise<InternalPosterMessageResult | null> {
   return pluginData.state.queue.add(async () => {
-    if (!pluginData.state.webhookClientCache.has(channel.id)) {
-      const webhookInfo = await getOrCreateWebhookForChannel(pluginData, channel);
-      if (webhookInfo) {
-        const client = new WebhookClient({
-          id: webhookInfo[0],
-          token: webhookInfo[1],
-        });
-        pluginData.state.webhookClientCache.set(channel.id, client);
-      } else {
-        pluginData.state.webhookClientCache.set(channel.id, null);
-      }
+    const webhookClient = await getOrCreateWebhookClientForChannel(pluginData, channel);
+    if (!webhookClient) {
+      return sendDirectly(channel, content);
     }
 
-    const webhookClient = pluginData.state.webhookClientCache.get(channel.id);
-    if (webhookClient) {
-      return webhookClient
-        .send({
-          ...content,
-          ...(pluginData.client.user && {
-            username: pluginData.client.user.username,
-            avatarURL: pluginData.client.user.avatarURL() || pluginData.client.user.defaultAvatarURL,
-          }),
-        })
-        .then((apiMessage) => ({
-          id: apiMessage.id,
-          channelId: apiMessage.channel_id,
-        }))
-        .catch(async (err) => {
-          // Unknown Webhook
-          if (isDiscordAPIError(err) && err.code === 10015) {
-            await pluginData.state.webhooks.delete(webhookClient.id);
-            pluginData.state.webhookClientCache.delete(channel.id);
+    return webhookClient
+      .send({
+        ...content,
+        ...(pluginData.client.user && {
+          username: pluginData.client.user.username,
+          avatarURL: pluginData.client.user.avatarURL() || pluginData.client.user.defaultAvatarURL,
+        }),
+      })
+      .then((apiMessage) => ({
+        id: apiMessage.id,
+        channelId: apiMessage.channel_id,
+      }))
+      .catch(async (err) => {
+        // Unknown Webhook
+        if (isDiscordAPIError(err) && err.code === 10015) {
+          await pluginData.state.webhooks.delete(webhookClient.id);
+          pluginData.state.webhookClientCache.delete(channel.id);
 
-            // Fallback to regular message for this log message
-            return sendDirectly(channel, content);
-          }
+          // Fallback to regular message for this log message
+          return sendDirectly(channel, content);
+        }
 
-          throw err;
-        });
-    }
-
-    return sendDirectly(channel, content);
+        throw err;
+      });
   });
 }
