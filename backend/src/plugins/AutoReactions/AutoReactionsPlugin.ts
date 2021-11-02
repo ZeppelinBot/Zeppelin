@@ -33,7 +33,11 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
     `),
   },
 
-  dependencies: () => [LogsPlugin],
+  // prettier-ignore
+  dependencies: () => [
+    LogsPlugin,
+  ],
+
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -51,5 +55,6 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
   beforeLoad(pluginData) {
     pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
     pluginData.state.autoReactions = GuildAutoReactions.getGuildInstance(pluginData.guild.id);
+    pluginData.state.cache = new Map();
   },
 });

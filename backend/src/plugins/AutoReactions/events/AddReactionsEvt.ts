@@ -6,6 +6,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { autoReactionsEvt } from "../types";
+import { AutoReaction } from "../../../data/entities/AutoReaction";
 
 const p = Permissions.FLAGS;
 
@@ -15,8 +16,19 @@ export const AddReactionsEvt = autoReactionsEvt({
   allowSelf: true,
 
   async listener({ pluginData, args: { message } }) {
-    const autoReaction = await pluginData.state.autoReactions.getForChannel(message.channel.id);
-    if (!autoReaction) return;
+    let autoReaction: AutoReaction | null = null;
+    const lock = await pluginData.locks.acquire(`auto-reactions-${message.channel.id}`);
+    if (pluginData.state.cache.has(message.channel.id)) {
+      autoReaction = pluginData.state.cache.get(message.channel.id) ?? null;
+    } else {
+      autoReaction = (await pluginData.state.autoReactions.getForChannel(message.channel.id)) ?? null;
+      pluginData.state.cache.set(message.channel.id, autoReaction);
+    }
+    lock.unlock();
+
+    if (!autoReaction) {
+      return;
+    }
 
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     if (me) {
