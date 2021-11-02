@@ -108,7 +108,7 @@ export default {
           caseHandlingMode: this.importCaseMode,
         });
       } catch (err) {
-        this.importError = String(err);
+        this.importError = err.body?.error ?? String(err);
         return;
       } finally {
         this.importing = false;
@@ -134,7 +134,7 @@ export default {
           guildId: this.$route.params.guildId,
         });
       } catch (err) {
-        this.exportError = String(err);
+        this.exportError = err.body?.error ?? String(err);
         return;
       } finally {
         this.exporting = false;
