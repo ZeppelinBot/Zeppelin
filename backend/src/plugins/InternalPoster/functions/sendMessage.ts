@@ -10,6 +10,16 @@ export type InternalPosterMessageResult = {
   channelId: string;
 };
 
+async function sendDirectly(
+  channel: TextChannel | NewsChannel,
+  content: MessageOptions,
+): Promise<InternalPosterMessageResult | null> {
+  return channel.send(content).then((message) => ({
+    id: message.id,
+    channelId: message.channelId,
+  }));
+}
+
 /**
  * Sends a message using a webhook or direct API requests, preferring webhooks when possible.
  */
@@ -17,7 +27,7 @@ export async function sendMessage(
   pluginData: GuildPluginData<InternalPosterPluginType>,
   channel: TextChannel | NewsChannel,
   content: MessageOptions,
-): Promise<InternalPosterMessageResult> {
+): Promise<InternalPosterMessageResult | null> {
   return pluginData.state.queue.add(async () => {
     if (!pluginData.state.webhookClientCache.has(channel.id)) {
       const webhookInfo = await getOrCreateWebhookForChannel(pluginData, channel);
@@ -53,19 +63,13 @@ export async function sendMessage(
             pluginData.state.webhookClientCache.delete(channel.id);
 
             // Fallback to regular message for this log message
-            return channel.send(content).then((message) => ({
-              id: message.id,
-              channelId: message.channelId,
-            }));
+            return sendDirectly(channel, content);
           }
 
           throw err;
         });
     }
 
-    return channel.send(content).then((message) => ({
-      id: message.id,
-      channelId: message.channelId,
-    }));
+    return sendDirectly(channel, content);
   });
 }
