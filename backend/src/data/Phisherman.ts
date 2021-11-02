@@ -184,6 +184,10 @@ export async function getPhishermanDomainInfo(domain: string): Promise<Phisherma
 }
 
 export async function phishermanApiKeyIsValid(apiKey: string): Promise<boolean> {
+  if (apiKey === MASTER_API_KEY) {
+    return true;
+  }
+
   const keyCache = getKeyCacheRepository();
   const hash = crypto.createHash("sha256").update(apiKey).digest("hex");
   const entry = await keyCache.findOne({ hash });
