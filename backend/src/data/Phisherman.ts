@@ -130,6 +130,11 @@ async function fetchDomainInfo(domain: string): Promise<PhishermanDomainInfo | n
   console.log(`[PHISHERMAN] Requesting domain information: ${domain}`);
   const result = await apiCall<Record<string, DomainInfoApiCallResult>>("GET", `/v2/domains/info/${domain}`);
   const domainInfo = result[domain];
+  if (!domainInfo) {
+    // tslint:disable-next-line:no-console
+    console.warn("Unexpected Phisherman API response:", result);
+    return null;
+  }
   if (domainInfo.classification === "unknown") {
     return null;
   }
