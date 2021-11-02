@@ -72,7 +72,7 @@ export async function muteUser(
       if (removeRoles) {
         // exclude managed roles from being removed
         const managedRoles = pluginData.guild.roles.cache.filter((x) => x.managed).map((y) => y.id);
-        newRoles = currentUserRoles.filter((r) => !managedRoles.includes(r));
+        newRoles = currentUserRoles.filter((r) => managedRoles.includes(r));
         await member.roles.set(newRoles as Snowflake[]);
       }
     } else {
