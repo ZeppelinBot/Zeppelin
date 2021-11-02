@@ -1,15 +1,12 @@
-import { FileOptions, Message, MessageOptions, NewsChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { FileOptions, MessageOptions, NewsChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
 import { isDiscordAPIError } from "../../../utils";
 import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { APIMessage } from "discord-api-types";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
-import { post } from "../../../../../dashboard/src/api";
 import { InternalPosterMessageResult } from "../../InternalPoster/functions/sendMessage";
 
 export async function postToCaseLogChannel(
