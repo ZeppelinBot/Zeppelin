@@ -29,10 +29,14 @@ export class Queue<TQueueFunction extends AnyFn = AnyFn> {
   }
 
   public add(fn: TQueueFunction): Promise<any> {
-    const promise = new Promise<any>((resolve) => {
+    const promise = new Promise<any>((resolve, reject) => {
       this.queue.push(async () => {
-        const result = await fn();
-        resolve(result);
+        try {
+          const result = await fn();
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
       });
 
       if (!this.running) this.next();

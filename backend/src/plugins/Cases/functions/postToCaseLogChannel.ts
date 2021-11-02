@@ -24,7 +24,7 @@ export async function postToCaseLogChannel(
   // This doesn't use `!isText() || isThread()` because TypeScript had some issues inferring types from it
   if (!caseLogChannel || !(caseLogChannel instanceof TextChannel || caseLogChannel instanceof NewsChannel)) return null;
 
-  let result;
+  let result: InternalPosterMessageResult | null = null;
   try {
     if (file != null) {
       content.files = file;
