@@ -12,6 +12,7 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { Webhooks } from "../../data/Webhooks";
 import { Queue } from "../../Queue";
 import { sendMessage } from "./functions/sendMessage";
+import { editMessage } from "./functions/editMessage";
 
 const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   config: {},
@@ -28,6 +29,7 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   // prettier-ignore
   public: {
     sendMessage: mapToPublicFn(sendMessage),
+    editMessage: mapToPublicFn(editMessage),
   },
 
   async beforeLoad(pluginData) {

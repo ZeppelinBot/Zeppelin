@@ -56,8 +56,12 @@ export async function postCaseToCaseLogChannel(
     const [channelId, messageId] = theCase.log_message_id.split("-");
 
     try {
+      const poster = pluginData.getPlugin(InternalPosterPlugin);
       const channel = pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel;
-      await channel.messages.edit(messageId as Snowflake, caseEmbed);
+      const message = await channel.messages.fetch(messageId);
+      if (message) {
+        await poster.editMessage(message, caseEmbed);
+      }
       return;
     } catch {} // tslint:disable-line:no-empty
   }

@@ -16,6 +16,16 @@ export class Webhooks extends BaseRepository {
     return entity;
   }
 
+  async find(id: string): Promise<Webhook | null> {
+    const result = await this.repository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    return result ? this._processEntityFromDB(result) : null;
+  }
+
   async findByChannelId(channelId: string): Promise<Webhook | null> {
     const result = await this.repository.findOne({
       where: {
