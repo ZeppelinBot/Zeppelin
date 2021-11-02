@@ -1,4 +1,4 @@
-import { FileOptions, Message, MessageOptions, Snowflake, TextChannel } from "discord.js";
+import { FileOptions, Message, MessageOptions, NewsChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
@@ -7,24 +7,30 @@ import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { APIMessage } from "discord-api-types";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
+import { post } from "../../../../../dashboard/src/api";
+import { InternalPosterMessageResult } from "../../InternalPoster/functions/sendMessage";
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
   content: MessageOptions,
   file?: FileOptions[],
-): Promise<Message | null> {
+): Promise<InternalPosterMessageResult | null> {
   const caseLogChannelId = pluginData.config.get().case_log_channel;
   if (!caseLogChannelId) return null;
 
   const caseLogChannel = pluginData.guild.channels.cache.get(caseLogChannelId as Snowflake);
-  if (!caseLogChannel || !(caseLogChannel instanceof TextChannel)) return null;
+  // This doesn't use `!isText() || isThread()` because TypeScript had some issues inferring types from it
+  if (!caseLogChannel || !(caseLogChannel instanceof TextChannel || caseLogChannel instanceof NewsChannel)) return null;
 
   let result;
   try {
     if (file != null) {
       content.files = file;
     }
-    result = await caseLogChannel.send({ ...content });
+    const poster = pluginData.getPlugin(InternalPosterPlugin);
+    result = await poster.sendMessage(caseLogChannel, { ...content });
   } catch (e) {
     if (isDiscordAPIError(e) && (e.code === 50013 || e.code === 50001)) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -42,12 +48,12 @@ export async function postToCaseLogChannel(
 export async function postCaseToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,
   caseOrCaseId: Case | number,
-): Promise<Message | null> {
+): Promise<void> {
   const theCase = await pluginData.state.cases.find(resolveCaseId(caseOrCaseId));
-  if (!theCase) return null;
+  if (!theCase) return;
 
   const caseEmbed = await getCaseEmbed(pluginData, caseOrCaseId, undefined, true);
-  if (!caseEmbed) return null;
+  if (!caseEmbed) return;
 
   if (theCase.log_message_id) {
     const [channelId, messageId] = theCase.log_message_id.split("-");
@@ -55,7 +61,7 @@ export async function postCaseToCaseLogChannel(
     try {
       const channel = pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel;
       await channel.messages.edit(messageId as Snowflake, caseEmbed);
-      return null;
+      return;
     } catch {} // tslint:disable-line:no-empty
   }
 
@@ -63,14 +69,13 @@ export async function postCaseToCaseLogChannel(
     const postedMessage = await postToCaseLogChannel(pluginData, caseEmbed);
     if (postedMessage) {
       await pluginData.state.cases.update(theCase.id, {
-        log_message_id: `${postedMessage.channel.id}-${postedMessage.id}`,
+        log_message_id: `${postedMessage.channelId}-${postedMessage.id}`,
       });
     }
-    return postedMessage;
   } catch {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Failed to post case #${theCase.case_number} to the case log channel`,
     });
-    return null;
+    return;
   }
 }

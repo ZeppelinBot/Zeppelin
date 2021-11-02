@@ -35,6 +35,7 @@ import { UtilityPlugin } from "./Utility/UtilityPlugin";
 import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
 import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
 import { PhishermanPlugin } from "./Phisherman/PhishermanPlugin";
+import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
@@ -71,6 +72,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   CountersPlugin,
   ContextMenuPlugin,
   PhishermanPlugin,
+  InternalPosterPlugin,
 ];
 
 // prettier-ignore
