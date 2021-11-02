@@ -17,7 +17,7 @@ import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordAPIError, isDiscordHTTPError, SECONDS, sleep, successMessage } from "./utils";
+import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, sleep, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
@@ -35,6 +35,7 @@ import { setProfiler } from "./profiler";
 import { enableProfiling } from "./utils/easyProfiler";
 import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
 import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { consumeQueryStats } from "./data/queryLogger";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -387,6 +388,17 @@ connect().then(async () => {
     console.log("Lowest global remaining in the past 15 seconds:", lowestGlobalRemaining);
     lowestGlobalRemaining = Infinity;
   }, 15000);
+
+  setInterval(() => {
+    const queryStatsMap = consumeQueryStats();
+    const entries = Array.from(queryStatsMap.entries());
+    entries.sort((a, b) => b[1] - a[1]);
+    const topEntriesStr = entries
+      .slice(0, 5)
+      .map(([key, count]) => `${count}x ${key}`)
+      .join("\n");
+    console.log(`Top query entries in the past 5 minutes:\n${topEntriesStr}`);
+  }, 5 * MINUTES);
 
   bot.initialize();
   logger.info("Bot Initialized");
