@@ -23,7 +23,6 @@
     "test-watch": "tsc-watch --onSuccess \"npx ava\""
   },
   "dependencies": {
-    "@discordjs/rest": "^0.1.0-canary.0",
     "@silvia-odwyer/photon-node": "^0.3.1",
     "blocked-at": "^1.2.0",
     "bufferutil": "^4.0.3",
