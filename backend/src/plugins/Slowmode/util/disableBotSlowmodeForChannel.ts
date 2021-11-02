@@ -24,5 +24,8 @@ export async function disableBotSlowmodeForChannel(
     }
   }
 
+  // Clear cache
+  pluginData.state.channelSlowmodeCache.set(channel.id, null);
+
   return { failedUsers };
 }

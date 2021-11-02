@@ -3,6 +3,7 @@ import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
+import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
 
 export const ConfigSchema = t.type({
   use_native_slowmode: t.boolean,
@@ -20,6 +21,7 @@ export interface SlowmodePluginType extends BasePluginType {
     logs: GuildLogs;
     clearInterval: NodeJS.Timeout;
     serverLogs: GuildLogs;
+    channelSlowmodeCache: Map<string, SlowmodeChannel | null>;
 
     onMessageCreateFn;
   };
