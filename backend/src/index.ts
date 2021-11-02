@@ -36,6 +36,7 @@ import { enableProfiling } from "./utils/easyProfiler";
 import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
 import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
 import { consumeQueryStats } from "./data/queryLogger";
+import { EventEmitter } from "events";
 
 if (!process.env.KEY) {
   // tslint:disable-next-line:no-console
@@ -227,7 +228,8 @@ connect().then(async () => {
       Intents.FLAGS.GUILD_VOICE_STATES,
     ],
   });
-  client.setMaxListeners(200);
+  // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
+  (client as unknown as EventEmitter).setMaxListeners(200);
 
   client.on(Constants.Events.RATE_LIMIT, (data) => {
     // tslint:disable-next-line:no-console
