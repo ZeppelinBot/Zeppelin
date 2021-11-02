@@ -1,6 +1,6 @@
 import moment from "moment-timezone";
 import { getRepository, In } from "typeorm";
-import { DAYS, DBDateFormat, MINUTES } from "../../utils";
+import { DAYS, DBDateFormat, MINUTES, SECONDS, sleep } from "../../utils";
 import { connection } from "../db";
 import { SavedMessage } from "../entities/SavedMessage";
 
@@ -11,7 +11,7 @@ import { SavedMessage } from "../entities/SavedMessage";
 const RETENTION_PERIOD = 1 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 const DELETED_MESSAGE_RETENTION_PERIOD = 5 * MINUTES;
-const CLEAN_PER_LOOP = 200;
+const CLEAN_PER_LOOP = 100;
 
 export async function cleanupMessages(): Promise<number> {
   let cleaned = 0;
@@ -79,6 +79,7 @@ export async function cleanupMessages(): Promise<number> {
       await messagesRepository.delete({
         id: In(ids),
       });
+      await sleep(1 * SECONDS);
     }
 
     cleaned += ids.length;
