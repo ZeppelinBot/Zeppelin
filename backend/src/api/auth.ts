@@ -81,7 +81,7 @@ export function initAuth(app: express.Express) {
   passport.use(
     "api-token",
     new CustomStrategy(async (req, cb) => {
-      const apiKey = req.header("X-Api-Key");
+      const apiKey = req.header("X-Api-Key") || req.body?.["X-Api-Key"];
       if (!apiKey) return cb("API key missing");
 
       const userId = await apiLogins.getUserIdByApiKey(apiKey);

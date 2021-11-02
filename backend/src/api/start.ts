@@ -7,6 +7,7 @@ import { initDocs } from "./docs";
 import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
+import multer from "multer";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
     limit: "10mb",
   }),
 );
+app.use(multer().none());
 
 initAuth(app);
 initGuildsAPI(app);

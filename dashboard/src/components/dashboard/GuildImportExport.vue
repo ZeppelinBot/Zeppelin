@@ -7,11 +7,9 @@
     </p>
 
     <h2>Export server data</h2>
-    <button class="inline-block bg-gray-700 rounded px-1 hover:bg-gray-800" :class="{ 'bg-gray-800': exportData, 'hover:bg-gray-800': !exportData }" @click="runExport()" :disabled="exportData">Create export file</button>
-    <button class="inline-block bg-gray-700 rounded px-1 hover:bg-gray-800" :class="{ 'bg-gray-800': !exportData, 'hover:bg-gray-800': exportData }" :disabled="!exportData" @click="downloadExportFile">Download export file</button>
+    <button class="inline-block bg-gray-700 rounded px-1 hover:bg-gray-800 hover:bg-gray-800" @click="runExport()" :disabled="exporting">Export data</button>
 
-    <p v-if="exportError">Error: {{ exportError }}</p>
-    <p v-else-if="exporting">Creating export file...</p>
+    <p v-if="exporting">Opened data export in new window!</p>
     <p v-else>&nbsp;</p>
 
     <h2>Import server data</h2>
@@ -41,7 +39,7 @@
 import { mapState } from "vuex";
 import { ApiPermissions, hasPermission } from "@shared/apiPermissions";
 import { AuthState, GuildState } from "../../store/types";
-import { ApiError } from "../../api";
+import { ApiError, formPost } from "../../api";
 import moment from "moment";
 
 export default {
@@ -81,8 +79,6 @@ export default {
       importCaseMode: "bumpImportedCases",
 
       exporting: false,
-      exportError: null,
-      exportData: null,
     };
   },
   methods: {
@@ -122,37 +118,9 @@ export default {
         return;
       }
 
-      if (this.exportData) {
-        return;
-      }
-
-      this.exportError = null;
       this.exporting = true;
 
-      try {
-        this.exportData = await this.$store.dispatch("guilds/exportData", {
-          guildId: this.$route.params.guildId,
-        });
-      } catch (err) {
-        this.exportError = err.body?.error ?? String(err);
-        return;
-      } finally {
-        this.exporting = false;
-      }
-    },
-    downloadExportFile() {
-      if (!this.exportData) {
-        return;
-      }
-
-      const dl = document.createElement("a");
-      dl.setAttribute("href", `data:application/json,${encodeURIComponent(JSON.stringify(this.exportData, null, 2))}`);
-      dl.setAttribute("download", `export_${this.$route.params.guildId}_${moment().format("YYYY-MM-DD_HH-mm-ss")}.json`);
-      dl.style.display = "none";
-
-      document.body.appendChild(dl);
-      dl.click();
-      document.body.removeChild(dl);
+      formPost(`guilds/${this.$route.params.guildId}/export`, {}, { target: "_blank" });
     },
   },
 };
