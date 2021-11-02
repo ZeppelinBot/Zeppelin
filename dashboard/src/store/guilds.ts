@@ -66,6 +66,17 @@ export const GuildStore: Module<GuildState, RootState> = {
       await post(`guilds/${guildId}/set-target-permissions`, { guildId, targetId, type, permissions, expiresAt });
       commit("setTargetPermissions", { guildId, targetId, type, permissions, expiresAt });
     },
+
+    async importData({ commit }, { guildId, data, caseHandlingMode }) {
+      return post(`guilds/${guildId}/import`, {
+        data,
+        caseHandlingMode,
+      });
+    },
+
+    async exportData({ commit }, { guildId }) {
+      return post(`guilds/${guildId}/export`);
+    },
   },
 
   mutations: {
