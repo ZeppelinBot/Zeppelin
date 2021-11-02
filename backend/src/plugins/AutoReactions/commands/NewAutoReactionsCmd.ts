@@ -59,6 +59,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
     }
 
     await pluginData.state.autoReactions.set(args.channel.id, finalReactions);
+    pluginData.state.cache.delete(args.channel.id);
     sendSuccessMessage(pluginData, msg.channel, `Auto-reactions set for <#${args.channel.id}>`);
   },
 });
