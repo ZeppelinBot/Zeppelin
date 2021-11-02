@@ -7,6 +7,7 @@ import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { LogType } from "../../../data/LogType";
 import { MessageBuffer } from "../../../utils/MessageBuffer";
 import { createChunkedMessage, isDiscordAPIError, MINUTES } from "../../../utils";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
@@ -98,6 +99,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
     // Initialize message buffer for this channel
     if (!pluginData.state.buffers.has(channelId)) {
       const batchTime = Math.min(Math.max(opts.batch_time ?? DEFAULT_BATCH_TIME, MIN_BATCH_TIME), MAX_BATCH_TIME);
+      const internalPosterPlugin = pluginData.getPlugin(InternalPosterPlugin);
       pluginData.state.buffers.set(
         channelId,
         new MessageBuffer({
@@ -105,26 +107,26 @@ export async function log<TLogType extends keyof ILogTypeData>(
           textSeparator: "\n",
           consume: (part) => {
             const parse: MessageMentionTypes[] = pluginData.config.get().allow_user_mentions ? ["users"] : [];
-            const promise =
-              part.content && !part.embeds?.length
-                ? createChunkedMessage(channel, part.content, { parse })
-                : channel.send({
-                    ...part,
-                    allowedMentions: { parse },
-                  });
-            promise.catch((err) => {
-              if (isDiscordAPIError(err)) {
-                // Missing Access / Missing Permissions
-                // TODO: Show/log this somewhere
-                if (err.code === 50001 || err.code === 50013) {
-                  pluginData.state.channelCooldowns.setCooldown(channelId, 2 * MINUTES);
-                  return;
+            internalPosterPlugin
+              .sendMessage(channel, {
+                ...part,
+                allowedMentions: { parse },
+              })
+              .catch((err) => {
+                if (isDiscordAPIError(err)) {
+                  // Missing Access / Missing Permissions
+                  // TODO: Show/log this somewhere
+                  if (err.code === 50001 || err.code === 50013) {
+                    pluginData.state.channelCooldowns.setCooldown(channelId, 2 * MINUTES);
+                    return;
+                  }
                 }
-              }
 
-              // tslint:disable-next-line:no-console
-              console.warn(`Error while sending ${typeStr} log to ${pluginData.guild.id}/${channelId}: ${err.message}`);
-            });
+                // tslint:disable-next-line:no-console
+                console.warn(
+                  `Error while sending ${typeStr} log to ${pluginData.guild.id}/${channelId}: ${err.message}`,
+                );
+              });
           },
         }),
       );

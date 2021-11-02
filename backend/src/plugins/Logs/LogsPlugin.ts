@@ -112,6 +112,7 @@ import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
 import { logMemberTimedUnban } from "./logFunctions/logMemberTimedUnban";
 import { logDmFailed } from "./logFunctions/logDmFailed";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -145,6 +146,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
 
   dependencies: async () => [
     TimeAndDatePlugin,
+    InternalPosterPlugin,
     // The `as any` cast here is to prevent TypeScript from locking up from the circular dependency
     ((await import("../Cases/CasesPlugin")) as any).CasesPlugin,
   ],
