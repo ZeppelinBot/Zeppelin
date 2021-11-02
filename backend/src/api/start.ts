@@ -4,7 +4,7 @@ import { TokenError } from "passport-oauth2";
 import { initArchives } from "./archives";
 import { initAuth } from "./auth";
 import { initDocs } from "./docs";
-import { initGuildsAPI } from "./guilds";
+import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
 
