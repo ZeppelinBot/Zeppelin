@@ -144,7 +144,12 @@ export const SlowmodeSetCmd = slowmodeCmd({
         });
       }
 
+      // Set bot-maintained slowmode
       await pluginData.state.slowmodes.setChannelSlowmode(channel.id, rateLimitSeconds);
+
+      // Update cache
+      const slowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
+      await pluginData.state.channelSlowmodeCache.set(channel.id, slowmode ?? null);
     }
 
     const humanizedSlowmodeTime = humanizeDuration(args.time);

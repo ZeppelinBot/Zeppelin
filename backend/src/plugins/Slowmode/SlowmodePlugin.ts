@@ -42,7 +42,11 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     prettyName: "Slowmode",
   },
 
-  dependencies: () => [LogsPlugin],
+  // prettier-ignore
+  dependencies: () => [
+    LogsPlugin,
+  ],
+
   configSchema: ConfigSchema,
   defaultOptions,
 
@@ -61,6 +65,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     state.slowmodes = GuildSlowmodes.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+    state.channelSlowmodeCache = new Map();
   },
 
   afterLoad(pluginData) {

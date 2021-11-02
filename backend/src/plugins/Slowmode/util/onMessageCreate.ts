@@ -10,6 +10,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { SlowmodePluginType } from "../types";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
+import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -22,8 +23,16 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
   if (thisMsgLock.interrupted) return;
 
   // Check if this channel even *has* a bot-maintained slowmode
-  const channelSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
-  if (!channelSlowmode) return thisMsgLock.unlock();
+  let channelSlowmode: SlowmodeChannel | null;
+  if (pluginData.state.channelSlowmodeCache.has(channel.id)) {
+    channelSlowmode = pluginData.state.channelSlowmodeCache.get(channel.id) ?? null;
+  } else {
+    channelSlowmode = (await pluginData.state.slowmodes.getChannelSlowmode(channel.id)) ?? null;
+    pluginData.state.channelSlowmodeCache.set(channel.id, channelSlowmode);
+  }
+  if (!channelSlowmode) {
+    return thisMsgLock.unlock();
+  }
 
   // Make sure this user is affected by the slowmode
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
@@ -32,7 +41,9 @@ export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePlugin
     userId: msg.user_id,
     member,
   });
-  if (!isAffected) return thisMsgLock.unlock();
+  if (!isAffected) {
+    return thisMsgLock.unlock();
+  }
 
   // Make sure we have the appropriate permissions to manage this slowmode
   const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
