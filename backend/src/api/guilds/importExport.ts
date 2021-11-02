@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Case } from "../../data/entities/Case";
 import { rateLimit } from "../rateLimits";
 import { MINUTES } from "../../utils";
+import moment from "moment-timezone";
 
 const caseHandlingModeSchema = z.union([
   z.literal("replace"),
@@ -167,7 +168,13 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
         }
       } while (cases.length === exportBatchSize);
 
-      res.json(data);
+      const filename = `export_${req.params.guildId}_${moment().format("YYYY-MM-DD_HH-mm-ss")}.json`;
+      const serialized = JSON.stringify(data, null, 2);
+
+      res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.setHeader("Content-Length", serialized.length);
+      res.send(serialized);
     },
   );
 

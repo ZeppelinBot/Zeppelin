@@ -66,3 +66,31 @@ export function post(resource: string, params: QueryParamObject = {}) {
     },
   });
 }
+
+type FormPostOpts = {
+  target?: string;
+};
+
+export function formPost(resource: string, body: Record<any, any> = {}, opts: FormPostOpts = {}) {
+  body["X-Api-Key"] = RootStore.state.auth.apiKey;
+  const form = document.createElement("form");
+  form.action = `${apiUrl}/${resource}`;
+  form.method = "POST";
+  form.enctype = "multipart/form-data";
+  if (opts.target != null) {
+    form.target = opts.target;
+  }
+  for (const [key, value] of Object.entries(body)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = value;
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    document.body.removeChild(form);
+  }, 1);
+}
