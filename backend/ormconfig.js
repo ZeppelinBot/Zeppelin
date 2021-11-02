@@ -1,13 +1,20 @@
 const fs = require("fs");
 const path = require("path");
+const pkgUp = require("pkg-up");
+
+const closestPackageJson = pkgUp.sync();
+if (!closestPackageJson) {
+  throw new Error("Could not find project root from ormconfig.js");
+}
+const backendRoot = path.dirname(closestPackageJson);
 
 try {
-  fs.accessSync(path.resolve(__dirname, "bot.env"));
-  require("dotenv").config({ path: path.resolve(__dirname, "bot.env") });
+  fs.accessSync(path.resolve(backendRoot, "bot.env"));
+  require("dotenv").config({ path: path.resolve(backendRoot, "bot.env") });
 } catch {
   try {
-    fs.accessSync(path.resolve(__dirname, "api.env"));
-    require("dotenv").config({ path: path.resolve(__dirname, "api.env") });
+    fs.accessSync(path.resolve(backendRoot, "api.env"));
+    require("dotenv").config({ path: path.resolve(backendRoot, "api.env") });
   } catch {
     throw new Error("bot.env or api.env required");
   }
@@ -16,9 +23,9 @@ try {
 const moment = require("moment-timezone");
 moment.tz.setDefault("UTC");
 
-const entities = path.relative(process.cwd(), path.resolve(__dirname, "dist/backend/src/data/entities/*.js"));
-const migrations = path.relative(process.cwd(), path.resolve(__dirname, "dist/backend/src/migrations/*.js"));
-const migrationsDir = path.relative(process.cwd(), path.resolve(__dirname, "src/migrations"));
+const entities = path.relative(process.cwd(), path.resolve(backendRoot, "dist/backend/src/data/entities/*.js"));
+const migrations = path.relative(process.cwd(), path.resolve(backendRoot, "dist/backend/src/migrations/*.js"));
+const migrationsDir = path.relative(process.cwd(), path.resolve(backendRoot, "src/migrations"));
 
 module.exports = {
   type: "mysql",
