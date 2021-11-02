@@ -33,6 +33,10 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
 });
 
 async function updateGuildInfo(guild: Guild) {
+  if (!guild.name) {
+    return;
+  }
+
   const allowedGuilds = new AllowedGuilds();
   const existingData = (await allowedGuilds.find(guild.id))!;
   allowedGuilds.updateInfo(guild.id, guild.name, guild.iconURL(), guild.ownerId);
