@@ -22,6 +22,6 @@ export const RestPerformanceCmd = botControlCmd({
       const cleanSource = callStats.source.replace(leadingPathRegex, "");
       return `**${callStats.count} calls**\n${callStats.method.toUpperCase()} ${callStats.path}\n${cleanSource}`;
     });
-    createChunkedMessage(msg.channel as TextChannel, formatted.join("\n"));
+    createChunkedMessage(msg.channel as TextChannel, `Top rest calls:\n\n${formatted.join("\n")}`);
   },
 });
