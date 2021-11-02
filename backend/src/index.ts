@@ -384,9 +384,9 @@ connect().then(async () => {
     lowestGlobalRemaining = Math.min(lowestGlobalRemaining, (client as any).rest.globalRemaining);
   }, 100);
   setInterval(() => {
-    console.log("Lowest global remaining in the past 5 seconds:", lowestGlobalRemaining);
+    console.log("Lowest global remaining in the past 15 seconds:", lowestGlobalRemaining);
     lowestGlobalRemaining = Infinity;
-  }, 5000);
+  }, 15000);
 
   bot.initialize();
   logger.info("Bot Initialized");
