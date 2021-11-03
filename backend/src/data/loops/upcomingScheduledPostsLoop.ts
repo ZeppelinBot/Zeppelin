@@ -1,3 +1,5 @@
+// tslint:disable:no-console
+
 import { lazyMemoize, MINUTES } from "../../utils";
 import moment from "moment-timezone";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents";

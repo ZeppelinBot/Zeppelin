@@ -123,6 +123,7 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
       (result) => {
         // Make sure there are no extra properties
         if (debug) {
+          // tslint:disable-next-line:no-console
           console.log(
             "JSON.stringify() check:",
             JSON.stringify(value) === JSON.stringify(result)

@@ -159,6 +159,8 @@ export class GuildCases extends BaseGuildRepository {
         .catch((err) => {
           if (err?.code === "ER_DUP_ENTRY") {
             if (data.audit_log_id) {
+              // FIXME: Debug
+              // tslint:disable-next-line:no-console
               console.trace(`Tried to insert case with duplicate audit_log_id`);
               return this.createInternal({
                 ...data,

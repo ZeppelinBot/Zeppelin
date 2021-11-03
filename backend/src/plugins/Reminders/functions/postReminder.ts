@@ -32,6 +32,7 @@ export async function postReminder(pluginData: GuildPluginData<RemindersPluginTy
       }
     } catch (err) {
       // If we were unable to post the reminder, we'll try again later
+      // tslint:disable-next-line:no-console
       console.warn(`Error when posting reminder for ${reminder.user_id} in guild ${reminder.guild_id}: ${String(err)}`);
       return;
     }
