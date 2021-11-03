@@ -24,8 +24,5 @@
     "useUnknownInCatchVariables": false,
     "allowJs": true
   },
-  "include": [
-    "src/**/*.ts",
-    "ormconfig.js"
-  ]
+  "include": ["src/**/*.ts", "ormconfig.js"]
 }

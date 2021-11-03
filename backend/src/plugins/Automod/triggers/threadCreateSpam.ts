@@ -30,7 +30,7 @@ export const ThreadCreateSpamTrigger = automodTrigger<unknown>()({
     const totalCount = sumRecentActionCounts(matchingActions);
 
     if (totalCount >= triggerConfig.amount) {
-      const extraContexts = matchingActions.map(a => a.context).filter(c => c !== context);
+      const extraContexts = matchingActions.map((a) => a.context).filter((c) => c !== context);
 
       pluginData.state.recentSpam.push({
         type: RecentActionType.ThreadCreate,
