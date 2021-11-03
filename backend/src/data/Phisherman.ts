@@ -147,7 +147,7 @@ export async function getPhishermanDomainInfo(domain: string): Promise<Phisherma
     return pendingDomainInfoChecks.get(domain)!;
   }
 
-  const promise = (async () => {
+  let promise = (async () => {
     if (memoryCache.has(domain)) {
       return memoryCache.get(domain)!.info;
     }
@@ -181,7 +181,7 @@ export async function getPhishermanDomainInfo(domain: string): Promise<Phisherma
 
     return freshData;
   })();
-  promise.finally(() => {
+  promise = promise.finally(() => {
     pendingDomainInfoChecks.delete(domain);
   });
   pendingDomainInfoChecks.set(domain, promise);
