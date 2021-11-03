@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
-export class AddSourceMessageIdToReminders1631494429170 implements MigrationInterface {
+export class AddSourceMessageIdToReminders1635950555533 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumns("reminders", [
       new TableColumn({
