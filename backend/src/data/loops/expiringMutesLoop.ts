@@ -1,3 +1,5 @@
+// tslint:disable:no-console
+
 import { lazyMemoize, memoize, MINUTES } from "../../utils";
 import { Mutes } from "../Mutes";
 import Timeout = NodeJS.Timeout;

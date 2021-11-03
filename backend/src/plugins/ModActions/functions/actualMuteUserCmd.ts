@@ -71,7 +71,8 @@ export async function actualMuteUserCmd(
     } else {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
       if (user.id == null) {
-        // tslint-disable-next-line:no-console
+        // FIXME: Debug
+        // tslint:disable-next-line:no-console
         console.trace("[DEBUG] Null user.id for mute");
       }
       sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user");

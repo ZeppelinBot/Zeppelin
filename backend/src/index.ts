@@ -184,6 +184,8 @@ setInterval(() => {
 }, 500);
 setInterval(() => {
   const avgBlocking = avgTotal / (avgCount || 1);
+  // FIXME: Debug
+  // tslint:disable-next-line:no-console
   console.log(`Average blocking in the last 5min: ${avgBlocking / avgTotal}ms`);
   avgTotal = 0;
   avgCount = 0;
@@ -387,6 +389,8 @@ connect().then(async () => {
     lowestGlobalRemaining = Math.min(lowestGlobalRemaining, (client as any).rest.globalRemaining);
   }, 100);
   setInterval(() => {
+    // FIXME: Debug
+    // tslint:disable-next-line:no-console
     console.log("Lowest global remaining in the past 15 seconds:", lowestGlobalRemaining);
     lowestGlobalRemaining = Infinity;
   }, 15000);
@@ -399,6 +403,8 @@ connect().then(async () => {
       .slice(0, 5)
       .map(([key, count]) => `${count}x ${key}`)
       .join("\n");
+    // FIXME: Debug
+    // tslint:disable-next-line:no-console
     console.log(`Top query entries in the past 5 minutes:\n${topEntriesStr}`);
   }, 5 * MINUTES);
 

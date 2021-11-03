@@ -1,3 +1,5 @@
+// tslint:disable:no-console
+
 import { MINUTES } from "../../utils";
 import { cleanupMessages } from "../cleanup/messages";
 

@@ -35,6 +35,7 @@ export async function getOrCreateWebhookForChannel(
       });
       return [webhook.id, webhook.token!];
     } catch (err) {
+      // tslint:disable-next-line:no-console
       console.warn(`Error when trying to create webhook for ${pluginData.guild.id}/${channel.id}: ${err.message}`);
 
       if (isDiscordAPIError(err) && err.code === 50013) {

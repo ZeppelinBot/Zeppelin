@@ -17,6 +17,8 @@ export const CleanAction = automodAction({
         }
 
         if (messageIdsToDeleteByChannelId.get(context.message.channel_id)!.includes(context.message.id)) {
+          // FIXME: Debug
+          // tslint:disable-next-line:no-console
           console.warn(`Message ID to delete was already present: ${pluginData.guild.name}, rule ${ruleName}`);
           continue;
         }

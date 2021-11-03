@@ -13,6 +13,7 @@ export async function reloadChangedGuilds(pluginData: GlobalPluginData<GuildConf
     if (!item.key.startsWith("guild-")) continue;
 
     const guildId = item.key.slice("guild-".length) as Snowflake;
+    // tslint:disable-next-line:no-console
     console.log(`Config changed, reloading guild ${guildId}`);
     await pluginData.getKnubInstance().reloadGuild(guildId);
 

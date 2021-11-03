@@ -19,4 +19,5 @@ const yaml = new YAML(src);
 json.plugins.myplugin.config.can_do_thing = false;
 yaml.json = json;
 
+// tslint:disable-next-line:no-console
 console.log(yaml.yaml);
