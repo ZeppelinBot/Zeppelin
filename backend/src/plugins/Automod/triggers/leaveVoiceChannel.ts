@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { ChannelTypeStrings } from "../../../types";
+import { tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface LeaveVoiceChannelResult {
@@ -8,8 +9,7 @@ interface LeaveVoiceChannelResult {
 
 export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>()({
   configType: t.type({
-    channels: t.union([t.string, t.array(t.string)]),
-    include_moves: t.boolean,
+    include_moves: tNullable(t.boolean),
   }),
 
   defaultConfig: {
@@ -22,11 +22,6 @@ export const LeaveVoiceChannelTrigger = automodTrigger<LeaveVoiceChannelResult>(
       typeof triggerConfig === "object" && !Array.isArray(triggerConfig) && triggerConfig.include_moves;
 
     if (!context.member || !matchedChannelId || (context.voiceChannel?.joined && !includeMoves)) {
-      return;
-    }
-
-    const triggerChannels = Array.isArray(triggerConfig.channels) ? triggerConfig.channels : [triggerConfig.channels];
-    if (!triggerChannels.includes(matchedChannelId)) {
       return;
     }
 
