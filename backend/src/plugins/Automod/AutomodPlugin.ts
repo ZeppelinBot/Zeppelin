@@ -214,7 +214,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     RunAutomodOnLeaveEvt,
     RunAutomodOnThreadCreate,
     RunAutomodOnThreadDelete,
-    RunAutomodOnThreadUpdate
+    RunAutomodOnThreadUpdate,
     RunAutomodOnVoiceStateUpdate,
     // Messages use message events from SavedMessages, see onLoad below
   ],

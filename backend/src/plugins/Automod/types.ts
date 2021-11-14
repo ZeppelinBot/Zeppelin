@@ -1,4 +1,12 @@
-import { GuildMember, PartialGuildMember, TextChannel, ThreadChannel, User } from "discord.js";
+import {
+  GuildMember,
+  PartialGuildMember,
+  StageChannel,
+  TextChannel,
+  ThreadChannel,
+  User,
+  VoiceChannel,
+} from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType, CooldownManager } from "knub";
 import { SavedMessage } from "../../data/entities/SavedMessage";
