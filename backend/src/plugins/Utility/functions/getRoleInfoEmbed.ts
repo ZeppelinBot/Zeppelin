@@ -3,7 +3,7 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
-import { permissionNames } from "../../../utils/permissionNames.js";
+import { PERMISSION_NAMES } from "../../../utils/permissionNames.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
@@ -37,8 +37,8 @@ export async function getRoleInfoEmbed(
   });
 
   const rolePerms = role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-    ? [permissionNames.ADMINISTRATOR]
-    : role.permissions.toArray().map((p) => permissionNames[p]);
+    ? [PERMISSION_NAMES.ADMINISTRATOR]
+    : role.permissions.toArray().map((p) => PERMISSION_NAMES[p]);
 
   // -1 because of the @everyone role
   const totalGuildRoles = pluginData.guild.roles.cache.size - 1;
