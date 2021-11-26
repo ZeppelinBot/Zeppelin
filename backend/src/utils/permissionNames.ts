@@ -1,7 +1,7 @@
 import { PermissionFlags } from "discord.js";
 import { EMPTY_CHAR } from "../utils";
 
-export const permissionNames: Record<keyof PermissionFlags, string> = {
+export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
   ADD_REACTIONS: "Add Reactions",
   ADMINISTRATOR: "Administrator",
   ATTACH_FILES: "Attach Files",
