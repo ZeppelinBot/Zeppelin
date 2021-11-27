@@ -17,6 +17,7 @@ import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
 export const ReplyAction = automodAction({
   configType: t.union([
@@ -107,6 +108,10 @@ export const ReplyAction = automodAction({
             failIfNotExists: false,
             messageReference: _contexts[0].message!.id,
           };
+        }
+
+        if (messageIsEmpty(messageOpts)) {
+          return;
         }
 
         const replyMsg = await channel.send(messageOpts);
