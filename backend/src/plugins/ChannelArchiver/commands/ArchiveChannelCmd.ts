@@ -81,9 +81,9 @@ export const ArchiveChannelCmd = channelArchiverCmd({
           }
         }
 
-        if (message.reactions && Object.keys(message.reactions).length > 0) {
+        if (message.reactions.cache.size > 0) {
           const reactionCounts: string[] = [];
-          for (const [emoji, info] of Object.entries(message.reactions)) {
+          for (const [emoji, info] of message.reactions.cache) {
             reactionCounts.push(`${info.count}x ${emoji}`);
           }
           content += `\n-- Reactions: ${reactionCounts.join(", ")}`;
