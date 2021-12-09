@@ -1,17 +1,20 @@
 import { Permissions, PermissionString } from "discord.js";
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
-import { tNullable, isValidSnowflake } from "../../../utils";
+import { tNullable, isValidSnowflake, tPartialDictionary } from "../../../utils";
 import { noop } from "knub/dist/utils";
 
 export const ChangePermsAction = automodAction({
   configType: t.type({
     target: t.string,
     channel: tNullable(t.string),
-    perms: t.record(t.keyof(Permissions.FLAGS), t.union([t.boolean, t.null])),
+    perms: tPartialDictionary(t.keyof(Permissions.FLAGS), tNullable(t.boolean)),
   }),
   defaultConfig: {
     channel: "",
+    perms: {
+      SEND_MESSAGES: true,
+    },
   },
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
@@ -50,7 +53,7 @@ export const ChangePermsAction = automodAction({
     for (const key in actionConfig.perms) {
       perms[key] = actionConfig.perms[key];
     }
-    const permsArray: PermissionString[] = <any>Object.keys(perms).filter((key) => perms[key]);
+    const permsArray = <PermissionString[]>Object.keys(perms).filter((key) => perms[key]);
     await role.setPermissions(new Permissions(permsArray)).catch(noop);
   },
 });
