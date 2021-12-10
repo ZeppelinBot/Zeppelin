@@ -39,14 +39,14 @@ export const ChangePermsAction = automodAction({
       );
     const target = await renderTarget(actionConfig.target);
     const channelId = actionConfig.channel ? await renderChannel(actionConfig.channel) : null;
-    const role = await pluginData.guild.roles.fetch(target);
+    const role = pluginData.guild.roles.resolve(target);
     if (!role) {
       const member = await pluginData.guild.members.fetch(target).catch(noop);
       if (!member) return;
     }
 
     if (channelId && isValidSnowflake(channelId)) {
-      const channel = await pluginData.guild.channels.fetch(channelId);
+      const channel = pluginData.guild.channels.resolve(channelId);
       if (!channel) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
       const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
