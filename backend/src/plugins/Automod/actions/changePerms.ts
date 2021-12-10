@@ -41,7 +41,7 @@ export const ChangePermsAction = automodAction({
     const channelId = actionConfig.channel ? await renderChannel(actionConfig.channel) : null;
     const role = await pluginData.guild.roles.fetch(target);
     if (!role) {
-      const member = await pluginData.guild.members.fetch(target);
+      const member = await pluginData.guild.members.fetch(target).catch(noop);
       if (!member) return;
     }
 
