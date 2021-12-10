@@ -16,12 +16,7 @@ export const ChangePermsAction = automodAction({
     channel: tNullable(t.string),
     perms: tPartialDictionary(t.keyof(Permissions.FLAGS), tNullable(t.boolean)),
   }),
-  defaultConfig: {
-    channel: "",
-    perms: {
-      SEND_MESSAGES: true,
-    },
-  },
+  defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const user = contexts.find((c) => c.user)?.user;
