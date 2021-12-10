@@ -50,7 +50,7 @@ export const ChangePermsAction = automodAction({
       if (!channel) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
       const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
-      const deny = new Permissions(overwrite ? overwrite.deny : "0").serialize();
+      const deny = new Permissions(overwrite?.deny ?? 0n).serialize();
       const newPerms: Partial<Record<PermissionString, boolean | null>> = {};
 
       for (const key in allow) {
