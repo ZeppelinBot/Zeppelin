@@ -31,6 +31,7 @@ export const ChangePermsAction = automodAction({
       const allow = new Permissions(overwrite ? overwrite.allow : "0").serialize();
       const deny = new Permissions(overwrite ? overwrite.deny : "0").serialize();
       const newPerms: Partial<Record<PermissionString, boolean | null>> = {};
+      let hasPerms = false;
 
       for (const key in allow) {
         if (typeof actionConfig.perms[key] !== "undefined") {
@@ -39,9 +40,15 @@ export const ChangePermsAction = automodAction({
         }
         if (allow[key]) {
           newPerms[key] = true;
+          hasPerms = true;
         } else if (deny[key]) {
           newPerms[key] = false;
+          hasPerms = true;
         }
+      }
+      if (overwrite && !hasPerms) {
+        await channel.permissionOverwrites.delete(actionConfig.target).catch(noop);
+        return;
       }
       await channel.permissionOverwrites.create(actionConfig.target, newPerms).catch(noop);
       return;
