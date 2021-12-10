@@ -49,7 +49,7 @@ export const ChangePermsAction = automodAction({
       const channel = await pluginData.guild.channels.fetch(channelId);
       if (!channel) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
-      const allow = new Permissions(overwrite ? overwrite.allow : "0").serialize();
+      const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
       const deny = new Permissions(overwrite ? overwrite.deny : "0").serialize();
       const newPerms: Partial<Record<PermissionString, boolean | null>> = {};
 
