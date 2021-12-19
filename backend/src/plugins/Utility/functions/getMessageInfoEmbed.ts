@@ -130,9 +130,10 @@ export async function getMessageInfoEmbed(
   }
 
   if (message.attachments.size) {
+    const attachmentUrls = message.attachments.map((att) => att.url);
     embed.fields.push({
       name: preEmbedPadding + "Attachments",
-      value: message.attachments[0].url,
+      value: attachmentUrls.join("\n"),
     });
   }
 
