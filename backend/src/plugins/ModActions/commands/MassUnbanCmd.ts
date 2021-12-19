@@ -38,10 +38,9 @@ export const MassunbanCmd = modActionsCmd({
       return;
     }
     const config = pluginData.config.get();
-    const unbanReason = formatReasonWithAttachments(
-      parseReason(config, unbanReasonReply.content),
-      [...msg.attachments.values()],
-    );
+    const unbanReason = formatReasonWithAttachments(parseReason(config, unbanReasonReply.content), [
+      ...msg.attachments.values(),
+    ]);
 
     // Ignore automatic unban cases and logs for these users
     // We'll create our own cases below and post a single "mass unbanned" log instead
