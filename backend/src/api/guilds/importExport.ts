@@ -75,7 +75,10 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       try {
         data = importExportData.parse(req.body.data);
       } catch (err) {
-        return clientError(res, "Invalid import data format");
+        const prettyMessage = `${err.issues[0].code}: expected ${err.issues[0].expected}, received ${
+          err.issues[0].received
+        } at /${err.issues[0].path.join("/")}`;
+        return clientError(res, `Invalid import data format: ${prettyMessage}`);
         return;
       }
 
