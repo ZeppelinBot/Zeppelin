@@ -90,6 +90,14 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
         return;
       }
 
+      const seenCaseNumbers = new Set();
+      for (const theCase of data.cases) {
+        if (seenCaseNumbers.has(theCase.case_number)) {
+          return clientError(res, `Duplicate case number: ${theCase.case_number}`);
+        }
+        seenCaseNumbers.add(theCase.case_number);
+      }
+
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);
 
       // Prepare cases
