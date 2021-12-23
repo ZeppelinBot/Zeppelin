@@ -128,7 +128,7 @@ type DomainInfoApiCallResult = PhishermanUnknownDomain | PhishermanDomainInfo;
 async function fetchDomainInfo(domain: string): Promise<PhishermanDomainInfo | null> {
   // tslint:disable-next-line:no-console
   console.log(`[PHISHERMAN] Requesting domain information: ${domain}`);
-  const result = await apiCall<Record<string, DomainInfoApiCallResult>>("GET", `/v2/domains/info/${domain}`);
+  const result = await apiCall<Record<string, DomainInfoApiCallResult>>("GET", `/v2/domains/check/${domain}`);
   const firstKey = Object.keys(result)[0];
   const domainInfo = firstKey ? result[firstKey] : null;
   if (!domainInfo) {
