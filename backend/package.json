@@ -32,7 +32,7 @@
     "discord.js": "^13.3.1",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
-    "erlpack": "github:almeidx/erlpack#f0c535f73817fd914806d6ca26a7730c14e0fb7c",
+    "erlpack": "github:discord/erlpack",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
     "fp-ts": "^2.0.1",
