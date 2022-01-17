@@ -4,6 +4,8 @@ import { LogType } from "../../../data/LogType";
 import { noop } from "../../../utils";
 import { automodAction } from "../helpers";
 
+const cleanDebugServer = process.env.TEMP_CLEAN_DEBUG_SERVER;
+
 export const CleanAction = automodAction({
   configType: t.boolean,
   defaultConfig: false,
@@ -27,13 +29,26 @@ export const CleanAction = automodAction({
       }
     }
 
+    if (pluginData.guild.id === cleanDebugServer) {
+      const toDeleteFormatted = Array.from(messageIdsToDeleteByChannelId.entries())
+        .map(([channelId, messageIds]) => `- ${channelId}: ${messageIds.join(", ")}`)
+        .join("\n");
+      // tslint:disable-next-line:no-console
+      console.log(`[DEBUG] Cleaning messages (${ruleName}):\n${toDeleteFormatted}`);
+    }
+
     for (const [channelId, messageIds] of messageIdsToDeleteByChannelId.entries()) {
       for (const id of messageIds) {
         pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id);
       }
 
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
-      await channel.bulkDelete(messageIds as Snowflake[]).catch(noop);
+      await channel.bulkDelete(messageIds as Snowflake[]).catch((err) => {
+        if (pluginData.guild.id === cleanDebugServer) {
+          // tslint:disable-next-line:no-console
+          console.error(`[DEBUG] Failed to bulk delete messages (${ruleName}): ${err}`);
+        }
+      });
     }
   },
 });
