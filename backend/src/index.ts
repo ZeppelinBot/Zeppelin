@@ -390,8 +390,10 @@ connect().then(async () => {
   }, 100);
   setInterval(() => {
     // FIXME: Debug
-    // tslint:disable-next-line:no-console
-    console.log("Lowest global remaining in the past 15 seconds:", lowestGlobalRemaining);
+    if (lowestGlobalRemaining < 30) {
+      // tslint:disable-next-line:no-console
+      console.log("[DEBUG] Lowest global remaining in the past 15 seconds:", lowestGlobalRemaining);
+    }
     lowestGlobalRemaining = Infinity;
   }, 15000);
 
