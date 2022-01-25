@@ -1,3 +1,4 @@
+import type { Snowflake } from "discord-api-types/globals";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { resolveUser } from "../../../utils";
@@ -13,9 +14,11 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
   const modName = mod.tag;
 
   let ppName: string | null = null;
+  let ppId: Snowflake | null = null;
   if (args.ppId) {
     const pp = await resolveUser(pluginData.client, args.ppId);
     ppName = pp.tag;
+    ppId = pp.id;
   }
 
   if (args.auditLogId) {
@@ -28,20 +31,20 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
 
   const createdCase = await pluginData.state.cases.create({
     type: args.type,
-    user_id: args.userId,
+    user_id: user.id,
     user_name: userName,
-    mod_id: args.modId,
+    mod_id: mod.id,
     mod_name: modName,
     audit_log_id: args.auditLogId,
-    pp_id: args.ppId,
+    pp_id: ppId,
     pp_name: ppName,
     is_hidden: Boolean(args.hide),
   });
 
-  if (args.reason || (args.noteDetails && args.noteDetails.length)) {
+  if (args.reason || args.noteDetails?.length) {
     await createCaseNote(pluginData, {
       caseId: createdCase.id,
-      modId: args.modId,
+      modId: mod.id,
       body: args.reason || "",
       automatic: args.automatic,
       postInCaseLogOverride: false,
@@ -53,7 +56,7 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
     for (const extraNote of args.extraNotes) {
       await createCaseNote(pluginData, {
         caseId: createdCase.id,
-        modId: args.modId,
+        modId: mod.id,
         body: extraNote,
         automatic: args.automatic,
         postInCaseLogOverride: false,
