@@ -350,7 +350,6 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
-client.user?.setPresence({ activities: [{ name: "over Ibot's Lodge", type: "WATCHING" }] });
   });
 
   client.on(Constants.Events.RATE_LIMIT, (data) => {
