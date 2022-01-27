@@ -23,7 +23,7 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
 
 export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
   name: "name_history",
-  showInDocs: false,
+  showInDocs: true,
 
   configSchema: ConfigSchema,
   defaultOptions,
