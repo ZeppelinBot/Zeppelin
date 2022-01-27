@@ -17,7 +17,7 @@ if (!isAPI()) {
   setTimeout(cleanup, 30 * SECONDS);
 }
 
-export const MAX_NICKNAME_ENTRIES_PER_USER = 10;
+export const MAX_NICKNAME_ENTRIES_PER_USER = 20;
 
 export class GuildNicknameHistory extends BaseGuildRepository {
   private nicknameHistory: Repository<NicknameHistoryEntry>;
