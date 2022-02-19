@@ -63,7 +63,7 @@ export const HelpCmd = utilityCmd({
       let snippet = `**${prefix}${trigger}**`;
       if (description) snippet += `\n${description}`;
       if (usage) snippet += `\nBasic usage: \`${usage}\``;
-      snippet += `\n<https://zeppelin.gg/docs/plugins/${plugin.blueprint.name}/usage#command-${commandSlug}>`;
+      snippet += `\n<https://zeppelin-dashboard.up.railway.app/docs/plugins/${plugin.blueprint.name}/usage#command-${commandSlug}>`;
 
       return snippet;
     });
