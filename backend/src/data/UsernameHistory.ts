@@ -17,7 +17,7 @@ if (!isAPI()) {
   setTimeout(cleanup, 30 * SECONDS);
 }
 
-export const MAX_USERNAME_ENTRIES_PER_USER = 5;
+export const MAX_USERNAME_ENTRIES_PER_USER = 20;
 
 export class UsernameHistory extends BaseRepository {
   private usernameHistory: Repository<UsernameHistoryEntry>;

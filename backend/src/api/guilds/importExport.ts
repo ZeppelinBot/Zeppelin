@@ -75,7 +75,10 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       try {
         data = importExportData.parse(req.body.data);
       } catch (err) {
-        return clientError(res, "Invalid import data format");
+        const prettyMessage = `${err.issues[0].code}: expected ${err.issues[0].expected}, received ${
+          err.issues[0].received
+        } at /${err.issues[0].path.join("/")}`;
+        return clientError(res, `Invalid import data format: ${prettyMessage}`);
         return;
       }
 
@@ -85,6 +88,14 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       } catch (err) {
         return clientError(res, "Invalid case handling mode");
         return;
+      }
+
+      const seenCaseNumbers = new Set();
+      for (const theCase of data.cases) {
+        if (seenCaseNumbers.has(theCase.case_number)) {
+          return clientError(res, `Duplicate case number: ${theCase.case_number}`);
+        }
+        seenCaseNumbers.add(theCase.case_number);
       }
 
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);
