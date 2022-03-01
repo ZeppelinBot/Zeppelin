@@ -47,7 +47,7 @@ export const ChangePermsAction = automodAction({
 
     if (channelId && isValidSnowflake(channelId)) {
       const channel = pluginData.guild.channels.resolve(channelId);
-      if (!channel) return;
+      if (!channel || channel.isThread()) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
       const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
       const deny = new Permissions(overwrite?.deny ?? 0n).serialize();
