@@ -64,6 +64,14 @@ export interface ISavedMessageStickerData {
   type: string | null;
 }
 
+export interface ISavedMessageMentionsData {
+  channels: Snowflake[];
+  everyone: boolean;
+  roles: Snowflake[];
+  users: Snowflake[];
+  repliedUser: Snowflake | null;
+}
+
 export interface ISavedMessageData {
   attachments?: ISavedMessageAttachmentData[];
   author: {
@@ -74,6 +82,7 @@ export interface ISavedMessageData {
   embeds?: ISavedMessageEmbedData[];
   stickers?: ISavedMessageStickerData[];
   timestamp: number;
+  mentions?: ISavedMessageMentionsData;
 }
 
 @Entity("messages")
