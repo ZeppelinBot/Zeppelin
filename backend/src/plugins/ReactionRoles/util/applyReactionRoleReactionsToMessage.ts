@@ -87,6 +87,12 @@ export async function applyReactionRoleReactionsToMessage(
             body: `Error ${e.code} while applying reaction role reactions to ${channelId}/${messageId}: ${e.message}`,
           });
           break;
+        } else if (e.code === 30010) {
+          errors.push(`Maximum number of reactions reached (20)`);
+          logs.logBotAlert({
+            body: `Error ${e.code} while applying reaction role reactions to ${channelId}/${messageId}: ${e.message}`,
+          });
+          break;
         }
       }
 
