@@ -28,12 +28,15 @@ export const ChangePermsAction = automodAction({
         new TemplateSafeValueContainer({
           user: user ? userToTemplateSafeUser(user) : null,
           guild: guildToTemplateSafeGuild(pluginData.guild),
+          msg: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
     const renderChannel = async (str: string) =>
       renderTemplate(
         str,
         new TemplateSafeValueContainer({
+          user: user ? userToTemplateSafeUser(user) : null,
+          guild: guildToTemplateSafeGuild(pluginData.guild),
           msg: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
