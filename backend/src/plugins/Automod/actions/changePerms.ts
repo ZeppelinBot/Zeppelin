@@ -28,7 +28,7 @@ export const ChangePermsAction = automodAction({
         new TemplateSafeValueContainer({
           user: user ? userToTemplateSafeUser(user) : null,
           guild: guildToTemplateSafeGuild(pluginData.guild),
-          msg: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
+          message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
     const renderChannel = async (str: string) =>
@@ -37,7 +37,7 @@ export const ChangePermsAction = automodAction({
         new TemplateSafeValueContainer({
           user: user ? userToTemplateSafeUser(user) : null,
           guild: guildToTemplateSafeGuild(pluginData.guild),
-          msg: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
+          message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
     const target = await renderTarget(actionConfig.target);
