@@ -8,7 +8,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   `),
   configurationGuide: trimPluginDescription(`
     ### Getting started
-    To get started, request an API key for Phisherman following the instructions at https://docs.phisherman.gg/#/api/getting-started?id=requesting-api-access.
+    To get started, request an API key for Phisherman following the instructions at https://docs.phisherman.gg/guide/getting-started.html#requesting-api-access
     Then, add the api key to the plugin's config:
     
     ~~~yml
