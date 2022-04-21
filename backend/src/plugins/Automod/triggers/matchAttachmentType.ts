@@ -72,7 +72,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     return (
       asSingleLine(`
         Matched attachment type \`${Util.escapeInlineCode(matchResult.extra.matchedType)}\`
-        (${matchResult.extra.mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
+        (${matchResult.extra.mode === "blacklist" ? "blacklisted" : "not in whitelist"})
         in message (\`${contexts[0].message!.id}\`) in ${prettyChannel}:
       `) + messageSummary(contexts[0].message!)
     );
