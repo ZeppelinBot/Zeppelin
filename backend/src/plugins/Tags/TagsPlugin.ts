@@ -8,7 +8,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
 import { mapToPublicFn } from "../../pluginUtils";
-import { convertDelayStringToMS } from "../../utils";
+import { convertDelayStringToMS, trimPluginDescription } from "../../utils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
@@ -22,6 +22,8 @@ import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { generateTemplateMarkdown } from "./docs";
+import { TemplateFunctions } from "./templateFunctions";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -58,6 +60,17 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Tags",
+    description: "Tags are a way to store and reuse information.",
+    configurationGuide: trimPluginDescription(`
+      ### Template Functions
+      You can use template functions in your tags. These functions are called when the tag is rendered.
+      You can use these functions to render dynamic content, or to access information from the message and/or user calling the tag.
+      You use them by adding a \`{}\` on your tag.
+
+      Here are the functions you can use in your tags:
+      
+      ${generateTemplateMarkdown(TemplateFunctions)}
+    `),
   },
 
   configSchema: ConfigSchema,
