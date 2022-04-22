@@ -22,6 +22,7 @@ export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
   MANAGE_ROLES: "Manage Roles",
   MANAGE_THREADS: "Manage Threads",
   MANAGE_WEBHOOKS: "Manage Webhooks",
+  MANAGE_EVENTS: "Manage Events",
   MENTION_EVERYONE: `Mention @${EMPTY_CHAR}everyone, @${EMPTY_CHAR}here, and All Roles`,
   MOVE_MEMBERS: "Move Members",
   MUTE_MEMBERS: "Mute Members",
@@ -43,4 +44,5 @@ export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
   VIEW_AUDIT_LOG: "View Audit Log",
   VIEW_CHANNEL: "View Channels",
   VIEW_GUILD_INSIGHTS: "View Guild Insights",
+  MODERATE_MEMBERS: "Moderate Members",
 };
