@@ -22,6 +22,7 @@ import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { GuildTagAliases } from "src/data/GuildTagAliases";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -110,6 +111,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.tags = GuildTags.getGuildInstance(guild.id);
+    state.tagAliases = GuildTagAliases.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
 

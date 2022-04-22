@@ -7,6 +7,7 @@ export const TagListCmd = tagsCmd({
 
   async run({ message: msg, pluginData }) {
     const tags = await pluginData.state.tags.all();
+    const aliases = await pluginData.state.tagAliases.all();
     if (tags.length === 0) {
       msg.channel.send(`No tags created yet! Use \`tag create\` command to create one.`);
       return;
@@ -14,7 +15,11 @@ export const TagListCmd = tagsCmd({
 
     const prefix = (await pluginData.config.getForMessage(msg)).prefix;
     const tagNames = tags.map((tag) => tag.tag).sort();
+    const tagAliasesNames = aliases.map((alias) => alias.alias).sort();
+    const tagAndAliasesNames = tagNames
+      .join(", ")
+      .concat(tagAliasesNames.length > 0 ? `, ${tagAliasesNames.join(", ")}` : "");
 
-    createChunkedMessage(msg.channel, `Available tags (use with ${prefix}tag): \`\`\`${tagNames.join(", ")}\`\`\``);
+    createChunkedMessage(msg.channel, `Available tags (use with ${prefix}tag): \`\`\`${tagAndAliasesNames}\`\`\``);
   },
 });

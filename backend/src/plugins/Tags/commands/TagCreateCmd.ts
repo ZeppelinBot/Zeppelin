@@ -8,11 +8,19 @@ export const TagCreateCmd = tagsCmd({
   permission: "can_create",
 
   signature: {
+    alias: ct.bool({ option: true, shortcut: "a", isSwitch: true }),
     tag: ct.string(),
     body: ct.string({ catchAll: true }),
   },
 
   async run({ message: msg, args, pluginData }) {
+    const prefix = pluginData.config.get().prefix;
+
+    if (args.alias) {
+      await pluginData.state.tagAliases.createOrUpdate(args.tag, args.body, msg.author.id);
+      sendSuccessMessage(pluginData, msg.channel, `Alias set! Use it with: \`${prefix}${args.tag}\``);
+      return;
+    }
     try {
       parseTemplate(args.body);
     } catch (e) {
@@ -26,7 +34,6 @@ export const TagCreateCmd = tagsCmd({
 
     await pluginData.state.tags.createOrUpdate(args.tag, args.body, msg.author.id);
 
-    const prefix = pluginData.config.get().prefix;
     sendSuccessMessage(pluginData, msg.channel, `Tag set! Use it with: \`${prefix}${args.tag}\``);
   },
 });

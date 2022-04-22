@@ -20,8 +20,18 @@ export async function findTagByName(
     return config.categories[categoryName]?.tags[tagName] ?? null;
   }
 
+  let tag: string | null;
+
   // Dynamic tag
   // Format: "tag"
   const dynamicTag = await pluginData.state.tags.find(name);
-  return dynamicTag?.body ?? null;
+  tag = dynamicTag?.body ?? null;
+
+  // Aliased tag
+  // Format: "alias"
+  const aliasedTagName = await pluginData.state.tagAliases.find(name);
+  const aliasedTag = await pluginData.state.tags.find(aliasedTagName?.tag);
+  tag ? (tag = tag) : (tag = aliasedTag?.body ?? null);
+
+  return tag;
 }
