@@ -16,6 +16,13 @@ import {
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
+const MAX_ROLES_TO_DISPLAY = 15;
+
+const trimRoles = (roles: string[]) =>
+  roles.length > MAX_ROLES_TO_DISPLAY
+    ? roles.slice(0, MAX_ROLES_TO_DISPLAY).join(", ") + `, and ${MAX_ROLES_TO_DISPLAY - roles.length} more roles`
+    : roles.join(", ");
+
 export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
@@ -109,7 +116,7 @@ export async function getUserInfoEmbed(
       name: preEmbedPadding + "Member information",
       value: trimLines(`
           ${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)
-          ${roles.length > 0 ? "Roles: " + roles.map((r) => `<@&${r.id}>`).join(", ") : ""}
+          ${roles.length > 0 ? "Roles: " + trimRoles(roles.map((r) => `<@&${r.id}>`)) : ""}
         `),
     });
 
