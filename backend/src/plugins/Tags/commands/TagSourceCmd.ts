@@ -14,19 +14,23 @@ export const TagSourceCmd = tagsCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    const alias = await pluginData.state.tagAliases.find(args.tag);
+    const tag = (await pluginData.state.tags.find(args.tag)) || (await pluginData.state.tags.find(alias?.tag ?? null));
+
     if (args.delete) {
       const actualTag = await pluginData.state.tags.find(args.tag);
-      if (!actualTag) {
+      const aliasedTag = await pluginData.state.tags.find(alias?.tag ?? null);
+
+      if (!actualTag && !aliasedTag) {
         sendErrorMessage(pluginData, msg.channel, "No tag with that name");
         return;
       }
 
-      await pluginData.state.tags.delete(args.tag);
-      sendSuccessMessage(pluginData, msg.channel, "Tag deleted!");
+      actualTag ? pluginData.state.tags.delete(args.tag) : pluginData.state.tagAliases.delete(args.tag);
+      sendSuccessMessage(pluginData, msg.channel, `${actualTag ? "Tag" : "Alias"} deleted!`);
       return;
     }
 
-    const tag = await pluginData.state.tags.find(args.tag);
     if (!tag) {
       sendErrorMessage(pluginData, msg.channel, "No tag with that name");
       return;

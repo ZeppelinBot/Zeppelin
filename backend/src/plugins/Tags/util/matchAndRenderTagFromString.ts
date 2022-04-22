@@ -44,7 +44,8 @@ export async function matchAndRenderTagFromString(
 
     const withoutPrefix = str.slice(prefix.length);
 
-    for (const [tagName, tagBody] of Object.entries(category.tags)) {
+    // tslint:disable-next-line:no-shadowed-variable
+    for (const [tagName, _tagBody] of Object.entries(category.tags)) {
       const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\\s|$)`);
       if (regex.test(withoutPrefix)) {
         const renderedContent = await renderTagFromString(
@@ -70,43 +71,46 @@ export async function matchAndRenderTagFromString(
     }
   }
 
-  // Dynamic tags
+  // Dynamic + Aliased tags
   if (config.can_use !== true) {
     return null;
   }
 
-  const dynamicTagPrefix = config.prefix;
-  if (!str.startsWith(dynamicTagPrefix)) {
+  const tagPrefix = config.prefix;
+  if (!str.startsWith(tagPrefix)) {
     return null;
   }
 
-  const dynamicTagNameMatch = str.slice(dynamicTagPrefix.length).match(/^\S+/);
-  if (dynamicTagNameMatch === null) {
+  const tagNameMatch = str.slice(tagPrefix.length).match(/^[a-z0-9_-]*/);
+  if (tagNameMatch == null) {
     return null;
   }
 
-  const dynamicTagName = dynamicTagNameMatch[0];
-  const dynamicTag = await pluginData.state.tags.find(dynamicTagName);
-  if (!dynamicTag) {
+  const tagName = tagNameMatch[0];
+
+  const aliasName = await pluginData.state.tagAliases.find(tagName);
+  const aliasedTag = await pluginData.state.tags.find(aliasName?.tag);
+  const dynamicTag = await pluginData.state.tags.find(tagName);
+
+  if (!aliasedTag && !dynamicTag) {
     return null;
   }
 
-  const renderedDynamicTagContent = await renderTagFromString(
-    pluginData,
-    str,
-    dynamicTagPrefix,
-    dynamicTagName,
-    dynamicTag.body,
-    member,
-  );
+  const tagBody = aliasedTag?.body ?? dynamicTag?.body;
 
-  if (renderedDynamicTagContent == null) {
+  if (!tagBody) {
+    return null;
+  }
+
+  const renderedTagContent = await renderTagFromString(pluginData, str, tagPrefix, tagName, tagBody, member);
+
+  if (renderedTagContent == null) {
     return null;
   }
 
   return {
-    renderedContent: renderedDynamicTagContent,
-    tagName: dynamicTagName,
+    renderedContent: renderedTagContent,
+    tagName,
     categoryName: null,
     category: null,
   };
