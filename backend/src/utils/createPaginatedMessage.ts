@@ -54,7 +54,7 @@ export async function createPaginatedMessage(
 
   const collector = message.createMessageComponentCollector({ time: fullOpts.timeout });
 
-  collector.on("collect", async interaction => {
+  collector.on("collect", async (interaction) => {
     if (fullOpts.limitToUserId && interaction.user.id !== fullOpts.limitToUserId) {
       return interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
     }
