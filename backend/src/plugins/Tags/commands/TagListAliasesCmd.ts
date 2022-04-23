@@ -21,7 +21,7 @@ export const TagListAliasesCmd = tagsCmd({
     aliasesArr = aliases.map((a) => a.alias);
     createChunkedMessage(
       msg.channel,
-      `Available aliases for tag \`${prefix + args.tag}\`: \`\`\`${aliasesArr.join(", ")}\`\`\``,
+      `Available aliases for tag \`${args.tag}\` (use with \`${prefix}alias\`: \`\`\`${aliasesArr.join(", ")}\`\`\``,
     );
     return;
   },
