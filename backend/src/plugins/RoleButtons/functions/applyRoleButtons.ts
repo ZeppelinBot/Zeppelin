@@ -4,8 +4,8 @@ import { isSnowflake, snowflakeRegex } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Message, MessageButton, MessageEditOptions, MessageOptions, Snowflake } from "discord.js";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem";
-import { splitButtonsIntoRows } from "./splitButtonsIntoRows";
 import { buildCustomId } from "../../../utils/buildCustomId";
+import { createButtonComponents } from "./createButtonComponents";
 
 const channelMessageRegex = new RegExp(`^(${snowflakeRegex.source})-(${snowflakeRegex.source})$`);
 
@@ -104,24 +104,8 @@ export async function applyRoleButtons(
   }
 
   // Apply role buttons
-  const buttons = configItem.options.map((opt, index) => {
-    const button = new MessageButton()
-      .setLabel(opt.label ?? "")
-      .setStyle(opt.style ?? "PRIMARY")
-      .setCustomId(buildCustomId("roleButtons", { name: configItem.name, index }));
-
-    if (opt.emoji) {
-      const emo = pluginData.client.emojis.resolve(opt.emoji as Snowflake) ?? opt.emoji;
-      button.setEmoji(emo);
-    }
-
-    return button;
-  });
-  const rows = splitButtonsIntoRows(buttons);
-
-  await message.edit({
-    components: rows,
-  });
+  const components = createButtonComponents(configItem);
+  await message.edit({ components });
 
   return {
     channel_id: message.channelId,

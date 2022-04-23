@@ -16,6 +16,7 @@ const RoleButtonOption = t.type({
   label: tNullable(t.string),
   emoji: tNullable(t.string),
   style: tNullable(t.keyof(ButtonStyles)), // https://discord.js.org/#/docs/discord.js/v13/typedef/MessageButtonStyle
+  start_new_row: tNullable(t.boolean),
 });
 export type TRoleButtonOption = t.TypeOf<typeof RoleButtonOption>;
 
