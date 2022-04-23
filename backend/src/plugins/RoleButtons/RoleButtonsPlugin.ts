@@ -8,6 +8,8 @@ import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { StrictValidationError } from "../../validatorUtils";
 import { onButtonInteraction } from "./events/buttonInteraction";
 import { pluginInfo } from "./info";
+import { createButtonComponents } from "./functions/createButtonComponents";
+import { TooManyComponentsError } from "./functions/TooManyComponentsError";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
@@ -26,10 +28,6 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
 
       if (buttonsConfig) {
         buttonsConfig.name = name;
-        // 5 action rows * 5 buttons
-        if (buttonsConfig.options?.length > 25) {
-          throw new StrictValidationError(["A single message can have at most 25 role buttons"]);
-        }
 
         if (buttonsConfig.message) {
           if ("message_id" in buttonsConfig.message) {
@@ -37,6 +35,17 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
               throw new StrictValidationError(["Can't target the same message with two sets of role buttons"]);
             }
             seenMessages.add(buttonsConfig.message.message_id);
+          }
+        }
+
+        if (buttonsConfig.options) {
+          try {
+            createButtonComponents(buttonsConfig);
+          } catch (err) {
+            if (err instanceof TooManyComponentsError) {
+              throw new StrictValidationError(["Too many options; can only have max 5 buttons per row on max 5 rows."]);
+            }
+            throw new StrictValidationError(["Error validating options"]);
           }
         }
       }
