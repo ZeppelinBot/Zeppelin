@@ -7,10 +7,13 @@ import { GuildRoleButtons } from "../../data/GuildRoleButtons";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { StrictValidationError } from "../../validatorUtils";
 import { onButtonInteraction } from "./events/buttonInteraction";
+import { pluginInfo } from "./info";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
   configSchema: ConfigSchema,
+  info: pluginInfo,
+  showInDocs: true,
 
   configPreprocessor(options) {
     // Auto-fill "name" property for buttons based on the object key

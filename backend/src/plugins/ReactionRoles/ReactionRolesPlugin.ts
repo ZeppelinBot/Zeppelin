@@ -36,6 +36,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   showInDocs: true,
   info: {
     prettyName: "Reaction roles",
+    legacy: "Consider using the [Role buttons](/docs/plugins/role_buttons) plugin instead.",
   },
 
   dependencies: () => [LogsPlugin],

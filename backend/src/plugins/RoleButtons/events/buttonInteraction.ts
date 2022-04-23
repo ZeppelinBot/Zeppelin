@@ -1,6 +1,8 @@
 import { typedGuildEventListener } from "knub";
 import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
+import { GuildMember } from "discord.js";
+import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
 
 export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType>()({
   event: "interactionCreate",
@@ -12,8 +14,9 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
     const config = pluginData.config.get();
     const [, name, optionIndex] = args.interaction.customId.split(":");
     // For some reason TS's type inference fails here so using a type annotation
-    const option: TRoleButtonOption | undefined = config.buttons[name]?.options[optionIndex];
-    if (!option) {
+    const buttons = config.buttons[name];
+    const option: TRoleButtonOption | undefined = buttons?.options[optionIndex];
+    if (!buttons || !option) {
       args.interaction.reply({
         ephemeral: true,
         content: "Invalid option selected",
@@ -21,30 +24,41 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
       return;
     }
 
-    const member = args.interaction.member || (await pluginData.guild.members.fetch(args.interaction.user.id));
-    if (!member) {
-      args.interaction.reply({
-        ephemeral: true,
-        content: "Error while fetching member to apply roles for",
-      });
-      return;
-    }
+    const member = args.interaction.member as GuildMember;
+    const role = pluginData.guild.roles.cache.get(option.role_id);
+    const roleName = role?.name || option.role_id;
 
-    const hasRole = Array.isArray(member.roles)
-      ? member.roles.includes(option.role_id)
-      : member.roles.cache.has(option.role_id);
-    if (hasRole) {
-      pluginData.getPlugin(RoleManagerPlugin).removeRole(member.user.id, option.role_id);
+    const rolesToRemove: string[] = [];
+    const rolesToAdd: string[] = [];
+
+    if (member.roles.cache.has(option.role_id)) {
+      rolesToRemove.push(option.role_id);
       args.interaction.reply({
         ephemeral: true,
-        content: "The selected role will be removed shortly!",
+        content: `The role **${roleName}** will be removed shortly!`,
       });
     } else {
-      pluginData.getPlugin(RoleManagerPlugin).addRole(member.user.id, option.role_id);
+      rolesToAdd.push(option.role_id);
+
+      if (buttons.exclusive) {
+        for (const roleId of getAllRolesInButtons(buttons)) {
+          if (member.roles.cache.has(roleId)) {
+            rolesToRemove.push(roleId);
+          }
+        }
+      }
+
       args.interaction.reply({
         ephemeral: true,
-        content: "You will receive the selected role shortly!",
+        content: `You will receive the **${roleName}** role shortly!`,
       });
+    }
+
+    for (const roleId of rolesToAdd) {
+      pluginData.getPlugin(RoleManagerPlugin).addRole(member.user.id, roleId);
+    }
+    for (const roleId of rolesToRemove) {
+      pluginData.getPlugin(RoleManagerPlugin).removeRole(member.user.id, roleId);
     }
   },
 });
