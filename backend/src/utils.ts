@@ -876,7 +876,7 @@ export function chunkArray<T>(arr: T[], chunkSize): T[][] {
 
   for (let i = 0; i < arr.length; i++) {
     currentChunk.push(arr[i]);
-    if ((i !== 0 && i % chunkSize === 0) || i === arr.length - 1) {
+    if ((i !== 0 && (i + 1) % chunkSize === 0) || i === arr.length - 1) {
       chunks.push(currentChunk);
       currentChunk = [];
     }

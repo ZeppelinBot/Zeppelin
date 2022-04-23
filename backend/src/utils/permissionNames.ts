@@ -43,4 +43,6 @@ export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
   VIEW_AUDIT_LOG: "View Audit Log",
   VIEW_CHANNEL: "View Channels",
   VIEW_GUILD_INSIGHTS: "View Guild Insights",
+  MODERATE_MEMBERS: "Moderate Members",
+  MANAGE_EVENTS: "Manage Events",
 };
