@@ -3,9 +3,9 @@ import { TemplateFunction } from "./types";
 
 export function generateTemplateMarkdown(definitions: TemplateFunction[]): string {
   return definitions
-    .map(def => {
+    .map((def) => {
       const usage = def.signature ?? `(${def.arguments.join(", ")})`;
-      const examples = def.examples?.map(ex => `> \`{${ex}}\``).join("\n") ?? null;
+      const examples = def.examples?.map((ex) => `> \`{${ex}}\``).join("\n") ?? null;
       return trimPluginDescription(`
         ## ${def.name}
         **${def.description}**\n
