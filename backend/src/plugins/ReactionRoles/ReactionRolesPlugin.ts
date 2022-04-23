@@ -68,11 +68,12 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   },
 
   afterLoad(pluginData) {
-    // let autoRefreshInterval = pluginData.config.get().auto_refresh_interval;
-    // if (autoRefreshInterval != null) {
-    //   autoRefreshInterval = Math.max(MIN_AUTO_REFRESH, autoRefreshInterval);
-    //   autoRefreshLoop(pluginData, autoRefreshInterval);
-    // }
+    const config = pluginData.config.get();
+    if (config.button_groups) {
+      pluginData.getPlugin(LogsPlugin).logBotAlert({
+        body: "The 'button_groups' option of the 'reaction_roles' plugin is deprecated and non-functional. Consider using the new 'role_buttons' plugin instead!",
+      });
+    }
   },
 
   beforeUnload(pluginData) {
