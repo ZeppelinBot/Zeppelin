@@ -5,6 +5,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { Message, MessageButton, MessageEditOptions, MessageOptions, Snowflake } from "discord.js";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem";
 import { splitButtonsIntoRows } from "./splitButtonsIntoRows";
+import { buildCustomId } from "../../../utils/buildCustomId";
 
 const channelMessageRegex = new RegExp(`^(${snowflakeRegex.source})-(${snowflakeRegex.source})$`);
 
@@ -107,7 +108,7 @@ export async function applyRoleButtons(
     const button = new MessageButton()
       .setLabel(opt.label ?? "")
       .setStyle(opt.style ?? "PRIMARY")
-      .setCustomId(`roleButtons:${configItem.name}:${index}:${Math.round(Date.now() / 1000)}`);
+      .setCustomId(buildCustomId("roleButtons", { name: configItem.name, index }));
 
     if (opt.emoji) {
       const emo = pluginData.client.emojis.resolve(opt.emoji as Snowflake) ?? opt.emoji;
