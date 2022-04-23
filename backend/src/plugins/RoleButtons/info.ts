@@ -15,7 +15,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
       config:
         buttons:
           my_roles: # You can use any name you want here, but make sure not to change it afterwards
-            messages:
+            message:
               channel_id: "967407495544983552"
               content: "Click the reactions below to get roles! Click again to remove the role."
             options:
@@ -37,7 +37,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
       config:
         buttons:
           my_roles:
-            messages:
+            message:
               channel_id: "967407495544983552"
               content:
                 embeds:
@@ -55,7 +55,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
       config:
         buttons:
           my_roles:
-            messages:
+            message:
               channel_id: "967407495544983552"
               message_id: "967407554412040193"
             options:
@@ -69,7 +69,7 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
       config:
         buttons:
           my_roles:
-            messages:
+            message:
               channel_id: "967407495544983552"
               message_id: "967407554412040193"
             exclusive: true # With this option set, only one role can be selected at a time
