@@ -3,16 +3,22 @@ import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { GuildMember } from "discord.js";
 import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
+import { parseCustomId } from "../../../utils/parseCustomId";
 
 export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType>()({
   event: "interactionCreate",
   async listener({ pluginData, args }) {
-    if (!args.interaction.isButton() || !args.interaction.customId.startsWith("roleButtons:")) {
+    if (!args.interaction.isButton()) {
+      return;
+    }
+
+    const { namespace, data } = parseCustomId(args.interaction.customId);
+    if (namespace !== "roleButtons") {
       return;
     }
 
     const config = pluginData.config.get();
-    const [, name, optionIndex] = args.interaction.customId.split(":");
+    const { name, index: optionIndex } = data;
     // For some reason TS's type inference fails here so using a type annotation
     const buttons = config.buttons[name];
     const option: TRoleButtonOption | undefined = buttons?.options[optionIndex];
