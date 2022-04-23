@@ -80,7 +80,7 @@ export const ChangePermsAction = automodAction({
         await channel.permissionOverwrites.delete(target).catch(noop);
         return;
       }
-      await channel.permissionOverwrites.create(target, newPerms).catch(noop);
+      await channel.permissionOverwrites.edit(target, newPerms).catch(noop);
       return;
     }
 
