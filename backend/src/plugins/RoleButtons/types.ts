@@ -32,6 +32,7 @@ const RoleButtonsConfigItem = t.type({
     }),
   ]),
   options: t.array(RoleButtonOption),
+  exclusive: tNullable(t.boolean),
 });
 export type TRoleButtonsConfigItem = t.TypeOf<typeof RoleButtonsConfigItem>;
 
