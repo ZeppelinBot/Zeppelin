@@ -94,7 +94,7 @@ export class ApiLogins extends BaseRepository {
 
     const login = await this.apiLogins.createQueryBuilder().where("id = :id", { id: loginId }).getOne();
     if (!login || moment.utc(login.expires_at).isSameOrAfter(updatedTime)) return;
-    
+
     await this.apiLogins.update(
       { id: loginId },
       {
