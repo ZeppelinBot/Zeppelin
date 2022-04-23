@@ -20,7 +20,7 @@ export async function applyRoleButtons(
   if (existingSavedButtons?.channel_id) {
     const existingChannel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
     const existingMessage = await (existingChannel?.isText() &&
-      existingChannel.messages.fetch(existingSavedButtons.message_id));
+      existingChannel.messages.fetch(existingSavedButtons.message_id).catch(() => null));
     if (existingMessage && existingMessage.components.length) {
       await existingMessage.edit({
         components: [],
