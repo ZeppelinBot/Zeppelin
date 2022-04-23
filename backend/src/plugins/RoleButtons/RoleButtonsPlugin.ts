@@ -10,12 +10,28 @@ import { onButtonInteraction } from "./events/buttonInteraction";
 import { pluginInfo } from "./info";
 import { createButtonComponents } from "./functions/createButtonComponents";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError";
+import { resetButtonsCmd } from "./commands/resetButtons";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
   configSchema: ConfigSchema,
   info: pluginInfo,
   showInDocs: true,
+
+  defaultOptions: {
+    config: {
+      buttons: {},
+      can_reset: false,
+    },
+    overrides: [
+      {
+        level: ">=100",
+        config: {
+          can_reset: true,
+        },
+      },
+    ],
+  },
 
   configPreprocessor(options) {
     // Auto-fill "name" property for buttons based on the object key
@@ -57,6 +73,8 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   dependencies: () => [LogsPlugin, RoleManagerPlugin],
 
   events: [onButtonInteraction],
+
+  commands: [resetButtonsCmd],
 
   beforeLoad(pluginData) {
     pluginData.state.roleButtons = GuildRoleButtons.getGuildInstance(pluginData.guild.id);
