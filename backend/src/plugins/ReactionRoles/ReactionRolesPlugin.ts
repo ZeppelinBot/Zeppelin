@@ -19,6 +19,8 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
     remove_user_reactions: true,
 
     can_manage: false,
+
+    button_groups: null,
   },
 
   overrides: [
