@@ -1,7 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ReactionRole } from "../../../data/entities/ReactionRole";
-import { LogType } from "../../../data/LogType";
 import { isDiscordAPIError, sleep } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ReactionRolesPluginType } from "../types";

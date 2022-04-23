@@ -36,6 +36,8 @@ import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
 import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
 import { PhishermanPlugin } from "./Phisherman/PhishermanPlugin";
 import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
+import { RoleManagerPlugin } from "./RoleManager/RoleManagerPlugin";
+import { RoleButtonsPlugin } from "./RoleButtons/RoleButtonsPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
@@ -73,6 +75,8 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   ContextMenuPlugin,
   PhishermanPlugin,
   InternalPosterPlugin,
+  RoleManagerPlugin,
+  RoleButtonsPlugin,
 ];
 
 // prettier-ignore

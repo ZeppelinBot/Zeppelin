@@ -72,6 +72,6 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener();
+    pluginData.state.unregisterGuildEventListener?.();
   },
 });
