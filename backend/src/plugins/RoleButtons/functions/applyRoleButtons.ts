@@ -32,7 +32,8 @@ export async function applyRoleButtons(
   if ("message_id" in configItem.message) {
     // channel id + message id: apply role buttons to existing message
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
-    const messageCandidate = await (channel?.isText() && channel.messages.fetch(configItem.message.message_id));
+    const messageCandidate = await (channel?.isText() &&
+      channel.messages.fetch(configItem.message.message_id).catch(() => null));
     if (!messageCandidate) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Message not found for role_buttons/${configItem.name}`,
