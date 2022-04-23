@@ -39,6 +39,7 @@ export type TRoleButtonsConfigItem = t.TypeOf<typeof RoleButtonsConfigItem>;
 
 export const ConfigSchema = t.type({
   buttons: t.record(t.string, RoleButtonsConfigItem),
+  can_reset: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
