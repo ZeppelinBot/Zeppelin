@@ -20,7 +20,7 @@ export async function applyRoleButtons(
   if (existingSavedButtons?.channel_id) {
     const existingChannel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
     const existingMessage = await (existingChannel?.isText() &&
-      existingChannel.messages.fetch(existingSavedButtons.message_id));
+      existingChannel.messages.fetch(existingSavedButtons.message_id).catch(() => null));
     if (existingMessage && existingMessage.components.length) {
       await existingMessage.edit({
         components: [],
@@ -32,7 +32,8 @@ export async function applyRoleButtons(
   if ("message_id" in configItem.message) {
     // channel id + message id: apply role buttons to existing message
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
-    const messageCandidate = await (channel?.isText() && channel.messages.fetch(configItem.message.message_id));
+    const messageCandidate = await (channel?.isText() &&
+      channel.messages.fetch(configItem.message.message_id).catch(() => null));
     if (!messageCandidate) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Message not found for role_buttons/${configItem.name}`,
@@ -87,7 +88,7 @@ export async function applyRoleButtons(
         candidateMessage = await channel.send(configItem.message.content as string | MessageOptions);
       } catch (err) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
-          body: `Error while posting message for role_buttons/${configItem.name}`,
+          body: `Error while posting message for role_buttons/${configItem.name}: ${String(err)}`,
         });
         return null;
       }
@@ -98,14 +99,19 @@ export async function applyRoleButtons(
 
   if (message.author.id !== pluginData.client.user?.id) {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
-      body: `Error applying role buttons for role_buttons/${configItem.name}: target message must be posted by the bot`,
+      body: `Error applying role buttons for role_buttons/${configItem.name}: target message must be posted by Zeppelin`,
     });
     return null;
   }
 
   // Apply role buttons
   const components = createButtonComponents(configItem);
-  await message.edit({ components });
+  await message.edit({ components }).catch((err) => {
+    pluginData.getPlugin(LogsPlugin).logBotAlert({
+      body: `Error applying role buttons for role_buttons/${configItem.name}: ${String(err)}`,
+    });
+    return null;
+  });
 
   return {
     channel_id: message.channelId,
