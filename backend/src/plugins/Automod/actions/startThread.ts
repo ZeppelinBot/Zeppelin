@@ -1,4 +1,4 @@
-import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types";
+import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types/v9";
 import { TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";

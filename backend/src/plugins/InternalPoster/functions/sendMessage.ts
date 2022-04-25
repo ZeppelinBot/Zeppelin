@@ -1,8 +1,7 @@
-import { GuildTextBasedChannel, Message, MessageOptions, NewsChannel, TextChannel, WebhookClient } from "discord.js";
+import { GuildTextBasedChannel, MessageOptions, WebhookClient } from "discord.js";
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { channelIsWebhookable, getOrCreateWebhookForChannel } from "./getOrCreateWebhookForChannel";
-import { APIMessage } from "discord-api-types";
+import { channelIsWebhookable } from "./getOrCreateWebhookForChannel";
 import { isDiscordAPIError } from "../../../utils";
 import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel";
 
