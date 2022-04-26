@@ -17,6 +17,11 @@ export const TagCreateCmd = tagsCmd({
     const prefix = pluginData.config.get().prefix;
 
     if (args.alias) {
+      const existingTag = await pluginData.state.tagAliases.find(args.body);
+      if (existingTag) {
+        sendErrorMessage(pluginData, msg.channel, `You cannot create an alias of an alias`);
+        return;
+      }
       await pluginData.state.tagAliases.createOrUpdate(args.tag, args.body, msg.author.id);
       sendSuccessMessage(pluginData, msg.channel, `Alias set! Use it with: \`${prefix}${args.tag}\``);
       return;
