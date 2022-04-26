@@ -85,7 +85,7 @@ export async function banUserId(
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, userId);
   ignoreEvent(pluginData, IgnoredEventType.Ban, userId);
   try {
-    const deleteMessageDays = Math.min(30, Math.max(0, banOptions.deleteMessageDays ?? 1));
+    const deleteMessageDays = Math.min(7, Math.max(0, banOptions.deleteMessageDays ?? 1));
     await pluginData.guild.bans.create(userId as Snowflake, {
       days: deleteMessageDays,
       reason: reason ?? undefined,

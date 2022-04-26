@@ -59,5 +59,14 @@ export interface TagsPluginType extends BasePluginType {
   };
 }
 
+export interface TemplateFunction {
+  name: string;
+  description: string;
+  arguments: string[];
+  returnValue: string;
+  signature?: string;
+  examples?: string[];
+}
+
 export const tagsCmd = typedGuildCommand<TagsPluginType>();
 export const tagsEvt = typedGuildEventListener<TagsPluginType>();

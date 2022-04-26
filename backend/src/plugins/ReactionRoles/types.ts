@@ -1,43 +1,15 @@
 import * as t from "io-ts";
 import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { GuildButtonRoles } from "src/data/GuildButtonRoles";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
 import { tNullable } from "../../utils";
 
-// These need to be updated every time discord adds/removes a style,
-// but i cant figure out how to import MessageButtonStyles at runtime
-enum ButtonStyles {
-  PRIMARY = 1,
-  SECONDARY = 2,
-  SUCCESS = 3,
-  DANGER = 4,
-  // LINK = 5, We do not want users to create link buttons, but it would be style 5
-}
-
-const ButtonOpts = t.type({
-  label: tNullable(t.string),
-  emoji: tNullable(t.string),
-  role_or_menu: t.string,
-  style: tNullable(t.keyof(ButtonStyles)), // https://discord.js.org/#/docs/main/master/typedef/MessageButtonStyle
-  disabled: tNullable(t.boolean),
-  end_row: tNullable(t.boolean),
-});
-export type TButtonOpts = t.TypeOf<typeof ButtonOpts>;
-
-const ButtonPairOpts = t.type({
-  message: t.string,
-  default_buttons: t.record(t.string, ButtonOpts),
-  button_menus: tNullable(t.record(t.string, t.record(t.string, ButtonOpts))),
-});
-export type TButtonPairOpts = t.TypeOf<typeof ButtonPairOpts>;
-
 export const ConfigSchema = t.type({
-  button_groups: t.record(t.string, ButtonPairOpts),
   auto_refresh_interval: t.number,
   remove_user_reactions: t.boolean,
   can_manage: t.boolean,
+  button_groups: tNullable(t.unknown),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
@@ -61,7 +33,6 @@ export interface ReactionRolesPluginType extends BasePluginType {
   state: {
     reactionRoles: GuildReactionRoles;
     savedMessages: GuildSavedMessages;
-    buttonRoles: GuildButtonRoles;
 
     reactionRemoveQueue: Queue;
     roleChangeQueue: Queue;
