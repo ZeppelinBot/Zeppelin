@@ -3,11 +3,13 @@ import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
+import { tNullable } from "../../utils";
 
 export const ConfigSchema = t.type({
   auto_refresh_interval: t.number,
   remove_user_reactions: t.boolean,
   can_manage: t.boolean,
+  button_groups: tNullable(t.unknown),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 

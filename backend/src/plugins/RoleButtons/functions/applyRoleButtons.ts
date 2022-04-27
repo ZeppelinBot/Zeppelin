@@ -18,7 +18,7 @@ export async function applyRoleButtons(
 
   // Remove existing role buttons, if any
   if (existingSavedButtons?.channel_id) {
-    const existingChannel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
+    const existingChannel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
     const existingMessage = await (existingChannel?.isText() &&
       existingChannel.messages.fetch(existingSavedButtons.message_id).catch(() => null));
     if (existingMessage && existingMessage.components.length) {
@@ -31,7 +31,7 @@ export async function applyRoleButtons(
   // Find or create message for role buttons
   if ("message_id" in configItem.message) {
     // channel id + message id: apply role buttons to existing message
-    const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
+    const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
     const messageCandidate = await (channel?.isText() &&
       channel.messages.fetch(configItem.message.message_id).catch(() => null));
     if (!messageCandidate) {
@@ -54,7 +54,7 @@ export async function applyRoleButtons(
       return null;
     }
 
-    const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id);
+    const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
     if (!channel || !channel.isText()) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Text channel not found for role_buttons/${configItem.name}`,
