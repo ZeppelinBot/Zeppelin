@@ -20,7 +20,7 @@ const MAX_ROLES_TO_DISPLAY = 15;
 
 const trimRoles = (roles: string[]) =>
   roles.length > MAX_ROLES_TO_DISPLAY
-    ? roles.slice(0, MAX_ROLES_TO_DISPLAY).join(", ") + `, and ${MAX_ROLES_TO_DISPLAY - roles.length} more roles`
+    ? roles.slice(0, MAX_ROLES_TO_DISPLAY).join(", ") + `, and ${roles.length - MAX_ROLES_TO_DISPLAY} more roles`
     : roles.join(", ");
 
 export async function getUserInfoEmbed(
