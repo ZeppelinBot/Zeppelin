@@ -1,4 +1,4 @@
-import { MessageEditOptions, MessageOptions } from "discord.js";
+import { MessageEditOptions, MessageOptions, Util } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -67,7 +67,7 @@ export async function getCaseEmbed(
   if (theCase.notes.length) {
     for (const note of theCase.notes) {
       const noteDate = moment.utc(note.created_at);
-      let noteBody = note.body.trim();
+      let noteBody = Util.escapeCodeBlock(note.body.trim());
       if (noteBody === "") {
         noteBody = emptyEmbedValue;
       }
