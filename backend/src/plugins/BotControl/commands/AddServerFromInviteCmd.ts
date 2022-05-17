@@ -8,7 +8,7 @@ import moment from "moment-timezone";
 import { isEligible } from "../functions/isEligible";
 
 export const AddServerFromInviteCmd = botControlCmd({
-  trigger: ["add_server_from_invite", "allow_server_from_invite"],
+  trigger: ["add_server_from_invite", "allow_server_from_invite", "adv"],
   permission: "can_add_server_from_invite",
 
   signature: {

@@ -164,7 +164,7 @@ export function getPluginConfigPreprocessor(
 
     if (options.overrides) {
       for (const override of options.overrides) {
-        const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config, override.config || {});
+        const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config || {}, override.config || {});
         const decodedOverrideConfig = blueprint.configSchema
           ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
           : overrideConfigMergedWithBaseConfig;
