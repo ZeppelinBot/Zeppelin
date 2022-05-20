@@ -84,7 +84,7 @@ export async function matchAndRenderTagFromString(
     return null;
   }
 
-  const tagNameMatch = str.slice(tagPrefix.length).match(/^[a-z0-9_-]*/);
+  const tagNameMatch = str.slice(tagPrefix.length).match(/^\S+/);
   if (tagNameMatch == null) {
     return null;
   }
