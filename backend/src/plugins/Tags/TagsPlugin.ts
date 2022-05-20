@@ -16,7 +16,6 @@ import { TagCreateCmd } from "./commands/TagCreateCmd";
 import { TagDeleteCmd } from "./commands/TagDeleteCmd";
 import { TagEvalCmd } from "./commands/TagEvalCmd";
 import { TagListCmd } from "./commands/TagListCmd";
-import { TagListAliasesCmd } from "./commands/TagListAliasesCmd";
 import { TagSourceCmd } from "./commands/TagSourceCmd";
 import { ConfigSchema, TagsPluginType } from "./types";
 import { findTagByName } from "./util/findTagByName";
@@ -84,7 +83,6 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
     TagEvalCmd,
     TagDeleteCmd,
     TagListCmd,
-    TagListAliasesCmd,
     TagSourceCmd,
     TagCreateCmd,
   ],
