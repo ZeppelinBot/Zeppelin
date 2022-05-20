@@ -11,13 +11,25 @@ export const TagDeleteCmd = tagsCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    const alias = await pluginData.state.tagAliases.find(args.tag);
     const tag = await pluginData.state.tags.find(args.tag);
-    if (!tag) {
+
+    if (!tag && !alias) {
       sendErrorMessage(pluginData, msg.channel, "No tag with that name");
       return;
     }
 
-    await pluginData.state.tags.delete(args.tag);
-    sendSuccessMessage(pluginData, msg.channel, "Tag deleted!");
+    if (tag) {
+      const aliasesOfTag = await pluginData.state.tagAliases.findAllWithTag(tag?.tag);
+      if (aliasesOfTag) {
+        // tslint:disable-next-line:no-shadowed-variable
+        aliasesOfTag.forEach((alias) => pluginData.state.tagAliases.delete(alias.alias));
+      }
+      await pluginData.state.tags.delete(args.tag);
+    } else {
+      await pluginData.state.tagAliases.delete(alias?.alias);
+    }
+
+    sendSuccessMessage(pluginData, msg.channel, `${tag ? "Tag" : "Alias"} deleted!`);
   },
 });

@@ -7,6 +7,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
+import { GuildTagAliases } from "src/data/GuildTagAliases";
 import { mapToPublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS, trimPluginDescription } from "../../utils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -68,7 +69,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       You use them by adding a \`{}\` on your tag.
 
       Here are the functions you can use in your tags:
-      
+
       ${generateTemplateMarkdown(TemplateFunctions)}
     `),
   },
@@ -123,6 +124,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
     state.archives = GuildArchives.getGuildInstance(guild.id);
     state.tags = GuildTags.getGuildInstance(guild.id);
+    state.tagAliases = GuildTagAliases.getGuildInstance(guild.id);
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
 

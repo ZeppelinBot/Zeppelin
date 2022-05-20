@@ -14,21 +14,39 @@ export const TagSourceCmd = tagsCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
+    const alias = await pluginData.state.tagAliases.find(args.tag);
+    const aliasedTag = await pluginData.state.tags.find(alias?.tag ?? null);
+    const tag = (await pluginData.state.tags.find(args.tag)) || aliasedTag;
+
     if (args.delete) {
       const actualTag = await pluginData.state.tags.find(args.tag);
-      if (!actualTag) {
+
+      if (!actualTag && !aliasedTag) {
         sendErrorMessage(pluginData, msg.channel, "No tag with that name");
         return;
       }
 
-      await pluginData.state.tags.delete(args.tag);
-      sendSuccessMessage(pluginData, msg.channel, "Tag deleted!");
+      if (actualTag) {
+        const aliasesOfTag = await pluginData.state.tagAliases.findAllWithTag(actualTag?.tag);
+        if (aliasesOfTag) {
+          // tslint:disable-next-line:no-shadowed-variable
+          aliasesOfTag.forEach((alias) => pluginData.state.tagAliases.delete(alias.alias));
+        }
+        await pluginData.state.tags.delete(args.tag);
+      } else {
+        await pluginData.state.tagAliases.delete(alias?.alias);
+      }
+
+      sendSuccessMessage(pluginData, msg.channel, `${actualTag ? "Tag" : "Alias"} deleted!`);
       return;
     }
 
-    const tag = await pluginData.state.tags.find(args.tag);
-    if (!tag) {
+    if (!tag && !aliasedTag) {
       sendErrorMessage(pluginData, msg.channel, "No tag with that name");
+      return;
+    }
+
+    if (!tag?.body) {
       return;
     }
 

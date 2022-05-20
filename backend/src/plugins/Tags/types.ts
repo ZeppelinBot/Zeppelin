@@ -4,6 +4,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
+import { GuildTagAliases } from "../../data/GuildTagAliases";
 import { tEmbed, tNullable } from "../../utils";
 
 export const Tag = t.union([t.string, tEmbed]);
@@ -50,6 +51,7 @@ export interface TagsPluginType extends BasePluginType {
   state: {
     archives: GuildArchives;
     tags: GuildTags;
+    tagAliases: GuildTagAliases;
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
 
