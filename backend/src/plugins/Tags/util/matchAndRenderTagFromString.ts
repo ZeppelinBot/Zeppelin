@@ -123,6 +123,7 @@ export async function matchAndRenderTagFromString(
     const content: StrictMessageContent = {
       content: `Did you mean:\n${lowest[1].join("\n")}`,
     };
+
     return {
       renderedContent: content,
       tagName: "",
