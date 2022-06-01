@@ -1,0 +1,56 @@
+version: '3'
+services:
+#  nginx:
+#    user: "${UID:?Missing UID}:${GID:?Missing GID}"
+#    build:
+#      context: ./nginx
+#      args:
+#        API_DOMAIN: ${API_DOMAIN:?Missing API_DOMAIN}
+#        API_PORT: ${API_PORT:?Missing API_PORT}
+#        DASHBOARD_DOMAIN: ${DASHBOARD_DOMAIN:?Missing DASHBOARD_DOMAIN}
+#        DASHBOARD_PORT: ${DASHBOARD_PORT:?Missing DASHBOARD_PORT}
+#    ports:
+#      - ${PORT:?Missing PORT}:443
+#    volumes:
+#      - ./:/zeppelin
+#
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD?:Missing MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: zeppelin
+      MYSQL_USER: zeppelin
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD?:Missing MYSQL_PASSWORD}
+    ports:
+      - ${MYSQL_PORT:?Missing MYSQL_PORT}:3306
+#
+#  backend:
+#    image: node:16
+#    user: "${UID:?Missing UID}:${GID:?Missing GID}"
+#    working_dir: /zeppelin/backend
+#    restart: always
+#    depends_on:
+#      - mysql
+#    volumes:
+#      - ./:/zeppelin
+#    command: sh -c "npm run migrate-dev && npm run watch"
+#
+#  dashboard:
+#    image: node:16
+#    user: "${UID:?Missing UID}:${GID:?Missing GID}"
+#    working_dir: /zeppelin/dashboard
+#    restart: always
+#    volumes:
+#      - ./:/zeppelin
+#    command: sh -c "npm run watch-build"
+
+  devenv:
+    build:
+      context: ./devenv
+      args:
+        DOCKER_UID: ${DOCKER_UID:?Missing DOCKER_UID}
+        DOCKER_GID: ${DOCKER_GID:?Missing DOCKER_GID}
+    ports:
+      - "${DEVELOPMENT_SSH_PORT:?Missing DEVELOPMENT_SSH_PORT}:22"
+    volumes:
+      - ../../:/zeppelin
