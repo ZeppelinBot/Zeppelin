@@ -16,6 +16,11 @@ export const AddReactionsEvt = autoReactionsEvt({
   allowSelf: true,
 
   async listener({ pluginData, args: { message } }) {
+    const channel = await message.guild?.channels.fetch(message.channelId);
+    if (!channel) {
+      return;
+    }
+
     let autoReaction: AutoReaction | null = null;
     const lock = await pluginData.locks.acquire(`auto-reactions-${message.channel.id}`);
     if (pluginData.state.cache.has(message.channel.id)) {
