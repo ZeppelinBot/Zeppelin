@@ -205,7 +205,9 @@ export const MutesCmd = mutesCmd({
 
         collector.on("collect", async (interaction: MessageComponentInteraction) => {
           if (msg.author.id !== interaction.user.id) {
-            interaction.reply({ content: `You are not permitted to use these buttons.`, ephemeral: true });
+            interaction
+              .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+              .catch((err) => console.trace(err.message));
           } else {
             collector.resetTimer();
             await interaction.deferUpdate();

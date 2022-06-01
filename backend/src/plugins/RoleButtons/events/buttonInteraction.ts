@@ -23,10 +23,12 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
     const buttons = config.buttons[name];
     const option: TRoleButtonOption | undefined = buttons?.options[optionIndex];
     if (!buttons || !option) {
-      args.interaction.reply({
-        ephemeral: true,
-        content: "Invalid option selected",
-      });
+      args.interaction
+        .reply({
+          ephemeral: true,
+          content: "Invalid option selected",
+        })
+        .catch((err) => console.trace(err.message));
       return;
     }
 
@@ -39,10 +41,12 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
 
     if (member.roles.cache.has(option.role_id)) {
       rolesToRemove.push(option.role_id);
-      args.interaction.reply({
-        ephemeral: true,
-        content: `The role **${roleName}** will be removed shortly!`,
-      });
+      args.interaction
+        .reply({
+          ephemeral: true,
+          content: `The role **${roleName}** will be removed shortly!`,
+        })
+        .catch((err) => console.trace(err.message));
     } else {
       rolesToAdd.push(option.role_id);
 
@@ -54,10 +58,12 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
         }
       }
 
-      args.interaction.reply({
-        ephemeral: true,
-        content: `You will receive the **${roleName}** role shortly!`,
-      });
+      args.interaction
+        .reply({
+          ephemeral: true,
+          content: `You will receive the **${roleName}** role shortly!`,
+        })
+        .catch((err) => console.trace(err.message));
     }
 
     for (const roleId of rolesToAdd) {
