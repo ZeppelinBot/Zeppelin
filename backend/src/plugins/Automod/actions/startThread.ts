@@ -7,6 +7,13 @@ import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { automodAction } from "../helpers";
 
+const validThreadAutoArchiveDurations: ThreadAutoArchiveDuration[] = [
+  ThreadAutoArchiveDuration.OneHour,
+  ThreadAutoArchiveDuration.OneDay,
+  ThreadAutoArchiveDuration.ThreeDays,
+  ThreadAutoArchiveDuration.OneWeek,
+];
+
 export const StartThreadAction = automodAction({
   configType: t.type({
     name: tNullable(t.string),
@@ -41,22 +48,9 @@ export const StartThreadAction = automodAction({
     const archiveSet = actionConfig.auto_archive
       ? Math.ceil(Math.max(convertDelayStringToMS(actionConfig.auto_archive) ?? 0, 0) / MINUTES)
       : ThreadAutoArchiveDuration.OneDay;
-    let autoArchive: ThreadAutoArchiveDuration;
-    if (archiveSet === ThreadAutoArchiveDuration.OneDay) {
-      autoArchive = ThreadAutoArchiveDuration.OneDay;
-    } else if (
-      archiveSet === ThreadAutoArchiveDuration.ThreeDays &&
-      guild.features.includes(GuildFeature.ThreeDayThreadArchive)
-    ) {
-      autoArchive = ThreadAutoArchiveDuration.ThreeDays;
-    } else if (
-      archiveSet === ThreadAutoArchiveDuration.OneWeek &&
-      guild.features.includes(GuildFeature.SevenDayThreadArchive)
-    ) {
-      autoArchive = ThreadAutoArchiveDuration.OneWeek;
-    } else {
-      autoArchive = ThreadAutoArchiveDuration.OneHour;
-    }
+    const autoArchive = validThreadAutoArchiveDurations.includes(archiveSet)
+      ? (archiveSet as ThreadAutoArchiveDuration)
+      : ThreadAutoArchiveDuration.OneHour;
 
     for (const threadContext of threads) {
       const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as TextChannel;
