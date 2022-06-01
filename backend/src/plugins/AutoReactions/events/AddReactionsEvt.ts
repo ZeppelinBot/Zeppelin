@@ -22,12 +22,12 @@ export const AddReactionsEvt = autoReactionsEvt({
     }
 
     let autoReaction: AutoReaction | null = null;
-    const lock = await pluginData.locks.acquire(`auto-reactions-${message.channel.id}`);
-    if (pluginData.state.cache.has(message.channel.id)) {
-      autoReaction = pluginData.state.cache.get(message.channel.id) ?? null;
+    const lock = await pluginData.locks.acquire(`auto-reactions-${channel.id}`);
+    if (pluginData.state.cache.has(channel.id)) {
+      autoReaction = pluginData.state.cache.get(channel.id) ?? null;
     } else {
-      autoReaction = (await pluginData.state.autoReactions.getForChannel(message.channel.id)) ?? null;
-      pluginData.state.cache.set(message.channel.id, autoReaction);
+      autoReaction = (await pluginData.state.autoReactions.getForChannel(channel.id)) ?? null;
+      pluginData.state.cache.set(channel.id, autoReaction);
     }
     lock.unlock();
 
@@ -39,15 +39,13 @@ export const AddReactionsEvt = autoReactionsEvt({
     if (me) {
       const missingPermissions = getMissingChannelPermissions(
         me,
-        message.channel as GuildChannel,
+        channel as GuildChannel,
         readChannelPermissions | p.ADD_REACTIONS,
       );
       if (missingPermissions) {
         const logs = pluginData.getPlugin(LogsPlugin);
         logs.logBotAlert({
-          body: `Cannot apply auto-reactions in <#${message.channel.id}>. ${missingPermissionError(
-            missingPermissions,
-          )}`,
+          body: `Cannot apply auto-reactions in <#${channel.id}>. ${missingPermissionError(missingPermissions)}`,
         });
         return;
       }
@@ -61,11 +59,11 @@ export const AddReactionsEvt = autoReactionsEvt({
           const logs = pluginData.getPlugin(LogsPlugin);
           if (e.code === 10008) {
             logs.logBotAlert({
-              body: `Could not apply auto-reactions in <#${message.channel.id}> for message \`${message.id}\`. Make sure nothing is deleting the message before the reactions are applied.`,
+              body: `Could not apply auto-reactions in <#${channel.id}> for message \`${message.id}\`. Make sure nothing is deleting the message before the reactions are applied.`,
             });
           } else {
             logs.logBotAlert({
-              body: `Could not apply auto-reactions in <#${message.channel.id}> for message \`${message.id}\`. Error code ${e.code}.`,
+              body: `Could not apply auto-reactions in <#${channel.id}> for message \`${message.id}\`. Error code ${e.code}.`,
             });
           }
 
