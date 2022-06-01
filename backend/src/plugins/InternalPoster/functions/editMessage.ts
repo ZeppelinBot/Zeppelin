@@ -1,4 +1,11 @@
-import { Message, MessageOptions, NewsChannel, TextChannel, WebhookClient } from "discord.js";
+import {
+  Message,
+  MessageEditOptions,
+  NewsChannel,
+  TextChannel,
+  WebhookClient,
+  WebhookEditMessageOptions,
+} from "discord.js";
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
 import { isDiscordAPIError, noop } from "../../../utils";
@@ -9,7 +16,7 @@ import { isDiscordAPIError, noop } from "../../../utils";
 export async function editMessage(
   pluginData: GuildPluginData<InternalPosterPluginType>,
   message: Message,
-  content: MessageOptions,
+  content: MessageEditOptions & WebhookEditMessageOptions,
 ): Promise<void> {
   if (!(message.channel instanceof TextChannel || message.channel instanceof NewsChannel)) {
     return;
