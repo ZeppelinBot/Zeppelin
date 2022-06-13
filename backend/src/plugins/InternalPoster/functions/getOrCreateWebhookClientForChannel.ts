@@ -1,11 +1,11 @@
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { NewsChannel, TextChannel, WebhookClient } from "discord.js";
-import { getOrCreateWebhookForChannel } from "./getOrCreateWebhookForChannel";
+import { WebhookClient } from "discord.js";
+import { getOrCreateWebhookForChannel, WebhookableChannel } from "./getOrCreateWebhookForChannel";
 
 export async function getOrCreateWebhookClientForChannel(
   pluginData: GuildPluginData<InternalPosterPluginType>,
-  channel: TextChannel | NewsChannel,
+  channel: WebhookableChannel,
 ): Promise<WebhookClient | null> {
   if (!pluginData.state.webhookClientCache.has(channel.id)) {
     const webhookInfo = await getOrCreateWebhookForChannel(pluginData, channel);

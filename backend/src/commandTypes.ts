@@ -1,4 +1,4 @@
-import { GuildChannel, GuildMember, Snowflake, Util, User } from "discord.js";
+import { GuildChannel, GuildMember, Snowflake, Util, User, GuildTextBasedChannel } from "discord.js";
 import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
@@ -14,6 +14,8 @@ import {
 import { isValidTimezone } from "./utils/isValidTimezone";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
 import { inputPatternToRegExp } from "./validatorUtils";
+import { getChannelId } from "knub/dist/utils";
+import { disableCodeBlocks } from "knub/dist/helpers";
 
 export const commandTypes = {
   ...baseTypeConverters,
@@ -100,6 +102,11 @@ export const commandTypes = {
 
     return value;
   },
+
+  guildTextBasedChannel(value: string, context: CommandContext<any>) {
+    // FIXME: Remove once Knub's types have been fixed
+    return baseTypeConverters.textChannel(value, context) as GuildTextBasedChannel;
+  },
 };
 
 export const commandTypeHelpers = {
@@ -113,4 +120,5 @@ export const commandTypeHelpers = {
   anyId: createTypeHelper<Promise<Snowflake>>(commandTypes.anyId),
   regex: createTypeHelper<RegExp>(commandTypes.regex),
   timezone: createTypeHelper<string>(commandTypes.timezone),
+  guildTextBasedChannel: createTypeHelper<GuildTextBasedChannel>(commandTypes.guildTextBasedChannel),
 };

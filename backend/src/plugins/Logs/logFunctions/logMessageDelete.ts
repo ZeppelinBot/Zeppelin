@@ -3,7 +3,7 @@ import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, ThreadChannel, User } from "discord.js";
+import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel, User } from "discord.js";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,
@@ -16,7 +16,7 @@ import { UnknownUser, useMediaUrls } from "../../../utils";
 
 interface LogMessageDeleteData {
   user: User | UnknownUser;
-  channel: BaseGuildTextChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   message: SavedMessage;
 }
 

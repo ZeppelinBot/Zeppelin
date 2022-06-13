@@ -3,13 +3,13 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, ThreadChannel } from "discord.js";
+import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel } from "discord.js";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
 
 interface LogMessageDeleteBulkData {
   count: number;
   authorIds: string[];
-  channel: BaseGuildTextChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   archiveUrl: string;
 }
 

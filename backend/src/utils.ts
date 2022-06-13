@@ -6,8 +6,10 @@ import {
   Guild,
   GuildAuditLogs,
   GuildAuditLogsEntry,
+  GuildBasedChannel,
   GuildChannel,
   GuildMember,
+  GuildTextBasedChannel,
   Invite,
   InviteGuild,
   LimitedCollection,
@@ -1085,7 +1087,7 @@ export type CustomEmoji = {
   id: string;
 } & Emoji;
 
-export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel | ThreadChannel };
+export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: GuildTextBasedChannel };
 
 export const disableUserNotificationStrings = ["no", "none", "off"];
 

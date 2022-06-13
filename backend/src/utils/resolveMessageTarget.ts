@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
 import { isSnowflake } from "../utils";
@@ -7,7 +7,7 @@ const channelAndMessageIdRegex = /^(\d+)[\-\/](\d+)$/;
 const messageLinkRegex = /^https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/\d+\/(\d+)\/(\d+)$/i;
 
 export interface MessageTarget {
-  channel: TextChannel;
+  channel: GuildTextBasedChannel;
   messageId: string;
 }
 
@@ -47,7 +47,7 @@ export async function resolveMessageTarget(pluginData: GuildPluginData<any>, val
   }
 
   const channel = pluginData.guild.channels.resolve(result.channelId as Snowflake);
-  if (!channel || !(channel instanceof TextChannel)) {
+  if (!channel?.isText()) {
     return null;
   }
 

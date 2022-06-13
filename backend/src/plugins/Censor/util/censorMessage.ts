@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { BaseGuildTextChannel, GuildTextBasedChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -22,9 +22,7 @@ export async function censorMessage(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as
-    | BaseGuildTextChannel
-    | ThreadChannel;
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   pluginData.getPlugin(LogsPlugin).logCensor({
     user,
