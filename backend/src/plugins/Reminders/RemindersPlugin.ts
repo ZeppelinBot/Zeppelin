@@ -56,7 +56,7 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener();
+    pluginData.state.unregisterGuildEventListener?.();
     pluginData.state.unloaded = true;
   },
 });
