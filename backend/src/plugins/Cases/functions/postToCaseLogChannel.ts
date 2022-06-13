@@ -18,8 +18,7 @@ export async function postToCaseLogChannel(
   if (!caseLogChannelId) return null;
 
   const caseLogChannel = pluginData.guild.channels.cache.get(caseLogChannelId as Snowflake);
-  // This doesn't use `!isText() || isThread()` because TypeScript had some issues inferring types from it
-  if (!caseLogChannel || !(caseLogChannel instanceof TextChannel || caseLogChannel instanceof NewsChannel)) return null;
+  if (!caseLogChannel?.isText() || caseLogChannel.isThread()) return null;
 
   let result: InternalPosterMessageResult | null = null;
   try {

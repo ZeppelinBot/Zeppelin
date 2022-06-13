@@ -1,13 +1,13 @@
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { NewsChannel, Permissions, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Permissions, ThreadChannel } from "discord.js";
 import { isDiscordAPIError } from "../../../utils";
 
 type WebhookInfo = [id: string, token: string];
 
 export async function getOrCreateWebhookForChannel(
   pluginData: GuildPluginData<InternalPosterPluginType>,
-  channel: TextChannel | NewsChannel,
+  channel: Exclude<GuildTextBasedChannel, ThreadChannel>,
 ): Promise<WebhookInfo | null> {
   // tslint:disable-next-line:no-console FIXME: Here for debugging purposes
   console.log(`getOrCreateWebhookForChannel(${channel.id})`);

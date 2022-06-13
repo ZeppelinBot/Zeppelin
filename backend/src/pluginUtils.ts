@@ -2,7 +2,14 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { GuildMember, Message, MessageMentionOptions, MessageOptions, TextChannel } from "discord.js";
+import {
+  GuildMember,
+  GuildTextBasedChannel,
+  Message,
+  MessageMentionOptions,
+  MessageOptions,
+  TextChannel,
+} from "discord.js";
 import * as t from "io-ts";
 import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
@@ -187,7 +194,7 @@ export function getPluginConfigPreprocessor(
 
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextChannel,
+  channel: GuildTextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {

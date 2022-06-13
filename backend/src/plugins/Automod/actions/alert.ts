@@ -38,7 +38,7 @@ export const AlertAction = automodAction({
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
-    if (channel && channel instanceof TextChannel) {
+    if (channel?.isText()) {
       const text = actionConfig.text;
       const theMessageLink =
         contexts[0].message && messageLink(pluginData.guild.id, contexts[0].message.channel_id, contexts[0].message.id);

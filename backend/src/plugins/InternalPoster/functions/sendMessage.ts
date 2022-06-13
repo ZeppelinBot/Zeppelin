@@ -1,8 +1,6 @@
-import { Message, MessageOptions, NewsChannel, TextChannel, WebhookClient } from "discord.js";
+import { GuildTextBasedChannel, MessageOptions } from "discord.js";
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { getOrCreateWebhookForChannel } from "./getOrCreateWebhookForChannel";
-import { APIMessage } from "discord-api-types";
 import { isDiscordAPIError } from "../../../utils";
 import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel";
 
@@ -12,7 +10,7 @@ export type InternalPosterMessageResult = {
 };
 
 async function sendDirectly(
-  channel: TextChannel | NewsChannel,
+  channel: GuildTextBasedChannel,
   content: MessageOptions,
 ): Promise<InternalPosterMessageResult | null> {
   return channel.send(content).then((message) => ({
@@ -26,11 +24,11 @@ async function sendDirectly(
  */
 export async function sendMessage(
   pluginData: GuildPluginData<InternalPosterPluginType>,
-  channel: TextChannel | NewsChannel,
+  channel: GuildTextBasedChannel,
   content: MessageOptions,
 ): Promise<InternalPosterMessageResult | null> {
   return pluginData.state.queue.add(async () => {
-    const webhookClient = await getOrCreateWebhookClientForChannel(pluginData, channel);
+    const webhookClient = !channel.isThread() ? await getOrCreateWebhookClientForChannel(pluginData, channel) : null;
     if (!webhookClient) {
       return sendDirectly(channel, content);
     }
