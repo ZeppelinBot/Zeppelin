@@ -11,17 +11,15 @@ const envType = z.object({
   CLIENT_SECRET: z.string().length(32),
   BOT_TOKEN: z.string().min(50),
 
-  OAUTH_CALLBACK_URL: z.string().url(),
-  DASHBOARD_DOMAIN: z.string(),
-  API_DOMAIN: z.string(),
+  DASHBOARD_URL: z.string().url(),
+  API_URL: z.string().url(),
+  API_PORT: z.preprocess((v) => Number(v), z.number().min(1).max(65535)).default(3000),
 
   STAFF: z.preprocess((v) => String(v).split(","), z.array(z.string())).optional(),
 
   PHISHERMAN_API_KEY: z.string().optional(),
 
-  API_PORT: z.preprocess((v) => Number(v), z.number().min(1).max(65535)),
-
-  DOCKER_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
+  DOCKER_DEV_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
 
   DB_HOST: z.string().optional().default("mysql"),
   DB_PORT: z
@@ -42,6 +40,6 @@ if (fs.existsSync(envPath)) {
 
 export const env = envType.parse(toValidate);
 
-if (env.DOCKER_MYSQL_PASSWORD && !env.DB_PASSWORD) {
-  env.DB_PASSWORD = env.DOCKER_MYSQL_PASSWORD;
+if (env.DOCKER_DEV_MYSQL_PASSWORD && !env.DB_PASSWORD) {
+  env.DB_PASSWORD = env.DOCKER_DEV_MYSQL_PASSWORD;
 }

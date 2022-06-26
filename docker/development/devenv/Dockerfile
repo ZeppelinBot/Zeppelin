@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-ARG DOCKER_UID
+ARG DOCKER_UID=1000
 ARG DOCKER_DEV_SSH_PASSWORD
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -13,7 +13,7 @@ RUN apt-get install -y sudo git curl
 # Set up SSH access
 RUN apt-get install -y openssh-server iptables
 RUN mkdir /var/run/sshd
-RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u "${DOCKER_UID}" ubuntu
+RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u $DOCKER_UID ubuntu
 RUN echo "ubuntu:${DOCKER_DEV_SSH_PASSWORD}" | chpasswd
 
 # Set up proper permissions for volumes

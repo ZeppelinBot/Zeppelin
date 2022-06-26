@@ -14,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: `https://${env.DASHBOARD_DOMAIN}`,
+    origin: env.DASHBOARD_URL,
   }),
 );
 app.use(

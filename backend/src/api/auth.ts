@@ -88,7 +88,7 @@ export function initAuth(app: express.Express) {
         tokenURL: "https://discord.com/api/oauth2/token",
         clientID: env.CLIENT_ID,
         clientSecret: env.CLIENT_SECRET,
-        callbackURL: env.OAUTH_CALLBACK_URL,
+        callbackURL: `${env.API_URL}/auth/oauth-callback`,
         scope: ["identify"],
       },
       async (accessToken, refreshToken, profile, cb) => {
@@ -117,9 +117,9 @@ export function initAuth(app: express.Express) {
     passport.authenticate("oauth2", { failureRedirect: "/", session: false }),
     (req: Request, res: Response) => {
       if (req.user && req.user.apiKey) {
-        res.redirect(`https://${env.DASHBOARD_DOMAIN}/login-callback/?apiKey=${req.user.apiKey}`);
+        res.redirect(`${env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
       } else {
-        res.redirect(`https://${env.DASHBOARD_DOMAIN}/login-callback/?error=noAccess`);
+        res.redirect(`${env.DASHBOARD_URL}/login-callback/?error=noAccess`);
       }
     },
   );

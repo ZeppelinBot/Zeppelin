@@ -20,7 +20,7 @@ Vue.mixin({
     return {
       get env() {
         return Object.freeze({
-          API_URL: `https://${process.env.API_DOMAIN}`,
+          API_URL: process.env.API_URL,
         });
       },
     };
