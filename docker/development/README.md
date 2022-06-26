@@ -1,8 +1,9 @@
 # Running the development environment
 1. Install Docker
-2. Fill the values in .env
-3. Run `./docker-compose-dev.sh up` to start the development environment
-4. Connect to the development environment with your editor's remote SSH feature (see below)
+2. Make a copy of `.env.example` called `.env`
+3. Fill in the missing values in `.env`
+4. Run `./docker-compose-dev.sh up` to start the development environment
+5. Connect to the development environment with your editor's remote SSH feature (see below)
 
 ## Connecting with VSCode
 1. Install the `Remote - SSH` plugin
