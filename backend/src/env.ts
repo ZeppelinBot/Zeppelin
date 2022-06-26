@@ -19,19 +19,22 @@ const envType = z.object({
 
   PHISHERMAN_API_KEY: z.string().optional(),
 
-  API_PORT: z.number().min(1).max(65535),
+  API_PORT: z.preprocess((v) => Number(v), z.number().min(1).max(65535)),
 
   DOCKER_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
 
   DB_HOST: z.string().optional().default("mysql"),
-  DB_PORT: z.number().optional().default(3306),
+  DB_PORT: z
+    .preprocess((v) => Number(v), z.number())
+    .optional()
+    .default(3306),
   DB_USER: z.string().optional().default("zeppelin"),
   DB_PASSWORD: z.string().optional(), // Default is set to DOCKER_MYSQL_PASSWORD further below
   DB_DATABASE: z.string().optional().default("zeppelin"),
 });
 
 let toValidate = {};
-const envPath = path.join(rootDir, "../.env");
+const envPath = path.join(rootDir, ".env");
 if (fs.existsSync(envPath)) {
   const buf = fs.readFileSync(envPath);
   toValidate = dotenv.parse(buf);
