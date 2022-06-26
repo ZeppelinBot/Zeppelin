@@ -7,14 +7,14 @@ volumes:
 services:
   nginx:
     build:
-      context: ./nginx
+      context: ./docker/development/nginx
       args:
         DOCKER_DEV_WEB_PORT: ${DOCKER_DEV_WEB_PORT:?Missing DOCKER_DEV_WEB_PORT}
         API_PORT: ${API_PORT:?Missing API_PORT}
     ports:
       - "${DOCKER_DEV_WEB_PORT:?Missing DOCKER_DEV_WEB_PORT}:443"
     volumes:
-      - ../../:/zeppelin
+      - ./:/zeppelin
 
   mysql:
     image: mysql:8.0
@@ -31,15 +31,14 @@ services:
 
   devenv:
     build:
-      context: ./devenv
+      context: ./docker/development/devenv
       args:
         DOCKER_DEV_SSH_PASSWORD: ${DOCKER_DEV_SSH_PASSWORD:?Missing DOCKER_DEV_SSH_PASSWORD}
-        DOCKER_UID: ${DOCKER_UID:?Missing DOCKER_UID}
-        DOCKER_STAY_RUNNING: ${DOCKER_STAY_RUNNING}
+        DOCKER_DEV_UID: ${DOCKER_DEV_UID:-1000}
     ports:
       - "${DOCKER_DEV_SSH_PORT:?Missing DOCKER_DEV_SSH_PORT}:22"
     volumes:
-      - ../../:/home/ubuntu/zeppelin
+      - ./:/home/ubuntu/zeppelin
       - ~/.ssh:/home/ubuntu/.ssh
       - vscode-remote:/home/ubuntu/.vscode-remote
       - vscode-server:/home/ubuntu/.vscode-server
