@@ -1,5 +1,5 @@
 import { RootStore } from "./store";
-const apiUrl = process.env.API_URL;
+const apiUrl = `https://${process.env.API_DOMAIN}`;
 
 type QueryParamObject = { [key: string]: string | null };
 
