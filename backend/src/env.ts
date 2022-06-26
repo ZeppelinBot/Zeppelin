@@ -7,9 +7,9 @@ import { z } from "zod";
 const envType = z.object({
   KEY: z.string().length(32),
 
-  CLIENT_ID: z.string(),
-  CLIENT_SECRET: z.string(),
-  BOT_TOKEN: z.string(),
+  CLIENT_ID: z.string().min(16),
+  CLIENT_SECRET: z.string().length(32),
+  BOT_TOKEN: z.string().min(50),
 
   OAUTH_CALLBACK_URL: z.string().url(),
   DASHBOARD_DOMAIN: z.string(),
