@@ -1,4 +1,4 @@
-import { BaseGuildTextChannel, MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
+import { BaseGuildTextChannel, GuildTextBasedChannel, MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -49,9 +49,7 @@ export async function onMessageUpdate(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as
-    | BaseGuildTextChannel
-    | ThreadChannel;
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   logMessageEdit(pluginData, {
     user,

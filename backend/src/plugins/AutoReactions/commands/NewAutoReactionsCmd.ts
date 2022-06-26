@@ -15,7 +15,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
   usage: "!auto_reactions 629990160477585428 👍 👎",
 
   signature: {
-    channel: ct.channel(),
+    channel: ct.guildTextBasedChannel(),
     reactions: ct.string({ rest: true }),
   },
 
@@ -23,7 +23,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
     const finalReactions: string[] = [];
 
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
-    const missingPermissions = getMissingChannelPermissions(me, args.channel as GuildChannel, requiredPermissions);
+    const missingPermissions = getMissingChannelPermissions(me, args.channel, requiredPermissions);
     if (missingPermissions) {
       sendErrorMessage(
         pluginData,

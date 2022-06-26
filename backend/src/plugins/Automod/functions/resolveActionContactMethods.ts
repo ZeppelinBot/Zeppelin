@@ -19,7 +19,7 @@ export function resolveActionContactMethods(
     }
 
     const channel = pluginData.guild.channels.cache.get(actionConfig.notifyChannel as Snowflake);
-    if (!(channel instanceof TextChannel || channel instanceof ThreadChannel)) {
+    if (!channel?.isText()) {
       throw new RecoverablePluginError(ERRORS.INVALID_USER_NOTIFICATION_CHANNEL);
     }
 

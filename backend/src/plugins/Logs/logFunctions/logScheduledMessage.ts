@@ -3,12 +3,12 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, ThreadChannel, User } from "discord.js";
+import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel, User } from "discord.js";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 
 interface LogScheduledMessageData {
   author: User;
-  channel: BaseGuildTextChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   datetime: string;
   date: string;
   time: string;

@@ -1,4 +1,4 @@
-import { Channel, Message, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
+import { Channel, GuildTextBasedChannel, Message, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -20,7 +20,7 @@ const MAX_REPEAT_UNTIL = moment.utc().add(100, "years");
 export async function actualPostCmd(
   pluginData: GuildPluginData<PostPluginType>,
   msg: Message,
-  targetChannel: Channel,
+  targetChannel: GuildTextBasedChannel,
   content: StrictMessageContent,
   opts: {
     "enable-mentions"?: boolean;
@@ -30,12 +30,8 @@ export async function actualPostCmd(
     "repeat-times"?: number;
   } = {},
 ) {
-  if (
-    !(targetChannel instanceof TextChannel) &&
-    !(targetChannel instanceof NewsChannel) &&
-    !(targetChannel instanceof ThreadChannel)
-  ) {
-    msg.channel.send(errorMessage("Specified channel is not a text channel, announcement channel, or thread"));
+  if (!targetChannel.isText()) {
+    msg.channel.send(errorMessage("Specified channel is not a text-based channel"));
     return;
   }
 
