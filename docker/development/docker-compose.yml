@@ -1,28 +1,33 @@
 version: '3'
+volumes:
+  mysql-data: {}
+  vscode-remote: {}
+  vscode-server: {}
+  jetbrains-data: {}
 services:
-#  nginx:
-#    user: "${UID:?Missing UID}:${GID:?Missing GID}"
-#    build:
-#      context: ./nginx
-#      args:
-#        API_DOMAIN: ${API_DOMAIN:?Missing API_DOMAIN}
-#        API_PORT: ${API_PORT:?Missing API_PORT}
-#        DASHBOARD_DOMAIN: ${DASHBOARD_DOMAIN:?Missing DASHBOARD_DOMAIN}
-#        DASHBOARD_PORT: ${DASHBOARD_PORT:?Missing DASHBOARD_PORT}
-#    ports:
-#      - ${PORT:?Missing PORT}:443
-#    volumes:
-#      - ./:/zeppelin
-#
+  nginx:
+    build:
+      context: ./nginx
+      args:
+        API_DOMAIN: ${API_DOMAIN:?Missing API_DOMAIN}
+        API_PORT: ${API_PORT:?Missing API_PORT}
+        DASHBOARD_DOMAIN: ${DASHBOARD_DOMAIN:?Missing DASHBOARD_DOMAIN}
+    ports:
+      - ${DOCKER_WEB_PORT:?Missing DOCKER_WEB_PORT}:443
+    volumes:
+      - ../../:/zeppelin
+
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD?:Missing MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DOCKER_MYSQL_ROOT_PASSWORD?:Missing DOCKER_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: zeppelin
       MYSQL_USER: zeppelin
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD?:Missing MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${DOCKER_MYSQL_PASSWORD?:Missing DOCKER_MYSQL_PASSWORD}
     ports:
-      - ${MYSQL_PORT:?Missing MYSQL_PORT}:3306
+      - ${DOCKER_MYSQL_PORT:?Missing DOCKER_MYSQL_PORT}:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
 #
 #  backend:
 #    image: node:16
@@ -50,7 +55,12 @@ services:
       args:
         DOCKER_UID: ${DOCKER_UID:?Missing DOCKER_UID}
         DOCKER_GID: ${DOCKER_GID:?Missing DOCKER_GID}
+        DOCKER_DEV_SSH_PASSWORD: ${DOCKER_DEV_SSH_PASSWORD:?Missing DOCKER_DEV_SSH_PASSWORD}
     ports:
-      - "${DEVELOPMENT_SSH_PORT:?Missing DEVELOPMENT_SSH_PORT}:22"
+      - "${DOCKER_DEV_SSH_PORT:?Missing DOCKER_DEV_SSH_PORT}:22"
     volumes:
-      - ../../:/zeppelin
+      - ../../:/home/ubuntu/zeppelin
+      - ~/.ssh:/home/ubuntu/.ssh
+      - vscode-remote:/home/ubuntu/.vscode-remote
+      - vscode-server:/home/ubuntu/.vscode-server
+      - jetbrains-data:/home/ubuntu/.cache/JetBrains

@@ -10,7 +10,6 @@ import { connect } from "./data/db";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
 import { DiscordJSError } from "./DiscordJSError";
-import "./loadEnv";
 import { logger } from "./logger";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { RecoverablePluginError } from "./RecoverablePluginError";
@@ -37,12 +36,7 @@ import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./dat
 import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
 import { consumeQueryStats } from "./data/queryLogger";
 import { EventEmitter } from "events";
-
-if (!process.env.KEY) {
-  // tslint:disable-next-line:no-console
-  console.error("Project root .env with KEY is required!");
-  process.exit(1);
-}
+import { env } from "./env";
 
 // Error handling
 let recentPluginErrors = 0;
@@ -413,5 +407,5 @@ connect().then(async () => {
   bot.initialize();
   logger.info("Bot Initialized");
   logger.info("Logging in...");
-  await client.login(process.env.TOKEN);
+  await client.login(env.BOT_TOKEN);
 });

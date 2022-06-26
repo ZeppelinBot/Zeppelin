@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: path.resolve(process.cwd(), "../.env") });
 
 const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
