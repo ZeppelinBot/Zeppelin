@@ -1,4 +1,4 @@
-import { Snowflake } from "discord-api-types";
+import { Snowflake } from "discord-api-types/v9";
 import { User, Util } from "discord.js";
 import * as t from "io-ts";
 import { tNullable } from "../../../utils";
