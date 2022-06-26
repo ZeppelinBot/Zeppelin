@@ -1,0 +1,10 @@
+{
+  "name": "Zeppelin Development",
+
+  "dockerComposeFile": "../docker/development/docker-compose.yml",
+  "runArgs": ["--env-file", "../.env"],
+
+  "service": "devenv",
+  "remoteUser": "ubuntu",
+  "workspaceFolder": "/home/ubuntu/zeppelin"
+}
