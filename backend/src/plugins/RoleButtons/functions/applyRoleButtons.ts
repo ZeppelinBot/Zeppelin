@@ -56,7 +56,7 @@ export async function applyRoleButtons(
 
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
     if (channel && (!channel.isText || typeof channel.isText !== "function")) {
-      console.log("wtf", channel);
+      console.log("wtf", pluginData.guild?.id, configItem.message.channel_id);
     }
     if (!channel || !channel?.isText?.()) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
