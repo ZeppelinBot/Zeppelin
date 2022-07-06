@@ -55,7 +55,7 @@ export async function applyRoleButtons(
     }
 
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
-    if (!channel || !channel.isText()) {
+    if (!channel || !channel?.isText()) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Text channel not found for role_buttons/${configItem.name}`,
       });
