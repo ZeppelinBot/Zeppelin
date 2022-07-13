@@ -67,7 +67,12 @@ export async function actualKickMemberCmd(
     return;
   }
 
+  const config = pluginData.config.get();
   const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  if (!reason && config.require_reason.includes("kick")) {
+    sendErrorMessage(pluginData, msg.channel, "You must include a reason in your kick");
+    return;
+  }
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,

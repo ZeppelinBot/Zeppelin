@@ -32,25 +32,29 @@ export const NoteCmd = modActionsCmd({
     }
 
     const userName = user.tag;
-    const reason = formatReasonWithAttachments(args.note, [...msg.attachments.values()]);
+    const content = formatReasonWithAttachments(args.note, [...msg.attachments.values()]);
+    if (!content) {
+      sendErrorMessage(pluginData, msg.channel, "You must include content for your note");
+      return;
+    }
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const createdCase = await casesPlugin.createCase({
       userId: user.id,
       modId: msg.author.id,
       type: CaseTypes.Note,
-      reason,
+      reason: content,
     });
 
     pluginData.getPlugin(LogsPlugin).logMemberNote({
       mod: msg.author,
       user,
       caseNumber: createdCase.case_number,
-      reason,
+      reason: content,
     });
 
     sendSuccessMessage(pluginData, msg.channel, `Note added on **${userName}** (Case #${createdCase.case_number})`);
 
-    pluginData.state.events.emit("note", user.id, reason);
+    pluginData.state.events.emit("note", user.id, content);
   },
 });

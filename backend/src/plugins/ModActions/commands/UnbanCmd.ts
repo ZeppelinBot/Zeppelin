@@ -49,7 +49,12 @@ export const UnbanCmd = modActionsCmd({
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
+    const config = pluginData.config.get();
     const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    if (!reason && config.require_reason.includes("unban")) {
+      sendErrorMessage(pluginData, msg.channel, "You must include a reason in your unban");
+      return;
+    }
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
