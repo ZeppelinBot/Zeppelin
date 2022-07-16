@@ -7,6 +7,7 @@ import { ArchiveThreadAction } from "./archiveThread";
 import { BanAction } from "./ban";
 import { ChangeNicknameAction } from "./changeNickname";
 import { CleanAction } from "./clean";
+import { CrosspostMessageAction } from "./crosspostMessage";
 import { KickAction } from "./kick";
 import { LogAction } from "./log";
 import { MuteAction } from "./mute";
@@ -36,6 +37,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   set_slowmode: SetSlowmodeAction,
   start_thread: StartThreadAction,
   archive_thread: ArchiveThreadAction,
+  crosspost_message: CrosspostMessageAction,
 };
 
 export const AvailableActions = t.type({
@@ -56,4 +58,5 @@ export const AvailableActions = t.type({
   set_slowmode: SetSlowmodeAction.configType,
   start_thread: StartThreadAction.configType,
   archive_thread: ArchiveThreadAction.configType,
+  crosspost_message: CrosspostMessageAction.configType,
 });
