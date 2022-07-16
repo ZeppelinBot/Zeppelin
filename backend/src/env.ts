@@ -20,6 +20,7 @@ const envType = z.object({
   PHISHERMAN_API_KEY: z.string().optional(),
 
   DOCKER_DEV_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
+  DOCKER_PROD_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in production
 
   DB_HOST: z.string().optional().default("mysql"),
   DB_PORT: z
@@ -40,6 +41,10 @@ if (fs.existsSync(envPath)) {
 
 export const env = envType.parse(toValidate);
 
-if (env.DOCKER_DEV_MYSQL_PASSWORD && !env.DB_PASSWORD) {
-  env.DB_PASSWORD = env.DOCKER_DEV_MYSQL_PASSWORD;
+if (!env.DB_PASSWORD) {
+  if (process.env.NODE_ENV === "production" && env.DOCKER_PROD_MYSQL_PASSWORD) {
+    env.DB_PASSWORD = env.DOCKER_PROD_MYSQL_PASSWORD;
+  } else if (env.DOCKER_DEV_MYSQL_PASSWORD) {
+    env.DB_PASSWORD = env.DOCKER_DEV_MYSQL_PASSWORD;
+  }
 }

@@ -1,4 +1,5 @@
 version: '3'
+name: zeppelin-dev
 volumes:
   mysql-data: {}
   vscode-remote: {}

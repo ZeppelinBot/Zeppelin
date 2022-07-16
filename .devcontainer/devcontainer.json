@@ -1,7 +1,7 @@
 {
   "name": "Zeppelin Development",
 
-  "dockerComposeFile": "../docker-compose.yml",
+  "dockerComposeFile": "../docker-compose.development.yml",
 
   "service": "devenv",
   "remoteUser": "ubuntu",
