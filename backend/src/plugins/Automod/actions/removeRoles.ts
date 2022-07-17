@@ -1,6 +1,5 @@
 import { Permissions, Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
@@ -25,7 +24,7 @@ export const RemoveRolesAction = automodAction({
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({
-        body: `Cannot add roles in Automod rule **${ruleName}**. ${missingPermissionError(missingPermissions)}`,
+        body: `Cannot remove roles in Automod rule **${ruleName}**. ${missingPermissionError(missingPermissions)}`,
       });
       return;
     }
