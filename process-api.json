@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "zeppelin-api",
+      "name": "airship-api",
       "cwd": "./backend",
       "script": "npm",
       "args": "run start-api-prod",

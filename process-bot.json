@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "zeppelin",
+      "name": "airship-bot",
       "cwd": "./backend",
       "script": "npm",
       "args": "run start-bot-prod",
