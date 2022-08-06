@@ -1,7 +1,7 @@
 import { ApiPermissions } from "@shared/apiPermissions";
 import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, isGuildInvite, isSnowflake, resolveInvite } from "../../../utils";
 import { botControlCmd } from "../types";
 import moment from "moment-timezone";

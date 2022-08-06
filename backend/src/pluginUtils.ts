@@ -14,6 +14,7 @@ import { TZeppelinKnub } from "./types";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
+import { isStaff } from "./staff";
 
 const { getMemberLevel } = helpers;
 
@@ -242,8 +243,8 @@ export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
   return owners.includes(userId);
 }
 
-export const isOwnerPreFilter = (_, context: CommandContext<any>) => {
-  return isOwner(context.pluginData, context.message.author.id);
+export const isStaffPreFilter = (_, context: CommandContext<any>) => {
+  return isStaff(context.message.author.id);
 };
 
 type AnyFn = (...args: any[]) => any;

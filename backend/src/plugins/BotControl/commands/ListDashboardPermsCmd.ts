@@ -2,7 +2,7 @@ import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { AllowedGuild } from "../../../data/entities/AllowedGuild";
 import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser } from "../../../utils";
 import { botControlCmd } from "../types";
 
