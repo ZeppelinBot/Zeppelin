@@ -17,7 +17,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
   if (!(await pluginData.state.allowedGuilds.isAllowed(guild.id))) {
     // tslint:disable-next-line:no-console
     console.log(`Non-allowed server ${guild.name} (${guild.id}), leaving`);
-    guild.leave();
+    // guild.leave();
   }
 }
 
@@ -43,7 +43,7 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
     const defaultAllowedServers = env.DEFAULT_ALLOWED_SERVERS || [];
     const configs = new Configs();
     for (const serverId of defaultAllowedServers) {
-      if (! await pluginData.state.allowedGuilds.isAllowed(serverId)) {
+      if (!(await pluginData.state.allowedGuilds.isAllowed(serverId))) {
         // tslint:disable-next-line:no-console
         console.log(`Adding allowed-by-default server ${serverId} to the allowed servers`);
         await pluginData.state.allowedGuilds.add(serverId);
