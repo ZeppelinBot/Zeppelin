@@ -2,7 +2,7 @@
   <div>
     <h1>Introduction</h1>
     <p>
-      Zeppelin is a private moderation bot for Discord, designed with large servers and reliability in mind.
+      Airship is a fork of Zeppelin, a moderation bot for Discord designed with large servers and reliability in mind.
     </p>
 
     <!-- WIP bar -->
@@ -19,13 +19,13 @@
 
     <h2>Configuration</h2>
     <p>
-      All Zeppelin configuration is done through the dashboard by editing a YAML config file. By default, only the server
+      All Airship configuration is done through the dashboard by editing a YAML config file. By default, only the server
       owner has access to this, but they can give other users access as they see fit. See <router-link to="/docs/configuration/configuration-format">Configuration format</router-link> for more details.
     </p>
 
     <h2>Plugins</h2>
     <p>
-      Zeppelin is divided into plugins: grouped functionality that can be enabled/disabled as needed, and that have their own configurations.
+      Airship is divided into plugins: grouped functionality that can be enabled/disabled as needed, and that have their own configurations.
     </p>
 
     <h2>Commands</h2>

@@ -1,6 +1,6 @@
 <template>
   <div class="docs container mx-auto px-6 py-6">
-    <Title title="Zeppelin - Documentation" />
+    <Title title="Airship - Documentation" />
 
     <!-- Top bar -->
     <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl">
@@ -8,7 +8,7 @@
         <img class="flex-auto w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
 
         <router-link to="/docs">
-          <h1 class="flex-auto font-semibold">Zeppelin Documentation</h1>
+          <h1 class="flex-auto font-semibold">Airship Documentation</h1>
         </router-link>
       </div>
       <div class="flex-1 flex items-center justify-end">

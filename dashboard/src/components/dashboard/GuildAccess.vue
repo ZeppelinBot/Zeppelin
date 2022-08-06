@@ -2,7 +2,7 @@
   <div>
     <h1>Dashboard access</h1>
     <p>
-      On this page you can manage who has access to the server's Zeppelin dashboard.
+      On this page you can manage who has access to the server's Airship dashboard.
     </p>
 
     <h2 class="mt-8">Roles</h2>

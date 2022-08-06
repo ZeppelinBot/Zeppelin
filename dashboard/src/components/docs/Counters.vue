@@ -2,7 +2,7 @@
   <div>
     <h1>Counters</h1>
     <p>
-      Counters are an advanced feature in Zeppelin that allows you keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number.
+      Counters are an advanced feature in Airship that allows you keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number.
       Common use cases are infraction points, XP systems, activity roles, and so on.
     </p>
     <p>

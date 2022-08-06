@@ -2,11 +2,11 @@
   <div>
     <h1>Plugin configuration</h1>
     <p>
-      Most plugins in Zeppelin have configurable options. The values for these options come from 3 places:
+      Most plugins in Airship have configurable options. The values for these options come from 3 places:
     </p>
     <ol>
       <li>
-        <strong>Default options</strong> (from Zeppelin)
+        <strong>Default options</strong> (from Airship)
       </li>
       <li>
         <strong>Custom options</strong> (set by you in config)

@@ -1,11 +1,11 @@
 <template>
   <div class="privacy-policy">
     <div class="wrapper">
-      <h1>Zeppelin Privacy Policy</h1>
+      <h1>Airship Privacy Policy</h1>
 
-      <h2>Zeppelin overview</h2>
+      <h2>Airship overview</h2>
       <p>
-        Zeppelin is a moderation bot for Discord that allows server staff to
+        Airship is a fork of Zeppelin, a moderation bot for Discord that allows server staff to
         carry out moderator actions (warn, mute, kick, ban, clean messages, view
         user information, etc.),
         keep records of infractions, perform automated actions ("automod", e.g.
@@ -16,17 +16,17 @@
       </p>
       <p>
         The bot's source code is available at
-        <a href="https://github.com/Dragory/ZeppelinBot">
-          https://github.com/Dragory/ZeppelinBot
+        <a href="https://github.com/CodeTheDev/Airship">
+          https://github.com/CodeTheDev/Airship
         </a>
       </p>
 
       <h2>Stored data</h2>
       <p>
-        When Zeppelin is used by a server, the following categories data can be
+        When Airship is used by a server, the following categories data can be
         stored by the bot.
         The specific categories of data saved for each server depends on how the
-        server has configured Zeppelin.
+        server has configured Airship.
       </p>
       <ul>
         <li>Recent messages and username/nickname changes of users engaged on
@@ -66,14 +66,14 @@
           engaged in chat or voice channels are stored for 30 days
         </li>
         <li>Archives of bulk-deleted messages are stored for 30 days</li>
-        <li>Infraction record data is kept until the server stops using Zeppelin
+        <li>Infraction record data is kept until the server stops using Airship
           unless explicitly deleted
         </li>
         <li>Roles and nicknames that are restored on rejoin are cleared when the
           user rejoins
         </li>
         <li>User information for users logged in to the bot's web dashboard via
-          Discord OAuth is stored as long as the server uses Zeppelin
+          Discord OAuth is stored as long as the server uses Airship
         </li>
       </ul>
 

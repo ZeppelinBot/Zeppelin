@@ -2,7 +2,7 @@
   <div>
     <h1>Permissions</h1>
     <p>
-      Permissions in Zeppelin are simply values in plugin configuration that are checked when the command is used.
+      Permissions in Airship are simply values in plugin configuration that are checked when the command is used.
       These values can be changed with overrides (see <router-link to="/docs/configuration/plugin-configuration">Plugin configuration</router-link> for more info)
       and can depend on e.g. user id, role id, channel id, category id, or <strong>permission level</strong>.
     </p>
