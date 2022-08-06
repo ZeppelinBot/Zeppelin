@@ -350,6 +350,14 @@ connect().then(async () => {
 
   client.once("ready", () => {
     startUptimeCounter();
+    // Airship start - Set bot presence.
+    client.user?.setPresence({
+      activities: [{
+        name: "the skies.",
+        type: "WATCHING"
+      }]
+    });
+    // Airship end
   });
 
   client.on(Constants.Events.RATE_LIMIT, (data) => {
