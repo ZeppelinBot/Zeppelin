@@ -2,7 +2,7 @@
 Zeppelin's development environment runs entirely within a Docker container.
 Below you can find instructions for setting up the environment and getting started with development!
 
-👉 **No support is offered for self-hosting the bot!** 👈
+**Note:** If you'd just like to run the bot for your own server, see 👉 **[PRODUCTION.md](./PRODUCTION.md)** 👈
 
 ## Starting the development environment
 

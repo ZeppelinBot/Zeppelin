@@ -19,52 +19,15 @@ Zeppelin is a moderation bot for Discord, designed with large servers and reliab
 
 See https://zeppelin.gg/ for more details.
 
+## Usage documentation
+For information on how to use the bot, see https://zeppelin.gg/docs
+
 ## Development
-👉 **No support is offered for self-hosting the bot!** 👈
+See [DEVELOPMENT.md](./DEVELOPMENT.md) for instructions on running the development environment.
 
-See [DEVELOPMENT.md](./DEVELOPMENT.md) for instructions on running the development environment!
+Once you have the environment up and running, see [MANAGEMENT.md](./MANAGEMENT.md) for how to manage your bot.
 
-### Config format example
-Configuration is stored in the database in the `configs` table
+## Production
+See [PRODUCTION.md](./PRODUCTION.md) for instructions on how to run the bot in production.
 
-```yml
-prefix: '!'
-
-# role id: level
-levels:
-  "12345678": 100 # Example admin
-  "98765432": 50 # Example mod
-
-plugins:
-  mod_plugin:
-    config:
-      kick_message: 'You have been kicked'
-      can_kick: false
-    overrides:
-      - level: '>=50'
-        config:
-          can_kick: true
-      - level: '>=100'
-        config:
-          kick_message: 'You have been kicked by an admin'
-
-  other_plugin:
-    config:
-      categories:
-        mycategory:
-          opt: "something"
-        othercategory:
-          enabled: false
-          opt: "hello"
-    overrides:
-      - level: '>=50'
-        config:
-          categories:
-            mycategory:
-              enabled: false
-      - channel: '1234'
-        config:
-          categories:
-            othercategory:
-              enabled: true
-```
+Once you have the environment up and running, see [MANAGEMENT.md](./MANAGEMENT.md) for how to manage your bot.

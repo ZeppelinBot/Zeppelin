@@ -1,7 +1,6 @@
 version: '3'
 name: zeppelin-dev
 volumes:
-  mysql-data: {}
   vscode-remote: {}
   vscode-server: {}
   jetbrains-data: {}
@@ -27,7 +26,7 @@ services:
     ports:
       - ${DOCKER_DEV_MYSQL_PORT:?Missing DOCKER_DEV_MYSQL_PORT}:3306
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./docker/development/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
 
   devenv:
