@@ -17,6 +17,8 @@ const envType = z.object({
 
   STAFF: z.preprocess((v) => String(v).split(","), z.array(z.string())).optional(),
 
+  DEFAULT_ALLOWED_SERVERS: z.preprocess((v) => String(v).split(","), z.array(z.string())).optional(),
+
   PHISHERMAN_API_KEY: z.string().optional(),
 
   DOCKER_DEV_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
