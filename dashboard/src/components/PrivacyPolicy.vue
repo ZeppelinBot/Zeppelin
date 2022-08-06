@@ -81,7 +81,7 @@
       <p>
         To request access to personal data stored about you, or to request its
         deletion, to the extent permitted by GDPR, please send an email to <a
-        href="mailto:contact@mivir.fi">contact@mivir.fi</a>.
+        href="mailto:code@codeerror.dev">code@codeerror.dev</a>.
       </p>
     </div></div>
 </template>
