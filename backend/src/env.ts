@@ -15,9 +15,27 @@ const envType = z.object({
   API_URL: z.string().url(),
   API_PORT: z.preprocess((v) => Number(v), z.number().min(1).max(65535)).default(3000),
 
-  STAFF: z.preprocess((v) => String(v).split(","), z.array(z.string())).optional(),
+  STAFF: z
+    .preprocess(
+      (v) =>
+        String(v)
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s !== ""),
+      z.array(z.string()),
+    )
+    .optional(),
 
-  DEFAULT_ALLOWED_SERVERS: z.preprocess((v) => String(v).split(","), z.array(z.string())).optional(),
+  DEFAULT_ALLOWED_SERVERS: z
+    .preprocess(
+      (v) =>
+        String(v)
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s !== ""),
+      z.array(z.string()),
+    )
+    .optional(),
 
   PHISHERMAN_API_KEY: z.string().optional(),
 
