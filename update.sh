@@ -2,8 +2,8 @@
 
 echo Updating Zeppelin...
 
-docker-compose -f docker-compose.production.yml down
+docker compose -f docker-compose.production.yml stop
 git pull
-docker-compose -f docker-compose.production.yml -d up
+docker compose -f docker-compose.production.yml start
 
 echo Update finished!
