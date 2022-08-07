@@ -7,6 +7,8 @@ Zeppelin's production environment - that is, the **bot, API, and dashboard** - u
 3. Fill in the missing values in `.env`
 4. Run `docker compose -f docker-compose.production.yml up -d`
 
+**Note:** The dashboard and API are exposed with a self-signed certificate. It is recommended to set up a proxy with a proper certificate in front of them. Cloudflare is a popular choice here.
+
 ## Updating the bot
 
 ### One-click script
