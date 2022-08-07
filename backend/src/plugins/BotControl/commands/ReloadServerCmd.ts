@@ -1,13 +1,13 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { botControlCmd } from "../types";
 
 export const ReloadServerCmd = botControlCmd({
   trigger: ["reload_server", "reload_guild"],
   permission: null,
   config: {
-    preFilters: [isOwnerPreFilter],
+    preFilters: [isStaffPreFilter],
   },
 
   signature: {

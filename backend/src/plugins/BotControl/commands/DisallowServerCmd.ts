@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isOwnerPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { noop } from "../../../utils";
 import { botControlCmd } from "../types";
 
@@ -8,7 +8,7 @@ export const DisallowServerCmd = botControlCmd({
   trigger: ["disallow_server", "disallowserver", "remove_server", "removeserver"],
   permission: null,
   config: {
-    preFilters: [isOwnerPreFilter],
+    preFilters: [isStaffPreFilter],
   },
 
   signature: {

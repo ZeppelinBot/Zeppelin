@@ -6,9 +6,10 @@ import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
 import moment from "moment-timezone";
 import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry";
 import crypto from "crypto";
+import { env } from "../env";
 
 const API_URL = "https://api.phisherman.gg";
-const MASTER_API_KEY = process.env.PHISHERMAN_API_KEY;
+const MASTER_API_KEY = env.PHISHERMAN_API_KEY;
 
 let caughtDomainTrackingMap: Map<string, Map<string, number[]>> = new Map();
 

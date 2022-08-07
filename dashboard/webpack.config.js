@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const path = require("path");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -154,7 +152,9 @@ let config = {
         js: ["./src/main.ts"],
       },
     }),
-    new DotenvPlugin(),
+    new DotenvPlugin({
+      path: path.resolve(process.cwd(), "../.env"),
+    }),
   ],
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".mjs", ".vue"],

@@ -1,7 +1,11 @@
 import { Connection, createConnection } from "typeorm";
 import { SimpleError } from "../SimpleError";
-import connectionOptions from "../../ormconfig";
 import { QueryLogger } from "./queryLogger";
+import path from "path";
+import { backendDir } from "../paths";
+
+const ormconfigPath = path.join(backendDir, "ormconfig.js");
+const connectionOptions = require(ormconfigPath);
 
 let connectionPromise: Promise<Connection>;
 

@@ -3,6 +3,8 @@ import * as t from "io-ts";
 import { BasePluginType, GlobalPluginData, typedGlobalEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
+import { env } from "../../env";
+import { Configs } from "../../data/Configs";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   config: {};
@@ -15,7 +17,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
   if (!(await pluginData.state.allowedGuilds.isAllowed(guild.id))) {
     // tslint:disable-next-line:no-console
     console.log(`Non-allowed server ${guild.name} (${guild.id}), leaving`);
-    guild.leave();
+    // guild.leave();
   }
 }
 
@@ -35,8 +37,19 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
     }),
   ],
 
-  beforeLoad(pluginData) {
+  async beforeLoad(pluginData) {
     pluginData.state.allowedGuilds = new AllowedGuilds();
+
+    const defaultAllowedServers = env.DEFAULT_ALLOWED_SERVERS || [];
+    const configs = new Configs();
+    for (const serverId of defaultAllowedServers) {
+      if (!(await pluginData.state.allowedGuilds.isAllowed(serverId))) {
+        // tslint:disable-next-line:no-console
+        console.log(`Adding allowed-by-default server ${serverId} to the allowed servers`);
+        await pluginData.state.allowedGuilds.add(serverId);
+        await configs.saveNewRevision(`guild-${serverId}`, "plugins: {}", 0);
+      }
+    }
   },
 
   afterLoad(pluginData) {
