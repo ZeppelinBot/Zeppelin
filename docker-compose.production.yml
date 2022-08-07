@@ -26,39 +26,51 @@ services:
     command: --authentication-policy=mysql_native_password
 
   prepare_backend:
-    image: node:16.16
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     depends_on:
       - mysql
     volumes:
       - ./:/zeppelin
-    user: node
     command: |-
       bash -c "cd /zeppelin/backend && npm ci && npm run build && npm run migrate-prod"
 
   api:
-    image: node:16.16
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     restart: on-failure
     depends_on:
       - prepare_backend
     volumes:
       - ./:/zeppelin
-    user: node
     command: ["/bin/bash", "/zeppelin/docker/production/start-api.sh"]
 
   bot:
-    image: node:16.16
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     restart: on-failure
     depends_on:
       - prepare_backend
     volumes:
       - ./:/zeppelin
-    user: node
     command: ["/bin/bash", "/zeppelin/docker/production/start-bot.sh"]
 
   build_dashboard:
-    image: node:16.16
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     volumes:
       - ./:/zeppelin
-    user: node
     command: |-
       bash -c "cd /zeppelin/dashboard && npm ci && npm run build"
