@@ -9,6 +9,9 @@ const CLEAN_PER_LOOP = 50;
 export async function cleanupConfigs() {
   const configRepository = getRepository(Config);
 
+  // FIXME: The query below doesn't work on MySQL 8.0. Pending an update.
+  return;
+
   let cleaned = 0;
   let rows;
 

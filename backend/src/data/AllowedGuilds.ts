@@ -4,6 +4,7 @@ import { BaseRepository } from "./BaseRepository";
 import { AllowedGuild } from "./entities/AllowedGuild";
 import moment from "moment-timezone";
 import { DBDateFormat } from "../utils";
+import { env } from "../env";
 
 export class AllowedGuilds extends BaseRepository {
   private allowedGuilds: Repository<AllowedGuild>;

@@ -1,8 +1,8 @@
 import { connect } from "../data/db";
 import { setIsAPI } from "../globals";
-import "./loadEnv";
+import { env } from "../env";
 
-if (!process.env.KEY) {
+if (!env.KEY) {
   // tslint:disable-next-line:no-console
   console.error("Project root .env with KEY is required!");
   process.exit(1);

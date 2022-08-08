@@ -1,0 +1,76 @@
+version: '3'
+name: zeppelin-prod
+services:
+  nginx:
+    build:
+      context: ./docker/production/nginx
+      args:
+        API_PORT: ${API_PORT:?Missing API_PORT}
+        DOCKER_PROD_DOMAIN: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
+    ports:
+      - "${DOCKER_PROD_WEB_PORT:?Missing DOCKER_PROD_WEB_PORT}:443"
+    volumes:
+      - ./:/zeppelin
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DOCKER_PROD_MYSQL_ROOT_PASSWORD?:Missing DOCKER_PROD_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: zeppelin
+      MYSQL_USER: zeppelin
+      MYSQL_PASSWORD: ${DOCKER_PROD_MYSQL_PASSWORD?:Missing DOCKER_PROD_MYSQL_PASSWORD}
+    ports:
+      - ${DOCKER_PROD_MYSQL_PORT:?Missing DOCKER_PROD_MYSQL_PORT}:3306
+    volumes:
+      - ./docker/production/data/mysql:/var/lib/mysql
+    command: --authentication-policy=mysql_native_password
+
+  prepare_backend:
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
+    depends_on:
+      - mysql
+    volumes:
+      - ./:/zeppelin
+    command: |-
+      bash -c "cd /zeppelin/backend && npm ci && npm run build && npm run migrate-prod"
+
+  api:
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
+    restart: on-failure
+    depends_on:
+      - prepare_backend
+    volumes:
+      - ./:/zeppelin
+    command: ["/bin/bash", "/zeppelin/docker/production/start-api.sh"]
+
+  bot:
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
+    restart: on-failure
+    depends_on:
+      - prepare_backend
+    volumes:
+      - ./:/zeppelin
+    command: ["/bin/bash", "/zeppelin/docker/production/start-bot.sh"]
+
+  build_dashboard:
+    build:
+      context: ./docker/production/node
+      args:
+        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
+        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
+    volumes:
+      - ./:/zeppelin
+    command: |-
+      bash -c "cd /zeppelin/dashboard && npm ci && npm run build"
