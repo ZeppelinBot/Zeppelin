@@ -80,7 +80,8 @@ export class ApiPermissionAssignments extends BaseRepository {
       .createQueryBuilder()
       .where("expires_at IS NOT NULL")
       .andWhere("expires_at <= NOW()")
-      .delete();
+      .delete()
+      .execute();
   }
 
   async applyOwnerChange(guildId: string, newOwnerId: string) {
