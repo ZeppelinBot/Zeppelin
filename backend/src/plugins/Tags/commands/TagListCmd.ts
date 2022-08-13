@@ -1,6 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { createChunkedMessage } from "../../../utils";
 import { tagsCmd } from "../types";
+import escapeStringRegexp from "escape-string-regexp";
 
 export const TagListCmd = tagsCmd({
   trigger: ["tag list", "tags", "taglist"],
@@ -19,20 +20,16 @@ export const TagListCmd = tagsCmd({
 
     const prefix = (await pluginData.config.getForMessage(msg)).prefix;
     const tagNames = tags.map((tag) => tag.tag).sort();
+    const searchRegex = args.search ? new RegExp([...args.search].map((s) => escapeStringRegexp(s)).join(".*")) : null;
 
-    const filteredTags = args.search
-      ? tagNames.filter((tag) =>
-          new RegExp(
-            args.search
-              .split("")
-              .map((char) => char.replace(/[.*+?^${}()|[\]\\]/, "\\$&"))
-              .join(".*")
-          ).test(tag)
-        )
-      : tagNames;
+    const filteredTags = args.search ? tagNames.filter((tag) => searchRegex!.test(tag)) : tagNames;
 
-    const tagGroups = filteredTags.reduce((acc, tag) => {
-      const obj = { ...acc };
+    if (filteredTags.length === 0) {
+      msg.channel.send("No tags matched the filter");
+      return;
+    }
+
+    const tagGroups = filteredTags.reduce((obj, tag) => {
       const tagUpper = tag.toUpperCase();
       const key = /[A-Z]/.test(tagUpper[0]) ? tagUpper[0] : "#";
       if (!(key in obj)) {
