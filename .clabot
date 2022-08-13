@@ -1,19 +1,22 @@
 {
   "contributors": [
-    "dependabot",
+    "BanTheNons",
     "CleverSource",
     "DarkView",
+    "DenverCoder1",
     "Jernik",
-    "WeebHiroyuki",
+    "Rstar284",
     "almeidx",
     "axisiscool",
     "dexbiobot",
     "greenbigfrog",
+    "k200-1",
     "metal0",
+    "paolojpa",
     "roflmaoqwerty",
+    "thewilloftheshadow",
     "usoka",
-    "vcokltfre",
-    "Rstar284"
+    "vcokltfre"
   ],
   "message": "Thank you for contributing to Zeppelin! We require contributors to sign our Contributor License Agreement (CLA). To let us review and merge your code, please visit https://github.com/ZeppelinBot/CLA to sign the CLA!"
 }
