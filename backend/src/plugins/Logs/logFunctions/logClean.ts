@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildTextChannel, User } from "discord.js";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogCleanData {
   mod: User;
@@ -24,8 +25,7 @@ export function logClean(pluginData: GuildPluginData<LogsPluginType>, data: LogC
       archiveUrl: data.archiveUrl,
     }),
     {
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

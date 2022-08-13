@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel, User } from "discord.js";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogRepeatedMessageData {
   author: User;
@@ -32,8 +33,7 @@ export function logRepeatedMessage(pluginData: GuildPluginData<LogsPluginType>, 
     {
       userId: data.author.id,
       bot: data.author.bot,
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

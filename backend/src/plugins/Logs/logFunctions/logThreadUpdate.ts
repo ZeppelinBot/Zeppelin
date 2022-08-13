@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { ThreadChannel } from "discord.js";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogThreadUpdateData {
   oldThread: ThreadChannel;
@@ -22,8 +23,7 @@ export function logThreadUpdate(pluginData: GuildPluginData<LogsPluginType>, dat
       differenceString: data.differenceString,
     }),
     {
-      channel: data.newThread.parentId,
-      category: data.newThread.parent?.parentId,
+      ...resolveChannelIds(data.newThread),
     },
   );
 }

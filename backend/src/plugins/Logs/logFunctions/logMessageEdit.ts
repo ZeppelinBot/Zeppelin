@@ -11,6 +11,7 @@ import {
 } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { UnknownUser } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageEditData {
   user: User | UnknownUser;
@@ -31,9 +32,9 @@ export function logMessageEdit(pluginData: GuildPluginData<LogsPluginType>, data
     }),
     {
       userId: data.user.id,
-      channel: data.channel.id,
       messageTextContent: data.after.data.content,
       bot: data.user instanceof User ? data.user.bot : false,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

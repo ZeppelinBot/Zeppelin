@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { GuildChannel, NewsChannel } from "discord.js";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogChannelCreateData {
   channel: GuildChannel | NewsChannel;
@@ -18,8 +19,7 @@ export function logChannelCreate(pluginData: GuildPluginData<LogsPluginType>, da
       channel: channelToTemplateSafeChannel(data.channel),
     }),
     {
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

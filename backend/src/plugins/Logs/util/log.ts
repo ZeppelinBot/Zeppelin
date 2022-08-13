@@ -22,6 +22,7 @@ interface ExclusionData {
   roles?: Snowflake[] | null;
   channel?: Snowflake | null;
   category?: Snowflake | null;
+  thread?: Snowflake | null;
   messageTextContent?: string | null;
 }
 
@@ -55,6 +56,10 @@ async function shouldExclude(
   }
 
   if (opts.excluded_categories && exclusionData.category && opts.excluded_categories.includes(exclusionData.category)) {
+    return true;
+  }
+
+  if (opts.excluded_threads && exclusionData.thread && opts.excluded_threads.includes(exclusionData.thread)) {
     return true;
   }
 

@@ -11,6 +11,7 @@ import {
 } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { UnknownUser } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageDeleteAutoData {
   message: SavedMessage;
@@ -32,8 +33,7 @@ export function logMessageDeleteAuto(pluginData: GuildPluginData<LogsPluginType>
     {
       userId: data.user.id,
       bot: data.user instanceof User ? data.user.bot : false,
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

@@ -42,6 +42,7 @@ const LogChannel = t.partial({
   excluded_message_regexes: t.array(TRegex),
   excluded_channels: t.array(t.string),
   excluded_categories: t.array(t.string),
+  excluded_threads: t.array(t.string),
   exclude_bots: t.boolean,
   excluded_roles: t.array(t.string),
   format: tNullable(tLogFormats),

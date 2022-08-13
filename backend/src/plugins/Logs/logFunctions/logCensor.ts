@@ -12,6 +12,7 @@ import {
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { UnknownUser } from "../../../utils";
 import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
+import { resolveChannelIds } from "src/utils/resolveChannelIds";
 
 interface LogCensorData {
   user: User | UnknownUser;
@@ -33,9 +34,8 @@ export function logCensor(pluginData: GuildPluginData<LogsPluginType>, data: Log
     }),
     {
       userId: data.user.id,
-      channel: data.channel.id,
-      category: data.channel.parentId,
       bot: data.user instanceof User ? data.user.bot : false,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildVoiceChannel, GuildMember } from "discord.js";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogVoiceChannelJoinData {
   member: GuildMember;
@@ -22,8 +23,7 @@ export function logVoiceChannelJoin(pluginData: GuildPluginData<LogsPluginType>,
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
       bot: data.member.user.bot,
     },
   );
