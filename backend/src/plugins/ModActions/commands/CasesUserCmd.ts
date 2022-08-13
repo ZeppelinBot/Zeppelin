@@ -67,6 +67,12 @@ export const CasesUserCmd = modActionsCmd({
       msg.channel.send(`No cases found for **${userName}**`);
     } else {
       const casesToDisplay = args.hidden ? cases : normalCases;
+      if (!casesToDisplay.length) {
+        msg.channel.send(
+          `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
+        );
+        return;
+      }
 
       if (args.expand) {
         if (casesToDisplay.length > 8) {
