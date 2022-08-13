@@ -31,4 +31,4 @@ Only edit files in `/backend/src`, `/shared/src`, and `/dashboard/src`.
 Make sure to revert any hotfixes before updating the bot normally.
 
 ## View logs
-To view real-time logs, run `docker compose -f docker-compose.production.yml -t -f logs`
+To view real-time logs, run `docker compose -f docker-compose.production.yml logs -t -f`
