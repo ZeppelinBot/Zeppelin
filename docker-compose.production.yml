@@ -24,6 +24,11 @@ services:
     volumes:
       - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=\"${DOCKER_PROD_MYSQL_ROOT_PASSWORD}\" --execute \"SHOW DATABASES;\""
+      interval: 5s
+      timeout: 300s
+      retries: 60
 
   prepare_backend:
     build:
@@ -32,7 +37,8 @@ services:
         DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
         DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     volumes:
       - ./:/zeppelin
     command: |-
