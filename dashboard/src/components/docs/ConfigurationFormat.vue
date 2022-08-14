@@ -20,7 +20,7 @@
         "172950000412655616": 50 # Example mod
 
       plugins:
-        mod_plugin:
+        mod_actions:
           config:
             kick_message: 'You have been kicked'
             can_kick: false
