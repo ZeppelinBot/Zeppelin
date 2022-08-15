@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildVoiceChannel, GuildMember } from "discord.js";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogVoiceChannelMoveData {
   member: GuildMember;
@@ -24,8 +25,7 @@ export function logVoiceChannelMove(pluginData: GuildPluginData<LogsPluginType>,
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.newChannel.id,
-      category: data.newChannel.parentId,
+      ...resolveChannelIds(data.newChannel),
       bot: data.member.user.bot,
     },
   );

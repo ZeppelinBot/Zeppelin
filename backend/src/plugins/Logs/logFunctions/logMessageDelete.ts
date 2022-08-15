@@ -13,6 +13,7 @@ import moment from "moment-timezone";
 import { ISavedMessageAttachmentData, SavedMessage } from "../../../data/entities/SavedMessage";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UnknownUser, useMediaUrls } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageDeleteData {
   user: User | UnknownUser;
@@ -47,10 +48,9 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
     }),
     {
       userId: data.user.id,
-      channel: data.channel.id,
-      category: data.channel.parentId,
       messageTextContent: data.message.data.content,
       bot: data.user instanceof User ? data.user.bot : false,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

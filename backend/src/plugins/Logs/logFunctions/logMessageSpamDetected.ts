@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildTextChannel, GuildChannel, GuildMember, ThreadChannel } from "discord.js";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageSpamDetectedData {
   member: GuildMember;
@@ -30,9 +31,8 @@ export function logMessageSpamDetected(pluginData: GuildPluginData<LogsPluginTyp
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.channel.id,
-      category: data.channel.parentId,
       bot: data.member.user.bot,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

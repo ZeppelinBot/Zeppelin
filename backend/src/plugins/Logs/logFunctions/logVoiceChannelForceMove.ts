@@ -9,6 +9,7 @@ import {
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogVoiceChannelForceMoveData {
   mod: User;
@@ -33,8 +34,7 @@ export function logVoiceChannelForceMove(
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.newChannel.id,
-      category: data.newChannel.parentId,
+      ...resolveChannelIds(data.newChannel),
       bot: data.member.user.bot,
     },
   );

@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { StageChannel, StageInstance } from "discord.js";
 import { channelToTemplateSafeChannel, stageToTemplateSafeStage } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogStageInstanceCreateData {
   stageInstance: StageInstance;
@@ -20,8 +21,7 @@ export function logStageInstanceCreate(pluginData: GuildPluginData<LogsPluginTyp
       stageChannel: channelToTemplateSafeChannel(data.stageChannel),
     }),
     {
-      channel: data.stageInstance.channel!.id,
-      category: data.stageInstance.channel!.parentId,
+      ...resolveChannelIds(data.stageInstance.channel!),
     },
   );
 }

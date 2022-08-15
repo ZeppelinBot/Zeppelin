@@ -5,6 +5,7 @@ import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel } from "discord.js";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageDeleteBareData {
   messageId: string;
@@ -20,8 +21,7 @@ export function logMessageDeleteBare(pluginData: GuildPluginData<LogsPluginType>
       channel: channelToTemplateSafeChannel(data.channel),
     }),
     {
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }
