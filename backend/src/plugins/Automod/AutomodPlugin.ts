@@ -310,26 +310,44 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
 
   async beforeUnload(pluginData) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
-    countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
-    countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+    if (pluginData.state.onCounterTrigger) {
+      countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
+    }
+    if (pluginData.state.onCounterReverseTrigger) {
+      countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+    }
 
     const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
-    unregisterEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+    if (pluginData.state.modActionsListeners) {
+      unregisterEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+    }
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
-    unregisterEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
+    if (pluginData.state.mutesListeners) {
+      unregisterEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
+    }
 
     pluginData.state.queue.clear();
 
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
 
-    clearInterval(pluginData.state.clearRecentActionsInterval);
+    if (pluginData.state.clearRecentActionsInterval) {
+      clearInterval(pluginData.state.clearRecentActionsInterval);
+    }
 
-    clearInterval(pluginData.state.clearRecentSpamInterval);
+    if (pluginData.state.clearRecentSpamInterval) {
+      clearInterval(pluginData.state.clearRecentSpamInterval);
+    }
 
-    clearInterval(pluginData.state.clearRecentNicknameChangesInterval);
+    if (pluginData.state.clearRecentNicknameChangesInterval) {
+      clearInterval(pluginData.state.clearRecentNicknameChangesInterval);
+    }
 
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    if (pluginData.state.onMessageCreateFn) {
+      pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
+    }
+    if (pluginData.state.onMessageUpdateFn) {
+      pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    }
   },
 });
