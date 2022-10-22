@@ -89,7 +89,7 @@ export const AboutCmd = utilityCmd({
       aboutContent.embeds![0].fields!.push({
         name: "Zeppelin supporters 🎉",
         value:
-          "These amazing people have supported Zeppelin development by pledging on [Patreon](https://www.patreon.com/zeppelinbot):\n\n" +
+          "These amazing people supported Zeppelin's development by pledging on the now defunct Patreon:\n\n" +
           formattedSupporters,
         inline: false,
       });
