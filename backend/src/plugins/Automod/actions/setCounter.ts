@@ -16,7 +16,7 @@ export const SetCounterAction = automodAction({
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     if (!countersPlugin.counterExists(actionConfig.counter)) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Unknown counter \`${actionConfig.counter}\` in \`add_to_counter\` action of Automod rule \`${ruleName}\``,
+        body: `Unknown counter \`${actionConfig.counter}\` in \`set_counter\` action of Automod rule \`${ruleName}\``,
       });
       return;
     }
