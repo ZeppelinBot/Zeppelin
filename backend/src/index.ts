@@ -349,7 +349,11 @@ connect().then(async () => {
   client.on(Constants.Events.RATE_LIMIT, (data) => {
     logRateLimit(data);
   });
-
+  
+  client.user?.setPresence({
+  activities: [{ name: "rule breakers", type: "WATCHING" }],
+});
+  
   bot.on("loadingFinished", async () => {
     runExpiringMutesLoop();
     await sleep(10 * SECONDS);
