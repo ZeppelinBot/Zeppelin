@@ -7,10 +7,21 @@ services:
       args:
         API_PORT: ${API_PORT:?Missing API_PORT}
         DOCKER_PROD_DOMAIN: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
-    ports:
-      - "${DOCKER_PROD_WEB_PORT:?Missing DOCKER_PROD_WEB_PORT}:443"
+    expose:
+      #- "${DOCKER_PROD_WEB_PORT:?Missing DOCKER_PROD_WEB_PORT}:443"
+      #- "${DOCKER_PROD_WEB_PORT:?Missing DOCKER_PROD_WEB_PORT}:80"
+      - "80"
+    environment:
+      VIRTUAL_HOST: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
+      VIRTUAL_PATH: /
+      LETSENCRYPT_HOST: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
+      LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+      DEBUG: true
     volumes:
       - ./:/zeppelin
+    networks:
+      - network
+      - nginx-proxy
 
   mysql:
     image: mysql:8.0
@@ -24,11 +35,37 @@ services:
     volumes:
       - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
+    networks:
+      - network
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=\"${DOCKER_PROD_MYSQL_ROOT_PASSWORD}\" --execute \"SHOW DATABASES;\""
       interval: 5s
       timeout: 300s
       retries: 60
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+      #- "443"
+    environment:
+      PMA_HOST: mysql
+      PMA_ABSOLUTE_URI: https://${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}/phpmyadmin/
+      MYSQL_ROOT_PASSWORD: ${DOCKER_PROD_MYSQL_ROOT_PASSWORD?:Missing DOCKER_PROD_MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: zeppelin
+      MYSQL_PASSWORD: ${DOCKER_PROD_MYSQL_PASSWORD?:Missing DOCKER_PROD_MYSQL_PASSWORD}
+      VIRTUAL_HOST: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
+      VIRTUAL_PATH: /phpmyadmin
+      VIRTUAL_DEST: /
+      LETSENCRYPT_HOST: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
+      LETSENCRYPT_EMAIL: $LETSENCRYPT_EMAIL
+      DEBUG: ${DEBUG:-false}
+    networks:
+      - network
+      - nginx-proxy
 
   prepare_backend:
     build:
@@ -41,6 +78,8 @@ services:
         condition: service_healthy
     volumes:
       - ./:/zeppelin
+    networks:
+      - network
     command: |-
       bash -c "cd /zeppelin/backend && npm ci && npm run build && npm run migrate-prod"
 
@@ -55,6 +94,8 @@ services:
       - prepare_backend
     volumes:
       - ./:/zeppelin
+    networks:
+      - network
     command: ["/bin/bash", "/zeppelin/docker/production/start-api.sh"]
 
   bot:
@@ -68,6 +109,8 @@ services:
       - prepare_backend
     volumes:
       - ./:/zeppelin
+    networks:
+      - network
     command: ["/bin/bash", "/zeppelin/docker/production/start-bot.sh"]
 
   build_dashboard:
@@ -78,5 +121,13 @@ services:
         DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     volumes:
       - ./:/zeppelin
+    networks:
+      - network
     command: |-
       bash -c "cd /zeppelin/dashboard && npm ci && npm run build"
+
+networks:
+  network:
+  nginx-proxy:
+    name: nginx-proxy
+    external: true
