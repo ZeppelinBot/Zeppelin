@@ -203,6 +203,10 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
 
       const decay = counter.decay;
       const decayPeriodMs = convertDelayStringToMS(decay.every)!;
+      if (decayPeriodMs === 0) {
+        continue;
+      }
+
       pluginData.state.decayTimers.push(
         setInterval(() => {
           decayCounter(pluginData, counterName, decayPeriodMs, decay.amount);

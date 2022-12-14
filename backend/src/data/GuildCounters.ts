@@ -161,7 +161,7 @@ export class GuildCounters extends BaseGuildRepository {
       }
 
       const decayAmountToApply = Math.round((diffFromLastDecayMs / decayPeriodMs) * decayAmount);
-      if (decayAmountToApply === 0) {
+      if (decayAmountToApply === 0 || Number.isNaN(decayAmountToApply)) {
         return;
       }
 
