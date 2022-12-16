@@ -31,12 +31,13 @@ export const PingCmd = utilityCmd({
 
     msg.channel.send(
       trimLines(`
-      **Ping:**
-      Lowest: **${lowest}ms**
-      Highest: **${highest}ms**
-      Mean: **${mean}ms**
-      Time between ping command and first reply: **${msgToMsgDelay!}ms**
-      Shard latency: **${pluginData.client.ws.ping}ms**
+      🏓 Pong! Bot latency is ${mean} ms!
+      // **Ping:**
+      // Lowest: **${lowest}ms**
+      // Highest: **${highest}ms**
+      // Mean: **${mean}ms**
+      // Time between ping command and first reply: **${msgToMsgDelay!}ms**
+      // Shard latency: **${pluginData.client.ws.ping}ms**
     `),
     );
 
