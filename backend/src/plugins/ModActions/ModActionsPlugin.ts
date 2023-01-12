@@ -1,4 +1,4 @@
-import { GuildMember, Message, Snowflake } from "discord.js";
+import { GuildMember, Message, PartialUser, Snowflake, User } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -6,7 +6,7 @@ import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import { mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
-import { MINUTES, trimPluginDescription } from "../../utils";
+import { MINUTES, trimPluginDescription, UnknownUser } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -25,6 +25,7 @@ import { KickCmd } from "./commands/KickCmd";
 import { MassbanCmd } from "./commands/MassBanCmd";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { MassunbanCmd } from "./commands/MassUnbanCmd";
+import { MassWarnCmd } from "./commands/MassWarnCmd";
 import { MuteCmd } from "./commands/MuteCmd";
 import { NoteCmd } from "./commands/NoteCmd";
 import { SoftbanCmd } from "./commands/SoftbanCommand";
@@ -80,10 +81,12 @@ const defaultOptions = {
     can_massunban: false,
     can_massban: false,
     can_massmute: false,
+    can_masswarn: false,
     can_hidecase: false,
     can_deletecase: false,
     can_act_as_other: false,
     create_cases_for_manual_actions: true,
+    reason_aliases: {},
   },
   overrides: [
     {
@@ -105,6 +108,7 @@ const defaultOptions = {
         can_massunban: true,
         can_massban: true,
         can_massmute: true,
+        can_masswarn: true,
         can_hidecase: true,
         can_act_as_other: true,
       },
@@ -144,6 +148,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     MassbanCmd,
     MassmuteCmd,
     MassunbanCmd,
+    MassWarnCmd,
     AddCaseCmd,
     CaseCmd,
     CasesUserCmd,
@@ -155,8 +160,8 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
   public: {
     warnMember(pluginData) {
-      return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
-        warnMember(pluginData, member, reason, warnOptions);
+      return (reason: string, member: GuildMember | null, user?: User | null, warnOptions?: WarnOptions) => {
+        warnMember(pluginData, reason, member, user, warnOptions);
       };
     },
 
@@ -204,6 +209,9 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     // Massbans can take a while depending on rate limits,
     // so we're giving each massban 15 minutes to complete before launching the next massban
     state.massbanQueue = new Queue(15 * MINUTES);
+
+    // Same goes for masswarns, since they have to send a lot of DMs
+    state.masswarnQueue = new Queue(15 * MINUTES);
 
     state.events = new EventEmitter();
   },
