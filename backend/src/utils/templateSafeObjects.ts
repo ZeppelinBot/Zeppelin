@@ -5,6 +5,7 @@ import {
   GuildMember,
   Message,
   PartialGuildMember,
+  PartialUser,
   Role,
   Snowflake,
   StageInstance,
@@ -23,6 +24,8 @@ import {
   SavedMessage,
 } from "../data/entities/SavedMessage";
 import { Case } from "../data/entities/Case";
+import { CounterValue } from "../data/entities/CounterValue";
+import { number } from "io-ts";
 
 type InputProps<T> = Omit<
   {
@@ -200,6 +203,23 @@ export class TemplateSafeCase extends TemplateSafeValueContainer {
   }
 }
 
+export class RankedCounterValue extends CounterValue {
+  rank?: number;
+}
+
+export class TemplateSafeCounterValue extends TemplateSafeValueContainer {
+  id: number;
+  counter_id: string;
+  user_id: string;
+  channel_id: string;
+  value: number;
+  rank?: number;
+
+  constructor(data: InputProps<TemplateSafeCounterValue>) {
+    super(data);
+  }
+}
+
 export class TemplateSafeMessage extends TemplateSafeValueContainer {
   id: string;
   content: string;
@@ -255,16 +275,25 @@ export function roleToTemplateSafeRole(role: Role): TemplateSafeRole {
   });
 }
 
-export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMember): TemplateSafeMember {
-  const templateSafeUser = userToTemplateSafeUser(member.user!);
+export function memberToTemplateSafeMember(
+  member?: GuildMember | PartialGuildMember | null,
+  user?: User | UnknownUser | null,
+): TemplateSafeMember {
+  if (!member && !user) {
+    throw new Error(`No usable information received; cannot create template`);
+  }
+
+  user = user ?? member?.user;
+
+  const templateSafeUser = userToTemplateSafeUser(user!);
 
   return new TemplateSafeMember({
     ...templateSafeUser,
     user: templateSafeUser,
-    nick: member.nickname ?? "*None*",
-    roles: [...member.roles.cache.mapValues((r) => roleToTemplateSafeRole(r)).values()],
-    joinedAt: member.joinedTimestamp ?? undefined,
-    guildName: member.guild.name,
+    nick: member?.nickname ?? "*None*",
+    roles: member ? [...member.roles.cache.mapValues((r) => roleToTemplateSafeRole(r)).values()] : [],
+    joinedAt: member?.joinedTimestamp ?? undefined,
+    guildName: member?.guild.name,
   });
 }
 
@@ -440,6 +469,17 @@ export function caseToTemplateSafeCase(theCase: Case): TemplateSafeCase {
     pp_id: theCase.pp_id,
     pp_name: theCase.pp_name,
     log_message_id: theCase.log_message_id,
+  });
+}
+
+export function counterValueToTemplateSafeCounterValue(theCounterValue: RankedCounterValue): TemplateSafeCounterValue {
+  return new TemplateSafeCounterValue({
+    id: theCounterValue.id,
+    counter_id: theCounterValue.counter_id,
+    channel_id: theCounterValue.channel_id,
+    user_id: theCounterValue.user_id,
+    value: theCounterValue.value,
+    rank: theCounterValue.rank,
   });
 }
 
