@@ -5,8 +5,11 @@ import { resolveUser } from "../../../utils";
 import { CaseArgs, CasesPluginType } from "../types";
 import { createCaseNote } from "./createCaseNote";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
+import { getDashboardUrl } from "../../../pluginUtils";
+import { CaseTypes } from "../../../data/CaseTypes";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
+  const casesTypesWithoutArchive = [CaseTypes.Note, CaseTypes.Unban];
   const user = await resolveUser(pluginData.client, args.userId);
   const userName = user.tag;
 
@@ -40,6 +43,28 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
     pp_name: ppName,
     is_hidden: Boolean(args.hide),
   });
+
+  if (!casesTypesWithoutArchive.includes(args.type)) {
+    const messagesToArchive = Array.from(await pluginData.state.savedMessages.getUserMessages(user.id, 50)).sort(
+      (a, b) => (a.posted_at > b.posted_at ? 1 : -1),
+    );
+    let noteBody = `No automatic archive was created because no messages were found for this user.`;
+
+    if (messagesToArchive.length > 0) {
+      const archiveId = await pluginData.state.archives.createFromSavedMessages(messagesToArchive, pluginData.guild);
+      const baseUrl = getDashboardUrl(pluginData);
+
+      noteBody = `Automatically archived messages: ${pluginData.state.archives.getUrl(baseUrl, archiveId)}`;
+    }
+
+    await createCaseNote(pluginData, {
+      caseId: createdCase.id,
+      modId: mod.id,
+      body: noteBody,
+      automatic: args.automatic,
+      postInCaseLogOverride: false,
+    });
+  }
 
   if (args.reason || args.noteDetails?.length) {
     await createCaseNote(pluginData, {
