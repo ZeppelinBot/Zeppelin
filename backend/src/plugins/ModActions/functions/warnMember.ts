@@ -1,25 +1,43 @@
-import { GuildMember, Snowflake } from "discord.js";
+import { GuildMember, Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
+import {
+  createUserNotificationError,
+  notifyUser,
+  resolveUser,
+  ucfirst,
+  UnknownUser,
+  UserNotificationResult,
+} from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { parseReason } from "./parseReason";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  member: GuildMember,
   reason: string,
+  member: GuildMember | null,
+  user?: User | null,
   warnOptions: WarnOptions = {},
 ): Promise<WarnResult> {
-  const config = pluginData.config.get();
+  if (!member && !user) {
+    return {
+      status: "failed",
+      error: "No member or user passed",
+    };
+  }
 
+  user = member?.user ?? user;
+
+  const config = pluginData.config.get();
+  reason = parseReason(config, reason);
   let notifyResult: UserNotificationResult;
+
   if (config.warn_message) {
     const warnMessage = await renderTemplate(
       config.warn_message,
@@ -34,7 +52,7 @@ export async function warnMember(
     const contactMethods = warnOptions?.contactMethods
       ? warnOptions.contactMethods
       : getDefaultContactMethods(pluginData, "warn");
-    notifyResult = await notifyUser(member.user, warnMessage, contactMethods);
+    notifyResult = await notifyUser(user as User, warnMessage, contactMethods);
   } else {
     notifyResult = createUserNotificationError("No warn message specified in config");
   }
@@ -53,7 +71,7 @@ export async function warnMember(
           error: "Failed to message user",
         };
       }
-    } else {
+    } else if (!warnOptions.silentErrors) {
       return {
         status: "failed",
         error: "Failed to message user",
@@ -66,7 +84,7 @@ export async function warnMember(
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const createdCase = await casesPlugin.createCase({
     ...(warnOptions.caseArgs || {}),
-    userId: member.id,
+    userId: user!.id,
     modId,
     type: CaseTypes.Warn,
     reason,
@@ -77,11 +95,12 @@ export async function warnMember(
   pluginData.getPlugin(LogsPlugin).logMemberWarn({
     mod,
     member,
+    user,
     caseNumber: createdCase.case_number,
     reason: reason ?? "",
   });
 
-  pluginData.state.events.emit("warn", member.id, reason, warnOptions.isAutomodAction);
+  pluginData.state.events.emit("warn", user!.id, reason, warnOptions.isAutomodAction);
 
   return {
     status: "success",
