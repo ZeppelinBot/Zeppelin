@@ -7,7 +7,6 @@ import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { isBanned } from "../functions/isBanned";
-import { parseReason } from "../functions/parseReason";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
 import { modActionsCmd } from "../types";
