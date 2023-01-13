@@ -147,7 +147,6 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     MassbanCmd,
     MassmuteCmd,
     MassunbanCmd,
-    MassWarnCmd,
     AddCaseCmd,
     CaseCmd,
     CasesUserCmd,
