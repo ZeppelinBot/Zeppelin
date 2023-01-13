@@ -80,7 +80,6 @@ const defaultOptions = {
     can_massunban: false,
     can_massban: false,
     can_massmute: false,
-    can_masswarn: false,
     can_hidecase: false,
     can_deletecase: false,
     can_act_as_other: false,
