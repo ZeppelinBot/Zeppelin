@@ -1,0 +1,238 @@
+From 60b88cc8fab83fe79574525d987d45392581a6cb Mon Sep 17 00:00:00 2001
+From: metal <metal@i0.tf>
+Date: Tue, 13 Dec 2022 10:40:53 +0000
+Subject: [PATCH 1/4] ghetto timeouts support
+
+Signed-off-by: GitHub <noreply@github.com>
+---
+ .../src/plugins/Mutes/functions/clearMute.ts  |  5 ++
+ .../Mutes/functions/memberHasMutedRole.ts     |  5 ++
+ .../src/plugins/Mutes/functions/muteUser.ts   | 75 +++++++++++--------
+ 3 files changed, 55 insertions(+), 30 deletions(-)
+
+diff --git a/backend/src/plugins/Mutes/functions/clearMute.ts b/backend/src/plugins/Mutes/functions/clearMute.ts
+index e7167474..a4ca0ce1 100644
+--- a/backend/src/plugins/Mutes/functions/clearMute.ts
++++ b/backend/src/plugins/Mutes/functions/clearMute.ts
+@@ -6,6 +6,7 @@ import { GuildPluginData } from "knub";
+ import { MutesPluginType } from "../types";
+ import { clearExpiringMute } from "../../../data/loops/expiringMutesLoop";
+ import { GuildMember } from "discord.js";
++import { memberHasMutedRole } from "./memberHasMutedRole";
+ 
+ export async function clearMute(
+   pluginData: GuildPluginData<MutesPluginType>,
+@@ -27,6 +28,10 @@ export async function clearMute(
+       const muteRole = pluginData.config.get().mute_role;
+       if (muteRole) {
+         await member.roles.remove(muteRole);
++      } else {
++        if (member.communicationDisabledUntil !== null && memberHasMutedRole(pluginData, member)) {
++          await member.timeout(null);
++        }
+       }
+       if (mute?.roles_to_restore) {
+         const guildRoles = pluginData.guild.roles.cache;
+diff --git a/backend/src/plugins/Mutes/functions/memberHasMutedRole.ts b/backend/src/plugins/Mutes/functions/memberHasMutedRole.ts
+index 2790285a..a6f91763 100644
+--- a/backend/src/plugins/Mutes/functions/memberHasMutedRole.ts
++++ b/backend/src/plugins/Mutes/functions/memberHasMutedRole.ts
+@@ -4,5 +4,10 @@ import { MutesPluginType } from "../types";
+ 
+ export function memberHasMutedRole(pluginData: GuildPluginData<MutesPluginType>, member: GuildMember): boolean {
+   const muteRole = pluginData.config.get().mute_role;
++  if (!muteRole) {
++    if (!member.communicationDisabledUntil) return false;
++    const diff = new Date(member.communicationDisabledUntil).getTime() - Date.now();
++    return diff > 10 * 1000;
++  }
+   return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
+ }
+diff --git a/backend/src/plugins/Mutes/functions/muteUser.ts b/backend/src/plugins/Mutes/functions/muteUser.ts
+index 3956be8a..b622dd41 100644
+--- a/backend/src/plugins/Mutes/functions/muteUser.ts
++++ b/backend/src/plugins/Mutes/functions/muteUser.ts
+@@ -21,6 +21,8 @@ import { MuteOptions, MutesPluginType } from "../types";
+ import { Mute } from "../../../data/entities/Mute";
+ import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop";
+ 
++const TIMEOUT_MAX = 27 * 24 * 60 * 60 * 1000;
++
+ /**
+  * TODO: Clean up this function
+  */
+@@ -36,11 +38,13 @@ export async function muteUser(
+   const lock = await pluginData.locks.acquire(muteLock({ id: userId }));
+ 
+   const muteRole = pluginData.config.get().mute_role;
+-  if (!muteRole) {
++  /*if (!muteRole) {
+     lock.unlock();
+     throw new RecoverablePluginError(ERRORS.NO_MUTE_ROLE_IN_CONFIG);
+-  }
++  }*/
+ 
++  if (!muteRole && muteTime && muteTime > TIMEOUT_MAX) muteTime = TIMEOUT_MAX;
++  if (!muteRole && !muteTime) muteTime = TIMEOUT_MAX;
+   const timeUntilUnmute = muteTime ? humanizeDuration(muteTime) : "indefinite";
+ 
+   // No mod specified -> mark Zeppelin as the mod
+@@ -90,37 +94,48 @@ export async function muteUser(
+     }
+ 
+     // Apply mute role if it's missing
+-    if (!currentUserRoles.includes(muteRole as Snowflake)) {
+-      try {
+-        await member.roles.add(muteRole as Snowflake);
+-      } catch (e) {
+-        const actualMuteRole = pluginData.guild.roles.cache.get(muteRole as Snowflake);
+-        if (!actualMuteRole) {
+-          lock.unlock();
+-          logs.logBotAlert({
+-            body: `Cannot mute users, specified mute role Id is invalid`,
+-          });
+-          throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
+-        }
++    if (muteRole) {
++      if (!currentUserRoles.includes(muteRole as Snowflake)) {
++        try {
++          await member.roles.add(muteRole as Snowflake);
++        } catch (e) {
++          const actualMuteRole = pluginData.guild.roles.cache.get(muteRole as Snowflake);
++          if (!actualMuteRole) {
++            lock.unlock();
++            logs.logBotAlert({
++              body: `Cannot mute users, specified mute role Id is invalid`,
++            });
++            throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
++          }
+ 
+-        const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
+-        const zepRoles = pluginData.guild.roles.cache.filter((x) => zep!.roles.cache.has(x.id));
+-        // If we have roles and one of them is above the muted role, throw generic error
+-        if (zepRoles.size >= 0 && zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
+-          lock.unlock();
+-          logs.logBotAlert({
+-            body: `Cannot mute user ${member.id}: ${e}`,
+-          });
+-          throw e;
+-        } else {
+-          // Otherwise, throw error that mute role is above zeps roles
+-          lock.unlock();
+-          logs.logBotAlert({
+-            body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
+-          });
+-          throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
++          const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
++          const zepRoles = pluginData.guild.roles.cache.filter((x) => zep!.roles.cache.has(x.id));
++          // If we have roles and one of them is above the muted role, throw generic error
++          if (zepRoles.size >= 0 && zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
++            lock.unlock();
++            logs.logBotAlert({
++              body: `Cannot mute user ${member.id}: ${e}`,
++            });
++            throw e;
++          } else {
++            // Otherwise, throw error that mute role is above zeps roles
++            lock.unlock();
++            logs.logBotAlert({
++              body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
++            });
++            throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
++          }
+         }
+       }
++    } else {
++      try {
++        await member.timeout(muteTime ?? TIMEOUT_MAX, reason);
++      } catch (e) {
++        lock.unlock();
++        logs.logBotAlert({
++          body: `Cannot mute users, timeout failed`,
++        });
++      }
+     }
+ 
+     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
+-- 
+2.38.1
+
+
+From 143753ee9688781cc54bb37aa1a9301cdb83b2b0 Mon Sep 17 00:00:00 2001
+From: metal <metal@i0.tf>
+Date: Sat, 16 Jul 2022 19:08:42 +0000
+Subject: [PATCH 2/4] better fix
+
+Signed-off-by: GitHub <noreply@github.com>
+---
+ backend/src/plugins/Mutes/MutesPlugin.ts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/backend/src/plugins/Mutes/MutesPlugin.ts b/backend/src/plugins/Mutes/MutesPlugin.ts
+index eba6b40f..922d5e14 100644
+--- a/backend/src/plugins/Mutes/MutesPlugin.ts
++++ b/backend/src/plugins/Mutes/MutesPlugin.ts
+@@ -92,6 +92,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
+     unmuteUser: mapToPublicFn(unmuteUser),
+     hasMutedRole(pluginData) {
+       return (member: GuildMember) => {
++        if (member.isCommunicationDisabled()) return true;
+         const muteRole = pluginData.config.get().mute_role;
+         return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
+       };
+-- 
+2.38.1
+
+
+From 23031caab6ee3d5d4da316b0a4d9fc6f43fcc359 Mon Sep 17 00:00:00 2001
+From: metal <metal@i0.tf>
+Date: Sat, 16 Jul 2022 19:04:17 +0000
+Subject: [PATCH 3/4] fix timeout unmute detection
+
+Signed-off-by: GitHub <noreply@github.com>
+---
+ backend/src/plugins/Mutes/MutesPlugin.ts | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/backend/src/plugins/Mutes/MutesPlugin.ts b/backend/src/plugins/Mutes/MutesPlugin.ts
+index 922d5e14..fffb4aab 100644
+--- a/backend/src/plugins/Mutes/MutesPlugin.ts
++++ b/backend/src/plugins/Mutes/MutesPlugin.ts
+@@ -94,6 +94,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
+       return (member: GuildMember) => {
+         if (member.isCommunicationDisabled()) return true;
+         const muteRole = pluginData.config.get().mute_role;
++        if (member.communicationDisabledUntilTimestamp) return true;
+         return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
+       };
+     },
+-- 
+2.38.1
+
+
+From 5463c89400e58f64f3e3f822f10ec656f18ae8fe Mon Sep 17 00:00:00 2001
+From: metal <metal@i0.tf>
+Date: Sat, 16 Jul 2022 19:11:04 +0000
+Subject: [PATCH 4/4] attempted fix at isMuted #2
+
+Signed-off-by: GitHub <noreply@github.com>
+---
+ backend/src/plugins/ModActions/commands/UnmuteCmd.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backend/src/plugins/ModActions/commands/UnmuteCmd.ts b/backend/src/plugins/ModActions/commands/UnmuteCmd.ts
+index f09c2e83..e15b6b42 100644
+--- a/backend/src/plugins/ModActions/commands/UnmuteCmd.ts
++++ b/backend/src/plugins/ModActions/commands/UnmuteCmd.ts
+@@ -44,7 +44,7 @@ export const UnmuteCmd = modActionsCmd({
+     const hasMuteRole = memberToUnmute && mutesPlugin.hasMutedRole(memberToUnmute);
+ 
+     // Check if they're muted in the first place
+-    if (!(await pluginData.state.mutes.isMuted(args.user)) && !hasMuteRole) {
++    if (!(await pluginData.state.mutes.isMuted(user.id)) && !hasMuteRole) {
+       sendErrorMessage(pluginData, msg.channel, "Cannot unmute: member is not muted");
+       return;
+     }
+-- 
+2.38.1
+

@@ -1,0 +1,197 @@
+From 140a4ad8070a442b5008000f551260b7b8053695 Mon Sep 17 00:00:00 2001
+From: KK <morrkade05@gmail.com>
+Date: Wed, 1 Jun 2022 16:53:20 -0500
+Subject: [PATCH] Created Activities Plugin
+
+---
+ .../plugins/Activities/ActivitiesPlugin.ts    | 32 +++++++++
+ .../Activities/commands/ActivitiesCmd.ts      | 72 +++++++++++++++++++
+ .../Activities/commands/ActivitiesList.ts     | 13 ++++
+ backend/src/plugins/Activities/types.ts       | 14 ++++
+ backend/src/plugins/availablePlugins.ts       |  2 +
+ 5 files changed, 133 insertions(+)
+ create mode 100644 backend/src/plugins/Activities/ActivitiesPlugin.ts
+ create mode 100644 backend/src/plugins/Activities/commands/ActivitiesCmd.ts
+ create mode 100644 backend/src/plugins/Activities/commands/ActivitiesList.ts
+ create mode 100644 backend/src/plugins/Activities/types.ts
+
+diff --git a/backend/src/plugins/Activities/ActivitiesPlugin.ts b/backend/src/plugins/Activities/ActivitiesPlugin.ts
+new file mode 100644
+index 00000000..6f11a1fb
+--- /dev/null
++++ b/backend/src/plugins/Activities/ActivitiesPlugin.ts
+@@ -0,0 +1,32 @@
++import { PluginOptions } from "knub";
++import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
++import { ActivitiesCmd } from "./commands/ActivitiesCmd";
++import { ActivitiesListCmd } from "./commands/ActivitiesList";
++import { ActivitiesPluginType, ConfigSchema } from "./types";
++
++const defaultOptions: PluginOptions<ActivitiesPluginType> = {
++  config: {
++    start_activities: false
++  },
++  overrides: [
++    {
++      level: ">=50",
++      config: {
++        start_activities: true
++      }
++    }
++  ]
++};
++
++export const ActivitiesPlugin = zeppelinGuildPlugin<ActivitiesPluginType>()({
++  name: "activities",
++  showInDocs: true,
++
++  commands: [
++    ActivitiesCmd,
++    ActivitiesListCmd
++  ],
++
++  configSchema: ConfigSchema,
++  defaultOptions,
++});
+diff --git a/backend/src/plugins/Activities/commands/ActivitiesCmd.ts b/backend/src/plugins/Activities/commands/ActivitiesCmd.ts
+new file mode 100644
+index 00000000..9507f917
+--- /dev/null
++++ b/backend/src/plugins/Activities/commands/ActivitiesCmd.ts
+@@ -0,0 +1,72 @@
++import { activitiesCmd } from "../types";
++import { commandTypeHelpers as ct } from "../../../commandTypes";
++import { sendErrorMessage } from "src/pluginUtils";
++
++import { RESTPostAPIChannelInviteJSONBody, APIInvite, InviteTargetType, RouteBases, Routes } from 'discord-api-types/v9';
++import fetch from "node-fetch";
++
++export const activities = {
++  poker: '755827207812677713',
++  betrayal: '773336526917861400',
++  youtube: '880218394199220334',
++  fishington: '814288819477020702',
++  chess: '832012774040141894',
++  checkers: '832013003968348200',
++  letter: '879863686565621790',
++  word: '879863976006127627',
++  sketchheads: '902271654783242291',
++  spellcast: '852509694341283871',
++  ocho: '832025144389533716',
++}
++
++export const ActivitiesCmd = activitiesCmd({
++  trigger: ['activities', 'activity'],
++  permission: 'start_activities',
++
++  signature: {
++    activity: ct.string(),
++    channel: ct.voiceChannel(),
++  },
++
++  async run({ message, args, pluginData}) {
++    if (!Object.keys(activities).includes(args.activity.toLowerCase())) {
++      sendErrorMessage(pluginData, message.channel, `Unknown activity \`${args.activity}\`.\nUse one from this list: \`${Object.keys(activities).join(', ')}\``);
++      return;
++    }
++
++    const channel = args.channel;
++    if (!channel) {
++      sendErrorMessage(pluginData, message.channel, `Unknown channel: ${args.channel}`);
++      return;
++    }
++
++    if (!channel.isVoice) {
++      sendErrorMessage(pluginData, message.channel, `Supplied channel is not a voice channel`);
++      return;
++    }
++
++    const r = await fetch(`${RouteBases.api}${Routes.channelInvites(channel.id)}`, {
++      method: 'POST',
++      headers: {
++        authorization: `Bot ${process.env.TOKEN}`,
++        'content-type': 'application/json'
++      },
++      body: JSON.stringify({
++        max_age: 0,
++        target_type: InviteTargetType.EmbeddedApplication,
++        target_application_id: activities[args.activity.toLowerCase()],
++      } as RESTPostAPIChannelInviteJSONBody)
++    });
++
++    const invite = await r.json() as APIInvite;
++
++    if (r.status !== 200) {
++      sendErrorMessage(pluginData, message.channel, `An error occurred: ${(invite as any).message}\nUnable to create an activities invite!\nMake sure I have the "Create Invite" permission in ${channel}.`);
++      return;
++    }
++
++    message.channel.send({
++      content: `Click here to join ${args.activity} in ${channel}: https://discord.gg/${invite.code}`,
++    });
++  },
++});
+\ No newline at end of file
+diff --git a/backend/src/plugins/Activities/commands/ActivitiesList.ts b/backend/src/plugins/Activities/commands/ActivitiesList.ts
+new file mode 100644
+index 00000000..84c40f3e
+--- /dev/null
++++ b/backend/src/plugins/Activities/commands/ActivitiesList.ts
+@@ -0,0 +1,13 @@
++import { activitiesCmd } from "../types";
++import { activities } from "./ActivitiesCmd";
++
++export const ActivitiesListCmd = activitiesCmd({
++  trigger: ['activities', 'activity', 'activities_list'],
++  permission: 'start_activities',
++
++  async run({ message, args, pluginData}) {
++    message.channel.send({
++      content: `The activities available are: \`${Object.keys(activities).join(', ')}\``,
++    });
++  },
++});
+\ No newline at end of file
+diff --git a/backend/src/plugins/Activities/types.ts b/backend/src/plugins/Activities/types.ts
+new file mode 100644
+index 00000000..901058ad
+--- /dev/null
++++ b/backend/src/plugins/Activities/types.ts
+@@ -0,0 +1,14 @@
++import * as t from "io-ts";
++import { BasePluginType, typedGuildCommand } from "knub";
++
++export const ConfigSchema = t.type({
++  start_activities: t.boolean,
++});
++export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
++
++export interface ActivitiesPluginType extends BasePluginType {
++  config: TConfigSchema;
++  state: {};
++}
++
++export const activitiesCmd = typedGuildCommand<ActivitiesPluginType>();
+diff --git a/backend/src/plugins/availablePlugins.ts b/backend/src/plugins/availablePlugins.ts
+index f337e2e2..59cdfd7b 100644
+--- a/backend/src/plugins/availablePlugins.ts
++++ b/backend/src/plugins/availablePlugins.ts
+@@ -39,6 +39,7 @@ import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
+ import { RoleManagerPlugin } from "./RoleManager/RoleManagerPlugin";
+ import { RoleButtonsPlugin } from "./RoleButtons/RoleButtonsPlugin";
+ import { SocialMediaPosterPlugin } from "./SocialMediaPoster/SocialMediaPosterPlugin";
++import { ActivitiesPlugin } from "./Activities/ActivitiesPlugin";
+ 
+ // prettier-ignore
+ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+@@ -79,6 +80,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+   RoleManagerPlugin,
+   RoleButtonsPlugin,
+   SocialMediaPosterPlugin,
++  ActivitiesPlugin,
+ ];
+ 
+ // prettier-ignore
+-- 
+2.35.1.windows.2
+
