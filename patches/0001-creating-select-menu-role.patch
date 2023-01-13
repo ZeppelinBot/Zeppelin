@@ -1,0 +1,792 @@
+From 1f18cfe51543c8990a0921aa31a4f548959fa032 Mon Sep 17 00:00:00 2001
+From: Jernik <info@jernik.me>
+Date: Fri, 8 Apr 2022 14:20:26 -0500
+Subject: [PATCH] creating select-menu role patch
+
+---
+ backend/src/data/GuildSelectRoles.ts          |  58 +++++++++
+ backend/src/data/entities/SelectRole.ts       |  24 ++++
+ .../1633452231495-CreateSelectRolesTable.ts   |  49 ++++++++
+ .../events/ButtonInteractionEvt.ts            |   2 +-
+ .../SelectMenuRoles/SelectMenuRolesPlugin.ts  | 115 ++++++++++++++++++
+ .../commands/PostSelectRolesCmd.ts            |  71 +++++++++++
+ .../events/ButtonInteractionEvt.ts            |  76 ++++++++++++
+ .../events/MessageDeletedEvt.ts               |  13 ++
+ backend/src/plugins/SelectMenuRoles/types.ts  |  65 ++++++++++
+ .../util/addMemberPendingRoleChange.ts        |  58 +++++++++
+ .../util/buttonActionHandlers.ts              |  54 ++++++++
+ .../util/buttonCustomIdFunctions.ts           |  37 ++++++
+ .../SelectMenuRoles/util/buttonMenuActions.ts |   3 +
+ .../util/splitMenusIntoRows.ts                |  19 +++
+ backend/src/plugins/availablePlugins.ts       |   2 +
+ 15 files changed, 645 insertions(+), 1 deletion(-)
+ create mode 100644 backend/src/data/GuildSelectRoles.ts
+ create mode 100644 backend/src/data/entities/SelectRole.ts
+ create mode 100644 backend/src/migrations/1633452231495-CreateSelectRolesTable.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/SelectMenuRolesPlugin.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/commands/PostSelectRolesCmd.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/events/ButtonInteractionEvt.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/events/MessageDeletedEvt.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/types.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/util/addMemberPendingRoleChange.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/util/buttonActionHandlers.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/util/buttonCustomIdFunctions.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/util/buttonMenuActions.ts
+ create mode 100644 backend/src/plugins/SelectMenuRoles/util/splitMenusIntoRows.ts
+
+diff --git a/backend/src/data/GuildSelectRoles.ts b/backend/src/data/GuildSelectRoles.ts
+new file mode 100644
+index 00000000..c0cbff1f
+--- /dev/null
++++ b/backend/src/data/GuildSelectRoles.ts
+@@ -0,0 +1,58 @@
++import { getRepository, Repository } from "typeorm";
++import { BaseGuildRepository } from "./BaseGuildRepository";
++import { SelectRole } from "./entities/SelectRole";
++
++export class GuildSelectRoles extends BaseGuildRepository {
++  private selectRoles: Repository<SelectRole>;
++
++  constructor(guildId) {
++    super(guildId);
++    this.selectRoles = getRepository(SelectRole);
++  }
++
++  async getForSelectId(selectId: string) {
++    return this.selectRoles.findOne({
++      guild_id: this.guildId,
++      menu_id: selectId,
++    });
++  }
++
++  async getAllForMessageId(messageId: string) {
++    return this.selectRoles.find({
++      guild_id: this.guildId,
++      message_id: messageId,
++    });
++  }
++
++  async removeForButtonId(selectId: string) {
++    return this.selectRoles.delete({
++      guild_id: this.guildId,
++      menu_id: selectId,
++    });
++  }
++
++  async removeAllForMessageId(messageId: string) {
++    return this.selectRoles.delete({
++      guild_id: this.guildId,
++      message_id: messageId,
++    });
++  }
++
++  async getForButtonGroup(selectGroup: string) {
++    return this.selectRoles.find({
++      guild_id: this.guildId,
++      menu_group: selectGroup,
++    });
++  }
++
++  async add(channelId: string, messageId: string, menuId: string, menuGroup: string, menuName: string) {
++    await this.selectRoles.insert({
++      guild_id: this.guildId,
++      channel_id: channelId,
++      message_id: messageId,
++      menu_id: menuId,
++      menu_group: menuGroup,
++      menu_name: menuName,
++    });
++  }
++}
+diff --git a/backend/src/data/entities/SelectRole.ts b/backend/src/data/entities/SelectRole.ts
+new file mode 100644
+index 00000000..0a72a4b5
+--- /dev/null
++++ b/backend/src/data/entities/SelectRole.ts
+@@ -0,0 +1,24 @@
++import { Column, Entity, PrimaryColumn } from "typeorm";
++
++@Entity("select_roles")
++export class SelectRole {
++  @Column()
++  @PrimaryColumn()
++  guild_id: string;
++
++  @Column()
++  @PrimaryColumn()
++  channel_id: string;
++
++  @Column()
++  @PrimaryColumn()
++  message_id: string;
++
++  @Column()
++  @PrimaryColumn()
++  menu_id: string;
++
++  @Column() menu_group: string;
++
++  @Column() menu_name: string;
++}
+diff --git a/backend/src/migrations/1633452231495-CreateSelectRolesTable.ts b/backend/src/migrations/1633452231495-CreateSelectRolesTable.ts
+new file mode 100644
+index 00000000..9c6b341f
+--- /dev/null
++++ b/backend/src/migrations/1633452231495-CreateSelectRolesTable.ts
+@@ -0,0 +1,49 @@
++import { MigrationInterface, QueryRunner, Table } from "typeorm";
++
++export class CreateSelectRolesTable1633452231495 implements MigrationInterface {
++  public async up(queryRunner: QueryRunner): Promise<void> {
++    await queryRunner.createTable(
++      new Table({
++        name: "select_roles",
++        columns: [
++          {
++            name: "guild_id",
++            type: "bigint",
++            isPrimary: true,
++          },
++          {
++            name: "channel_id",
++            type: "bigint",
++            isPrimary: true,
++          },
++          {
++            name: "message_id",
++            type: "bigint",
++            isPrimary: true,
++          },
++          {
++            name: "menu_id",
++            type: "varchar",
++            length: "100",
++            isPrimary: true,
++            isUnique: true,
++          },
++          {
++            name: "menu_group",
++            type: "varchar",
++            length: "100",
++          },
++          {
++            name: "menu_name",
++            type: "varchar",
++            length: "100",
++          },
++        ],
++      }),
++    );
++  }
++
++  public async down(queryRunner: QueryRunner): Promise<void> {
++    await queryRunner.dropTable("select_roles");
++  }
++}
+diff --git a/backend/src/plugins/ReactionRoles/events/ButtonInteractionEvt.ts b/backend/src/plugins/ReactionRoles/events/ButtonInteractionEvt.ts
+index 65ace443..8ff382ca 100644
+--- a/backend/src/plugins/ReactionRoles/events/ButtonInteractionEvt.ts
++++ b/backend/src/plugins/ReactionRoles/events/ButtonInteractionEvt.ts
+@@ -18,7 +18,7 @@ export const ButtonInteractionEvt = reactionRolesEvt({
+ 
+   async listener(meta) {
+     const int = meta.args.interaction;
+-    if (!int.isMessageComponent()) return;
++    if (!int.isMessageComponent() || !int.isButton()) return;
+ 
+     const cfg = meta.pluginData.config.get();
+     const split = int.customId.split(BUTTON_CONTEXT_SEPARATOR);
+diff --git a/backend/src/plugins/SelectMenuRoles/SelectMenuRolesPlugin.ts b/backend/src/plugins/SelectMenuRoles/SelectMenuRolesPlugin.ts
+new file mode 100644
+index 00000000..1aa6a69b
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/SelectMenuRolesPlugin.ts
+@@ -0,0 +1,115 @@
++import { PluginOptions } from "knub";
++import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
++import { GuildSelectRoles } from "src/data/GuildSelectRoles";
++import { Queue } from "src/Queue";
++import { isValidSnowflake } from "src/utils";
++import { StrictValidationError } from "src/validatorUtils";
++import { GuildSavedMessages } from "../../data/GuildSavedMessages";
++import { LogsPlugin } from "../Logs/LogsPlugin";
++import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
++import { PostSelectRolesCmd } from "./commands/PostSelectRolesCmd";
++import { InteractionEvt } from "./events/ButtonInteractionEvt";
++import { ConfigSchema, SelectMenuRolesPluginType } from "./types";
++
++const defaultOptions: PluginOptions<SelectMenuRolesPluginType> = {
++  config: {
++    select_groups: {},
++
++    can_manage: false,
++  },
++
++  overrides: [
++    {
++      level: ">=100",
++      config: {
++        can_manage: true,
++      },
++    },
++  ],
++};
++
++const MAXIMUM_COMPONENT_ROWS = 5;
++
++const configPreprocessor: ConfigPreprocessorFn<SelectMenuRolesPluginType> = (options) => {
++  if (options.config.select_groups) {
++    for (const [groupName, group] of Object.entries(options.config.select_groups)) {
++      const defaultSelectMenuNames = Object.keys(group.menus);
++      const defaultMenus = Object.values(group.menus);
++      const menuNames = Object.keys(group.menus ?? []);
++
++      const defaultMenuRowCount = defaultMenus.length;
++      if (defaultMenuRowCount > MAXIMUM_COMPONENT_ROWS || defaultMenuRowCount === 0) {
++        throw new StrictValidationError([
++          `Invalid row count for menus: You currently have ${defaultMenuRowCount}, the maximum is 5. A new row is started automatically after each menu.`,
++        ]);
++      }
++
++      for (let i = 0; i < defaultMenus.length; i++) {
++        const defMenu = defaultMenus[i];
++        if (defMenu.maxValues && (defMenu.maxValues > 25 || defMenu.maxValues < 1)) {
++          throw new StrictValidationError([
++            `Invalid value for menus/${defaultSelectMenuNames[i]}/maxValues: Maximum Values Must be between 1 and 25`,
++          ]);
++        }
++        if (defMenu.minValues && (defMenu.minValues > 25 || defMenu.minValues < 0)) {
++          throw new StrictValidationError([
++            `Invalid value for menus/${defaultSelectMenuNames[i]}/maxValues: Minimum Values Must be between 0 and 25`,
++          ]);
++        }
++        if (defMenu.items.length > 25 || defMenu.items.length === 0) {
++          throw new StrictValidationError([
++            `Invalid values for menus/${defaultSelectMenuNames[i]}/items: Must have between 1 and 25 items configured`,
++          ]);
++        }
++        for (let i2 = 0; i2 < defMenu.items.length; i2++) {
++          const item = defMenu.items[i2];
++
++          if (!isValidSnowflake(item.role)) {
++            throw new StrictValidationError([
++              `Invalid value for menus/${defaultSelectMenuNames[i]}/items/${i2}/role: ${item.role} is not a valid snowflake.`,
++            ]);
++          }
++          if (!item.label && !item.emoji) {
++            throw new StrictValidationError([
++              `Invalid values for menus/${defaultSelectMenuNames[i]}/items/${i2}/(label|emoji): Must have label, emoji or both set for the select menu to be valid.`,
++            ]);
++          }
++        }
++      }
++    }
++  }
++
++  return options;
++};
++
++export const SelectMenuRolesPlugin = zeppelinGuildPlugin<SelectMenuRolesPluginType>()({
++  name: "select_menu_roles",
++  showInDocs: true,
++  info: {
++    prettyName: "Select menu roles",
++  },
++
++  dependencies: () => [LogsPlugin],
++  configSchema: ConfigSchema,
++  defaultOptions,
++
++  // prettier-ignore
++  commands: [
++    PostSelectRolesCmd,
++  ],
++
++  // prettier-ignore
++  events: [
++    InteractionEvt,
++  ],
++  configPreprocessor,
++
++  beforeLoad(pluginData) {
++    const { state, guild } = pluginData;
++
++    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
++    state.selectMenus = GuildSelectRoles.getGuildInstance(guild.id);
++    state.roleChangeQueue = new Queue();
++    state.pendingRoleChanges = new Map();
++  },
++});
+diff --git a/backend/src/plugins/SelectMenuRoles/commands/PostSelectRolesCmd.ts b/backend/src/plugins/SelectMenuRoles/commands/PostSelectRolesCmd.ts
+new file mode 100644
+index 00000000..7f017436
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/commands/PostSelectRolesCmd.ts
+@@ -0,0 +1,71 @@
++import { createHash } from "crypto";
++import { MessageButton, MessageSelectMenu, Snowflake, MessageSelectOptionData } from "discord.js";
++import moment from "moment";
++import { sendErrorMessage, sendSuccessMessage } from "src/pluginUtils";
++import { commandTypeHelpers as ct } from "../../../commandTypes";
++import { selectRolesCmd } from "../types";
++import { splitButtonsIntoRows } from "../util/splitMenusIntoRows";
++
++export const PostSelectRolesCmd = selectRolesCmd({
++  trigger: "select_roles post",
++  permission: "can_manage",
++
++  signature: {
++    channel: ct.textChannel(),
++    selectGroup: ct.string(),
++  },
++
++  async run({ message: msg, args, pluginData }) {
++    const cfg = pluginData.config.get();
++    if (!cfg.select_groups) {
++      sendErrorMessage(pluginData, msg.channel, "No select menu groups defined in config");
++      return;
++    }
++    const group = cfg.select_groups[args.selectGroup];
++
++    if (!group) {
++      sendErrorMessage(pluginData, msg.channel, `No select menu group matches the name **${args.selectGroup}**`);
++      return;
++    }
++
++    const selectMenus: MessageSelectMenu[] = [];
++    const toInsert: Array<{ customId; selectGroup; menuName }> = [];
++    for (const [menuName, menu] of Object.entries(group.menus)) {
++      const customId = createHash("md5").update(`${menuName}${moment.utc().valueOf()}`).digest("hex");
++      const opts: MessageSelectOptionData[] = [];
++      for (const [k, item] of Object.entries(menu.items)) {
++        opts.push({
++          label: item.label,
++          description: item.description ?? "",
++          default: item.default ?? false,
++          value: item.role,
++          emoji: item.emoji ? pluginData.client.emojis.resolve(item.emoji as Snowflake) ?? item.emoji : undefined,
++        });
++      }
++      const slm = new MessageSelectMenu()
++        .setMinValues(menu.minValues ?? 1)
++        .setMaxValues(menu.maxValues ?? opts.length)
++        .setCustomId(customId)
++        .setDisabled(menu.disabled ?? false);
++      if (menu.placeholder) slm.setPlaceholder(menu.placeholder);
++      slm.addOptions(...opts);
++      selectMenus.push(slm);
++
++      toInsert.push({ customId, selectGroup: args.selectGroup, menuName });
++    }
++    const rows = splitButtonsIntoRows(selectMenus, Object.values(group.menus)); // new MessageActionRow().addComponents(buttons);
++
++    try {
++      const newMsg = await args.channel.send({ content: group.message, components: rows });
++
++      for (const btn of toInsert) {
++        await pluginData.state.selectMenus.add(args.channel.id, newMsg.id, btn.customId, btn.selectGroup, btn.menuName);
++      }
++    } catch (e) {
++      sendErrorMessage(pluginData, msg.channel, `Error trying to post message: ${e}`);
++      return;
++    }
++
++    await sendSuccessMessage(pluginData, msg.channel, `Successfully posted message in <#${args.channel.id}>`);
++  },
++});
+diff --git a/backend/src/plugins/SelectMenuRoles/events/ButtonInteractionEvt.ts b/backend/src/plugins/SelectMenuRoles/events/ButtonInteractionEvt.ts
+new file mode 100644
+index 00000000..caf30c42
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/events/ButtonInteractionEvt.ts
+@@ -0,0 +1,76 @@
++import { MessageComponentInteraction } from "discord.js";
++import humanizeDuration from "humanize-duration";
++import moment from "moment";
++import { logger } from "src/logger";
++import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
++import { MINUTES } from "src/utils";
++import { idToTimestamp } from "src/utils/idToTimestamp";
++import { interactionEvt } from "../types";
++import { handleModifyRole } from "../util/buttonActionHandlers";
++import { MENU_CONTEXT_SEPARATOR, resolveStatefulCustomId } from "../util/buttonCustomIdFunctions";
++import { SelectMenuActions } from "../util/buttonMenuActions";
++
++const INVALIDATION_TIME = 15 * MINUTES;
++
++export const InteractionEvt = interactionEvt({
++  event: "interactionCreate",
++
++  async listener(meta) {
++    const int = meta.args.interaction;
++    if (!int.isMessageComponent() || !int.isSelectMenu()) return;
++
++    const cfg = meta.pluginData.config.get();
++    const split = int.customId.split(MENU_CONTEXT_SEPARATOR);
++    const context = (await resolveStatefulCustomId(meta.pluginData, int.customId)) ?? {
++      groupName: split[0],
++      menuName: split[1],
++      action: split[2],
++      stateless: true,
++    };
++
++    if (context.stateless) {
++      const timeSinceCreation = moment.utc().valueOf() - idToTimestamp(int.message.id)!;
++      if (timeSinceCreation >= INVALIDATION_TIME) {
++        sendEphemeralReply(
++          int,
++          `Sorry, but these select menus are invalid because they are older than ${humanizeDuration(
++            INVALIDATION_TIME,
++          )}.\nIf the menu is still available, open it again to assign yourself roles!`,
++        );
++        return;
++      }
++    }
++
++    const group = cfg.select_groups[context.groupName];
++    if (!group) {
++      await sendEphemeralReply(int, `A configuration error was encountered, please contact the Administrators!`);
++      meta.pluginData.getPlugin(LogsPlugin).logBotAlert({
++        body: `**A configuration error occurred** on select menus for message ${int.message.id}, group **${context.groupName}** not found in config`,
++      });
++      return;
++    }
++
++    // Verify that detected action is known by us
++    if (!(<any>Object).values(SelectMenuActions).includes(context.action)) {
++      await sendEphemeralReply(int, `A internal error was encountered, please contact the Administrators!`);
++      meta.pluginData.getPlugin(LogsPlugin).logBotAlert({
++        body: `**A internal error occurred** on select menus for message ${int.message.id}, action **${context.action}** is not known`,
++      });
++      return;
++    }
++
++    if (context.action === SelectMenuActions.MODIFY_ROLE) {
++      await handleModifyRole(meta.pluginData, int, group, context);
++      return;
++    }
++
++    logger.warn(
++      `Action ${context.action} on select menu ${int.customId} (Guild: ${int.guildId}, Channel: ${int.channelId}) is unknown!`,
++    );
++    await sendEphemeralReply(int, `A internal error was encountered, please contact the Administrators!`);
++  },
++});
++
++async function sendEphemeralReply(interaction: MessageComponentInteraction, message: string) {
++  await interaction.reply({ content: message, ephemeral: true });
++}
+diff --git a/backend/src/plugins/SelectMenuRoles/events/MessageDeletedEvt.ts b/backend/src/plugins/SelectMenuRoles/events/MessageDeletedEvt.ts
+new file mode 100644
+index 00000000..2acbbb23
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/events/MessageDeletedEvt.ts
+@@ -0,0 +1,13 @@
++import { interactionEvt } from "../types";
++
++export const MessageDeletedEvt = interactionEvt({
++  event: "messageDelete",
++  allowBots: true,
++  allowSelf: true,
++
++  async listener(meta) {
++    const pluginData = meta.pluginData;
++
++    await pluginData.state.selectMenus.removeAllForMessageId(meta.args.message.id);
++  },
++});
+diff --git a/backend/src/plugins/SelectMenuRoles/types.ts b/backend/src/plugins/SelectMenuRoles/types.ts
+new file mode 100644
+index 00000000..045fe47b
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/types.ts
+@@ -0,0 +1,65 @@
++import * as t from "io-ts";
++import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
++import { GuildSelectRoles } from "src/data/GuildSelectRoles";
++import { GuildSavedMessages } from "../../data/GuildSavedMessages";
++import { Queue } from "../../Queue";
++import { tNullable } from "../../utils";
++
++const SelectMenuItem = t.type({
++  label: t.string,
++  role: t.string,
++  description: tNullable(t.string),
++  emoji: tNullable(t.string),
++  default: tNullable(t.boolean),
++});
++export type TSelectMenuItemOpts = t.TypeOf<typeof SelectMenuItem>;
++
++const SelectMenuOpts = t.type({
++  items: t.array(SelectMenuItem),
++  placeholder: tNullable(t.string),
++  minValues: tNullable(t.number),
++  maxValues: tNullable(t.number),
++  disabled: tNullable(t.boolean),
++});
++export type TSelectMenuOpts = t.TypeOf<typeof SelectMenuOpts>;
++
++const SelectMenuPairOpts = t.type({
++  message: t.string,
++  menus: t.record(t.string, SelectMenuOpts),
++});
++export type TSelectMenuPairOpts = t.TypeOf<typeof SelectMenuPairOpts>;
++
++export const ConfigSchema = t.type({
++  select_groups: t.record(t.string, SelectMenuPairOpts),
++  can_manage: t.boolean,
++});
++export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
++
++export type RoleChangeMode = "+" | "-";
++
++export type PendingMemberRoleChanges = {
++  timeout: NodeJS.Timeout | null;
++  applyFn: () => void;
++  changes: Array<{
++    mode: RoleChangeMode;
++    roleId: string;
++  }>;
++};
++
++export interface SelectMenuRolesPluginType extends BasePluginType {
++  config: TConfigSchema;
++  state: {
++    savedMessages: GuildSavedMessages;
++    selectMenus: GuildSelectRoles;
++
++    reactionRemoveQueue: Queue;
++    roleChangeQueue: Queue;
++    pendingRoleChanges: Map<string, PendingMemberRoleChanges>;
++    pendingRefreshes: Set<string>;
++
++    autoRefreshTimeout: NodeJS.Timeout;
++  };
++}
++
++export const interactionEvt = typedGuildEventListener<SelectMenuRolesPluginType>();
++export const selectRolesCmd = typedGuildCommand<SelectMenuRolesPluginType>();
+diff --git a/backend/src/plugins/SelectMenuRoles/util/addMemberPendingRoleChange.ts b/backend/src/plugins/SelectMenuRoles/util/addMemberPendingRoleChange.ts
+new file mode 100644
+index 00000000..01dcb454
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/util/addMemberPendingRoleChange.ts
+@@ -0,0 +1,58 @@
++import { Snowflake } from "discord.js";
++import { GuildPluginData } from "knub";
++import { logger } from "../../../logger";
++import { resolveMember } from "../../../utils";
++import { memberRolesLock } from "../../../utils/lockNameHelpers";
++import { PendingMemberRoleChanges, SelectMenuRolesPluginType, RoleChangeMode } from "../types";
++
++const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 3000;
++
++export async function addMemberPendingRoleChange(
++  pluginData: GuildPluginData<SelectMenuRolesPluginType>,
++  memberId: string,
++  mode: RoleChangeMode,
++  roleId: string,
++) {
++  if (!pluginData.state.pendingRoleChanges.has(memberId)) {
++    const newPendingRoleChangeObj: PendingMemberRoleChanges = {
++      timeout: null,
++      changes: [],
++      applyFn: async () => {
++        pluginData.state.pendingRoleChanges.delete(memberId);
++
++        const lock = await pluginData.locks.acquire(memberRolesLock({ id: memberId }));
++
++        const member = await resolveMember(pluginData.client, pluginData.guild, memberId);
++        if (member) {
++          const newRoleIds = new Set(member.roles.cache.keys());
++          for (const change of newPendingRoleChangeObj.changes) {
++            if (change.mode === "+") newRoleIds.add(change.roleId as Snowflake);
++            else newRoleIds.delete(change.roleId as Snowflake);
++          }
++
++          try {
++            await member.edit(
++              {
++                roles: Array.from(newRoleIds.values()),
++              },
++              "Select menu roles",
++            );
++          } catch (e) {
++            logger.warn(`Failed to apply role changes to ${member.user.tag} (${member.id}): ${e.message}`);
++          }
++        }
++        lock.unlock();
++      },
++    };
++
++    pluginData.state.pendingRoleChanges.set(memberId, newPendingRoleChangeObj);
++  }
++
++  const pendingRoleChangeObj = pluginData.state.pendingRoleChanges.get(memberId)!;
++  pendingRoleChangeObj.changes.push({ mode, roleId });
++  if (pendingRoleChangeObj.timeout) clearTimeout(pendingRoleChangeObj.timeout);
++  pendingRoleChangeObj.timeout = setTimeout(
++    () => pluginData.state.roleChangeQueue.add(pendingRoleChangeObj.applyFn),
++    ROLE_CHANGE_BATCH_DEBOUNCE_TIME,
++  );
++}
+diff --git a/backend/src/plugins/SelectMenuRoles/util/buttonActionHandlers.ts b/backend/src/plugins/SelectMenuRoles/util/buttonActionHandlers.ts
+new file mode 100644
+index 00000000..4aa948a5
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/util/buttonActionHandlers.ts
+@@ -0,0 +1,54 @@
++import { SelectMenuInteraction } from "discord.js";
++import { GuildPluginData } from "knub";
++import { LogsPlugin } from "../../Logs/LogsPlugin";
++import { SelectMenuRolesPluginType, TSelectMenuPairOpts } from "../types";
++import { addMemberPendingRoleChange } from "./addMemberPendingRoleChange";
++
++export async function handleModifyRole(
++  pluginData: GuildPluginData<SelectMenuRolesPluginType>,
++  int: SelectMenuInteraction,
++  group: TSelectMenuPairOpts,
++  context,
++) {
++  const values = int.values;
++  const menuName = context.menuName;
++  if (!values) return;
++  const guildRoles = await pluginData.guild.roles.fetch();
++  for (const i in values) {
++    if (!guildRoles.find((rl) => rl.id === values[i])) {
++      await int.reply({
++        content: `A configuration error was encountered, please contact the Administrators!`,
++        ephemeral: true,
++      });
++      pluginData.getPlugin(LogsPlugin).logBotAlert({
++        body: `**A configuration error occurred** on select menus for message ${int.message.id}, role **${values[i]}** not found on server`,
++      });
++      return;
++    }
++  }
++
++  try {
++    const member = await pluginData.guild.members.fetch(int.user.id);
++    const configuredRoles: string[] = [];
++    const menuGroup = group.menus[menuName];
++    for (const key in menuGroup.items) {
++      configuredRoles.push(menuGroup.items[key].role);
++    }
++    const memberRoles = Array.from(member.roles.cache.keys());
++    const toAdd = configuredRoles.filter((rl) => values.includes(rl) && !memberRoles.includes(rl));
++    const toRemove = configuredRoles.filter(
++      (rl) => !toAdd.includes(rl) && memberRoles.includes(rl) && !values.includes(rl),
++    );
++    toAdd.forEach((r) => addMemberPendingRoleChange(pluginData, member.id, "+", r));
++    toRemove.forEach((r) => addMemberPendingRoleChange(pluginData, member.id, "-", r));
++    await int.deferUpdate();
++  } catch (e) {
++    await int.reply({
++      content: "A configuration error was encountered, please contact the Administrators!",
++      ephemeral: true,
++    });
++    pluginData.getPlugin(LogsPlugin).logBotAlert({
++      body: `**A configuration error occurred** on select menus for message ${int.message.id}, error: ${e}. We might be missing permissions!`,
++    });
++  }
++}
+diff --git a/backend/src/plugins/SelectMenuRoles/util/buttonCustomIdFunctions.ts b/backend/src/plugins/SelectMenuRoles/util/buttonCustomIdFunctions.ts
+new file mode 100644
+index 00000000..c0a4a29a
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/util/buttonCustomIdFunctions.ts
+@@ -0,0 +1,37 @@
++import { Snowflake } from "discord.js";
++import { GuildPluginData } from "knub";
++import { SelectMenuRolesPluginType } from "../types";
++import { SelectMenuActions } from "./buttonMenuActions";
++
++export const MENU_CONTEXT_SEPARATOR = ":rm:";
++
++export async function generateStatelessCustomId(
++  pluginData: GuildPluginData<SelectMenuRolesPluginType>,
++  groupName: string,
++  menuName: string,
++) {
++  let id = groupName + MENU_CONTEXT_SEPARATOR + menuName + MENU_CONTEXT_SEPARATOR;
++
++  id += `${SelectMenuActions.MODIFY_ROLE}`;
++
++  return id;
++}
++
++export async function resolveStatefulCustomId(pluginData: GuildPluginData<SelectMenuRolesPluginType>, id: string) {
++  const menu = await pluginData.state.selectMenus.getForSelectId(id);
++
++  if (menu) {
++    const group = pluginData.config.get().select_groups[menu.menu_group];
++    if (!group) return null;
++    const cfgButton = group.menus[menu.menu_name];
++
++    return {
++      groupName: menu.menu_group,
++      menuName: menu.menu_name,
++      action: SelectMenuActions.MODIFY_ROLE,
++      stateless: false,
++    };
++  } else {
++    return null;
++  }
++}
+diff --git a/backend/src/plugins/SelectMenuRoles/util/buttonMenuActions.ts b/backend/src/plugins/SelectMenuRoles/util/buttonMenuActions.ts
+new file mode 100644
+index 00000000..d3fd4c1e
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/util/buttonMenuActions.ts
+@@ -0,0 +1,3 @@
++export enum SelectMenuActions {
++  MODIFY_ROLE = "grant",
++}
+diff --git a/backend/src/plugins/SelectMenuRoles/util/splitMenusIntoRows.ts b/backend/src/plugins/SelectMenuRoles/util/splitMenusIntoRows.ts
+new file mode 100644
+index 00000000..7c0e6d71
+--- /dev/null
++++ b/backend/src/plugins/SelectMenuRoles/util/splitMenusIntoRows.ts
+@@ -0,0 +1,19 @@
++import { MessageActionRow, MessageSelectMenu } from "discord.js";
++import { TSelectMenuOpts } from "../types";
++
++export function splitButtonsIntoRows(
++  actualMenus: MessageSelectMenu[],
++  configButtons: TSelectMenuOpts[],
++): MessageActionRow[] {
++  const rows: MessageActionRow[] = [];
++  let curRow = new MessageActionRow();
++
++  for (const item of actualMenus) {
++    curRow.addComponents(item);
++    rows.push(curRow);
++    curRow = new MessageActionRow();
++  }
++
++  if (curRow.components.length >= 1) rows.push(curRow);
++  return rows;
++}
+diff --git a/backend/src/plugins/availablePlugins.ts b/backend/src/plugins/availablePlugins.ts
+index dc8adf25..f98fc40c 100644
+--- a/backend/src/plugins/availablePlugins.ts
++++ b/backend/src/plugins/availablePlugins.ts
+@@ -24,6 +24,7 @@ import { PostPlugin } from "./Post/PostPlugin";
+ import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
+ import { RemindersPlugin } from "./Reminders/RemindersPlugin";
+ import { RolesPlugin } from "./Roles/RolesPlugin";
++import { SelectMenuRolesPlugin } from "./SelectMenuRoles/SelectMenuRolesPlugin";
+ import { SelfGrantableRolesPlugin } from "./SelfGrantableRoles/SelfGrantableRolesPlugin";
+ import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
+ import { SpamPlugin } from "./Spam/SpamPlugin";
+@@ -73,6 +74,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+   ContextMenuPlugin,
+   PhishermanPlugin,
+   InternalPosterPlugin,
++  SelectMenuRolesPlugin
+ ];
+ 
+ // prettier-ignore
+-- 
+2.33.1.windows.1
+

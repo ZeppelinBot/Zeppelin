@@ -1,0 +1,3 @@
+[submodule "Zeppelin"]
+	path = Zeppelin
+	url = https://github.com/ZeppelinBot/Zeppelin

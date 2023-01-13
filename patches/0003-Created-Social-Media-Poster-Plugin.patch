@@ -1,0 +1,480 @@
+From 62ee0291b640269f227698f0aa0114b426965c6e Mon Sep 17 00:00:00 2001
+From: KK
+Date: Wed, 1 Jun 2022 07:38:29 -0500
+Subject: [PATCH] Created Social Media Poster Plugin
+
+---
+ backend/src/data/GuildSocialPosts.ts          |  42 +++++++
+ backend/src/data/entities/SocialPosts.ts      |  18 +++
+ .../1654041201056-CreateSocialPostsTable.ts   |  40 +++++++
+ .../SocialMediaPosterPlugin.ts                |  77 ++++++++++++
+ .../functions/pollSubreddit.ts                | 110 ++++++++++++++++++
+ backend/src/plugins/SocialMediaPoster/info.ts |  65 +++++++++++
+ .../src/plugins/SocialMediaPoster/types.ts    |  37 ++++++
+ backend/src/plugins/availablePlugins.ts       |   2 +
+ 8 files changed, 391 insertions(+)
+ create mode 100644 backend/src/data/GuildSocialPosts.ts
+ create mode 100644 backend/src/data/entities/SocialPosts.ts
+ create mode 100644 backend/src/migrations/1654041201056-CreateSocialPostsTable.ts
+ create mode 100644 backend/src/plugins/SocialMediaPoster/SocialMediaPosterPlugin.ts
+ create mode 100644 backend/src/plugins/SocialMediaPoster/functions/pollSubreddit.ts
+ create mode 100644 backend/src/plugins/SocialMediaPoster/info.ts
+ create mode 100644 backend/src/plugins/SocialMediaPoster/types.ts
+
+diff --git a/backend/src/data/GuildSocialPosts.ts b/backend/src/data/GuildSocialPosts.ts
+new file mode 100644
+index 00000000..31f7ad68
+--- /dev/null
++++ b/backend/src/data/GuildSocialPosts.ts
+@@ -0,0 +1,42 @@
++import { getRepository, Repository } from "typeorm";
++import { BaseGuildRepository } from "./BaseGuildRepository";
++import { SocialPosts } from "./entities/SocialPosts";
++
++export class GuildSocialPosts extends BaseGuildRepository {
++  socialPosts: Repository<SocialPosts>;
++
++  constructor(guildId) {
++    super(guildId);
++    this.socialPosts = getRepository(SocialPosts);
++  }
++
++  async getLastPost(platform: string, path: string) {
++    const post = await this.socialPosts.findOne({
++      guild_id: this.guildId,
++      platform,
++      path
++    });
++    return BigInt(post?.last_post ?? 0);
++  }
++
++  async setLastPost(platform: string, path: string, lastPost: string) {
++    if (await this.getLastPost(platform, path) == BigInt(0))
++      return await this.addLastPost(platform, path, lastPost);
++    await this.socialPosts.update({
++      guild_id: this.guildId,
++      platform,
++      path
++    }, {
++      last_post: lastPost
++    });
++  }
++
++  async addLastPost(platform: string, path: string, lastPost: string) {
++    await this.socialPosts.insert({
++      guild_id: this.guildId,
++      platform,
++      path,
++      last_post: lastPost
++    });
++  }
++}
+\ No newline at end of file
+diff --git a/backend/src/data/entities/SocialPosts.ts b/backend/src/data/entities/SocialPosts.ts
+new file mode 100644
+index 00000000..5497856c
+--- /dev/null
++++ b/backend/src/data/entities/SocialPosts.ts
+@@ -0,0 +1,18 @@
++import { Column, Entity, PrimaryColumn } from "typeorm";
++
++@Entity("social_posts")
++export class SocialPosts {
++  @Column()
++  @PrimaryColumn()
++  guild_id: string;
++
++  @Column()
++  platform: string;
++
++  @Column()
++  path: string;
++
++  @Column() last_post: string;
++
++  // Guild, reddit, subreddit, last_post (ms)
++}
+diff --git a/backend/src/migrations/1654041201056-CreateSocialPostsTable.ts b/backend/src/migrations/1654041201056-CreateSocialPostsTable.ts
+new file mode 100644
+index 00000000..e72b2874
+--- /dev/null
++++ b/backend/src/migrations/1654041201056-CreateSocialPostsTable.ts
+@@ -0,0 +1,40 @@
++import {MigrationInterface, QueryRunner, Table} from "typeorm";
++
++export class CreateSocialPostsTable1654041201056 implements MigrationInterface {
++
++    public async up(queryRunner: QueryRunner): Promise<void> {
++      await queryRunner.createTable(
++        new Table({
++          name: "social_posts",
++          columns: [
++            {
++              name: "guild_id",
++              type: "bigint",
++              isPrimary: true,
++            },
++            {
++              name: "platform",
++              type: "varchar",
++              length: "100",
++              isPrimary: true,
++            },
++            {
++              name: "path",
++              type: "varchar",
++              length: "100",
++              isPrimary: true,
++            },
++            {
++              name: "last_post",
++              type: "bigint",
++            },
++          ],
++        }
++      ),
++    );
++  }
++
++  public async down(queryRunner: QueryRunner): Promise<void> {
++    await queryRunner.dropTable("social_posts");
++  }
++}
+diff --git a/backend/src/plugins/SocialMediaPoster/SocialMediaPosterPlugin.ts b/backend/src/plugins/SocialMediaPoster/SocialMediaPosterPlugin.ts
+new file mode 100644
+index 00000000..c597116c
+--- /dev/null
++++ b/backend/src/plugins/SocialMediaPoster/SocialMediaPosterPlugin.ts
+@@ -0,0 +1,77 @@
++import { GuildPluginData, PluginOptions } from "knub";
++import { GuildLogs } from "../../data/GuildLogs";
++import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
++import { ConfigSchema, SocialMediaPosterPluginType, TPlatformPath } from "./types";
++import { LogsPlugin } from "../Logs/LogsPlugin";
++import { convertDelayStringToMS } from "src/utils";
++import { pollSubreddit } from "./functions/pollSubreddit";
++import { GuildSocialPosts } from "src/data/GuildSocialPosts";
++
++import { pluginInfo } from "./info";
++
++const defaultOptions: PluginOptions<SocialMediaPosterPluginType> = {
++  config: {
++    platforms: {
++      reddit: {}
++    },
++  },
++};
++
++const platforms = {
++  reddit: pollSubreddit
++}
++
++export const SocialMediaPosterPlugin = zeppelinGuildPlugin<SocialMediaPosterPluginType>()({
++  name: "social_media_poster",
++  showInDocs: true,
++
++  info: pluginInfo,
++
++  configSchema: ConfigSchema,
++  dependencies: () => [LogsPlugin],
++  defaultOptions,
++
++  beforeLoad(pluginData) {
++    const { state, guild } = pluginData;
++
++    state.logs = new GuildLogs(guild.id);
++    state.sentPosts = new Map();
++    state.socialPosts = new GuildSocialPosts(guild.id);
++  },
++
++  async afterLoad(pluginData) {
++    const config = pluginData.config.get();
++
++    // Start poll timers
++    pluginData.state.pollTimers = [];
++    for (const platform of Object.keys(config.platforms)) {
++      if (!Object.keys(platforms).includes(platform)) continue;
++      if (Object.values(config.platforms[platform]).length == 0) continue;
++      pluginData.state.sentPosts.set(platform, new Map());
++      for (const [path, pathSettings] of Object.entries(config.platforms[platform])) {
++        await this.addPathTimer(pluginData, 'reddit', path, pathSettings as TPlatformPath);
++      }
++    }
++  },
++
++  async addPathTimer(pluginData: GuildPluginData<SocialMediaPosterPluginType>, platform: string, path: string, pathSettings: TPlatformPath) {
++    const pathLastPost = await pluginData.state.socialPosts.getLastPost(platform, path);
++    pluginData.state.sentPosts.get(platform)!.set(path, pathLastPost);
++
++    const poll = pathSettings.poll_interval ?? '60s';
++    const pollPeriodMs = convertDelayStringToMS(poll)!;
++    pluginData.state.pollTimers.push(
++      setInterval(() => {
++        platforms[platform](pluginData, path);
++      }, pollPeriodMs),
++    );
++  },
++
++  beforeUnload(pluginData) {
++    if (pluginData.state.pollTimers) {
++      for (const interval of pluginData.state.pollTimers) {
++        clearInterval(interval);
++      }
++    }
++  }
++});
+diff --git a/backend/src/plugins/SocialMediaPoster/functions/pollSubreddit.ts b/backend/src/plugins/SocialMediaPoster/functions/pollSubreddit.ts
+new file mode 100644
+index 00000000..cbcfa5ee
+--- /dev/null
++++ b/backend/src/plugins/SocialMediaPoster/functions/pollSubreddit.ts
+@@ -0,0 +1,110 @@
++import fetch from "node-fetch";
++import { GuildPluginData } from "knub";
++import { SocialMediaPosterPluginType } from "../types";
++import { LogsPlugin } from "src/plugins/Logs/LogsPlugin";
++import { convertDelayStringToMS, renderRecursively, validateAndParseMessageContent } from "src/utils";
++import { renderTemplate, TemplateSafeValueContainer } from "src/templateFormatter";
++import { userToTemplateSafeUser } from "src/utils/templateSafeObjects";
++import { MessageOptions, Snowflake, TextChannel } from "discord.js";
++import { messageIsEmpty } from "src/utils/messageIsEmpty";
++
++const REDDIT_URL = 'http://www.reddit.com';
++const REDDIT_ICON = 'https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png'
++const REDDIT_SPOILER_IMG = 'https://cdn.discordapp.com/attachments/980238012384444446/981535288289525830/SpoilerImg.jpg'
++export const DEFAULT_POST_POLL_COUNT = 10;
++
++type TRedditPost = {
++  title: string,
++  thumbnail: string,
++  created: number,
++  author: string,
++  permalink: string,
++  url: string,
++  id: string
++};
++
++export async function pollSubreddit(
++  pluginData: GuildPluginData<SocialMediaPosterPluginType>,
++  subredditName: string,
++) {
++  const config = pluginData.config.get();
++  const subreddit = config.platforms.reddit![subredditName];
++  if (!subreddit) return;
++  if (!subreddit.enabled) return;
++  if (subreddit.channels.length == 0) return;
++  const limit = subreddit.post_poll_count ?? DEFAULT_POST_POLL_COUNT;
++  let redditJson;
++  try {
++    const redditResponse = await fetch(getRedditUrl(subredditName, limit));
++    if (!redditResponse) return;
++    redditJson = await redditResponse.json();
++    if (!redditJson) return;
++  } catch (err) {
++    subreddit.enabled = false;
++    const logs = pluginData.getPlugin(LogsPlugin);
++    logs.logBotAlert({
++      body: `Unable to poll from r/**${subredditName}**.\nPolling will be disabled for this subreddit until a config change is made.`,
++    });
++    return;
++  }
++
++  const previousPost = pluginData.state.sentPosts.get('reddit')!.get(subredditName)!;
++
++  let posts: TRedditPost[] = redditJson.data.children.map((child) => child.data as TRedditPost);
++  posts = posts.filter((post) => {
++    return (BigInt(post.created) > previousPost);
++  });
++  if (posts.length === 0) return;
++
++  posts = posts.sort((a,b) => a.created - b.created);
++
++  pluginData.state.sentPosts.get('reddit')!.set(subredditName, BigInt(posts[posts.length - 1].created));
++  await pluginData.state.socialPosts.setLastPost('reddit', subredditName, posts[posts.length - 1].created.toString());
++
++  for (const post of posts) {
++    const renderReplyText = async (str: string) =>
++      {
++        let thumbnail = post.thumbnail;
++        if (!thumbnail.startsWith('http')) thumbnail = REDDIT_SPOILER_IMG;
++        return renderTemplate(
++          str,
++          new TemplateSafeValueContainer({
++            title: post.title,
++            thumbnail,
++            created: post.created,
++            author: post.author,
++            permalink: REDDIT_URL + post.permalink,
++            url: post.url,
++            id: post.id,
++            reddit_icon: REDDIT_ICON
++        }),
++        );
++      }
++
++    const formatted =
++      typeof subreddit.message === "string"
++        ? await renderReplyText(subreddit.message)
++        : ((await renderRecursively(subreddit.message, renderReplyText)) as MessageOptions);
++
++    if (!formatted) continue;
++
++    const messageContent = validateAndParseMessageContent(formatted);
++    const messageOpts: MessageOptions = {
++      ...messageContent,
++    };
++
++    if (messageIsEmpty(messageOpts)) continue;
++
++    for (const channelId of subreddit.channels) {
++      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
++      if (!channel) continue;
++      if (!channel.isText) continue;
++      const txtChannel = channel as TextChannel;
++      await txtChannel.send(messageOpts);
++    }
++  }
++}
++
++function getRedditUrl(subreddit, limit) {
++  return `${REDDIT_URL}/r/${subreddit}/new.json?limit=${limit}`
++}
+\ No newline at end of file
+diff --git a/backend/src/plugins/SocialMediaPoster/info.ts b/backend/src/plugins/SocialMediaPoster/info.ts
+new file mode 100644
+index 00000000..263c83cd
+--- /dev/null
++++ b/backend/src/plugins/SocialMediaPoster/info.ts
+@@ -0,0 +1,65 @@
++import { trimPluginDescription } from "../../utils";
++import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
++
++export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
++  prettyName: "Social Media Auto Poster",
++  description: trimPluginDescription(`
++      Allows posting new social media posts automatically.
++    `),
++  configurationGuide: trimPluginDescription(`
++      The Social Media Auto Poster plugin is very customizable. For a full list of available platforms, and their options, see Config schema at the bottom of this page.    
++    
++      ### Simple reddit poster
++      Automatically sends reddit posts to a channel
++      
++      ~~~yml
++      social_media_poster:
++        config:
++          platforms:
++            reddit:
++              tbhCreature: # Name of the subreddit
++                enabled: true
++                channels: ["473087035574321152"]
++                message: |-
++                  **{author}** posted **{title}** in **tbhCreature**
++      ~~~
++      
++      ### Embed reddit poster
++      This example posts the post as an embed
++      
++      ~~~yml
++      social_media_poster:
++        config:
++          platforms:
++            reddit:
++              tbhCreature: # Name of the subreddit
++                enabled: true
++                channels: ["473087035574321152"]
++                message:
++                  embed:
++                    title: "{title}"
++                    color: 0xff4500
++                    description: "{url}"
++                    url: "{permalink}"
++                    footer:
++                      url: "{permalink}"
++                      icon_url: "{reddit_icon}"
++                      text: "{author}"
++                    thumbnail:
++                      url: "{thumbnail}"
++      ~~~
++      
++      ### List of variables
++      
++      \`\`\`
++       - {title} : Title of the post
++       - {thumbnail} : Img URL for the post
++       - {created} : The epoch time of when posted
++       - {author} : The posts author
++       - {permalink} : The posts permalink url
++       - {url} : The posts URL
++       - {id}: The ID of the post
++       - {reddit_icon}: A 32x32 image of the reddit logo
++      \`\`\`
++    `),
++};
+diff --git a/backend/src/plugins/SocialMediaPoster/types.ts b/backend/src/plugins/SocialMediaPoster/types.ts
+new file mode 100644
+index 00000000..710f4ef7
+--- /dev/null
++++ b/backend/src/plugins/SocialMediaPoster/types.ts
+@@ -0,0 +1,37 @@
++import * as t from "io-ts";
++import { BasePluginType, typedGuildCommand } from "knub";
++import { GuildSocialPosts } from "src/data/GuildSocialPosts";
++import { GuildLogs } from "../../data/GuildLogs";
++import { tMessageContent, tNullable } from "../../utils";
++import Timeout = NodeJS.Timeout;
++
++export const PlatformPath = t.type({
++  enabled: t.boolean,
++  channels: t.array(t.string),
++  message: tMessageContent,
++  poll_interval: tNullable(t.string),
++  post_poll_count: tNullable(t.number)
++});
++export type TPlatformPath = t.TypeOf<typeof PlatformPath>;
++
++export const PlatformTypes = t.type({
++  reddit: t.record(t.string, PlatformPath),
++});
++
++export type TPlatformTypes = t.TypeOf<typeof PlatformTypes>;
++
++export const ConfigSchema = t.type({
++  platforms: PlatformTypes,
++});
++export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
++
++export interface SocialMediaPosterPluginType extends BasePluginType {
++  config: TConfigSchema;
++  state: {
++    logs: GuildLogs;
++    pollTimers: Timeout[];
++    // Platform: { path: lastPost }
++    sentPosts: Map<string, Map<string, BigInt>>;
++    socialPosts: GuildSocialPosts;
++  };
++}
+\ No newline at end of file
+diff --git a/backend/src/plugins/availablePlugins.ts b/backend/src/plugins/availablePlugins.ts
+index d47df12f..f337e2e2 100644
+--- a/backend/src/plugins/availablePlugins.ts
++++ b/backend/src/plugins/availablePlugins.ts
+@@ -38,6 +38,7 @@ import { PhishermanPlugin } from "./Phisherman/PhishermanPlugin";
+ import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
+ import { RoleManagerPlugin } from "./RoleManager/RoleManagerPlugin";
+ import { RoleButtonsPlugin } from "./RoleButtons/RoleButtonsPlugin";
++import { SocialMediaPosterPlugin } from "./SocialMediaPoster/SocialMediaPosterPlugin";
+ 
+ // prettier-ignore
+ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+@@ -77,6 +78,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+   InternalPosterPlugin,
+   RoleManagerPlugin,
+   RoleButtonsPlugin,
++  SocialMediaPosterPlugin,
+ ];
+ 
+ // prettier-ignore
+-- 
+2.35.1.windows.2
+
