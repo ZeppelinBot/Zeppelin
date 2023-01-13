@@ -106,7 +106,6 @@ const defaultOptions = {
         can_massunban: true,
         can_massban: true,
         can_massmute: true,
-        can_masswarn: true,
         can_hidecase: true,
         can_act_as_other: true,
       },
