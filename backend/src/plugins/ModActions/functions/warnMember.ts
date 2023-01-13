@@ -16,7 +16,6 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { parseReason } from "./parseReason";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
