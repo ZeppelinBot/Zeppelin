@@ -25,7 +25,6 @@ import { KickCmd } from "./commands/KickCmd";
 import { MassbanCmd } from "./commands/MassBanCmd";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { MassunbanCmd } from "./commands/MassUnbanCmd";
-import { MassWarnCmd } from "./commands/MassWarnCmd";
 import { MuteCmd } from "./commands/MuteCmd";
 import { NoteCmd } from "./commands/NoteCmd";
 import { SoftbanCmd } from "./commands/SoftbanCommand";
