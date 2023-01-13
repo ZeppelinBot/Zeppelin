@@ -1,4 +1,4 @@
-import { TextChannel, User } from "discord.js";
+import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -26,7 +26,7 @@ export const WarnCmd = modActionsCmd({
   },
 
   async run({ pluginData, message: msg, args }) {
-    const user = (await resolveUser(pluginData.client, args.user)) as User;
+    const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
       sendErrorMessage(pluginData, msg.channel, `User not found`);
       return;
@@ -41,10 +41,12 @@ export const WarnCmd = modActionsCmd({
       } else {
         sendErrorMessage(pluginData, msg.channel, `User not found on the server`);
       }
+
+      return;
     }
 
     // Make sure we're allowed to warn this member
-    if (memberToWarn && !canActOn(pluginData, msg.member, memberToWarn)) {
+    if (!canActOn(pluginData, msg.member, memberToWarn)) {
       sendErrorMessage(pluginData, msg.channel, "Cannot warn: insufficient permissions");
       return;
     }
@@ -61,10 +63,10 @@ export const WarnCmd = modActionsCmd({
     }
 
     const config = pluginData.config.get();
-    const reason = parseReason(config, formatReasonWithAttachments(args.reason, [...msg.attachments.values()]));
+    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
-    const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(user.id, CaseTypes.Warn);
+    const priorWarnAmount = await casesPlugin.getCaseTypeAmountForUserId(memberToWarn.id, CaseTypes.Warn);
     if (config.warn_notify_enabled && priorWarnAmount >= config.warn_notify_threshold) {
       const reply = await waitForButtonConfirm(
         msg.channel,
@@ -85,7 +87,7 @@ export const WarnCmd = modActionsCmd({
       return;
     }
 
-    const warnResult = await warnMember(pluginData, reason, memberToWarn, user!, {
+    const warnResult = await warnMember(pluginData, memberToWarn, reason, {
       contactMethods,
       caseArgs: {
         modId: mod.id,
@@ -105,7 +107,7 @@ export const WarnCmd = modActionsCmd({
     sendSuccessMessage(
       pluginData,
       msg.channel,
-      `Warned **${user.tag}** (Case #${warnResult.case.case_number})${messageResultText}`,
+      `Warned **${memberToWarn.user.tag}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );
   },
 });
