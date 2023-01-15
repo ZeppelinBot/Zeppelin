@@ -100,6 +100,7 @@ export const ReplyAction = automodAction({
           ...messageContent,
           allowedMentions: {
             users: [user.id],
+            parse: ['roles'],
           },
         };
 
