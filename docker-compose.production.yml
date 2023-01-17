@@ -1,5 +1,5 @@
 version: '3'
-name: zeppelin-prod
+name: ${PROJECT_NAME:-zeppelin-prod}
 services:
   nginx:
     build:
@@ -30,8 +30,11 @@ services:
       MYSQL_DATABASE: zeppelin
       MYSQL_USER: zeppelin
       MYSQL_PASSWORD: ${DOCKER_PROD_MYSQL_PASSWORD?:Missing DOCKER_PROD_MYSQL_PASSWORD}
-    ports:
-      - ${DOCKER_PROD_MYSQL_PORT:?Missing DOCKER_PROD_MYSQL_PORT}:3306
+    expose:
+      - 3306
+    #Comment the expose section above AND uncomment the ports section below if the database needs to be accessible from host computer or from outside.
+    #ports:
+    #  - ${DOCKER_PROD_MYSQL_PORT:-3306}:3306
     volumes:
       - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
