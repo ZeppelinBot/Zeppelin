@@ -1,5 +1,5 @@
 version: '3'
-name: ${PROJECT_NAME:-zeppelin-prod}
+name: zeppelin-prod
 services:
   nginx:
     build:
