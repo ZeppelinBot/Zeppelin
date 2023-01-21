@@ -8,27 +8,12 @@ In all examples below, `@Bot` refers to a user mention of the bot user. Make sur
 
 In the command parameters, `<this>` refers to a required parameter (don't include the `< >` symbols) and `[this]` refers to an optional parameter (don't include the `[ ]` symbols). `<this...>` refers to being able to list multiple values, e.g. `value1 value2 value3`.
 
-## Allow a server to invite the bot
-Run the following command:
-```
-@Bot allow_server <serverId> [userId]
-```
+## Bot Access
 When specifying a user ID, that user will be given "Bot manager" level access to the server's dashboard, allowing them to manage access for other users.
 
-## Disallow a server
-Run the following command:
-```
-@Bot disallow_server <serverId>
-```
+- Allow a server to invite the bot: `@Bot allow_server <serverId> [userId]`
+- Disallow a server: `@Bot disallow_server <serverId>`
 
-## Grant access to a server's dashboard
-Run the following command:
-```
-@Bot add_dashboard_user <serverId> <userId...>
-```
-
-## Remove access to a server's dashboard
-Run the following command:
-```
-@Bot remove_dashboard_user <serverId> <userId...>
-```
+## Dashboard Access
+- Grant access to a server's dashboard: `@Bot add_dashboard_user <serverId> <userId...>`
+- Remove access to a server's dashboard: `@Bot remove_dashboard_user <serverId> <userId...>`
