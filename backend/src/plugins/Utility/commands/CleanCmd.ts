@@ -11,8 +11,8 @@ import { utilityCmd, UtilityPluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 
-const MAX_CLEAN_COUNT = 150;
-const MAX_CLEAN_TIME = 1 * DAYS;
+const MAX_CLEAN_COUNT = 1000;
+const MAX_CLEAN_TIME = 14 * DAYS;
 const MAX_CLEAN_API_REQUESTS = 20;
 const CLEAN_COMMAND_DELETE_DELAY = 10 * SECONDS;
 
