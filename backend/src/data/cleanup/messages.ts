@@ -8,7 +8,7 @@ import { SavedMessage } from "../entities/SavedMessage";
  * How long message edits, deletions, etc. will include the original message content.
  * This is very heavy storage-wise, so keeping it as low as possible is ideal.
  */
-const RETENTION_PERIOD = 1 * DAYS;
+const RETENTION_PERIOD = 30 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
 const DELETED_MESSAGE_RETENTION_PERIOD = 5 * MINUTES;
 const CLEAN_PER_LOOP = 100;
