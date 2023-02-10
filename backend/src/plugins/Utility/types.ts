@@ -12,6 +12,7 @@ export const ConfigSchema = t.type({
   can_level: t.boolean,
   can_search: t.boolean,
   can_clean: t.boolean,
+  can_archive: t.boolean,
   can_info: t.boolean,
   can_server: t.boolean,
   can_inviteinfo: t.boolean,
