@@ -177,7 +177,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
        .createQueryBuilder()
        .where("guild_id = :guild_id", { guild_id: this.guildId })
        .andWhere("user_id = :user_id", { user_id: userId })
-       .andWhere("deleted_at IS NULL");
+       .orderBy("posted_at");
 
      if (limit != null) {
        query = query.limit(limit);
