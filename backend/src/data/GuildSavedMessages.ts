@@ -172,6 +172,23 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     return this.processMultipleEntitiesFromDB(results);
   }
 
+  async getUserMessages(userId, limit?: number): Promise<SavedMessage[]> {
+     let query = this.messages
+       .createQueryBuilder()
+       .where("guild_id = :guild_id", { guild_id: this.guildId })
+       .andWhere("user_id = :user_id", { user_id: userId })
+       .andWhere("deleted_at IS NULL");
+
+     if (limit != null) {
+       query = query.limit(limit);
+     }
+
+     const results = await query.getMany();
+
+     return this.processMultipleEntitiesFromDB(results);
+   }
+
+
   async getMultiple(messageIds: string[]): Promise<SavedMessage[]> {
     const results = await this.messages
       .createQueryBuilder()
