@@ -14,7 +14,7 @@ import {
 import { SavedMessage } from "./entities/SavedMessage";
 import { decrypt, encrypt } from "../utils/crypt";
 
-const DEFAULT_EXPIRY_DAYS = 30;
+const DEFAULT_EXPIRY_DAYS = 90;
 
 const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
   Server: {guild.name} ({guild.id})
