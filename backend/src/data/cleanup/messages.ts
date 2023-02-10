@@ -10,7 +10,7 @@ import { SavedMessage } from "../entities/SavedMessage";
  */
 const RETENTION_PERIOD = 30 * DAYS;
 const BOT_MESSAGE_RETENTION_PERIOD = 30 * MINUTES;
-const DELETED_MESSAGE_RETENTION_PERIOD = 5 * MINUTES;
+const DELETED_MESSAGE_RETENTION_PERIOD = RETENTION_PERIOD; // Because of the archive command, we want to keep those, too
 const CLEAN_PER_LOOP = 100;
 
 export async function cleanupMessages(): Promise<number> {
