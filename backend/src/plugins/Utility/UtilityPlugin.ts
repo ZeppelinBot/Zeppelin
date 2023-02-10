@@ -15,6 +15,7 @@ import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
 import { CleanArgs, cleanCmd, CleanCmd } from "./commands/CleanCmd";
+import { ArchiveArgs, archiveCmd, ArchiveCmd } from "./commands/ArchiveCmd";
 import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
 import { HelpCmd } from "./commands/HelpCmd";
@@ -51,6 +52,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
     can_search: false,
     can_clean: false,
     can_info: false,
+    can_archive: false,
     can_server: false,
     can_inviteinfo: false,
     can_channelinfo: false,
@@ -79,6 +81,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
       level: ">=50",
       config: {
         can_roles: true,
+        can_archive: true,
         can_level: true,
         can_search: true,
         can_clean: true,
@@ -106,6 +109,7 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
       config: {
         can_reload_guild: true,
         can_ping: true,
+        can_archive: true,
         can_about: true,
       },
     },
@@ -145,6 +149,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     JumboCmd,
     AvatarCmd,
     CleanCmd,
+    ArchiveCmd,
     InviteInfoCmd,
     ChannelInfoCmd,
     MessageInfoCmd,
@@ -166,7 +171,13 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
         cleanCmd(pluginData, args, msg);
       };
     },
-
+  
+    archive(pluginData) {
+       return (args: ArchiveArgs, msg) => {
+         archiveCmd(pluginData, args, msg);
+       };
+     },
+   
     userInfo(pluginData) {
       return (userId: Snowflake, requestMemberId?: Snowflake) => {
         return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
