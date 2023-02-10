@@ -11,8 +11,6 @@ export async function archiveMessages(
   pluginData: GuildPluginData<UtilityPluginType>,
   messagesToArchive: SavedMessage[],
 ) {
-  messagesToArchive = Array.from(messagesToArchive).sort((a, b) => (a.posted_at > b.posted_at ? 1 : -1));
-
   const archiveId = await pluginData.state.archives.createFromSavedMessages(messagesToArchive, pluginData.guild);
   const baseUrl = getBaseUrl(pluginData);
 
