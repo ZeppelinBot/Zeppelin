@@ -6,8 +6,10 @@ import { CaseArgs, CasesPluginType } from "../types";
 import { createCaseNote } from "./createCaseNote";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { getBaseUrl } from "../../../pluginUtils";
+import { CaseTypes } from "../../../data/CaseTypes";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
+  const casesTypesWithoutArchive = [CaseTypes.Note, CaseTypes.Unban];
   const user = await resolveUser(pluginData.client, args.userId);
   const userName = user.tag;
 
@@ -41,16 +43,18 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
     pp_name: ppName,
     is_hidden: Boolean(args.hide),
   });
-  const messagesToArchive = await pluginData.state.savedMessages.getUserMessages(user.id, 50);
-  const archiveId = await pluginData.state.archives.createFromSavedMessages(messagesToArchive, pluginData.guild);
-  const baseUrl = getBaseUrl(pluginData);
-
-   await createCaseNote(pluginData, {
-     caseId: createdCase.id,
-     modId: mod.id,
-     body: `Automatically archived messages: ${pluginData.state.archives.getUrl(baseUrl, archiveId)}`,
-     automatic: args.automatic,
-     postInCaseLogOverride: false,
+  if (!casesTypesWithoutArchive.includes(args.type)) {
+     const messagesToArchive = await pluginData.state.savedMessages.getUserMessages(user.id, 50);
+     const archiveId = await pluginData.state.archives.createFromSavedMessages(messagesToArchive, pluginData.guild);
+     const baseUrl = getBaseUrl(pluginData);
+     await createCaseNote(pluginData, {
+       caseId: createdCase.id,
+       modId: mod.id,
+       body: `Automatically archived messages: ${pluginData.state.archives.getUrl(baseUrl, archiveId)}`,
+       automatic: args.automatic,
+       postInCaseLogOverride: false,
+     });
+   }
    });
   if (args.reason || args.noteDetails?.length) {
     await createCaseNote(pluginData, {
