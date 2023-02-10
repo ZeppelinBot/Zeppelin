@@ -17,6 +17,7 @@ import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 
 const defaultOptions = {
   config: {
@@ -84,5 +85,6 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     pluginData.state.logs = new GuildLogs(pluginData.guild.id);
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
+    pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
   },
 });
