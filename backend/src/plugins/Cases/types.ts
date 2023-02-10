@@ -6,6 +6,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { tDelayString, tNullable, tPartialDictionary } from "../../utils";
 import { tColor } from "../../utils/tColor";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 
 export const ConfigSchema = t.type({
   log_automatic_actions: t.boolean,
@@ -23,6 +24,7 @@ export interface CasesPluginType extends BasePluginType {
     logs: GuildLogs;
     cases: GuildCases;
     archives: GuildArchives;
+    savedMessages: GuildSavedMessages;
   };
 }
 
