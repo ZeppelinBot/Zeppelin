@@ -117,7 +117,7 @@ export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
     guild: Guild,
     expiresAt?: moment.Moment,
   ): Promise<string> {
-    if (expiresAt == null) {
+    if (!expiresAt) {
       expiresAt = moment.utc().add(DEFAULT_EXPIRY_DAYS, "days");
     }
 
