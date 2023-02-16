@@ -31,7 +31,7 @@ function resizeBuffer(input: Buffer, width: number, height: number): Buffer {
   return photonImageToBuffer(photonImage);
 }
 
-const CDN_URL = "https://twemoji.maxcdn.com/";
+const CDN_URL = "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/";
 
 export const JumboCmd = utilityCmd({
   trigger: "jumbo",
@@ -71,7 +71,7 @@ export const JumboCmd = utilityCmd({
         file = new MessageAttachment(image, `emoji${extension}`);
       }
     } else {
-      let url = `${twemoji.base}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
+      let url = `${CDN_URL}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
       let image: Buffer | undefined;
       try {
         const downloadedBuffer = await getBufferFromUrl(url);
