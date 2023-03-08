@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { AnyChannel, GuildChannel, MessageManager, NewsChannel, Permissions, TextChannel } from "discord.js";
+import { AnyChannel, GuildChannel, MessageManager, NewsChannel, Permissions, TextChannel, ThreadChannel } from "discord.js";
 import { isDiscordAPIError } from "../../../utils";
 
 type WebhookInfo = [id: string, token: string];
