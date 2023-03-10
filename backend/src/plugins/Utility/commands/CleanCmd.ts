@@ -37,10 +37,10 @@ export async function cleanMessages(
 
   const chunks = chunkArray(idsToDelete, 100);
   await Promise.all(
-    chunks.map(async (chunk) => {
-      await channel.bulkDelete(chunk);
-      await pluginData.state.savedMessages.markBulkAsDeleted(chunk);
-    }),
+    chunks.map((chunk) => Promise.all([
+      channel.bulkDelete(chunk),
+      pluginData.state.savedMessages.markBulkAsDeleted(chunk),
+    ]),
   );
 
   // Create an archive
