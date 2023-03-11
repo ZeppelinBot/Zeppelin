@@ -19,7 +19,7 @@ export const AddDashboardUserCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Server is not using Zeppelin");
+      sendErrorMessage(pluginData, msg.channel, "Server is not using Zeppelin");
       return;
     }
 

@@ -4,6 +4,7 @@ import {
   ButtonBuilder,
   ButtonComponent,
   ButtonStyle,
+  GuildTextBasedChannel,
   Message,
   MessageActionRowComponentBuilder,
   MessageComponentInteraction,
@@ -16,7 +17,7 @@ import moment from "moment";
 import uuidv4 from "uuid/v4";
 
 export async function waitForButtonConfirm(
-  channel: TextChannel,
+  channel: GuildTextBasedChannel,
   toPost: MessageCreateOptions,
   options?: WaitForOptions,
 ): Promise<boolean> {

@@ -1,4 +1,12 @@
-import { MessageOptions, PermissionsBitField, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
+import {
+  GuildTextBasedChannel,
+  MessageOptions,
+  PermissionsBitField,
+  Snowflake,
+  TextChannel,
+  ThreadChannel,
+  User,
+} from "discord.js";
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
@@ -66,7 +74,7 @@ export const ReplyAction = automodAction({
           : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageOptions);
 
       if (formatted) {
-        const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
+        const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;
 
         // Check for basic Send Messages and View Channel permissions
         if (

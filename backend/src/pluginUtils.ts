@@ -3,6 +3,7 @@
  */
 
 import {
+  ChannelType,
   GuildMember,
   GuildTextBasedChannel,
   Message,
@@ -197,7 +198,7 @@ export function getPluginConfigPreprocessor(
 
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextChannel,
+  channel: GuildTextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
@@ -218,7 +219,7 @@ export async function sendSuccessMessage(
 
 export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
-  channel: GuildTextBasedChannel,
+  channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {

@@ -952,7 +952,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextChannel | ThreadChannel | User,
+  channel: GuildTextBasedChannel | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1402,7 +1402,11 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
   return fetchedSticker;
 }
 
-export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
+export async function confirm(
+  channel: GuildTextBasedChannel,
+  userId: string,
+  content: MessageOptions,
+): Promise<boolean> {
   return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
 
@@ -1441,7 +1445,7 @@ export function verboseUserName(user: User | UnknownUser): string {
   return `**${user.tag}** (\`${user.id}\`)`;
 }
 
-export function verboseChannelMention(channel: GuildChannel | ThreadChannel): string {
+export function verboseChannelMention(channel: GuildTextBasedChannel): string {
   const plainTextName =
     channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice
       ? channel.name

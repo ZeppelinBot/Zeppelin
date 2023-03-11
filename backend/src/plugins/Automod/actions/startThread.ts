@@ -1,5 +1,5 @@
 import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types/v9";
-import { ChannelType, TextChannel } from "discord.js";
+import { BaseGuildTextChannel, ChannelType, GuildTextBasedChannel, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "../../../utils";
@@ -52,7 +52,7 @@ export const StartThreadAction = automodAction({
       : ThreadAutoArchiveDuration.OneHour;
 
     for (const threadContext of threads) {
-      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as TextChannel;
+      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as BaseGuildTextChannel;
       const renderThreadName = async (str: string) =>
         renderTemplate(
           str,
@@ -62,7 +62,7 @@ export const StartThreadAction = automodAction({
           }),
         );
       const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
-      const thread = await channel.threads
+      const thread = await channel!.threads
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,

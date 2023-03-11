@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { availableActions } from "../actions/availableActions";
 import { CleanAction } from "../actions/clean";
@@ -18,7 +18,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   const channelOrThread =
     context.channel ??
     (channelIdOrThreadId
-      ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as TextChannel | ThreadChannel)
+      ? (pluginData.guild.channels.cache.get(channelIdOrThreadId as Snowflake) as GuildTextBasedChannel)
       : null);
   const channelId = channelOrThread?.isThread() ? channelOrThread.parent?.id : channelIdOrThreadId;
   const threadId = channelOrThread?.isThread() ? channelOrThread.id : null;
