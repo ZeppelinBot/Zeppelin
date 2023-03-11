@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { GuildPluginData, typedGuildEventListener } from "knub";
+import { GuildPluginData, guildPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { MINUTES } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -14,7 +14,7 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
   configSchema: t.type({}),
 
   events: [
-    typedGuildEventListener({
+    guildPluginEventListener({
       event: "guildUpdate",
       listener({ args }) {
         void updateGuildInfo(args.newGuild);

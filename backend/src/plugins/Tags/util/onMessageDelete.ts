@@ -1,10 +1,10 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { GuildPluginData, typedGuildEventListener } from "knub";
+import { GuildPluginData, guildPluginEventListener } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { TagsPluginType } from "../types";
 import { noop } from "../../../utils";
 
-export const onMessageDelete = typedGuildEventListener({
+export const onMessageDelete = guildPluginEventListener({
   event: "messageDelete",
   async listener({ pluginData, args: { message: msg } }) {
     // Command message was deleted -> delete the response as well

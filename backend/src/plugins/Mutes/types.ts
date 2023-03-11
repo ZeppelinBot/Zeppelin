@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
 import { Case } from "../../data/entities/Case";
 import { Mute } from "../../data/entities/Mute";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -79,5 +79,5 @@ export interface MuteOptions {
   isAutomodAction?: boolean;
 }
 
-export const mutesCmd = typedGuildCommand<MutesPluginType>();
-export const mutesEvt = typedGuildEventListener<MutesPluginType>();
+export const mutesCmd = guildPluginMessageCommand<MutesPluginType>();
+export const mutesEvt = guildPluginEventListener<MutesPluginType>();

@@ -1,9 +1,9 @@
-import { typedGuildEventListener } from "knub";
+import { guildPluginEventListener } from "knub";
 import { RecentActionType } from "../constants";
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
 
-export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginType>()({
+export const RunAutomodOnThreadCreate = guildPluginEventListener<AutomodPluginType>()({
   event: "threadCreate",
   async listener({ pluginData, args: { thread } }) {
     const user = thread.ownerId
@@ -32,7 +32,7 @@ export const RunAutomodOnThreadCreate = typedGuildEventListener<AutomodPluginTyp
   },
 });
 
-export const RunAutomodOnThreadDelete = typedGuildEventListener<AutomodPluginType>()({
+export const RunAutomodOnThreadDelete = guildPluginEventListener<AutomodPluginType>()({
   event: "threadDelete",
   async listener({ pluginData, args: { thread } }) {
     const user = thread.ownerId
@@ -54,7 +54,7 @@ export const RunAutomodOnThreadDelete = typedGuildEventListener<AutomodPluginTyp
   },
 });
 
-export const RunAutomodOnThreadUpdate = typedGuildEventListener<AutomodPluginType>()({
+export const RunAutomodOnThreadUpdate = guildPluginEventListener<AutomodPluginType>()({
   event: "threadUpdate",
   async listener({ pluginData, args: { oldThread, newThread: thread } }) {
     const user = thread.ownerId

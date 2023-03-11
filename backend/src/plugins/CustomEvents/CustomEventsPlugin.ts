@@ -1,4 +1,4 @@
-import { parseSignature, typedGuildCommand } from "knub";
+import { parseSignature, guildPluginMessageCommand } from "knub";
 import { commandTypes } from "../../commandTypes";
 import { stripObjectToScalars, UnknownUser } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -32,7 +32,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
     for (const [key, event] of Object.entries(config.events)) {
       if (event.trigger.type === "command") {
         const signature = event.trigger.params ? parseSignature(event.trigger.params, commandTypes) : {};
-        const eventCommand = typedGuildCommand({
+        const eventCommand = guildPluginMessageCommand({
           trigger: event.trigger.name,
           permission: `events.${key}.trigger.can_use`,
           signature,

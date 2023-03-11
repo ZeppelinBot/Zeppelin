@@ -5,8 +5,8 @@ import {
   GlobalPluginData,
   GuildPluginBlueprint,
   GuildPluginData,
-  typedGlobalPlugin,
-  typedGuildPlugin,
+  globalPlugin,
+  guildPlugin,
 } from "knub";
 import { PluginOptions } from "knub/dist/config/configTypes";
 import { Awaitable } from "knub/dist/utils";
@@ -50,8 +50,8 @@ export function zeppelinGuildPlugin<TPluginType extends BasePluginType>(): <
 
 export function zeppelinGuildPlugin(...args) {
   if (args.length) {
-    const blueprint = typedGuildPlugin(
-      ...(args as Parameters<typeof typedGuildPlugin>),
+    const blueprint = guildPlugin(
+      ...(args as Parameters<typeof guildPlugin>),
     ) as unknown as ZeppelinGuildPluginBlueprint;
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);
     return blueprint;
@@ -84,8 +84,8 @@ export function zeppelinGlobalPlugin<TPluginType extends BasePluginType>(): <
 
 export function zeppelinGlobalPlugin(...args) {
   if (args.length) {
-    const blueprint = typedGlobalPlugin(
-      ...(args as Parameters<typeof typedGlobalPlugin>),
+    const blueprint = globalPlugin(
+      ...(args as Parameters<typeof globalPlugin>),
     ) as unknown as ZeppelinGlobalPluginBlueprint;
     // @ts-ignore FIXME: Check the types here
     blueprint.configPreprocessor = getPluginConfigPreprocessor(blueprint, blueprint.configPreprocessor);

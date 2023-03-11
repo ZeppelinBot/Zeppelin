@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand } from "knub";
+import { BasePluginType, guildPluginMessageCommand } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
 

@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { z } from "zod";
-import { BasePluginType, CooldownManager, typedGuildEventListener } from "knub";
+import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -96,7 +96,7 @@ export interface LogsPluginType extends BasePluginType {
   };
 }
 
-export const logsEvt = typedGuildEventListener<LogsPluginType>();
+export const logsEvt = guildPluginEventListener<LogsPluginType>();
 
 export const LogTypeData = z.object({
   [LogType.MEMBER_WARN]: z.object({

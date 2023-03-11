@@ -1,4 +1,4 @@
-import { PluginOptions, typedGuildCommand } from "knub";
+import { PluginOptions, guildPluginMessageCommand } from "knub";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, PhishermanPluginType } from "./types";

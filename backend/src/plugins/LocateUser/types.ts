@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
 import Timeout = NodeJS.Timeout;
 
@@ -18,5 +18,5 @@ export interface LocateUserPluginType extends BasePluginType {
   };
 }
 
-export const locateUserCmd = typedGuildCommand<LocateUserPluginType>();
-export const locateUserEvt = typedGuildEventListener<LocateUserPluginType>();
+export const locateUserCmd = guildPluginMessageCommand<LocateUserPluginType>();
+export const locateUserEvt = guildPluginEventListener<LocateUserPluginType>();

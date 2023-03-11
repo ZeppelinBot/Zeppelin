@@ -1,11 +1,11 @@
-import { typedGuildEventListener } from "knub";
+import { guildPluginEventListener } from "knub";
 import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { GuildMember } from "discord.js";
 import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
 import { parseCustomId } from "../../../utils/parseCustomId";
 
-export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType>()({
+export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginType>()({
   event: "interactionCreate",
   async listener({ pluginData, args }) {
     if (!args.interaction.isButton()) {
