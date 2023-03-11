@@ -1,4 +1,5 @@
 import {
+  ChannelType,
   Client,
   Constants,
   DiscordAPIError,
@@ -42,7 +43,6 @@ import tmp from "tmp";
 import { URL } from "url";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
 import { SimpleCache } from "./SimpleCache";
-import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
@@ -1444,7 +1444,7 @@ export function verboseUserName(user: User | UnknownUser): string {
 
 export function verboseChannelMention(channel: GuildChannel | ThreadChannel): string {
   const plainTextName =
-    channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
+    channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice
       ? channel.name
       : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
@@ -1578,7 +1578,7 @@ export function isGuildInvite(invite: Invite): invite is GuildInvite {
 }
 
 export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
-  return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
+  return invite.guild == null && invite.channel?.type === ChannelType.GroupDM;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {

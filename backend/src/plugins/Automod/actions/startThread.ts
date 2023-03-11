@@ -1,8 +1,7 @@
 import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types/v9";
-import { TextChannel } from "discord.js";
+import { ChannelType, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { ChannelTypeStrings } from "../../../types";
 import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { automodAction } from "../helpers";
@@ -32,7 +31,7 @@ export const StartThreadAction = automodAction({
     const threads = contexts.filter((c) => {
       if (!c.message || !c.user) return false;
       const channel = pluginData.guild.channels.cache.get(c.message.channel_id);
-      if (channel?.type !== ChannelTypeStrings.TEXT || !channel.isTextBased()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
+      if (channel?.type !== ChannelType.GuildText || !channel.isTextBased()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
       // check against max threads per channel
       if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
         const threadCount = channel.threads.cache.filter(
@@ -67,10 +66,7 @@ export const StartThreadAction = automodAction({
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,
-          type:
-            actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-              ? ChannelTypeStrings.PRIVATE_THREAD
-              : ChannelTypeStrings.PUBLIC_THREAD,
+          type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
           startMessage:
             !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
               ? threadContext.message!.id

@@ -1,8 +1,8 @@
-import { MessageEmbedOptions, PremiumTier, Snowflake } from "discord.js";
+import { ChannelType, MessageEmbedOptions, PremiumTier, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { ChannelTypeStrings } from "../../../types";
+
 import {
   EmbedWith,
   formatNumber,
@@ -90,10 +90,10 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
-  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ size: 2048 })})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ size: 2048 })})` : "None";
   const splashUrl = (restGuild || guildPreview)!.splash
-    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    ? `[Link](${(restGuild || guildPreview)!.splashURL({ size: 2048 })})`
     : "None";
 
   embed.fields.push(
@@ -162,9 +162,19 @@ export async function getServerInfoEmbed(
   // CHANNEL COUNTS
   if (thisServer) {
     const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.CATEGORY);
-    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.TEXT);
-    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.VOICE);
+    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildCategory);
+    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
+    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
+    const threadChannels = thisServer.channels.cache.filter(
+      (channel) =>
+        channel.type === ChannelType.PublicThread ||
+        channel.type === ChannelType.PrivateThread ||
+        channel.type === ChannelType.AnnouncementThread,
+    );
+    const announcementChannels = thisServer.channels.cache.filter(
+      (channel) => channel.type === ChannelType.GuildAnnouncement,
+    );
+    const stageChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildStageVoice);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
@@ -172,8 +182,10 @@ export async function getServerInfoEmbed(
       value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.size}**
-          Text: **${textChannels.size}**
+          Text: **${textChannels.size}** (**${threadChannels.size} threads**)
+          Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
+          Stage: **${stageChannels.size}**
         `),
     });
   }

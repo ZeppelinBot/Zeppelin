@@ -1,6 +1,5 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { ChannelType, Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
-import { ChannelTypeStrings } from "src/types";
 import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
@@ -23,15 +22,15 @@ export const SetSlowmodeAction = automodAction({
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
 
       // Only text channels and text channels within categories support slowmodes
-      if (!channel || !(channel.type === ChannelTypeStrings.TEXT || ChannelTypeStrings.CATEGORY)) {
+      if (!channel || !(channel.type === ChannelType.GuildText || ChannelType.GuildCategory)) {
         continue;
       }
 
       const channelsToSlowmode: TextChannel[] = [];
-      if (channel.type === ChannelTypeStrings.CATEGORY) {
+      if (channel.type === ChannelType.GuildCategory) {
         // Find all text channels within the category
         for (const ch of pluginData.guild.channels.cache.values()) {
-          if (ch.parentId === channel.id && ch.type === ChannelTypeStrings.TEXT) {
+          if (ch.parentId === channel.id && ch.type === ChannelType.GuildText) {
             channelsToSlowmode.push(ch as TextChannel);
           }
         }
