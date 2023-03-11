@@ -4,6 +4,7 @@ import {
   Constants,
   DiscordAPIError,
   Emoji,
+  escapeCodeBlock,
   Guild,
   GuildAuditLogs,
   GuildAuditLogsEntry,
@@ -15,7 +16,6 @@ import {
   InviteGuild,
   LimitedCollection,
   Message,
-  MessageAttachment,
   MessageEmbed,
   MessageEmbedOptions,
   MessageMentionOptions,
@@ -27,7 +27,6 @@ import {
   TextChannel,
   ThreadChannel,
   User,
-  Util,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import { either } from "fp-ts/lib/Either";
@@ -258,7 +257,7 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 export type GuildInvite = Invite & { guild: InviteGuild | Guild };
 export type GroupDMInvite = Invite & {
   channel: PartialChannelData;
-  type: typeof Constants.ChannelTypes.GROUP_DM;
+  type: typeof ChannelType.GroupDM;
 };
 
 /**
@@ -648,7 +647,7 @@ interface MatchedURL extends URL {
 }
 
 export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
-  let matches = str.match(urlRegex) || [];
+  let matches = [...str.match(urlRegex)];
   if (onlyUnique) {
     matches = unique(matches);
   }
@@ -1409,11 +1408,11 @@ export async function confirm(channel: TextChannel, userId: string, content: Mes
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
   const richEmbed = (msg.data.embeds || []).find((e) => (e as MessageEmbed).type === "rich");
-  if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
+  if (richEmbed) result += "Embed:```" + escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments && msg.data.attachments.length) {

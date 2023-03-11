@@ -1,5 +1,5 @@
 import { Snowflake } from "discord-api-types/v9";
-import { User, Util } from "discord.js";
+import { escapeBold, User } from "discord.js";
 import * as t from "io-ts";
 import { automodTrigger } from "../helpers";
 
@@ -41,7 +41,7 @@ export const ThreadCreateTrigger = automodTrigger<ThreadCreateResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     const base = `Thread **#${threadName}** (\`${threadId}\`) has been created in the **#${parentName}** (\`${parentId}\`) channel`;
     if (threadOwner) {
-      return `${base} by **${Util.escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
+      return `${base} by **${escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
     }
     return base;
   },

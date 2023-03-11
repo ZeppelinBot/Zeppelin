@@ -1,4 +1,11 @@
-import { ChannelType, GuildTextBasedChannel, PermissionsBitField, TextChannel, ThreadChannel, Util } from "discord.js";
+import {
+  ChannelType,
+  escapeInlineCode,
+  GuildTextBasedChannel,
+  PermissionsBitField,
+  TextChannel,
+  ThreadChannel,
+} from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -132,7 +139,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
           rateLimitPerUser: rateLimitSeconds,
         });
       } catch (e) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${Util.escapeInlineCode(e.message)}`);
+        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${escapeInlineCode(e.message)}`);
         return;
       }
     } else {

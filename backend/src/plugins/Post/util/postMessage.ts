@@ -1,7 +1,7 @@
 import {
+  Attachment,
   GuildTextBasedChannel,
   Message,
-  MessageAttachment,
   MessageOptions,
   NewsChannel,
   TextChannel,
@@ -19,7 +19,7 @@ export async function postMessage(
   pluginData: GuildPluginData<PostPluginType>,
   channel: GuildTextBasedChannel,
   content: MessageOptions,
-  attachments: MessageAttachment[] = [],
+  attachments: Attachment[] = [],
   enableMentions: boolean = false,
 ): Promise<Message> {
   if (typeof content === "string") {

@@ -35,7 +35,6 @@ import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
-import { Util } from "discord.js";
 import {
   createTypedTemplateSafeValueContainer,
   TemplateSafeValueContainer,
@@ -113,6 +112,7 @@ import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
 import { logMemberTimedUnban } from "./logFunctions/logMemberTimedUnban";
 import { logDmFailed } from "./logFunctions/logDmFailed";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
+import { escapeCodeBlock } from "discord.js";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
@@ -300,7 +300,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
             The following regex has taken longer than ${timeoutMs}ms for ${failedTimes} times and has been temporarily disabled:
           `.trim() +
             "\n```" +
-            Util.escapeCodeBlock(regexSource) +
+            escapeCodeBlock(regexSource) +
             "```",
         }),
       );

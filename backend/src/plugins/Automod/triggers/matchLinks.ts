@@ -1,4 +1,3 @@
-import { Util } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
@@ -11,6 +10,7 @@ import { mergeRegexes } from "../../../utils/mergeRegexes";
 import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
 import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
 import { phishermanDomainIsSafe } from "../../../data/Phisherman";
+import { escapeInlineCode } from "discord.js";
 
 interface MatchResultType {
   type: MatchableTextType;
@@ -186,7 +186,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    let information = `Matched link \`${Util.escapeInlineCode(matchResult.extra.link)}\``;
+    let information = `Matched link \`${escapeInlineCode(matchResult.extra.link)}\``;
     if (matchResult.extra.details) {
       information += ` ${matchResult.extra.details}`;
     }
