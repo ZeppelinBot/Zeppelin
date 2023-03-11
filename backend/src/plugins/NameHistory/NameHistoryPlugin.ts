@@ -28,7 +28,7 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     NamesCmd,
   ],
 

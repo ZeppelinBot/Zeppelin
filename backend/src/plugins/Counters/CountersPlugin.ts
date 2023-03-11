@@ -136,7 +136,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
   },
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     CountersListCmd,
     ViewCounterCmd,
     AddCounterCmd,

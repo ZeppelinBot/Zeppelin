@@ -73,7 +73,7 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
 
   events: [onButtonInteraction],
 
-  commands: [resetButtonsCmd],
+  messageCommands: [resetButtonsCmd],
 
   beforeLoad(pluginData) {
     pluginData.state.roleButtons = GuildRoleButtons.getGuildInstance(pluginData.guild.id);

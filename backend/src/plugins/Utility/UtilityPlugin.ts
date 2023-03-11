@@ -124,7 +124,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     SearchCmd,
     BanSearchCmd,
     UserInfoCmd,

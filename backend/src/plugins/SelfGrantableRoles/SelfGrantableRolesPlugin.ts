@@ -29,7 +29,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
       ### Basic configuration
       In this example, users can add themselves platform roles on the channel 473087035574321152 by using the
       \`!role\` command. For example, \`!role pc ps4\` to add both the "pc" and "ps4" roles as specified below.
-      
+
       ~~~yml
       self_grantable_roles:
         config:
@@ -46,10 +46,10 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
                 basic:
                   can_use: true
       ~~~
-      
+
       ### Maximum number of roles
       This is identical to the basic example above, but users can only choose 1 role.
-      
+
       ~~~yml
       self_grantable_roles:
         config:
@@ -88,7 +88,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
   },
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     RoleHelpCmd,
     RoleRemoveCmd,
     RoleAddCmd,

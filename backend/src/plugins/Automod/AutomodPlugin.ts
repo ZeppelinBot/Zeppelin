@@ -218,7 +218,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     // Messages use message events from SavedMessages, see onLoad below
   ],
 
-  commands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
+  messageCommands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
 
   async beforeLoad(pluginData) {
     pluginData.state.queue = new Queue();

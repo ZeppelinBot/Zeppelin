@@ -45,7 +45,7 @@ export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     ResetTimezoneCmd,
     SetTimezoneCmd,
     ViewTimezoneCmd,

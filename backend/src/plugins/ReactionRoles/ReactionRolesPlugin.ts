@@ -46,7 +46,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     RefreshReactionRolesCmd,
     ClearReactionRolesCmd,
     InitReactionRolesCmd,

@@ -34,8 +34,8 @@ export const DocsStore: Module<DocsState, RootState> = {
       if (state.plugins[name]) return;
 
       const data = await get(`docs/plugins/${name}`);
-      if (data && data.commands) {
-        data.commands.sort((a, b) => {
+      if (data && data.messageCommands) {
+        data.messageCommands.sort((a, b) => {
           const aName = (Array.isArray(a.trigger) ? a.trigger[0] : a.trigger).toLowerCase();
           const bName = (Array.isArray(b.trigger) ? b.trigger[0] : b.trigger).toLowerCase();
           if (aName > bName) return 1;

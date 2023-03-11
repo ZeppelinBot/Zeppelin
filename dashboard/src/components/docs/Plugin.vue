@@ -45,10 +45,10 @@
         <MarkdownBlock :content="data.info.usageGuide" class="content" />
       </div>
 
-      <!-- Command list -->
-      <div v-if="data.commands.length">
-        <h3 id="commands" class="text-2xl">Commands</h3>
-        <div v-for="command in data.commands"
+      <!-- Message Command list -->
+      <div v-if="data.messageCommands.length">
+        <h3 id="commands" class="text-2xl">Message Commands</h3>
+        <div v-for="command in data.messageCommands"
              class="command mb-4"
              v-bind:ref="getCommandSlug(command)" v-bind:class="{target: targetCommandId === getCommandSlug(command)}">
           <h4 class="text-xl font-semibold mb-0">
@@ -309,7 +309,8 @@
         },
         hasUsageInfo() {
           if (!this.data) return true;
-          if (this.data.commands.length) return true;
+          if (this.data.messageCommands.length) return true;
+          if (this.data.slashCommands.length) return true;
           if (this.data.info.usageGuide) return true;
           return false;
         },

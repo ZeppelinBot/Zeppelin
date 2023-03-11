@@ -35,7 +35,7 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     RemindCmd,
     RemindersCmd,
     RemindersDeleteCmd,

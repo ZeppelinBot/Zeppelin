@@ -68,7 +68,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       You use them by adding a \`{}\` on your tag.
 
       Here are the functions you can use in your tags:
-      
+
       ${generateTemplateMarkdown(TemplateFunctions)}
     `),
   },
@@ -78,7 +78,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     TagEvalCmd,
     TagDeleteCmd,
     TagListCmd,

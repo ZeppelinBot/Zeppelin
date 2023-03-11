@@ -44,7 +44,7 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     WhereCmd,
     FollowCmd,
     ListFollowCmd,

@@ -46,7 +46,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     AddRoleCmd,
     RemoveRoleCmd,
     MassAddRoleCmd,

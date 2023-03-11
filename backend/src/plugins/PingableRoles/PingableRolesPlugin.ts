@@ -30,7 +30,7 @@ export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>(
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     PingableRoleEnableCmd,
     PingableRoleDisableCmd,
   ],

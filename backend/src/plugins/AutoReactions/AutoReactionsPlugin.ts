@@ -42,7 +42,7 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     NewAutoReactionsCmd,
     DisableAutoReactionsCmd,
   ],

@@ -135,7 +135,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
   },
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     MigratePinsCmd,
   ],
 

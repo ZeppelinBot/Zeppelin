@@ -51,7 +51,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     SlowmodeDisableCmd,
     SlowmodeClearCmd,
     SlowmodeListCmd,

@@ -72,7 +72,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     MutesCmd,
     ClearBannedMutesCmd,
     ClearMutesWithoutRoleCmd,

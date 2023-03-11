@@ -41,7 +41,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     ReloadGlobalPluginsCmd,
     ServersCmd,
     LeaveServerCmd,

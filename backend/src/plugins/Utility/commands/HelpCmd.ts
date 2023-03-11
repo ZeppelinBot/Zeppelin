@@ -24,7 +24,7 @@ export const HelpCmd = utilityCmd({
 
     const guildData = pluginData.getKnubInstance().getLoadedGuild(pluginData.guild.id)!;
     for (const plugin of guildData.loadedPlugins.values()) {
-      const registeredCommands = plugin.pluginData.commands.getAll();
+      const registeredCommands = plugin.pluginData.messageCommands.getAll();
       for (const registeredCommand of registeredCommands) {
         for (const trigger of registeredCommand.originalTriggers) {
           const strTrigger = typeof trigger === "string" ? trigger : trigger.source;

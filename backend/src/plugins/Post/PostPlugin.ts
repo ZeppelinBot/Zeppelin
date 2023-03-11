@@ -42,7 +42,7 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
       PostCmd,
       PostEmbedCmd,
       EditCmd,

@@ -12,7 +12,7 @@ export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginTy
   configSchema: t.type({}),
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
       ArchiveChannelCmd,
   ],
 });
