@@ -186,7 +186,7 @@ export async function muteUser(
       const channel = config.message_channel
         ? pluginData.guild.channels.cache.get(config.message_channel as Snowflake)
         : null;
-      if (useChannel && channel?.isText()) {
+      if (useChannel && channel?.isTextBased()) {
         contactMethods.push({ type: "channel", channel });
       }
     }

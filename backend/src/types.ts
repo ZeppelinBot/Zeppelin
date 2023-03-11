@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { BaseConfig, Knub } from "knub";
 
-export interface ZeppelinGuildConfig extends BaseConfig<any> {
+export interface ZeppelinGuildConfig extends BaseConfig {
   success_emoji?: string;
   error_emoji?: string;
 
@@ -26,7 +26,7 @@ export const ZeppelinGuildConfigSchema = t.type({
 });
 export const PartialZeppelinGuildConfigSchema = t.partial(ZeppelinGuildConfigSchema.props);
 
-export interface ZeppelinGlobalConfig extends BaseConfig<any> {
+export interface ZeppelinGlobalConfig extends BaseConfig {
   url: string;
   owners?: string[];
 }
@@ -37,7 +37,7 @@ export const ZeppelinGlobalConfigSchema = t.type({
   plugins: t.record(t.string, t.unknown),
 });
 
-export type TZeppelinKnub = Knub<ZeppelinGuildConfig, ZeppelinGlobalConfig>;
+export type TZeppelinKnub = Knub;
 
 /**
  * Wrapper for the string type that indicates the text will be parsed as Markdown later

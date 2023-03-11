@@ -36,7 +36,7 @@ export const ReplyAction = automodAction({
       .filter((c) => c.message?.channel_id)
       .filter((c) => {
         const channel = pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake);
-        return channel?.isText();
+        return channel?.isTextBased();
       });
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {

@@ -53,13 +53,13 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
         title: embed.title,
         description: embed.description,
         url: embed.url,
-        timestamp: embed.timestamp,
+        timestamp: embed.timestamp ? Date.parse(embed.timestamp) : null,
         color: embed.color,
 
         fields: embed.fields.map((field) => ({
           name: field.name,
           value: field.value,
-          inline: field.inline,
+          inline: field.inline ?? false,
         })),
 
         author: embed.author

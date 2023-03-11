@@ -47,7 +47,7 @@ export async function resolveMessageTarget(pluginData: GuildPluginData<any>, val
   }
 
   const channel = pluginData.guild.channels.resolve(result.channelId as Snowflake);
-  if (!channel?.isText()) {
+  if (!channel?.isTextBased()) {
     return null;
   }
 

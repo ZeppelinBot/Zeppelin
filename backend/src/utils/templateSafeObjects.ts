@@ -9,6 +9,7 @@ import {
   Snowflake,
   StageInstance,
   Sticker,
+  StickerFormatType,
   ThreadChannel,
   User,
 } from "discord.js";
@@ -239,7 +240,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     discriminator: user.discriminator,
     mention: `<@${user.id}>`,
     tag: user.tag,
-    avatarURL: user.displayAvatarURL?.({ dynamic: true }),
+    avatarURL: user.displayAvatarURL?.(),
     bot: user.bot,
     createdAt: user.createdTimestamp,
   });
@@ -305,9 +306,9 @@ export function stickerToTemplateSafeSticker(sticker: Sticker): TemplateSafeStic
     packId: sticker.packId ?? undefined,
     name: sticker.name,
     description: sticker.description ?? "",
-    tags: sticker.tags?.join(", ") ?? "",
+    tags: sticker.tags ?? "",
     format: sticker.format,
-    animated: sticker.format === "PNG" ? false : true,
+    animated: sticker.format === StickerFormatType.PNG ? false : true,
     url: sticker.url,
   });
 }

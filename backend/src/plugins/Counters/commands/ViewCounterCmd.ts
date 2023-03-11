@@ -68,7 +68,7 @@ export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
       }
 
       const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
-      if (!potentialChannel?.isText()) {
+      if (!potentialChannel?.isTextBased()) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;
       }

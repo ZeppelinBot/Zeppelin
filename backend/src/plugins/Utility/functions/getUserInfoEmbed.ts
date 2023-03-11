@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, Role } from "discord.js";
+import { MessageEmbedOptions } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";

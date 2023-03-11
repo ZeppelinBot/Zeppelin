@@ -56,7 +56,7 @@ export function initDocs(app: express.Express) {
     const name = plugin.name;
     const info = plugin.info || {};
 
-    const commands = (plugin.commands || []).map((cmd) => ({
+    const commands = (plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
       permission: cmd.permission,
       signature: cmd.signature,

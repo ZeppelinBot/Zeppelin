@@ -45,7 +45,7 @@ export async function postScheduledPost(pluginData: GuildPluginData<PostPluginTy
 
   // Post the message
   const channel = pluginData.guild.channels.cache.get(post.channel_id as Snowflake);
-  if (channel?.isText() || channel?.isThread()) {
+  if (channel?.isTextBased() || channel?.isThread()) {
     const [username, discriminator] = post.author_name.split("#");
     const author: User = (await pluginData.client.users.fetch(post.author_id as Snowflake)) || {
       id: post.author_id,

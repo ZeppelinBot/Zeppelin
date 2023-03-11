@@ -9,7 +9,7 @@ import humanizeDuration from "humanize-duration";
 
 export async function postReminder(pluginData: GuildPluginData<RemindersPluginType>, reminder: Reminder) {
   const channel = pluginData.guild.channels.cache.get(reminder.channel_id as Snowflake);
-  if (channel && (channel.isText() || channel.isThread())) {
+  if (channel && (channel.isTextBased() || channel.isThread())) {
     try {
       // Only show created at date if one exists
       if (moment.utc(reminder.created_at).isValid()) {

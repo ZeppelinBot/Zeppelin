@@ -1,10 +1,10 @@
-import { Channel, ThreadChannel } from "discord.js";
+import { AnyThreadChannel, Channel, ChannelType } from "discord.js";
 import { ChannelTypeStrings } from "src/types";
 
-export function isThreadChannel(channel: Channel): channel is ThreadChannel {
+export function isThreadChannel(channel: Channel): channel is AnyThreadChannel {
   return (
-    channel.type === ChannelTypeStrings.NEWS_THREAD ||
-    channel.type === ChannelTypeStrings.PUBLIC_THREAD ||
-    channel.type === ChannelTypeStrings.PRIVATE_THREAD
+    channel.type === ChannelType.PublicThread ||
+    channel.type === ChannelType.PrivateThread ||
+    channel.type === ChannelType.AnnouncementThread
   );
 }

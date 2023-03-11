@@ -88,7 +88,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
 
   logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
     const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
-    if (!channel?.isText()) continue;
+    if (!channel?.isTextBased()) continue;
     if (pluginData.state.channelCooldowns.isOnCooldown(channelId)) continue;
     if (opts.include?.length && !opts.include.includes(typeStr)) continue;
     if (opts.exclude && opts.exclude.includes(typeStr)) continue;
