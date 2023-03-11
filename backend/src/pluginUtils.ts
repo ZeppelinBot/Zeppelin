@@ -6,8 +6,9 @@ import {
   GuildMember,
   GuildTextBasedChannel,
   Message,
+  MessageCreateOptions,
   MessageMentionOptions,
-  MessageOptions,
+  MessagePayload,
   TextBasedChannel,
   TextChannel,
 } from "discord.js";
@@ -202,7 +203,7 @@ export async function sendSuccessMessage(
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
-  const content: MessageOptions = allowedMentions
+  const content: MessageCreateOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
@@ -223,7 +224,7 @@ export async function sendErrorMessage(
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
   const formattedBody = errorMessage(body, emoji);
-  const content: MessageOptions = allowedMentions
+  const content: MessageCreateOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
