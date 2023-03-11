@@ -20,7 +20,7 @@ export async function getRoleInfoEmbed(
 
   embed.author = {
     name: `Role:  ${role.name}`,
-    icon_url: MENTION_ICON,
+    iconURL: MENTION_ICON,
   };
 
   embed.color = role.color;

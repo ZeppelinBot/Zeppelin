@@ -36,7 +36,7 @@ export async function getInviteInfoEmbed(
     };
 
     if (invite.guild.icon) {
-      embed.author.icon_url = `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.png?size=256`;
+      embed.author.iconURL = `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.png?size=256`;
     }
 
     if (invite.guild.description) {

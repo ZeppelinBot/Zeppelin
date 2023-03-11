@@ -1,11 +1,13 @@
 import {
   Client,
+  GuildTextBasedChannel,
   Message,
+  MessageCreateOptions,
   MessageEditOptions,
-  MessageOptions,
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
+  TextBasedChannel,
   TextChannel,
   User,
 } from "discord.js";
@@ -13,7 +15,7 @@ import { Awaitable } from "knub/dist/utils";
 import { MINUTES, noop } from "../utils";
 import Timeout = NodeJS.Timeout;
 
-export type LoadPageFn = (page: number) => Awaitable<MessageOptions & MessageEditOptions>;
+export type LoadPageFn = (page: number) => Awaitable<MessageCreateOptions & MessageEditOptions>;
 
 export interface PaginateMessageOpts {
   timeout: number;
@@ -27,7 +29,7 @@ const defaultOpts: PaginateMessageOpts = {
 
 export async function createPaginatedMessage(
   client: Client,
-  channel: TextChannel | User,
+  channel: TextBasedChannel | User,
   totalPages: number,
   loadPageFn: LoadPageFn,
   opts: Partial<PaginateMessageOpts> = {},

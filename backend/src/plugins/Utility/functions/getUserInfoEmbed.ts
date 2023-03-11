@@ -47,7 +47,7 @@ export async function getUserInfoEmbed(
   };
 
   const avatarURL = user.displayAvatarURL();
-  embed.author.icon_url = avatarURL;
+  embed.author.iconURL = avatarURL;
 
   const createdAt = moment.utc(user.createdAt, "x");
   const tzCreatedAt = requestMemberId

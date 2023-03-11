@@ -58,7 +58,7 @@ export async function getChannelInfoEmbed(
 
   embed.author = {
     name: `${channelType}:  ${channel.name}`,
-    icon_url: icon,
+    iconURL: icon,
   };
 
   let channelName = `#${channel.name}`;

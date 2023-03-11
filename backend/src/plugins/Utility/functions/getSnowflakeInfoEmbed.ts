@@ -21,7 +21,7 @@ export async function getSnowflakeInfoEmbed(
 
   embed.author = {
     name: `Snowflake:  ${snowflake}`,
-    icon_url: SNOWFLAKE_ICON,
+    iconURL: SNOWFLAKE_ICON,
   };
 
   if (showUnknownWarning) {

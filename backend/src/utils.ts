@@ -3,6 +3,9 @@ import {
   Client,
   Constants,
   DiscordAPIError,
+  Embed,
+  EmbedData,
+  EmbedType,
   Emoji,
   escapeCodeBlock,
   Guild,
@@ -16,10 +19,8 @@ import {
   InviteGuild,
   LimitedCollection,
   Message,
-  MessageEmbed,
-  MessageEmbedOptions,
+  MessageCreateOptions,
   MessageMentionOptions,
-  MessageOptions,
   PartialChannelData,
   PartialMessage,
   Snowflake,
@@ -391,8 +392,7 @@ export const zEmbedInput = z.object({
     .nullable(),
 });
 
-export type EmbedWith<T extends keyof MessageEmbedOptions> = MessageEmbedOptions &
-  Pick<Required<MessageEmbedOptions>, T>;
+export type EmbedWith<T extends keyof EmbedData> = EmbedData & Pick<Required<EmbedData>, T>;
 
 export const zStrictMessageContent = z.object({
   content: z.string().optional(),
@@ -405,7 +405,7 @@ export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 export type StrictMessageContent = {
   content?: string;
   tts?: boolean;
-  embeds?: MessageEmbedOptions[];
+  embeds?: EmbedData[];
 };
 
 export const tStrictMessageContent = t.type({
@@ -647,7 +647,7 @@ interface MatchedURL extends URL {
 }
 
 export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
-  let matches = [...str.match(urlRegex)];
+  let matches = [...(str.match(urlRegex) ?? [])];
   if (onlyUnique) {
     matches = unique(matches);
   }
@@ -1405,7 +1405,7 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
 export async function confirm(
   channel: GuildTextBasedChannel,
   userId: string,
-  content: MessageOptions,
+  content: MessageCreateOptions,
 ): Promise<boolean> {
   return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
@@ -1415,7 +1415,7 @@ export function messageSummary(msg: SavedMessage) {
   let result = "```\n" + (msg.data.content ? escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find((e) => (e as MessageEmbed).type === "rich");
+  const richEmbed = (msg.data.embeds || []).find((e) => (e as EmbedData).type === EmbedType.Rich);
   if (richEmbed) result += "Embed:```" + escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments

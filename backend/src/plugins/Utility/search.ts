@@ -1,8 +1,11 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   GuildMember,
   Message,
-  MessageActionRow,
-  MessageButton,
+  MessageActionRowComponent,
+  MessageActionRowComponentBuilder,
   MessageComponentInteraction,
   PermissionsBitField,
   Snowflake,
@@ -169,23 +172,23 @@ export async function displaySearch(
     // Set up pagination reactions if needed. The reactions are cleared after a timeout.
     if (searchResult.totalResults > perPage) {
       const idMod = `${searchMsg.id}:${moment.utc().valueOf()}`;
-      const buttons: MessageButton[] = [];
+      const buttons: ButtonBuilder[] = [];
 
       buttons.push(
-        new MessageButton()
-          .setStyle("SECONDARY")
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
           .setEmoji("⬅")
           .setCustomId(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
-        new MessageButton()
-          .setStyle("SECONDARY")
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
           .setEmoji("➡")
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
-        new MessageButton().setStyle("SECONDARY").setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
       );
 
-      const row = new MessageActionRow().addComponents(buttons);
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(buttons);
       await searchMsg.edit({ content: result, components: [row] });
 
       const collector = searchMsg.createMessageComponentCollector({ time: 2 * MINUTES });

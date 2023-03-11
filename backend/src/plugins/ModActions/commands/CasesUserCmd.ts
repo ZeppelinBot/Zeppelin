@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, User } from "discord.js";
+import { EmbedData, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
@@ -116,13 +116,13 @@ export const CasesUserCmd = modActionsCmd({
           const chunkStart = i * linesPerChunk + 1;
           const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
 
-          const embed: MessageEmbedOptions = {
+          const embed: EmbedData = {
             author: {
               name:
                 lineChunks.length === 1
                   ? `Cases for ${userName} (${lines.length} total)`
                   : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
+              iconURL: user instanceof User ? user.displayAvatarURL() : undefined,
             },
             fields: [
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),

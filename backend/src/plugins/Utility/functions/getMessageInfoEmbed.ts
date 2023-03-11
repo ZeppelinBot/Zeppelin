@@ -31,7 +31,7 @@ export async function getMessageInfoEmbed(
 
   embed.author = {
     name: `Message:  ${message.id}`,
-    icon_url: MESSAGE_ICON,
+    iconURL: MESSAGE_ICON,
   };
 
   const createdAt = moment.utc(message.createdAt, "x");
