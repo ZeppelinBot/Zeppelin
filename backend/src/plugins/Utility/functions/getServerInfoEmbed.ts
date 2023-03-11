@@ -26,6 +26,12 @@ const PremiumTiers: Record<PremiumTier, number> = {
   TIER_3: 3,
 };
 
+const prettifyFeature = (feature: string): string =>
+  `\`${feature
+    .split("_")
+    .map((e) => `${e.substring(0, 1).toUpperCase()}${e.substring(1).toLowerCase()}`)
+    .join(" ")}\``;
+
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
@@ -81,13 +87,10 @@ export async function getServerInfoEmbed(
   }
 
   if (features.length > 0) {
-    basicInformation.push(`Features: ${features.join(", ")}`);
+    basicInformation.push(`Features: ${features.map(prettifyFeature).join(", ")}`);
   }
 
-  embed.fields.push({
-    name: preEmbedPadding + "Basic information",
-    value: basicInformation.join("\n"),
-  });
+  embed.description = `${preEmbedPadding}**Basic Information**\n${basicInformation.join("\n")}`;
 
   // IMAGE LINKS
   const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
