@@ -1,4 +1,4 @@
-import { Permissions, Snowflake, TextChannel } from "discord.js";
+import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -26,7 +26,9 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const logs = pluginData.getPlugin(LogsPlugin);
   const perms = channel.permissionsFor(pluginData.client.user!.id);
 
-  if (!hasDiscordPermissions(perms, Permissions.FLAGS.VIEW_CHANNEL | Permissions.FLAGS.READ_MESSAGE_HISTORY)) {
+  if (
+    !hasDiscordPermissions(perms, PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.ReadMessageHistory)
+  ) {
     logs.logBotAlert({
       body: `Missing permissions to read messages or message history in auto-delete channel ${verboseChannelMention(
         channel,
@@ -35,7 +37,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
     return;
   }
 
-  if (!hasDiscordPermissions(perms, Permissions.FLAGS.MANAGE_MESSAGES)) {
+  if (!hasDiscordPermissions(perms, PermissionsBitField.Flags.ManageMessages)) {
     logs.logBotAlert({
       body: `Missing permissions to delete messages in auto-delete channel ${verboseChannelMention(channel)}`,
     });

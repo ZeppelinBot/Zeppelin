@@ -1,4 +1,4 @@
-import { MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
+import { MessageOptions, PermissionsBitField, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
@@ -72,7 +72,7 @@ export const ReplyAction = automodAction({
         if (
           !hasDiscordPermissions(
             channel.permissionsFor(pluginData.client.user!.id),
-            Permissions.FLAGS.SEND_MESSAGES | Permissions.FLAGS.VIEW_CHANNEL,
+            PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.ViewChannel,
           )
         ) {
           pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -84,7 +84,10 @@ export const ReplyAction = automodAction({
         // If the message is an embed, check for embed permissions
         if (
           typeof formatted !== "string" &&
-          !hasDiscordPermissions(channel.permissionsFor(pluginData.client.user!.id), Permissions.FLAGS.EMBED_LINKS)
+          !hasDiscordPermissions(
+            channel.permissionsFor(pluginData.client.user!.id),
+            PermissionsBitField.Flags.EmbedLinks,
+          )
         ) {
           pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Missing permissions to reply **with an embed** in ${verboseChannelMention(

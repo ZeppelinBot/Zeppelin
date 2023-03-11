@@ -2,7 +2,6 @@ import { ApiPermissions } from "@shared/apiPermissions";
 import { getRepository, Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
 import { ApiPermissionAssignment } from "./entities/ApiPermissionAssignment";
-import { Permissions } from "discord.js";
 import { ApiAuditLog } from "./ApiAuditLog";
 import { AuditLogEventTypes } from "./apiAuditLogTypes";
 

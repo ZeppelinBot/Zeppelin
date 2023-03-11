@@ -1,9 +1,10 @@
-import { Permissions } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 
 /**
  * Bitmask of permissions required to read messages in a channel
  */
-export const readChannelPermissions = Permissions.FLAGS.VIEW_CHANNEL | Permissions.FLAGS.READ_MESSAGE_HISTORY;
+export const readChannelPermissions =
+  PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.ReadMessageHistory;
 
 /**
  * Bitmask of permissions required to read messages in a channel (bigint)

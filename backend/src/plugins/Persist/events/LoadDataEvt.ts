@@ -1,4 +1,4 @@
-import { GuildMemberEditData, Permissions } from "discord.js";
+import { GuildMemberEditData, PermissionsBitField } from "discord.js";
 import intersection from "lodash.intersection";
 import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
@@ -9,7 +9,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { persistEvt } from "../types";
 
-const p = Permissions.FLAGS;
+const p = PermissionsBitField.Flags;
 
 export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
@@ -33,8 +33,8 @@ export const LoadDataEvt = persistEvt({
     // Check permissions
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     let requiredPermissions = 0n;
-    if (config.persist_nicknames) requiredPermissions |= p.MANAGE_NICKNAMES;
-    if (config.persisted_roles) requiredPermissions |= p.MANAGE_ROLES;
+    if (config.persist_nicknames) requiredPermissions |= p.ManageNicknames;
+    if (config.persisted_roles) requiredPermissions |= p.ManageRoles;
     const missingPermissions = getMissingPermissions(me.permissions, requiredPermissions);
     if (missingPermissions) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({

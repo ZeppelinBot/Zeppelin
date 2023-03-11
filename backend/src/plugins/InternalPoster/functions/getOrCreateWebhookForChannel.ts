@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { AnyChannel, GuildChannel, MessageManager, NewsChannel, Permissions, TextChannel } from "discord.js";
+import { AnyChannel, GuildChannel, MessageManager, NewsChannel, PermissionsBitField, TextChannel } from "discord.js";
 import { isDiscordAPIError } from "../../../utils";
 
 type WebhookInfo = [id: string, token: string];
@@ -27,7 +27,7 @@ export async function getOrCreateWebhookForChannel(
 
   // Create new webhook
   const member = pluginData.client.user && pluginData.guild.members.cache.get(pluginData.client.user.id);
-  if (!member || member.permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) {
+  if (!member || member.permissions.has(PermissionsBitField.Flags.ManageWebhooks)) {
     try {
       const webhook = await channel.createWebhook(`Zephook ${channel.id}`);
       await pluginData.state.webhooks.create({

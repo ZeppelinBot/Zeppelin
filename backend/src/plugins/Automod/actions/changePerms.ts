@@ -1,4 +1,4 @@
-import { Permissions, PermissionString } from "discord.js";
+import { PermissionsBitField, PermissionsString } from "discord.js";
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 import { tNullable, isValidSnowflake, tPartialDictionary } from "../../../utils";
@@ -14,7 +14,7 @@ export const ChangePermsAction = automodAction({
   configType: t.type({
     target: t.string,
     channel: tNullable(t.string),
-    perms: tPartialDictionary(t.keyof(Permissions.FLAGS), tNullable(t.boolean)),
+    perms: tPartialDictionary(t.keyof(PermissionsBitField.Flags), tNullable(t.boolean)),
   }),
   defaultConfig: {},
 
@@ -52,9 +52,9 @@ export const ChangePermsAction = automodAction({
       const channel = pluginData.guild.channels.resolve(channelId);
       if (!channel || channel.isThread()) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
-      const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
-      const deny = new Permissions(overwrite?.deny ?? 0n).serialize();
-      const newPerms: Partial<Record<PermissionString, boolean | null>> = {};
+      const allow = new PermissionsBitField(overwrite?.allow ?? 0n).serialize();
+      const deny = new PermissionsBitField(overwrite?.deny ?? 0n).serialize();
+      const newPerms: Partial<Record<PermissionsString, boolean | null>> = {};
 
       for (const key in allow) {
         if (typeof actionConfig.perms[key] !== "undefined") {
@@ -86,11 +86,11 @@ export const ChangePermsAction = automodAction({
 
     if (!role) return;
 
-    const perms = new Permissions(role.permissions).serialize();
+    const perms = new PermissionsBitField(role.permissions).serialize();
     for (const key in actionConfig.perms) {
       perms[key] = actionConfig.perms[key];
     }
-    const permsArray = <PermissionString[]>Object.keys(perms).filter((key) => perms[key]);
-    await role.setPermissions(new Permissions(permsArray)).catch(noop);
+    const permsArray = <PermissionsString[]>Object.keys(perms).filter((key) => perms[key]);
+    await role.setPermissions(new PermissionsBitField(permsArray)).catch(noop);
   },
 });

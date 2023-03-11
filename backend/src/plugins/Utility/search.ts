@@ -4,7 +4,7 @@ import {
   MessageActionRow,
   MessageButton,
   MessageComponentInteraction,
-  Permissions,
+  PermissionsBitField,
   Snowflake,
   TextChannel,
   User,
@@ -430,7 +430,7 @@ async function performBanSearch(
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
   const member = pluginData.guild.members.cache.get(pluginData.client.user!.id);
-  if (member && !hasDiscordPermissions(member.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
+  if (member && !hasDiscordPermissions(member.permissions, PermissionsBitField.Flags.BanMembers)) {
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
   }
 

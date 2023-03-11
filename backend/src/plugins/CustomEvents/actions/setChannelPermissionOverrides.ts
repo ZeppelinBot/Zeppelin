@@ -1,4 +1,4 @@
-import { Permissions, Snowflake, TextChannel, PermissionString } from "discord.js";
+import { Snowflake, TextChannel, PermissionsString, PermissionsBitField } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { ActionError } from "../ActionError";
@@ -32,9 +32,9 @@ export async function setChannelPermissionOverridesAction(
   }
 
   for (const override of action.overrides) {
-    const allow = new Permissions(BigInt(override.allow)).serialize();
-    const deny = new Permissions(BigInt(override.deny)).serialize();
-    const perms: Partial<Record<PermissionString, boolean | null>> = {};
+    const allow = new PermissionsBitField(BigInt(override.allow)).serialize();
+    const deny = new PermissionsBitField(BigInt(override.deny)).serialize();
+    const perms: Partial<Record<PermissionsString, boolean | null>> = {};
     for (const key in allow) {
       if (allow[key]) {
         perms[key] = true;

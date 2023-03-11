@@ -1,4 +1,4 @@
-import { ChannelType, GuildTextBasedChannel, Permissions, TextChannel, ThreadChannel, Util } from "discord.js";
+import { ChannelType, GuildTextBasedChannel, PermissionsBitField, TextChannel, ThreadChannel, Util } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -88,7 +88,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "native") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new Permissions(),
+        channelPermissions ?? new PermissionsBitField(),
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -103,7 +103,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "bot") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new Permissions(),
+        channelPermissions ?? new PermissionsBitField(),
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {

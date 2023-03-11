@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, Permissions, Role } from "discord.js";
+import { MessageEmbedOptions, PermissionsBitField, Role } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -36,8 +36,8 @@ export async function getRoleInfoEmbed(
     round: true,
   });
 
-  const rolePerms = role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-    ? [PERMISSION_NAMES.ADMINISTRATOR]
+  const rolePerms = role.permissions.has(PermissionsBitField.Flags.Administrator)
+    ? [PERMISSION_NAMES.Administrator]
     : role.permissions.toArray().map((p) => PERMISSION_NAMES[p]);
 
   // -1 because of the @everyone role

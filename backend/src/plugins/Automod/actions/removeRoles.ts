@@ -1,4 +1,4 @@
-import { Permissions, Snowflake } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
@@ -10,7 +10,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 import { automodAction } from "../helpers";
 
-const p = Permissions.FLAGS;
+const p = PermissionsBitField.Flags;
 
 export const RemoveRolesAction = automodAction({
   configType: t.array(t.string),
@@ -21,7 +21,7 @@ export const RemoveRolesAction = automodAction({
     const members = unique(contexts.map((c) => c.member).filter(nonNullish));
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
 
-    const missingPermissions = getMissingPermissions(me.permissions, p.MANAGE_ROLES);
+    const missingPermissions = getMissingPermissions(me.permissions, p.ManageRoles);
     if (missingPermissions) {
       const logs = pluginData.getPlugin(LogsPlugin);
       logs.logBotAlert({

@@ -1,4 +1,4 @@
-import { Permissions, Snowflake } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { isDiscordAPIError, isDiscordHTTPError, SECONDS, sleep } from "../../../utils";
@@ -12,7 +12,7 @@ export async function isBanned(
   timeout: number = 5 * SECONDS,
 ): Promise<boolean> {
   const botMember = pluginData.guild.members.cache.get(pluginData.client.user!.id);
-  if (botMember && !hasDiscordPermissions(botMember.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
+  if (botMember && !hasDiscordPermissions(botMember.permissions, PermissionsBitField.Flags.BanMembers)) {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Missing "Ban Members" permission to check for existing bans`,
     });
