@@ -8,7 +8,7 @@ import { channelToTemplateSafeChannel, stageToTemplateSafeStage } from "../../..
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogStageInstanceUpdateData {
-  oldStageInstance: StageInstance;
+  oldStageInstance: StageInstance | null;
   newStageInstance: StageInstance;
   stageChannel: StageChannel;
   differenceString: string;
@@ -19,7 +19,7 @@ export function logStageInstanceUpdate(pluginData: GuildPluginData<LogsPluginTyp
     pluginData,
     LogType.STAGE_INSTANCE_UPDATE,
     createTypedTemplateSafeValueContainer({
-      oldStageInstance: stageToTemplateSafeStage(data.oldStageInstance),
+      oldStageInstance: data.oldStageInstance ? stageToTemplateSafeStage(data.oldStageInstance) : null,
       newStageInstance: stageToTemplateSafeStage(data.newStageInstance),
       stageChannel: channelToTemplateSafeChannel(data.stageChannel),
       differenceString: data.differenceString,

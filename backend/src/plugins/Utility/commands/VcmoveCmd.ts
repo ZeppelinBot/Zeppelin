@@ -1,11 +1,5 @@
 import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
-import {
-  channelToTemplateSafeChannel,
-  memberToTemplateSafeMember,
-  userToTemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { channelMentionRegex, isSnowflake, simpleClosestStringMatch } from "../../../utils";
 import { utilityCmd } from "../types";

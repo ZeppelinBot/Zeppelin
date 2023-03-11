@@ -1,5 +1,4 @@
-import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types/v9";
-import { BaseGuildTextChannel, ChannelType, GuildTextBasedChannel, TextChannel } from "discord.js";
+import { ChannelType, GuildFeature, ThreadAutoArchiveDuration } from "discord.js";
 import * as t from "io-ts";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "../../../utils";
@@ -35,8 +34,7 @@ export const StartThreadAction = automodAction({
       // check against max threads per channel
       if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
         const threadCount = channel.threads.cache.filter(
-          (tr) =>
-            tr.ownerId === pluginData.client.user!.id && !tr.deleted && !tr.archived && tr.parentId === channel.id,
+          (tr) => tr.ownerId === pluginData.client.user!.id && !tr.archived && tr.parentId === channel.id,
         ).size;
         if (threadCount >= actionConfig.limit_per_channel) return false;
       }
@@ -52,7 +50,9 @@ export const StartThreadAction = automodAction({
       : ThreadAutoArchiveDuration.OneHour;
 
     for (const threadContext of threads) {
-      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as BaseGuildTextChannel;
+      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id);
+      if (!channel || !("threads" in channel)) continue;
+
       const renderThreadName = async (str: string) =>
         renderTemplate(
           str,
@@ -62,7 +62,7 @@ export const StartThreadAction = automodAction({
           }),
         );
       const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
-      const thread = await channel!.threads
+      const thread = await channel.threads
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,

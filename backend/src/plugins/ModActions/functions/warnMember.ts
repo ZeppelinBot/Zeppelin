@@ -1,8 +1,7 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";

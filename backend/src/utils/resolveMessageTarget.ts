@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
 import { isSnowflake } from "../utils";

@@ -1,5 +1,4 @@
 import { GuildMember } from "discord.js";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";

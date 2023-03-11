@@ -1,7 +1,6 @@
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { createChunkedMessage, formatNumber, resolveInvite, sorter, verboseUserMention } from "../../../utils";
+import { getBaseUrl } from "../../../pluginUtils";
+import { sorter } from "../../../utils";
 import { botControlCmd } from "../types";
 import { GuildArchives } from "../../../data/GuildArchives";
 import moment from "moment-timezone";

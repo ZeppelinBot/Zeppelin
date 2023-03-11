@@ -3,7 +3,6 @@ import { GuildPingableRoles } from "../../data/GuildPingableRoles";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd";
 import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd";
-import { MessageCreateDisablePingableEvt, TypingEnablePingableEvt } from "./events/ChangePingableEvts";
 import { ConfigSchema, PingableRolesPluginType } from "./types";
 
 const defaultOptions: PluginOptions<PingableRolesPluginType> = {

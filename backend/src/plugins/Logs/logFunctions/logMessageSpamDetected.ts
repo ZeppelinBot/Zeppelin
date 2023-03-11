@@ -3,13 +3,13 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, GuildChannel, GuildMember, ThreadChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel } from "discord.js";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogMessageSpamDetectedData {
   member: GuildMember;
-  channel: GuildChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   description: string;
   limit: number;
   interval: number;

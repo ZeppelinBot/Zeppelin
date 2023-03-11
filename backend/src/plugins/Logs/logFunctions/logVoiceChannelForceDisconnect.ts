@@ -3,7 +3,7 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildVoiceChannel, GuildMember, User } from "discord.js";
+import { VoiceBasedChannel, GuildMember, User } from "discord.js";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
@@ -14,7 +14,7 @@ import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 interface LogVoiceChannelForceDisconnectData {
   mod: User;
   member: GuildMember;
-  oldChannel: BaseGuildVoiceChannel;
+  oldChannel: VoiceBasedChannel;
 }
 
 export function logVoiceChannelForceDisconnect(

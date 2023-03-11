@@ -1,8 +1,7 @@
-import { GuildAuditLogs, User } from "discord.js";
+import { AuditLogEvent, User } from "discord.js";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
@@ -24,7 +23,11 @@ export const CreateBanCaseOnManualBanEvt = modActionsEvt({
       return;
     }
 
-    const relevantAuditLogEntry = await findMatchingAuditLogEntry(pluginData.guild, "MEMBER_BAN_ADD", user.id);
+    const relevantAuditLogEntry = await findMatchingAuditLogEntry(
+      pluginData.guild,
+      AuditLogEvent.MemberBanAdd,
+      user.id,
+    );
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
 

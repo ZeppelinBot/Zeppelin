@@ -1,7 +1,5 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { SlowmodePluginType } from "../types";

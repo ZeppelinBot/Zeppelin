@@ -1,7 +1,6 @@
-import { ChannelType, EmbedData } from "discord.js";
+import { APIEmbed, ChannelType } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
 import {
   EmbedWith,
   formatNumber,
@@ -19,7 +18,7 @@ import { UtilityPluginType } from "../types";
 export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   inviteCode: string,
-): Promise<EmbedData | null> {
+): Promise<APIEmbed | null> {
   let invite = await resolveInvite(pluginData.client, inviteCode, true);
   if (!invite) {
     return null;
@@ -36,7 +35,7 @@ export async function getInviteInfoEmbed(
     };
 
     if (invite.guild.icon) {
-      embed.author.iconURL = `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.png?size=256`;
+      embed.author.icon_url = `https://cdn.discordapp.com/icons/${invite.guild.id}/${invite.guild.icon}.png?size=256`;
     }
 
     if (invite.guild.description) {
@@ -44,7 +43,6 @@ export async function getInviteInfoEmbed(
     }
 
     const serverCreatedAtTimestamp = snowflakeToTimestamp(invite.guild.id);
-    const serverCreatedAt = moment.utc(serverCreatedAtTimestamp, "x");
     const serverAge = humanizeDuration(Date.now() - serverCreatedAtTimestamp, {
       largest: 2,
       round: true,
@@ -69,7 +67,6 @@ export async function getInviteInfoEmbed(
         invite.channel.type === ChannelType.GuildVoice ? `🔉 ${invite.channel.name}` : `#${invite.channel.name}`;
 
       const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-      const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
       const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
         largest: 2,
         round: true,
@@ -119,8 +116,9 @@ export async function getInviteInfoEmbed(
 
     /*if (invite.channel.icon) {
       embed.author.icon_url = `https://cdn.discordapp.com/channel-icons/${invite.channel.id}/${invite.channel.icon}.png?size=256`;
-    }*/ const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel!.id);
-    const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
+    }*/
+
+    const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel!.id);
     const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
       largest: 2,
       round: true,

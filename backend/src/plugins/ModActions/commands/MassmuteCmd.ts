@@ -1,6 +1,5 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -30,7 +29,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Ask for mute reason
     msg.channel.send("Mute reason? `cancel` to cancel");
-    const muteReasonReceived = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
+    const muteReasonReceived = await waitForReply(pluginData.client, msg.channel, msg.author.id);
     if (
       !muteReasonReceived ||
       !muteReasonReceived.content ||

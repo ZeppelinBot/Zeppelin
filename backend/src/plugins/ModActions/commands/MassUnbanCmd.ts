@@ -1,6 +1,5 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { waitForReply } from "knub/dist/helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
@@ -32,7 +31,7 @@ export const MassunbanCmd = modActionsCmd({
 
     // Ask for unban reason (cleaner this way instead of trying to cram it into the args)
     msg.channel.send("Unban reason? `cancel` to cancel");
-    const unbanReasonReply = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
+    const unbanReasonReply = await waitForReply(pluginData.client, msg.channel, msg.author.id);
     if (!unbanReasonReply || !unbanReasonReply.content || unbanReasonReply.content.toLowerCase().trim() === "cancel") {
       sendErrorMessage(pluginData, msg.channel, "Cancelled");
       return;

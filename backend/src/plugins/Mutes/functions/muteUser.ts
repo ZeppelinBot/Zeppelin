@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, User } from "discord.js";
+import { Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";

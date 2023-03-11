@@ -1,9 +1,8 @@
-import { MessageEmbedOptions, Snowflake, TextChannel } from "discord.js";
+import { APIEmbed, MessageType, Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
 import moment from "moment-timezone";
-import { MessageTypeStrings } from "src/types";
 import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
@@ -15,7 +14,7 @@ export async function getMessageInfoEmbed(
   channelId: string,
   messageId: string,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   const message = await (pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel).messages
     .fetch(messageId as Snowflake)
     .catch(() => null);
@@ -25,13 +24,12 @@ export async function getMessageInfoEmbed(
 
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
-  const embed: EmbedWith<"fields"> = {
+  const embed: EmbedWith<"fields" | "author"> = {
     fields: [],
-  };
-
-  embed.author = {
-    name: `Message:  ${message.id}`,
-    iconURL: MESSAGE_ICON,
+    author: {
+      name: `Message:  ${message.id}`,
+      icon_url: MESSAGE_ICON,
+    },
   };
 
   const createdAt = moment.utc(message.createdAt, "x");
@@ -58,17 +56,17 @@ export async function getMessageInfoEmbed(
 
   const type =
     {
-      [MessageTypeStrings.DEFAULT]: "Regular message",
-      [MessageTypeStrings.PINS_ADD]: "System message",
-      [MessageTypeStrings.GUILD_MEMBER_JOIN]: "System message",
-      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION]: "System message",
-      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_1]: "System message",
-      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_2]: "System message",
-      [MessageTypeStrings.USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3]: "System message",
-      [MessageTypeStrings.CHANNEL_FOLLOW_ADD]: "System message",
-      [MessageTypeStrings.GUILD_DISCOVERY_DISQUALIFIED]: "System message",
-      [MessageTypeStrings.GUILD_DISCOVERY_REQUALIFIED]: "System message",
-    }[message.type] || "Unknown";
+      [MessageType.Default]: "Regular message",
+      [MessageType.ChannelPinnedMessage]: "System message",
+      [MessageType.UserJoin]: "System message",
+      [MessageType.GuildBoost]: "System message",
+      [MessageType.GuildBoostTier1]: "System message",
+      [MessageType.GuildBoostTier2]: "System message",
+      [MessageType.GuildBoostTier3]: "System message",
+      [MessageType.ChannelFollowAdd]: "System message",
+      [MessageType.GuildDiscoveryDisqualified]: "System message",
+      [MessageType.GuildDiscoveryRequalified]: "System message",
+    }[message.type] ?? "Unknown";
 
   embed.fields.push({
     name: preEmbedPadding + "Message information",

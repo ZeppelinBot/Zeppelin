@@ -3,8 +3,8 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { GuildMember, User } from "discord.js";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { User } from "discord.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { UnknownUser } from "../../../utils";
 
 interface LogMemberMuteData {

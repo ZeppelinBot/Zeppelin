@@ -1,6 +1,5 @@
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, RoleButtonsPluginType } from "./types";
-import { mapToPublicFn } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";

@@ -1,4 +1,4 @@
-import { TextChannel } from "discord.js";
+import { GuildTextBasedChannel } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
@@ -10,8 +10,6 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import { Queue } from "../../Queue";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
-
-import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -129,7 +127,7 @@ export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
-  retryPromptChannel?: TextChannel | null;
+  retryPromptChannel?: GuildTextBasedChannel | null;
   isAutomodAction?: boolean;
 }
 

@@ -1,4 +1,3 @@
-import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { SavedMessage } from "../../../data/entities/SavedMessage";

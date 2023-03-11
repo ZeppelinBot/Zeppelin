@@ -1,5 +1,5 @@
-import { Channel, GuildBasedChannel, GuildChannel } from "discord.js";
+import type { Channel, GuildBasedChannel } from "discord.js";
 
 export function isGuildChannel(channel: Channel): channel is GuildBasedChannel {
-  return channel.type.toString().startsWith("GUILD_");
+  return "guild" in channel && channel.guild !== null;
 }

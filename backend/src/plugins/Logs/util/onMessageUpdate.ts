@@ -1,9 +1,7 @@
-import { BaseGuildTextChannel, GuildTextBasedChannel, MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
+import { GuildTextBasedChannel, MessageEmbed, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { resolveUser } from "../../../utils";
 import { LogsPluginType } from "../types";
 import { logMessageEdit } from "../logFunctions/logMessageEdit";

@@ -1,5 +1,4 @@
-import { GuildChannel, GuildTextBasedChannel, PermissionsBitField } from "discord.js";
-import { LogType } from "../../../data/LogType";
+import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
 import { isDiscordAPIError } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";

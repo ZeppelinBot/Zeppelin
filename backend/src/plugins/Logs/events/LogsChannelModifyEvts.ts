@@ -1,6 +1,4 @@
-import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
 import { logsEvt } from "../types";
 import { logChannelCreate } from "../logFunctions/logChannelCreate";
 import { logChannelDelete } from "../logFunctions/logChannelDelete";

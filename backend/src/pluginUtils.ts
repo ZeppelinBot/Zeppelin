@@ -2,17 +2,7 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import {
-  ChannelType,
-  GuildMember,
-  GuildTextBasedChannel,
-  Message,
-  MessageCreateOptions,
-  MessageMentionOptions,
-  MessagePayload,
-  TextBasedChannel,
-  TextChannel,
-} from "discord.js";
+import { GuildMember, Message, MessageCreateOptions, MessageMentionOptions, TextBasedChannel } from "discord.js";
 import * as t from "io-ts";
 import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
 import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
@@ -198,7 +188,7 @@ export function getPluginConfigPreprocessor(
 
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: GuildTextBasedChannel,
+  channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
@@ -211,7 +201,7 @@ export async function sendSuccessMessage(
   return channel
     .send({ ...content }) // Force line break
     .catch((err) => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
+      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });
@@ -232,7 +222,7 @@ export async function sendErrorMessage(
   return channel
     .send({ ...content }) // Force line break
     .catch((err) => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
+      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });

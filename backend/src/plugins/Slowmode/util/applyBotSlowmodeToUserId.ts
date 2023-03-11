@@ -1,6 +1,5 @@
 import { GuildChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { isDiscordAPIError, UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
@@ -17,9 +16,9 @@ export async function applyBotSlowmodeToUserId(
   try {
     pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channel.id, 5 * 1000);
     if (existingOverride) {
-      await existingOverride.edit({ SEND_MESSAGES: false });
+      await existingOverride.edit({ SendMessages: false });
     } else {
-      await channel.permissionOverwrites?.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
+      await channel.permissionOverwrites?.create(userId as Snowflake, { SendMessages: false }, { type: 1 });
     }
   } catch (e) {
     const user = await pluginData.client.users.fetch(userId as Snowflake).catch(() => new UnknownUser({ id: userId }));

@@ -11,8 +11,6 @@ import { GuildMutes } from "../../data/GuildMutes";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
-import Timeout = NodeJS.Timeout;
-
 export const ConfigSchema = t.type({
   mute_role: tNullable(t.string),
   move_to_voice_channel: tNullable(t.string),

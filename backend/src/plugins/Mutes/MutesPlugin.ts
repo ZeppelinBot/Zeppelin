@@ -13,7 +13,6 @@ import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { MutesCmd } from "./commands/MutesCmd";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
-import { ClearActiveMuteOnRoleRemovalEvt } from "./events/ClearActiveMuteOnRoleRemovalEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
 import { muteUser } from "./functions/muteUser";
 import { offMutesEvent } from "./functions/offMutesEvent";

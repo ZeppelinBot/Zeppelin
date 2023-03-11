@@ -4,7 +4,6 @@ import { UsernameHistory } from "../../data/UsernameHistory";
 import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { NamesCmd } from "./commands/NamesCmd";
-import { ChannelJoinEvt, MessageCreateEvt } from "./events/UpdateNameEvts";
 import { ConfigSchema, NameHistoryPluginType } from "./types";
 
 const defaultOptions: PluginOptions<NameHistoryPluginType> = {

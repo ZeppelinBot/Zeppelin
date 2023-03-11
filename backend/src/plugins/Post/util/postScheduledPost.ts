@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, User } from "discord.js";
+import { Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { logger } from "../../../logger";
@@ -57,6 +57,7 @@ export async function postScheduledPost(pluginData: GuildPluginData<PostPluginTy
       const postedMessage = await postMessage(
         pluginData,
         channel,
+        // @ts-expect-error
         post.content,
         post.attachments,
         post.enable_mentions,

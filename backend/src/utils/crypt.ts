@@ -1,5 +1,4 @@
 import { spawn, Worker, Pool } from "threads";
-import type { CryptFns } from "./cryptWorker";
 import { MINUTES } from "../utils";
 import { env } from "../env";
 

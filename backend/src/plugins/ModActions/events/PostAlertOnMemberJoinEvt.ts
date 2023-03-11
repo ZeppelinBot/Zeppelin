@@ -1,5 +1,4 @@
 import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
-import { LogType } from "../../../data/LogType";
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";

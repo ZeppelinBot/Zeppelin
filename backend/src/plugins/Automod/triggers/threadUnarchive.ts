@@ -1,5 +1,4 @@
-import { Snowflake } from "discord-api-types/v9";
-import { escapeBold, User } from "discord.js";
+import { escapeBold, User, type Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";

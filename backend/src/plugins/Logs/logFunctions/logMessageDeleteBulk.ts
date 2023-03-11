@@ -3,7 +3,7 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, GuildTextBasedChannel, ThreadChannel } from "discord.js";
+import { GuildTextBasedChannel } from "discord.js";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 

@@ -1,11 +1,8 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { resolveMember, resolveUser } from "../../../utils";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseArgs } from "../../Cases/types";
 import { MutesPluginType, UnmuteResult } from "../types";

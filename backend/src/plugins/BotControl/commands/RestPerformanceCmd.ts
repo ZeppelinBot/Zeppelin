@@ -1,7 +1,5 @@
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { createChunkedMessage, formatNumber, resolveInvite, sorter, verboseUserMention } from "../../../utils";
+import { createChunkedMessage } from "../../../utils";
 import { botControlCmd } from "../types";
 import { getTopRestCallStats } from "../../../restCallStats";
 
@@ -22,6 +20,6 @@ export const RestPerformanceCmd = botControlCmd({
       const cleanSource = callStats.source.replace(leadingPathRegex, "");
       return `**${callStats.count} calls**\n${callStats.method.toUpperCase()} ${callStats.path}\n${cleanSource}`;
     });
-    createChunkedMessage(msg.channel as TextChannel, `Top rest calls:\n\n${formatted.join("\n")}`);
+    createChunkedMessage(msg.channel, `Top rest calls:\n\n${formatted.join("\n")}`);
   },
 });

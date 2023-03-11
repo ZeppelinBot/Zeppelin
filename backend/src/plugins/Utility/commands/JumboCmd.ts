@@ -1,4 +1,4 @@
-import { Attachment, AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder } from "discord.js";
 import fs from "fs";
 import photon from "@silvia-odwyer/photon-node";
 import twemoji from "twemoji";

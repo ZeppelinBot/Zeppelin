@@ -3,13 +3,13 @@ import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
 import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, User } from "discord.js";
+import { User, GuildTextBasedChannel } from "discord.js";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 
 interface LogCleanData {
   mod: User;
-  channel: BaseGuildTextChannel;
+  channel: GuildTextBasedChannel;
   count: number;
   archiveUrl: string;
 }

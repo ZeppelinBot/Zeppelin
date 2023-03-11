@@ -1,6 +1,5 @@
-import { ChannelType, GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
+import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
 import { automodAction } from "../helpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -42,9 +41,7 @@ export const SetSlowmodeAction = automodAction({
 
       try {
         for (const chan of channelsToSlowmode) {
-          await chan.edit({
-            rateLimitPerUser: slowmodeSeconds,
-          });
+          await chan.setRateLimitPerUser(slowmodeSeconds);
         }
       } catch (e) {
         // Check for invalid form body -> indicates duration was too large

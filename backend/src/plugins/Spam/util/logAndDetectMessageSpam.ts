@@ -1,7 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";

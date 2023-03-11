@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { guildPluginMessageCommand } from "knub";
 import { waitForReply } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";

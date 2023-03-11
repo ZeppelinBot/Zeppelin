@@ -1,7 +1,6 @@
-import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { resolveUser, verboseChannelMention } from "../../../utils";
@@ -47,7 +46,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   pluginData.state.guildLogs.ignoreLog(LogType.MESSAGE_DELETE, itemToDelete.message.id);
-  (channel as TextChannel).messages.delete(itemToDelete.message.id as Snowflake).catch((err) => {
+  channel.messages.delete(itemToDelete.message.id as Snowflake).catch((err) => {
     if (err.code === 10008) {
       // "Unknown Message", probably already deleted by automod or another bot, ignore
       return;

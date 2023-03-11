@@ -1,12 +1,4 @@
-import {
-  GuildTextBasedChannel,
-  MessageOptions,
-  PermissionsBitField,
-  Snowflake,
-  TextChannel,
-  ThreadChannel,
-  User,
-} from "discord.js";
+import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import * as t from "io-ts";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
@@ -71,7 +63,7 @@ export const ReplyAction = automodAction({
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)
-          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageOptions);
+          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
 
       if (formatted) {
         const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;
@@ -107,7 +99,7 @@ export const ReplyAction = automodAction({
 
         const messageContent = validateAndParseMessageContent(formatted);
 
-        const messageOpts: MessageOptions = {
+        const messageOpts: MessageCreateOptions = {
           ...messageContent,
           allowedMentions: {
             users: [user.id],

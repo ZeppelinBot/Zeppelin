@@ -1,6 +1,5 @@
-import { PermissionsBitField, Snowflake } from "discord.js";
+import { PermissionFlagsBits, Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
@@ -10,7 +9,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 import { automodAction } from "../helpers";
 
-const p = PermissionsBitField.Flags;
+const p = PermissionFlagsBits;
 
 export const AddRolesAction = automodAction({
   configType: t.array(t.string),

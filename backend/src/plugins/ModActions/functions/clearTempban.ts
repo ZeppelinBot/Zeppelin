@@ -5,7 +5,7 @@ import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { resolveUser, SECONDS } from "../../../utils";
+import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";

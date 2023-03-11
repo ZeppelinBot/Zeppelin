@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";

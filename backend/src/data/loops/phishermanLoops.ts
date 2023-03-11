@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 
-import { HOURS, MINUTES } from "../../utils";
+import { MINUTES } from "../../utils";
 import {
   deleteStalePhishermanCacheEntries,
   deleteStalePhishermanKeyCacheEntries,

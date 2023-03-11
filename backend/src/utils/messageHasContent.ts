@@ -1,5 +1,5 @@
-import { MessageOptions } from "child_process";
-import { MessageCreateOptions, MessagePayload } from "discord.js";
+import { MessageCreateOptions } from "discord.js";
+import { StrictMessageContent } from "../utils.js";
 
 function embedHasContent(embed: any) {
   for (const [key, value] of Object.entries(embed)) {
@@ -19,7 +19,7 @@ function embedHasContent(embed: any) {
   return false;
 }
 
-export function messageHasContent(content: string | MessageCreateOptions): boolean {
+export function messageHasContent(content: string | MessageCreateOptions | StrictMessageContent): boolean {
   if (typeof content === "string") {
     return content.trim() !== "";
   }

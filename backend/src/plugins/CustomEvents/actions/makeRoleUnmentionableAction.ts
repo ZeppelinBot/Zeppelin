@@ -23,10 +23,5 @@ export async function makeRoleUnmentionableAction(
     throw new ActionError(`Unknown role: ${role}`);
   }
 
-  await role.edit(
-    {
-      mentionable: false,
-    },
-    `Custom event: ${event.name}`,
-  );
+  await role.setMentionable(false, `Custom event: ${event.name}`);
 }

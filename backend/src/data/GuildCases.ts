@@ -4,7 +4,6 @@ import { CaseTypes } from "./CaseTypes";
 import { connection } from "./db";
 import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
-import moment from "moment-timezone";
 import { chunkArray } from "../utils";
 import { Queue } from "../Queue";
 

@@ -1,7 +1,5 @@
-import { GuildMemberEditData, PermissionsBitField } from "discord.js";
+import { PermissionFlagsBits, GuildMemberEditOptions } from "discord.js";
 import intersection from "lodash.intersection";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
@@ -9,7 +7,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { persistEvt } from "../types";
 
-const p = PermissionsBitField.Flags;
+const p = PermissionFlagsBits;
 
 export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
@@ -26,7 +24,9 @@ export const LoadDataEvt = persistEvt({
       return;
     }
 
-    const toRestore: GuildMemberEditData = {};
+    const toRestore: GuildMemberEditOptions = {
+      reason: "Restored upon rejoin",
+    };
     const config = await pluginData.config.getForMember(member);
     const restoredData: string[] = [];
 
@@ -73,7 +73,7 @@ export const LoadDataEvt = persistEvt({
     }
 
     if (restoredData.length) {
-      await member.edit(toRestore, "Restored upon rejoin");
+      await member.edit(toRestore);
       await pluginData.state.persistedData.clear(member.id);
 
       pluginData.getPlugin(LogsPlugin).logMemberRestore({

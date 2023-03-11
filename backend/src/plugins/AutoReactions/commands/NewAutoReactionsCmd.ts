@@ -1,4 +1,4 @@
-import { GuildChannel, PermissionsBitField } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";

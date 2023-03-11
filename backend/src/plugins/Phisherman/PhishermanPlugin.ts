@@ -1,13 +1,7 @@
-import { PluginOptions, guildPluginMessageCommand } from "knub";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
+import { PluginOptions } from "knub";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ConfigSchema, PhishermanPluginType } from "./types";
-import {
-  getPhishermanDomainInfo,
-  hasPhishermanMasterAPIKey,
-  phishermanApiKeyIsValid,
-  reportTrackedDomainsToPhisherman,
-} from "../../data/Phisherman";
+import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
 import { mapToPublicFn } from "../../pluginUtils";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { pluginInfo } from "./info";

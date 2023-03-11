@@ -5,7 +5,6 @@ import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
 import { ConfigSchema, MessageSaverPluginType } from "./types";
-import { Queue } from "../../Queue";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {

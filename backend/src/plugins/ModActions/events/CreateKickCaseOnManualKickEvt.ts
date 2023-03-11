@@ -1,8 +1,6 @@
-import { GuildAuditLogs, User } from "discord.js";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { User } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -24,7 +22,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt({
       return;
     }
 
-    const kickAuditLogEntry = await findMatchingAuditLogEntry(pluginData.guild, "MEMBER_KICK", member.id);
+    const kickAuditLogEntry = await findMatchingAuditLogEntry(pluginData.guild, AuditLogEvent.MemberKick, member.id);
 
     let mod: User | UnknownUser | null = null;
     let createdCase: Case | null = null;

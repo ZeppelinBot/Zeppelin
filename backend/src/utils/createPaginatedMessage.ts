@@ -1,6 +1,5 @@
 import {
   Client,
-  GuildTextBasedChannel,
   Message,
   MessageCreateOptions,
   MessageEditOptions,
@@ -8,7 +7,6 @@ import {
   PartialMessageReaction,
   PartialUser,
   TextBasedChannel,
-  TextChannel,
   User,
 } from "discord.js";
 import { Awaitable } from "knub/dist/utils";

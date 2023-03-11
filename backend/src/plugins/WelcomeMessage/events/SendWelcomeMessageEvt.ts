@@ -1,13 +1,11 @@
 import { Snowflake, TextChannel } from "discord.js";
 import {
-  channelToTemplateSafeChannel,
   guildToTemplateSafeGuild,
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { createChunkedMessage, stripObjectToScalars, verboseChannelMention, verboseUserMention } from "../../../utils";
+import { createChunkedMessage, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { sendDM } from "../../../utils/sendDM";
 import { welcomeMessageEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";

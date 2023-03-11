@@ -42,13 +42,13 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
       ### Note on emojis
       To specify emoji in the config, you need to use the emoji's "raw form".
       To obtain this, post the emoji with a backslash in front of it.
-      
+
       - Example with a default emoji: "\:star:" => "⭐"
       - Example with a custom emoji: "\:mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
 
       ### Basic starboard
       Any message on the server that gets 5 star reactions will be posted into the starboard channel (604342689038729226).
-      
+
       ~~~yml
       starboard:
         config:
@@ -57,10 +57,10 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
               channel_id: "604342689038729226"
               stars_required: 5
       ~~~
-      
+
       ### Basic starboard with custom color
       Any message on the server that gets 5 star reactions will be posted into the starboard channel (604342689038729226), with the given color (0x87CEEB).
-      
+
       ~~~yml
       starboard:
         config:
@@ -70,10 +70,10 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
               stars_required: 5
               color: 0x87CEEB
       ~~~
-      
+
       ### Custom star emoji
       This is identical to the basic starboard above, but accepts two emoji: the regular star and a custom :mrvnSmile: emoji
-      
+
       ~~~yml
       starboard:
         config:
@@ -83,10 +83,10 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
               star_emoji: ["⭐", "<:mrvnSmile:543000534102310933>"]
               stars_required: 5
       ~~~
-      
+
       ### Limit starboard to a specific channel
       This is identical to the basic starboard above, but only works from a specific channel (473087035574321152).
-      
+
       ~~~yml
       starboard:
         config:
@@ -105,7 +105,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
 
       ### Limit starboard to a specific level (and above)
       This is identical to the basic starboard above, but only works for a specific level (>=50).
-      
+
       ~~~yml
       starboard:
         config:
@@ -136,14 +136,14 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
 
   // prettier-ignore
   commands: [
-      MigratePinsCmd,
+    MigratePinsCmd,
   ],
 
   // prettier-ignore
   events: [
-      StarboardReactionAddEvt,
-      StarboardReactionRemoveEvt,
-      StarboardReactionRemoveAllEvt,
+    StarboardReactionAddEvt,
+    StarboardReactionRemoveEvt,
+    StarboardReactionRemoveAllEvt,
   ],
 
   beforeLoad(pluginData) {

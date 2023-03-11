@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { GuildPluginData, guildPluginEventListener } from "knub";
+import { guildPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { MINUTES } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";

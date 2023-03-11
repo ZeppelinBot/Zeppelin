@@ -1,4 +1,4 @@
-import { ActivityType, Snowflake, TextChannel } from "discord.js";
+import { ActivityType, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { messageSummary, verboseChannelMention } from "../../../utils";
 import { AutomodContext, AutomodPluginType } from "../types";

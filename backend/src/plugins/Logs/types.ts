@@ -6,10 +6,9 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { RegExpRunner } from "../../RegExpRunner";
-import { StrictMessageContent, tMessageContent, tNullable } from "../../utils";
+import { tMessageContent, tNullable } from "../../utils";
 import { TRegex } from "../../validatorUtils";
 import { LogType } from "../../data/LogType";
-import { GuildMember } from "discord.js";
 import {
   TemplateSafeCase,
   TemplateSafeChannel,
@@ -23,11 +22,6 @@ import {
   TemplateSafeUnknownUser,
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import {
-  TemplateSafeValue,
-  TemplateSafeValueContainer,
-  TypedTemplateSafeValueContainer,
-} from "../../templateFormatter";
 import { MessageBuffer } from "../../utils/MessageBuffer";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
@@ -280,7 +274,7 @@ export const LogTypeData = z.object({
   }),
 
   [LogType.STAGE_INSTANCE_UPDATE]: z.object({
-    oldStageInstance: z.instanceof(TemplateSafeStage),
+    oldStageInstance: z.instanceof(TemplateSafeStage).or(z.null()),
     newStageInstance: z.instanceof(TemplateSafeStage),
     stageChannel: z.instanceof(TemplateSafeChannel),
     differenceString: z.string(),

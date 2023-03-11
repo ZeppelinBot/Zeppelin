@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { availableActions } from "../actions/availableActions";
 import { CleanAction } from "../actions/clean";

@@ -1,7 +1,7 @@
-import { PermissionFlags } from "discord.js";
+import type { PermissionFlagsBits } from "discord.js";
 import { EMPTY_CHAR } from "../utils";
 
-export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
+export const PERMISSION_NAMES = {
   AddReactions: "Add Reactions",
   Administrator: "Administrator",
   AttachFiles: "Attach Files",
@@ -43,4 +43,4 @@ export const PERMISSION_NAMES: Record<keyof PermissionFlags, string> = {
   ViewGuildInsights: "View Guild Insights",
   ModerateMembers: "Moderate Members",
   ManageEvents: "Manage Events",
-};
+} as const satisfies Record<keyof typeof PermissionFlagsBits, string>;

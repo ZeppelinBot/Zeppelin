@@ -1,4 +1,11 @@
-import { GuildMember, MessageActionRow, MessageButton, MessageComponentInteraction, Snowflake } from "discord.js";
+import {
+  GuildMember,
+  MessageComponentInteraction,
+  Snowflake,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+} from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
@@ -192,13 +199,12 @@ export const MutesCmd = mutesCmd({
 
       if (totalPages > 1) {
         const idMod = `${listMessage.id}:muteList`;
-        const buttons: MessageButton[] = [];
+        const buttons = [
+          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji("⬅").setCustomId(`previousButton:${idMod}`),
+          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji("➡").setCustomId(`nextButton:${idMod}`),
+        ] satisfies ButtonBuilder[];
 
-        buttons.push(new MessageButton().setStyle("SECONDARY").setEmoji("⬅").setCustomId(`previousButton:${idMod}`));
-
-        buttons.push(new MessageButton().setStyle("SECONDARY").setEmoji("➡").setCustomId(`nextButton:${idMod}`));
-
-        const row = new MessageActionRow().addComponents(buttons);
+        const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
         await listMessage.edit({ components: [row] });
 
         const collector = listMessage.createMessageComponentCollector({ time: stopCollectionDebounce });

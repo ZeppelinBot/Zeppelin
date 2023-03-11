@@ -1,4 +1,4 @@
-import { MessageCreateOptions, MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
+import { EmbedData, MessageMentionTypes, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { allowTimeout } from "../../../RegExpRunner";
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";
@@ -6,7 +6,7 @@ import { getLogMessage } from "./getLogMessage";
 import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { LogType } from "../../../data/LogType";
 import { MessageBuffer } from "../../../utils/MessageBuffer";
-import { createChunkedMessage, isDiscordAPIError, MINUTES } from "../../../utils";
+import { isDiscordAPIError, MINUTES } from "../../../utils";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 const excludedUserProps = ["user", "member", "mod"];
@@ -141,7 +141,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
     const buffer = pluginData.state.buffers.get(channelId)!;
     buffer.push({
       content: typeof message === "string" ? message : message.content || "",
-      embeds: typeof message === "string" ? [] : ((message.embeds || []) as MessageCreateOptions[]),
+      embeds: typeof message === "string" ? [] : ((message.embeds || []) as EmbedData[]),
     });
   }
 }

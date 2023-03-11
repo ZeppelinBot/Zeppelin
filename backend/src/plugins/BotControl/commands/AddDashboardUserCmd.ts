@@ -1,5 +1,4 @@
 import { ApiPermissions } from "@shared/apiPermissions";
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { botControlCmd } from "../types";
@@ -38,7 +37,7 @@ export const AddDashboardUserCmd = botControlCmd({
     const userNameList = args.users.map((user) => `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`);
     sendSuccessMessage(
       pluginData,
-      msg.channel as TextChannel,
+      msg.channel,
       `The following users were given dashboard access for **${guild.name}**:\n\n${userNameList}`,
     );
   },

@@ -1,13 +1,9 @@
 import { GuildPluginData } from "knub";
 import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types";
-import { isSnowflake, snowflakeRegex } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Message, MessageButton, MessageEditOptions, MessageOptions, Snowflake } from "discord.js";
+import { Message, MessageEditOptions, MessageCreateOptions } from "discord.js";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem";
-import { buildCustomId } from "../../../utils/buildCustomId";
 import { createButtonComponents } from "./createButtonComponents";
-
-const channelMessageRegex = new RegExp(`^(${snowflakeRegex.source})-(${snowflakeRegex.source})$`);
 
 export async function applyRoleButtons(
   pluginData: GuildPluginData<RoleButtonsPluginType>,
@@ -88,7 +84,7 @@ export async function applyRoleButtons(
 
     if (!candidateMessage) {
       try {
-        candidateMessage = await channel.send(configItem.message.content as string | MessageOptions);
+        candidateMessage = await channel.send(configItem.message.content as string | MessageCreateOptions);
       } catch (err) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
           body: `Error while posting message for role_buttons/${configItem.name}: ${String(err)}`,

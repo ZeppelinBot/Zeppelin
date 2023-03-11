@@ -1,13 +1,11 @@
 import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 import { buildEntity } from "./buildEntity";
 import { noop } from "../utils";
-import { decrypt } from "../utils/crypt";
 import { decryptJson, encryptJson } from "../utils/cryptHelpers";
 import { asyncMap } from "../utils/async";
 

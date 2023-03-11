@@ -35,11 +35,7 @@ import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
-import {
-  createTypedTemplateSafeValueContainer,
-  TemplateSafeValueContainer,
-  TypedTemplateSafeValueContainer,
-} from "../../templateFormatter";
+import { createTypedTemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { mapToPublicFn } from "../../pluginUtils";
 
 import { logAutomodAction } from "./logFunctions/logAutomodAction";

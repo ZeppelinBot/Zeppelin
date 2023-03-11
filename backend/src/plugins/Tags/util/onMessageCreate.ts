@@ -2,7 +2,6 @@ import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { validate } from "../../../validatorUtils";
@@ -17,8 +16,8 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
-  if (!channel) return;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake);
+  if (!channel?.isTextBased()) return;
 
   const config = await pluginData.config.getMatchingConfig({
     member,

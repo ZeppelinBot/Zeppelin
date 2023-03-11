@@ -1,7 +1,6 @@
 import * as t from "io-ts";
 import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
-import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   can_where: t.boolean,

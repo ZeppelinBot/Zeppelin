@@ -1,11 +1,11 @@
 import { parseSignature, guildPluginMessageCommand } from "knub";
 import { commandTypes } from "../../commandTypes";
-import { stripObjectToScalars, UnknownUser } from "../../utils";
+import { UnknownUser } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { runEvent } from "./functions/runEvent";
 import { ConfigSchema, CustomEventsPluginType } from "./types";
 import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
-import { Channel, GuildChannel, GuildMember, ThreadChannel, User } from "discord.js";
+import { GuildChannel, GuildMember, ThreadChannel, User } from "discord.js";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,

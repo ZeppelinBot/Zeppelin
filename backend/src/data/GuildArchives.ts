@@ -1,4 +1,4 @@
-import { Guild, Snowflake, User } from "discord.js";
+import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { isDefaultSticker } from "src/utils/isDefaultSticker";
 import { getRepository, Repository } from "typeorm";
@@ -6,11 +6,7 @@ import { renderTemplate, TemplateSafeValueContainer } from "../templateFormatter
 import { trimLines } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
-import {
-  channelToTemplateSafeChannel,
-  guildToTemplateSafeGuild,
-  userToTemplateSafeUser,
-} from "../utils/templateSafeObjects";
+import { channelToTemplateSafeChannel, guildToTemplateSafeGuild } from "../utils/templateSafeObjects";
 import { SavedMessage } from "./entities/SavedMessage";
 import { decrypt, encrypt } from "../utils/crypt";
 

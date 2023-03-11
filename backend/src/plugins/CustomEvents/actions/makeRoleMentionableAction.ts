@@ -25,22 +25,10 @@ export async function makeRoleMentionableAction(
     throw new ActionError(`Unknown role: ${role}`);
   }
 
-  await role.edit(
-    {
-      mentionable: true,
-    },
-    `Custom event: ${event.name}`,
-  );
+  await role.setMentionable(true, `Custom event: ${event.name}`);
 
   const timeout = convertDelayStringToMS(action.timeout)!;
   setTimeout(() => {
-    role
-      .edit(
-        {
-          mentionable: false,
-        },
-        `Custom event: ${event.name}`,
-      )
-      .catch(noop);
+    role.setMentionable(false, `Custom event: ${event.name}`).catch(noop);
   }, timeout);
 }

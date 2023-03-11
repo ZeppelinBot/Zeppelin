@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { noop } from "../../../utils";

@@ -1,9 +1,7 @@
 import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/dist/helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";

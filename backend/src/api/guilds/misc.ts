@@ -5,7 +5,6 @@ import { validateGuildConfig } from "../../configValidator";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments, ApiPermissionTypes } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
-import { apiTokenAuthHandlers } from "../auth";
 import { hasGuildPermission, requireGuildPermission } from "../permissions";
 import { clientError, ok, serverError, unauthorized } from "../responses";
 import { loadYamlSafely } from "../../utils/loadYamlSafely";
@@ -15,8 +14,6 @@ import moment from "moment-timezone";
 import { ApiAuditLog } from "../../data/ApiAuditLog";
 import { AuditLogEventTypes } from "../../data/apiAuditLogTypes";
 import { Queue } from "../../Queue";
-import { GuildCases } from "../../data/GuildCases";
-import { z } from "zod";
 
 const apiPermissionAssignments = new ApiPermissionAssignments();
 const auditLog = new ApiAuditLog();

@@ -1,5 +1,3 @@
-import { Not } from "../utils";
-
 const scalarTypes = ["string", "number", "boolean", "bigint"];
 
 export class ObjectAliasError extends Error {}

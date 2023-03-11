@@ -6,7 +6,7 @@ import { logEmojiUpdate } from "../logFunctions/logEmojiUpdate";
 import { logStickerCreate } from "../logFunctions/logStickerCreate";
 import { logStickerDelete } from "../logFunctions/logStickerDelete";
 import { logStickerUpdate } from "../logFunctions/logStickerUpdate";
-import { Emoji, GuildEmoji, Sticker, ThreadChannel } from "discord.js";
+import { GuildEmoji, Sticker } from "discord.js";
 import { filterObject } from "../../../utils/filterObject";
 
 export const LogsEmojiCreateEvt = logsEvt({

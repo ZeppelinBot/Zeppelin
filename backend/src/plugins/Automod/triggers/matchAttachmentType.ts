@@ -1,4 +1,4 @@
-import { escapeInlineCode, Snowflake, TextChannel } from "discord.js";
+import { escapeInlineCode, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
@@ -66,7 +66,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake);
+    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake)!;
     const prettyChannel = verboseChannelMention(channel);
 
     return (

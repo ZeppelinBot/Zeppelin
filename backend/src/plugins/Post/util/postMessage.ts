@@ -1,12 +1,4 @@
-import {
-  Attachment,
-  GuildTextBasedChannel,
-  Message,
-  MessageOptions,
-  NewsChannel,
-  TextChannel,
-  ThreadChannel,
-} from "discord.js";
+import { Attachment, GuildTextBasedChannel, Message, MessageCreateOptions } from "discord.js";
 import fs from "fs";
 import { GuildPluginData } from "knub";
 import { downloadFile } from "../../../utils";
@@ -18,7 +10,7 @@ const fsp = fs.promises;
 export async function postMessage(
   pluginData: GuildPluginData<PostPluginType>,
   channel: GuildTextBasedChannel,
-  content: MessageOptions,
+  content: MessageCreateOptions,
   attachments: Attachment[] = [],
   enableMentions: boolean = false,
 ): Promise<Message> {

@@ -1,4 +1,16 @@
-import { Client, Constants, Intents, Options, TextChannel, ThreadChannel } from "discord.js";
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  GuildTextBasedChannel,
+  Message,
+  Options,
+  Partials,
+  RESTEvents,
+  TextBasedChannel,
+  TextChannel,
+  ThreadChannel,
+} from "discord.js";
 import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
@@ -14,13 +26,11 @@ import { logger } from "./logger";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
-import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
 import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, sleep, successMessage } from "./utils";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
-import { logRestCall } from "./restCallStats";
 import { logRateLimit } from "./rateLimitStats";
 import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
 import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
@@ -37,6 +47,19 @@ import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
 import { consumeQueryStats } from "./data/queryLogger";
 import { EventEmitter } from "events";
 import { env } from "./env";
+import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
+
+// TODO: Remove this once fixed on upstream
+declare module "knub/dist/helpers" {
+  export function waitForReply(
+    client: Client,
+    channel: GuildTextBasedChannel,
+    restrictToUserId?: string,
+    timeout?: number,
+  ): Promise<Message | null>;
+
+  export function createChunkedMessage(channel: TextBasedChannel, messageText: string): Promise<Message[]>;
+}
 
 // Error handling
 let recentPluginErrors = 0;
@@ -188,17 +211,19 @@ setInterval(() => {
 logger.info("Connecting to database");
 connect().then(async () => {
   const client = new Client({
-    partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
+    partials: [Partials.User, Partials.Channel, Partials.GuildMember, Partials.Message, Partials.Reaction],
 
     makeCache: Options.cacheWithLimits({
-      ...Options.defaultMakeCacheSettings,
+      ...Options.DefaultMakeCacheSettings,
       MessageManager: 1,
       // GuildMemberManager: 15000,
       GuildInviteManager: 0,
     }),
 
-    restGlobalRateLimit: 50,
-    // restTimeOffset: 1000,
+    rest: {
+      // globalRequestsPerSecond: 50,
+      // offset: 1000,
+    },
 
     // Disable mentions by default
     allowedMentions: {
@@ -209,25 +234,25 @@ connect().then(async () => {
     },
     intents: [
       // Privileged
-      Intents.FLAGS.GUILD_MEMBERS,
-      // Intents.FLAGS.GUILD_PRESENCES,
-      Intents.FLAGS.GUILD_MESSAGE_TYPING,
+      GatewayIntentBits.GuildMembers,
+      // GatewayIntentBits.GuildPresences,
 
       // Regular
-      Intents.FLAGS.DIRECT_MESSAGES,
-      Intents.FLAGS.GUILD_BANS,
-      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-      Intents.FLAGS.GUILD_INVITES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_VOICE_STATES,
+      GatewayIntentBits.GuildMessageTyping,
+      GatewayIntentBits.DirectMessages,
+      GatewayIntentBits.GuildModeration,
+      GatewayIntentBits.GuildEmojisAndStickers,
+      GatewayIntentBits.GuildInvites,
+      GatewayIntentBits.GuildMessageReactions,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildVoiceStates,
     ],
   });
   // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
   (client as unknown as EventEmitter).setMaxListeners(200);
 
-  client.on(Constants.Events.RATE_LIMIT, (data) => {
+  client.rest.on(RESTEvents.RateLimited, (data) => {
     // tslint:disable-next-line:no-console
     // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
   });
@@ -235,7 +260,7 @@ connect().then(async () => {
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
-  client.on(Constants.Events.DEBUG, (errorText) => {
+  client.on(Events.Debug, (errorText) => {
     if (!errorText.includes("429")) {
       return;
     }
@@ -346,7 +371,7 @@ connect().then(async () => {
     startUptimeCounter();
   });
 
-  client.on(Constants.Events.RATE_LIMIT, (data) => {
+  client.rest.on(RESTEvents.RateLimited, (data) => {
     logRateLimit(data);
   });
 

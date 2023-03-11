@@ -1,4 +1,3 @@
-import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
 import { getUrlsInString, tNullable } from "../../../utils";

@@ -1,11 +1,9 @@
-import { LogType } from "../../../data/LogType";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { roleToTemplateSafeRole } from "../../../utils/templateSafeObjects";
 import { logsEvt } from "../types";
 import { logRoleCreate } from "../logFunctions/logRoleCreate";
 import { logRoleDelete } from "../logFunctions/logRoleDelete";
 import { logRoleUpdate } from "../logFunctions/logRoleUpdate";
-import { GuildEmoji, Role } from "discord.js";
+import { Role } from "discord.js";
 import { filterObject } from "../../../utils/filterObject";
 
 export const LogsRoleCreateEvt = logsEvt({

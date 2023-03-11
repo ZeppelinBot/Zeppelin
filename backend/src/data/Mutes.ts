@@ -1,5 +1,5 @@
 import moment from "moment-timezone";
-import { Brackets, getRepository, Repository } from "typeorm";
+import { getRepository, Repository } from "typeorm";
 import { Mute } from "./entities/Mute";
 import { DAYS, DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";

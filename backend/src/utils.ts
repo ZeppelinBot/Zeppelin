@@ -1,16 +1,13 @@
 import {
+  APIEmbed,
   ChannelType,
   Client,
-  Constants,
   DiscordAPIError,
-  Embed,
   EmbedData,
   EmbedType,
   Emoji,
   escapeCodeBlock,
   Guild,
-  GuildAuditLogs,
-  GuildAuditLogsEntry,
   GuildBasedChannel,
   GuildChannel,
   GuildMember,
@@ -25,8 +22,7 @@ import {
   PartialMessage,
   Snowflake,
   Sticker,
-  TextChannel,
-  ThreadChannel,
+  TextBasedChannel,
   User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
@@ -179,7 +175,7 @@ function tDeepPartialProp(prop: any) {
   }
 }
 
-export function getScalarDifference<T>(
+export function getScalarDifference<T extends object>(
   base: T,
   object: T,
   ignoreKeys: string[] = [],
@@ -392,7 +388,7 @@ export const zEmbedInput = z.object({
     .nullable(),
 });
 
-export type EmbedWith<T extends keyof EmbedData> = EmbedData & Pick<Required<EmbedData>, T>;
+export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
 export const zStrictMessageContent = z.object({
   content: z.string().optional(),
@@ -952,7 +948,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: GuildTextBasedChannel | User,
+  channel: TextBasedChannel | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1445,7 +1441,7 @@ export function verboseUserName(user: User | UnknownUser): string {
   return `**${user.tag}** (\`${user.id}\`)`;
 }
 
-export function verboseChannelMention(channel: GuildTextBasedChannel): string {
+export function verboseChannelMention(channel: GuildBasedChannel): string {
   const plainTextName =
     channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice
       ? channel.name

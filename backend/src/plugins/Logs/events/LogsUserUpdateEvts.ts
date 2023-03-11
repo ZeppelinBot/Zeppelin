@@ -1,7 +1,5 @@
-import { GuildAuditLogs } from "discord.js";
 import diff from "lodash.difference";
 import isEqual from "lodash.isequal";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logsEvt } from "../types";
 import { logMemberNickChange } from "../logFunctions/logMemberNickChange";

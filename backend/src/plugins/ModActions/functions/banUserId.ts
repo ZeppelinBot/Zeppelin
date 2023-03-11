@@ -8,9 +8,10 @@ import { logger } from "../../../logger";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   createUserNotificationError,
+  DAYS,
   notifyUser,
   resolveUser,
-  stripObjectToScalars,
+  SECONDS,
   ucfirst,
   UserNotificationResult,
 } from "../../../utils";
@@ -87,7 +88,7 @@ export async function banUserId(
   try {
     const deleteMessageDays = Math.min(7, Math.max(0, banOptions.deleteMessageDays ?? 1));
     await pluginData.guild.bans.create(userId as Snowflake, {
-      days: deleteMessageDays,
+      deleteMessageSeconds: (deleteMessageDays * DAYS) / SECONDS,
       reason: reason ?? undefined,
     });
   } catch (e) {

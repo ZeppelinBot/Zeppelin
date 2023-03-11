@@ -28,8 +28,7 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
-    "discord-api-types": "^0.33.1",
-    "discord.js": "^14.7.1",
+    "discord.js": "14.7.2-dev.1678536262-1b29099.0",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "erlpack": "github:discord/erlpack",
@@ -68,7 +67,7 @@
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
     "typeorm": "^0.2.31",
-    "typescript": "4.9",
+    "typescript": "~4.9.5",
     "utf-8-validate": "^5.0.5",
     "uuid": "^3.3.2",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
@@ -103,5 +102,11 @@
     "require": [
       "./register-tsconfig-paths.js"
     ]
+  },
+  "overrides": {
+    "@discordjs/formatters": "0.1.1-dev.1678536268-1b29099.0",
+    "knub": {
+      "discord.js": "14.7.2-dev.1678536262-1b29099.0"
+    }
   }
 }

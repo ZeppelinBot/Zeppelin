@@ -4,12 +4,9 @@ import {
   ButtonStyle,
   GuildMember,
   Message,
-  MessageActionRowComponent,
-  MessageActionRowComponentBuilder,
   MessageComponentInteraction,
   PermissionsBitField,
   Snowflake,
-  TextChannel,
   User,
 } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
@@ -119,12 +116,12 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
         return;
       }
 
       if (e instanceof InvalidRegexError) {
-        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
         return;
       }
 
@@ -132,7 +129,7 @@ export async function displaySearch(
     }
 
     if (searchResult.totalResults === 0) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
+      sendErrorMessage(pluginData, msg.channel, "No results found");
       return;
     }
 
@@ -172,9 +169,7 @@ export async function displaySearch(
     // Set up pagination reactions if needed. The reactions are cleared after a timeout.
     if (searchResult.totalResults > perPage) {
       const idMod = `${searchMsg.id}:${moment.utc().valueOf()}`;
-      const buttons: ButtonBuilder[] = [];
-
-      buttons.push(
+      const buttons: ButtonBuilder[] = [
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
           .setEmoji("⬅")
@@ -186,9 +181,9 @@ export async function displaySearch(
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
         new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
-      );
+      ];
 
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(buttons);
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
       await searchMsg.edit({ content: result, components: [row] });
 
       const collector = searchMsg.createMessageComponentCollector({ time: 2 * MINUTES });
@@ -264,12 +259,12 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
       return;
     }
 
     if (e instanceof InvalidRegexError) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
       return;
     }
 
@@ -277,7 +272,7 @@ export async function archiveSearch(
   }
 
   if (results.totalResults === 0) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
+    sendErrorMessage(pluginData, msg.channel, "No results found");
     return;
   }
 

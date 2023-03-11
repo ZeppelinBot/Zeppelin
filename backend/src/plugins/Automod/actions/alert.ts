@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { LogType } from "../../../data/LogType";
@@ -9,9 +9,7 @@ import {
   TemplateSafeValueContainer,
 } from "../../../templateFormatter";
 import {
-  createChunkedMessage,
   messageLink,
-  stripObjectToScalars,
   tAllowedMentions,
   tNormalizedNullOptional,
   isTruthy,
@@ -21,7 +19,7 @@ import {
 } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
-import { TemplateSafeUser, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
@@ -96,7 +94,7 @@ export const AlertAction = automodAction({
         const chunks = chunkMessageLines(rendered);
         for (const chunk of chunks) {
           await poster.sendMessage(channel, {
-            content: rendered,
+            content: chunk,
             allowedMentions: erisAllowedMentionsToDjsMentionOptions(actionConfig.allowed_mentions),
           });
         }

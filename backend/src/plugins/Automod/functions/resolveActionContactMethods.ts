@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
