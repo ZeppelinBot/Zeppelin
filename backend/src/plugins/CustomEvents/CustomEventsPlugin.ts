@@ -66,4 +66,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
   beforeUnload() {
     // TODO: Run clearTriggers() once we actually have something there
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

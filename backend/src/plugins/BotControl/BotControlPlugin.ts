@@ -80,4 +80,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       }
     }
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

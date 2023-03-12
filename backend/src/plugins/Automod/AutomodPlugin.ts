@@ -65,12 +65,12 @@ const defaultOptions = {
  * Config preprocessor to set default values for triggers and perform extra validation
  */
 
-const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
-  if (options.config?.rules) {
+const configParser = (options) => {
+  if (options.rules) {
     // Loop through each rule
-    for (const [name, rule] of Object.entries(options.config.rules)) {
+    for (const [name, rule] of Object.entries(options.rules)) {
       if (rule == null) {
-        delete options.config.rules[name];
+        delete options.rules[name];
         continue;
       }
 
@@ -98,7 +98,7 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
         for (const triggerObj of rule["triggers"]) {
           for (const triggerName in triggerObj) {
             if (!availableTriggers[triggerName]) {
-              throw new StrictValidationError([`Unknown trigger '${triggerName}' in rule '${rule.name}'`]);
+              throw new StrictValidationError([`Unknown trigger '${triggerName}' in rule '${rule["name"]}'`]);
             }
 
             const triggerBlueprint = availableTriggers[triggerName];
@@ -118,11 +118,11 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
 
               if (white && black) {
                 throw new StrictValidationError([
-                  `Cannot have both blacklist and whitelist enabled at rule <${rule.name}/match_attachment_type>`,
+                  `Cannot have both blacklist and whitelist enabled at rule <${rule["name"]}/match_attachment_type>`,
                 ]);
               } else if (!white && !black) {
                 throw new StrictValidationError([
-                  `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_attachment_type>`,
+                  `Must have either blacklist or whitelist enabled at rule <${rule["name"]}/match_attachment_type>`,
                 ]);
               }
             }
@@ -133,11 +133,11 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
 
               if (white && black) {
                 throw new StrictValidationError([
-                  `Cannot have both blacklist and whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                  `Cannot have both blacklist and whitelist enabled at rule <${rule["name"]}/match_mime_type>`,
                 ]);
               } else if (!white && !black) {
                 throw new StrictValidationError([
-                  `Must have either blacklist or whitelist enabled at rule <${rule.name}/match_mime_type>`,
+                  `Must have either blacklist or whitelist enabled at rule <${rule["name"]}/match_mime_type>`,
                 ]);
               }
             }
@@ -148,7 +148,7 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
       if (rule["actions"]) {
         for (const actionName in rule["actions"]) {
           if (!availableActions[actionName]) {
-            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule.name}'`]);
+            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule["name"]}'`]);
           }
 
           const actionBlueprint = availableActions[actionName];
@@ -164,9 +164,9 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
 
       // Enable logging of automod actions by default
       if (rule["actions"]) {
-        for (const actionName in rule.actions) {
+        for (const actionName in rule["actions"]) {
           if (!availableActions[actionName]) {
-            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule.name}'`]);
+            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule["name"]}'`]);
           }
         }
 
@@ -174,7 +174,7 @@ const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
           rule["actions"]["log"] = true;
         }
         if (rule["actions"]["clean"] && rule["actions"]["start_thread"]) {
-          throw new StrictValidationError([`Cannot have both clean and start_thread at rule '${rule.name}'`]);
+          throw new StrictValidationError([`Cannot have both clean and start_thread at rule '${rule["name"]}'`]);
         }
       }
     }

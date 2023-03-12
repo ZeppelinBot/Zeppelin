@@ -46,4 +46,7 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
     state.usernameHistory = new UsernameHistory();
     state.updateQueue = new Queue();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

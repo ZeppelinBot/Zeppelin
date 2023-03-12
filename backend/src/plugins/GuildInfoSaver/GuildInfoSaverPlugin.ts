@@ -30,6 +30,9 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
   beforeUnload(pluginData) {
     clearInterval(pluginData.state.updateInterval);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });
 
 async function updateGuildInfo(guild: Guild) {

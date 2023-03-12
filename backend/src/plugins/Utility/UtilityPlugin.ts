@@ -221,4 +221,7 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   beforeUnload(pluginData) {
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

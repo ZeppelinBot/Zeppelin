@@ -45,4 +45,7 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

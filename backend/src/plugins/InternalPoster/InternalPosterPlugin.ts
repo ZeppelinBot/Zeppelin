@@ -31,4 +31,7 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
     pluginData.state.missingPermissions = false;
     pluginData.state.webhookClientCache = new Map();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

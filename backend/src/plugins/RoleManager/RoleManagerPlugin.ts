@@ -36,4 +36,7 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
     pluginData.state.abortRoleAssignmentLoop = true;
     await pluginData.state.pendingRoleAssignmentPromise;
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

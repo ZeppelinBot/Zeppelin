@@ -37,4 +37,7 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
   afterLoad(pluginData) {
     pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

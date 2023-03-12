@@ -43,4 +43,7 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
     state.persistedData = GuildPersistedData.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

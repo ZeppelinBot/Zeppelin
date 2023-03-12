@@ -125,13 +125,14 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
   },
 
   configParser(options) {
-    if (options.config?.boards) {
-      for (const [name, opts] of Object.entries(options.config.boards)) {
-        options.config.boards[name] = Object.assign({}, defaultStarboardOpts, options.config.boards[name]);
+    if (options.boards) {
+      for (const [name, opts] of Object.entries(options.boards)) {
+        options.boards[name] = Object.assign({}, defaultStarboardOpts, options.boards[name]);
       }
     }
 
-    return options;
+    // FIXME: any typing lol
+    return <any>options;
   },
 
   // prettier-ignore

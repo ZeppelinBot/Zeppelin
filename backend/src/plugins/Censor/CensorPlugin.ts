@@ -84,4 +84,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
     pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
     pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

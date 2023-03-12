@@ -49,4 +49,7 @@ export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>(
     state.cache = new Map();
     state.timeouts = new Map();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

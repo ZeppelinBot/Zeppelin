@@ -35,4 +35,7 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
     state.logs = new GuildLogs(guild.id);
     state.sentWelcomeMessages = new Set();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

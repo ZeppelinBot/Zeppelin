@@ -58,4 +58,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
 
     state.logs = new GuildLogs(guild.id);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

@@ -59,4 +59,7 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     pluginData.state.unregisterGuildEventListener?.();
     pluginData.state.unloaded = true;
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

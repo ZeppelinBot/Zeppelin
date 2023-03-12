@@ -47,4 +47,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
       }
     }
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

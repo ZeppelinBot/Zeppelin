@@ -122,4 +122,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     pluginData.state.unregisterGuildEventListener?.();
     pluginData.state.events.removeAllListeners();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

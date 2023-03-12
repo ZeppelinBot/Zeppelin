@@ -69,4 +69,7 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   beforeUnload(pluginData) {
     pluginData.state.unregisterGuildEventListener?.();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

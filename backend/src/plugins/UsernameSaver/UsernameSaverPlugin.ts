@@ -23,4 +23,7 @@ export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>(
     state.usernameHistory = new UsernameHistory();
     state.updateQueue = new Queue();
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

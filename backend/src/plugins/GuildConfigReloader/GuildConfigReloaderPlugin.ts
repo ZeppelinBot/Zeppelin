@@ -23,4 +23,7 @@ export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloade
     clearTimeout(pluginData.state.nextCheckTimeout);
     pluginData.state.unloaded = true;
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

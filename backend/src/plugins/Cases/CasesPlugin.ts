@@ -85,4 +85,7 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
     pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

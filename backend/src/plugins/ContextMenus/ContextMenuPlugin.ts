@@ -53,4 +53,7 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   afterLoad(pluginData) {
     loadAllCommands(pluginData);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

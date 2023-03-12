@@ -15,4 +15,7 @@ export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginTy
   messageCommands: [
       ArchiveChannelCmd,
   ],
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

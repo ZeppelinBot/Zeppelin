@@ -34,9 +34,9 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
 
   configParser(options) {
     // Auto-fill "name" property for buttons based on the object key
-    const buttonsArray = Array.isArray(options.config?.buttons) ? options.config.buttons : [];
+    const buttonsArray = Array.isArray(options.buttons) ? options.buttons : [];
     const seenMessages = new Set();
-    for (const [name, buttonsConfig] of Object.entries(options.config?.buttons ?? {})) {
+    for (const [name, buttonsConfig] of Object.entries(options.buttons ?? {})) {
       if (name.length > 16) {
         throw new StrictValidationError(["Name for role buttons can be at most 16 characters long"]);
       }
@@ -66,7 +66,8 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
       }
     }
 
-    return options;
+    // FIXME: any typing lol
+    return <any>options;
   },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],

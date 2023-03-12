@@ -71,7 +71,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
   },
 
   configParser: (options) => {
-    const config = options.config;
+    const config = options;
     for (const [key, entry] of Object.entries(config.entries)) {
       // Apply default entry config
       config.entries[key] = { ...defaultSelfGrantableRoleEntry, ...entry };

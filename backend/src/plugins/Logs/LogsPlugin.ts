@@ -324,4 +324,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     }
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
+
+  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
+  configParser: (o: any) => o,
 });

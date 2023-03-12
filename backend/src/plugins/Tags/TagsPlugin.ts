@@ -97,16 +97,16 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   configParser(options) {
-    if (options.config.delete_with_command && options.config.auto_delete_command) {
+    if (options.delete_with_command && options.auto_delete_command) {
       throw new StrictValidationError([
         `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,
       ]);
     }
 
     // Check each category for conflicting options
-    if (options.config?.categories) {
-      for (const [name, opts] of Object.entries(options.config.categories)) {
-        const cat = options.config.categories[name];
+    if (options.categories) {
+      for (const [name, opts] of Object.entries(options.categories)) {
+        const cat = options.categories[name];
         if (cat.delete_with_command && cat.auto_delete_command) {
           throw new StrictValidationError([
             `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
@@ -115,7 +115,8 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       }
     }
 
-    return options;
+    // FIXME: any typing lol
+    return <any>options;
   },
 
   beforeLoad(pluginData) {

@@ -55,47 +55,6 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
   ],
 };
 
-// TODO: Fix `any` typing
-const configParser: ConfigParserFn<CountersPluginType> = (options: any) => {
-  for (const [counterName, counter] of Object.entries(options.config?.counters || {})) {
-    counter.name = counterName;
-    counter.per_user = counter.per_user ?? false;
-    counter.per_channel = counter.per_channel ?? false;
-    counter.initial_value = counter.initial_value ?? 0;
-    counter.triggers = counter.triggers || {};
-
-    if (Object.values(counter.triggers).length > MAX_TRIGGERS_PER_COUNTER) {
-      throw new StrictValidationError([`You can only have at most ${MAX_TRIGGERS_PER_COUNTER} triggers per counter`]);
-    }
-
-    // Normalize triggers
-    for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
-      const triggerObj: Partial<TTrigger> = typeof trigger === "string" ? { condition: trigger } : trigger;
-
-      triggerObj.name = triggerName;
-      const parsedCondition = parseCounterConditionString(triggerObj.condition || "");
-      if (!parsedCondition) {
-        throw new StrictValidationError([
-          `Invalid comparison in counter trigger ${counterName}/${triggerName}: "${triggerObj.condition}"`,
-        ]);
-      }
-
-      triggerObj.condition = buildCounterConditionString(parsedCondition[0], parsedCondition[1]);
-      triggerObj.reverse_condition =
-        triggerObj.reverse_condition ||
-        buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
-
-      counter.triggers[triggerName] = triggerObj as TTrigger;
-    }
-  }
-
-  if (Object.values(options.config?.counters || {}).length > MAX_COUNTERS) {
-    throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
-  }
-
-  return options;
-};
-
 /**
  * The Counters plugin keeps track of simple integer values that are tied to a user, channel, both, or neither — "counters".
  * These values can be changed using the functions in the plugin's public interface.
@@ -118,7 +77,46 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
 
   configSchema: ConfigSchema,
   defaultOptions,
-  configParser,
+  configParser: (options) => {
+    for (const [counterName, counter] of Object.entries(options.counters || {})) {
+      counter.name = counterName;
+      counter.per_user = counter.per_user ?? false;
+      counter.per_channel = counter.per_channel ?? false;
+      counter.initial_value = counter.initial_value ?? 0;
+      counter.triggers = counter.triggers || {};
+
+      if (Object.values(counter.triggers).length > MAX_TRIGGERS_PER_COUNTER) {
+        throw new StrictValidationError([`You can only have at most ${MAX_TRIGGERS_PER_COUNTER} triggers per counter`]);
+      }
+
+      // Normalize triggers
+      for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
+        const triggerObj: Partial<TTrigger> = typeof trigger === "string" ? { condition: trigger } : trigger;
+
+        triggerObj.name = triggerName;
+        const parsedCondition = parseCounterConditionString(triggerObj.condition || "");
+        if (!parsedCondition) {
+          throw new StrictValidationError([
+            `Invalid comparison in counter trigger ${counterName}/${triggerName}: "${triggerObj.condition}"`,
+          ]);
+        }
+
+        triggerObj.condition = buildCounterConditionString(parsedCondition[0], parsedCondition[1]);
+        triggerObj.reverse_condition =
+          triggerObj.reverse_condition ||
+          buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
+
+        counter.triggers[triggerName] = triggerObj as TTrigger;
+      }
+    }
+
+    if (Object.values(options.counters || {}).length > MAX_COUNTERS) {
+      throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
+    }
+
+    // FIXME: Any typing
+    return <any>options;
+  },
 
   public: {
     counterExists: mapToPublicFn(counterExists),
