@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, MessageEmbed, Snowflake } from "discord.js";
+import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
@@ -14,13 +14,13 @@ export async function onMessageUpdate(
   // To log a message update, either the message content or a rich embed has to change
   let logUpdate = false;
 
-  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as MessageEmbed[])
+  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as EmbedData[])
     .map((e) => cloneDeep(e))
-    .filter((e) => (e as MessageEmbed).type === "rich");
+    .filter((e) => (e as EmbedData).type === "rich");
 
-  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as MessageEmbed[])
+  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as EmbedData[])
     .map((e) => cloneDeep(e))
-    .filter((e) => (e as MessageEmbed).type === "rich");
+    .filter((e) => (e as EmbedData).type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {
