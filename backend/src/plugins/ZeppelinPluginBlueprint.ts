@@ -8,7 +8,7 @@ import {
   globalPlugin,
   guildPlugin,
 } from "knub";
-import { PluginOptions } from "knub/dist/config/configTypes";
+import { ConfigParserFn, PluginOptions } from "knub/dist/config/configTypes";
 import { Awaitable } from "knub/dist/utils";
 import { getPluginConfigParser } from "../pluginUtils";
 import { TMarkdown } from "../types";
@@ -30,8 +30,8 @@ export interface ZeppelinGuildPluginBlueprint<TPluginData extends GuildPluginDat
     legacy?: boolean | string;
   };
 
-  configParser?: (
-    options: PluginOptions<TPluginData["_pluginType"]>,
+  configParser: (
+    options: TPluginData["_pluginType"]["config"],
     strict?: boolean,
   ) => Awaitable<PluginOptions<TPluginData["_pluginType"]>>;
 }
@@ -67,7 +67,7 @@ export function zeppelinGuildPlugin(...args) {
 export interface ZeppelinGlobalPluginBlueprint<TPluginType extends BasePluginType = BasePluginType>
   extends GlobalPluginBlueprint<GlobalPluginData<TPluginType>> {
   configSchema: t.TypeC<any>;
-  configParser?: (options: PluginOptions<TPluginType>, strict?: boolean) => Awaitable<PluginOptions<TPluginType>>;
+  configParser: (options: TPluginType["config"], strict?: boolean) => Awaitable<PluginOptions<TPluginType>>;
 }
 
 export function zeppelinGlobalPlugin<TBlueprint extends ZeppelinGlobalPluginBlueprint>(
