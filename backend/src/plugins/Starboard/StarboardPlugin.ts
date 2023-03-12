@@ -124,7 +124,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
     `),
   },
 
-  configPreprocessor(options) {
+  configParser(options) {
     if (options.config?.boards) {
       for (const [name, opts] of Object.entries(options.config.boards)) {
         options.config.boards[name] = Object.assign({}, defaultStarboardOpts, options.config.boards[name]);

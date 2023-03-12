@@ -32,7 +32,7 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
     ],
   },
 
-  configPreprocessor(options) {
+  configParser(options) {
     // Auto-fill "name" property for buttons based on the object key
     const buttonsArray = Array.isArray(options.config?.buttons) ? options.config.buttons : [];
     const seenMessages = new Set();

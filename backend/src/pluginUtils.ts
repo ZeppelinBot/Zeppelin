@@ -91,10 +91,7 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
   );
 }
 
-export function getPluginConfigPreprocessor(
-  blueprint: ZeppelinPlugin,
-  customPreprocessor?: ZeppelinPlugin["configPreprocessor"],
-) {
+export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: ZeppelinPlugin["configParser"]) {
   return async (options: PluginOptions<any>, strict?: boolean) => {
     // 1. Validate the basic structure of plugin config
     const basicOptionsValidation = validate(BasicPluginStructureType, options);
@@ -146,8 +143,8 @@ export function getPluginConfigPreprocessor(
     }
 
     // 3. Run custom preprocessor, if any
-    if (customPreprocessor) {
-      options = await customPreprocessor(options);
+    if (customParser) {
+      options = await customParser(options);
     }
 
     // 4. Merge with default options and validate/decode the entire config

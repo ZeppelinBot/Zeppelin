@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { PluginOptions } from "knub";
-import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
+import { ConfigParserFn } from "knub/dist/config/configTypes";
 import {
   buildCounterConditionString,
   CounterTrigger,
@@ -55,7 +55,8 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
   ],
 };
 
-const configPreprocessor: ConfigPreprocessorFn<CountersPluginType> = (options) => {
+// TODO: Fix `any` typing
+const configParser: ConfigParserFn<CountersPluginType> = (options: any) => {
   for (const [counterName, counter] of Object.entries(options.config?.counters || {})) {
     counter.name = counterName;
     counter.per_user = counter.per_user ?? false;
@@ -117,7 +118,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
 
   configSchema: ConfigSchema,
   defaultOptions,
-  configPreprocessor,
+  configParser,
 
   public: {
     counterExists: mapToPublicFn(counterExists),

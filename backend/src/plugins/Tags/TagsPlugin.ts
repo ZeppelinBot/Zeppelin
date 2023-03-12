@@ -96,7 +96,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
     findTagByName: mapToPublicFn(findTagByName),
   },
 
-  configPreprocessor(options) {
+  configParser(options) {
     if (options.config.delete_with_command && options.config.auto_delete_command) {
       throw new StrictValidationError([
         `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,

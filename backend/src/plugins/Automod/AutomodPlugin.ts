@@ -1,5 +1,5 @@
 import { configUtils, CooldownManager } from "knub";
-import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
+import { ConfigParserFn } from "knub/dist/config/configTypes";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -64,7 +64,8 @@ const defaultOptions = {
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
  */
-const configPreprocessor: ConfigPreprocessorFn<AutomodPluginType> = (options) => {
+// TODO: Fix `any` typing
+const configParser: ConfigParserFn<AutomodPluginType> = (options: any) => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
@@ -199,7 +200,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
 
   configSchema: ConfigSchema,
   defaultOptions,
-  configPreprocessor,
+  configParser,
 
   customOverrideCriteriaFunctions: {
     antiraid_level: (pluginData, matchParams, value) => {
