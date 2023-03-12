@@ -64,8 +64,8 @@ const defaultOptions = {
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
  */
-// TODO: Fix `any` typing
-const configParser: ConfigParserFn<AutomodPluginType> = (options: any) => {
+
+const configParser: ConfigParserFn<AutomodPluginType> = (options) => {
   if (options.config?.rules) {
     // Loop through each rule
     for (const [name, rule] of Object.entries(options.config.rules)) {
