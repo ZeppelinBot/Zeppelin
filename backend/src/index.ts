@@ -283,7 +283,7 @@ connect().then(async () => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub<ZeppelinGuildConfig, ZeppelinGlobalConfig>(client, {
+  const bot = new Knub(client, {
     guildPlugins,
     globalPlugins,
 
