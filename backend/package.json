@@ -28,7 +28,7 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "deep-diff": "^1.0.2",
-    "discord.js": "14.7.2-dev.1678536262-1b29099.0",
+    "discord.js": "^14.8.0",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "erlpack": "github:discord/erlpack",
@@ -102,11 +102,5 @@
     "require": [
       "./register-tsconfig-paths.js"
     ]
-  },
-  "overrides": {
-    "@discordjs/formatters": "0.1.1-dev.1678536268-1b29099.0",
-    "knub": {
-      "discord.js": "14.7.2-dev.1678536262-1b29099.0"
-    }
   }
 }
