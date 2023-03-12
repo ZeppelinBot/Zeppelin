@@ -66,6 +66,7 @@ export const StartThreadAction = automodAction({
         .create({
           name: threadName,
           autoArchiveDuration: autoArchive,
+          // @ts-expect-error FIXME
           type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
           startMessage:
             !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)

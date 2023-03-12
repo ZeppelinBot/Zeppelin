@@ -1,7 +1,7 @@
 import {
   Emoji,
   Guild,
-  GuildChannel,
+  GuildBasedChannel,
   GuildMember,
   Message,
   PartialGuildMember,
@@ -10,7 +10,6 @@ import {
   StageInstance,
   Sticker,
   StickerFormatType,
-  ThreadChannel,
   User,
 } from "discord.js";
 import { UnknownUser } from "src/utils";
@@ -269,7 +268,7 @@ export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMem
   });
 }
 
-export function channelToTemplateSafeChannel(channel: GuildChannel | ThreadChannel): TemplateSafeChannel {
+export function channelToTemplateSafeChannel(channel: GuildBasedChannel): TemplateSafeChannel {
   return new TemplateSafeChannel({
     id: channel.id,
     name: channel.name,
@@ -449,7 +448,7 @@ export function messageToTemplateSafeMessage(message: Message): TemplateSafeMess
     id: message.id,
     content: message.content,
     author: userToTemplateSafeUser(message.author),
-    channel: channelToTemplateSafeChannel(message.channel as GuildChannel | ThreadChannel),
+    channel: channelToTemplateSafeChannel(message.channel as GuildBasedChannel),
   });
 }
 

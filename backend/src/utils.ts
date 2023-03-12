@@ -401,7 +401,7 @@ export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 export type StrictMessageContent = {
   content?: string;
   tts?: boolean;
-  embeds?: EmbedData[];
+  embeds?: APIEmbed[];
 };
 
 export const tStrictMessageContent = t.type({

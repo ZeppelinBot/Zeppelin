@@ -1,4 +1,4 @@
-import { Snowflake } from "discord.js";
+import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { hasPermission } from "../../../pluginUtils";
@@ -15,8 +15,8 @@ import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel";
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
 
-  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake);
-  if (!channel?.isTextBased()) return;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as GuildTextBasedChannel;
+  if (!channel?.isTextBased() || channel.type === ChannelType.GuildStageVoice) return;
 
   // Don't apply slowmode if the lock was interrupted earlier (e.g. the message was caught by word filters)
   const thisMsgLock = await pluginData.locks.acquire(messageLock(msg));

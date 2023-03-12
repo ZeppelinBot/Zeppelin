@@ -1,4 +1,4 @@
-import { User } from "discord.js";
+import { AuditLogEvent, User } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { logger } from "../../../logger";

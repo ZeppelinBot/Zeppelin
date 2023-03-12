@@ -1,4 +1,4 @@
-import { EmbedData, MessageMentionTypes, Snowflake } from "discord.js";
+import { APIEmbed, MessageMentionTypes, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { allowTimeout } from "../../../RegExpRunner";
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";
@@ -141,7 +141,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
     const buffer = pluginData.state.buffers.get(channelId)!;
     buffer.push({
       content: typeof message === "string" ? message : message.content || "",
-      embeds: typeof message === "string" ? [] : ((message.embeds || []) as EmbedData[]),
+      embeds: typeof message === "string" ? [] : ((message.embeds || []) as APIEmbed[]),
     });
   }
 }

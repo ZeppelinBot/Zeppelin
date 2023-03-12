@@ -1,4 +1,4 @@
-import { GuildChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
@@ -8,9 +8,12 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
-  channel: GuildChannel & TextChannel,
+  channel: GuildTextBasedChannel,
   userId: string,
 ) {
+  // FIXME: Is there a better way to do this?
+  if (channel.isThread()) return;
+
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
   const existingOverride = channel.permissionOverwrites?.resolve(userId as Snowflake);
   try {

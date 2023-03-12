@@ -1,5 +1,4 @@
 import { configUtils, CooldownManager } from "knub";
-import { ConfigParserFn } from "knub/dist/config/configTypes";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";

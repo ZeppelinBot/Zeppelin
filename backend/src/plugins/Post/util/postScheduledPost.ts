@@ -57,7 +57,6 @@ export async function postScheduledPost(pluginData: GuildPluginData<PostPluginTy
       const postedMessage = await postMessage(
         pluginData,
         channel,
-        // @ts-expect-error
         post.content,
         post.attachments,
         post.enable_mentions,

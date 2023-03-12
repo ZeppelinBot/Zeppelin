@@ -43,7 +43,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
                 safeArgs[argKey] = userToTemplateSafeUser(argValue);
               } else if (argValue instanceof GuildMember) {
                 safeArgs[argKey] = memberToTemplateSafeMember(argValue);
-              } else if (argValue instanceof GuildChannel || argValue instanceof ThreadChannel) {
+              } else if (argValue instanceof GuildChannel && argValue.isTextBased()) {
                 safeArgs[argKey] = channelToTemplateSafeChannel(argValue);
               } else if (isScalar(argValue)) {
                 safeArgs[argKey] = argValue;

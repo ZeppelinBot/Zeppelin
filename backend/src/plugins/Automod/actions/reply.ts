@@ -121,7 +121,7 @@ export const ReplyAction = automodAction({
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
-          setTimeout(() => !replyMsg.deleted && replyMsg.delete().catch(noop), delay);
+          setTimeout(() => replyMsg.deletable && replyMsg.delete().catch(noop), delay);
         }
       }
     }
