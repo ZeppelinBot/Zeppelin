@@ -58,7 +58,8 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
             runEvent(pluginData, event, { msg: message, args }, values);
           },
         });
-        pluginData.commands.add(eventCommand);
+        // FIXME: Typings
+        // pluginData.messageCommands.add(eventCommand);
       }
     }
   },
