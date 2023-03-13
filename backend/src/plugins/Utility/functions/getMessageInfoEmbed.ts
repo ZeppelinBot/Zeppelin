@@ -136,6 +136,7 @@ export async function getMessageInfoEmbed(
   }
 
   if (message.embeds.length) {
+    // @ts-expect-error
     const prefix = pluginData.fullConfig.prefix || getDefaultPrefix(pluginData.client);
     embed.fields.push({
       name: preEmbedPadding + "Embeds",

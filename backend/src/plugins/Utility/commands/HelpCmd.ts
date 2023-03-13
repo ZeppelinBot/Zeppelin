@@ -32,6 +32,7 @@ export const HelpCmd = utilityCmd({
           if (strTrigger.startsWith(searchStr)) {
             matchingCommands.push({
               plugin,
+              // @ts-expect-error
               command: registeredCommand,
             });
             break;

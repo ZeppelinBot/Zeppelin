@@ -354,6 +354,7 @@ connect().then(async () => {
       sendSuccessMessageFn(channel, body) {
         const guildId =
           channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
+        // @ts-expect-error
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
         channel.send(successMessage(body, emoji));
       },
@@ -361,6 +362,7 @@ connect().then(async () => {
       sendErrorMessageFn(channel, body) {
         const guildId =
           channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
+        // @ts-expect-error
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
         channel.send(errorMessage(body, emoji));
       },

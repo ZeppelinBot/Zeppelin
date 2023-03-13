@@ -93,6 +93,11 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
 
 export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: ZeppelinPlugin["configParser"]) {
   return async (options: PluginOptions<any>, strict?: boolean) => {
+    const ident = `[getPluginConfigParser.${blueprint.name}] | `;
+    if (blueprint.name === "mutes") {
+      console.log(ident, "options => ", JSON.stringify(options));
+    }
+
     // 1. Validate the basic structure of plugin config
     const basicOptionsValidation = validate(BasicPluginStructureType, options);
     if (basicOptionsValidation instanceof StrictValidationError) {
@@ -142,7 +147,7 @@ export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: 
       }
     }
 
-    // 3. Run custom preprocessor, if any
+    // 3. Run custom parser, if any
     if (customParser) {
       options = await customParser(options);
     }
@@ -156,6 +161,7 @@ export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: 
         ? decodeAndValidateStrict(blueprint.configSchema, options.config)
         : options.config;
       if (decodedConfig instanceof StrictValidationError) {
+        console.error("4.strict:", blueprint.name);
         throw strictValidationErrorToConfigValidationError(decodedConfig);
       }
     }
@@ -167,6 +173,7 @@ export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: 
           ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
           : overrideConfigMergedWithBaseConfig;
         if (decodedOverrideConfig instanceof StrictValidationError) {
+          console.error("4.overrides.strict:", blueprint.name, options, decodedOverrideConfig);
           throw strictValidationErrorToConfigValidationError(decodedOverrideConfig);
         }
         decodedOverrides.push({
@@ -227,11 +234,13 @@ export async function sendErrorMessage(
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  // @ts-expect-error
   return knub.getGlobalConfig().url;
 }
 
 export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  // @ts-expect-error
   const owners = knub.getGlobalConfig()?.owners;
   if (!owners) {
     return false;
