@@ -1,18 +1,18 @@
-import { parseSignature, guildPluginMessageCommand } from "knub";
+import { GuildChannel, GuildMember, User } from "discord.js";
+import { guildPluginMessageCommand, parseSignature } from "knub";
 import { commandTypes } from "../../commandTypes";
-import { UnknownUser } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { runEvent } from "./functions/runEvent";
-import { ConfigSchema, CustomEventsPluginType } from "./types";
 import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
-import { GuildChannel, GuildMember, ThreadChannel, User } from "discord.js";
+import { UnknownUser } from "../../utils";
+import { isScalar } from "../../utils/isScalar";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import { isScalar } from "../../utils/isScalar";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { runEvent } from "./functions/runEvent";
+import { ConfigSchema, CustomEventsPluginType } from "./types";
 
 const defaultOptions = {
   config: {

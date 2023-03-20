@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/dist/helpers";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DAYS, SECONDS, errorMessage, resolveMember, resolveUser } from "../../../utils";
+import { DAYS, errorMessage, resolveMember, resolveUser, SECONDS } from "../../../utils";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";

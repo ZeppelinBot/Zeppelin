@@ -12,6 +12,7 @@ import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigReloaderPlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
+import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
 import { LocateUserPlugin } from "./LocateUser/LocateUserPlugin";
 import { LogsPlugin } from "./Logs/LogsPlugin";
 import { MessageSaverPlugin } from "./MessageSaver/MessageSaverPlugin";
@@ -19,10 +20,13 @@ import { ModActionsPlugin } from "./ModActions/ModActionsPlugin";
 import { MutesPlugin } from "./Mutes/MutesPlugin";
 import { NameHistoryPlugin } from "./NameHistory/NameHistoryPlugin";
 import { PersistPlugin } from "./Persist/PersistPlugin";
+import { PhishermanPlugin } from "./Phisherman/PhishermanPlugin";
 import { PingableRolesPlugin } from "./PingableRoles/PingableRolesPlugin";
 import { PostPlugin } from "./Post/PostPlugin";
 import { ReactionRolesPlugin } from "./ReactionRoles/ReactionRolesPlugin";
 import { RemindersPlugin } from "./Reminders/RemindersPlugin";
+import { RoleButtonsPlugin } from "./RoleButtons/RoleButtonsPlugin";
+import { RoleManagerPlugin } from "./RoleManager/RoleManagerPlugin";
 import { RolesPlugin } from "./Roles/RolesPlugin";
 import { SelfGrantableRolesPlugin } from "./SelfGrantableRoles/SelfGrantableRolesPlugin";
 import { SlowmodePlugin } from "./Slowmode/SlowmodePlugin";
@@ -34,10 +38,6 @@ import { UsernameSaverPlugin } from "./UsernameSaver/UsernameSaverPlugin";
 import { UtilityPlugin } from "./Utility/UtilityPlugin";
 import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
 import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
-import { PhishermanPlugin } from "./Phisherman/PhishermanPlugin";
-import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
-import { RoleManagerPlugin } from "./RoleManager/RoleManagerPlugin";
-import { RoleButtonsPlugin } from "./RoleButtons/RoleButtonsPlugin";
 
 // prettier-ignore
 export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [

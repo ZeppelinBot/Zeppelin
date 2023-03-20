@@ -1,9 +1,9 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
 import { ConfigSchema, WelcomeMessagePluginType } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   config: {

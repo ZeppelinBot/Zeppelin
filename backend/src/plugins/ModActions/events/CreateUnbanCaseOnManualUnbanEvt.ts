@@ -2,12 +2,12 @@ import { AuditLogEvent, User } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { resolveUser, UnknownUser } from "../../../utils";
+import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { clearIgnoredEvents } from "../functions/clearIgnoredEvents";
 import { isEventIgnored } from "../functions/isEventIgnored";
 import { IgnoredEventType, modActionsEvt } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
 
 /**
  * Create an UNBAN case automatically when a user is unbanned manually.

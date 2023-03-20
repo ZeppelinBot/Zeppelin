@@ -10,9 +10,11 @@ import { registerEventListenersFromMap } from "../../utils/registerEventListener
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
 import { StrictValidationError } from "../../validatorUtils";
 import { CountersPlugin } from "../Counters/CountersPlugin";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
+import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { availableActions } from "./actions/availableActions";
 import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
@@ -34,8 +36,6 @@ import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { pluginInfo } from "./info";
 import { availableTriggers } from "./triggers/availableTriggers";
 import { AutomodPluginType, ConfigSchema } from "./types";
-import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin";
-import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 
 const defaultOptions = {
   config: {

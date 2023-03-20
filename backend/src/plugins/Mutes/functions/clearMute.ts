@@ -1,11 +1,11 @@
+import { GuildMember } from "discord.js";
+import { GuildPluginData } from "knub";
 import { Mute } from "../../../data/entities/Mute";
+import { clearExpiringMute } from "../../../data/loops/expiringMutesLoop";
 import { resolveMember, verboseUserMention } from "../../../utils";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { GuildPluginData } from "knub";
 import { MutesPluginType } from "../types";
-import { clearExpiringMute } from "../../../data/loops/expiringMutesLoop";
-import { GuildMember } from "discord.js";
 
 export async function clearMute(
   pluginData: GuildPluginData<MutesPluginType>,

@@ -12,9 +12,9 @@ import {
   StickerFormatType,
   User,
 } from "discord.js";
-import { UnknownUser } from "src/utils";
 import { GuildPluginData } from "knub";
-import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../templateFormatter";
+import { UnknownUser } from "src/utils";
+import { Case } from "../data/entities/Case";
 import {
   ISavedMessageAttachmentData,
   ISavedMessageData,
@@ -22,7 +22,7 @@ import {
   ISavedMessageStickerData,
   SavedMessage,
 } from "../data/entities/SavedMessage";
-import { Case } from "../data/entities/Case";
+import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../templateFormatter";
 
 type InputProps<T> = Omit<
   {

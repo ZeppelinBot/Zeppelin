@@ -1,13 +1,13 @@
 import { APIEmbed, MessageMentionTypes, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
+import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { isDiscordAPIError, MINUTES } from "../../../utils";
+import { MessageBuffer } from "../../../utils/MessageBuffer";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
-import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { LogType } from "../../../data/LogType";
-import { MessageBuffer } from "../../../utils/MessageBuffer";
-import { isDiscordAPIError, MINUTES } from "../../../utils";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];

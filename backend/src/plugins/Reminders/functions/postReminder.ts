@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { RemindersPluginType } from "../types";
-import { Reminder } from "../../../data/entities/Reminder";
 import { HTTPError, Snowflake } from "discord.js";
-import moment from "moment-timezone";
+import { GuildPluginData } from "knub";
 import { disableLinkPreviews } from "knub/dist/helpers";
+import moment from "moment-timezone";
+import { Reminder } from "../../../data/entities/Reminder";
 import { DBDateFormat } from "../../../utils";
+import { RemindersPluginType } from "../types";
 
 export async function postReminder(pluginData: GuildPluginData<RemindersPluginType>, reminder: Reminder) {
   const channel = pluginData.guild.channels.cache.get(reminder.channel_id as Snowflake);

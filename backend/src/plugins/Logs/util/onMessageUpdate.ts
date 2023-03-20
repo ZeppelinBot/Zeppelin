@@ -3,8 +3,8 @@ import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveUser } from "../../../utils";
-import { LogsPluginType } from "../types";
 import { logMessageEdit } from "../logFunctions/logMessageEdit";
+import { LogsPluginType } from "../types";
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,

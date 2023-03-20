@@ -3,8 +3,8 @@ import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { isDiscordAPIError, UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { SlowmodePluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { SlowmodePluginType } from "../types";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,

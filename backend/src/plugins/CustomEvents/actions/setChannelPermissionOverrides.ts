@@ -1,9 +1,9 @@
-import { Snowflake, PermissionsString, PermissionsBitField } from "discord.js";
+import { PermissionsBitField, PermissionsString, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),

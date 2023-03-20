@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";

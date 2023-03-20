@@ -1,8 +1,8 @@
+import { ButtonStyle } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { tMessageContent, tNullable } from "../../utils";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { ButtonStyle } from "discord.js";
+import { tMessageContent, tNullable } from "../../utils";
 
 const RoleButtonOption = t.type({
   role_id: t.string,

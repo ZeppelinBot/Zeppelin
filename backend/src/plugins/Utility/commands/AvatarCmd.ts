@@ -1,4 +1,4 @@
-import { ImageFormat, APIEmbed } from "discord.js";
+import { APIEmbed, ImageFormat } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { UnknownUser } from "../../../utils";

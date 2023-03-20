@@ -9,6 +9,7 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
 import { mapToPublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS, trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
@@ -16,14 +17,13 @@ import { TagDeleteCmd } from "./commands/TagDeleteCmd";
 import { TagEvalCmd } from "./commands/TagEvalCmd";
 import { TagListCmd } from "./commands/TagListCmd";
 import { TagSourceCmd } from "./commands/TagSourceCmd";
+import { generateTemplateMarkdown } from "./docs";
+import { TemplateFunctions } from "./templateFunctions";
 import { ConfigSchema, TagsPluginType } from "./types";
 import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { generateTemplateMarkdown } from "./docs";
-import { TemplateFunctions } from "./templateFunctions";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {

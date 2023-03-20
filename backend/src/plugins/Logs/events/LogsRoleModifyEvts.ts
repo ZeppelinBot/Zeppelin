@@ -1,10 +1,10 @@
+import { Role } from "discord.js";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { logsEvt } from "../types";
+import { filterObject } from "../../../utils/filterObject";
 import { logRoleCreate } from "../logFunctions/logRoleCreate";
 import { logRoleDelete } from "../logFunctions/logRoleDelete";
 import { logRoleUpdate } from "../logFunctions/logRoleUpdate";
-import { Role } from "discord.js";
-import { filterObject } from "../../../utils/filterObject";
+import { logsEvt } from "../types";
 
 export const LogsRoleCreateEvt = logsEvt({
   event: "roleCreate",

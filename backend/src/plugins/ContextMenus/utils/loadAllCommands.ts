@@ -1,6 +1,6 @@
 import { ApplicationCommandData, ApplicationCommandType } from "discord.js";
-import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { GuildPluginData } from "knub";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { ContextMenuPluginType } from "../types";
 import { hardcodedContext } from "./hardcodedContextOptions";
 

@@ -1,9 +1,9 @@
+import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { GuildArchives } from "../../../data/GuildArchives";
 import { getBaseUrl } from "../../../pluginUtils";
 import { sorter } from "../../../utils";
 import { botControlCmd } from "../types";
-import { GuildArchives } from "../../../data/GuildArchives";
-import moment from "moment-timezone";
 
 const sortProps = {
   totalTime: "TOTAL TIME",

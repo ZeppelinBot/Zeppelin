@@ -1,12 +1,12 @@
 import * as t from "io-ts";
 import {
   BasePluginType,
+  globalPlugin,
   GlobalPluginBlueprint,
   GlobalPluginData,
+  guildPlugin,
   GuildPluginBlueprint,
   GuildPluginData,
-  globalPlugin,
-  guildPlugin,
 } from "knub";
 import { PluginOptions } from "knub/dist/config/configTypes";
 import { Awaitable } from "knub/dist/utils";

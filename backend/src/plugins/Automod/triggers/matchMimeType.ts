@@ -1,7 +1,7 @@
-import { automodTrigger } from "../helpers";
+import { escapeInlineCode } from "discord.js";
 import * as t from "io-ts";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
-import { escapeInlineCode } from "discord.js";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   matchedType: string;

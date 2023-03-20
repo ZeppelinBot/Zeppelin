@@ -1,15 +1,15 @@
+import { escapeInlineCode } from "discord.js";
 import * as t from "io-ts";
+import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 import { allowTimeout } from "../../../RegExpRunner";
 import { getUrlsInString, tNullable } from "../../../utils";
+import { mergeRegexes } from "../../../utils/mergeRegexes";
+import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
 import { TRegex } from "../../../validatorUtils";
+import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
-import { mergeRegexes } from "../../../utils/mergeRegexes";
-import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
-import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
-import { phishermanDomainIsSafe } from "../../../data/Phisherman";
-import { escapeInlineCode } from "discord.js";
 
 interface MatchResultType {
   type: MatchableTextType;

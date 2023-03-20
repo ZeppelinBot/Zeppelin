@@ -1,11 +1,11 @@
+import { Guild } from "discord.js";
 import * as t from "io-ts";
 import { guildPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
+import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { MINUTES } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildInfoSaverPluginType } from "./types";
-import { Guild } from "discord.js";
-import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 
 export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType>()({
   name: "guild_info_saver",

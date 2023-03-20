@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { isGuildInvite, resolveInvite } from "../../../utils";
-import { botControlCmd } from "../types";
 import { isEligible } from "../functions/isEligible";
+import { botControlCmd } from "../types";
 
 export const EligibleCmd = botControlCmd({
   trigger: ["eligible", "is_eligible", "iseligible"],

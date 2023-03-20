@@ -1,4 +1,5 @@
 import { PluginOptions } from "knub";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
 import { trimPluginDescription } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -8,9 +9,8 @@ import { WhereCmd } from "./commands/WhereCmd";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { ConfigSchema, LocateUserPluginType } from "./types";
-import { fillActiveAlertsList } from "./utils/fillAlertsList";
-import { onGuildEvent } from "../../data/GuildEvents";
 import { clearExpiredAlert } from "./utils/clearExpiredAlert";
+import { fillActiveAlertsList } from "./utils/fillAlertsList";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {

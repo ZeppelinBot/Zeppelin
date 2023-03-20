@@ -1,8 +1,8 @@
+import { Message, MessageCreateOptions, MessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Message, MessageEditOptions, MessageCreateOptions } from "discord.js";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types";
 import { createButtonComponents } from "./createButtonComponents";
 
 export async function applyRoleButtons(

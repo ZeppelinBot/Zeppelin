@@ -1,11 +1,11 @@
+import { GuildMember, VoiceBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { VoiceBasedChannel, GuildMember } from "discord.js";
-import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
+import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogVoiceChannelLeaveData {
   member: GuildMember;

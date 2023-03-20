@@ -1,18 +1,18 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { GuildTextBasedChannel, User } from "discord.js";
+import { GuildPluginData } from "knub";
+import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
+import { resolveChannelIds } from "src/utils/resolveChannelIds";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { UnknownUser } from "../../../utils";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { UnknownUser } from "../../../utils";
-import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
-import { resolveChannelIds } from "src/utils/resolveChannelIds";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogCensorData {
   user: User | UnknownUser;

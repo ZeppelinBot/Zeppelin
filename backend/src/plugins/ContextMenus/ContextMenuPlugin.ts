@@ -2,11 +2,11 @@ import { PluginOptions } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
+import { UtilityPlugin } from "../Utility/UtilityPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ContextClickedEvt } from "./events/ContextClickedEvt";
 import { ConfigSchema, ContextMenuPluginType } from "./types";
 import { loadAllCommands } from "./utils/loadAllCommands";
-import { UtilityPlugin } from "../Utility/UtilityPlugin";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {

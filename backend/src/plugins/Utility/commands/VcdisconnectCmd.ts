@@ -1,8 +1,8 @@
 import { VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { utilityCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { utilityCmd } from "../types";
 
 export const VcdisconnectCmd = utilityCmd({
   trigger: ["vcdisconnect", "vcdisc", "vcdc", "vckick", "vck"],

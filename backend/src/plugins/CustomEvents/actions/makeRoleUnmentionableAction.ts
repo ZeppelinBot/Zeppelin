@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const MakeRoleUnmentionableAction = t.type({
   type: t.literal("make_role_unmentionable"),

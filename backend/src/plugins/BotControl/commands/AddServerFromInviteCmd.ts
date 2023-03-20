@@ -1,10 +1,10 @@
 import { ApiPermissions } from "@shared/apiPermissions";
+import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils";
-import { botControlCmd } from "../types";
-import moment from "moment-timezone";
 import { isEligible } from "../functions/isEligible";
+import { botControlCmd } from "../types";
 
 export const AddServerFromInviteCmd = botControlCmd({
   trigger: ["add_server_from_invite", "allow_server_from_invite", "adv"],

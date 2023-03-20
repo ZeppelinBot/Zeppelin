@@ -1,11 +1,11 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { AnyThreadChannel } from "discord.js";
-import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
+import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogThreadDeleteData {
   thread: AnyThreadChannel;

@@ -1,11 +1,11 @@
 import { PluginOptions } from "knub";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, InternalPosterPluginType } from "./types";
-import { mapToPublicFn } from "../../pluginUtils";
 import { Webhooks } from "../../data/Webhooks";
+import { mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
-import { sendMessage } from "./functions/sendMessage";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { editMessage } from "./functions/editMessage";
+import { sendMessage } from "./functions/sendMessage";
+import { ConfigSchema, InternalPosterPluginType } from "./types";
 
 const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   config: {},

@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
-import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { Case } from "../../data/entities/Case";
 import { Mute } from "../../data/entities/Mute";
 import { GuildArchives } from "../../data/GuildArchives";

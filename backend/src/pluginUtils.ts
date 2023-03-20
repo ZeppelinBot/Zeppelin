@@ -10,11 +10,11 @@ import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // T
 import { AnyPluginData } from "knub/dist/plugins/PluginData";
 import { logger } from "./logger";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
 import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
 import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
-import { isStaff } from "./staff";
 
 const { getMemberLevel } = helpers;
 

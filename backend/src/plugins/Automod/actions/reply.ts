@@ -1,6 +1,5 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import * as t from "io-ts";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
@@ -14,10 +13,11 @@ import {
   verboseChannelMention,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
 export const ReplyAction = automodAction({
   configType: t.union([

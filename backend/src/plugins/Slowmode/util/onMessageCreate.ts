@@ -1,6 +1,7 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel";
 import { hasPermission } from "../../../pluginUtils";
 import { resolveMember } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
@@ -10,7 +11,6 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { SlowmodePluginType } from "../types";
 import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
-import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;

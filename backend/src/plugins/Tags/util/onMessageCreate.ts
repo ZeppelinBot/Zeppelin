@@ -5,9 +5,9 @@ import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { validate } from "../../../validatorUtils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;

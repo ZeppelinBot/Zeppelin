@@ -3,8 +3,8 @@ import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { getBaseUrl } from "../../../pluginUtils";
-import { LogsPluginType } from "../types";
 import { logMessageDeleteBulk } from "../logFunctions/logMessageDeleteBulk";
+import { LogsPluginType } from "../types";
 import { isLogIgnored } from "./isLogIgnored";
 
 export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPluginType>, savedMessages: SavedMessage[]) {

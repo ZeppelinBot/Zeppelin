@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, guildPluginMessageCommand, guildPluginEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
 
 export const ConfigSchema = t.type({

@@ -2,12 +2,12 @@ import { MessageCreateOptions, NewsChannel, RESTJSONErrorCodes, Snowflake, TextC
 import { GuildPluginData } from "knub";
 import { Case } from "../../../data/entities/Case";
 import { isDiscordAPIError } from "../../../utils";
+import { InternalPosterMessageResult } from "../../InternalPoster/functions/sendMessage";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CasesPluginType } from "../types";
 import { getCaseEmbed } from "./getCaseEmbed";
 import { resolveCaseId } from "./resolveCaseId";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
-import { InternalPosterMessageResult } from "../../InternalPoster/functions/sendMessage";
 
 export async function postToCaseLogChannel(
   pluginData: GuildPluginData<CasesPluginType>,

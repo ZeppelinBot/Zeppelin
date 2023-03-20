@@ -2,6 +2,7 @@ import { GuildMember, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { mapToPublicFn } from "../../pluginUtils";
@@ -14,13 +15,12 @@ import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { MutesCmd } from "./commands/MutesCmd";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
+import { clearMute } from "./functions/clearMute";
 import { muteUser } from "./functions/muteUser";
 import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { unmuteUser } from "./functions/unmuteUser";
 import { ConfigSchema, MutesPluginType } from "./types";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { clearMute } from "./functions/clearMute";
 
 const defaultOptions = {
   config: {

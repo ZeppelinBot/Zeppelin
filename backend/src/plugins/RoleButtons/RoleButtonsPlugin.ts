@@ -1,15 +1,15 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, RoleButtonsPluginType } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { StrictValidationError } from "../../validatorUtils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { resetButtonsCmd } from "./commands/resetButtons";
 import { onButtonInteraction } from "./events/buttonInteraction";
-import { pluginInfo } from "./info";
+import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { createButtonComponents } from "./functions/createButtonComponents";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError";
-import { resetButtonsCmd } from "./commands/resetButtons";
+import { pluginInfo } from "./info";
+import { ConfigSchema, RoleButtonsPluginType } from "./types";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",

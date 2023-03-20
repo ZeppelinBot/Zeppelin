@@ -1,10 +1,10 @@
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { MessageCreateOptions } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { TemplateParseError } from "../../../templateFormatter";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
-import { MessageCreateOptions } from "discord.js";
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",

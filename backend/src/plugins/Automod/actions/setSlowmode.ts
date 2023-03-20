@@ -1,8 +1,8 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
-import { automodAction } from "../helpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({

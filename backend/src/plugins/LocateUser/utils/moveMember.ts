@@ -1,4 +1,4 @@
-import { GuildMember, Snowflake, GuildTextBasedChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { LocateUserPluginType } from "../types";

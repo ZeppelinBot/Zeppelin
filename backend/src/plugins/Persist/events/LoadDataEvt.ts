@@ -1,4 +1,4 @@
-import { PermissionFlagsBits, GuildMemberEditOptions } from "discord.js";
+import { GuildMemberEditOptions, PermissionFlagsBits } from "discord.js";
 import intersection from "lodash.intersection";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";

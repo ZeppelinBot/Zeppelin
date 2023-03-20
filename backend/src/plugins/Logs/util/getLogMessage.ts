@@ -18,14 +18,14 @@ import {
   verboseUserMention,
   verboseUserName,
 } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types";
 import {
   getTemplateSafeMemberLevel,
-  TemplateSafeMember,
   memberToTemplateSafeMember,
+  TemplateSafeMember,
   TemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types";
 
 export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   pluginData: GuildPluginData<LogsPluginType>,

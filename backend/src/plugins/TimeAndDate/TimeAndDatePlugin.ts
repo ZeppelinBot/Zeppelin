@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
-import { getPluginConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";

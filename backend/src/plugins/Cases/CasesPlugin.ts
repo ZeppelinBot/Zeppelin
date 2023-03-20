@@ -5,6 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { mapToPublicFn } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { createCase } from "./functions/createCase";
@@ -16,7 +17,6 @@ import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
 import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
 import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
-import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 
 const defaultOptions = {
   config: {

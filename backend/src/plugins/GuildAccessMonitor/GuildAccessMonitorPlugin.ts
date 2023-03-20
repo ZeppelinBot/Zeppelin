@@ -2,9 +2,9 @@ import { Guild } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType, GlobalPluginData, globalPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
-import { env } from "../../env";
 import { Configs } from "../../data/Configs";
+import { env } from "../../env";
+import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   config: {};

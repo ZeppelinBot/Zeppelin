@@ -1,8 +1,8 @@
 import { guildPluginMessageCommand } from "knub";
-import { RoleButtonsPluginType } from "../types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { applyAllRoleButtons } from "../functions/applyAllRoleButtons";
+import { RoleButtonsPluginType } from "../types";
 
 export const resetButtonsCmd = guildPluginMessageCommand<RoleButtonsPluginType>()({
   trigger: "role_buttons reset",

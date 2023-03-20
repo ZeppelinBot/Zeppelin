@@ -3,8 +3,8 @@ import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
 import { resolveUser } from "../../../utils";
-import { CensorPluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { CensorPluginType } from "../types";
 
 export async function censorMessage(
   pluginData: GuildPluginData<CensorPluginType>,

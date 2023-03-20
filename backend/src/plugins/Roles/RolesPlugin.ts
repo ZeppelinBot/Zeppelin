@@ -1,13 +1,13 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { trimPluginDescription } from "../../utils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddRoleCmd } from "./commands/AddRoleCmd";
 import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
 import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
 import { ConfigSchema, RolesPluginType } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {

@@ -1,10 +1,10 @@
+import type { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { resolveUser } from "../../../utils";
 import { CaseArgs, CasesPluginType } from "../types";
 import { createCaseNote } from "./createCaseNote";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
-import type { Snowflake } from "discord.js";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
   const user = await resolveUser(pluginData.client, args.userId);

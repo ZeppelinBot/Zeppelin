@@ -2,8 +2,8 @@ import { ActivityType, Embed } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
-import { AutomodPluginType } from "../types";
 import { DeepMutable } from "../../../utils/typeUtils.js";
+import { AutomodPluginType } from "../types";
 
 type TextTriggerWithMultipleMatchTypes = {
   match_messages: boolean;

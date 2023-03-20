@@ -1,14 +1,14 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { tNullable, isValidSnowflake, tPartialDictionary } from "../../../utils";
 import { noop } from "knub/dist/utils";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { isValidSnowflake, tNullable, tPartialDictionary } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { automodAction } from "../helpers";
 
 export const ChangePermsAction = automodAction({
   configType: t.type({

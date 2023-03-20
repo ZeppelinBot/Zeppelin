@@ -1,7 +1,7 @@
 import { Message, MessageEditOptions, WebhookClient, WebhookMessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
 import { isDiscordAPIError, noop } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 
 /**
  * Sends a message using a webhook or direct API requests, preferring webhooks when possible.

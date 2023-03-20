@@ -3,8 +3,8 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 
 export async function updateCase(pluginData, msg: Message, args) {
   let theCase: Case | undefined;

@@ -1,11 +1,11 @@
 import { GuildTextBasedChannel, PermissionsBitField } from "discord.js";
+import { AutoReaction } from "../../../data/entities/AutoReaction";
 import { isDiscordAPIError } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { autoReactionsEvt } from "../types";
-import { AutoReaction } from "../../../data/entities/AutoReaction";
 
 const p = PermissionsBitField.Flags;
 

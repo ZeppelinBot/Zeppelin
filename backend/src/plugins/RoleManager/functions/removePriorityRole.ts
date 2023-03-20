@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { RoleManagerPluginType } from "../types";
 import { PRIORITY_ROLE_PRIORITY } from "../constants";
+import { RoleManagerPluginType } from "../types";
 import { runRoleAssignmentLoop } from "./runRoleAssignmentLoop";
 
 export async function removePriorityRole(

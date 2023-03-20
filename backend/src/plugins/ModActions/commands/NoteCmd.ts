@@ -3,9 +3,9 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const NoteCmd = modActionsCmd({
   trigger: "note",

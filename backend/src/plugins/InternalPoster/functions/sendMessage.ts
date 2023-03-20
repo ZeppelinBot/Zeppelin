@@ -1,9 +1,9 @@
 import { GuildTextBasedChannel, MessageCreateOptions, WebhookClient } from "discord.js";
 import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
-import { channelIsWebhookable } from "./getOrCreateWebhookForChannel";
 import { isDiscordAPIError } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel";
+import { channelIsWebhookable } from "./getOrCreateWebhookForChannel";
 
 export type InternalPosterMessageResult = {
   id: string;

@@ -1,11 +1,11 @@
 import { getRepository, In, InsertResult, Repository } from "typeorm";
+import { Queue } from "../Queue";
+import { chunkArray } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { CaseTypes } from "./CaseTypes";
 import { connection } from "./db";
 import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
-import { chunkArray } from "../utils";
-import { Queue } from "../Queue";
 
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 

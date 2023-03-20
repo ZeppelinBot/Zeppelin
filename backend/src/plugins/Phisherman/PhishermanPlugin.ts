@@ -1,10 +1,10 @@
 import { PluginOptions } from "knub";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, PhishermanPluginType } from "./types";
 import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
 import { mapToPublicFn } from "../../pluginUtils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { pluginInfo } from "./info";
+import { ConfigSchema, PhishermanPluginType } from "./types";
 
 const defaultOptions: PluginOptions<PhishermanPluginType> = {
   config: {

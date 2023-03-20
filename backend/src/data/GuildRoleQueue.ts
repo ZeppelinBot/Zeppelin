@@ -1,7 +1,7 @@
 import { getRepository, Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { RoleQueueItem } from "./entities/RoleQueueItem";
 import { connection } from "./db";
+import { RoleQueueItem } from "./entities/RoleQueueItem";
 
 export class GuildRoleQueue extends BaseGuildRepository {
   private roleQueue: Repository<RoleQueueItem>;

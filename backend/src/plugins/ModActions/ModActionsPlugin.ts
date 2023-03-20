@@ -1,6 +1,7 @@
 import { GuildMember, Message, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildCases } from "../../data/GuildCases";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
@@ -8,6 +9,7 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { MINUTES, trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -37,6 +39,7 @@ import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEv
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
 import { banUserId } from "./functions/banUserId";
+import { clearTempban } from "./functions/clearTempban";
 import { hasMutePermission } from "./functions/hasMutePerm";
 import { kickMember } from "./functions/kickMember";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
@@ -44,9 +47,6 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { clearTempban } from "./functions/clearTempban";
 
 const defaultOptions = {
   config: {

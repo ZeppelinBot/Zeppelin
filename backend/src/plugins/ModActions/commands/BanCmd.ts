@@ -2,18 +2,18 @@ import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/dist/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
 import { banLock } from "../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { banUserId } from "../functions/banUserId";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 
 const opts = {
   mod: ct.member({ option: true }),

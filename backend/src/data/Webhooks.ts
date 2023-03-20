@@ -1,7 +1,7 @@
 import { getRepository, Repository } from "typeorm";
-import { Webhook } from "./entities/Webhook";
-import { BaseRepository } from "./BaseRepository";
 import { decrypt, encrypt } from "../utils/crypt";
+import { BaseRepository } from "./BaseRepository";
+import { Webhook } from "./entities/Webhook";
 
 export class Webhooks extends BaseRepository {
   repository: Repository<Webhook> = getRepository(Webhook);

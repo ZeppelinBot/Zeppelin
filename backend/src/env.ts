@@ -1,8 +1,8 @@
-import path from "path";
-import fs from "fs";
 import dotenv from "dotenv";
-import { rootDir } from "./paths";
+import fs from "fs";
+import path from "path";
 import { z } from "zod";
+import { rootDir } from "./paths";
 
 const envType = z.object({
   KEY: z.string().length(32),

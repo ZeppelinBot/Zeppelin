@@ -1,6 +1,6 @@
 import { Profiler } from "knub/dist/Profiler";
 import { performance } from "perf_hooks";
-import { SECONDS, noop } from "../utils";
+import { noop, SECONDS } from "../utils";
 
 let _profilingEnabled = false;
 

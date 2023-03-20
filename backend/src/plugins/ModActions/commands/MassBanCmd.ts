@@ -7,11 +7,11 @@ import { LogType } from "../../../data/LogType";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DAYS, MINUTES, SECONDS, noop } from "../../../utils";
+import { DAYS, MINUTES, noop, SECONDS } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",

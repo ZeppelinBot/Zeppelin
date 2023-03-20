@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, Attachment, MessageCreateOptions } from "discord.js";
+import { Attachment, GuildTextBasedChannel, MessageCreateOptions } from "discord.js";
 import fs from "fs";
 import { downloadFile } from "../../utils";
 const fsp = fs.promises;

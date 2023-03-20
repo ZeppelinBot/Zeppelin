@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, globalPluginMessageCommand, globalPluginEventListener } from "knub";
+import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";

@@ -12,6 +12,7 @@
     "husky": "^3.0.9",
     "lint-staged": "^9.4.2",
     "prettier": "^2.8.4",
+    "prettier-plugin-organize-imports": "^3.2.2",
     "tslint": "^5.13.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "~4.9.5"

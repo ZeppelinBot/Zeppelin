@@ -1,7 +1,7 @@
-import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
 import { GuildBasedChannel, PermissionsBitField } from "discord.js";
+import { GuildPluginData } from "knub";
 import { isDiscordAPIError } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 
 type WebhookInfo = [id: string, token: string];
 

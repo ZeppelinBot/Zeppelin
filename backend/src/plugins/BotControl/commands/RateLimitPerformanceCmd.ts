@@ -1,8 +1,8 @@
-import { botControlCmd } from "../types";
-import { getRateLimitStats } from "../../../rateLimitStats";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../../data/GuildArchives";
 import { getBaseUrl, sendSuccessMessage } from "../../../pluginUtils";
+import { getRateLimitStats } from "../../../rateLimitStats";
+import { botControlCmd } from "../types";
 
 export const RateLimitPerformanceCmd = botControlCmd({
   trigger: ["rate_limit_performance"],

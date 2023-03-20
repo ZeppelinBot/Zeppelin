@@ -9,19 +9,19 @@ import {
   TemplateSafeValueContainer,
 } from "../../../templateFormatter";
 import {
+  chunkMessageLines,
+  isTruthy,
   messageLink,
   tAllowedMentions,
   tNormalizedNullOptional,
-  isTruthy,
-  verboseChannelMention,
   validateAndParseMessageContent,
-  chunkMessageLines,
+  verboseChannelMention,
 } from "../../../utils";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 export const AlertAction = automodAction({
   configType: t.type({

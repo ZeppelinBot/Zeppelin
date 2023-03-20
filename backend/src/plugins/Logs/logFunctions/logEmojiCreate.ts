@@ -1,10 +1,10 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { Emoji } from "discord.js";
+import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { emojiToTemplateSafeEmoji } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogEmojiCreateData {
   emoji: Emoji;

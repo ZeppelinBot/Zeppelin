@@ -5,9 +5,9 @@ import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",

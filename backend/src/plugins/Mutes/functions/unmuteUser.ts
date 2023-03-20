@@ -5,10 +5,10 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { resolveMember, resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseArgs } from "../../Cases/types";
-import { MutesPluginType, UnmuteResult } from "../types";
-import { memberHasMutedRole } from "./memberHasMutedRole";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { MutesPluginType, UnmuteResult } from "../types";
 import { clearMute } from "./clearMute";
+import { memberHasMutedRole } from "./memberHasMutedRole";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,

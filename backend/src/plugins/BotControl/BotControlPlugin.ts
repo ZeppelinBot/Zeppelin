@@ -7,22 +7,22 @@ import { sendSuccessMessage } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
+import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
 import { AllowServerCmd } from "./commands/AllowServerCmd";
+import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
 import { DisallowServerCmd } from "./commands/DisallowServerCmd";
 import { EligibleCmd } from "./commands/EligibleCmd";
 import { LeaveServerCmd } from "./commands/LeaveServerCmd";
 import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
 import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
+import { ProfilerDataCmd } from "./commands/ProfilerDataCmd";
+import { RateLimitPerformanceCmd } from "./commands/RateLimitPerformanceCmd";
 import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
 import { ReloadServerCmd } from "./commands/ReloadServerCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
+import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
-import { ProfilerDataCmd } from "./commands/ProfilerDataCmd";
-import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
-import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
-import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
-import { RateLimitPerformanceCmd } from "./commands/RateLimitPerformanceCmd";
 
 const defaultOptions = {
   config: {

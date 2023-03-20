@@ -1,16 +1,16 @@
 import {
-  GuildChannel,
-  GuildMember,
-  Snowflake,
-  User,
-  GuildTextBasedChannel,
   escapeCodeBlock,
   escapeInlineCode,
+  GuildChannel,
+  GuildMember,
+  GuildTextBasedChannel,
+  Snowflake,
+  User,
 } from "discord.js";
 import {
   baseCommandParameterTypeHelpers,
-  messageCommandBaseTypeConverters,
   CommandContext,
+  messageCommandBaseTypeConverters,
   TypeConversionError,
 } from "knub";
 import { createTypeHelper } from "knub-command-manager";

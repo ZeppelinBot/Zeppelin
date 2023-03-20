@@ -1,11 +1,11 @@
 // tslint:disable:no-console
 
-import { lazyMemoize, MINUTES } from "../../utils";
-import { Mutes } from "../Mutes";
-import Timeout = NodeJS.Timeout;
 import moment from "moment-timezone";
+import { lazyMemoize, MINUTES } from "../../utils";
 import { Mute } from "../entities/Mute";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents";
+import { Mutes } from "../Mutes";
+import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;

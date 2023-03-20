@@ -1,8 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { TRoleButtonsConfigItem } from "../types";
 import { buildCustomId } from "../../../utils/buildCustomId";
-import { TooManyComponentsError } from "./TooManyComponentsError";
+import { TRoleButtonsConfigItem } from "../types";
 import { convertButtonStyleStringToEnum } from "./convertButtonStyleStringToEnum.js";
+import { TooManyComponentsError } from "./TooManyComponentsError";
 
 export function createButtonComponents(configItem: TRoleButtonsConfigItem): Array<ActionRowBuilder<ButtonBuilder>> {
   const rows: Array<ActionRowBuilder<ButtonBuilder>> = [];

@@ -1,6 +1,6 @@
+import photon from "@silvia-odwyer/photon-node";
 import { AttachmentBuilder } from "discord.js";
 import fs from "fs";
-import photon from "@silvia-odwyer/photon-node";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";

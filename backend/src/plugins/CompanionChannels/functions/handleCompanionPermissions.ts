@@ -2,10 +2,10 @@ import { PermissionsBitField, Snowflake, StageChannel, TextChannel, VoiceChannel
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { isDiscordAPIError, MINUTES } from "../../../utils";
+import { filterObject } from "../../../utils/filterObject";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
 import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
-import { filterObject } from "../../../utils/filterObject";
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;

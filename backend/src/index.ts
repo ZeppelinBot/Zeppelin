@@ -15,39 +15,38 @@ import { Knub, PluginError } from "knub";
 import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
 // Always use UTC internally
 // This is also enforced for the database in data/db.ts
+import { EventEmitter } from "events";
+import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
 import moment from "moment-timezone";
+import { performance } from "perf_hooks";
 import { AllowedGuilds } from "./data/AllowedGuilds";
 import { Configs } from "./data/Configs";
 import { connect } from "./data/db";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
+import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
+import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
+import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
+import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
+import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
+import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
+import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
+import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
+import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { consumeQueryStats } from "./data/queryLogger";
 import { DiscordJSError } from "./DiscordJSError";
+import { env } from "./env";
 import { logger } from "./logger";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
+import { setProfiler } from "./profiler";
+import { logRateLimit } from "./rateLimitStats";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
 import { startUptimeCounter } from "./uptime";
 import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, sleep, successMessage } from "./utils";
-import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { DecayingCounter } from "./utils/DecayingCounter";
-import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
-import { logRateLimit } from "./rateLimitStats";
-import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
-import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
-import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
-import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
-import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
-import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
-import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
-import { performance } from "perf_hooks";
-import { setProfiler } from "./profiler";
 import { enableProfiling } from "./utils/easyProfiler";
-import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
-import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
-import { consumeQueryStats } from "./data/queryLogger";
-import { EventEmitter } from "events";
-import { env } from "./env";
-import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
+import { loadYamlSafely } from "./utils/loadYamlSafely";
 
 // TODO: Remove this once fixed on upstream
 declare module "knub/dist/helpers" {

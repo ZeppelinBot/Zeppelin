@@ -6,18 +6,12 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
+import { mapToPublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { createTypedTemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
-import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
-import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
-import { LogsRoleCreateEvt, LogsRoleDeleteEvt, LogsRoleUpdateEvt } from "./events/LogsRoleModifyEvts";
-import {
-  LogsStageInstanceCreateEvt,
-  LogsStageInstanceDeleteEvt,
-  LogsStageInstanceUpdateEvt,
-} from "./events/LogsStageInstanceModifyEvts";
 import {
   LogsEmojiCreateEvt,
   LogsEmojiDeleteEvt,
@@ -26,6 +20,14 @@ import {
   LogsStickerDeleteEvt,
   LogsStickerUpdateEvt,
 } from "./events/LogsEmojiAndStickerModifyEvts";
+import { LogsGuildMemberAddEvt } from "./events/LogsGuildMemberAddEvt";
+import { LogsGuildMemberRemoveEvt } from "./events/LogsGuildMemberRemoveEvt";
+import { LogsRoleCreateEvt, LogsRoleDeleteEvt, LogsRoleUpdateEvt } from "./events/LogsRoleModifyEvts";
+import {
+  LogsStageInstanceCreateEvt,
+  LogsStageInstanceDeleteEvt,
+  LogsStageInstanceUpdateEvt,
+} from "./events/LogsStageInstanceModifyEvts";
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
@@ -35,9 +37,9 @@ import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
 import { onMessageUpdate } from "./util/onMessageUpdate";
-import { createTypedTemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
-import { mapToPublicFn } from "../../pluginUtils";
 
+import { escapeCodeBlock } from "discord.js";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { logAutomodAction } from "./logFunctions/logAutomodAction";
 import { logBotAlert } from "./logFunctions/logBotAlert";
 import { logCaseCreate } from "./logFunctions/logCaseCreate";
@@ -48,6 +50,7 @@ import { logChannelCreate } from "./logFunctions/logChannelCreate";
 import { logChannelDelete } from "./logFunctions/logChannelDelete";
 import { logChannelUpdate } from "./logFunctions/logChannelUpdate";
 import { logClean } from "./logFunctions/logClean";
+import { logDmFailed } from "./logFunctions/logDmFailed";
 import { logEmojiCreate } from "./logFunctions/logEmojiCreate";
 import { logEmojiDelete } from "./logFunctions/logEmojiDelete";
 import { logEmojiUpdate } from "./logFunctions/logEmojiUpdate";
@@ -71,6 +74,7 @@ import { logMemberRoleChanges } from "./logFunctions/logMemberRoleChanges";
 import { logMemberRoleRemove } from "./logFunctions/logMemberRoleRemove";
 import { logMemberTimedBan } from "./logFunctions/logMemberTimedBan";
 import { logMemberTimedMute } from "./logFunctions/logMemberTimedMute";
+import { logMemberTimedUnban } from "./logFunctions/logMemberTimedUnban";
 import { logMemberTimedUnmute } from "./logFunctions/logMemberTimedUnmute";
 import { logMemberUnban } from "./logFunctions/logMemberUnban";
 import { logMemberUnmute } from "./logFunctions/logMemberUnmute";
@@ -105,10 +109,6 @@ import { logVoiceChannelForceMove } from "./logFunctions/logVoiceChannelForceMov
 import { logVoiceChannelJoin } from "./logFunctions/logVoiceChannelJoin";
 import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
-import { logMemberTimedUnban } from "./logFunctions/logMemberTimedUnban";
-import { logDmFailed } from "./logFunctions/logDmFailed";
-import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
-import { escapeCodeBlock } from "discord.js";
 
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {

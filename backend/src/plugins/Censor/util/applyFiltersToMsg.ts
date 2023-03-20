@@ -1,4 +1,4 @@
-import { Invite, Embed } from "discord.js";
+import { Embed, Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
