@@ -188,7 +188,6 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   info: pluginInfo,
 
   // prettier-ignore
-  // @ts-expect-error
   dependencies: () => [
     LogsPlugin,
     ModActionsPlugin,
@@ -257,7 +256,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
 
     pluginData.state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
     pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
-    // @ts-expect-error
+
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
     pluginData.state.onCounterTrigger = (name, triggerName, channelId, userId) => {
@@ -267,9 +266,8 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     pluginData.state.onCounterReverseTrigger = (name, triggerName, channelId, userId) => {
       runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, true);
     };
-    // @ts-expect-error
+
     countersPlugin.onCounterEvent("trigger", pluginData.state.onCounterTrigger);
-    // @ts-expect-error
     countersPlugin.onCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
 
     const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
@@ -311,14 +309,11 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   },
 
   async beforeUnload(pluginData) {
-    // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     if (pluginData.state.onCounterTrigger) {
-      // @ts-expect-error
       countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
     }
     if (pluginData.state.onCounterReverseTrigger) {
-      // @ts-expect-error
       countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
     }
 

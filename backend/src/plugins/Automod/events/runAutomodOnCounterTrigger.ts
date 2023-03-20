@@ -14,11 +14,9 @@ export async function runAutomodOnCounterTrigger(
 ) {
   const user = userId ? await resolveUser(pluginData.client, userId) : undefined;
   const member = (userId && (await resolveMember(pluginData.client, pluginData.guild, userId))) || undefined;
-  // @ts-expect-error
+
   const prettyCounterName = pluginData.getPlugin(CountersPlugin).getPrettyNameForCounter(counterName);
-  // @ts-expect-error
   const prettyTriggerName = pluginData
-    // @ts-expect-error
     .getPlugin(CountersPlugin)
     .getPrettyNameForCounterTrigger(counterName, triggerName);
 

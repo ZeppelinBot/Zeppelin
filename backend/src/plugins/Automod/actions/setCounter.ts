@@ -12,9 +12,7 @@ export const SetCounterAction = automodAction({
   defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, matchResult, ruleName }) {
-    // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
-    // @ts-expect-error
     if (!countersPlugin.counterExists(actionConfig.counter)) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Unknown counter \`${actionConfig.counter}\` in \`add_to_counter\` action of Automod rule \`${ruleName}\``,
@@ -22,7 +20,6 @@ export const SetCounterAction = automodAction({
       return;
     }
 
-    // @ts-expect-error
     countersPlugin.setCounterValue(
       actionConfig.counter,
       contexts[0].message?.channel_id || null,

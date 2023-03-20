@@ -54,7 +54,7 @@ export function zeppelinGuildPlugin(...args) {
     const blueprint = guildPlugin(
       ...(args as Parameters<typeof guildPlugin>),
     ) as unknown as ZeppelinGuildPluginBlueprint;
-    blueprint.configParser = <any>getPluginConfigParser(blueprint, blueprint.configParser);
+    blueprint.configParser = getPluginConfigParser(blueprint, blueprint.configParser);
     return blueprint;
   } else {
     return zeppelinGuildPlugin as (name, blueprint) => ZeppelinGuildPluginBlueprint;
@@ -89,7 +89,7 @@ export function zeppelinGlobalPlugin(...args) {
     const blueprint = globalPlugin(
       ...(args as Parameters<typeof globalPlugin>),
     ) as unknown as ZeppelinGlobalPluginBlueprint;
-    // @ts-expect-error FIXME: Check the types here
+    // @ts-ignore FIXME: Check the types here
     blueprint.configParser = getPluginConfigParser(blueprint, blueprint.configParser);
     return blueprint;
   } else {
