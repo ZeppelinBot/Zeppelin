@@ -87,8 +87,10 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    clearInterval(pluginData.state.expiryInterval);
+    const { state, guild } = pluginData;
+
+    state.savedMessages.events.off("create", state.onMessageCreateFn);
+    clearInterval(state.expiryInterval);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

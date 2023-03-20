@@ -81,9 +81,11 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.logs = new GuildLogs(pluginData.guild.id);
-    pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
-    pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
+    const { state, guild } = pluginData;
+
+    state.logs = new GuildLogs(pluginData.guild.id);
+    state.archives = GuildArchives.getGuildInstance(guild.id);
+    state.cases = GuildCases.getGuildInstance(guild.id);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

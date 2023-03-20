@@ -26,10 +26,12 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   },
 
   async beforeLoad(pluginData) {
-    pluginData.state.webhooks = new Webhooks();
-    pluginData.state.queue = new Queue();
-    pluginData.state.missingPermissions = false;
-    pluginData.state.webhookClientCache = new Map();
+    const { state } = pluginData;
+
+    state.webhooks = new Webhooks();
+    state.queue = new Queue();
+    state.missingPermissions = false;
+    state.webhookClientCache = new Map();
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

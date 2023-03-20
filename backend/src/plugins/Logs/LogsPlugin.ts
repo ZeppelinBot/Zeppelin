@@ -271,7 +271,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   },
 
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.logListener = ({ type, data }) => log(pluginData, type, data);
     state.guildLogs.on("log", state.logListener);
@@ -305,24 +305,26 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    if (pluginData.state.logListener) {
-      pluginData.state.guildLogs.removeListener("log", pluginData.state.logListener);
+    const { state, guild } = pluginData;
+
+    if (state.logListener) {
+      state.guildLogs.removeListener("log", state.logListener);
     }
 
-    if (pluginData.state.onMessageDeleteFn) {
-      pluginData.state.savedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
+    if (state.onMessageDeleteFn) {
+      state.savedMessages.events.off("delete", state.onMessageDeleteFn);
     }
-    if (pluginData.state.onMessageDeleteBulkFn) {
-      pluginData.state.savedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
+    if (state.onMessageDeleteBulkFn) {
+      state.savedMessages.events.off("deleteBulk", state.onMessageDeleteBulkFn);
     }
-    if (pluginData.state.onMessageUpdateFn) {
-      pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    if (state.onMessageUpdateFn) {
+      state.savedMessages.events.off("update", state.onMessageUpdateFn);
     }
 
-    if (pluginData.state.regexRunnerRepeatedTimeoutListener) {
-      pluginData.state.regexRunner.off("repeatedTimeout", pluginData.state.regexRunnerRepeatedTimeoutListener);
+    if (state.regexRunnerRepeatedTimeoutListener) {
+      state.regexRunner.off("repeatedTimeout", state.regexRunnerRepeatedTimeoutListener);
     }
-    discardRegExpRunner(`guild-${pluginData.guild.id}`);
+    discardRegExpRunner(`guild-${guild.id}`);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

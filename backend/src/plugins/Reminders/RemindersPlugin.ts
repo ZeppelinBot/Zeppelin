@@ -50,14 +50,18 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "reminder", (reminder) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "reminder", (reminder) =>
       postReminder(pluginData, reminder),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
-    pluginData.state.unloaded = true;
+    const { state } = pluginData;
+
+    state.unregisterGuildEventListener?.();
+    state.unloaded = true;
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

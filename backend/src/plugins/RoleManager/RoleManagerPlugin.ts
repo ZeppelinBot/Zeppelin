@@ -24,8 +24,10 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   },
 
   beforeLoad(pluginData) {
-    pluginData.state.roleQueue = GuildRoleQueue.getGuildInstance(pluginData.guild.id);
-    pluginData.state.pendingRoleAssignmentPromise = Promise.resolve();
+    const { state, guild } = pluginData;
+
+    state.roleQueue = GuildRoleQueue.getGuildInstance(guild.id);
+    state.pendingRoleAssignmentPromise = Promise.resolve();
   },
 
   afterLoad(pluginData) {
@@ -33,8 +35,10 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   },
 
   async afterUnload(pluginData) {
-    pluginData.state.abortRoleAssignmentLoop = true;
-    await pluginData.state.pendingRoleAssignmentPromise;
+    const { state } = pluginData;
+
+    state.abortRoleAssignmentLoop = true;
+    await state.pendingRoleAssignmentPromise;
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

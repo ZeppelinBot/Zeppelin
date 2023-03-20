@@ -61,17 +61,19 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   ],
 
   async afterLoad(pluginData) {
-    pluginData.state.archives = new GuildArchives(0);
-    pluginData.state.allowedGuilds = new AllowedGuilds();
-    pluginData.state.configs = new Configs();
-    pluginData.state.apiPermissionAssignments = new ApiPermissionAssignments();
+    const { state, client } = pluginData;
+
+    state.archives = new GuildArchives(0);
+    state.allowedGuilds = new AllowedGuilds();
+    state.configs = new Configs();
+    state.apiPermissionAssignments = new ApiPermissionAssignments();
 
     const activeReload = getActiveReload();
     if (activeReload) {
       const [guildId, channelId] = activeReload;
       resetActiveReload();
 
-      const guild = await pluginData.client.guilds.fetch(guildId as Snowflake);
+      const guild = await client.guilds.fetch(guildId as Snowflake);
       if (guild) {
         const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {

@@ -209,15 +209,19 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredTempban", (tempban) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredTempban", (tempban) =>
       clearTempban(pluginData, tempban),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unloaded = true;
-    pluginData.state.unregisterGuildEventListener?.();
-    pluginData.state.events.removeAllListeners();
+    const { state, guild } = pluginData;
+
+    state.unloaded = true;
+    state.unregisterGuildEventListener?.();
+    state.events.removeAllListeners();
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

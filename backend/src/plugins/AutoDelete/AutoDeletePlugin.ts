@@ -56,9 +56,11 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.guildSavedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    pluginData.state.guildSavedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
-    pluginData.state.guildSavedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
+    const { state, guild } = pluginData;
+
+    state.guildSavedMessages.events.off("create", state.onMessageCreateFn);
+    state.guildSavedMessages.events.off("delete", state.onMessageDeleteFn);
+    state.guildSavedMessages.events.off("deleteBulk", state.onMessageDeleteBulkFn);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

@@ -65,14 +65,18 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredVCAlert", (alert) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredVCAlert", (alert) =>
       clearExpiredAlert(pluginData, alert),
     );
     fillActiveAlertsList(pluginData);
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener?.();
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

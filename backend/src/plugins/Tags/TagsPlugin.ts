@@ -131,7 +131,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
@@ -278,6 +278,8 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
+    const { state, guild } = pluginData;
+
+    state.savedMessages.events.off("create", state.onMessageCreateFn);
   },
 });

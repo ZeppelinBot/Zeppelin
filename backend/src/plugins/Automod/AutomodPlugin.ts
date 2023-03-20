@@ -222,137 +222,129 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   messageCommands: [AntiraidClearCmd, SetAntiraidCmd, ViewAntiraidCmd],
 
   async beforeLoad(pluginData) {
-    pluginData.state.queue = new Queue();
+    const { state, guild } = pluginData;
 
-    pluginData.state.regexRunner = getRegExpRunner(`guild-${pluginData.guild.id}`);
+    state.queue = new Queue();
 
-    pluginData.state.recentActions = [];
+    state.regexRunner = getRegExpRunner(`guild-${guild.id}`);
 
-    pluginData.state.recentSpam = [];
+    state.recentActions = [];
 
-    pluginData.state.recentNicknameChanges = new Map();
+    state.recentSpam = [];
 
-    pluginData.state.ignoredRoleChanges = new Set();
+    state.recentNicknameChanges = new Map();
 
-    pluginData.state.cooldownManager = new CooldownManager();
+    state.ignoredRoleChanges = new Set();
 
-    pluginData.state.logs = new GuildLogs(pluginData.guild.id);
-    pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
-    pluginData.state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(pluginData.guild.id);
-    pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
+    state.cooldownManager = new CooldownManager();
 
-    pluginData.state.cachedAntiraidLevel = await pluginData.state.antiraidLevels.get();
+    state.logs = new GuildLogs(guild.id);
+    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.antiraidLevels = GuildAntiraidLevels.getGuildInstance(guild.id);
+    state.archives = GuildArchives.getGuildInstance(guild.id);
+
+    state.cachedAntiraidLevel = await state.antiraidLevels.get();
   },
 
   async afterLoad(pluginData) {
-    pluginData.state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
-    pluginData.state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
-    pluginData.state.clearRecentNicknameChangesInterval = setInterval(
+    const { state, guild } = pluginData;
+
+    state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
+    state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);
+    state.clearRecentNicknameChangesInterval = setInterval(
       () => clearOldRecentNicknameChanges(pluginData),
       30 * SECONDS,
     );
 
-    pluginData.state.onMessageCreateFn = (message) => runAutomodOnMessage(pluginData, message, false);
-    pluginData.state.savedMessages.events.on("create", pluginData.state.onMessageCreateFn);
+    state.onMessageCreateFn = (message) => runAutomodOnMessage(pluginData, message, false);
+    state.savedMessages.events.on("create", state.onMessageCreateFn);
 
-    pluginData.state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
-    pluginData.state.savedMessages.events.on("update", pluginData.state.onMessageUpdateFn);
+    state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
+    state.savedMessages.events.on("update", state.onMessageUpdateFn);
     // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
-    pluginData.state.onCounterTrigger = (name, triggerName, channelId, userId) => {
+    state.onCounterTrigger = (name, triggerName, channelId, userId) => {
       runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, false);
     };
 
-    pluginData.state.onCounterReverseTrigger = (name, triggerName, channelId, userId) => {
+    state.onCounterReverseTrigger = (name, triggerName, channelId, userId) => {
       runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, true);
     };
     // @ts-expect-error
-    countersPlugin.onCounterEvent("trigger", pluginData.state.onCounterTrigger);
+    countersPlugin.onCounterEvent("trigger", state.onCounterTrigger);
     // @ts-expect-error
-    countersPlugin.onCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+    countersPlugin.onCounterEvent("reverseTrigger", state.onCounterReverseTrigger);
 
     const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
-    pluginData.state.modActionsListeners = new Map();
-    pluginData.state.modActionsListeners.set("note", (userId: string) =>
-      runAutomodOnModAction(pluginData, "note", userId),
+    state.modActionsListeners = new Map();
+    state.modActionsListeners.set("note", (userId: string) => runAutomodOnModAction(pluginData, "note", userId));
+    state.modActionsListeners.set("warn", (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+      runAutomodOnModAction(pluginData, "warn", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set(
-      "warn",
-      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
-        runAutomodOnModAction(pluginData, "warn", userId, reason, isAutomodAction),
+    state.modActionsListeners.set("kick", (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+      runAutomodOnModAction(pluginData, "kick", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set(
-      "kick",
-      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
-        runAutomodOnModAction(pluginData, "kick", userId, reason, isAutomodAction),
+    state.modActionsListeners.set("ban", (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+      runAutomodOnModAction(pluginData, "ban", userId, reason, isAutomodAction),
     );
-    pluginData.state.modActionsListeners.set(
-      "ban",
-      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
-        runAutomodOnModAction(pluginData, "ban", userId, reason, isAutomodAction),
-    );
-    pluginData.state.modActionsListeners.set("unban", (userId: string) =>
-      runAutomodOnModAction(pluginData, "unban", userId),
-    );
-    registerEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+    state.modActionsListeners.set("unban", (userId: string) => runAutomodOnModAction(pluginData, "unban", userId));
+    registerEventListenersFromMap(modActionsEvents, state.modActionsListeners);
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
-    pluginData.state.mutesListeners = new Map();
-    pluginData.state.mutesListeners.set(
-      "mute",
-      (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
-        runAutomodOnModAction(pluginData, "mute", userId, reason, isAutomodAction),
+    state.mutesListeners = new Map();
+    state.mutesListeners.set("mute", (userId: string, reason: string | undefined, isAutomodAction: boolean) =>
+      runAutomodOnModAction(pluginData, "mute", userId, reason, isAutomodAction),
     );
-    pluginData.state.mutesListeners.set("unmute", (userId: string) =>
-      runAutomodOnModAction(pluginData, "unmute", userId),
-    );
-    registerEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
+    state.mutesListeners.set("unmute", (userId: string) => runAutomodOnModAction(pluginData, "unmute", userId));
+    registerEventListenersFromMap(mutesEvents, state.mutesListeners);
   },
 
   async beforeUnload(pluginData) {
+    const { state, guild } = pluginData;
+
     // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
-    if (pluginData.state.onCounterTrigger) {
+    if (state.onCounterTrigger) {
       // @ts-expect-error
-      countersPlugin.offCounterEvent("trigger", pluginData.state.onCounterTrigger);
+      countersPlugin.offCounterEvent("trigger", state.onCounterTrigger);
     }
-    if (pluginData.state.onCounterReverseTrigger) {
+    if (state.onCounterReverseTrigger) {
       // @ts-expect-error
-      countersPlugin.offCounterEvent("reverseTrigger", pluginData.state.onCounterReverseTrigger);
+      countersPlugin.offCounterEvent("reverseTrigger", state.onCounterReverseTrigger);
     }
 
     const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
-    if (pluginData.state.modActionsListeners) {
-      unregisterEventListenersFromMap(modActionsEvents, pluginData.state.modActionsListeners);
+    if (state.modActionsListeners) {
+      unregisterEventListenersFromMap(modActionsEvents, state.modActionsListeners);
     }
 
     const mutesEvents = pluginData.getPlugin(MutesPlugin).getEventEmitter();
-    if (pluginData.state.mutesListeners) {
-      unregisterEventListenersFromMap(mutesEvents, pluginData.state.mutesListeners);
+    if (state.mutesListeners) {
+      unregisterEventListenersFromMap(mutesEvents, state.mutesListeners);
     }
 
-    pluginData.state.queue.clear();
+    state.queue.clear();
 
-    discardRegExpRunner(`guild-${pluginData.guild.id}`);
+    discardRegExpRunner(`guild-${guild.id}`);
 
-    if (pluginData.state.clearRecentActionsInterval) {
-      clearInterval(pluginData.state.clearRecentActionsInterval);
+    if (state.clearRecentActionsInterval) {
+      clearInterval(state.clearRecentActionsInterval);
     }
 
-    if (pluginData.state.clearRecentSpamInterval) {
-      clearInterval(pluginData.state.clearRecentSpamInterval);
+    if (state.clearRecentSpamInterval) {
+      clearInterval(state.clearRecentSpamInterval);
     }
 
-    if (pluginData.state.clearRecentNicknameChangesInterval) {
-      clearInterval(pluginData.state.clearRecentNicknameChangesInterval);
+    if (state.clearRecentNicknameChangesInterval) {
+      clearInterval(state.clearRecentNicknameChangesInterval);
     }
 
-    if (pluginData.state.onMessageCreateFn) {
-      pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
+    if (state.onMessageCreateFn) {
+      state.savedMessages.events.off("create", state.onMessageCreateFn);
     }
-    if (pluginData.state.onMessageUpdateFn) {
-      pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    if (state.onMessageUpdateFn) {
+      state.savedMessages.events.off("update", state.onMessageUpdateFn);
     }
   },
 });

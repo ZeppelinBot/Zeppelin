@@ -53,9 +53,11 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
   ],
 
   beforeLoad(pluginData) {
-    pluginData.state.savedMessages = GuildSavedMessages.getGuildInstance(pluginData.guild.id);
-    pluginData.state.autoReactions = GuildAutoReactions.getGuildInstance(pluginData.guild.id);
-    pluginData.state.cache = new Map();
+    const { state, guild } = pluginData;
+
+    state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+    state.autoReactions = GuildAutoReactions.getGuildInstance(guild.id);
+    state.cache = new Map();
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

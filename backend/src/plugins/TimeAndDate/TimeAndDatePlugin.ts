@@ -60,7 +60,9 @@ export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()({
   },
 
   beforeLoad(pluginData) {
-    pluginData.state.memberTimezones = GuildMemberTimezones.getGuildInstance(pluginData.guild.id);
+    const { state, guild } = pluginData;
+
+    state.memberTimezones = GuildMemberTimezones.getGuildInstance(guild.id);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

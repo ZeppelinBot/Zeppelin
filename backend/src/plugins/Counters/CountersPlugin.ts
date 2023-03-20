@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
 import { PluginOptions } from "knub";
-import { ConfigParserFn } from "knub/dist/config/configTypes";
 import {
   buildCounterConditionString,
   CounterTrigger,
@@ -145,32 +144,30 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
   ],
 
   async beforeLoad(pluginData) {
-    pluginData.state.counters = new GuildCounters(pluginData.guild.id);
-    pluginData.state.events = new EventEmitter();
-    pluginData.state.counterTriggersByCounterId = new Map();
+    const { state, guild } = pluginData;
+
+    state.counters = new GuildCounters(guild.id);
+    state.events = new EventEmitter();
+    state.counterTriggersByCounterId = new Map();
 
     const activeTriggerIds: number[] = [];
 
     // Initialize and store the IDs of each of the counters internally
-    pluginData.state.counterIds = {};
+    state.counterIds = {};
     const config = pluginData.config.get();
     for (const counter of Object.values(config.counters)) {
-      const dbCounter = await pluginData.state.counters.findOrCreateCounter(
-        counter.name,
-        counter.per_channel,
-        counter.per_user,
-      );
-      pluginData.state.counterIds[counter.name] = dbCounter.id;
+      const dbCounter = await state.counters.findOrCreateCounter(counter.name, counter.per_channel, counter.per_user);
+      state.counterIds[counter.name] = dbCounter.id;
 
       const thisCounterTriggers: CounterTrigger[] = [];
-      pluginData.state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
+      state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
 
       // Initialize triggers
       for (const trigger of Object.values(counter.triggers)) {
         const theTrigger = trigger as TTrigger;
         const parsedCondition = parseCounterConditionString(theTrigger.condition)!;
         const parsedReverseCondition = parseCounterConditionString(theTrigger.reverse_condition)!;
-        const counterTrigger = await pluginData.state.counters.initCounterTrigger(
+        const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,
           theTrigger.name,
           parsedCondition[0],
@@ -184,17 +181,19 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
     }
 
     // Mark old/unused counters to be deleted later
-    await pluginData.state.counters.markUnusedCountersToBeDeleted([...Object.values(pluginData.state.counterIds)]);
+    await state.counters.markUnusedCountersToBeDeleted([...Object.values(state.counterIds)]);
 
     // Mark old/unused triggers to be deleted later
-    await pluginData.state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
+    await state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
   },
 
   async afterLoad(pluginData) {
+    const { state } = pluginData;
+
     const config = pluginData.config.get();
 
     // Start decay timers
-    pluginData.state.decayTimers = [];
+    state.decayTimers = [];
     for (const [counterName, counter] of Object.entries(config.counters)) {
       if (!counter.decay) {
         continue;
@@ -206,7 +205,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
         continue;
       }
 
-      pluginData.state.decayTimers.push(
+      state.decayTimers.push(
         setInterval(() => {
           decayCounter(pluginData, counterName, decayPeriodMs, decay.amount);
         }, DECAY_APPLY_INTERVAL),
@@ -215,12 +214,14 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    if (pluginData.state.decayTimers) {
-      for (const interval of pluginData.state.decayTimers) {
+    const { state } = pluginData;
+
+    if (state.decayTimers) {
+      for (const interval of state.decayTimers) {
         clearInterval(interval);
       }
     }
 
-    pluginData.state.events.removeAllListeners();
+    state.events.removeAllListeners();
   },
 });

@@ -27,6 +27,8 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
   },
 
   async beforeLoad(pluginData) {
+    const { state } = pluginData;
+
     pluginData.state.validApiKey = null;
 
     if (!hasPhishermanMasterAPIKey()) {
@@ -43,7 +45,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
         return false;
       });
       if (isValid) {
-        pluginData.state.validApiKey = apiKey;
+        state.validApiKey = apiKey;
       }
     }
   },

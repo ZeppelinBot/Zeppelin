@@ -79,8 +79,10 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    clearInterval(pluginData.state.clearInterval);
+    const { state, guild } = pluginData;
+
+    state.savedMessages.events.off("create", state.onMessageCreateFn);
+    clearInterval(state.clearInterval);
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint

@@ -38,15 +38,17 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
   ],
 
   async beforeLoad(pluginData) {
-    pluginData.state.allowedGuilds = new AllowedGuilds();
+    const { state } = pluginData;
+
+    state.allowedGuilds = new AllowedGuilds();
 
     const defaultAllowedServers = env.DEFAULT_ALLOWED_SERVERS || [];
     const configs = new Configs();
     for (const serverId of defaultAllowedServers) {
-      if (!(await pluginData.state.allowedGuilds.isAllowed(serverId))) {
+      if (!(await state.allowedGuilds.isAllowed(serverId))) {
         // tslint:disable-next-line:no-console
         console.log(`Adding allowed-by-default server ${serverId} to the allowed servers`);
-        await pluginData.state.allowedGuilds.add(serverId);
+        await state.allowedGuilds.add(serverId);
         await configs.saveNewRevision(`guild-${serverId}`, "plugins: {}", 0);
       }
     }

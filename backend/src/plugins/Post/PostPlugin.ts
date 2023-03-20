@@ -61,13 +61,17 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "scheduledPost", (post) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "scheduledPost", (post) =>
       postScheduledPost(pluginData, post),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
+    const { state } = pluginData;
+
+    state.unregisterGuildEventListener?.();
   },
 
   // FIXME: Proper inherittance from ZeppelinPluginBlueprint
