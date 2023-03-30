@@ -120,6 +120,16 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       }));
     }
 
+    if (msg.mentions) {
+      data.mentions = {
+        channels: Array.from(msg.mentions.channels.keys()),
+        everyone: msg.mentions.everyone,
+        roles: Array.from(msg.mentions.roles.keys()),
+        repliedUser: msg.mentions.repliedUser?.id ?? null,
+        users: Array.from(msg.mentions.users.keys()),
+      };
+    }
+
     return data;
   }
 
