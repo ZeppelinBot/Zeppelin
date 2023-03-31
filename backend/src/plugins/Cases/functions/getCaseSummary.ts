@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { splitMessageIntoChunks } from "knub/dist/helpers";
+import { splitMessageIntoChunks } from "knub/helpers";
 import moment from "moment-timezone";
 import { Case } from "../../../data/entities/Case";
 import { convertDelayStringToMS, DAYS, DBDateFormat, disableLinkPreviews, messageLink } from "../../../utils";

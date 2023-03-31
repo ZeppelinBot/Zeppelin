@@ -6,7 +6,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { createTypedTemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -110,6 +110,11 @@ import { logVoiceChannelJoin } from "./logFunctions/logVoiceChannelJoin";
 import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
 
+// The `any` cast here is to prevent TypeScript from locking up from the circular dependency
+function getCasesPlugin(): Promise<any> {
+  return import("../Cases/CasesPlugin.js") as Promise<any>;
+}
+
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
@@ -138,15 +143,11 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Logs",
+    configSchema: ConfigSchema,
   },
 
-  dependencies: async () => [
-    TimeAndDatePlugin,
-    InternalPosterPlugin,
-    // The `as any` cast here is to prevent TypeScript from locking up from the circular dependency
-    ((await import("../Cases/CasesPlugin")) as any).CasesPlugin,
-  ],
-  configSchema: ConfigSchema,
+  dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   events: [
@@ -326,7 +327,4 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     }
     discardRegExpRunner(`guild-${guild.id}`);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

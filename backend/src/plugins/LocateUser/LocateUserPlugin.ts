@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { FollowCmd } from "./commands/FollowCmd";
@@ -38,9 +39,10 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
       * Instantly receive an invite to the voice channel of a user
       * Be notified as soon as a user switches or joins a voice channel
     `),
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -78,7 +80,4 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
 
     state.unregisterGuildEventListener?.();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

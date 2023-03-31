@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { getChannelId, getRoleId } from "knub/dist/utils";
+import { getChannelId, getRoleId } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { isValidSnowflake, noop, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";

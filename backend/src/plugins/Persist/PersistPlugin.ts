@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildPersistedData } from "../../data/GuildPersistedData";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -25,10 +26,11 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
       Re-apply roles or nicknames for users when they rejoin the server.
       Mute roles are re-applied automatically, this plugin is not required for that.
     `),
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -43,7 +45,4 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
     state.persistedData = GuildPersistedData.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

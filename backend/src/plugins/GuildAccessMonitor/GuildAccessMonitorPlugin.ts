@@ -4,6 +4,7 @@ import { BasePluginType, GlobalPluginData, globalPluginEventListener } from "knu
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { Configs } from "../../data/Configs";
 import { env } from "../../env";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
@@ -26,7 +27,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
  */
 export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configSchema: t.type({}),
+  configParser: makeIoTsConfigParser(t.type({})),
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({
@@ -59,7 +60,4 @@ export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorP
       checkGuild(pluginData, guild);
     }
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

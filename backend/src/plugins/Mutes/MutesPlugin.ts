@@ -5,7 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -65,10 +65,11 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Mutes",
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   dependencies: () => [CasesPlugin, LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -126,7 +127,4 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     state.unregisterGuildEventListener?.();
     state.events.removeAllListeners();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

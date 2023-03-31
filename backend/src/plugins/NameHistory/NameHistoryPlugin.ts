@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { NamesCmd } from "./commands/NamesCmd";
@@ -24,7 +25,7 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
   name: "name_history",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -46,7 +47,4 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
     state.usernameHistory = new UsernameHistory();
     state.updateQueue = new Queue();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

@@ -4,17 +4,21 @@
 
 import { GuildMember, Message, MessageCreateOptions, MessageMentionOptions, TextBasedChannel } from "discord.js";
 import * as t from "io-ts";
-import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
-import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
-import { AnyPluginData } from "knub/dist/plugins/PluginData";
+import {
+  AnyPluginData,
+  CommandContext,
+  ConfigValidationError,
+  ExtendedMatchParams,
+  GuildPluginData,
+  helpers,
+  PluginOverrideCriteria,
+} from "knub";
 import { logger } from "./logger";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
-import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
+import { errorMessage, successMessage, tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
-import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
+import { StrictValidationError, validate } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 
@@ -91,102 +95,13 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
   );
 }
 
-export function getPluginConfigParser(blueprint: ZeppelinPlugin, customParser?: ZeppelinPlugin["configParser"]) {
-  return async (options: PluginOptions<any>, strict?: boolean) => {
-    const ident = `[getPluginConfigParser.${blueprint.name}] | `;
-    if (blueprint.name === "mutes") {
-      console.log(ident, "options => ", JSON.stringify(options));
+export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema): (input: unknown) => t.TypeOf<Schema> {
+  return (input: unknown) => {
+    const error = validate(schema, input);
+    if (error) {
+      throw error;
     }
-
-    // 1. Validate the basic structure of plugin config
-    const basicOptionsValidation = validate(BasicPluginStructureType, options);
-    if (basicOptionsValidation instanceof StrictValidationError) {
-      throw strictValidationErrorToConfigValidationError(basicOptionsValidation);
-    }
-
-    // 2. Validate config/overrides against *partial* config schema. This ensures valid properties have valid types.
-    const partialConfigSchema = tDeepPartial(blueprint.configSchema);
-
-    if (options.config) {
-      const partialConfigValidation = validate(partialConfigSchema, options.config);
-      if (partialConfigValidation instanceof StrictValidationError) {
-        throw strictValidationErrorToConfigValidationError(partialConfigValidation);
-      }
-    }
-
-    if (options.overrides) {
-      for (const override of options.overrides) {
-        // Validate criteria and extra criteria
-        // FIXME: This is ugly
-        for (const key of Object.keys(override)) {
-          if (!validTopLevelOverrideKeys.includes(key)) {
-            if (strict) {
-              throw new ConfigValidationError(`Unknown override criterion '${key}'`);
-            }
-
-            delete override[key];
-          }
-        }
-        if (override.extra != null) {
-          for (const extraCriterion of Object.keys(override.extra)) {
-            if (!blueprint.customOverrideCriteriaFunctions?.[extraCriterion]) {
-              if (strict) {
-                throw new ConfigValidationError(`Unknown override extra criterion '${extraCriterion}'`);
-              }
-
-              delete override.extra[extraCriterion];
-            }
-          }
-        }
-
-        // Validate override config
-        const partialOverrideConfigValidation = decodeAndValidateStrict(partialConfigSchema, override.config || {});
-        if (partialOverrideConfigValidation instanceof StrictValidationError) {
-          throw strictValidationErrorToConfigValidationError(partialOverrideConfigValidation);
-        }
-      }
-    }
-
-    // 3. Run custom parser, if any
-    if (customParser) {
-      options = await customParser(options);
-    }
-
-    // 4. Merge with default options and validate/decode the entire config
-    let decodedConfig = {};
-    const decodedOverrides: Array<PluginOverrideCriteria<unknown> & { config: any }> = [];
-
-    if (options.config) {
-      decodedConfig = blueprint.configSchema
-        ? decodeAndValidateStrict(blueprint.configSchema, options.config)
-        : options.config;
-      if (decodedConfig instanceof StrictValidationError) {
-        console.error("4.strict:", blueprint.name);
-        throw strictValidationErrorToConfigValidationError(decodedConfig);
-      }
-    }
-
-    if (options.overrides) {
-      for (const override of options.overrides) {
-        const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config || {}, override.config || {});
-        const decodedOverrideConfig = blueprint.configSchema
-          ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
-          : overrideConfigMergedWithBaseConfig;
-        if (decodedOverrideConfig instanceof StrictValidationError) {
-          console.error("4.overrides.strict:", blueprint.name, options, decodedOverrideConfig);
-          throw strictValidationErrorToConfigValidationError(decodedOverrideConfig);
-        }
-        decodedOverrides.push({
-          ...override,
-          config: deepKeyIntersect(decodedOverrideConfig, override.config || {}),
-        });
-      }
-    }
-
-    return {
-      config: decodedConfig,
-      overrides: decodedOverrides,
-    };
+    return input as t.TypeOf<Schema>;
   };
 }
 

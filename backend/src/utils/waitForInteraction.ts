@@ -7,9 +7,9 @@ import {
   MessageComponentInteraction,
   MessageCreateOptions,
 } from "discord.js";
-import { noop } from "knub/dist/utils";
 import moment from "moment";
 import uuidv4 from "uuid/v4";
+import { noop } from "../utils";
 
 export async function waitForButtonConfirm(
   channel: GuildTextBasedChannel,
@@ -37,6 +37,7 @@ export async function waitForButtonConfirm(
       if (options?.restrictToId && options.restrictToId !== interaction.user.id) {
         interaction
           .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+          // tslint:disable-next-line no-console
           .catch((err) => console.trace(err.message));
       } else {
         if (interaction.customId.startsWith(`confirmButton:${idMod}:`)) {

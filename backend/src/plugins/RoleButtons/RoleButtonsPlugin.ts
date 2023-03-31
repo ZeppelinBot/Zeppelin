@@ -1,5 +1,6 @@
+import * as t from "io-ts";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { StrictValidationError } from "../../validatorUtils";
+import { StrictValidationError, validate } from "../../validatorUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -13,7 +14,6 @@ import { ConfigSchema, RoleButtonsPluginType } from "./types";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
-  configSchema: ConfigSchema,
   info: pluginInfo,
   showInDocs: true,
 
@@ -32,11 +32,10 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
     ],
   },
 
-  configParser(options) {
+  configParser(input) {
     // Auto-fill "name" property for buttons based on the object key
-    const buttonsArray = Array.isArray(options.buttons) ? options.buttons : [];
     const seenMessages = new Set();
-    for (const [name, buttonsConfig] of Object.entries(options.buttons ?? {})) {
+    for (const [name, buttonsConfig] of Object.entries<any>((input as any).buttons ?? {})) {
       if (name.length > 16) {
         throw new StrictValidationError(["Name for role buttons can be at most 16 characters long"]);
       }
@@ -66,8 +65,12 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
       }
     }
 
-    // FIXME: any typing lol
-    return <any>options;
+    const error = validate(ConfigSchema, input);
+    if (error) {
+      throw error;
+    }
+
+    return input as t.TypeOf<typeof ConfigSchema>;
   },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],

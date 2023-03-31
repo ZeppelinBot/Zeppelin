@@ -3,7 +3,7 @@ import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { sendSuccessMessage } from "../../pluginUtils";
+import { makeIoTsConfigParser, sendSuccessMessage } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
@@ -37,7 +37,7 @@ const defaultOptions = {
 
 export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -82,7 +82,4 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       }
     }
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

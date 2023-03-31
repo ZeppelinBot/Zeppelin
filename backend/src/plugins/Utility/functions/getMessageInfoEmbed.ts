@@ -1,7 +1,6 @@
 import { APIEmbed, MessageType, Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { GuildPluginData } from "knub";
-import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
+import { getDefaultMessageCommandPrefix, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -136,8 +135,7 @@ export async function getMessageInfoEmbed(
   }
 
   if (message.embeds.length) {
-    // @ts-expect-error
-    const prefix = pluginData.fullConfig.prefix || getDefaultPrefix(pluginData.client);
+    const prefix = pluginData.fullConfig.prefix || getDefaultMessageCommandPrefix(pluginData.client);
     embed.fields.push({
       name: preEmbedPadding + "Embeds",
       value: `Message contains an embed, use \`${prefix}source\` to see the embed source`,

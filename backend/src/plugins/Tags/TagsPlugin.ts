@@ -1,8 +1,9 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
+import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import moment from "moment-timezone";
-import { StrictValidationError } from "src/validatorUtils";
+import { StrictValidationError, validate } from "src/validatorUtils";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -71,9 +72,9 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
       ${generateTemplateMarkdown(TemplateFunctions)}
     `),
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   dependencies: () => [LogsPlugin],
   defaultOptions,
 
@@ -96,17 +97,19 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
     findTagByName: mapToPublicFn(findTagByName),
   },
 
-  configParser(options) {
-    if (options.delete_with_command && options.auto_delete_command) {
+  configParser(_input) {
+    const input = _input as any;
+
+    if (input.delete_with_command && input.auto_delete_command) {
       throw new StrictValidationError([
         `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,
       ]);
     }
 
     // Check each category for conflicting options
-    if (options.categories) {
-      for (const [name, opts] of Object.entries(options.categories)) {
-        const cat = options.categories[name];
+    if (input.categories) {
+      for (const [name, opts] of Object.entries(input.categories)) {
+        const cat = input.categories[name];
         if (cat.delete_with_command && cat.auto_delete_command) {
           throw new StrictValidationError([
             `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
@@ -115,8 +118,12 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       }
     }
 
-    // FIXME: any typing lol
-    return <any>options;
+    const error = validate(ConfigSchema, input);
+    if (error) {
+      throw error;
+    }
+
+    return input as t.TypeOf<typeof ConfigSchema>;
   },
 
   beforeLoad(pluginData) {

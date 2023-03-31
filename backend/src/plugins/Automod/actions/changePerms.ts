@@ -1,8 +1,7 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import * as t from "io-ts";
-import { noop } from "knub/dist/utils";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { isValidSnowflake, tNullable, tPartialDictionary } from "../../../utils";
+import { isValidSnowflake, noop, tNullable, tPartialDictionary } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,

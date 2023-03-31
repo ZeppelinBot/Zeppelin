@@ -2,21 +2,14 @@ import {
   Client,
   Events,
   GatewayIntentBits,
-  GuildTextBasedChannel,
-  Message,
   Options,
   Partials,
   RESTEvents,
-  TextBasedChannel,
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { Knub, PluginError } from "knub";
-import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
-// Always use UTC internally
-// This is also enforced for the database in data/db.ts
 import { EventEmitter } from "events";
-import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
+import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
 import { AllowedGuilds } from "./data/AllowedGuilds";
@@ -47,18 +40,6 @@ import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, 
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { enableProfiling } from "./utils/easyProfiler";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
-
-// TODO: Remove this once fixed on upstream
-declare module "knub/dist/helpers" {
-  export function waitForReply(
-    client: Client,
-    channel: GuildTextBasedChannel,
-    restrictToUserId?: string,
-    timeout?: number,
-  ): Promise<Message | null>;
-
-  export function createChunkedMessage(channel: TextBasedChannel, messageText: string): Promise<Message[]>;
-}
 
 // Error handling
 let recentPluginErrors = 0;
@@ -184,6 +165,8 @@ for (const [i, part] of actualVersionParts.entries()) {
   throw new SimpleError(`Unsupported Node.js version! Must be at least ${REQUIRED_NODE_VERSION}`);
 }
 
+// Always use UTC internally
+// This is also enforced for the database in data/db.ts
 moment.tz.setDefault("UTC");
 
 // Blocking check

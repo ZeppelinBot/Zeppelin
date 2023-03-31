@@ -1,5 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
@@ -35,8 +36,8 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
   dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -53,7 +54,4 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   afterLoad(pluginData) {
     loadAllCommands(pluginData);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

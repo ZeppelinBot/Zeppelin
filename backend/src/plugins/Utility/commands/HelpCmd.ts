@@ -1,5 +1,4 @@
-import { LoadedGuildPlugin } from "knub";
-import { PluginCommandDefinition } from "knub/dist/commands/commandUtils";
+import { LoadedGuildPlugin, PluginCommandDefinition } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { createChunkedMessage } from "../../../utils";
 import { utilityCmd } from "../types";
@@ -32,7 +31,6 @@ export const HelpCmd = utilityCmd({
           if (strTrigger.startsWith(searchStr)) {
             matchingCommands.push({
               plugin,
-              // @ts-expect-error
               command: registeredCommand,
             });
             break;

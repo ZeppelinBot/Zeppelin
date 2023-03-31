@@ -10,8 +10,7 @@ import {
   User,
 } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { GuildPluginData } from "knub";
-import { ArgsFromSignatureOrArray } from "knub/dist/commands/commandUtils";
+import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
 import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
@@ -192,6 +191,7 @@ export async function displaySearch(
         if (msg.author.id !== interaction.user.id) {
           interaction
             .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+            // tslint:disable-next-line no-console
             .catch((err) => console.trace(err.message));
         } else {
           if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {

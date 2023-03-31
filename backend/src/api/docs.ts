@@ -66,7 +66,7 @@ export function initDocs(app: express.Express) {
     }));
 
     const defaultOptions = plugin.defaultOptions || {};
-    const configSchema = plugin.configSchema && formatConfigSchema(plugin.configSchema);
+    const configSchema = plugin.info?.configSchema && formatConfigSchema(plugin.info.configSchema);
 
     res.json({
       name,

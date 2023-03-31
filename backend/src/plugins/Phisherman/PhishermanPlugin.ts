@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { pluginInfo } from "./info";
@@ -18,7 +18,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
   showInDocs: true,
   info: pluginInfo,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -49,7 +49,4 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
       }
     }
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

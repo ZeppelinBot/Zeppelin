@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { Webhooks } from "../../data/Webhooks";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { editMessage } from "./functions/editMessage";
@@ -16,7 +16,7 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   name: "internal_poster",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -33,7 +33,4 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
     state.missingPermissions = false;
     state.webhookClientCache = new Map();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

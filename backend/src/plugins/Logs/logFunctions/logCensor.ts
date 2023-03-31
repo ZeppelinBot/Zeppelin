@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { deactivateMentions, disableCodeBlocks } from "knub/dist/helpers";
+import { deactivateMentions, disableCodeBlocks } from "knub/helpers";
 import { resolveChannelIds } from "src/utils/resolveChannelIds";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";

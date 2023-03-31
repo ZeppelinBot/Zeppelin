@@ -1,5 +1,5 @@
 import humanizeDuration from "humanize-duration";
-import { getMemberLevel } from "knub/dist/helpers";
+import { getMemberLevel } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";

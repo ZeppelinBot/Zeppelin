@@ -2,6 +2,7 @@ import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { SECONDS } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -40,6 +41,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Slowmode",
+    configSchema: ConfigSchema,
   },
 
   // prettier-ignore
@@ -47,7 +49,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     LogsPlugin,
   ],
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -84,7 +86,4 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
     state.savedMessages.events.off("create", state.onMessageCreateFn);
     clearInterval(state.clearInterval);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

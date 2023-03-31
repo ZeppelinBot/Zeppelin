@@ -3,6 +3,7 @@ import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -35,10 +36,11 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Post",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -73,7 +75,4 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
 
     state.unregisterGuildEventListener?.();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

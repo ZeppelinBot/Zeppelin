@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { waitForReply } from "knub/dist/helpers";
+import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";

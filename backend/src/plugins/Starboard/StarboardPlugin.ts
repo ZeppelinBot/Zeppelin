@@ -1,8 +1,10 @@
+import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
 import { trimPluginDescription } from "../../utils";
+import { validate } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
@@ -29,9 +31,6 @@ const defaultOptions: PluginOptions<StarboardPluginType> = {
 export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
   name: "starboard",
   showInDocs: true,
-
-  configSchema: ConfigSchema,
-  defaultOptions,
 
   info: {
     prettyName: "Starboard",
@@ -122,18 +121,25 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
                   enabled: true
       ~~~
     `),
+    configSchema: ConfigSchema,
   },
 
-  configParser(options) {
-    if (options.boards) {
-      for (const [name, opts] of Object.entries(options.boards)) {
-        options.boards[name] = Object.assign({}, defaultStarboardOpts, options.boards[name]);
+  configParser(input) {
+    const boards = (input as any).boards;
+    if (boards) {
+      for (const [name, opts] of Object.entries(boards)) {
+        boards[name] = Object.assign({}, defaultStarboardOpts, boards[name]);
       }
     }
 
-    // FIXME: any typing lol
-    return <any>options;
+    const error = validate(ConfigSchema, input);
+    if (error) {
+      throw error;
+    }
+
+    return input as t.TypeOf<typeof ConfigSchema>;
   },
+  defaultOptions,
 
   // prettier-ignore
   messageCommands: [

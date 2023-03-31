@@ -1,5 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -39,10 +40,11 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
     description: trimPluginDescription(`
       Enables authorised users to add and remove whitelisted roles with a command.
     `),
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   dependencies: () => [LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -58,7 +60,4 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
 
     state.logs = new GuildLogs(guild.id);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

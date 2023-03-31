@@ -3,6 +3,7 @@ import * as t from "io-ts";
 import { guildPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { MINUTES } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { GuildInfoSaverPluginType } from "./types";
@@ -11,7 +12,7 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
   name: "guild_info_saver",
   showInDocs: false,
 
-  configSchema: t.type({}),
+  configParser: makeIoTsConfigParser(t.type({})),
 
   events: [
     guildPluginEventListener({
@@ -30,9 +31,6 @@ export const GuildInfoSaverPlugin = zeppelinGuildPlugin<GuildInfoSaverPluginType
   beforeUnload(pluginData) {
     clearInterval(pluginData.state.updateInterval);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });
 
 async function updateGuildInfo(guild: Guild) {

@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import {
   buildCounterConditionString,
@@ -9,7 +10,7 @@ import {
 import { GuildCounters } from "../../data/GuildCounters";
 import { mapToPublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS, MINUTES } from "../../utils";
-import { StrictValidationError } from "../../validatorUtils";
+import { StrictValidationError, validate } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
@@ -72,12 +73,13 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
     description:
       "Keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number",
     configurationGuide: "See <a href='/docs/setup-guides/counters'>Counters setup guide</a>",
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   defaultOptions,
-  configParser: (options) => {
-    for (const [counterName, counter] of Object.entries(options.counters || {})) {
+  // TODO: Separate input and output types
+  configParser: (input) => {
+    for (const [counterName, counter] of Object.entries<any>((input as any).counters || {})) {
       counter.name = counterName;
       counter.per_user = counter.per_user ?? false;
       counter.per_channel = counter.per_channel ?? false;
@@ -90,7 +92,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
 
       // Normalize triggers
       for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
-        const triggerObj: Partial<TTrigger> = typeof trigger === "string" ? { condition: trigger } : trigger;
+        const triggerObj = (typeof trigger === "string" ? { condition: trigger } : trigger) as Partial<TTrigger>;
 
         triggerObj.name = triggerName;
         const parsedCondition = parseCounterConditionString(triggerObj.condition || "");
@@ -109,12 +111,16 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
       }
     }
 
-    if (Object.values(options.counters || {}).length > MAX_COUNTERS) {
+    if (Object.values((input as any).counters || {}).length > MAX_COUNTERS) {
       throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
     }
 
-    // FIXME: Any typing
-    return <any>options;
+    const error = validate(ConfigSchema, input);
+    if (error) {
+      throw error;
+    }
+
+    return input as t.TypeOf<typeof ConfigSchema>;
   },
 
   public: {

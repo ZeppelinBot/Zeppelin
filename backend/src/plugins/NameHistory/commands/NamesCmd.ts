@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import { createChunkedMessage, disableCodeBlocks } from "knub/dist/helpers";
+import { createChunkedMessage, disableCodeBlocks } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory";

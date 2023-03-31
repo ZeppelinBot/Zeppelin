@@ -1,6 +1,7 @@
 import { GuildChannel, GuildMember, User } from "discord.js";
 import { guildPluginMessageCommand, parseSignature } from "knub";
 import { commandTypes } from "../../commandTypes";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
 import { UnknownUser } from "../../utils";
 import { isScalar } from "../../utils/isScalar";
@@ -24,7 +25,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
   name: "custom_events",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   afterLoad(pluginData) {
@@ -67,7 +68,4 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
   beforeUnload() {
     // TODO: Run clearTriggers() once we actually have something there
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

@@ -5,7 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { sendSuccessMessage } from "../../pluginUtils";
+import { makeIoTsConfigParser, sendSuccessMessage } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
@@ -117,10 +117,11 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Utility",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -221,7 +222,4 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   beforeUnload(pluginData) {
     discardRegExpRunner(`guild-${pluginData.guild.id}`);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

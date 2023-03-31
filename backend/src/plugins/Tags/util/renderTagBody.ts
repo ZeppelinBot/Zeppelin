@@ -1,5 +1,4 @@
-import { GuildPluginData } from "knub";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { renderTemplate, TemplateSafeValue, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { renderRecursively, StrictMessageContent } from "../../../utils";
 import { TagsPluginType, TTag } from "../types";

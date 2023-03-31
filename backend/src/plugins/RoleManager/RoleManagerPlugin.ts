@@ -1,5 +1,5 @@
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { addPriorityRole } from "./functions/addPriorityRole";
@@ -11,10 +11,10 @@ import { ConfigSchema, RoleManagerPluginType } from "./types";
 
 export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   name: "role_manager",
-  configSchema: ConfigSchema,
   showInDocs: false,
 
   dependencies: () => [LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
 
   public: {
     addRole: mapToPublicFn(addRole),
@@ -40,7 +40,4 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
     state.abortRoleAssignmentLoop = true;
     await state.pendingRoleAssignmentPromise;
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

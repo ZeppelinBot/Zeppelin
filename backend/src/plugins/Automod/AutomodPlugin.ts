@@ -1,3 +1,4 @@
+import * as t from "io-ts";
 import { configUtils, CooldownManager } from "knub";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -8,7 +9,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { MINUTES, SECONDS } from "../../utils";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
-import { StrictValidationError } from "../../validatorUtils";
+import { StrictValidationError, validate } from "../../validatorUtils";
 import { CountersPlugin } from "../Counters/CountersPlugin";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -62,14 +63,15 @@ const defaultOptions = {
 
 /**
  * Config preprocessor to set default values for triggers and perform extra validation
+ * TODO: Separate input and output types
  */
-
-const configParser = (options) => {
-  if (options.rules) {
+const configParser = (input: unknown) => {
+  const rules = (input as any).rules;
+  if (rules) {
     // Loop through each rule
-    for (const [name, rule] of Object.entries(options.rules)) {
+    for (const [name, rule] of Object.entries(rules)) {
       if (rule == null) {
-        delete options.rules[name];
+        delete rules[name];
         continue;
       }
 
@@ -179,7 +181,12 @@ const configParser = (options) => {
     }
   }
 
-  return options;
+  const error = validate(ConfigSchema, input);
+  if (error) {
+    throw error;
+  }
+
+  return input as t.TypeOf<typeof ConfigSchema>;
 };
 
 export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
@@ -188,7 +195,6 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   info: pluginInfo,
 
   // prettier-ignore
-  // @ts-expect-error
   dependencies: () => [
     LogsPlugin,
     ModActionsPlugin,
@@ -198,7 +204,6 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     InternalPosterPlugin,
   ],
 
-  configSchema: ConfigSchema,
   defaultOptions,
   configParser,
 
@@ -261,7 +266,6 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
 
     state.onMessageUpdateFn = (message) => runAutomodOnMessage(pluginData, message, true);
     state.savedMessages.events.on("update", state.onMessageUpdateFn);
-    // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
 
     state.onCounterTrigger = (name, triggerName, channelId, userId) => {
@@ -271,9 +275,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
     state.onCounterReverseTrigger = (name, triggerName, channelId, userId) => {
       runAutomodOnCounterTrigger(pluginData, name, triggerName, channelId, userId, true);
     };
-    // @ts-expect-error
     countersPlugin.onCounterEvent("trigger", state.onCounterTrigger);
-    // @ts-expect-error
     countersPlugin.onCounterEvent("reverseTrigger", state.onCounterReverseTrigger);
 
     const modActionsEvents = pluginData.getPlugin(ModActionsPlugin).getEventEmitter();
@@ -303,14 +305,11 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   async beforeUnload(pluginData) {
     const { state, guild } = pluginData;
 
-    // @ts-expect-error
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     if (state.onCounterTrigger) {
-      // @ts-expect-error
       countersPlugin.offCounterEvent("trigger", state.onCounterTrigger);
     }
     if (state.onCounterReverseTrigger) {
-      // @ts-expect-error
       countersPlugin.offCounterEvent("reverseTrigger", state.onCounterReverseTrigger);
     }
 

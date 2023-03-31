@@ -5,7 +5,7 @@ import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { MINUTES, trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
@@ -120,10 +120,11 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     description: trimPluginDescription(`
       This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
     `),
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt],
@@ -223,7 +224,4 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     state.unregisterGuildEventListener?.();
     state.events.removeAllListeners();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

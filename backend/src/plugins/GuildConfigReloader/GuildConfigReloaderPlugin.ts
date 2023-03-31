@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { Configs } from "../../data/Configs";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds";
 import { GuildConfigReloaderPluginType } from "./types";
@@ -8,7 +9,7 @@ export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloade
   name: "guild_config_reloader",
   showInDocs: false,
 
-  configSchema: t.type({}),
+  configParser: makeIoTsConfigParser(t.type({})),
 
   async beforeLoad(pluginData) {
     const { state } = pluginData;
@@ -25,7 +26,4 @@ export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloade
     clearTimeout(pluginData.state.nextCheckTimeout);
     pluginData.state.unloaded = true;
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

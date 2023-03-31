@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -39,10 +40,11 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   info: {
     prettyName: "Reaction roles",
     legacy: "Consider using the [Role buttons](/docs/plugins/role_buttons) plugin instead.",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -85,7 +87,4 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
       clearTimeout(state.autoRefreshTimeout);
     }
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

@@ -1,5 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
@@ -18,10 +19,11 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
   showInDocs: true,
   info: {
     prettyName: "Welcome message",
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   dependencies: () => [LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -35,7 +37,4 @@ export const WelcomeMessagePlugin = zeppelinGuildPlugin<WelcomeMessagePluginType
     state.logs = new GuildLogs(guild.id);
     state.sentWelcomeMessages = new Set();
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

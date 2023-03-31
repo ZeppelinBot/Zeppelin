@@ -1,5 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
@@ -24,7 +25,7 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
   name: "message_saver",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -45,7 +46,4 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });

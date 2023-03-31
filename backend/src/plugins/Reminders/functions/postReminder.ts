@@ -1,6 +1,6 @@
 import { HTTPError, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { disableLinkPreviews } from "knub/dist/helpers";
+import { disableLinkPreviews } from "knub/helpers";
 import moment from "moment-timezone";
 import { Reminder } from "../../../data/entities/Reminder";
 import { DBDateFormat } from "../../../utils";

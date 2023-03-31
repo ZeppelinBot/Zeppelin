@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildReminders } from "../../data/GuildReminders";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RemindCmd } from "./commands/RemindCmd";
@@ -28,10 +29,11 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Reminders",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -63,7 +65,4 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
     state.unregisterGuildEventListener?.();
     state.unloaded = true;
   },
-
-  // FIXME: Proper inherittance from ZeppelinPluginBlueprint
-  configParser: (o: any) => o,
 });
