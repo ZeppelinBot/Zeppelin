@@ -217,6 +217,7 @@ connect().then(async () => {
     intents: [
       // Privileged
       GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.MessageContent,
       // GatewayIntentBits.GuildPresences,
 
       // Regular
