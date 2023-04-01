@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Queue } from "../../Queue";
@@ -43,5 +43,5 @@ export interface ReactionRolesPluginType extends BasePluginType {
   };
 }
 
-export const reactionRolesCmd = typedGuildCommand<ReactionRolesPluginType>();
-export const reactionRolesEvt = typedGuildEventListener<ReactionRolesPluginType>();
+export const reactionRolesCmd = guildPluginMessageCommand<ReactionRolesPluginType>();
+export const reactionRolesEvt = guildPluginEventListener<ReactionRolesPluginType>();

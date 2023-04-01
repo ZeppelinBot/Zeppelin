@@ -1,25 +1,27 @@
-import { GuildChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { isDiscordAPIError, UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { SlowmodePluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { SlowmodePluginType } from "../types";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,
-  channel: GuildChannel & TextChannel,
+  channel: GuildTextBasedChannel,
   userId: string,
 ) {
+  // FIXME: Is there a better way to do this?
+  if (channel.isThread()) return;
+
   // Deny sendMessage permission from the user. If there are existing permission overwrites, take those into account.
   const existingOverride = channel.permissionOverwrites?.resolve(userId as Snowflake);
   try {
     pluginData.state.serverLogs.ignoreLog(LogType.CHANNEL_UPDATE, channel.id, 5 * 1000);
     if (existingOverride) {
-      await existingOverride.edit({ SEND_MESSAGES: false });
+      await existingOverride.edit({ SendMessages: false });
     } else {
-      await channel.permissionOverwrites?.create(userId as Snowflake, { SEND_MESSAGES: false }, { type: 1 });
+      await channel.permissionOverwrites?.create(userId as Snowflake, { SendMessages: false }, { type: 1 });
     }
   } catch (e) {
     const user = await pluginData.client.users.fetch(userId as Snowflake).catch(() => new UnknownUser({ id: userId }));

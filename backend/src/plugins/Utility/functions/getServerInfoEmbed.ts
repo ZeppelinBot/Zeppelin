@@ -1,8 +1,7 @@
-import { MessageEmbedOptions, PremiumTier, Snowflake } from "discord.js";
+import { APIEmbed, ChannelType, GuildPremiumTier, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { ChannelTypeStrings } from "../../../types";
 import {
   EmbedWith,
   formatNumber,
@@ -19,18 +18,11 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
 
-const PremiumTiers: Record<PremiumTier, number> = {
-  NONE: 0,
-  TIER_1: 1,
-  TIER_2: 2,
-  TIER_3: 3,
-};
-
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
@@ -54,7 +46,7 @@ export async function getServerInfoEmbed(
 
   embed.author = {
     name: `Server:  ${(guildPreview || restGuild)!.name}`,
-    iconURL: (guildPreview || restGuild)!.iconURL() ?? undefined,
+    icon_url: (guildPreview || restGuild)!.iconURL() ?? undefined,
   };
 
   // BASIC INFORMATION
@@ -90,10 +82,10 @@ export async function getServerInfoEmbed(
   });
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
-  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ size: 2048 })})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ size: 2048 })})` : "None";
   const splashUrl = (restGuild || guildPreview)!.splash
-    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    ? `[Link](${(restGuild || guildPreview)!.splashURL({ size: 2048 })})`
     : "None";
 
   embed.fields.push(
@@ -162,9 +154,14 @@ export async function getServerInfoEmbed(
   // CHANNEL COUNTS
   if (thisServer) {
     const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.CATEGORY);
-    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.TEXT);
-    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.VOICE);
+    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildCategory);
+    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
+    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
+    const threadChannels = thisServer.channels.cache.filter((channel) => channel.isThread());
+    const announcementChannels = thisServer.channels.cache.filter(
+      (channel) => channel.type === ChannelType.GuildAnnouncement,
+    );
+    const stageChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildStageVoice);
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
@@ -172,8 +169,10 @@ export async function getServerInfoEmbed(
       value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.size}**
-          Text: **${textChannels.size}**
+          Text: **${textChannels.size}** (**${threadChannels.size} threads**)
+          Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
+          Stage: **${stageChannels.size}**
         `),
     });
   }
@@ -186,22 +185,20 @@ export async function getServerInfoEmbed(
   }
 
   if (restGuild) {
-    const premiumTierValue = PremiumTiers[restGuild.premiumTier];
-
     const maxEmojis =
       {
-        0: 50,
-        1: 100,
-        2: 150,
-        3: 250,
-      }[premiumTierValue] ?? 50;
+        [GuildPremiumTier.None]: 50,
+        [GuildPremiumTier.Tier1]: 100,
+        [GuildPremiumTier.Tier2]: 150,
+        [GuildPremiumTier.Tier3]: 250,
+      }[restGuild.premiumTier] ?? 50;
     const maxStickers =
       {
-        0: 0,
-        1: 15,
-        2: 30,
-        3: 60,
-      }[premiumTierValue] ?? 0;
+        [GuildPremiumTier.None]: 0,
+        [GuildPremiumTier.Tier1]: 15,
+        [GuildPremiumTier.Tier2]: 30,
+        [GuildPremiumTier.Tier3]: 60,
+      }[restGuild.premiumTier] ?? 0;
 
     otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
@@ -211,9 +208,7 @@ export async function getServerInfoEmbed(
   }
 
   if (thisServer) {
-    otherStats.push(
-      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${PremiumTiers[thisServer.premiumTier]})`,
-    );
+    otherStats.push(`Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${thisServer.premiumTier})`);
   }
 
   embed.fields.push({

@@ -1,5 +1,7 @@
+import * as t from "io-ts";
 import { CooldownManager, PluginOptions } from "knub";
 import { trimPluginDescription } from "../../utils";
+import { validate } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
@@ -17,9 +19,6 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
   name: "self_grantable_roles",
   showInDocs: true,
 
-  configSchema: ConfigSchema,
-  defaultOptions,
-
   info: {
     prettyName: "Self-grantable roles",
     description: trimPluginDescription(`
@@ -29,7 +28,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
       ### Basic configuration
       In this example, users can add themselves platform roles on the channel 473087035574321152 by using the
       \`!role\` command. For example, \`!role pc ps4\` to add both the "pc" and "ps4" roles as specified below.
-      
+
       ~~~yml
       self_grantable_roles:
         config:
@@ -46,10 +45,10 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
                 basic:
                   can_use: true
       ~~~
-      
+
       ### Maximum number of roles
       This is identical to the basic example above, but users can only choose 1 role.
-      
+
       ~~~yml
       self_grantable_roles:
         config:
@@ -68,27 +67,34 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
                   can_use: true
       ~~~
     `),
+    configSchema: ConfigSchema,
   },
 
-  configPreprocessor: (options) => {
-    const config = options.config;
-    for (const [key, entry] of Object.entries(config.entries)) {
+  configParser: (input) => {
+    const entries = (input as any).entries;
+    for (const [key, entry] of Object.entries<any>(entries)) {
       // Apply default entry config
-      config.entries[key] = { ...defaultSelfGrantableRoleEntry, ...entry };
+      entries[key] = { ...defaultSelfGrantableRoleEntry, ...entry };
 
       // Normalize alias names
       if (entry.roles) {
-        for (const [roleId, aliases] of Object.entries(entry.roles)) {
+        for (const [roleId, aliases] of Object.entries<string[]>(entry.roles)) {
           entry.roles[roleId] = aliases.map((a) => a.toLowerCase());
         }
       }
     }
 
-    return { ...options, config };
+    const error = validate(ConfigSchema, input);
+    if (error) {
+      throw error;
+    }
+
+    return input as t.TypeOf<typeof ConfigSchema>;
   },
+  defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     RoleHelpCmd,
     RoleRemoveCmd,
     RoleAddCmd,

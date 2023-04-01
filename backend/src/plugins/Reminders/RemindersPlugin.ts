@@ -1,13 +1,14 @@
 import { PluginOptions } from "knub";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildReminders } from "../../data/GuildReminders";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
-import { ConfigSchema, RemindersPluginType } from "./types";
-import { onGuildEvent } from "../../data/GuildEvents";
 import { postReminder } from "./functions/postReminder";
+import { ConfigSchema, RemindersPluginType } from "./types";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {
@@ -28,14 +29,15 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Reminders",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     RemindCmd,
     RemindersCmd,
     RemindersDeleteCmd,
@@ -50,13 +52,17 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "reminder", (reminder) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "reminder", (reminder) =>
       postReminder(pluginData, reminder),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
-    pluginData.state.unloaded = true;
+    const { state } = pluginData;
+
+    state.unregisterGuildEventListener?.();
+    state.unloaded = true;
   },
 });

@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { LogType } from "../../../data/LogType";
@@ -9,21 +9,19 @@ import {
   TemplateSafeValueContainer,
 } from "../../../templateFormatter";
 import {
-  createChunkedMessage,
+  chunkMessageLines,
+  isTruthy,
   messageLink,
-  stripObjectToScalars,
   tAllowedMentions,
   tNormalizedNullOptional,
-  isTruthy,
-  verboseChannelMention,
   validateAndParseMessageContent,
-  chunkMessageLines,
+  verboseChannelMention,
 } from "../../../utils";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
-import { TemplateSafeUser, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 export const AlertAction = automodAction({
   configType: t.type({
@@ -38,7 +36,7 @@ export const AlertAction = automodAction({
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
-    if (channel?.isText()) {
+    if (channel?.isTextBased()) {
       const text = actionConfig.text;
       const theMessageLink =
         contexts[0].message && messageLink(pluginData.guild.id, contexts[0].message.channel_id, contexts[0].message.id);
@@ -96,7 +94,7 @@ export const AlertAction = automodAction({
         const chunks = chunkMessageLines(rendered);
         for (const chunk of chunks) {
           await poster.sendMessage(channel, {
-            content: rendered,
+            content: chunk,
             allowedMentions: erisAllowedMentionsToDjsMentionOptions(actionConfig.allowed_mentions),
           });
         }

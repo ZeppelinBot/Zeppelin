@@ -1,11 +1,13 @@
 import {
+  APIEmbed,
+  ChannelType,
   Client,
-  Constants,
   DiscordAPIError,
+  EmbedData,
+  EmbedType,
   Emoji,
+  escapeCodeBlock,
   Guild,
-  GuildAuditLogs,
-  GuildAuditLogsEntry,
   GuildBasedChannel,
   GuildChannel,
   GuildMember,
@@ -14,19 +16,14 @@ import {
   InviteGuild,
   LimitedCollection,
   Message,
-  MessageAttachment,
-  MessageEmbed,
-  MessageEmbedOptions,
+  MessageCreateOptions,
   MessageMentionOptions,
-  MessageOptions,
   PartialChannelData,
   PartialMessage,
   Snowflake,
   Sticker,
-  TextChannel,
-  ThreadChannel,
+  TextBasedChannel,
   User,
-  Util,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import { either } from "fp-ts/lib/Either";
@@ -37,18 +34,17 @@ import humanizeDuration from "humanize-duration";
 import * as t from "io-ts";
 import { isEqual } from "lodash";
 import moment from "moment-timezone";
+import { performance } from "perf_hooks";
 import tlds from "tlds";
 import tmp from "tmp";
 import { URL } from "url";
+import { z, ZodError } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
+import { getProfiler } from "./profiler";
 import { SimpleCache } from "./SimpleCache";
-import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { z, ZodError } from "zod";
-import { getProfiler } from "./profiler";
-import { performance } from "perf_hooks";
 
 const fsp = fs.promises;
 
@@ -179,7 +175,7 @@ function tDeepPartialProp(prop: any) {
   }
 }
 
-export function getScalarDifference<T>(
+export function getScalarDifference<T extends object>(
   base: T,
   object: T,
   ignoreKeys: string[] = [],
@@ -258,7 +254,7 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 export type GuildInvite = Invite & { guild: InviteGuild | Guild };
 export type GroupDMInvite = Invite & {
   channel: PartialChannelData;
-  type: typeof Constants.ChannelTypes.GROUP_DM;
+  type: typeof ChannelType.GroupDM;
 };
 
 /**
@@ -392,8 +388,7 @@ export const zEmbedInput = z.object({
     .nullable(),
 });
 
-export type EmbedWith<T extends keyof MessageEmbedOptions> = MessageEmbedOptions &
-  Pick<Required<MessageEmbedOptions>, T>;
+export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
 export const zStrictMessageContent = z.object({
   content: z.string().optional(),
@@ -406,7 +401,7 @@ export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 export type StrictMessageContent = {
   content?: string;
   tts?: boolean;
-  embeds?: MessageEmbedOptions[];
+  embeds?: APIEmbed[];
 };
 
 export const tStrictMessageContent = t.type({
@@ -573,7 +568,7 @@ export function convertMSToDelayString(ms: number): string {
   return result;
 }
 
-export function successMessage(str, emoji = "<:zep_check:650361014180904971>") {
+export function successMessage(str: string, emoji = "<:zep_check:650361014180904971>") {
   return emoji ? `${emoji} ${str}` : str;
 }
 
@@ -648,7 +643,7 @@ interface MatchedURL extends URL {
 }
 
 export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
-  let matches = str.match(urlRegex) || [];
+  let matches = [...(str.match(urlRegex) ?? [])];
   if (onlyUnique) {
     matches = unique(matches);
   }
@@ -953,7 +948,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextChannel | ThreadChannel | User,
+  channel: TextBasedChannel | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1403,17 +1398,21 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
   return fetchedSticker;
 }
 
-export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
+export async function confirm(
+  channel: GuildTextBasedChannel,
+  userId: string,
+  content: MessageCreateOptions,
+): Promise<boolean> {
   return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find((e) => (e as MessageEmbed).type === "rich");
-  if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
+  const richEmbed = (msg.data.embeds || []).find((e) => (e as EmbedData).type === EmbedType.Rich);
+  if (richEmbed) result += "Embed:```" + escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments && msg.data.attachments.length) {
@@ -1442,9 +1441,9 @@ export function verboseUserName(user: User | UnknownUser): string {
   return `**${user.tag}** (\`${user.id}\`)`;
 }
 
-export function verboseChannelMention(channel: GuildChannel | ThreadChannel): string {
+export function verboseChannelMention(channel: GuildBasedChannel): string {
   const plainTextName =
-    channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
+    channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice
       ? channel.name
       : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
@@ -1578,7 +1577,7 @@ export function isGuildInvite(invite: Invite): invite is GuildInvite {
 }
 
 export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
-  return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
+  return invite.guild == null && invite.channel?.type === ChannelType.GroupDM;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {

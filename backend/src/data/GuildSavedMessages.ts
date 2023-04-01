@@ -1,15 +1,13 @@
 import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
-import { buildEntity } from "./buildEntity";
 import { noop } from "../utils";
-import { decrypt } from "../utils/crypt";
-import { decryptJson, encryptJson } from "../utils/cryptHelpers";
 import { asyncMap } from "../utils/async";
+import { decryptJson, encryptJson } from "../utils/cryptHelpers";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { buildEntity } from "./buildEntity";
+import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 
 export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
   private messages: Repository<SavedMessage>;
@@ -53,13 +51,13 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
         title: embed.title,
         description: embed.description,
         url: embed.url,
-        timestamp: embed.timestamp,
+        timestamp: embed.timestamp ? Date.parse(embed.timestamp) : null,
         color: embed.color,
 
         fields: embed.fields.map((field) => ({
           name: field.name,
           value: field.value,
-          inline: field.inline,
+          inline: field.inline ?? false,
         })),
 
         author: embed.author

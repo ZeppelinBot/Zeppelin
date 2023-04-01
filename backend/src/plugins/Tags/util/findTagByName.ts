@@ -1,6 +1,5 @@
 import * as t from "io-ts";
-import { GuildPluginData } from "knub";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { Tag, TagsPluginType } from "../types";
 
 export async function findTagByName(

@@ -1,16 +1,15 @@
 import { Snowflake } from "discord.js";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { clearExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveUser } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { IgnoredEventType, modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { clearExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 
 const opts = {
   mod: ct.member({ option: true }),

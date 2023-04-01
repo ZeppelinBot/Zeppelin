@@ -1,18 +1,11 @@
-import { PluginOptions, typedGuildCommand } from "knub";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, InternalPosterPluginType } from "./types";
-import {
-  getPhishermanDomainInfo,
-  hasPhishermanMasterAPIKey,
-  phishermanApiKeyIsValid,
-  reportTrackedDomainsToPhisherman,
-} from "../../data/Phisherman";
-import { mapToPublicFn } from "../../pluginUtils";
+import { PluginOptions } from "knub";
 import { Webhooks } from "../../data/Webhooks";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
-import { sendMessage } from "./functions/sendMessage";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { editMessage } from "./functions/editMessage";
+import { sendMessage } from "./functions/sendMessage";
+import { ConfigSchema, InternalPosterPluginType } from "./types";
 
 const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   config: {},
@@ -23,7 +16,7 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   name: "internal_poster",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -33,9 +26,11 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   },
 
   async beforeLoad(pluginData) {
-    pluginData.state.webhooks = new Webhooks();
-    pluginData.state.queue = new Queue();
-    pluginData.state.missingPermissions = false;
-    pluginData.state.webhookClientCache = new Map();
+    const { state } = pluginData;
+
+    state.webhooks = new Webhooks();
+    state.queue = new Queue();
+    state.missingPermissions = false;
+    state.webhookClientCache = new Map();
   },
 });

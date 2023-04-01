@@ -1,4 +1,4 @@
-import { MessageEmbed, Snowflake, TextChannel } from "discord.js";
+import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { trimLines } from "../../../utils";
@@ -42,7 +42,7 @@ export const EditEmbedCmd = postCmd({
       return;
     }
 
-    const embed = (targetMessage.embeds![0] ?? { fields: [] }) as MessageEmbed;
+    const embed = (targetMessage.embeds![0] ?? { fields: [] }) as APIEmbed;
     if (args.title) embed.title = args.title;
     if (content) embed.description = formatContent(content);
     if (color) embed.color = color;

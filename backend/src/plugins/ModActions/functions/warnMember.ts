@@ -1,15 +1,14 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,

@@ -1,4 +1,4 @@
-import { configUtils, ConfigValidationError, PluginOptions } from "knub";
+import { ConfigValidationError, PluginConfigManager } from "knub";
 import moment from "moment-timezone";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
@@ -34,9 +34,12 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
       }
 
       const plugin = pluginNameToPlugin.get(pluginName)!;
+      const configManager = new PluginConfigManager(plugin.defaultOptions || { config: {} }, pluginOptions, {
+        levels: {},
+        parser: plugin.configParser,
+      });
       try {
-        const mergedOptions = configUtils.mergeConfig(plugin.defaultOptions || {}, pluginOptions);
-        await plugin.configPreprocessor?.(mergedOptions as unknown as PluginOptions<any>, true);
+        await configManager.init();
       } catch (err) {
         if (err instanceof ConfigValidationError || err instanceof StrictValidationError) {
           return `${pluginName}: ${err.message}`;

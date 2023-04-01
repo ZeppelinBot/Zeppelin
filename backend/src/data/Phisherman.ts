@@ -1,12 +1,12 @@
-import { getRepository, Repository } from "typeorm";
-import { PhishermanCacheEntry } from "./entities/PhishermanCacheEntry";
-import { PhishermanDomainInfo, PhishermanUnknownDomain } from "./types/phisherman";
-import fetch, { Headers } from "node-fetch";
-import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
-import moment from "moment-timezone";
-import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry";
 import crypto from "crypto";
+import moment from "moment-timezone";
+import fetch, { Headers } from "node-fetch";
+import { getRepository, Repository } from "typeorm";
 import { env } from "../env";
+import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
+import { PhishermanCacheEntry } from "./entities/PhishermanCacheEntry";
+import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry";
+import { PhishermanDomainInfo, PhishermanUnknownDomain } from "./types/phisherman";
 
 const API_URL = "https://api.phisherman.gg";
 const MASTER_API_KEY = env.PHISHERMAN_API_KEY;

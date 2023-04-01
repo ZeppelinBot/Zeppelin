@@ -1,9 +1,10 @@
-import { Snowflake, TextChannel, User } from "discord.js";
+import { Snowflake, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
+import { Mute } from "../../../data/entities/Mute";
+import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
@@ -16,10 +17,9 @@ import {
   UserNotificationResult,
 } from "../../../utils";
 import { muteLock } from "../../../utils/lockNameHelpers";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { MuteOptions, MutesPluginType } from "../types";
-import { Mute } from "../../../data/entities/Mute";
-import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop";
 
 /**
  * TODO: Clean up this function
@@ -186,7 +186,7 @@ export async function muteUser(
       const channel = config.message_channel
         ? pluginData.guild.channels.cache.get(config.message_channel as Snowflake)
         : null;
-      if (useChannel && channel?.isText()) {
+      if (useChannel && channel?.isTextBased()) {
         contactMethods.push({ type: "channel", channel });
       }
     }

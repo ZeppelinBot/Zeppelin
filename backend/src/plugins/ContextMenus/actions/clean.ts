@@ -1,6 +1,5 @@
-import { ContextMenuInteraction, TextChannel } from "discord.js";
+import { ContextMenuCommandInteraction, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -9,7 +8,7 @@ import { ContextMenuPluginType } from "../types";
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   amount: number,
-  interaction: ContextMenuInteraction,
+  interaction: ContextMenuCommandInteraction,
 ) {
   interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);

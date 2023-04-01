@@ -1,16 +1,9 @@
-import { Snowflake, VoiceChannel } from "discord.js";
-import {
-  channelToTemplateSafeChannel,
-  memberToTemplateSafeMember,
-  userToTemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
+import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { channelMentionRegex, isSnowflake, simpleClosestStringMatch } from "../../../utils";
-import { utilityCmd } from "../types";
-import { ChannelTypeStrings } from "../../../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { utilityCmd } from "../types";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",
@@ -48,7 +41,7 @@ export const VcmoveCmd = utilityCmd({
     } else {
       // Search string -> find closest matching voice channel name
       const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
-        (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
+        (c): c is VoiceChannel => c.type === ChannelType.GuildVoice,
       );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {
@@ -127,7 +120,7 @@ export const VcmoveAllCmd = utilityCmd({
     } else {
       // Search string -> find closest matching voice channel name
       const voiceChannels = [...pluginData.guild.channels.cache.values()].filter(
-        (c): c is VoiceChannel => c.type === ChannelTypeStrings.VOICE,
+        (c): c is VoiceChannel => c.type === ChannelType.GuildVoice,
       );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {

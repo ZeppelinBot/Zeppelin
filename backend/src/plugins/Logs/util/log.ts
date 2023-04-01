@@ -1,13 +1,13 @@
-import { MessageEmbedOptions, MessageMentionTypes, Snowflake, TextChannel } from "discord.js";
+import { APIEmbed, MessageMentionTypes, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
+import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { isDiscordAPIError, MINUTES } from "../../../utils";
+import { MessageBuffer } from "../../../utils/MessageBuffer";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
-import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { LogType } from "../../../data/LogType";
-import { MessageBuffer } from "../../../utils/MessageBuffer";
-import { createChunkedMessage, isDiscordAPIError, MINUTES } from "../../../utils";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 
 const excludedUserProps = ["user", "member", "mod"];
 const excludedRoleProps = ["message.member.roles", "member.roles"];
@@ -88,7 +88,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
 
   logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
     const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
-    if (!channel?.isText()) continue;
+    if (!channel?.isTextBased()) continue;
     if (pluginData.state.channelCooldowns.isOnCooldown(channelId)) continue;
     if (opts.include?.length && !opts.include.includes(typeStr)) continue;
     if (opts.exclude && opts.exclude.includes(typeStr)) continue;
@@ -141,7 +141,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
     const buffer = pluginData.state.buffers.get(channelId)!;
     buffer.push({
       content: typeof message === "string" ? message : message.content || "",
-      embeds: typeof message === "string" ? [] : ((message.embeds || []) as MessageEmbedOptions[]),
+      embeds: typeof message === "string" ? [] : ((message.embeds || []) as APIEmbed[]),
     });
   }
 }

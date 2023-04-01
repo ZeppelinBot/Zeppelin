@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -53,10 +54,11 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
       For more advanced filtering, check out the Automod plugin!
     `),
     legacy: true,
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   beforeLoad(pluginData) {
@@ -69,7 +71,7 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
   },
 
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.savedMessages.events.on("create", state.onMessageCreateFn);
@@ -79,9 +81,11 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    discardRegExpRunner(`guild-${pluginData.guild.id}`);
+    const { state, guild } = pluginData;
 
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    pluginData.state.savedMessages.events.off("update", pluginData.state.onMessageUpdateFn);
+    discardRegExpRunner(`guild-${guild.id}`);
+
+    state.savedMessages.events.off("create", state.onMessageCreateFn);
+    state.savedMessages.events.off("update", state.onMessageUpdateFn);
   },
 });

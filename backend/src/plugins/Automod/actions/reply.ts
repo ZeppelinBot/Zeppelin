@@ -1,6 +1,5 @@
-import { MessageOptions, Permissions, Snowflake, TextChannel, ThreadChannel, User } from "discord.js";
+import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import * as t from "io-ts";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
@@ -14,10 +13,11 @@ import {
   verboseChannelMention,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 
 export const ReplyAction = automodAction({
   configType: t.union([
@@ -36,7 +36,7 @@ export const ReplyAction = automodAction({
       .filter((c) => c.message?.channel_id)
       .filter((c) => {
         const channel = pluginData.guild.channels.cache.get(c.message!.channel_id as Snowflake);
-        return channel?.isText();
+        return channel?.isTextBased();
       });
 
     const contextsByChannelId = contextsWithTextChannels.reduce((map: Map<string, AutomodContext[]>, context) => {
@@ -63,16 +63,16 @@ export const ReplyAction = automodAction({
       const formatted =
         typeof actionConfig === "string"
           ? await renderReplyText(actionConfig)
-          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageOptions);
+          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
 
       if (formatted) {
-        const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
+        const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;
 
         // Check for basic Send Messages and View Channel permissions
         if (
           !hasDiscordPermissions(
             channel.permissionsFor(pluginData.client.user!.id),
-            Permissions.FLAGS.SEND_MESSAGES | Permissions.FLAGS.VIEW_CHANNEL,
+            PermissionsBitField.Flags.SendMessages | PermissionsBitField.Flags.ViewChannel,
           )
         ) {
           pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -84,7 +84,10 @@ export const ReplyAction = automodAction({
         // If the message is an embed, check for embed permissions
         if (
           typeof formatted !== "string" &&
-          !hasDiscordPermissions(channel.permissionsFor(pluginData.client.user!.id), Permissions.FLAGS.EMBED_LINKS)
+          !hasDiscordPermissions(
+            channel.permissionsFor(pluginData.client.user!.id),
+            PermissionsBitField.Flags.EmbedLinks,
+          )
         ) {
           pluginData.getPlugin(LogsPlugin).logBotAlert({
             body: `Missing permissions to reply **with an embed** in ${verboseChannelMention(
@@ -96,7 +99,7 @@ export const ReplyAction = automodAction({
 
         const messageContent = validateAndParseMessageContent(formatted);
 
-        const messageOpts: MessageOptions = {
+        const messageOpts: MessageCreateOptions = {
           ...messageContent,
           allowedMentions: {
             users: [user.id],
@@ -118,7 +121,7 @@ export const ReplyAction = automodAction({
 
         if (typeof actionConfig === "object" && actionConfig.auto_delete) {
           const delay = convertDelayStringToMS(String(actionConfig.auto_delete))!;
-          setTimeout(() => !replyMsg.deleted && replyMsg.delete().catch(noop), delay);
+          setTimeout(() => replyMsg.deletable && replyMsg.delete().catch(noop), delay);
         }
       }
     }

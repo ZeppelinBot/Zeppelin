@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
@@ -22,7 +22,7 @@ export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake) as TextChannel;
+    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake);
     return `Matched message (\`${contexts[0].message!.id}\`) in ${
       channel ? verboseChannelMention(channel) : "Unknown Channel"
     }`;

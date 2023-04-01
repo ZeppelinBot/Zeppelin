@@ -1,4 +1,3 @@
-import { TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { slowmodeCmd } from "../types";
@@ -13,7 +12,7 @@ export const SlowmodeGetCmd = slowmodeCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const channel = args.channel || (msg.channel as TextChannel);
+    const channel = args.channel || msg.channel;
 
     let currentSlowmode = channel.rateLimitPerUser;
     let isNative = true;

@@ -8,8 +8,8 @@ import { ApiLogins } from "../data/ApiLogins";
 import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
-import { ok } from "./responses";
 import { env } from "../env";
+import { ok } from "./responses";
 
 interface IPassportApiUser {
   apiKey: string;

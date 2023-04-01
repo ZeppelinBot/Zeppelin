@@ -56,7 +56,7 @@ export function initDocs(app: express.Express) {
     const name = plugin.name;
     const info = plugin.info || {};
 
-    const commands = (plugin.commands || []).map((cmd) => ({
+    const commands = (plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
       permission: cmd.permission,
       signature: cmd.signature,
@@ -66,7 +66,7 @@ export function initDocs(app: express.Express) {
     }));
 
     const defaultOptions = plugin.defaultOptions || {};
-    const configSchema = plugin.configSchema && formatConfigSchema(plugin.configSchema);
+    const configSchema = plugin.info?.configSchema && formatConfigSchema(plugin.info.configSchema);
 
     res.json({
       name,

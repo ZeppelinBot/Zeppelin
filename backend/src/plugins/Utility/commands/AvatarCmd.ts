@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from "discord.js";
+import { APIEmbed, ImageFormat } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { UnknownUser } from "../../../utils";
@@ -16,9 +16,9 @@ export const AvatarCmd = utilityCmd({
   async run({ message: msg, args, pluginData }) {
     const user = args.user || msg.author;
     if (!(user instanceof UnknownUser)) {
-      const embed: MessageEmbedOptions = {
+      const embed: APIEmbed = {
         image: {
-          url: user.displayAvatarURL({ dynamic: true, format: "png", size: 2048 }),
+          url: user.displayAvatarURL({ extension: ImageFormat.PNG, size: 2048 }),
         },
         title: `Avatar of ${user.tag}:`,
       };

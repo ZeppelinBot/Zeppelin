@@ -1,4 +1,3 @@
-import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getBaseUrl, sendErrorMessage } from "../../../pluginUtils";

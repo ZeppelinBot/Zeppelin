@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 import { UsernameHistory } from "../../data/UsernameHistory";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
@@ -9,7 +10,7 @@ export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>(
   name: "username_saver",
   showInDocs: false,
 
-  configSchema: t.type({}),
+  configParser: makeIoTsConfigParser(t.type({})),
 
   // prettier-ignore
   events: [
@@ -18,7 +19,7 @@ export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>(
   ],
 
   beforeLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.usernameHistory = new UsernameHistory();
     state.updateQueue = new Queue();

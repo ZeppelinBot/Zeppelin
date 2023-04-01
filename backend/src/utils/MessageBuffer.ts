@@ -1,6 +1,6 @@
 import { StrictMessageContent } from "../utils";
-import Timeout = NodeJS.Timeout;
 import { calculateEmbedSize } from "./calculateEmbedSize";
+import Timeout = NodeJS.Timeout;
 
 type ConsumeFn = (part: StrictMessageContent) => void;
 

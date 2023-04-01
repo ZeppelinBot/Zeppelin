@@ -1,6 +1,6 @@
 import { Mute } from "./entities/Mute";
-import { ScheduledPost } from "./entities/ScheduledPost";
 import { Reminder } from "./entities/Reminder";
+import { ScheduledPost } from "./entities/ScheduledPost";
 import { Tempban } from "./entities/Tempban";
 import { VCAlert } from "./entities/VCAlert";
 

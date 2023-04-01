@@ -14,7 +14,6 @@ export async function runAutomodOnCounterTrigger(
 ) {
   const user = userId ? await resolveUser(pluginData.client, userId) : undefined;
   const member = (userId && (await resolveMember(pluginData.client, pluginData.guild, userId))) || undefined;
-
   const prettyCounterName = pluginData.getPlugin(CountersPlugin).getPrettyNameForCounter(counterName);
   const prettyTriggerName = pluginData
     .getPlugin(CountersPlugin)

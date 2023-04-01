@@ -2,9 +2,10 @@ import { GuildMember, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -13,15 +14,13 @@ import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { MutesCmd } from "./commands/MutesCmd";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
-import { ClearActiveMuteOnRoleRemovalEvt } from "./events/ClearActiveMuteOnRoleRemovalEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
+import { clearMute } from "./functions/clearMute";
 import { muteUser } from "./functions/muteUser";
 import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { unmuteUser } from "./functions/unmuteUser";
 import { ConfigSchema, MutesPluginType } from "./types";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { clearMute } from "./functions/clearMute";
 
 const defaultOptions = {
   config: {
@@ -66,14 +65,15 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Mutes",
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
   dependencies: () => [CasesPlugin, LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     MutesCmd,
     ClearBannedMutesCmd,
     ClearMutesWithoutRoleCmd,
@@ -105,22 +105,26 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   beforeLoad(pluginData) {
-    pluginData.state.mutes = GuildMutes.getGuildInstance(pluginData.guild.id);
-    pluginData.state.cases = GuildCases.getGuildInstance(pluginData.guild.id);
-    pluginData.state.serverLogs = new GuildLogs(pluginData.guild.id);
-    pluginData.state.archives = GuildArchives.getGuildInstance(pluginData.guild.id);
+    const { state, guild } = pluginData;
 
-    pluginData.state.events = new EventEmitter();
+    state.mutes = GuildMutes.getGuildInstance(guild.id);
+    state.cases = GuildCases.getGuildInstance(guild.id);
+    state.serverLogs = new GuildLogs(guild.id);
+    state.archives = GuildArchives.getGuildInstance(guild.id);
+
+    state.events = new EventEmitter();
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredMute", (mute) =>
-      clearMute(pluginData, mute),
-    );
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredMute", (mute) => clearMute(pluginData, mute));
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
-    pluginData.state.events.removeAllListeners();
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener?.();
+    state.events.removeAllListeners();
   },
 });

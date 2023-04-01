@@ -1,8 +1,8 @@
-import { getRepository, Repository } from "typeorm";
-import { VCAlert } from "./entities/VCAlert";
-import { BaseRepository } from "./BaseRepository";
 import moment from "moment-timezone";
+import { getRepository, Repository } from "typeorm";
 import { DBDateFormat } from "../utils";
+import { BaseRepository } from "./BaseRepository";
+import { VCAlert } from "./entities/VCAlert";
 
 export class VCAlerts extends BaseRepository {
   private allAlerts: Repository<VCAlert>;

@@ -1,9 +1,7 @@
 import { Snowflake } from "discord.js";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
-import { mutesEvt } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { mutesEvt } from "../types";
 
 /**
  * Reapply active mutes on join

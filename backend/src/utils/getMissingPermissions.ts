@@ -1,4 +1,4 @@
-import { Permissions } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 
 /**
  * @param resolvedPermissions A Permission object from e.g. GuildChannel#permissionsFor() or Member#permission
@@ -6,13 +6,13 @@ import { Permissions } from "discord.js";
  * @return Bitmask of missing permissions
  */
 export function getMissingPermissions(
-  resolvedPermissions: Permissions | Readonly<Permissions>,
+  resolvedPermissions: PermissionsBitField | Readonly<PermissionsBitField>,
   requiredPermissions: number | bigint,
 ): bigint {
   const allowedPermissions = resolvedPermissions;
   const nRequiredPermissions = requiredPermissions;
 
-  if (Boolean(allowedPermissions.bitfield & Permissions.FLAGS.ADMINISTRATOR)) {
+  if (Boolean(allowedPermissions.bitfield & PermissionsBitField.Flags.Administrator)) {
     return BigInt(0);
   }
 

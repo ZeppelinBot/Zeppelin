@@ -31,12 +31,7 @@ export async function addMemberPendingRoleChange(
           }
 
           try {
-            await member.edit(
-              {
-                roles: Array.from(newRoleIds.values()),
-              },
-              "Reaction roles",
-            );
+            await member.roles.set(Array.from(newRoleIds.values()), "Reaction roles");
           } catch (e) {
             logger.warn(`Failed to apply role changes to ${member.user.tag} (${member.id}): ${e.message}`);
           }

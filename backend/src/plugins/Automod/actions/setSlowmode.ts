@@ -1,10 +1,8 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { ChannelTypeStrings } from "src/types";
-import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
-import { automodAction } from "../helpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
   configType: t.type({
@@ -23,29 +21,27 @@ export const SetSlowmodeAction = automodAction({
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
 
       // Only text channels and text channels within categories support slowmodes
-      if (!channel || !(channel.type === ChannelTypeStrings.TEXT || ChannelTypeStrings.CATEGORY)) {
+      if (!channel || (!channel.isTextBased() && channel.type !== ChannelType.GuildCategory)) {
         continue;
       }
 
-      const channelsToSlowmode: TextChannel[] = [];
-      if (channel.type === ChannelTypeStrings.CATEGORY) {
+      const channelsToSlowmode: GuildTextBasedChannel[] = [];
+      if (channel.type === ChannelType.GuildCategory) {
         // Find all text channels within the category
         for (const ch of pluginData.guild.channels.cache.values()) {
-          if (ch.parentId === channel.id && ch.type === ChannelTypeStrings.TEXT) {
-            channelsToSlowmode.push(ch as TextChannel);
+          if (ch.parentId === channel.id && ch.type === ChannelType.GuildText) {
+            channelsToSlowmode.push(ch);
           }
         }
       } else {
-        channelsToSlowmode.push(channel as TextChannel);
+        channelsToSlowmode.push(channel);
       }
 
       const slowmodeSeconds = Math.ceil(slowmodeMs / 1000);
 
       try {
         for (const chan of channelsToSlowmode) {
-          await chan.edit({
-            rateLimitPerUser: slowmodeSeconds,
-          });
+          await chan.setRateLimitPerUser(slowmodeSeconds);
         }
       } catch (e) {
         // Check for invalid form body -> indicates duration was too large

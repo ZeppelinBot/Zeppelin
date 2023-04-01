@@ -1,8 +1,8 @@
-import { getRepository, Repository } from "typeorm";
-import { Reminder } from "./entities/Reminder";
-import { BaseRepository } from "./BaseRepository";
 import moment from "moment-timezone";
+import { getRepository, Repository } from "typeorm";
 import { DBDateFormat } from "../utils";
+import { BaseRepository } from "./BaseRepository";
+import { Reminder } from "./entities/Reminder";
 
 export class Reminders extends BaseRepository {
   private reminders: Repository<Reminder>;

@@ -1,4 +1,4 @@
-import { GuildMember, PartialGuildMember, TextChannel, ThreadChannel, User } from "discord.js";
+import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType, CooldownManager } from "knub";
 import { SavedMessage } from "../../data/entities/SavedMessage";
@@ -139,7 +139,7 @@ export interface AutomodContext {
     locked?: ThreadChannel;
     unlocked?: ThreadChannel;
   };
-  channel?: TextChannel | ThreadChannel;
+  channel?: GuildTextBasedChannel;
 }
 
 export interface RecentAction {

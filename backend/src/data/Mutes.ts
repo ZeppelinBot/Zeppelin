@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
-import { Brackets, getRepository, Repository } from "typeorm";
-import { Mute } from "./entities/Mute";
+import { getRepository, Repository } from "typeorm";
 import { DAYS, DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
+import { Mute } from "./entities/Mute";
 
 const OLD_EXPIRED_MUTE_THRESHOLD = 7 * DAYS;
 

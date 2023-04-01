@@ -1,4 +1,3 @@
-import { Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";

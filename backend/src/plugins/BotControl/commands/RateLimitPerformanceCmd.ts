@@ -1,9 +1,8 @@
-import { botControlCmd } from "../types";
-import { getRateLimitStats } from "../../../rateLimitStats";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../../data/GuildArchives";
-import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { TextChannel } from "discord.js";
+import { getBaseUrl, sendSuccessMessage } from "../../../pluginUtils";
+import { getRateLimitStats } from "../../../rateLimitStats";
+import { botControlCmd } from "../types";
 
 export const RateLimitPerformanceCmd = botControlCmd({
   trigger: ["rate_limit_performance"],
@@ -14,7 +13,7 @@ export const RateLimitPerformanceCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const logItems = getRateLimitStats();
     if (logItems.length === 0) {
-      sendSuccessMessage(pluginData, msg.channel as TextChannel, `No rate limits hit`);
+      sendSuccessMessage(pluginData, msg.channel, `No rate limits hit`);
       return;
     }
 
@@ -25,7 +24,7 @@ export const RateLimitPerformanceCmd = botControlCmd({
       if (item.data.global) items.push("GLOBAL");
       items.push(item.data.method.toUpperCase());
       items.push(item.data.route);
-      items.push(`stalled for ${item.data.timeout}ms`);
+      items.push(`stalled for ${item.data.timeToReset}ms`);
       items.push(`(max requests ${item.data.limit})`);
       return items.join(" ");
     });

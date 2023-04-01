@@ -1,7 +1,7 @@
 import {
   Emoji,
   Guild,
-  GuildChannel,
+  GuildBasedChannel,
   GuildMember,
   Message,
   PartialGuildMember,
@@ -9,12 +9,12 @@ import {
   Snowflake,
   StageInstance,
   Sticker,
-  ThreadChannel,
+  StickerFormatType,
   User,
 } from "discord.js";
-import { UnknownUser } from "src/utils";
 import { GuildPluginData } from "knub";
-import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../templateFormatter";
+import { UnknownUser } from "src/utils";
+import { Case } from "../data/entities/Case";
 import {
   ISavedMessageAttachmentData,
   ISavedMessageData,
@@ -22,7 +22,7 @@ import {
   ISavedMessageStickerData,
   SavedMessage,
 } from "../data/entities/SavedMessage";
-import { Case } from "../data/entities/Case";
+import { TemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../templateFormatter";
 
 type InputProps<T> = Omit<
   {
@@ -239,7 +239,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     discriminator: user.discriminator,
     mention: `<@${user.id}>`,
     tag: user.tag,
-    avatarURL: user.displayAvatarURL?.({ dynamic: true }),
+    avatarURL: user.displayAvatarURL?.(),
     bot: user.bot,
     createdAt: user.createdTimestamp,
   });
@@ -268,7 +268,7 @@ export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMem
   });
 }
 
-export function channelToTemplateSafeChannel(channel: GuildChannel | ThreadChannel): TemplateSafeChannel {
+export function channelToTemplateSafeChannel(channel: GuildBasedChannel): TemplateSafeChannel {
   return new TemplateSafeChannel({
     id: channel.id,
     name: channel.name,
@@ -305,9 +305,9 @@ export function stickerToTemplateSafeSticker(sticker: Sticker): TemplateSafeStic
     packId: sticker.packId ?? undefined,
     name: sticker.name,
     description: sticker.description ?? "",
-    tags: sticker.tags?.join(", ") ?? "",
+    tags: sticker.tags ?? "",
     format: sticker.format,
-    animated: sticker.format === "PNG" ? false : true,
+    animated: sticker.format === StickerFormatType.PNG ? false : true,
     url: sticker.url,
   });
 }
@@ -448,7 +448,7 @@ export function messageToTemplateSafeMessage(message: Message): TemplateSafeMess
     id: message.id,
     content: message.content,
     author: userToTemplateSafeUser(message.author),
-    channel: channelToTemplateSafeChannel(message.channel as GuildChannel | ThreadChannel),
+    channel: channelToTemplateSafeChannel(message.channel as GuildBasedChannel),
   });
 }
 

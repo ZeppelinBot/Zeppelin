@@ -3,10 +3,10 @@ import Vuex, { Store } from "vuex";
 
 Vue.use(Vuex);
 
-import { RootState } from "./types";
 import { AuthStore } from "./auth";
-import { GuildStore } from "./guilds";
 import { DocsStore } from "./docs";
+import { GuildStore } from "./guilds";
+import { RootState } from "./types";
 
 export const RootStore = new Vuex.Store<RootState>({
   modules: {

@@ -1,10 +1,10 @@
-import { typedGuildCommand } from "knub";
-import { RoleButtonsPluginType } from "../types";
+import { guildPluginMessageCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { applyAllRoleButtons } from "../functions/applyAllRoleButtons";
+import { RoleButtonsPluginType } from "../types";
 
-export const resetButtonsCmd = typedGuildCommand<RoleButtonsPluginType>()({
+export const resetButtonsCmd = guildPluginMessageCommand<RoleButtonsPluginType>()({
   trigger: "role_buttons reset",
   description:
     "In case of issues, you can run this command to have Zeppelin 'forget' about specific role buttons and re-apply them. This will also repost the message, if not targeting an existing message.",

@@ -1,4 +1,4 @@
-import { GuildMember, Message, TextChannel, User } from "discord.js";
+import { GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
@@ -19,7 +19,7 @@ export async function actualUnmuteCmd(
 
   if (args.mod) {
     if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id }))) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "You don't have permission to use -mod");
+      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
       return;
     }
 
@@ -37,7 +37,7 @@ export async function actualUnmuteCmd(
   });
 
   if (!result) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, "User is not muted!");
+    sendErrorMessage(pluginData, msg.channel, "User is not muted!");
     return;
   }
 
@@ -46,7 +46,7 @@ export async function actualUnmuteCmd(
     const timeUntilUnmute = args.time && humanizeDuration(args.time);
     sendSuccessMessage(
       pluginData,
-      msg.channel as TextChannel,
+      msg.channel,
       asSingleLine(`
         Unmuting **${user.tag}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
@@ -55,7 +55,7 @@ export async function actualUnmuteCmd(
   } else {
     sendSuccessMessage(
       pluginData,
-      msg.channel as TextChannel,
+      msg.channel,
       asSingleLine(`
         Unmuted **${user.tag}**
         (Case #${result.case.case_number})

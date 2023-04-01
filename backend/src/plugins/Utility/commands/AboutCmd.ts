@@ -1,13 +1,13 @@
-import { GuildChannel, MessageOptions } from "discord.js";
+import { APIEmbed, GuildChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
+import { shuffle } from "lodash";
 import moment from "moment-timezone";
 import { rootDir } from "../../../paths";
 import { getCurrentUptime } from "../../../uptime";
-import { multiSorter, resolveMember, sorter } from "../../../utils";
+import { resolveMember, sorter } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { utilityCmd } from "../types";
-import { shuffle } from "lodash";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",
@@ -59,20 +59,16 @@ export const AboutCmd = utilityCmd({
     );
     loadedPlugins.sort();
 
-    const aboutContent: MessageOptions = {
-      embeds: [
+    const aboutEmbed: APIEmbed = {
+      title: `About ${pluginData.client.user!.username}`,
+      fields: [
         {
-          title: `About ${pluginData.client.user!.username}`,
-          fields: [
-            {
-              name: "Status",
-              value: basicInfoRows.map(([label, value]) => `${label}: **${value}**`).join("\n"),
-            },
-            {
-              name: `Loaded plugins on this server (${loadedPlugins.length})`,
-              value: loadedPlugins.join(", "),
-            },
-          ],
+          name: "Status",
+          value: basicInfoRows.map(([label, value]) => `${label}: **${value}**`).join("\n"),
+        },
+        {
+          name: `Loaded plugins on this server (${loadedPlugins.length})`,
+          value: loadedPlugins.join(", "),
         },
       ],
     };
@@ -86,7 +82,7 @@ export const AboutCmd = utilityCmd({
         .map((s, i) => (i % 2 === 0 ? `**${s.name}**` : `__${s.name}__`))
         .join(" ");
 
-      aboutContent.embeds![0].fields!.push({
+      aboutEmbed.fields!.push({
         name: "Zeppelin supporters 🎉",
         value:
           "These amazing people have supported Zeppelin development by pledging on [Patreon](https://www.patreon.com/zeppelinbot):\n\n" +
@@ -102,14 +98,14 @@ export const AboutCmd = utilityCmd({
     botRoles = botRoles.filter((r) => r.color); // Filter to those with a color
     botRoles.sort(sorter("position", "DESC")); // Sort by position (highest first)
     if (botRoles.length) {
-      aboutContent.embeds![0].color = botRoles[0].color;
+      aboutEmbed.color = botRoles[0].color;
     }
 
     // Use the bot avatar as the embed image
     if (pluginData.client.user!.avatarURL()) {
-      aboutContent.embeds![0].thumbnail = { url: pluginData.client.user!.avatarURL()! };
+      aboutEmbed.thumbnail = { url: pluginData.client.user!.avatarURL()! };
     }
 
-    msg.channel.send(aboutContent);
+    msg.channel.send({ embeds: [aboutEmbed] });
   },
 });

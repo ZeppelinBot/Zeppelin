@@ -1,13 +1,13 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { typedGuildCommand } from "knub";
-import { waitForReply } from "knub/dist/helpers";
+import { guildPluginMessageCommand } from "knub";
+import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { setCounterValue } from "../functions/setCounterValue";
 import { CountersPluginType } from "../types";
 
-export const ResetCounterCmd = typedGuildCommand<CountersPluginType>()({
+export const ResetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters reset", "counter reset", "resetcounter"],
   permission: "can_edit",
 

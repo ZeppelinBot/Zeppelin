@@ -1,11 +1,11 @@
-import { typedGuildEventListener } from "knub";
-import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { GuildMember } from "discord.js";
-import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
+import { guildPluginEventListener } from "knub";
 import { parseCustomId } from "../../../utils/parseCustomId";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
+import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
+import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
 
-export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType>()({
+export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginType>()({
   event: "interactionCreate",
   async listener({ pluginData, args }) {
     if (!args.interaction.isButton()) {
@@ -28,6 +28,7 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
           ephemeral: true,
           content: "Invalid option selected",
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
       return;
     }
@@ -46,6 +47,7 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
           ephemeral: true,
           content: `The role **${roleName}** will be removed shortly!`,
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
     } else {
       rolesToAdd.push(option.role_id);
@@ -63,6 +65,7 @@ export const onButtonInteraction = typedGuildEventListener<RoleButtonsPluginType
           ephemeral: true,
           content: `You will receive the **${roleName}** role shortly!`,
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
     }
 

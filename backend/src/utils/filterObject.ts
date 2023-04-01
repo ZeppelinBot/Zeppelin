@@ -6,7 +6,7 @@ type FilterResult<T> = {
  * Filter an object's properties based on its values and keys
  * @return New object with filtered properties
  */
-export function filterObject<T>(
+export function filterObject<T extends object>(
   object: T,
   filterFn: <K extends keyof T>(value: T[K], key: K) => boolean,
 ): FilterResult<T> {
