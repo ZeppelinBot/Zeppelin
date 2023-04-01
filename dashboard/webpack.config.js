@@ -163,7 +163,7 @@ let config = {
   },
 };
 
-if (process.env.NODE_ENV === "web") config.plugins.push(new webpack.EnvironmentPlugin(['NODE_ENV', 'API_URL']));
+if (process.env.NODE_ENV === "web") config.plugins.push(new webpack.EnvironmentPlugin(["NODE_ENV", "API_URL"]));
 
 if (process.env.NODE_ENV === "production") {
   config = merge(config, {
