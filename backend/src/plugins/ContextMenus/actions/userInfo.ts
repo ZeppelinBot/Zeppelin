@@ -7,7 +7,7 @@ export async function userInfoAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   interaction: ContextMenuCommandInteraction,
 ) {
-  interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
