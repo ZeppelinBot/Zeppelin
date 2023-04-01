@@ -113,8 +113,7 @@ export const commandTypes = {
   },
 
   guildTextBasedChannel(value: string, context: CommandContext<any>) {
-    // FIXME: Remove once Knub's types have been fixed
-    return messageCommandBaseTypeConverters.textChannel(value, context) as GuildTextBasedChannel;
+    return messageCommandBaseTypeConverters.textChannel(value, context);
   },
 };
 
