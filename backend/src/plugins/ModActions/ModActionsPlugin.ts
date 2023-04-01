@@ -35,6 +35,7 @@ import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
 import { UnmuteCmd } from "./commands/UnmuteCmd";
 import { UpdateCmd } from "./commands/UpdateCmd";
 import { WarnCmd } from "./commands/WarnCmd";
+import { AuditLogEvents } from "./events/AuditLogEvents";
 import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
@@ -127,7 +128,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
-  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt],
+  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 
   messageCommands: [
     UpdateCmd,

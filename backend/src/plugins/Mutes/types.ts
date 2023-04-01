@@ -50,7 +50,8 @@ export interface MutesPluginType extends BasePluginType {
     serverLogs: GuildLogs;
     archives: GuildArchives;
 
-    unregisterGuildEventListener: () => void;
+    unregisterExpiredRoleMuteListener: () => void;
+    unregisterTimeoutMuteToRenewListener: () => void;
 
     events: MutesEventEmitter;
   };
