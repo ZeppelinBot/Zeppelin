@@ -213,6 +213,7 @@ export const MutesCmd = mutesCmd({
           if (msg.author.id !== interaction.user.id) {
             interaction
               .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+              // tslint:disable-next-line no-console
               .catch((err) => console.trace(err.message));
           } else {
             collector.resetTimer();

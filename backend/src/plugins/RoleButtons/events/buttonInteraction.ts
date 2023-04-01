@@ -28,6 +28,7 @@ export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginTyp
           ephemeral: true,
           content: "Invalid option selected",
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
       return;
     }
@@ -46,6 +47,7 @@ export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginTyp
           ephemeral: true,
           content: `The role **${roleName}** will be removed shortly!`,
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
     } else {
       rolesToAdd.push(option.role_id);
@@ -63,6 +65,7 @@ export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginTyp
           ephemeral: true,
           content: `You will receive the **${roleName}** role shortly!`,
         })
+        // tslint:disable-next-line no-console
         .catch((err) => console.trace(err.message));
     }
 

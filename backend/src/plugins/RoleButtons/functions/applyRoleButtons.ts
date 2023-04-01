@@ -52,6 +52,8 @@ export async function applyRoleButtons(
 
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
     if (channel && (!channel.isTextBased || typeof channel.isTextBased !== "function")) {
+      // FIXME: Probably not relevant anymore?
+      // tslint:disable-next-line no-console
       console.log("wtf", pluginData.guild?.id, configItem.message.channel_id);
     }
     if (!channel || !channel?.isTextBased()) {
