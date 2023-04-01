@@ -578,7 +578,10 @@ export function errorMessage(str, emoji = "⚠") {
 
 export function get(obj, path, def?): any {
   let cursor = obj;
-  const pathParts = path.split(".");
+  const pathParts = path
+    .split(".")
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
   for (const part of pathParts) {
     // hasOwnProperty check here is necessary to prevent prototype traversal in tags
     if (!cursor.hasOwnProperty(part)) return def;

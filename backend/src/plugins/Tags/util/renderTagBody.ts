@@ -30,7 +30,7 @@ export async function renderTagBody(
       return val;
     },
     get(name) {
-      return dynamicVars[name] == null ? "" : dynamicVars[name];
+      return !dynamicVars.hasOwnProperty(name) || dynamicVars[name] == null ? "" : dynamicVars[name];
     },
     tag: async (name, ...subTagArgs) => {
       if (++tagFnCallsObj.calls > MAX_TAG_FN_CALLS) return "";
