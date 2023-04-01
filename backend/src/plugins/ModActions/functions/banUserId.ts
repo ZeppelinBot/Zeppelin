@@ -1,4 +1,4 @@
-import { DiscordAPIError, Snowflake, User } from "discord.js";
+import { DiscordAPIError, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -10,6 +10,7 @@ import {
   createUserNotificationError,
   DAYS,
   notifyUser,
+  resolveMember,
   resolveUser,
   SECONDS,
   ucfirst,
@@ -42,8 +43,9 @@ export async function banUserId(
   }
 
   // Attempt to message the user *before* banning them, as doing it after may not be possible
+  const member = await resolveMember(pluginData.client, pluginData.guild, userId);
   let notifyResult: UserNotificationResult = { method: null, success: true };
-  if (reason && user instanceof User) {
+  if (reason && member) {
     const contactMethods = banOptions?.contactMethods
       ? banOptions.contactMethods
       : getDefaultContactMethods(pluginData, "ban");
@@ -61,7 +63,7 @@ export async function banUserId(
           }),
         );
 
-        notifyResult = await notifyUser(user, banMessage, contactMethods);
+        notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else if (banTime && config.tempban_message) {
         const banMessage = await renderTemplate(
           config.tempban_message,
@@ -75,7 +77,7 @@ export async function banUserId(
           }),
         );
 
-        notifyResult = await notifyUser(user, banMessage, contactMethods);
+        notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else {
         notifyResult = createUserNotificationError("No ban/tempban message specified in config");
       }

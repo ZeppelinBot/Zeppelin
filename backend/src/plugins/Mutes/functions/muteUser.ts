@@ -1,4 +1,4 @@
-import { Snowflake, User } from "discord.js";
+import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -191,7 +191,7 @@ export async function muteUser(
       }),
     ));
 
-  if (muteMessage && user instanceof User) {
+  if (muteMessage && member) {
     let contactMethods: UserNotificationMethod[] = [];
 
     if (muteOptions?.contactMethods) {
@@ -211,7 +211,7 @@ export async function muteUser(
       }
     }
 
-    notifyResult = await notifyUser(user, muteMessage, contactMethods);
+    notifyResult = await notifyUser(member.user, muteMessage, contactMethods);
   }
 
   // Create/update a case
