@@ -309,9 +309,9 @@
         },
         hasUsageInfo() {
           if (!this.data) return true;
-          if (this.data.messageCommands.length) return true;
-          if (this.data.slashCommands.length) return true;
-          if (this.data.info.usageGuide) return true;
+          if (this.data.messageCommands?.length) return true;
+          if (this.data.slashCommands?.length) return true;
+          if (this.data.info?.usageGuide) return true;
           return false;
         },
       }),
