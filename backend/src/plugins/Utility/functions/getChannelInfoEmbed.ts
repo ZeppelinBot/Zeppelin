@@ -18,6 +18,8 @@ const PUBLIC_THREAD_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/870343055855738921/public-thread.png";
 const PRIVATE_THREAD_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/870343402447839242/private-thread.png";
+const FORUM_CHANNEL_ICON =
+  "https://cdn.discordapp.com/attachments/740650744830623756/1091681253364875294/forum-channel-icon.png";
 
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
@@ -40,6 +42,8 @@ export async function getChannelInfoEmbed(
       [ChannelType.GuildStageVoice]: STAGE_CHANNEL_ICON,
       [ChannelType.PublicThread]: PUBLIC_THREAD_ICON,
       [ChannelType.PrivateThread]: PRIVATE_THREAD_ICON,
+      [ChannelType.AnnouncementThread]: PUBLIC_THREAD_ICON,
+      [ChannelType.GuildForum]: FORUM_CHANNEL_ICON,
     }[channel.type] ?? TEXT_CHANNEL_ICON;
 
   const channelType =
