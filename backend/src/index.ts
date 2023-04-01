@@ -61,8 +61,8 @@ const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
 const SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES = ["Server didn't acknowledge previous heartbeat, possible lost connection"];
 
 function errorHandler(err) {
-  const guildName = err.guild?.name || "Global";
-  const guildId = err.guild?.id || "0";
+  const guildId = err.guild?.id || err.guildId || "0";
+  const guildName = err.guild?.name || (guildId && guildId !== "0" ? "Unknown" : "Global");
 
   if (err instanceof RecoverablePluginError) {
     // Recoverable plugin errors can be, well, recovered from.
