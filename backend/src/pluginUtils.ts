@@ -2,7 +2,14 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { GuildMember, Message, MessageCreateOptions, MessageMentionOptions, TextBasedChannel } from "discord.js";
+import {
+  GuildMember,
+  Message,
+  MessageCreateOptions,
+  MessageMentionOptions,
+  PermissionsBitField,
+  TextBasedChannel,
+} from "discord.js";
 import * as t from "io-ts";
 import {
   AnyPluginData,
@@ -27,8 +34,14 @@ export function canActOn(
   member1: GuildMember,
   member2: GuildMember,
   allowSameLevel = false,
+  allowAdmins = false,
 ) {
   if (member2.id === pluginData.client.user!.id) {
+    return false;
+  }
+  const isOwnerOrAdmin =
+    member2.id === member2.guild.ownerId || member2.permissions.has(PermissionsBitField.Flags.Administrator);
+  if (isOwnerOrAdmin && !allowAdmins) {
     return false;
   }
 

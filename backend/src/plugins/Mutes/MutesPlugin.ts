@@ -15,10 +15,12 @@ import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
 import { MutesCmd } from "./commands/MutesCmd";
 import { ClearActiveMuteOnMemberBanEvt } from "./events/ClearActiveMuteOnMemberBanEvt";
 import { ReapplyActiveMuteOnJoinEvt } from "./events/ReapplyActiveMuteOnJoinEvt";
+import { RegisterManualTimeoutsEvt } from "./events/RegisterManualTimeoutsEvt";
 import { clearMute } from "./functions/clearMute";
 import { muteUser } from "./functions/muteUser";
 import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
+import { renewTimeoutMute } from "./functions/renewTimeoutMute";
 import { unmuteUser } from "./functions/unmuteUser";
 import { ConfigSchema, MutesPluginType } from "./types";
 
@@ -85,6 +87,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     // ClearActiveMuteOnRoleRemovalEvt, // FIXME: Temporarily disabled for performance
     ClearActiveMuteOnMemberBanEvt,
     ReapplyActiveMuteOnJoinEvt,
+    RegisterManualTimeoutsEvt,
   ],
 
   public: {
@@ -118,13 +121,24 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   afterLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredMute", (mute) => clearMute(pluginData, mute));
+    state.unregisterExpiredRoleMuteListener = onGuildEvent(guild.id, "expiredMute", (mute) =>
+      clearMute(pluginData, mute),
+    );
+    state.unregisterTimeoutMuteToRenewListener = onGuildEvent(guild.id, "timeoutMuteToRenew", (mute) =>
+      renewTimeoutMute(pluginData, mute),
+    );
+
+    const muteRole = pluginData.config.get().mute_role;
+    if (muteRole) {
+      state.mutes.fillMissingMuteRole(muteRole);
+    }
   },
 
   beforeUnload(pluginData) {
     const { state, guild } = pluginData;
 
-    state.unregisterGuildEventListener?.();
+    state.unregisterExpiredRoleMuteListener?.();
+    state.unregisterTimeoutMuteToRenewListener?.();
     state.events.removeAllListeners();
   },
 });

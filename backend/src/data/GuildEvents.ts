@@ -6,6 +6,7 @@ import { VCAlert } from "./entities/VCAlert";
 
 interface GuildEventArgs extends Record<string, unknown[]> {
   expiredMute: [Mute];
+  timeoutMuteToRenew: [Mute];
   scheduledPost: [ScheduledPost];
   reminder: [Reminder];
   expiredTempban: [Tempban];
