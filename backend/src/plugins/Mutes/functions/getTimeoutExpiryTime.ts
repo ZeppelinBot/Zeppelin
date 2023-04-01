@@ -7,7 +7,7 @@ import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes";
  * @return - Timeout expiry timestamp
  */
 export function getTimeoutExpiryTime(muteExpiresAt: number | null | undefined): number {
-  if (muteExpiresAt && muteExpiresAt <= MAX_TIMEOUT_DURATION) {
+  if (muteExpiresAt && muteExpiresAt - Date.now() <= MAX_TIMEOUT_DURATION) {
     return muteExpiresAt;
   }
   return Date.now() + MAX_TIMEOUT_DURATION;
