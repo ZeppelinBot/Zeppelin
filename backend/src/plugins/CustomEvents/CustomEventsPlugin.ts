@@ -1,5 +1,6 @@
 import { GuildChannel, GuildMember, User } from "discord.js";
 import { guildPluginMessageCommand, parseSignature } from "knub";
+import { TSignature } from "knub-command-manager";
 import { commandTypes } from "../../commandTypes";
 import { makeIoTsConfigParser } from "../../pluginUtils";
 import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
@@ -32,8 +33,10 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
     const config = pluginData.config.get();
     for (const [key, event] of Object.entries(config.events)) {
       if (event.trigger.type === "command") {
-        const signature = event.trigger.params ? parseSignature(event.trigger.params, commandTypes) : {};
-        const eventCommand = guildPluginMessageCommand({
+        const signature: TSignature<any> = event.trigger.params
+          ? parseSignature(event.trigger.params, commandTypes)
+          : {};
+        const eventCommand = guildPluginMessageCommand<CustomEventsPluginType>()({
           trigger: event.trigger.name,
           permission: `events.${key}.trigger.can_use`,
           signature,
@@ -59,8 +62,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
             runEvent(pluginData, event, { msg: message, args }, values);
           },
         });
-        // FIXME: Typings
-        // pluginData.messageCommands.add(eventCommand);
+        pluginData.messageCommands.add(eventCommand);
       }
     }
   },
