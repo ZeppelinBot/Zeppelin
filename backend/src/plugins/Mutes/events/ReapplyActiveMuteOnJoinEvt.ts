@@ -1,7 +1,9 @@
 import { Snowflake } from "discord.js";
+import moment from "moment-timezone";
 import { MuteTypes } from "../../../data/MuteTypes";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { getTimeoutExpiryTime } from "../functions/getTimeoutExpiryTime";
 import { mutesEvt } from "../types";
 
 /**
@@ -25,6 +27,12 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
         } finally {
           memberRoleLock.unlock();
         }
+      }
+    } else {
+      if (!member.isCommunicationDisabled()) {
+        const expiresAt = mute.expires_at ? moment.utc(mute.expires_at).valueOf() : null;
+        const timeoutExpiresAt = getTimeoutExpiryTime(expiresAt);
+        await member.disableCommunicationUntil(timeoutExpiresAt);
       }
     }
 
