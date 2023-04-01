@@ -112,7 +112,7 @@ export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema)
   return (input: unknown) => {
     const error = validate(schema, input);
     if (error) {
-      throw error;
+      throw strictValidationErrorToConfigValidationError(error);
     }
     return input as t.TypeOf<Schema>;
   };
