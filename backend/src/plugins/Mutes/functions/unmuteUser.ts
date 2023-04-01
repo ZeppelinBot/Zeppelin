@@ -26,12 +26,7 @@ export async function unmuteUser(
   const member = await resolveMember(pluginData.client, pluginData.guild, userId, true); // Grab the fresh member so we don't have stale role info
   const modId = caseArgs.modId || pluginData.client.user!.id;
 
-  if (
-    !existingMute &&
-    member &&
-    !memberHasMutedRole(pluginData, member) &&
-    !member?.communicationDisabledUntilTimestamp
-  ) {
+  if (!existingMute && member && !memberHasMutedRole(pluginData, member) && !member?.isCommunicationDisabled()) {
     return null;
   }
 

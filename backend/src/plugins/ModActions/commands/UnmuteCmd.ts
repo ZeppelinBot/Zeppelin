@@ -47,7 +47,7 @@ export const UnmuteCmd = modActionsCmd({
     if (
       !(await pluginData.state.mutes.isMuted(user.id)) &&
       !hasMuteRole &&
-      !memberToUnmute?.communicationDisabledUntilTimestamp
+      !memberToUnmute?.isCommunicationDisabled()
     ) {
       sendErrorMessage(pluginData, msg.channel, "Cannot unmute: member is not muted");
       return;

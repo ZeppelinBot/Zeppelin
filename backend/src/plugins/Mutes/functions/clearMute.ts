@@ -53,7 +53,7 @@ export async function clearMute(
         if (muteRole && member.roles.cache.has(muteRole)) {
           await member.roles.remove(muteRole);
         }
-        if (member.communicationDisabledUntilTimestamp) {
+        if (member.isCommunicationDisabled()) {
           await member.timeout(null);
         }
       }
