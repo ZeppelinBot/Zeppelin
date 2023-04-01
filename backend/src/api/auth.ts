@@ -56,7 +56,7 @@ export function initAuth(app: express.Express) {
   app.use(passport.initialize());
 
   passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((user, done) => done(null, user));
+  passport.deserializeUser((user, done) => done(null, user as IPassportApiUser));
 
   const apiLogins = new ApiLogins();
   const apiUserInfo = new ApiUserInfo();
