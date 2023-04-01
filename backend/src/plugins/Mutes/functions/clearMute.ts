@@ -50,10 +50,12 @@ export async function clearMute(
       } else {
         // Unmuting someone without an active mute -> remove timeouts and/or mute role
         const muteRole = pluginData.config.get().mute_role;
-        if (muteRole) {
+        if (muteRole && member.roles.cache.has(muteRole)) {
           await member.roles.remove(muteRole);
         }
-        await member.timeout(null);
+        if (member.communicationDisabledUntilTimestamp) {
+          await member.timeout(null);
+        }
       }
     } catch {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
