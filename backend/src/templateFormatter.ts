@@ -59,28 +59,35 @@ function isTemplateSafeValue(value: unknown): value is TemplateSafeValue {
 export class TemplateSafeValueContainer {
   // Fake property used for stricter type checks since TypeScript uses structural typing
   _isTemplateSafeValueContainer: true;
-
   [key: string]: TemplateSafeValue;
 
-  constructor(data: Record<string, TemplateSafeValue> = {}) {
-    for (const [key, value] of Object.entries(data)) {
-      if (!isTemplateSafeValue(value)) {
-        // tslint:disable:no-console
-        console.error("=== CONTEXT FOR UNSAFE VALUE ===");
-        console.error("stringified:", JSON.stringify(value));
-        console.error("typeof:", typeof value);
-        console.error("constructor name:", (value as any)?.constructor?.name);
-        console.error("=== /CONTEXT FOR UNSAFE VALUE ===");
-        // tslint:enable:no-console
-        throw new Error(`Unsafe value for key "${key}" in SafeTemplateValueContainer`);
-      }
-
-      this[key] = value;
+  constructor(data?: Record<string, TemplateSafeValue>) {
+    if (data) {
+      ingestDataIntoTemplateSafeValueContainer(this, data);
     }
   }
 }
 
 export type TypedTemplateSafeValueContainer<T> = TemplateSafeValueContainer & T;
+
+export function ingestDataIntoTemplateSafeValueContainer(
+  target: TemplateSafeValueContainer,
+  data: Record<string, TemplateSafeValue> = {},
+) {
+  for (const [key, value] of Object.entries(data)) {
+    if (!isTemplateSafeValue(value)) {
+      // tslint:disable:no-console
+      console.error("=== CONTEXT FOR UNSAFE VALUE ===");
+      console.error("stringified:", JSON.stringify(value));
+      console.error("typeof:", typeof value);
+      console.error("constructor name:", (value as any)?.constructor?.name);
+      console.error("=== /CONTEXT FOR UNSAFE VALUE ===");
+      // tslint:enable:no-console
+      throw new Error(`Unsafe value for key "${key}" in SafeTemplateValueContainer`);
+    }
+    target[key] = value;
+  }
+}
 
 export function createTypedTemplateSafeValueContainer<T extends Record<string, TemplateSafeValue>>(
   data: T,
