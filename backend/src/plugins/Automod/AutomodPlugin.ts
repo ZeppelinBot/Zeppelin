@@ -1,4 +1,3 @@
-import * as t from "io-ts";
 import { configUtils, CooldownManager } from "knub";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
@@ -9,7 +8,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { MINUTES, SECONDS } from "../../utils";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
-import { StrictValidationError, validate } from "../../validatorUtils";
+import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
 import { CountersPlugin } from "../Counters/CountersPlugin";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -181,12 +180,7 @@ const configParser = (input: unknown) => {
     }
   }
 
-  const error = validate(ConfigSchema, input);
-  if (error) {
-    throw error;
-  }
-
-  return input as t.TypeOf<typeof ConfigSchema>;
+  return parseIoTsSchema(ConfigSchema, input);
 };
 
 export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({

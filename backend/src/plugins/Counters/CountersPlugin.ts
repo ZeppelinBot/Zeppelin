@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import {
   buildCounterConditionString,
@@ -10,7 +9,7 @@ import {
 import { GuildCounters } from "../../data/GuildCounters";
 import { mapToPublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS, MINUTES } from "../../utils";
-import { StrictValidationError, validate } from "../../validatorUtils";
+import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
@@ -115,12 +114,7 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
       throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
     }
 
-    const error = validate(ConfigSchema, input);
-    if (error) {
-      throw error;
-    }
-
-    return input as t.TypeOf<typeof ConfigSchema>;
+    return parseIoTsSchema(ConfigSchema, input);
   },
 
   public: {

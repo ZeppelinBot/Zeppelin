@@ -25,7 +25,7 @@ import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
 import { errorMessage, successMessage, tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
-import { StrictValidationError, validate } from "./validatorUtils";
+import { parseIoTsSchema, StrictValidationError } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 
@@ -110,11 +110,14 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
 
 export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema): (input: unknown) => t.TypeOf<Schema> {
   return (input: unknown) => {
-    const error = validate(schema, input);
-    if (error) {
-      throw strictValidationErrorToConfigValidationError(error);
+    try {
+      return parseIoTsSchema(schema, input);
+    } catch (err) {
+      if (err instanceof StrictValidationError) {
+        throw strictValidationErrorToConfigValidationError(err);
+      }
+      throw err;
     }
-    return input as t.TypeOf<Schema>;
   };
 }
 

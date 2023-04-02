@@ -1,6 +1,5 @@
-import * as t from "io-ts";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { StrictValidationError, validate } from "../../validatorUtils";
+import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -65,12 +64,7 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
       }
     }
 
-    const error = validate(ConfigSchema, input);
-    if (error) {
-      throw error;
-    }
-
-    return input as t.TypeOf<typeof ConfigSchema>;
+    return parseIoTsSchema(ConfigSchema, input);
   },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],

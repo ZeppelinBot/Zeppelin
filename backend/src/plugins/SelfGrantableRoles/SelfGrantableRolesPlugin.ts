@@ -1,7 +1,6 @@
-import * as t from "io-ts";
 import { CooldownManager, PluginOptions } from "knub";
 import { trimPluginDescription } from "../../utils";
-import { validate } from "../../validatorUtils";
+import { parseIoTsSchema } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
@@ -84,12 +83,7 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
       }
     }
 
-    const error = validate(ConfigSchema, input);
-    if (error) {
-      throw error;
-    }
-
-    return input as t.TypeOf<typeof ConfigSchema>;
+    return parseIoTsSchema(ConfigSchema, input);
   },
   defaultOptions,
 

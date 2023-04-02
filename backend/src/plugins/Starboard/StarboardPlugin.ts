@@ -1,10 +1,9 @@
-import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
 import { trimPluginDescription } from "../../utils";
-import { validate } from "../../validatorUtils";
+import { parseIoTsSchema } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
@@ -132,12 +131,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
       }
     }
 
-    const error = validate(ConfigSchema, input);
-    if (error) {
-      throw error;
-    }
-
-    return input as t.TypeOf<typeof ConfigSchema>;
+    return parseIoTsSchema(ConfigSchema, input);
   },
   defaultOptions,
 
