@@ -1,9 +1,8 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import * as t from "io-ts";
 import { PluginOptions } from "knub";
 import moment from "moment-timezone";
-import { StrictValidationError, validate } from "src/validatorUtils";
+import { parseIoTsSchema, StrictValidationError } from "src/validatorUtils";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -118,12 +117,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
       }
     }
 
-    const error = validate(ConfigSchema, input);
-    if (error) {
-      throw error;
-    }
-
-    return input as t.TypeOf<typeof ConfigSchema>;
+    return parseIoTsSchema(ConfigSchema, input);
   },
 
   beforeLoad(pluginData) {
