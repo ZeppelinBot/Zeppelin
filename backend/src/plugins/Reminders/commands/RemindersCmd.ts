@@ -29,7 +29,12 @@ export const RemindersCmd = remindersCmd({
       const prettyRemindAt = timeAndDate
         .inGuildTz(moment.utc(reminder.remind_at, DBDateFormat))
         .format(timeAndDate.getDateFormat("pretty_datetime"));
-      return `\`${paddedNum}.\` \`${prettyRemindAt} (${result})\` ${reminder.body}`;
+      const remindIn =
+        diff > 0
+          ? `in ${humanizeDuration(diff, { largest: 2, round: true })}`
+          : `${humanizeDuration(Math.abs(diff), { largest: 2, round: true })} ago`;
+      const timestamp = `<t:${target.unix()}:f>`;
+      return `\`${paddedNum}.\` ${timestamp} (${remindIn}): ${reminder.body}`;
     });
 
     createChunkedMessage(msg.channel, lines.join("\n"));
