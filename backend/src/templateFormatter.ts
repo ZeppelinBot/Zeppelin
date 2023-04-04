@@ -413,7 +413,7 @@ const baseValues = {
       [from, to] = [to, from];
     }
 
-    const randValue = seed != null ? new seedrandom(seed)() : Math.random();
+    const randValue = seed != null ? seedrandom(seed)() : Math.random();
 
     return Math.round(randValue * (to - from) + from);
   },
