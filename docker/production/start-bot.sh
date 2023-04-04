@@ -8,6 +8,11 @@
 echo "Waiting for prepare_backend to finish before starting the bot..."
 while ping -c1 prepare_backend &>/dev/null; do sleep 1; done;
 
-echo "Starting the bot"
 cd /zeppelin/backend
-exec npm run start-bot-prod
+if [ -n "$DEBUG" ]; then
+  echo "Starting bot in debug mode"
+  exec npm run start-bot-prod-debug
+else
+  echo "Starting bot"
+  exec npm run start-bot-prod
+fi

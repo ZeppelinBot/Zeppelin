@@ -8,6 +8,11 @@
 echo "Waiting for prepare_backend to finish before starting the API..."
 while ping -c1 prepare_backend &>/dev/null; do sleep 1; done;
 
-echo "Starting the API"
 cd /zeppelin/backend
-exec npm run start-api-prod
+if [ -n "$DEBUG" ]; then
+  echo "Starting API in debug mode"
+  exec npm run start-api-prod-debug
+else
+  echo "Starting API"
+  exec npm run start-api-prod
+fi
