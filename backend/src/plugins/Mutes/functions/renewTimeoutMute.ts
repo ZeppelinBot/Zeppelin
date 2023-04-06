@@ -1,3 +1,4 @@
+import { PermissionFlagsBits } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { Mute } from "../../../data/entities/Mute";
@@ -6,6 +7,12 @@ import { DBDateFormat, resolveMember } from "../../../utils";
 import { MutesPluginType } from "../types";
 
 export async function renewTimeoutMute(pluginData: GuildPluginData<MutesPluginType>, mute: Mute) {
+  const me =
+    pluginData.client.user && (await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user.id));
+  if (!me || !me.permissions.has(PermissionFlagsBits.ModerateMembers)) {
+    return;
+  }
+
   const member = await resolveMember(pluginData.client, pluginData.guild, mute.user_id, true);
   if (!member) {
     return;
