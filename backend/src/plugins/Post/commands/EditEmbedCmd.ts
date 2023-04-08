@@ -1,7 +1,7 @@
 import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { trimLines } from "../../../utils";
+import { isValidEmbed, trimLines } from "../../../utils";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
 import { postCmd } from "../types";
@@ -20,6 +20,7 @@ export const EditEmbedCmd = postCmd({
     title: ct.string({ option: true }),
     content: ct.string({ option: true }),
     color: ct.string({ option: true }),
+    raw: ct.bool({ option: true, isSwitch: true, shortcut: "r" }),
   },
 
   async run({ message: msg, args, pluginData }) {
@@ -42,10 +43,30 @@ export const EditEmbedCmd = postCmd({
       return;
     }
 
-    const embed = (targetMessage.embeds![0] ?? { fields: [] }) as APIEmbed;
+    let embed: APIEmbed = targetMessage.embeds![0]?.toJSON() ?? { fields: [] };
     if (args.title) embed.title = args.title;
-    if (content) embed.description = formatContent(content);
     if (color) embed.color = color;
+
+    if (content) {
+      if (args.raw) {
+        let parsed;
+        try {
+          parsed = JSON.parse(content);
+        } catch (e) {
+          sendErrorMessage(pluginData, msg.channel, `Syntax error in embed JSON: ${e.message}`);
+          return;
+        }
+
+        if (!isValidEmbed(parsed)) {
+          sendErrorMessage(pluginData, msg.channel, "Embed is not valid");
+          return;
+        }
+
+        embed = Object.assign({}, embed, parsed);
+      } else {
+        embed.description = formatContent(content);
+      }
+    }
 
     args.message.channel.messages.edit(targetMessage.id, {
       embeds: [embed],
