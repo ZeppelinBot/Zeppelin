@@ -164,7 +164,7 @@ export async function getServerInfoEmbed(
       (channel) => channel.type === ChannelType.GuildAnnouncement,
     );
     const stageChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildStageVoice);
-    const totalChannels = thisServer.channels.cache.size - threadChannels.size;
+    const totalChannels = thisServer.channels.cache.filter((channel) => !channel.isThread()).size;
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
