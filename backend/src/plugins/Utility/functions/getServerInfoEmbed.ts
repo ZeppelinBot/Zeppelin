@@ -159,7 +159,13 @@ export async function getServerInfoEmbed(
     const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildCategory);
     const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
     const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
-    const threadChannels = thisServer.channels.cache.filter((channel) => channel.isThread());
+    const forumChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildForum);
+    const threadChannelsText = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type !== ChannelType.GuildForum,
+    );
+    const threadChannelsForums = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type === ChannelType.GuildForum,
+    );
     const announcementChannels = thisServer.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildAnnouncement,
     );
@@ -172,7 +178,8 @@ export async function getServerInfoEmbed(
       value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.size}**
-          Text: **${textChannels.size}** (**${threadChannels.size} threads**)
+          Text: **${textChannels.size}** (**${threadChannelsText.size} threads**)
+          Forums: **${forumChannels.size}** (**${threadChannelsForums.size} threads**)
           Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
           Stage: **${stageChannels.size}**
@@ -186,6 +193,12 @@ export async function getServerInfoEmbed(
   if (thisServer) {
     otherStats.push(`Roles: **${thisServer.roles.cache.size}** / 250`);
   }
+
+  const roleLockedEmojis = (
+    restGuild
+      ? restGuild?.emojis?.cache.filter((e) => e.roles.cache.size)
+      : guildPreview?.emojis.filter((e) => e.roles.length)
+  )!.size;
 
   if (restGuild) {
     const maxEmojis =
@@ -203,15 +216,25 @@ export async function getServerInfoEmbed(
         [GuildPremiumTier.Tier3]: 60,
       }[restGuild.premiumTier] ?? 0;
 
-    otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
+    otherStats.push(
+      `Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}${
+        roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""
+      }`,
+    );
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
-    otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
+    otherStats.push(
+      `Emojis: **${guildPreview!.emojis.size}**${roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""}`,
+    );
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
   }
 
   if (thisServer) {
-    otherStats.push(`Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${thisServer.premiumTier})`);
+    otherStats.push(
+      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}**${
+        thisServer.premiumTier ? ` (level ${thisServer.premiumTier})` : ""
+      }`,
+    );
   }
 
   embed.fields.push({
