@@ -194,11 +194,11 @@ export async function getServerInfoEmbed(
     otherStats.push(`Roles: **${thisServer.roles.cache.size}** / 250`);
   }
 
-  const roleLockedEmojis = (
-    restGuild
+  const roleLockedEmojis =
+    (restGuild
       ? restGuild?.emojis?.cache.filter((e) => e.roles.cache.size)
       : guildPreview?.emojis.filter((e) => e.roles.length)
-  )!.size;
+    )?.size ?? 0;
 
   if (restGuild) {
     const maxEmojis =
