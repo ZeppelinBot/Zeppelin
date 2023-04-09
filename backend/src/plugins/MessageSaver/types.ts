@@ -1,7 +1,6 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,
@@ -15,5 +14,5 @@ export interface MessageSaverPluginType extends BasePluginType {
   };
 }
 
-export const messageSaverCmd = typedGuildCommand<MessageSaverPluginType>();
-export const messageSaverEvt = typedGuildEventListener<MessageSaverPluginType>();
+export const messageSaverCmd = guildPluginMessageCommand<MessageSaverPluginType>();
+export const messageSaverEvt = guildPluginEventListener<MessageSaverPluginType>();

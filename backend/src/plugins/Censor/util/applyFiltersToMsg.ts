@@ -1,4 +1,4 @@
-import { Invite, MessageEmbed } from "discord.js";
+import { Embed, Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
@@ -19,7 +19,7 @@ export async function applyFiltersToMsg(
   let messageContent = savedMessage.data.content || "";
   if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
   if (savedMessage.data.embeds) {
-    const embeds = (savedMessage.data.embeds as MessageEmbed[]).map((e) => cloneDeep(e));
+    const embeds = (savedMessage.data.embeds as Embed[]).map((e) => cloneDeep(e));
     for (const embed of embeds) {
       if (embed.type === "video") {
         // Ignore video descriptions as they're not actually shown on the embed

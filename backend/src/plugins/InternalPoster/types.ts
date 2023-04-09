@@ -1,8 +1,8 @@
+import { WebhookClient } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
 import { Webhooks } from "../../data/Webhooks";
 import { Queue } from "../../Queue";
-import { WebhookClient } from "discord.js";
 
 export const ConfigSchema = t.type({});
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

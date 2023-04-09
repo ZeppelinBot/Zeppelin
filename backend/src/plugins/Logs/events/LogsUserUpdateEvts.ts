@@ -1,13 +1,11 @@
-import { GuildAuditLogs } from "discord.js";
 import diff from "lodash.difference";
 import isEqual from "lodash.isequal";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
-import { logsEvt } from "../types";
 import { logMemberNickChange } from "../logFunctions/logMemberNickChange";
-import { logMemberRoleChanges } from "../logFunctions/logMemberRoleChanges";
 import { logMemberRoleAdd } from "../logFunctions/logMemberRoleAdd";
+import { logMemberRoleChanges } from "../logFunctions/logMemberRoleChanges";
 import { logMemberRoleRemove } from "../logFunctions/logMemberRoleRemove";
+import { logsEvt } from "../types";
 
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",

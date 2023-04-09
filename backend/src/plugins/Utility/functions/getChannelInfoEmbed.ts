@@ -1,8 +1,7 @@
-import { MessageEmbedOptions, Snowflake, StageChannel, ThreadChannel, VoiceChannel } from "discord.js";
+import { APIEmbed, ChannelType, Snowflake, StageChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { ChannelTypeStrings } from "src/types";
 import { EmbedWith, formatNumber, MINUTES, preEmbedPadding, trimLines, verboseUserMention } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
@@ -17,14 +16,16 @@ const STAGE_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/839930647711186995/stage-channel.png";
 const PUBLIC_THREAD_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/870343055855738921/public-thread.png";
-const PRIVATE_THREAD_UCON =
+const PRIVATE_THREAD_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/870343402447839242/private-thread.png";
+const FORUM_CHANNEL_ICON =
+  "https://cdn.discordapp.com/attachments/740650744830623756/1091681253364875294/forum-channel-icon.png";
 
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
   if (!channel) {
     return null;
@@ -36,25 +37,28 @@ export async function getChannelInfoEmbed(
 
   const icon =
     {
-      [ChannelTypeStrings.VOICE]: VOICE_CHANNEL_ICON,
-      [ChannelTypeStrings.NEWS]: ANNOUNCEMENT_CHANNEL_ICON,
-      [ChannelTypeStrings.STAGE]: STAGE_CHANNEL_ICON,
-      [ChannelTypeStrings.PUBLIC_THREAD]: PUBLIC_THREAD_ICON,
-      [ChannelTypeStrings.PRIVATE_THREAD]: PRIVATE_THREAD_UCON,
-    }[channel.type] || TEXT_CHANNEL_ICON;
+      [ChannelType.GuildVoice]: VOICE_CHANNEL_ICON,
+      [ChannelType.GuildAnnouncement]: ANNOUNCEMENT_CHANNEL_ICON,
+      [ChannelType.GuildStageVoice]: STAGE_CHANNEL_ICON,
+      [ChannelType.PublicThread]: PUBLIC_THREAD_ICON,
+      [ChannelType.PrivateThread]: PRIVATE_THREAD_ICON,
+      [ChannelType.AnnouncementThread]: PUBLIC_THREAD_ICON,
+      [ChannelType.GuildForum]: FORUM_CHANNEL_ICON,
+    }[channel.type] ?? TEXT_CHANNEL_ICON;
 
   const channelType =
     {
-      [ChannelTypeStrings.TEXT]: "Text channel",
-      [ChannelTypeStrings.VOICE]: "Voice channel",
-      [ChannelTypeStrings.CATEGORY]: "Category",
-      [ChannelTypeStrings.NEWS]: "Announcement channel",
-      [ChannelTypeStrings.STORE]: "Store channel",
-      [ChannelTypeStrings.STAGE]: "Stage channel",
-      [ChannelTypeStrings.PUBLIC_THREAD]: "Public Thread channel",
-      [ChannelTypeStrings.PRIVATE_THREAD]: "Private Thread channel",
-      [ChannelTypeStrings.NEWS_THREAD]: "News Thread channel",
-    }[channel.type] || "Channel";
+      [ChannelType.GuildText]: "Text channel",
+      [ChannelType.GuildVoice]: "Voice channel",
+      [ChannelType.GuildCategory]: "Category channel",
+      [ChannelType.GuildAnnouncement]: "Announcement channel",
+      [ChannelType.GuildStageVoice]: "Stage channel",
+      [ChannelType.PublicThread]: "Public Thread channel",
+      [ChannelType.PrivateThread]: "Private Thread channel",
+      [ChannelType.AnnouncementThread]: "News Thread channel",
+      [ChannelType.GuildDirectory]: "Hub channel",
+      [ChannelType.GuildForum]: "Forum channel",
+    }[channel.type] ?? "Channel";
 
   embed.author = {
     name: `${channelType}:  ${channel.name}`,
@@ -63,9 +67,9 @@ export async function getChannelInfoEmbed(
 
   let channelName = `#${channel.name}`;
   if (
-    channel.type === ChannelTypeStrings.VOICE ||
-    channel.type === ChannelTypeStrings.CATEGORY ||
-    channel.type === ChannelTypeStrings.STAGE
+    channel.type === ChannelType.GuildVoice ||
+    channel.type === ChannelType.GuildCategory ||
+    channel.type === ChannelType.GuildStageVoice
   ) {
     channelName = channel.name;
   }
@@ -81,7 +85,7 @@ export async function getChannelInfoEmbed(
     round: true,
   });
 
-  const showMention = channel.type !== ChannelTypeStrings.CATEGORY;
+  const showMention = channel.type !== ChannelType.GuildCategory;
 
   embed.fields.push({
     name: preEmbedPadding + "Channel information",
@@ -94,11 +98,11 @@ export async function getChannelInfoEmbed(
     `),
   });
 
-  if (channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE) {
+  if (channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice) {
     const voiceMembers = Array.from((channel as VoiceChannel | StageChannel).members.values());
     const muted = voiceMembers.filter((vm) => vm.voice.mute || vm.voice.selfMute);
     const deafened = voiceMembers.filter((vm) => vm.voice.deaf || vm.voice.selfDeaf);
-    const voiceOrStage = channel.type === ChannelTypeStrings.VOICE ? "Voice" : "Stage";
+    const voiceOrStage = channel.type === ChannelType.GuildVoice ? "Voice" : "Stage";
 
     embed.fields.push({
       name: preEmbedPadding + `${voiceOrStage} information`,
@@ -110,13 +114,13 @@ export async function getChannelInfoEmbed(
     });
   }
 
-  if (channel.type === ChannelTypeStrings.CATEGORY) {
+  if (channel.type === ChannelType.GuildCategory) {
     const textChannels = pluginData.guild.channels.cache.filter(
-      (ch) => ch.parentId === channel.id && ch.type !== ChannelTypeStrings.VOICE,
+      (ch) => ch.parentId === channel.id && ch.type !== ChannelType.GuildVoice,
     );
     const voiceChannels = pluginData.guild.channels.cache.filter(
       (ch) =>
-        ch.parentId === channel.id && (ch.type === ChannelTypeStrings.VOICE || ch.type === ChannelTypeStrings.STAGE),
+        ch.parentId === channel.id && (ch.type === ChannelType.GuildVoice || ch.type === ChannelType.GuildStageVoice),
     );
 
     embed.fields.push({
@@ -128,14 +132,13 @@ export async function getChannelInfoEmbed(
     });
   }
 
-  if (channel.type === ChannelTypeStrings.PRIVATE_THREAD || channel.type === ChannelTypeStrings.PUBLIC_THREAD) {
-    const thread = channel as ThreadChannel;
-    const parentChannelName = thread.parent?.name ?? `<#${thread.parentId}>`;
-    const memberCount = thread.memberCount ?? thread.members.cache.size;
-    const owner = await thread.fetchOwner().catch(() => null);
+  if (channel.isThread()) {
+    const parentChannelName = channel.parent?.name ?? `<#${channel.parentId}>`;
+    const memberCount = channel.memberCount ?? channel.members.cache.size;
+    const owner = await channel.fetchOwner().catch(() => null);
     const ownerMention = owner?.user ? verboseUserMention(owner.user) : "Unknown#0000";
     const humanizedArchiveTime = `Archive duration: **${humanizeDuration(
-      (thread.autoArchiveDuration ?? 0) * MINUTES,
+      (channel.autoArchiveDuration ?? 0) * MINUTES,
     )}**`;
 
     embed.fields.push({
@@ -144,7 +147,7 @@ export async function getChannelInfoEmbed(
       Parent channel: **#${parentChannelName}**
       Member count: **${memberCount}**
       Thread creator: ${ownerMention}
-      ${thread.archived ? "Archived: **True**" : humanizedArchiveTime}`),
+      ${channel.archived ? "Archived: **True**" : humanizedArchiveTime}`),
     });
   }
 

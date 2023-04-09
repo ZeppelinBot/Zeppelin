@@ -3,13 +3,13 @@ import { GuildPluginData } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { allowTimeout } from "../../../RegExpRunner";
 import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
-import { utilityCmd, UtilityPluginType } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { utilityCmd, UtilityPluginType } from "../types";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -81,7 +81,7 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
   }
 
   const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
-  if (!targetChannel?.isText()) {
+  if (!targetChannel?.isTextBased()) {
     sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`);
     return;
   }

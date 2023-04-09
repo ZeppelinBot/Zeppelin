@@ -3,6 +3,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const DotenvPlugin = require("dotenv-webpack");
 const merge = require("webpack-merge");
+const webpack = require("webpack");
 
 const targetDir = path.normalize(path.join(__dirname, "dist"));
 
@@ -161,6 +162,8 @@ let config = {
     alias: pathAliases,
   },
 };
+
+if (process.env.NODE_ENV === "web") config.plugins.push(new webpack.EnvironmentPlugin(["NODE_ENV", "API_URL"]));
 
 if (process.env.NODE_ENV === "production") {
   config = merge(config, {

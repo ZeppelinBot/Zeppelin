@@ -2,19 +2,30 @@
  * @file Utility functions that are plugin-instance-specific (i.e. use PluginData)
  */
 
-import { GuildMember, Message, MessageMentionOptions, MessageOptions, TextChannel } from "discord.js";
+import {
+  GuildMember,
+  Message,
+  MessageCreateOptions,
+  MessageMentionOptions,
+  PermissionsBitField,
+  TextBasedChannel,
+} from "discord.js";
 import * as t from "io-ts";
-import { CommandContext, configUtils, ConfigValidationError, GuildPluginData, helpers, PluginOptions } from "knub";
-import { PluginOverrideCriteria } from "knub/dist/config/configTypes";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager"; // TODO: Export from Knub index
-import { AnyPluginData } from "knub/dist/plugins/PluginData";
+import {
+  AnyPluginData,
+  CommandContext,
+  ConfigValidationError,
+  ExtendedMatchParams,
+  GuildPluginData,
+  helpers,
+  PluginOverrideCriteria,
+} from "knub";
 import { logger } from "./logger";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
-import { TZeppelinKnub } from "./types";
-import { deepKeyIntersect, errorMessage, successMessage, tDeepPartial, tNullable } from "./utils";
-import { Tail } from "./utils/typeUtils";
-import { decodeAndValidateStrict, StrictValidationError, validate } from "./validatorUtils";
 import { isStaff } from "./staff";
+import { TZeppelinKnub } from "./types";
+import { errorMessage, successMessage, tNullable } from "./utils";
+import { Tail } from "./utils/typeUtils";
+import { parseIoTsSchema, StrictValidationError } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 
@@ -23,8 +34,14 @@ export function canActOn(
   member1: GuildMember,
   member2: GuildMember,
   allowSameLevel = false,
+  allowAdmins = false,
 ) {
   if (member2.id === pluginData.client.user!.id) {
+    return false;
+  }
+  const isOwnerOrAdmin =
+    member2.id === member2.guild.ownerId || member2.permissions.has(PermissionsBitField.Flags.Administrator);
+  if (isOwnerOrAdmin && !allowAdmins) {
     return false;
   }
 
@@ -91,117 +108,35 @@ export function strictValidationErrorToConfigValidationError(err: StrictValidati
   );
 }
 
-export function getPluginConfigPreprocessor(
-  blueprint: ZeppelinPlugin,
-  customPreprocessor?: ZeppelinPlugin["configPreprocessor"],
-) {
-  return async (options: PluginOptions<any>, strict?: boolean) => {
-    // 1. Validate the basic structure of plugin config
-    const basicOptionsValidation = validate(BasicPluginStructureType, options);
-    if (basicOptionsValidation instanceof StrictValidationError) {
-      throw strictValidationErrorToConfigValidationError(basicOptionsValidation);
-    }
-
-    // 2. Validate config/overrides against *partial* config schema. This ensures valid properties have valid types.
-    const partialConfigSchema = tDeepPartial(blueprint.configSchema);
-
-    if (options.config) {
-      const partialConfigValidation = validate(partialConfigSchema, options.config);
-      if (partialConfigValidation instanceof StrictValidationError) {
-        throw strictValidationErrorToConfigValidationError(partialConfigValidation);
+export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema): (input: unknown) => t.TypeOf<Schema> {
+  return (input: unknown) => {
+    try {
+      return parseIoTsSchema(schema, input);
+    } catch (err) {
+      if (err instanceof StrictValidationError) {
+        throw strictValidationErrorToConfigValidationError(err);
       }
+      throw err;
     }
-
-    if (options.overrides) {
-      for (const override of options.overrides) {
-        // Validate criteria and extra criteria
-        // FIXME: This is ugly
-        for (const key of Object.keys(override)) {
-          if (!validTopLevelOverrideKeys.includes(key)) {
-            if (strict) {
-              throw new ConfigValidationError(`Unknown override criterion '${key}'`);
-            }
-
-            delete override[key];
-          }
-        }
-        if (override.extra != null) {
-          for (const extraCriterion of Object.keys(override.extra)) {
-            if (!blueprint.customOverrideCriteriaFunctions?.[extraCriterion]) {
-              if (strict) {
-                throw new ConfigValidationError(`Unknown override extra criterion '${extraCriterion}'`);
-              }
-
-              delete override.extra[extraCriterion];
-            }
-          }
-        }
-
-        // Validate override config
-        const partialOverrideConfigValidation = decodeAndValidateStrict(partialConfigSchema, override.config || {});
-        if (partialOverrideConfigValidation instanceof StrictValidationError) {
-          throw strictValidationErrorToConfigValidationError(partialOverrideConfigValidation);
-        }
-      }
-    }
-
-    // 3. Run custom preprocessor, if any
-    if (customPreprocessor) {
-      options = await customPreprocessor(options);
-    }
-
-    // 4. Merge with default options and validate/decode the entire config
-    let decodedConfig = {};
-    const decodedOverrides: Array<PluginOverrideCriteria<unknown> & { config: any }> = [];
-
-    if (options.config) {
-      decodedConfig = blueprint.configSchema
-        ? decodeAndValidateStrict(blueprint.configSchema, options.config)
-        : options.config;
-      if (decodedConfig instanceof StrictValidationError) {
-        throw strictValidationErrorToConfigValidationError(decodedConfig);
-      }
-    }
-
-    if (options.overrides) {
-      for (const override of options.overrides) {
-        const overrideConfigMergedWithBaseConfig = configUtils.mergeConfig(options.config || {}, override.config || {});
-        const decodedOverrideConfig = blueprint.configSchema
-          ? decodeAndValidateStrict(blueprint.configSchema, overrideConfigMergedWithBaseConfig)
-          : overrideConfigMergedWithBaseConfig;
-        if (decodedOverrideConfig instanceof StrictValidationError) {
-          throw strictValidationErrorToConfigValidationError(decodedOverrideConfig);
-        }
-        decodedOverrides.push({
-          ...override,
-          config: deepKeyIntersect(decodedOverrideConfig, override.config || {}),
-        });
-      }
-    }
-
-    return {
-      config: decodedConfig,
-      overrides: decodedOverrides,
-    };
   };
 }
 
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextChannel,
+  channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
-  const content: MessageOptions = allowedMentions
+  const content: MessageCreateOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
   return channel
     .send({ ...content }) // Force line break
     .catch((err) => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
+      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });
@@ -209,20 +144,20 @@ export async function sendSuccessMessage(
 
 export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextChannel,
+  channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
   const formattedBody = errorMessage(body, emoji);
-  const content: MessageOptions = allowedMentions
+  const content: MessageCreateOptions = allowedMentions
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
   return channel
     .send({ ...content }) // Force line break
     .catch((err) => {
-      const channelInfo = channel.guild ? `${channel.id} (${channel.guild.id})` : channel.id;
+      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
       logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
       return undefined;
     });
@@ -230,11 +165,13 @@ export async function sendErrorMessage(
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  // @ts-expect-error
   return knub.getGlobalConfig().url;
 }
 
 export function isOwner(pluginData: AnyPluginData<any>, userId: string) {
   const knub = pluginData.getKnubInstance() as TZeppelinKnub;
+  // @ts-expect-error
   const owners = knub.getGlobalConfig()?.owners;
   if (!owners) {
     return false;

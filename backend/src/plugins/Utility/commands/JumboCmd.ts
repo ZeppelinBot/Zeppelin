@@ -1,6 +1,6 @@
-import { MessageAttachment } from "discord.js";
-import fs from "fs";
 import photon from "@silvia-odwyer/photon-node";
+import { AttachmentBuilder } from "discord.js";
+import fs from "fs";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
@@ -50,7 +50,7 @@ export const JumboCmd = utilityCmd({
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
     let extension = ".png";
-    let file: MessageAttachment | undefined;
+    let file: AttachmentBuilder | undefined;
 
     if (!isEmoji(args.emoji)) {
       sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
@@ -65,10 +65,10 @@ export const JumboCmd = utilityCmd({
       url += `${results[2]}${extension}`;
       if (extension === ".png") {
         const image = resizeBuffer(await getBufferFromUrl(url), size, size);
-        file = new MessageAttachment(image, `emoji${extension}`);
+        file = new AttachmentBuilder(image, { name: `emoji${extension}` });
       } else {
         const image = await getBufferFromUrl(url);
-        file = new MessageAttachment(image, `emoji${extension}`);
+        file = new AttachmentBuilder(image, { name: `emoji${extension}` });
       }
     } else {
       let url = `${twemoji.base}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
@@ -87,7 +87,7 @@ export const JumboCmd = utilityCmd({
         return;
       }
 
-      file = new MessageAttachment(image, "emoji.png");
+      file = new AttachmentBuilder(image, { name: "emoji.png" });
     }
 
     msg.channel.send({ files: [file] });

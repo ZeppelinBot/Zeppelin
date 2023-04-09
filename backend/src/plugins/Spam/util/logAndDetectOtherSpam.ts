@@ -1,7 +1,5 @@
 import { GuildPluginData } from "knub";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";

@@ -1,6 +1,5 @@
-import { ContextMenuInteraction, TextChannel } from "discord.js";
+import { ContextMenuCommandInteraction, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -9,9 +8,9 @@ import { ContextMenuPluginType } from "../types";
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   amount: number,
-  interaction: ContextMenuInteraction,
+  interaction: ContextMenuCommandInteraction,
 ) {
-  interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -35,10 +34,10 @@ export async function cleanAction(
   const user = undefined;
 
   try {
-    interaction.followUp(`Cleaning... Amount: ${amount}, User Only: ${targetUserOnly}, Pins: ${deletePins}`);
+    await interaction.followUp(`Cleaning... Amount: ${amount}, User Only: ${targetUserOnly}, Pins: ${deletePins}`);
     utility.clean({ count: amount, user, channel: targetMessage.channel.id, "delete-pins": deletePins }, targetMessage);
   } catch (e) {
-    interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
+    await interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({

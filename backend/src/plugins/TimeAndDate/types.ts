@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand } from "knub";
+import { BasePluginType, guildPluginMessageCommand } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
 import { tNullable, tPartialDictionary } from "../../utils";
 import { tValidTimezone } from "../../utils/tValidTimezone";
@@ -19,4 +19,4 @@ export interface TimeAndDatePluginType extends BasePluginType {
   };
 }
 
-export const timeAndDateCmd = typedGuildCommand<TimeAndDatePluginType>();
+export const timeAndDateCmd = guildPluginMessageCommand<TimeAndDatePluginType>();

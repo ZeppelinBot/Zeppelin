@@ -1,23 +1,22 @@
-import { MessageActionRow, MessageButton, Snowflake } from "discord.js";
-import { chunkArray } from "../../../utils";
-import { RoleButtonsPluginType, TRoleButtonOption, TRoleButtonsConfigItem } from "../types";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { buildCustomId } from "../../../utils/buildCustomId";
-import { GuildPluginData } from "knub";
+import { TRoleButtonsConfigItem } from "../types";
+import { convertButtonStyleStringToEnum } from "./convertButtonStyleStringToEnum.js";
 import { TooManyComponentsError } from "./TooManyComponentsError";
 
-export function createButtonComponents(configItem: TRoleButtonsConfigItem): MessageActionRow[] {
-  const rows: MessageActionRow[] = [];
+export function createButtonComponents(configItem: TRoleButtonsConfigItem): Array<ActionRowBuilder<ButtonBuilder>> {
+  const rows: Array<ActionRowBuilder<ButtonBuilder>> = [];
 
-  let currentRow = new MessageActionRow();
+  let currentRow = new ActionRowBuilder<ButtonBuilder>();
   for (const [index, option] of configItem.options.entries()) {
     if (currentRow.components.length === 5 || (currentRow.components.length > 0 && option.start_new_row)) {
       rows.push(currentRow);
-      currentRow = new MessageActionRow();
+      currentRow = new ActionRowBuilder<ButtonBuilder>();
     }
 
-    const button = new MessageButton()
+    const button = new ButtonBuilder()
       .setLabel(option.label ?? "")
-      .setStyle(option.style ?? "PRIMARY")
+      .setStyle(convertButtonStyleStringToEnum(option.style) ?? ButtonStyle.Primary)
       .setCustomId(buildCustomId("roleButtons", { name: configItem.name, index }));
 
     if (option.emoji) {

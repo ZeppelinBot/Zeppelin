@@ -1,5 +1,5 @@
 import deepDiff from "deep-diff";
-import { either, fold } from "fp-ts/lib/Either";
+import { either, fold, isLeft } from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/pipeable";
 import * as t from "io-ts";
 import { noop } from "./utils";
@@ -104,6 +104,14 @@ export function validate(schema: t.Type<any>, value: any): StrictValidationError
       ),
     ) || null
   );
+}
+
+export function parseIoTsSchema<T extends t.Type<any>>(schema: T, value: unknown): t.TypeOf<T> {
+  const decodeResult = schema.decode(value);
+  if (isLeft(decodeResult)) {
+    throw report(decodeResult);
+  }
+  return decodeResult.right;
 }
 
 /**

@@ -1,11 +1,5 @@
 import { getRepository, Repository } from "typeorm";
-import { Reminder } from "./entities/Reminder";
-import { BaseRepository } from "./BaseRepository";
-import moment from "moment-timezone";
-import { DBDateFormat } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
-import { RoleQueueItem } from "./entities/RoleQueueItem";
-import { connection } from "./db";
 import { RoleButtonsItem } from "./entities/RoleButtonsItem";
 
 export class GuildRoleButtons extends BaseGuildRepository {

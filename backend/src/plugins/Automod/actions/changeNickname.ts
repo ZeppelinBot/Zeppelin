@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { nonNullish, unique } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";

@@ -1,25 +1,27 @@
-import { DiscordAPIError, Snowflake, User } from "discord.js";
+import { DiscordAPIError, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
+import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { logger } from "../../../logger";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import {
   createUserNotificationError,
+  DAYS,
   notifyUser,
+  resolveMember,
   resolveUser,
-  stripObjectToScalars,
+  SECONDS,
   ucfirst,
   UserNotificationResult,
 } from "../../../utils";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -41,8 +43,9 @@ export async function banUserId(
   }
 
   // Attempt to message the user *before* banning them, as doing it after may not be possible
+  const member = await resolveMember(pluginData.client, pluginData.guild, userId);
   let notifyResult: UserNotificationResult = { method: null, success: true };
-  if (reason && user instanceof User) {
+  if (reason && member) {
     const contactMethods = banOptions?.contactMethods
       ? banOptions.contactMethods
       : getDefaultContactMethods(pluginData, "ban");
@@ -60,7 +63,7 @@ export async function banUserId(
           }),
         );
 
-        notifyResult = await notifyUser(user, banMessage, contactMethods);
+        notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else if (banTime && config.tempban_message) {
         const banMessage = await renderTemplate(
           config.tempban_message,
@@ -74,7 +77,7 @@ export async function banUserId(
           }),
         );
 
-        notifyResult = await notifyUser(user, banMessage, contactMethods);
+        notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else {
         notifyResult = createUserNotificationError("No ban/tempban message specified in config");
       }
@@ -87,7 +90,7 @@ export async function banUserId(
   try {
     const deleteMessageDays = Math.min(7, Math.max(0, banOptions.deleteMessageDays ?? 1));
     await pluginData.guild.bans.create(userId as Snowflake, {
-      days: deleteMessageDays,
+      deleteMessageSeconds: (deleteMessageDays * DAYS) / SECONDS,
       reason: reason ?? undefined,
     });
   } catch (e) {

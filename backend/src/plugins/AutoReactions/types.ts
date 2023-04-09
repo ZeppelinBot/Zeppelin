@@ -1,9 +1,9 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { AutoReaction } from "../../data/entities/AutoReaction";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { AutoReaction } from "../../data/entities/AutoReaction";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,
@@ -20,5 +20,5 @@ export interface AutoReactionsPluginType extends BasePluginType {
   };
 }
 
-export const autoReactionsCmd = typedGuildCommand<AutoReactionsPluginType>();
-export const autoReactionsEvt = typedGuildEventListener<AutoReactionsPluginType>();
+export const autoReactionsCmd = guildPluginMessageCommand<AutoReactionsPluginType>();
+export const autoReactionsEvt = guildPluginEventListener<AutoReactionsPluginType>();

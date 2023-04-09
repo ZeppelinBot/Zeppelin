@@ -1,18 +1,20 @@
-import { parseSignature, typedGuildCommand } from "knub";
+import { GuildChannel, GuildMember, User } from "discord.js";
+import { guildPluginMessageCommand, parseSignature } from "knub";
+import { TSignature } from "knub-command-manager";
 import { commandTypes } from "../../commandTypes";
-import { stripObjectToScalars, UnknownUser } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { runEvent } from "./functions/runEvent";
-import { ConfigSchema, CustomEventsPluginType } from "./types";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
-import { Channel, GuildChannel, GuildMember, ThreadChannel, User } from "discord.js";
+import { UnknownUser } from "../../utils";
+import { isScalar } from "../../utils/isScalar";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import { isScalar } from "../../utils/isScalar";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { runEvent } from "./functions/runEvent";
+import { ConfigSchema, CustomEventsPluginType } from "./types";
 
 const defaultOptions = {
   config: {
@@ -24,15 +26,17 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
   name: "custom_events",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   afterLoad(pluginData) {
     const config = pluginData.config.get();
     for (const [key, event] of Object.entries(config.events)) {
       if (event.trigger.type === "command") {
-        const signature = event.trigger.params ? parseSignature(event.trigger.params, commandTypes) : {};
-        const eventCommand = typedGuildCommand({
+        const signature: TSignature<any> = event.trigger.params
+          ? parseSignature(event.trigger.params, commandTypes)
+          : {};
+        const eventCommand = guildPluginMessageCommand<CustomEventsPluginType>()({
           trigger: event.trigger.name,
           permission: `events.${key}.trigger.can_use`,
           signature,
@@ -43,7 +47,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
                 safeArgs[argKey] = userToTemplateSafeUser(argValue);
               } else if (argValue instanceof GuildMember) {
                 safeArgs[argKey] = memberToTemplateSafeMember(argValue);
-              } else if (argValue instanceof GuildChannel || argValue instanceof ThreadChannel) {
+              } else if (argValue instanceof GuildChannel && argValue.isTextBased()) {
                 safeArgs[argKey] = channelToTemplateSafeChannel(argValue);
               } else if (isScalar(argValue)) {
                 safeArgs[argKey] = argValue;
@@ -58,7 +62,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
             runEvent(pluginData, event, { msg: message, args }, values);
           },
         });
-        pluginData.commands.add(eventCommand);
+        pluginData.messageCommands.add(eventCommand);
       }
     }
   },

@@ -1,7 +1,7 @@
-import { TextChannel } from "discord.js";
+import { GuildTextBasedChannel } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { Case } from "../../data/entities/Case";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -10,8 +10,6 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import { Queue } from "../../Queue";
 import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
-
-import Timeout = NodeJS.Timeout;
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -129,7 +127,7 @@ export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
-  retryPromptChannel?: TextChannel | null;
+  retryPromptChannel?: GuildTextBasedChannel | null;
   isAutomodAction?: boolean;
 }
 
@@ -149,5 +147,5 @@ export interface BanOptions {
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
 
-export const modActionsCmd = typedGuildCommand<ModActionsPluginType>();
-export const modActionsEvt = typedGuildEventListener<ModActionsPluginType>();
+export const modActionsCmd = guildPluginMessageCommand<ModActionsPluginType>();
+export const modActionsEvt = guildPluginEventListener<ModActionsPluginType>();

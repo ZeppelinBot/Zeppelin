@@ -1,14 +1,14 @@
 import cors from "cors";
 import express from "express";
+import multer from "multer";
 import { TokenError } from "passport-oauth2";
+import { env } from "../env";
 import { initArchives } from "./archives";
 import { initAuth } from "./auth";
 import { initDocs } from "./docs";
 import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
-import multer from "multer";
-import { env } from "../env";
 
 const app = express();
 

@@ -1,12 +1,12 @@
-import { Snowflake, TextChannel } from "discord.js";
-import { typedGuildCommand } from "knub";
-import { waitForReply } from "knub/dist/helpers";
+import { Snowflake } from "discord.js";
+import { guildPluginMessageCommand } from "knub";
+import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { resolveUser, UnknownUser } from "../../../utils";
 import { CountersPluginType } from "../types";
 
-export const ViewCounterCmd = typedGuildCommand<CountersPluginType>()({
+export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters view", "counter view", "viewcounter", "counter"],
   permission: "can_view",
 
@@ -68,7 +68,7 @@ export const ViewCounterCmd = typedGuildCommand<CountersPluginType>()({
       }
 
       const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
-      if (!potentialChannel?.isText()) {
+      if (!potentialChannel?.isTextBased()) {
         sendErrorMessage(pluginData, message.channel, "Channel is not a text channel, cancelling");
         return;
       }

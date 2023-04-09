@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { TemplateParseError } from "../../../templateFormatter";
 import { StrictMessageContent, validateAndParseMessageContent } from "../../../utils";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TagsPluginType, TTag } from "../types";
 import { renderTagBody } from "./renderTagBody";

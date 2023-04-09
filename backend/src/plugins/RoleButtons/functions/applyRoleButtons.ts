@@ -1,13 +1,9 @@
+import { Message, MessageCreateOptions, MessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types";
-import { isSnowflake, snowflakeRegex } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Message, MessageButton, MessageEditOptions, MessageOptions, Snowflake } from "discord.js";
 import { RoleButtonsItem } from "../../../data/entities/RoleButtonsItem";
-import { buildCustomId } from "../../../utils/buildCustomId";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleButtonsPluginType, TRoleButtonsConfigItem } from "../types";
 import { createButtonComponents } from "./createButtonComponents";
-
-const channelMessageRegex = new RegExp(`^(${snowflakeRegex.source})-(${snowflakeRegex.source})$`);
 
 export async function applyRoleButtons(
   pluginData: GuildPluginData<RoleButtonsPluginType>,
@@ -19,7 +15,7 @@ export async function applyRoleButtons(
   // Remove existing role buttons, if any
   if (existingSavedButtons?.channel_id) {
     const existingChannel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
-    const existingMessage = await (existingChannel?.isText() &&
+    const existingMessage = await (existingChannel?.isTextBased() &&
       existingChannel.messages.fetch(existingSavedButtons.message_id).catch(() => null));
     if (existingMessage && existingMessage.components.length) {
       await existingMessage.edit({
@@ -32,7 +28,7 @@ export async function applyRoleButtons(
   if ("message_id" in configItem.message) {
     // channel id + message id: apply role buttons to existing message
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
-    const messageCandidate = await (channel?.isText() &&
+    const messageCandidate = await (channel?.isTextBased() &&
       channel.messages.fetch(configItem.message.message_id).catch(() => null));
     if (!messageCandidate) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -55,10 +51,12 @@ export async function applyRoleButtons(
     }
 
     const channel = await pluginData.guild.channels.fetch(configItem.message.channel_id).catch(() => null);
-    if (channel && (!channel.isText || typeof channel.isText !== "function")) {
+    if (channel && (!channel.isTextBased || typeof channel.isTextBased !== "function")) {
+      // FIXME: Probably not relevant anymore?
+      // tslint:disable-next-line no-console
       console.log("wtf", pluginData.guild?.id, configItem.message.channel_id);
     }
-    if (!channel || !channel?.isText?.()) {
+    if (!channel || !channel?.isTextBased()) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Text channel not found for role_buttons/${configItem.name}`,
       });
@@ -88,7 +86,7 @@ export async function applyRoleButtons(
 
     if (!candidateMessage) {
       try {
-        candidateMessage = await channel.send(configItem.message.content as string | MessageOptions);
+        candidateMessage = await channel.send(configItem.message.content as string | MessageCreateOptions);
       } catch (err) {
         pluginData.getPlugin(LogsPlugin).logBotAlert({
           body: `Error while posting message for role_buttons/${configItem.name}: ${String(err)}`,

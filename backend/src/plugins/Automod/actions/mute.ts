@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { convertDelayStringToMS, nonNullish, tDelayString, tNullable, unique } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";

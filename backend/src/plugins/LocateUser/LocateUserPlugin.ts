@@ -1,5 +1,7 @@
 import { PluginOptions } from "knub";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { FollowCmd } from "./commands/FollowCmd";
@@ -8,9 +10,8 @@ import { WhereCmd } from "./commands/WhereCmd";
 import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
 import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { ConfigSchema, LocateUserPluginType } from "./types";
-import { fillActiveAlertsList } from "./utils/fillAlertsList";
-import { onGuildEvent } from "../../data/GuildEvents";
 import { clearExpiredAlert } from "./utils/clearExpiredAlert";
+import { fillActiveAlertsList } from "./utils/fillAlertsList";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {
@@ -38,13 +39,14 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
       * Instantly receive an invite to the voice channel of a user
       * Be notified as soon as a user switches or joins a voice channel
     `),
+    configSchema: ConfigSchema,
   },
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     WhereCmd,
     FollowCmd,
     ListFollowCmd,
@@ -65,13 +67,17 @@ export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredVCAlert", (alert) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredVCAlert", (alert) =>
       clearExpiredAlert(pluginData, alert),
     );
     fillActiveAlertsList(pluginData);
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener?.();
   },
 });

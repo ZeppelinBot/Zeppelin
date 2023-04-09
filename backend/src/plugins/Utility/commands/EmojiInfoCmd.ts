@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
 import { getCustomEmojiId } from "../functions/getCustomEmojiId";
+import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
 import { utilityCmd } from "../types";
 
 export const EmojiInfoCmd = utilityCmd({

@@ -1,16 +1,15 @@
-import { Util } from "discord.js";
-import escapeStringRegexp from "escape-string-regexp";
+import { escapeInlineCode } from "discord.js";
 import * as t from "io-ts";
+import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 import { allowTimeout } from "../../../RegExpRunner";
 import { getUrlsInString, tNullable } from "../../../utils";
+import { mergeRegexes } from "../../../utils/mergeRegexes";
+import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
 import { TRegex } from "../../../validatorUtils";
+import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
-import { mergeRegexes } from "../../../utils/mergeRegexes";
-import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
-import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
-import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 
 interface MatchResultType {
   type: MatchableTextType;
@@ -186,7 +185,7 @@ export const MatchLinksTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const partialSummary = getTextMatchPartialSummary(pluginData, matchResult.extra.type, contexts[0]);
-    let information = `Matched link \`${Util.escapeInlineCode(matchResult.extra.link)}\``;
+    let information = `Matched link \`${escapeInlineCode(matchResult.extra.link)}\``;
     if (matchResult.extra.details) {
       information += ` ${matchResult.extra.details}`;
     }

@@ -1,10 +1,10 @@
 import { PluginOptions } from "knub";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { NamesCmd } from "./commands/NamesCmd";
-import { ChannelJoinEvt, MessageCreateEvt } from "./events/UpdateNameEvts";
 import { ConfigSchema, NameHistoryPluginType } from "./types";
 
 const defaultOptions: PluginOptions<NameHistoryPluginType> = {
@@ -25,11 +25,11 @@ export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
   name: "name_history",
   showInDocs: false,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     NamesCmd,
   ],
 

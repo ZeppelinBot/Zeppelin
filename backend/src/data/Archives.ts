@@ -1,6 +1,6 @@
 import { getRepository, Repository } from "typeorm";
-import { ArchiveEntry } from "./entities/ArchiveEntry";
 import { BaseRepository } from "./BaseRepository";
+import { ArchiveEntry } from "./entities/ArchiveEntry";
 
 export class Archives extends BaseRepository {
   protected archives: Repository<ArchiveEntry>;

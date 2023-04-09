@@ -1,5 +1,6 @@
 import { trimPluginDescription } from "../../utils";
 import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
+import { ConfigSchema } from "./types";
 
 export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   prettyName: "Automod",
@@ -99,4 +100,5 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
                     {matchSummary}
       ~~~
     `),
+  configSchema: ConfigSchema,
 };

@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
 import { isSnowflake } from "../utils";
@@ -47,7 +47,7 @@ export async function resolveMessageTarget(pluginData: GuildPluginData<any>, val
   }
 
   const channel = pluginData.guild.channels.resolve(result.channelId as Snowflake);
-  if (!channel?.isText()) {
+  if (!channel?.isTextBased()) {
     return null;
   }
 

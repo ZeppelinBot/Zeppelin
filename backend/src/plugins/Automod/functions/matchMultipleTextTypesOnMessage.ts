@@ -1,7 +1,8 @@
-import { Constants, MessageEmbed } from "discord.js";
+import { ActivityType, Embed } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveMember } from "../../../utils";
+import { DeepMutable } from "../../../utils/typeUtils.js";
 import { AutomodPluginType } from "../types";
 
 type TextTriggerWithMultipleMatchTypes = {
@@ -33,7 +34,7 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   if (trigger.match_embeds && msg.data.embeds?.length) {
-    const copiedEmbed: MessageEmbed = JSON.parse(JSON.stringify(msg.data.embeds[0]));
+    const copiedEmbed: DeepMutable<Embed> = JSON.parse(JSON.stringify(msg.data.embeds[0]));
     if (copiedEmbed.video) {
       copiedEmbed.description = ""; // The description is not rendered, hence it doesn't need to be matched
     }
@@ -53,7 +54,7 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   for (const activity of member.presence?.activities ?? []) {
-    if (activity.type === Constants.ActivityTypes[4]) {
+    if (activity.type === ActivityType.Custom) {
       yield ["customstatus", `${activity.emoji} ${activity.name}`];
       break;
     }

@@ -1,7 +1,6 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
@@ -142,7 +141,9 @@ export async function logAndDetectMessageSpam(
         clearRecentUserActions(pluginData, type, savedMessage.user_id, savedMessage.channel_id);
 
         // Generate a log from the detected messages
-        const channel = pluginData.guild.channels.cache.get(savedMessage.channel_id as Snowflake);
+        const channel = pluginData.guild.channels.cache.get(
+          savedMessage.channel_id as Snowflake,
+        ) as GuildTextBasedChannel;
         const archiveUrl = await saveSpamArchives(pluginData, uniqueMessages);
 
         // Create a case

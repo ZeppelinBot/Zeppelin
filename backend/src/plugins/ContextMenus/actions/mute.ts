@@ -1,9 +1,8 @@
-import { ContextMenuInteraction } from "discord.js";
+import { ContextMenuCommandInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { canActOn } from "src/pluginUtils";
-import { LogType } from "../../../data/LogType";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
@@ -14,9 +13,9 @@ import { ContextMenuPluginType } from "../types";
 export async function muteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   duration: string | undefined,
-  interaction: ContextMenuInteraction,
+  interaction: ContextMenuCommandInteraction,
 ) {
-  interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ ephemeral: true });
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -35,7 +34,7 @@ export async function muteAction(
   const targetMember = await pluginData.guild.members.fetch(interaction.targetId);
 
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    interaction.followUp({ ephemeral: true, content: "Cannot mute: insufficient permissions" });
+    await interaction.followUp({ ephemeral: true, content: "Cannot mute: insufficient permissions" });
     return;
   }
 
@@ -52,9 +51,9 @@ export async function muteAction(
       result.notifyResult.method ?? "dm"
     })\nPlease update the new case with the \`update\` command`;
 
-    interaction.followUp({ ephemeral: true, content: muteMessage });
+    await interaction.followUp({ ephemeral: true, content: muteMessage });
   } catch (e) {
-    interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
+    await interaction.followUp({ ephemeral: true, content: "Plugin error, please check your BOT_ALERTs" });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({

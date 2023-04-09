@@ -1,5 +1,18 @@
-import { GuildChannel, GuildMember, Snowflake, Util, User, GuildTextBasedChannel } from "discord.js";
-import { baseCommandParameterTypeHelpers, baseTypeConverters, CommandContext, TypeConversionError } from "knub";
+import {
+  escapeCodeBlock,
+  escapeInlineCode,
+  GuildChannel,
+  GuildMember,
+  GuildTextBasedChannel,
+  Snowflake,
+  User,
+} from "discord.js";
+import {
+  baseCommandParameterTypeHelpers,
+  CommandContext,
+  messageCommandBaseTypeConverters,
+  TypeConversionError,
+} from "knub";
 import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,
@@ -14,11 +27,9 @@ import {
 import { isValidTimezone } from "./utils/isValidTimezone";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
 import { inputPatternToRegExp } from "./validatorUtils";
-import { getChannelId } from "knub/dist/utils";
-import { disableCodeBlocks } from "knub/dist/helpers";
 
 export const commandTypes = {
-  ...baseTypeConverters,
+  ...messageCommandBaseTypeConverters,
 
   delay(value) {
     const result = convertDelayStringToMS(value);
@@ -32,7 +43,7 @@ export const commandTypes = {
   async resolvedUser(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null || result instanceof UnknownUser) {
-      throw new TypeConversionError(`User \`${Util.escapeCodeBlock(value)}\` was not found`);
+      throw new TypeConversionError(`User \`${escapeCodeBlock(value)}\` was not found`);
     }
     return result;
   },
@@ -40,7 +51,7 @@ export const commandTypes = {
   async resolvedUserLoose(value, context: CommandContext<any>) {
     const result = await resolveUser(context.pluginData.client, value);
     if (result == null) {
-      throw new TypeConversionError(`Invalid user: \`${Util.escapeCodeBlock(value)}\``);
+      throw new TypeConversionError(`Invalid user: \`${escapeCodeBlock(value)}\``);
     }
     return result;
   },
@@ -52,9 +63,7 @@ export const commandTypes = {
 
     const result = await resolveMember(context.pluginData.client, context.message.channel.guild, value);
     if (result == null) {
-      throw new TypeConversionError(
-        `Member \`${Util.escapeCodeBlock(value)}\` was not found or they have left the server`,
-      );
+      throw new TypeConversionError(`Member \`${escapeCodeBlock(value)}\` was not found or they have left the server`);
     }
     return result;
   },
@@ -64,7 +73,7 @@ export const commandTypes = {
 
     const result = await resolveMessageTarget(context.pluginData, value);
     if (!result) {
-      throw new TypeConversionError(`Unknown message \`${Util.escapeInlineCode(value)}\``);
+      throw new TypeConversionError(`Unknown message \`${escapeInlineCode(value)}\``);
     }
 
     return result;
@@ -84,28 +93,27 @@ export const commandTypes = {
       return value as Snowflake;
     }
 
-    throw new TypeConversionError(`Could not parse ID: \`${Util.escapeInlineCode(value)}\``);
+    throw new TypeConversionError(`Could not parse ID: \`${escapeInlineCode(value)}\``);
   },
 
   regex(value: string, context: CommandContext<any>): RegExp {
     try {
       return inputPatternToRegExp(value);
     } catch (e) {
-      throw new TypeConversionError(`Could not parse RegExp: \`${Util.escapeInlineCode(e.message)}\``);
+      throw new TypeConversionError(`Could not parse RegExp: \`${escapeInlineCode(e.message)}\``);
     }
   },
 
   timezone(value: string) {
     if (!isValidTimezone(value)) {
-      throw new TypeConversionError(`Invalid timezone: ${Util.escapeInlineCode(value)}`);
+      throw new TypeConversionError(`Invalid timezone: ${escapeInlineCode(value)}`);
     }
 
     return value;
   },
 
   guildTextBasedChannel(value: string, context: CommandContext<any>) {
-    // FIXME: Remove once Knub's types have been fixed
-    return baseTypeConverters.textChannel(value, context) as GuildTextBasedChannel;
+    return messageCommandBaseTypeConverters.textChannel(value, context);
   },
 };
 

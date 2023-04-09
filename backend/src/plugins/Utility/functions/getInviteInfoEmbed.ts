@@ -1,8 +1,6 @@
-import { MessageEmbedOptions } from "discord.js";
+import { APIEmbed, ChannelType } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
-import { ChannelTypeStrings } from "src/types";
 import {
   EmbedWith,
   formatNumber,
@@ -20,7 +18,7 @@ import { UtilityPluginType } from "../types";
 export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   inviteCode: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   let invite = await resolveInvite(pluginData.client, inviteCode, true);
   if (!invite) {
     return null;
@@ -45,7 +43,6 @@ export async function getInviteInfoEmbed(
     }
 
     const serverCreatedAtTimestamp = snowflakeToTimestamp(invite.guild.id);
-    const serverCreatedAt = moment.utc(serverCreatedAtTimestamp, "x");
     const serverAge = humanizeDuration(Date.now() - serverCreatedAtTimestamp, {
       largest: 2,
       round: true,
@@ -67,10 +64,9 @@ export async function getInviteInfoEmbed(
     });
     if (invite.channel) {
       const channelName =
-        invite.channel.type === ChannelTypeStrings.VOICE ? `🔉 ${invite.channel.name}` : `#${invite.channel.name}`;
+        invite.channel.type === ChannelType.GuildVoice ? `🔉 ${invite.channel.name}` : `#${invite.channel.name}`;
 
       const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-      const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
       const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
         largest: 2,
         round: true,
@@ -82,7 +78,7 @@ export async function getInviteInfoEmbed(
         Created: **${channelAge} ago**
     `);
 
-      if (invite.channel.type !== ChannelTypeStrings.VOICE) {
+      if (invite.channel.type !== ChannelType.GuildVoice) {
         channelInfo += `\nMention: <#${invite.channel.id}>`;
       }
 
@@ -114,14 +110,15 @@ export async function getInviteInfoEmbed(
 
     invite = invite as GroupDMInvite;
     embed.author = {
-      name: invite.channel.name ? `Group DM invite:  ${invite.channel.name}` : `Group DM invite`,
+      name: invite.channel!.name ? `Group DM invite:  ${invite.channel!.name}` : `Group DM invite`,
       url: `https://discord.gg/${invite.code}`,
     }; // FIXME pending invite re-think
 
     /*if (invite.channel.icon) {
       embed.author.icon_url = `https://cdn.discordapp.com/channel-icons/${invite.channel.id}/${invite.channel.icon}.png?size=256`;
-    }*/ const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel.id);
-    const channelCreatedAt = moment.utc(channelCreatedAtTimestamp, "x");
+    }*/
+
+    const channelCreatedAtTimestamp = snowflakeToTimestamp(invite.channel!.id);
     const channelAge = humanizeDuration(Date.now() - channelCreatedAtTimestamp, {
       largest: 2,
       round: true,
@@ -130,8 +127,8 @@ export async function getInviteInfoEmbed(
     embed.fields.push({
       name: preEmbedPadding + "Group DM information",
       value: trimLines(`
-        Name: ${invite.channel.name ? `**${invite.channel.name}**` : `_Unknown_`}
-        ID: \`${invite.channel.id}\`
+        Name: ${invite.channel!.name ? `**${invite.channel!.name}**` : `_Unknown_`}
+        ID: \`${invite.channel!.id}\`
         Created: **${channelAge} ago**
         Members: **${formatNumber((invite as any).memberCount)}**
       `),

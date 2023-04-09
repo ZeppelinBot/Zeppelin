@@ -3,6 +3,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -52,11 +53,11 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
       For more advanced spam filtering, check out the Automod plugin!
     `),
     legacy: true,
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [LogsPlugin],
-
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -87,7 +88,9 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.savedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    clearInterval(pluginData.state.expiryInterval);
+    const { state, guild } = pluginData;
+
+    state.savedMessages.events.off("create", state.onMessageCreateFn);
+    clearInterval(state.expiryInterval);
   },
 });

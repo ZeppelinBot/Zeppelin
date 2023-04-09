@@ -1,13 +1,15 @@
 import { GuildMember, Message, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
 import { GuildCases } from "../../data/GuildCases";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { Queue } from "../../Queue";
 import { MINUTES, trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -33,10 +35,12 @@ import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
 import { UnmuteCmd } from "./commands/UnmuteCmd";
 import { UpdateCmd } from "./commands/UpdateCmd";
 import { WarnCmd } from "./commands/WarnCmd";
+import { AuditLogEvents } from "./events/AuditLogEvents";
 import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
 import { banUserId } from "./functions/banUserId";
+import { clearTempban } from "./functions/clearTempban";
 import { hasMutePermission } from "./functions/hasMutePerm";
 import { kickMember } from "./functions/kickMember";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
@@ -44,9 +48,6 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { clearTempban } from "./functions/clearTempban";
 
 const defaultOptions = {
   config: {
@@ -120,15 +121,16 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     description: trimPluginDescription(`
       This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
     `),
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
-  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt],
+  events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 
-  commands: [
+  messageCommands: [
     UpdateCmd,
     NoteCmd,
     WarnCmd,
@@ -209,14 +211,18 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "expiredTempban", (tempban) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "expiredTempban", (tempban) =>
       clearTempban(pluginData, tempban),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unloaded = true;
-    pluginData.state.unregisterGuildEventListener?.();
-    pluginData.state.events.removeAllListeners();
+    const { state, guild } = pluginData;
+
+    state.unloaded = true;
+    state.unregisterGuildEventListener?.();
+    state.events.removeAllListeners();
   },
 });

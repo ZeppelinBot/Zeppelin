@@ -1,17 +1,16 @@
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   GuildMember,
   Message,
-  MessageActionRow,
-  MessageButton,
   MessageComponentInteraction,
-  Permissions,
+  PermissionsBitField,
   Snowflake,
-  TextChannel,
   User,
 } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { GuildPluginData } from "knub";
-import { ArgsFromSignatureOrArray } from "knub/dist/commands/commandUtils";
+import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
 import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
@@ -116,12 +115,12 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
         return;
       }
 
       if (e instanceof InvalidRegexError) {
-        sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+        sendErrorMessage(pluginData, msg.channel, e.message);
         return;
       }
 
@@ -129,7 +128,7 @@ export async function displaySearch(
     }
 
     if (searchResult.totalResults === 0) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
+      sendErrorMessage(pluginData, msg.channel, "No results found");
       return;
     }
 
@@ -169,23 +168,21 @@ export async function displaySearch(
     // Set up pagination reactions if needed. The reactions are cleared after a timeout.
     if (searchResult.totalResults > perPage) {
       const idMod = `${searchMsg.id}:${moment.utc().valueOf()}`;
-      const buttons: MessageButton[] = [];
-
-      buttons.push(
-        new MessageButton()
-          .setStyle("SECONDARY")
+      const buttons: ButtonBuilder[] = [
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
           .setEmoji("⬅")
           .setCustomId(`previousButton:${idMod}`)
           .setDisabled(currentPage === 1),
-        new MessageButton()
-          .setStyle("SECONDARY")
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
           .setEmoji("➡")
           .setCustomId(`nextButton:${idMod}`)
           .setDisabled(currentPage === searchResult.lastPage),
-        new MessageButton().setStyle("SECONDARY").setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
-      );
+        new ButtonBuilder().setStyle(ButtonStyle.Secondary).setEmoji("🔄").setCustomId(`reloadButton:${idMod}`),
+      ];
 
-      const row = new MessageActionRow().addComponents(buttons);
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(buttons);
       await searchMsg.edit({ content: result, components: [row] });
 
       const collector = searchMsg.createMessageComponentCollector({ time: 2 * MINUTES });
@@ -194,6 +191,7 @@ export async function displaySearch(
         if (msg.author.id !== interaction.user.id) {
           interaction
             .reply({ content: `You are not permitted to use these buttons.`, ephemeral: true })
+            // tslint:disable-next-line no-console
             .catch((err) => console.trace(err.message));
         } else {
           if (interaction.customId === `previousButton:${idMod}` && currentPage > 1) {
@@ -261,12 +259,12 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
       return;
     }
 
     if (e instanceof InvalidRegexError) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+      sendErrorMessage(pluginData, msg.channel, e.message);
       return;
     }
 
@@ -274,7 +272,7 @@ export async function archiveSearch(
   }
 
   if (results.totalResults === 0) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, "No results found");
+    sendErrorMessage(pluginData, msg.channel, "No results found");
     return;
   }
 
@@ -430,7 +428,7 @@ async function performBanSearch(
   perPage = SEARCH_RESULTS_PER_PAGE,
 ): Promise<{ results: User[]; totalResults: number; page: number; lastPage: number; from: number; to: number }> {
   const member = pluginData.guild.members.cache.get(pluginData.client.user!.id);
-  if (member && !hasDiscordPermissions(member.permissions, Permissions.FLAGS.BAN_MEMBERS)) {
+  if (member && !hasDiscordPermissions(member.permissions, PermissionsBitField.Flags.BanMembers)) {
     throw new SearchError(`Unable to search bans: missing "Ban Members" permission`);
   }
 

@@ -10,7 +10,7 @@ export const TypingEnablePingableEvt = pingableRolesEvt({
 
   async listener(meta) {
     const pluginData = meta.pluginData;
-    const channel = meta.args.channel;
+    const channel = meta.args.typing.channel;
 
     const pingableRoles = await getPingableRolesForChannel(pluginData, channel.id);
     if (pingableRoles.length === 0) return;

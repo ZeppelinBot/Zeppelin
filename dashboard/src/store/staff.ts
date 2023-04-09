@@ -1,5 +1,5 @@
-import { get, post } from "../api";
 import { Module } from "vuex";
+import { get } from "../api";
 import { RootState, StaffState } from "./types";
 
 export const StaffStore: Module<StaffState, RootState> = {

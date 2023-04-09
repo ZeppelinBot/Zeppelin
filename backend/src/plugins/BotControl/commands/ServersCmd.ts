@@ -1,4 +1,3 @@
-import { TextChannel } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
@@ -51,7 +50,7 @@ export const ServersCmd = botControlCmd({
           const owner = getUser(pluginData.client, g.ownerId);
           return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.tag}** \`${owner.id}\`)`;
         });
-        createChunkedMessage(msg.channel as TextChannel, lines.join("\n"));
+        createChunkedMessage(msg.channel, lines.join("\n"));
       } else {
         msg.channel.send("No servers matched the filters");
       }

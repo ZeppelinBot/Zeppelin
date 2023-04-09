@@ -1,16 +1,15 @@
 import { Snowflake } from "discord.js";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveMember, resolveUser } from "../../../utils";
+import { DAYS, MINUTES, resolveMember, resolveUser } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
 import { IgnoredEventType, modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -70,7 +69,7 @@ export const ForcebanCmd = modActionsCmd({
     try {
       // FIXME: Use banUserId()?
       await pluginData.guild.bans.create(user.id as Snowflake, {
-        days: 1,
+        deleteMessageSeconds: (1 * DAYS) / MINUTES,
         reason: reason ?? undefined,
       });
     } catch {

@@ -3,26 +3,26 @@ import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { sendSuccessMessage } from "../../pluginUtils";
+import { makeIoTsConfigParser, sendSuccessMessage } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
+import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
 import { AllowServerCmd } from "./commands/AllowServerCmd";
+import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
 import { DisallowServerCmd } from "./commands/DisallowServerCmd";
 import { EligibleCmd } from "./commands/EligibleCmd";
 import { LeaveServerCmd } from "./commands/LeaveServerCmd";
 import { ListDashboardPermsCmd } from "./commands/ListDashboardPermsCmd";
 import { ListDashboardUsersCmd } from "./commands/ListDashboardUsersCmd";
+import { ProfilerDataCmd } from "./commands/ProfilerDataCmd";
+import { RateLimitPerformanceCmd } from "./commands/RateLimitPerformanceCmd";
 import { ReloadGlobalPluginsCmd } from "./commands/ReloadGlobalPluginsCmd";
 import { ReloadServerCmd } from "./commands/ReloadServerCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
+import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
 import { ServersCmd } from "./commands/ServersCmd";
 import { BotControlPluginType, ConfigSchema } from "./types";
-import { ProfilerDataCmd } from "./commands/ProfilerDataCmd";
-import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
-import { ChannelToServerCmd } from "./commands/ChannelToServerCmd";
-import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
-import { RateLimitPerformanceCmd } from "./commands/RateLimitPerformanceCmd";
 
 const defaultOptions = {
   config: {
@@ -37,11 +37,11 @@ const defaultOptions = {
 
 export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
     ReloadGlobalPluginsCmd,
     ServersCmd,
     LeaveServerCmd,
@@ -61,17 +61,19 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   ],
 
   async afterLoad(pluginData) {
-    pluginData.state.archives = new GuildArchives(0);
-    pluginData.state.allowedGuilds = new AllowedGuilds();
-    pluginData.state.configs = new Configs();
-    pluginData.state.apiPermissionAssignments = new ApiPermissionAssignments();
+    const { state, client } = pluginData;
+
+    state.archives = new GuildArchives(0);
+    state.allowedGuilds = new AllowedGuilds();
+    state.configs = new Configs();
+    state.apiPermissionAssignments = new ApiPermissionAssignments();
 
     const activeReload = getActiveReload();
     if (activeReload) {
       const [guildId, channelId] = activeReload;
       resetActiveReload();
 
-      const guild = await pluginData.client.guilds.fetch(guildId as Snowflake);
+      const guild = await client.guilds.fetch(guildId as Snowflake);
       if (guild) {
         const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {

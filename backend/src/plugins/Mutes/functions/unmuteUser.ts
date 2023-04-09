@@ -1,17 +1,19 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
+import { Mute } from "../../../data/entities/Mute";
+import { AddMuteParams } from "../../../data/GuildMutes";
+import { MuteTypes } from "../../../data/MuteTypes";
 import { resolveMember, resolveUser } from "../../../utils";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseArgs } from "../../Cases/types";
-import { MutesPluginType, UnmuteResult } from "../types";
-import { memberHasMutedRole } from "./memberHasMutedRole";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { MutesPluginType, UnmuteResult } from "../types";
 import { clearMute } from "./clearMute";
+import { getDefaultMuteType } from "./getDefaultMuteType";
+import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime";
+import { memberHasMutedRole } from "./memberHasMutedRole";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,
@@ -24,14 +26,37 @@ export async function unmuteUser(
   const member = await resolveMember(pluginData.client, pluginData.guild, userId, true); // Grab the fresh member so we don't have stale role info
   const modId = caseArgs.modId || pluginData.client.user!.id;
 
-  if (!existingMute && member && !memberHasMutedRole(pluginData, member)) return null;
+  if (!existingMute && member && !memberHasMutedRole(pluginData, member) && !member?.isCommunicationDisabled()) {
+    return null;
+  }
 
   if (unmuteTime) {
-    // Schedule timed unmute (= just set the mute's duration)
+    // Schedule timed unmute (= just update the mute's duration)
+    const muteExpiresAt = Date.now() + unmuteTime;
+    const timeoutExpiresAt = getTimeoutExpiryTime(muteExpiresAt);
+    let createdMute: Mute | null = null;
+
     if (!existingMute) {
-      await pluginData.state.mutes.addMute(userId, unmuteTime);
+      const defaultMuteType = getDefaultMuteType(pluginData);
+      const muteParams: AddMuteParams = {
+        userId,
+        type: defaultMuteType,
+        expiresAt: muteExpiresAt,
+      };
+      if (defaultMuteType === MuteTypes.Role) {
+        muteParams.muteRole = pluginData.config.get().mute_role;
+      } else {
+        muteParams.timeoutExpiresAt = timeoutExpiresAt;
+      }
+      createdMute = await pluginData.state.mutes.addMute(muteParams);
     } else {
       await pluginData.state.mutes.updateExpiryTime(userId, unmuteTime);
+    }
+
+    // Update timeout
+    if (existingMute?.type === MuteTypes.Timeout || createdMute?.type === MuteTypes.Timeout) {
+      await member?.disableCommunicationUntil(timeoutExpiresAt);
+      await pluginData.state.mutes.updateTimeoutExpiresAt(userId, timeoutExpiresAt);
     }
   } else {
     // Unmute immediately

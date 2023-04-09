@@ -1,6 +1,5 @@
 import * as t from "io-ts";
-import { GuildPluginData } from "knub";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { Tag, TagsPluginType } from "../types";
 
 export async function findTagByName(
@@ -15,9 +14,16 @@ export async function findTagByName(
   const categorySeparatorIndex = name.indexOf(".");
   if (categorySeparatorIndex > 0) {
     const categoryName = name.slice(0, categorySeparatorIndex);
-    const tagName = name.slice(categorySeparatorIndex + 1);
+    if (!Object.hasOwn(config.categories, categoryName)) {
+      return null;
+    }
+    const category = config.categories[categoryName];
 
-    return config.categories[categoryName]?.tags[tagName] ?? null;
+    const tagName = name.slice(categorySeparatorIndex + 1);
+    if (!Object.hasOwn(category.tags, tagName)) {
+      return null;
+    }
+    return category.tags[tagName];
   }
 
   // Dynamic tag

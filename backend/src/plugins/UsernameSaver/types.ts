@@ -1,4 +1,4 @@
-import { BasePluginType, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener } from "knub";
 import { UsernameHistory } from "../../data/UsernameHistory";
 import { Queue } from "../../Queue";
 
@@ -9,4 +9,4 @@ export interface UsernameSaverPluginType extends BasePluginType {
   };
 }
 
-export const usernameSaverEvt = typedGuildEventListener<UsernameSaverPluginType>();
+export const usernameSaverEvt = guildPluginEventListener<UsernameSaverPluginType>();

@@ -1,4 +1,4 @@
-import { Awaitable } from "knub/dist/utils";
+import { Awaitable } from "./typeUtils";
 
 export async function asyncReduce<T, V>(
   arr: T[],
