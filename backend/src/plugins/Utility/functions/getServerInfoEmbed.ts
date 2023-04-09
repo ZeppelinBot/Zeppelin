@@ -85,10 +85,10 @@ export async function getServerInfoEmbed(
   embed.description = `${preEmbedPadding}**Basic Information**\n${basicInformation.join("\n")}`;
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ size: 2048 })})`;
-  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ size: 2048 })})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL()})` : "None";
   const splashUrl = (restGuild || guildPreview)!.splash
-    ? `[Link](${(restGuild || guildPreview)!.splashURL({ size: 2048 })})`
+    ? `[Link](${(restGuild || guildPreview)!.splashURL()})`
     : "None";
 
   embed.fields.push(
