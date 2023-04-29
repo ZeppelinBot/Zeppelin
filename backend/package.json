@@ -71,7 +71,6 @@
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
     "typeorm": "^0.2.31",
-    "typescript": "~4.9.5",
     "utf-8-validate": "^5.0.5",
     "uuid": "^3.3.2",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
@@ -95,8 +94,7 @@
     "@types/twemoji": "^12.1.0",
     "ava": "^3.15.0",
     "rimraf": "^2.6.2",
-    "source-map-support": "^0.5.16",
-    "tsc-watch": "^5.0.2"
+    "source-map-support": "^0.5.16"
   },
   "ava": {
     "files": [
