@@ -11,7 +11,7 @@ while ping -c1 prepare_backend &>/dev/null; do sleep 1; done;
 cd /zeppelin/backend
 if [ -n "$DEBUG" ]; then
   echo "Starting bot in debug mode"
-  exec env NO_INSIGHT=true npm run start-bot-prod-debug
+  exec npm run start-bot-prod-debug
 else
   echo "Starting bot"
   exec npm run start-bot-prod
