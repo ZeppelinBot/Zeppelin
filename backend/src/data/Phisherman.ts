@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import moment from "moment-timezone";
-import fetch, { Headers } from "node-fetch";
 import { getRepository, Repository } from "typeorm";
 import { env } from "../env";
 import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";

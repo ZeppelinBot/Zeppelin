@@ -291,7 +291,7 @@ connect().then(async () => {
 
         return Array.from(plugins.keys()).filter((pluginName) => {
           if (basePluginNames.includes(pluginName)) return true;
-          return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
+          return configuredPlugins[pluginName] && (configuredPlugins[pluginName] as any).enabled !== false;
         });
       },
 
