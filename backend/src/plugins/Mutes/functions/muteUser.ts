@@ -1,26 +1,27 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { AddMuteParams } from "../../../data/GuildMutes";
+import { MuteTypes } from "../../../data/MuteTypes";
 import { Case } from "../../../data/entities/Case";
 import { Mute } from "../../../data/entities/Mute";
-import { AddMuteParams } from "../../../data/GuildMutes";
 import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop";
-import { MuteTypes } from "../../../data/MuteTypes";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
+  UserNotificationMethod,
+  UserNotificationResult,
   notifyUser,
   resolveMember,
   resolveUser,
   ucfirst,
-  UserNotificationMethod,
-  UserNotificationResult,
 } from "../../../utils";
 import { muteLock } from "../../../utils/lockNameHelpers";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { MuteOptions, MutesPluginType } from "../types";
 import { getDefaultMuteType } from "./getDefaultMuteType";
 import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime";
@@ -91,38 +92,29 @@ export async function muteUser(
     }
 
     if (muteType === MuteTypes.Role) {
-      // Apply mute role if it's missing
-      if (!currentUserRoles.includes(muteRole!)) {
-        try {
-          await member.roles.add(muteRole!);
-        } catch (e) {
-          const actualMuteRole = pluginData.guild.roles.cache.get(muteRole!);
-          if (!actualMuteRole) {
-            lock.unlock();
-            logs.logBotAlert({
-              body: `Cannot mute users, specified mute role Id is invalid`,
-            });
-            throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
-          }
+      // Verify the configured mute role is valid
+      const actualMuteRole = pluginData.guild.roles.cache.get(muteRole!);
+      if (!actualMuteRole) {
+        lock.unlock();
+        logs.logBotAlert({
+          body: `Cannot mute users, specified mute role Id is invalid`,
+        });
+        throw new RecoverablePluginError(ERRORS.INVALID_MUTE_ROLE_ID);
+      }
 
-          const zep = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
-          const zepRoles = pluginData.guild.roles.cache.filter((x) => zep!.roles.cache.has(x.id));
-          // If we have roles and one of them is above the muted role, throw generic error
-          if (zepRoles.size >= 0 && zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
-            lock.unlock();
-            logs.logBotAlert({
-              body: `Cannot mute user ${member.id}: ${e}`,
-            });
-            throw e;
-          } else {
-            // Otherwise, throw error that mute role is above zeps roles
-            lock.unlock();
-            logs.logBotAlert({
-              body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
-            });
-            throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
-          }
-        }
+      // Verify the mute role is not above Zep's roles
+      const zep = await pluginData.guild.members.fetchMe();
+      const zepRoles = pluginData.guild.roles.cache.filter((x) => zep.roles.cache.has(x.id));
+      if (zepRoles.size === 0 || !zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
+        lock.unlock();
+        logs.logBotAlert({
+          body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
+        });
+        throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
+      }
+
+      if (!currentUserRoles.includes(muteRole!)) {
+        pluginData.getPlugin(RoleManagerPlugin).addPriorityRole(member.id, muteRole!);
       }
     } else {
       await member.disableCommunicationUntil(timeoutUntil);

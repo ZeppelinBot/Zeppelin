@@ -1,3 +1,7 @@
+// KEEP THIS AS FIRST IMPORT
+// See comment in module for details
+import "./threadsSignalFix";
+
 import {
   Client,
   Events,
@@ -12,31 +16,34 @@ import { EventEmitter } from "events";
 import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
+import process from "process";
+import { DiscordJSError } from "./DiscordJSError";
+import { RecoverablePluginError } from "./RecoverablePluginError";
+import { SimpleError } from "./SimpleError";
 import { AllowedGuilds } from "./data/AllowedGuilds";
 import { Configs } from "./data/Configs";
-import { connect } from "./data/db";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
+import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { connect } from "./data/db";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
+import { runExpiredMemberCacheDeletionLoop } from "./data/loops/expiredMemberCacheDeletionLoop";
 import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
 import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
 import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
+import { runMemberCacheDeletionLoop } from "./data/loops/memberCacheDeletionLoop";
 import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
 import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
 import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
 import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
-import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
 import { consumeQueryStats } from "./data/queryLogger";
-import { DiscordJSError } from "./DiscordJSError";
 import { env } from "./env";
 import { logger } from "./logger";
 import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { setProfiler } from "./profiler";
 import { logRateLimit } from "./rateLimitStats";
-import { RecoverablePluginError } from "./RecoverablePluginError";
-import { SimpleError } from "./SimpleError";
 import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, sleep, successMessage } from "./utils";
+import { MINUTES, SECONDS, errorMessage, isDiscordAPIError, isDiscordHTTPError, sleep, successMessage } from "./utils";
 import { DecayingCounter } from "./utils/DecayingCounter";
 import { enableProfiling } from "./utils/easyProfiler";
 import { loadYamlSafely } from "./utils/loadYamlSafely";
@@ -191,7 +198,7 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 logger.info("Connecting to database");
-connect().then(async () => {
+connect().then(async (connection) => {
   const client = new Client({
     partials: [Partials.User, Partials.Channel, Partials.GuildMember, Partials.Message, Partials.Reaction],
 
@@ -365,6 +372,11 @@ connect().then(async () => {
   });
 
   bot.on("loadingFinished", async () => {
+    setProfiler(bot.profiler);
+    if (process.env.PROFILING === "true") {
+      enableProfiling();
+    }
+
     runExpiringMutesLoop();
     await sleep(10 * SECONDS);
     runExpiringTempbansLoop();
@@ -378,6 +390,10 @@ connect().then(async () => {
     runExpiredArchiveDeletionLoop();
     await sleep(10 * SECONDS);
     runSavedMessageCleanupLoop();
+    await sleep(10 * SECONDS);
+    runExpiredMemberCacheDeletionLoop();
+    await sleep(10 * SECONDS);
+    runMemberCacheDeletionLoop();
 
     if (hasPhishermanMasterAPIKey()) {
       await sleep(10 * SECONDS);
@@ -386,11 +402,6 @@ connect().then(async () => {
       runPhishermanReportingLoop();
     }
   });
-
-  setProfiler(bot.profiler);
-  if (process.env.PROFILING === "true") {
-    enableProfiling();
-  }
 
   let lowestGlobalRemaining = Infinity;
   setInterval(() => {
@@ -422,4 +433,28 @@ connect().then(async () => {
   logger.info("Bot Initialized");
   logger.info("Logging in...");
   await client.login(env.BOT_TOKEN);
+
+  let stopping = false;
+  const cleanupAndStop = async (code) => {
+    if (stopping) {
+      return;
+    }
+    stopping = true;
+    logger.info("Cleaning up before exit...");
+    // Force exit after 10sec
+    setTimeout(() => process.exit(code), 10 * SECONDS);
+    await bot.stop();
+    await connection.close();
+    logger.info("Done! Exiting now.");
+    process.exit(code);
+  };
+  process.on("beforeExit", () => cleanupAndStop(0));
+  process.on("SIGINT", () => {
+    logger.info("Received SIGINT, exiting...");
+    cleanupAndStop(0);
+  });
+  process.on("SIGTERM", (code) => {
+    logger.info("Received SIGTERM, exiting...");
+    cleanupAndStop(0);
+  });
 });

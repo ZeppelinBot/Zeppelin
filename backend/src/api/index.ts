@@ -1,3 +1,7 @@
+// KEEP THIS AS FIRST IMPORT
+// See comment in module for details
+import "../threadsSignalFix";
+
 import { connect } from "../data/db";
 import { env } from "../env";
 import { setIsAPI } from "../globals";

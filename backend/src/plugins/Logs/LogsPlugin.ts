@@ -8,7 +8,7 @@ import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
 import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { createTypedTemplateSafeValueContainer, TypedTemplateSafeValueContainer } from "../../templateFormatter";
+import { TypedTemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
@@ -40,6 +40,7 @@ import { onMessageUpdate } from "./util/onMessageUpdate";
 
 import { escapeCodeBlock } from "discord.js";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
+import { LogsGuildMemberRoleChangeEvt } from "./events/LogsGuildMemberRoleChangeEvt";
 import { logAutomodAction } from "./logFunctions/logAutomodAction";
 import { logBotAlert } from "./logFunctions/logBotAlert";
 import { logCaseCreate } from "./logFunctions/logCaseCreate";
@@ -173,6 +174,7 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsStickerCreateEvt,
     LogsStickerDeleteEvt,
     LogsStickerUpdateEvt,
+    LogsGuildMemberRoleChangeEvt,
   ],
 
   public: {

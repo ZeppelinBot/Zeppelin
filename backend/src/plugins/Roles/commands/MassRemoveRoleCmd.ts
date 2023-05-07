@@ -1,10 +1,9 @@
 import { GuildMember } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveMember, resolveRoleId, successMessage } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
 
 export const MassRemoveRoleCmd = rolesCmd({
@@ -71,19 +70,13 @@ export const MassRemoveRoleCmd = rolesCmd({
     );
 
     for (const member of membersWithTheRole) {
-      try {
-        pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, member.id);
-        await member.roles.remove(roleId);
-        pluginData.getPlugin(LogsPlugin).logMemberRoleRemove({
-          member,
-          roles: [role],
-          mod: msg.author,
-        });
-        assigned++;
-      } catch (e) {
-        logger.warn(`Error when removing role via !massremoverole: ${e.message}`);
-        failed.push(member.id);
-      }
+      pluginData.getPlugin(RoleManagerPlugin).removeRole(member.id, roleId);
+      pluginData.getPlugin(LogsPlugin).logMemberRoleRemove({
+        member,
+        roles: [role],
+        mod: msg.author,
+      });
+      assigned++;
     }
 
     let resultMessage = `Removed role **${role.name}** from  ${assigned} ${assigned === 1 ? "member" : "members"}!`;

@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const pkgUp = require("pkg-up");
 const { backendDir } = require("./dist/backend/src/paths");
 const { env } = require("./dist/backend/src/env");
 

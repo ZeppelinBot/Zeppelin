@@ -14,6 +14,9 @@ interface LogMemberRoleChangesData {
   removedRoles: Role[];
 }
 
+/**
+ * @deprecated Use logMemberRoleAdd() and logMemberRoleRemove() instead
+ */
 export function logMemberRoleChanges(pluginData: GuildPluginData<LogsPluginType>, data: LogMemberRoleChangesData) {
   return log(
     pluginData,

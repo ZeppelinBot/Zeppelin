@@ -1,9 +1,9 @@
 import { GuildChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveRoleId, verboseUserMention } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
 
 export const AddRoleCmd = rolesCmd({
@@ -49,9 +49,7 @@ export const AddRoleCmd = rolesCmd({
       return;
     }
 
-    pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_ADD, args.member.id);
-
-    await args.member.roles.add(roleId);
+    pluginData.getPlugin(RoleManagerPlugin).addRole(args.member.id, roleId);
 
     pluginData.getPlugin(LogsPlugin).logMemberRoleAdd({
       mod: msg.author,

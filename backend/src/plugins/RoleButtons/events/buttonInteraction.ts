@@ -1,9 +1,12 @@
 import { GuildMember } from "discord.js";
 import { guildPluginEventListener } from "knub";
+import { SECONDS } from "../../../utils";
 import { parseCustomId } from "../../../utils/parseCustomId";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
 import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
+
+const ROLE_BUTTON_CD = 5 * SECONDS;
 
 export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginType>()({
   event: "interactionCreate",
@@ -32,6 +35,16 @@ export const onButtonInteraction = guildPluginEventListener<RoleButtonsPluginTyp
         .catch((err) => console.trace(err.message));
       return;
     }
+
+    const cdIdentifier = `${args.interaction.user.id}-${optionIndex}`;
+    if (pluginData.cooldowns.isOnCooldown(cdIdentifier)) {
+      args.interaction.reply({
+        ephemeral: true,
+        content: "Please wait before clicking the button again",
+      });
+      return;
+    }
+    pluginData.cooldowns.setCooldown(cdIdentifier, ROLE_BUTTON_CD);
 
     const member = args.interaction.member as GuildMember;
     const role = pluginData.guild.roles.cache.get(option.role_id);

@@ -3,6 +3,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddRoleCmd } from "./commands/AddRoleCmd";
 import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
@@ -43,7 +44,7 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
     configSchema: ConfigSchema,
   },
 
-  dependencies: () => [LogsPlugin],
+  dependencies: () => [LogsPlugin, RoleManagerPlugin],
   configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 

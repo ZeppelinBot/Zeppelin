@@ -3,9 +3,9 @@ import * as t from "io-ts";
 import { nonNullish, unique } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
 import { automodAction } from "../helpers";
 
@@ -52,25 +52,14 @@ export const AddRolesAction = automodAction({
 
     await Promise.all(
       members.map(async (member) => {
-        const memberRoles = new Set(member.roles.cache.keys());
+        const currentMemberRoles = new Set(member.roles.cache.keys());
         for (const roleId of rolesToAssign) {
-          memberRoles.add(roleId as Snowflake);
-          ignoreRoleChange(pluginData, member.id, roleId);
+          if (!currentMemberRoles.has(roleId)) {
+            pluginData.getPlugin(RoleManagerPlugin).addRole(member.id, roleId);
+            // TODO: Remove this and just ignore bot changes in general?
+            ignoreRoleChange(pluginData, member.id, roleId);
+          }
         }
-
-        if (memberRoles.size === member.roles.cache.size) {
-          // No role changes
-          return;
-        }
-
-        const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
-
-        const rolesArr = Array.from(memberRoles.values());
-        await member.edit({
-          roles: rolesArr,
-        });
-
-        memberRoleLock.unlock();
       }),
     );
   },

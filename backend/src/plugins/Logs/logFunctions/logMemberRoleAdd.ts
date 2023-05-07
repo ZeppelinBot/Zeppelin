@@ -2,6 +2,7 @@ import { GuildMember, Role, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { UnknownRole } from "../../../utils";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
@@ -9,7 +10,7 @@ import { log } from "../util/log";
 interface LogMemberRoleAddData {
   mod: User | null;
   member: GuildMember;
-  roles: Role[];
+  roles: Array<Role | UnknownRole>;
 }
 
 export function logMemberRoleAdd(pluginData: GuildPluginData<LogsPluginType>, data: LogMemberRoleAddData) {

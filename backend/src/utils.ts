@@ -20,6 +20,7 @@ import {
   MessageMentionOptions,
   PartialChannelData,
   PartialMessage,
+  RoleResolvable,
   Snowflake,
   Sticker,
   TextBasedChannel,
@@ -680,7 +681,7 @@ export function parseInviteCodeInput(str: string): string {
   return getInviteCodesInString(str)[0];
 }
 
-export function isNotNull(value): value is Exclude<typeof value, null> {
+export function isNotNull<T>(value: T): value is Exclude<T, null | undefined> {
   return value != null;
 }
 
@@ -1365,6 +1366,22 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
     return value;
   }
   return null;
+}
+
+export class UnknownRole {
+  public id: string;
+  public name: string;
+
+  constructor(props = {}) {
+    for (const key in props) {
+      this[key] = props[key];
+    }
+  }
+}
+
+export function resolveRole(guild: Guild, roleResolvable: RoleResolvable) {
+  const roleId = guild.roles.resolveId(roleResolvable);
+  return guild.roles.resolve(roleId) ?? new UnknownRole({ id: roleId, name: roleId });
 }
 
 const inviteCache = new SimpleCache<Promise<Invite | null>>(10 * MINUTES, 200);

@@ -1,8 +1,7 @@
-import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { MuteTypes } from "../../../data/MuteTypes";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { getTimeoutExpiryTime } from "../functions/getTimeoutExpiryTime";
 import { mutesEvt } from "../types";
 
@@ -18,15 +17,9 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
     }
 
     if (mute.type === MuteTypes.Role) {
-      const muteRole = pluginData.config.get().mute_role;
-
-      if (muteRole) {
-        const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
-        try {
-          await member.roles.add(muteRole as Snowflake);
-        } finally {
-          memberRoleLock.unlock();
-        }
+      const muteRoleId = pluginData.config.get().mute_role;
+      if (muteRoleId) {
+        pluginData.getPlugin(RoleManagerPlugin).addPriorityRole(member.id, muteRoleId);
       }
     } else {
       if (!member.isCommunicationDisabled()) {

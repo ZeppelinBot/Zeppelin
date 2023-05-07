@@ -1,5 +1,6 @@
 import { Pool, spawn, Worker } from "threads";
 import { env } from "../env";
+import "../threadsSignalFix";
 import { MINUTES } from "../utils";
 
 const pool = Pool(() => spawn(new Worker("./cryptWorker"), { timeout: 10 * MINUTES }), 8);
