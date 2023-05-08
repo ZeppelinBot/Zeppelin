@@ -219,7 +219,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.unloaded = true;
     state.unregisterGuildEventListener?.();

@@ -45,7 +45,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   },
 
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.guildSavedMessages.events.on("create", state.onMessageCreateFn);
@@ -58,7 +58,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.guildSavedMessages.events.off("create", state.onMessageCreateFn);
     state.guildSavedMessages.events.off("delete", state.onMessageDeleteFn);

@@ -46,14 +46,7 @@ export async function matchAndRenderTagFromString(
     for (const [tagName, tagBody] of Object.entries(category.tags)) {
       const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\\s|$)`);
       if (regex.test(withoutPrefix)) {
-        const renderedContent = await renderTagFromString(
-          pluginData,
-          str,
-          prefix,
-          tagName,
-          category.tags[tagName],
-          member,
-        );
+        const renderedContent = await renderTagFromString(pluginData, str, prefix, tagName, tagBody, member);
 
         if (renderedContent == null) {
           return null;

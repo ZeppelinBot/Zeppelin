@@ -12,7 +12,7 @@ export async function postMessage(
   channel: GuildTextBasedChannel,
   content: MessageCreateOptions,
   attachments: Attachment[] = [],
-  enableMentions: boolean = false,
+  enableMentions = false,
 ): Promise<Message> {
   if (typeof content === "string") {
     content = { content };

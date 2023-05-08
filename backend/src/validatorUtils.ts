@@ -53,19 +53,6 @@ function stringify(v) {
   return JSON.stringify(v);
 }
 
-// From io-ts/lib/PathReporter
-// tslint:disable
-function getContextPath(context) {
-  return context
-    .map(function (_a) {
-      var key = _a.key,
-        type = _a.type;
-      return key + ": " + type.name;
-    })
-    .join("/");
-}
-// tslint:enable
-
 export class StrictValidationError extends Error {
   private readonly errors;
 
@@ -99,8 +86,8 @@ export function validate(schema: t.Type<any>, value: any): StrictValidationError
     pipe(
       validationResult,
       fold(
-        (err) => report(validationResult),
-        (result) => null,
+        () => report(validationResult),
+        () => null,
       ),
     ) || null
   );
@@ -127,7 +114,7 @@ export function decodeAndValidateStrict<T extends t.HasProps>(
   return pipe(
     validationResult,
     fold(
-      (err) => report(validationResult),
+      () => report(validationResult),
       (result) => {
         // Make sure there are no extra properties
         if (debug) {

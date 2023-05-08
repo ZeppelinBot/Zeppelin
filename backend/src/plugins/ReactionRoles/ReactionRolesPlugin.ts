@@ -81,7 +81,7 @@ export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>(
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     if (state.autoRefreshTimeout) {
       clearTimeout(state.autoRefreshTimeout);

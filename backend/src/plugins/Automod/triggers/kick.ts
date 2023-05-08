@@ -29,7 +29,7 @@ export const KickTrigger = automodTrigger<KickTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was kicked`;
   },
 });

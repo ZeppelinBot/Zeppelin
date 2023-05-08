@@ -22,9 +22,9 @@ export type TSetChannelPermissionOverridesAction = t.TypeOf<typeof SetChannelPer
 export async function setChannelPermissionOverridesAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TSetChannelPermissionOverridesAction,
-  values: TemplateSafeValueContainer,
-  event: TCustomEvent,
-  eventData: any,
+  values: TemplateSafeValueContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+  event: TCustomEvent, // eslint-disable-line @typescript-eslint/no-unused-vars
+  eventData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
   const channel = pluginData.guild.channels.cache.get(action.channel as Snowflake);
   if (!channel || channel.isThread() || !("guild" in channel)) {

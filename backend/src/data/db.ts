@@ -5,6 +5,7 @@ import { backendDir } from "../paths";
 import { QueryLogger } from "./queryLogger";
 
 const ormconfigPath = path.join(backendDir, "ormconfig.js");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const connectionOptions = require(ormconfigPath);
 
 let connectionPromise: Promise<Connection>;

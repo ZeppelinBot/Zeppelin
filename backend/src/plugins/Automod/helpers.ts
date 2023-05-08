@@ -12,7 +12,7 @@ interface BaseAutomodTriggerMatchResult {
   fullSummary?: string;
 }
 
-export type AutomodTriggerMatchResult<TExtra extends any = unknown> = unknown extends TExtra
+export type AutomodTriggerMatchResult<TExtra = unknown> = unknown extends TExtra
   ? BaseAutomodTriggerMatchResult
   : BaseAutomodTriggerMatchResult & { extra: TExtra };
 

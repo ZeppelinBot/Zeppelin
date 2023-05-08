@@ -1,4 +1,4 @@
-import { GuildMemberEditOptions, PermissionFlagsBits } from "discord.js";
+import { PermissionFlagsBits } from "discord.js";
 import intersection from "lodash.intersection";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
@@ -22,9 +22,6 @@ export const LoadDataEvt = persistEvt({
     }
     await pluginData.state.persistedData.clear(member.id);
 
-    const toRestore: GuildMemberEditOptions = {
-      reason: "Restored upon rejoin",
-    };
     const config = await pluginData.config.getForMember(member);
     const restoredData: string[] = [];
 

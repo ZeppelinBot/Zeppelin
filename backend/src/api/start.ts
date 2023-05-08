@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
 });
 
 // Error response
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {
   if (err instanceof TokenError) {
     clientError(res, "Invalid code");
@@ -45,6 +46,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 response
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((req, res, next) => {
   return notFound(res);
 });

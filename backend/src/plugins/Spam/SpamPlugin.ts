@@ -88,7 +88,7 @@ export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.savedMessages.events.off("create", state.onMessageCreateFn);
     clearInterval(state.expiryInterval);

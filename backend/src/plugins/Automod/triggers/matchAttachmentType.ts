@@ -23,7 +23,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     whitelist_enabled: false,
   },
 
-  async match({ pluginData, context, triggerConfig: trigger }) {
+  async match({ context, triggerConfig: trigger }) {
     if (!context.message) {
       return;
     }

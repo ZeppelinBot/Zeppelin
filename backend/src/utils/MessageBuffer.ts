@@ -31,7 +31,7 @@ export class MessageBuffer {
 
   protected timeoutMs: number | null = null;
 
-  protected textSeparator: string = "";
+  protected textSeparator = "";
 
   protected chunk: Chunk | null = null;
 

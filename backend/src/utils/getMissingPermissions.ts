@@ -12,7 +12,7 @@ export function getMissingPermissions(
   const allowedPermissions = resolvedPermissions;
   const nRequiredPermissions = requiredPermissions;
 
-  if (Boolean(allowedPermissions.bitfield & PermissionsBitField.Flags.Administrator)) {
+  if (allowedPermissions.bitfield & PermissionsBitField.Flags.Administrator) {
     return BigInt(0);
   }
 

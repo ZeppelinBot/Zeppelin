@@ -9,13 +9,6 @@ import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin"
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";
 import { getLogMessage } from "./getLogMessage";
 
-const excludedUserProps = ["user", "member", "mod"];
-const excludedRoleProps = ["message.member.roles", "member.roles"];
-
-function isRoleArray(value: any): value is string[] {
-  return Array.isArray(value);
-}
-
 interface ExclusionData {
   userId?: Snowflake | null;
   bot?: boolean | null;
@@ -86,7 +79,7 @@ export async function log<TLogType extends keyof ILogTypeData>(
   const logChannels: TLogChannelMap = pluginData.config.get().channels;
   const typeStr = LogType[type];
 
-  logChannelLoop: for (const [channelId, opts] of Object.entries(logChannels)) {
+  for (const [channelId, opts] of Object.entries(logChannels)) {
     const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
     if (!channel?.isTextBased()) continue;
     if (pluginData.state.channelCooldowns.isOnCooldown(channelId)) continue;

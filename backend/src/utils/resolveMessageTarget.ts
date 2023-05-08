@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { getChannelIdFromMessageId } from "../data/getChannelIdFromMessageId";
 import { isSnowflake } from "../utils";
 
-const channelAndMessageIdRegex = /^(\d+)[\-\/](\d+)$/;
+const channelAndMessageIdRegex = /^(\d+)[-/](\d+)$/;
 const messageLinkRegex = /^https:\/\/(?:\w+\.)?discord(?:app)?\.com\/channels\/\d+\/(\d+)\/(\d+)$/i;
 
 export interface MessageTarget {

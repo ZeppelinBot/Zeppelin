@@ -107,9 +107,8 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
     // Check each category for conflicting options
     if (input.categories) {
-      for (const [name, opts] of Object.entries(input.categories)) {
-        const cat = input.categories[name];
-        if (cat.delete_with_command && cat.auto_delete_command) {
+      for (const [name, cat] of Object.entries(input.categories)) {
+        if ((cat as any).delete_with_command && (cat as any).auto_delete_command) {
           throw new StrictValidationError([
             `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
           ]);
@@ -279,7 +278,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.savedMessages.events.off("create", state.onMessageCreateFn);
   },

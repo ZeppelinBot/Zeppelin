@@ -10,7 +10,7 @@ export const RateLimitPerformanceCmd = botControlCmd({
 
   signature: {},
 
-  async run({ pluginData, message: msg, args }) {
+  async run({ pluginData, message: msg }) {
     const logItems = getRateLimitStats();
     if (logItems.length === 0) {
       sendSuccessMessage(pluginData, msg.channel, `No rate limits hit`);

@@ -29,7 +29,7 @@ export const MuteTrigger = automodTrigger<MuteTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was muted`;
   },
 });

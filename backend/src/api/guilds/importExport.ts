@@ -50,7 +50,7 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
   importExportRouter.get(
     "/:guildId/pre-import",
     requireGuildPermission(ApiPermissions.ManageAccess),
-    async (req: Request, res: Response) => {
+    async (req: Request) => {
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);
       const minNum = await guildCases.getMinCaseNumber();
       const maxNum = await guildCases.getMaxCaseNumber();

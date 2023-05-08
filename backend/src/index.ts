@@ -242,11 +242,6 @@ connect().then(async (connection) => {
   // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
   (client as unknown as EventEmitter).setMaxListeners(200);
 
-  client.rest.on(RESTEvents.RateLimited, (data) => {
-    // tslint:disable-next-line:no-console
-    // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
-  });
-
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
@@ -453,7 +448,7 @@ connect().then(async (connection) => {
     logger.info("Received SIGINT, exiting...");
     cleanupAndStop(0);
   });
-  process.on("SIGTERM", (code) => {
+  process.on("SIGTERM", () => {
     logger.info("Received SIGTERM, exiting...");
     cleanupAndStop(0);
   });

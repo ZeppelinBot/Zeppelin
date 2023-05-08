@@ -8,6 +8,7 @@ export const ExampleAction = automodAction({
 
   defaultConfig: {},
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async apply({ pluginData, contexts, actionConfig }) {
     // TODO: Everything
   },

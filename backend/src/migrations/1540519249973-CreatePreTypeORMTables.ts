@@ -106,7 +106,7 @@ export class CreatePreTypeORMTables1540519249973 implements MigrationInterface {
       `);
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
+  public async down(): Promise<any> {
     // No down function since we're migrating (hehe) from another migration system (knex)
   }
 }

@@ -2,7 +2,7 @@ import { GuildPluginData } from "knub";
 import { splitMessageIntoChunks } from "knub/helpers";
 import moment from "moment-timezone";
 import { Case } from "../../../data/entities/Case";
-import { convertDelayStringToMS, DAYS, DBDateFormat, disableLinkPreviews, messageLink } from "../../../utils";
+import { convertDelayStringToMS, DBDateFormat, disableLinkPreviews, messageLink } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { caseAbbreviations } from "../caseAbbreviations";
 import { CasesPluginType } from "../types";
@@ -11,8 +11,6 @@ import { getCaseIcon } from "./getCaseIcon";
 const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;
 const UPDATE_STR = "**[Update]**";
-
-const RELATIVE_TIME_THRESHOLD = 7 * DAYS;
 
 export async function getCaseSummary(
   pluginData: GuildPluginData<CasesPluginType>,

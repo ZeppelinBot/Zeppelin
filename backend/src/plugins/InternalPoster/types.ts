@@ -7,9 +7,6 @@ import { Webhooks } from "../../data/Webhooks";
 export const ConfigSchema = t.type({});
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
-// <channelId, webhookUrl>
-type ChannelWebhookMap = Map<string, string>;
-
 export interface InternalPosterPluginType extends BasePluginType {
   config: TConfigSchema;
 

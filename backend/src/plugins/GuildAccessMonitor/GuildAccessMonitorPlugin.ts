@@ -8,7 +8,6 @@ import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
-  config: {};
   state: {
     allowedGuilds: AllowedGuilds;
   };

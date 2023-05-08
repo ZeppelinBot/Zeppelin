@@ -11,7 +11,7 @@ export const SetCounterAction = automodAction({
 
   defaultConfig: {},
 
-  async apply({ pluginData, contexts, actionConfig, matchResult, ruleName }) {
+  async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const countersPlugin = pluginData.getPlugin(CountersPlugin);
     if (!countersPlugin.counterExists(actionConfig.counter)) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({

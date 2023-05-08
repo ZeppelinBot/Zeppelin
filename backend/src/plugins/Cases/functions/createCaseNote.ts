@@ -39,7 +39,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     });
   }
 
-  const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9\-]+/g);
+  const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9-]+/g);
   if (archiveLinkMatch) {
     for (const archiveId of archiveLinkMatch) {
       pluginData.state.archives.makePermanent(archiveId);

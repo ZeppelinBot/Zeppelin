@@ -126,7 +126,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       return entity;
     }
 
-    entity.data = await decryptJson(entity.data as unknown as string);
+    entity.data = (await decryptJson(entity.data as unknown as string)) as ISavedMessageData;
     return entity;
   }
 

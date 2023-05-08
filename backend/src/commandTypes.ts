@@ -96,7 +96,7 @@ export const commandTypes = {
     throw new TypeConversionError(`Could not parse ID: \`${escapeInlineCode(value)}\``);
   },
 
-  regex(value: string, context: CommandContext<any>): RegExp {
+  regex(value: string): RegExp {
     try {
       return inputPatternToRegExp(value);
     } catch (e) {

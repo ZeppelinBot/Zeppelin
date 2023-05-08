@@ -1,6 +1,6 @@
 import { asyncMap } from "../utils/async";
 
-export class BaseRepository<TEntity extends unknown = unknown> {
+export class BaseRepository<TEntity = unknown> {
   private nextRelations: string[];
 
   constructor() {

@@ -45,7 +45,7 @@ export const MemberJoinSpamTrigger = automodTrigger<unknown>()({
     }
   },
 
-  renderMatchInformation({ pluginData, contexts, triggerConfig }) {
+  renderMatchInformation() {
     return "";
   },
 });

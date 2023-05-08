@@ -248,7 +248,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   },
 
   async afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.clearRecentActionsInterval = setInterval(() => clearOldRecentActions(pluginData), 1 * MINUTES);
     state.clearRecentSpamInterval = setInterval(() => clearOldRecentSpam(pluginData), 1 * SECONDS);

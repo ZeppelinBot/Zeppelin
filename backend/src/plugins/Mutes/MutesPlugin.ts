@@ -60,8 +60,6 @@ const defaultOptions = {
   ],
 };
 
-const EXPIRED_MUTE_CHECK_INTERVAL = 60 * 1000;
-
 export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   name: "mutes",
   showInDocs: true,
@@ -135,7 +133,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.unregisterExpiredRoleMuteListener?.();
     state.unregisterTimeoutMuteToRenewListener?.();

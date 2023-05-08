@@ -31,7 +31,7 @@ export const StartThreadAction = automodAction({
     limit_per_channel: 5,
   },
 
-  async apply({ pluginData, contexts, actionConfig, ruleName }) {
+  async apply({ pluginData, contexts, actionConfig }) {
     // check if the message still exists, we don't want to create threads for deleted messages
     const threads = contexts.filter((c) => {
       if (!c.message || !c.user) return false;

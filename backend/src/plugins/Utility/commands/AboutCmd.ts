@@ -25,7 +25,7 @@ export const AboutCmd = utilityCmd({
     try {
       const lcl = new LCL(rootDir);
       lastCommit = await lcl.getLastCommit();
-    } catch {} // tslint:disable-line:no-empty
+    } catch {} // eslint-disable-line no-empty
 
     let lastUpdate;
     let version;

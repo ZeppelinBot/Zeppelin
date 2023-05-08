@@ -29,7 +29,7 @@ export async function clearMute(
     try {
       const defaultMuteRole = pluginData.config.get().mute_role;
       if (mute) {
-        const muteRoleId = mute.mute_role || pluginData.config.get().mute_role;
+        const muteRoleId = mute.mute_role || defaultMuteRole;
 
         if (mute.type === MuteTypes.Role) {
           if (muteRoleId) {
@@ -41,8 +41,7 @@ export async function clearMute(
 
         if (mute.roles_to_restore) {
           const guildRoles = pluginData.guild.roles.cache;
-          const newRoles = [...member.roles.cache.keys()].filter((roleId) => roleId !== muteRoleId);
-          for (const roleIdToRestore of mute?.roles_to_restore) {
+          for (const roleIdToRestore of mute?.roles_to_restore ?? []) {
             if (guildRoles.has(roleIdToRestore) && roleIdToRestore !== muteRoleId) {
               roleManagerPlugin.addRole(member.id, roleIdToRestore);
             }
@@ -50,7 +49,7 @@ export async function clearMute(
         }
       } else {
         // Unmuting someone without an active mute -> remove timeouts and/or mute role
-        const muteRole = pluginData.config.get().mute_role;
+        const muteRole = defaultMuteRole;
         if (muteRole && member.roles.cache.has(muteRole)) {
           roleManagerPlugin.removePriorityRole(member.id, muteRole);
         }

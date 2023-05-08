@@ -41,8 +41,8 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
       To specify emoji in the config, you need to use the emoji's "raw form".
       To obtain this, post the emoji with a backslash in front of it.
 
-      - Example with a default emoji: "\:star:" => "⭐"
-      - Example with a custom emoji: "\:mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
+      - Example with a default emoji: ":star:" => "⭐"
+      - Example with a custom emoji: ":mrvnSmile:" => "<:mrvnSmile:543000534102310933>"
 
       ### Basic starboard
       Any message on the server that gets 5 star reactions will be posted into the starboard channel (604342689038729226).
@@ -127,7 +127,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
     const boards = (input as any).boards;
     if (boards) {
       for (const [name, opts] of Object.entries(boards)) {
-        boards[name] = Object.assign({}, defaultStarboardOpts, boards[name]);
+        boards[name] = Object.assign({}, defaultStarboardOpts, opts);
       }
     }
 
@@ -163,7 +163,7 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.savedMessages.events.off("delete", state.onMessageDeleteFn);
   },

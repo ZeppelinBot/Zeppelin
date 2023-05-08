@@ -127,7 +127,7 @@ export async function muteUser(
       // TODO: Add back the voiceState check once we figure out how to get voice state for guild members that are loaded on-demand
       try {
         await member.edit({ channel: moveToVoiceChannel as Snowflake });
-      } catch {} // tslint:disable-line
+      } catch {} // eslint-disable-line no-empty
     }
   }
 

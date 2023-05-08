@@ -1,7 +1,7 @@
 import escapeStringRegexp from "escape-string-regexp";
 import moment from "moment-timezone";
 
-const normalizeTzName = (str) => str.replace(/[^a-zA-Z0-9+\-]/g, "").toLowerCase();
+const normalizeTzName = (str) => str.replace(/[^a-zA-Z0-9+-]/g, "").toLowerCase();
 
 const validTimezones = moment.tz.names();
 const normalizedTimezoneMap = validTimezones.reduce((map, tz) => {

@@ -10,7 +10,7 @@ export const CountersListCmd = guildPluginMessageCommand<CountersPluginType>()({
 
   signature: {},
 
-  async run({ pluginData, message, args }) {
+  async run({ pluginData, message }) {
     const config = await pluginData.config.getForMessage(message);
 
     const countersToShow = Array.from(Object.values(config.counters)).filter((c) => c.can_view !== false);

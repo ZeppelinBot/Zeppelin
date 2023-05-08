@@ -3,7 +3,6 @@ import * as t from "io-ts";
 import { verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
-// tslint:disable-next-line:no-empty-interface
 interface AnyMessageResultType {}
 
 export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
@@ -11,7 +10,7 @@ export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
 
   defaultConfig: {},
 
-  async match({ pluginData, context, triggerConfig: trigger }) {
+  async match({ context }) {
     if (!context.message) {
       return;
     }
@@ -21,7 +20,7 @@ export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
     };
   },
 
-  renderMatchInformation({ pluginData, contexts, matchResult }) {
+  renderMatchInformation({ pluginData, contexts }) {
     const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake);
     return `Matched message (\`${contexts[0].message!.id}\`) in ${
       channel ? verboseChannelMention(channel) : "Unknown Channel"

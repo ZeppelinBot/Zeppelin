@@ -16,7 +16,7 @@ export async function makeRoleUnmentionableAction(
   action: TMakeRoleUnmentionableAction,
   values: TemplateSafeValueContainer,
   event: TCustomEvent,
-  eventData: any,
+  eventData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
   const role = pluginData.guild.roles.cache.get(action.role as Snowflake);
   if (!role) {

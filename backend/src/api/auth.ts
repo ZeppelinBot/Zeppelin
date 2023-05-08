@@ -18,7 +18,6 @@ interface IPassportApiUser {
 
 declare global {
   namespace Express {
-    // tslint:disable-next-line:no-empty-interface
     interface User extends IPassportApiUser {}
   }
 }
@@ -151,6 +150,7 @@ export function initAuth(app: express.Express) {
 export function apiTokenAuthHandlers() {
   return [
     passport.authenticate("api-token", { failWithError: true }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (err, req: Request, res: Response, next) => {
       return res.status(401).json({ error: err.message });
     },

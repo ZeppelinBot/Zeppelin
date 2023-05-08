@@ -70,7 +70,7 @@ export const ChangePermsAction = automodAction({
   }),
   defaultConfig: {},
 
-  async apply({ pluginData, contexts, actionConfig, ruleName }) {
+  async apply({ pluginData, contexts, actionConfig }) {
     const user = contexts.find((c) => c.user)?.user;
     const message = contexts.find((c) => c.message)?.message;
 

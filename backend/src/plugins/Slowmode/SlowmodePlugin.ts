@@ -81,7 +81,7 @@ export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
   },
 
   beforeUnload(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.savedMessages.events.off("create", state.onMessageCreateFn);
     clearInterval(state.clearInterval);

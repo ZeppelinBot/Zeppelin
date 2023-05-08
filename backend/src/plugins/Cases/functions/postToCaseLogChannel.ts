@@ -68,7 +68,7 @@ export async function postCaseToCaseLogChannel(
         }
       }
       return;
-    } catch {} // tslint:disable-line:no-empty
+    } catch {} // eslint-disable-line no-empty
   }
 
   try {

@@ -29,7 +29,7 @@ export const WarnTrigger = automodTrigger<WarnTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was warned`;
   },
 });

@@ -5,7 +5,7 @@ export async function encryptJson(obj: any): Promise<string> {
   return encrypt(serialized);
 }
 
-export async function decryptJson<T extends unknown>(encrypted: string): Promise<T> {
+export async function decryptJson(encrypted: string): Promise<unknown> {
   const decrypted = await decrypt(encrypted);
   return JSON.parse(decrypted);
 }

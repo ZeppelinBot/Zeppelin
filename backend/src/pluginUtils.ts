@@ -77,28 +77,6 @@ const PluginOverrideCriteriaType: t.Type<PluginOverrideCriteria<unknown>> = t.re
     }),
 );
 
-const validTopLevelOverrideKeys = [
-  "channel",
-  "category",
-  "thread",
-  "is_thread",
-  "level",
-  "user",
-  "role",
-  "all",
-  "any",
-  "not",
-  "extra",
-  "config",
-];
-
-const BasicPluginStructureType = t.type({
-  enabled: tNullable(t.boolean),
-  config: tNullable(t.unknown),
-  overrides: tNullable(t.array(t.union([PluginOverrideCriteriaType, t.type({ config: t.unknown })]))),
-  replaceDefaultOverrides: tNullable(t.boolean),
-});
-
 export function strictValidationErrorToConfigValidationError(err: StrictValidationError) {
   return new ConfigValidationError(
     err

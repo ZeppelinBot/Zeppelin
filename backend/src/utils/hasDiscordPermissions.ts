@@ -17,5 +17,5 @@ export function hasDiscordPermissions(
   }
 
   const nRequiredPermissions = BigInt(requiredPermissions);
-  return Boolean((resolvedPermissions?.bitfield! & nRequiredPermissions) === nRequiredPermissions);
+  return Boolean((resolvedPermissions.bitfield! & nRequiredPermissions) === nRequiredPermissions);
 }

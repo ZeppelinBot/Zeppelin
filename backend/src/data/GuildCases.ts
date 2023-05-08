@@ -7,8 +7,6 @@ import { connection } from "./db";
 import { Case } from "./entities/Case";
 import { CaseNote } from "./entities/CaseNote";
 
-const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
-
 export class GuildCases extends BaseGuildRepository {
   private cases: Repository<Case>;
   private caseNotes: Repository<CaseNote>;
