@@ -4,9 +4,9 @@
   "description": "",
   "private": true,
   "scripts": {
-    "format": "prettier --write './**/*.{css,html,js,json,ts,tsx}'",
-    "lint": "tslint \"./{backend,dashboard}/{,!(node_modules)/**/}/*.ts\"",
-    "codestyle-check": "prettier --check './**/*.{css,html,js,json,ts,tsx}'"
+    "format": "prettier --write './backend/src/**/*.{css,html,js,json,ts,tsx}' './dashboard/src/**/*.{css,html,js,json,ts,tsx}'",
+    "lint": "tslint './backend/src/**/*.{js,ts,tsx}' './dashboard/src/**/*.{js,ts,tsx}'",
+    "codestyle-check": "prettier --check './backend/src/**/*.{css,html,js,json,ts,tsx}' './dashboard/src/**/*.{css,html,js,json,ts,tsx}'"
   },
   "devDependencies": {
     "husky": "^3.0.9",
