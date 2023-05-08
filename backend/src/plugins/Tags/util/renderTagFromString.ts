@@ -5,7 +5,7 @@ import { TemplateParseError } from "../../../templateFormatter";
 import { StrictMessageContent, validateAndParseMessageContent } from "../../../utils";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { TagsPluginType, TTag } from "../types";
+import { TTag, TagsPluginType } from "../types";
 import { renderTagBody } from "./renderTagBody";
 
 export async function renderTagFromString(

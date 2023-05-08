@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { getBaseUrl } from "../../../pluginUtils";
 import { logMessageDeleteBulk } from "../logFunctions/logMessageDeleteBulk";
 import { LogsPluginType } from "../types";

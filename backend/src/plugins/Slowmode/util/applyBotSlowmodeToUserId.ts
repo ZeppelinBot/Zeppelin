@@ -2,7 +2,7 @@ import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { isDiscordAPIError, UnknownUser, verboseChannelMention, verboseUserMention } from "../../../utils";
+import { UnknownUser, isDiscordAPIError, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { SlowmodePluginType } from "../types";
 

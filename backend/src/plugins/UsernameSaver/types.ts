@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
-import { UsernameHistory } from "../../data/UsernameHistory";
 import { Queue } from "../../Queue";
+import { UsernameHistory } from "../../data/UsernameHistory";
 
 export interface UsernameSaverPluginType extends BasePluginType {
   state: {

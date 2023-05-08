@@ -5,16 +5,16 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { logger } from "../../../logger";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
-  createUserNotificationError,
   DAYS,
+  SECONDS,
+  UserNotificationResult,
+  createUserNotificationError,
   notifyUser,
   resolveMember,
   resolveUser,
-  SECONDS,
   ucfirst,
-  UserNotificationResult,
 } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";

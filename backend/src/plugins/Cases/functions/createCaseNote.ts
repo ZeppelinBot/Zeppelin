@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { resolveUser, UnknownUser } from "../../../utils";
+import { UnknownUser, resolveUser } from "../../../utils";
 import { CaseNoteArgs, CasesPluginType } from "../types";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { resolveCaseId } from "./resolveCaseId";

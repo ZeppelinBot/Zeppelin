@@ -1,4 +1,4 @@
-import { escapeBold, User, type Snowflake } from "discord.js";
+import { User, escapeBold, type Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";

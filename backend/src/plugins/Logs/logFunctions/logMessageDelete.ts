@@ -1,8 +1,8 @@
 import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { ISavedMessageAttachmentData, SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { ISavedMessageAttachmentData, SavedMessage } from "../../../data/entities/SavedMessage";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { UnknownUser, useMediaUrls } from "../../../utils";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";

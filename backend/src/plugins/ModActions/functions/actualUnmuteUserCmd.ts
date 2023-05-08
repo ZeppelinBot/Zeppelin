@@ -1,9 +1,9 @@
 import { GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, UnknownUser } from "../../../utils";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { UnknownUser, asSingleLine } from "../../../utils";
 import { ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 

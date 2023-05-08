@@ -1,9 +1,9 @@
 import { APIEmbed, MessageMentionTypes, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
 import { allowTimeout } from "../../../RegExpRunner";
+import { LogType } from "../../../data/LogType";
 import { TypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { isDiscordAPIError, MINUTES } from "../../../utils";
+import { MINUTES, isDiscordAPIError } from "../../../utils";
 import { MessageBuffer } from "../../../utils/MessageBuffer";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { ILogTypeData, LogsPluginType, TLogChannel, TLogChannelMap } from "../types";

@@ -1,9 +1,9 @@
 import { ConfigValidationError, PluginConfigManager } from "knub";
 import moment from "moment-timezone";
-import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
+import { guildPlugins } from "./plugins/availablePlugins";
 import { PartialZeppelinGuildConfigSchema, ZeppelinGuildConfig } from "./types";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
+import { StrictValidationError, decodeAndValidateStrict } from "./validatorUtils";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {

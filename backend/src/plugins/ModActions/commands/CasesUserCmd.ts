@@ -1,9 +1,9 @@
 import { APIEmbed, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { chunkArray, emptyEmbedValue, resolveUser, trimLines, UnknownUser } from "../../../utils";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { UnknownUser, chunkArray, emptyEmbedValue, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";

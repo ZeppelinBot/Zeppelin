@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { Queue } from "../../Queue";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { Queue } from "../../Queue";
 import { tNullable } from "../../utils";
 
 export const ConfigSchema = t.type({

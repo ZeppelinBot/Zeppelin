@@ -8,7 +8,7 @@ import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
-import { ConfigSchema, defaultStarboardOpts, StarboardPluginType } from "./types";
+import { ConfigSchema, StarboardPluginType, defaultStarboardOpts } from "./types";
 import { onMessageDelete } from "./util/onMessageDelete";
 
 const defaultOptions: PluginOptions<StarboardPluginType> = {

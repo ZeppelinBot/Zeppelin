@@ -1,7 +1,7 @@
 import { PermissionsBitField, Snowflake, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../data/LogType";
-import { isDiscordAPIError, MINUTES } from "../../../utils";
+import { MINUTES, isDiscordAPIError } from "../../../utils";
 import { filterObject } from "../../../utils/filterObject";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";

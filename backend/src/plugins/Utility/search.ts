@@ -12,12 +12,12 @@ import {
 import escapeStringRegexp from "escape-string-regexp";
 import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
-import { allowTimeout, RegExpRunner } from "../../RegExpRunner";
 import { MINUTES, multiSorter, sorter, trimLines } from "../../utils";
 import { asyncFilter } from "../../utils/async";
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
-import { inputPatternToRegExp, InvalidRegexError } from "../../validatorUtils";
+import { InvalidRegexError, inputPatternToRegExp } from "../../validatorUtils";
 import { banSearchSignature } from "./commands/BanSearchCmd";
 import { searchCmdSignature } from "./commands/SearchCmd";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";

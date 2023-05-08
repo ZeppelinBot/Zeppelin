@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 

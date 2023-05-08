@@ -1,8 +1,8 @@
 import { PluginOptions } from "knub";
+import { Queue } from "../../Queue";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
 import { makeIoTsConfigParser } from "../../pluginUtils";
-import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { NamesCmd } from "./commands/NamesCmd";
 import { ConfigSchema, NameHistoryPluginType } from "./types";

@@ -1,7 +1,7 @@
 import { AuditLogEvent, User } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { resolveUser, UnknownUser } from "../../../utils";
+import { UnknownUser, resolveUser } from "../../../utils";
 import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";

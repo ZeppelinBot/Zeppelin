@@ -1,12 +1,12 @@
 import * as t from "io-ts";
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import { z } from "zod";
+import { RegExpRunner } from "../../RegExpRunner";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
-import { RegExpRunner } from "../../RegExpRunner";
 import { tMessageContent, tNullable } from "../../utils";
 import { MessageBuffer } from "../../utils/MessageBuffer";
 import {

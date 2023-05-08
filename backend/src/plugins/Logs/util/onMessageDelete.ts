@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { resolveUser } from "../../../utils";
 import { logMessageDelete } from "../logFunctions/logMessageDelete";
 import { logMessageDeleteBare } from "../logFunctions/logMessageDeleteBare";

@@ -1,7 +1,7 @@
 import { ExtendedMatchParams, GuildPluginData } from "knub";
-import { renderTemplate, TemplateSafeValue, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { renderRecursively, StrictMessageContent } from "../../../utils";
-import { TagsPluginType, TTag } from "../types";
+import { TemplateSafeValue, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { StrictMessageContent, renderRecursively } from "../../../utils";
+import { TTag, TagsPluginType } from "../types";
 import { findTagByName } from "./findTagByName";
 
 const MAX_TAG_FN_CALLS = 25;

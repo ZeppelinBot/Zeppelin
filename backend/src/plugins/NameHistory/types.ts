@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { Queue } from "../../Queue";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
-import { Queue } from "../../Queue";
 
 export const ConfigSchema = t.type({
   can_view: t.boolean,

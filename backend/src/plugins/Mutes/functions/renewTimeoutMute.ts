@@ -1,8 +1,8 @@
 import { PermissionFlagsBits } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { Mute } from "../../../data/entities/Mute";
 import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes";
+import { Mute } from "../../../data/entities/Mute";
 import { DBDateFormat, resolveMember } from "../../../utils";
 import { MutesPluginType } from "../types";
 

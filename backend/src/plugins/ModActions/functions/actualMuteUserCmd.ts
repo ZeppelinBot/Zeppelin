@@ -1,10 +1,10 @@
 import { GuildMember, GuildTextBasedChannel, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { asSingleLine, isDiscordAPIError, UnknownUser } from "../../../utils";
+import { UnknownUser, asSingleLine, isDiscordAPIError } from "../../../utils";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MuteResult } from "../../Mutes/types";
 import { ModActionsPluginType } from "../types";

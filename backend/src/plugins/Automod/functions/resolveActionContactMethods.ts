@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
+import { UserNotificationMethod, disableUserNotificationStrings } from "../../../utils";
 import { AutomodPluginType } from "../types";
 
 export function resolveActionContactMethods(

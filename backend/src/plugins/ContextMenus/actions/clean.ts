@@ -1,7 +1,7 @@
 import { ContextMenuCommandInteraction, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ContextMenuPluginType } from "../types";
 

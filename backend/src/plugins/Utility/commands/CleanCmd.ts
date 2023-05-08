@@ -1,15 +1,15 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
-import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { allowTimeout } from "../../../RegExpRunner";
-import { DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { LogType } from "../../../data/LogType";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
+import { DAYS, SECONDS, getInviteCodesInString, noop } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { utilityCmd, UtilityPluginType } from "../types";
+import { UtilityPluginType, utilityCmd } from "../types";
 
 const MAX_CLEAN_COUNT = 150;
 const MAX_CLEAN_TIME = 1 * DAYS;

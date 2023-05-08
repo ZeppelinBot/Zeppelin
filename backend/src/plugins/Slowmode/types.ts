@@ -1,9 +1,9 @@
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
+import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
 
 export const ConfigSchema = t.type({
   use_native_slowmode: t.boolean,

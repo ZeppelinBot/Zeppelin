@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { convertDelayStringToMS, resolveMember } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RecentActionType, SpamPluginType } from "../types";

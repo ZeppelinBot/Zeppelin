@@ -1,7 +1,7 @@
 import * as t from "io-ts";
+import { Queue } from "../../Queue";
 import { UsernameHistory } from "../../data/UsernameHistory";
 import { makeIoTsConfigParser } from "../../pluginUtils";
-import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
 import { UsernameSaverPluginType } from "./types";

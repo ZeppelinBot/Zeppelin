@@ -1,8 +1,8 @@
 import { APIEmbed, MessageType, Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { getDefaultMessageCommandPrefix, GuildPluginData } from "knub";
+import { GuildPluginData, getDefaultMessageCommandPrefix } from "knub";
 import moment from "moment-timezone";
-import { chunkMessageLines, EmbedWith, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
+import { EmbedWith, chunkMessageLines, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 

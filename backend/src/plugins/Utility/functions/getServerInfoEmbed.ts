@@ -4,10 +4,10 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import {
   EmbedWith,
+  MINUTES,
   formatNumber,
   inviteHasCounts,
   memoize,
-  MINUTES,
   preEmbedPadding,
   resolveInvite,
   resolveUser,

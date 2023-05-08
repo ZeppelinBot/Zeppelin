@@ -23,9 +23,9 @@ import {
   SavedMessage,
 } from "../data/entities/SavedMessage";
 import {
-  ingestDataIntoTemplateSafeValueContainer,
   TemplateSafeValueContainer,
   TypedTemplateSafeValueContainer,
+  ingestDataIntoTemplateSafeValueContainer,
 } from "../templateFormatter";
 
 type InputProps<T> = Omit<

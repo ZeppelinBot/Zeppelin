@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import * as t from "io-ts";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,

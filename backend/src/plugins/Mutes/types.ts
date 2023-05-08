@@ -2,13 +2,13 @@ import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
-import { Case } from "../../data/entities/Case";
-import { Mute } from "../../data/entities/Mute";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { tNullable, UserNotificationMethod, UserNotificationResult } from "../../utils";
+import { Case } from "../../data/entities/Case";
+import { Mute } from "../../data/entities/Mute";
+import { UserNotificationMethod, UserNotificationResult, tNullable } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
 export const ConfigSchema = t.type({

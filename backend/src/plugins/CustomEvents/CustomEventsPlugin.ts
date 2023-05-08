@@ -3,7 +3,7 @@ import { guildPluginMessageCommand, parseSignature } from "knub";
 import { TSignature } from "knub-command-manager";
 import { commandTypes } from "../../commandTypes";
 import { makeIoTsConfigParser } from "../../pluginUtils";
-import { createTypedTemplateSafeValueContainer, TemplateSafeValueContainer } from "../../templateFormatter";
+import { TemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { UnknownUser } from "../../utils";
 import { isScalar } from "../../utils/isScalar";
 import {

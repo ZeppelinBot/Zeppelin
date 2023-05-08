@@ -1,7 +1,7 @@
 import { GuildBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { UnknownUser } from "../../../utils";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";

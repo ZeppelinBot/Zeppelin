@@ -2,7 +2,7 @@ import { APIEmbed, ChannelType, Snowflake, StageChannel, VoiceChannel } from "di
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { EmbedWith, formatNumber, MINUTES, preEmbedPadding, trimLines, verboseUserMention } from "../../../utils";
+import { EmbedWith, MINUTES, formatNumber, preEmbedPadding, trimLines, verboseUserMention } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 

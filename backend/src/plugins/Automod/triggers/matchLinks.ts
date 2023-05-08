@@ -1,7 +1,7 @@
 import { escapeInlineCode } from "discord.js";
 import * as t from "io-ts";
-import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 import { allowTimeout } from "../../../RegExpRunner";
+import { phishermanDomainIsSafe } from "../../../data/Phisherman";
 import { getUrlsInString, tNullable } from "../../../utils";
 import { mergeRegexes } from "../../../utils/mergeRegexes";
 import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";

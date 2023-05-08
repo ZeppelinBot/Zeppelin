@@ -1,7 +1,7 @@
 import { PluginOptions } from "knub";
+import { Queue } from "../../Queue";
 import { Webhooks } from "../../data/Webhooks";
 import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
-import { Queue } from "../../Queue";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { editMessage } from "./functions/editMessage";
 import { sendMessage } from "./functions/sendMessage";

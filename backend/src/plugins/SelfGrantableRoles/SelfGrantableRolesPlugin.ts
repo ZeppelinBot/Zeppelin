@@ -5,7 +5,7 @@ import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
 import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
-import { ConfigSchema, defaultSelfGrantableRoleEntry, SelfGrantableRolesPluginType } from "./types";
+import { ConfigSchema, SelfGrantableRolesPluginType, defaultSelfGrantableRoleEntry } from "./types";
 
 const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   config: {

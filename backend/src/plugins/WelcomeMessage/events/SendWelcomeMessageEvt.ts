@@ -1,5 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { createChunkedMessage, verboseChannelMention, verboseUserMention } from "../../../utils";
 import { sendDM } from "../../../utils/sendDM";
 import {

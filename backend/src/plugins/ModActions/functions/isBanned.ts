@@ -1,6 +1,6 @@
 import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { isDiscordAPIError, isDiscordHTTPError, SECONDS, sleep } from "../../../utils";
+import { SECONDS, isDiscordAPIError, isDiscordHTTPError, sleep } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../types";

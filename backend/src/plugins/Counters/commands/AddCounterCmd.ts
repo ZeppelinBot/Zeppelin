@@ -3,7 +3,7 @@ import { guildPluginMessageCommand } from "knub";
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { resolveUser, UnknownUser } from "../../../utils";
+import { UnknownUser, resolveUser } from "../../../utils";
 import { changeCounterValue } from "../functions/changeCounterValue";
 import { CountersPluginType } from "../types";
 

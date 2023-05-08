@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
-import { RecentActionType, RECENT_ACTION_EXPIRY_TIME } from "../constants";
+import { RECENT_ACTION_EXPIRY_TIME, RecentActionType } from "../constants";
 import { AutomodContext, AutomodPluginType } from "../types";
 
 export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {

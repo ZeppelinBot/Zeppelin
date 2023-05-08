@@ -1,6 +1,6 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import * as t from "io-ts";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { isValidSnowflake, noop, tNullable, tPartialDictionary } from "../../../utils";
 import {
   guildToTemplateSafeGuild,

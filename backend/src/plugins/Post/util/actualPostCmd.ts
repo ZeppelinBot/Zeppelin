@@ -4,7 +4,7 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DBDateFormat, errorMessage, MINUTES, StrictMessageContent } from "../../../utils";
+import { DBDateFormat, MINUTES, StrictMessageContent, errorMessage } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { PostPluginType } from "../types";

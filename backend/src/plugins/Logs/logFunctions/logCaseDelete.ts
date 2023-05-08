@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { Case } from "../../../data/entities/Case";
 import { LogType } from "../../../data/LogType";
+import { Case } from "../../../data/entities/Case";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { caseToTemplateSafeCase, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";

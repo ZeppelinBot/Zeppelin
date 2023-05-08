@@ -3,8 +3,8 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import {
   EmbedWith,
-  formatNumber,
   GroupDMInvite,
+  formatNumber,
   inviteHasCounts,
   isGroupDMInvite,
   isGuildInvite,

@@ -15,7 +15,7 @@ import { AboutCmd } from "./commands/AboutCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
-import { CleanArgs, cleanCmd, CleanCmd } from "./commands/CleanCmd";
+import { CleanArgs, CleanCmd, cleanCmd } from "./commands/CleanCmd";
 import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
 import { HelpCmd } from "./commands/HelpCmd";

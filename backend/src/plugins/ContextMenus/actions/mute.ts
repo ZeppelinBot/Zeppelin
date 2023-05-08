@@ -1,8 +1,8 @@
 import { ContextMenuCommandInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { canActOn } from "src/pluginUtils";
+import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";

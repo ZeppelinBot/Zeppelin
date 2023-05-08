@@ -17,15 +17,15 @@ import {
   ConfigValidationError,
   ExtendedMatchParams,
   GuildPluginData,
-  helpers,
   PluginOverrideCriteria,
+  helpers,
 } from "knub";
 import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
 import { errorMessage, successMessage, tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
-import { parseIoTsSchema, StrictValidationError } from "./validatorUtils";
+import { StrictValidationError, parseIoTsSchema } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 

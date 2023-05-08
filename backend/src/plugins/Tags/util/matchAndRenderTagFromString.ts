@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { StrictMessageContent } from "../../../utils";
-import { TagsPluginType, TTagCategory } from "../types";
+import { TTagCategory, TagsPluginType } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
 
 interface BaseResult {

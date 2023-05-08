@@ -6,8 +6,8 @@ import {
   ThreadChannel,
 } from "discord.js";
 import * as t from "io-ts";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "../../../utils";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { MINUTES, convertDelayStringToMS, noop, tDelayString, tNullable } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { automodAction } from "../helpers";
 
