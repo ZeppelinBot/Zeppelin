@@ -10,11 +10,10 @@ export const updateMemberCacheOnVoiceStateUpdate = guildPluginEventListener<Guil
       return;
     }
     // Update each member once per guild load when we see a message from them
-    const key = `${pluginData.guild.id}-${memberId}`;
-    if (pluginData.state.initialUpdatedMembers.has(key)) {
+    if (pluginData.state.initialUpdatedMembers.has(memberId)) {
       return;
     }
     updateMemberCacheForMember(pluginData, memberId);
-    pluginData.state.initialUpdatedMembers.add(key);
+    pluginData.state.initialUpdatedMembers.add(memberId);
   },
 });

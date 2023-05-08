@@ -6,11 +6,10 @@ export const updateMemberCacheOnMessage = guildPluginEventListener<GuildMemberCa
   event: "messageCreate",
   listener({ pluginData, args }) {
     // Update each member once per guild load when we see a message from them
-    const key = `${pluginData.guild.id}-${args.message.author.id}`;
-    if (pluginData.state.initialUpdatedMembers.has(key)) {
+    if (pluginData.state.initialUpdatedMembers.has(args.message.author.id)) {
       return;
     }
     updateMemberCacheForMember(pluginData, args.message.author.id);
-    pluginData.state.initialUpdatedMembers.add(key);
+    pluginData.state.initialUpdatedMembers.add(args.message.author.id);
   },
 });
