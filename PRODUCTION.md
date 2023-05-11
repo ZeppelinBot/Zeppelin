@@ -3,9 +3,11 @@ Zeppelin's production environment - that is, the **bot, API, and dashboard** - u
 
 ## Starting the production environment
 1. Install Docker on the machine running the bot
-2. Make a copy of `.env.example` called `.env`
-3. Fill in the missing values in `.env`
-4. Run `docker compose -f docker-compose.production.yml up -d`
+2. Clone the respository `git clone https://github.com/ZeppelinBot/Zeppelin`. This creates a new folder called "Zeppelin", and copies the bot's code into the Zeppelin folder.
+3. Enter the Zeppelin folder.
+4. Make a copy of `.env.example` called `.env`
+5. Open `.env` and fill in the missing values.
+6. Run `docker compose -f docker-compose.production.yml up -d`
 
 **Note:** The dashboard and API are exposed with a self-signed certificate. It is recommended to set up a proxy with a proper certificate in front of them. Cloudflare is a popular choice here.
 
