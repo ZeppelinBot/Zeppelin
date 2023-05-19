@@ -174,8 +174,8 @@ export const TemplateFunctions: TemplateFunction[] = [
     name: "tag",
     description: "Returns the return value of an existing tag.",
     returnValue: "any",
-    arguments: ["tagName"],
-    examples: ['tag("tagName")'],
+    arguments: ["tagName", "optionalArgs"],
+    examples: ['tag("tagName", 123)'],
   },
 {
     name: "mentions",
