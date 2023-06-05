@@ -1,4 +1,4 @@
-import { Util } from "discord.js";
+import { escapeCodeBlock } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { createChunkedMessage, DBDateFormat, deactivateMentions, sorter, trimLines } from "../../../utils";
@@ -26,7 +26,7 @@ export const ScheduledPostsListCmd = postCmd({
 
       const isTruncated = previewText.length > SCHEDULED_POST_PREVIEW_TEXT_LENGTH;
 
-      previewText = Util.escapeCodeBlock(deactivateMentions(previewText))
+      previewText = escapeCodeBlock(deactivateMentions(previewText))
         .replace(/\s+/g, " ")
         .slice(0, SCHEDULED_POST_PREVIEW_TEXT_LENGTH);
 

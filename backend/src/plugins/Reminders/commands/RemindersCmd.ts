@@ -9,7 +9,7 @@ export const RemindersCmd = remindersCmd({
   trigger: "reminders",
   permission: "can_use",
 
-  async run({ message: msg, args, pluginData }) {
+  async run({ message: msg, pluginData }) {
     const reminders = await pluginData.state.reminders.getRemindersByUserId(msg.author.id);
     if (reminders.length === 0) {
       sendErrorMessage(pluginData, msg.channel, "No reminders");

@@ -1,7 +1,7 @@
-import { automodTrigger } from "../helpers";
+import { escapeInlineCode } from "discord.js";
 import * as t from "io-ts";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
-import { GuildChannel, Util } from "discord.js";
+import { automodTrigger } from "../helpers";
 
 interface MatchResultType {
   matchedType: string;
@@ -65,13 +65,13 @@ export const MatchMimeTypeTrigger = automodTrigger<MatchResultType>()({
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
     const { message } = contexts[0];
-    const channel = pluginData.guild.channels.resolve(message!.channel_id);
-    const prettyChannel = verboseChannelMention(channel as GuildChannel);
+    const channel = pluginData.guild.channels.resolve(message!.channel_id)!;
+    const prettyChannel = verboseChannelMention(channel);
     const { matchedType, mode } = matchResult.extra;
 
     return (
       asSingleLine(`
-        Matched MIME type \`${Util.escapeInlineCode(matchedType)}\`
+        Matched MIME type \`${escapeInlineCode(matchedType)}\`
         (${mode === "blacklist" ? "blacklisted" : "not in whitelist"})
         in message (\`${message!.id}\`) in ${prettyChannel}
       `) + messageSummary(message!)

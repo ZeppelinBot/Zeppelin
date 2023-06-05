@@ -1,7 +1,8 @@
+import { ButtonStyle } from "discord.js";
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { tMessageContent, tNullable } from "../../utils";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
+import { tMessageContent, tNullable } from "../../utils";
 
 const RoleButtonOption = t.type({
   role_id: t.string,
@@ -10,6 +11,12 @@ const RoleButtonOption = t.type({
   // https://discord.js.org/#/docs/discord.js/v13/typedef/MessageButtonStyle
   style: tNullable(
     t.union([
+      t.literal(ButtonStyle.Primary),
+      t.literal(ButtonStyle.Secondary),
+      t.literal(ButtonStyle.Success),
+      t.literal(ButtonStyle.Danger),
+
+      // The following are deprecated
       t.literal("PRIMARY"),
       t.literal("SECONDARY"),
       t.literal("SUCCESS"),

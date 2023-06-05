@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from "discord.js";
+import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { isValidEmbed, trimLines } from "../../../utils";
@@ -46,7 +46,7 @@ export const PostEmbedCmd = postCmd({
       }
     }
 
-    let embed: MessageEmbedOptions = {};
+    let embed: APIEmbed = {};
     if (args.title) embed.title = args.title;
     if (color) embed.color = color;
 

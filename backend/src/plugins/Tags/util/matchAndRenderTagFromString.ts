@@ -1,9 +1,8 @@
 import { GuildMember } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
-import { GuildPluginData } from "knub";
-import { ExtendedMatchParams } from "knub/dist/config/PluginConfigManager";
+import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { StrictMessageContent } from "../../../utils";
-import { TagsPluginType, TTagCategory } from "../types";
+import { TTagCategory, TagsPluginType } from "../types";
 import { renderTagFromString } from "./renderTagFromString";
 
 interface BaseResult {
@@ -47,14 +46,7 @@ export async function matchAndRenderTagFromString(
     for (const [tagName, tagBody] of Object.entries(category.tags)) {
       const regex = new RegExp(`^${escapeStringRegexp(tagName)}(?:\\s|$)`);
       if (regex.test(withoutPrefix)) {
-        const renderedContent = await renderTagFromString(
-          pluginData,
-          str,
-          prefix,
-          tagName,
-          category.tags[tagName],
-          member,
-        );
+        const renderedContent = await renderTagFromString(pluginData, str, prefix, tagName, tagBody, member);
 
         if (renderedContent == null) {
           return null;

@@ -35,6 +35,6 @@ export class Case {
    */
   @Column({ type: String, nullable: true }) log_message_id: string | null;
 
-  @OneToMany((type) => CaseNote, (note) => note.case)
+  @OneToMany(() => CaseNote, (note) => note.case)
   notes: CaseNote[];
 }

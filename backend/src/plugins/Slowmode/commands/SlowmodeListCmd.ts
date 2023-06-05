@@ -1,6 +1,6 @@
 import { GuildChannel, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { createChunkedMessage } from "knub/dist/helpers";
+import { createChunkedMessage } from "knub/helpers";
 import { errorMessage } from "../../../utils";
 import { slowmodeCmd } from "../types";
 

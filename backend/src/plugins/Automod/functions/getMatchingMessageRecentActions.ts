@@ -1,10 +1,10 @@
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { startProfiling } from "../../../utils/easyProfiler";
 import { RecentActionType } from "../constants";
 import { AutomodPluginType } from "../types";
 import { getMatchingRecentActions } from "./getMatchingRecentActions";
-import { startProfiling } from "../../../utils/easyProfiler";
 
 export function getMatchingMessageRecentActions(
   pluginData: GuildPluginData<AutomodPluginType>,

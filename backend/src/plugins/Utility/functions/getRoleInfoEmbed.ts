@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, Permissions, Role } from "discord.js";
+import { APIEmbed, PermissionFlagsBits, Role } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -13,17 +13,15 @@ export async function getRoleInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   role: Role,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions> {
-  const embed: EmbedWith<"fields"> = {
+): Promise<APIEmbed> {
+  const embed: EmbedWith<"fields" | "author" | "color"> = {
     fields: [],
+    author: {
+      name: `Role:  ${role.name}`,
+      icon_url: MENTION_ICON,
+    },
+    color: role.color,
   };
-
-  embed.author = {
-    name: `Role:  ${role.name}`,
-    icon_url: MENTION_ICON,
-  };
-
-  embed.color = role.color;
 
   const createdAt = moment.utc(role.createdAt, "x");
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
@@ -36,8 +34,8 @@ export async function getRoleInfoEmbed(
     round: true,
   });
 
-  const rolePerms = role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-    ? [PERMISSION_NAMES.ADMINISTRATOR]
+  const rolePerms = role.permissions.has(PermissionFlagsBits.Administrator)
+    ? [PERMISSION_NAMES.Administrator]
     : role.permissions.toArray().map((p) => PERMISSION_NAMES[p]);
 
   // -1 because of the @everyone role

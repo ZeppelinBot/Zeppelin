@@ -1,4 +1,4 @@
-import { Snowflake, User } from "discord.js";
+import { Snowflake } from "discord.js";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { mutesCmd } from "../types";
 

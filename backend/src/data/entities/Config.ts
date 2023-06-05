@@ -22,7 +22,7 @@ export class Config {
   @Column()
   edited_at: string;
 
-  @ManyToOne((type) => ApiUserInfo)
+  @ManyToOne(() => ApiUserInfo)
   @JoinColumn({ name: "edited_by" })
   userInfo: ApiUserInfo;
 }

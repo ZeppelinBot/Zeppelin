@@ -25,6 +25,6 @@ export function parseCustomId(customId: string): { namespace: string; data: any 
   return {
     namespace: parts[1],
     // Skipping timestamp
-    data: JSON.parse(parts[2]),
+    data: parsedData,
   };
 }

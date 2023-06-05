@@ -1,11 +1,10 @@
 import { ApiPermissions } from "@shared/apiPermissions";
-import { TextChannel } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DBDateFormat, isGuildInvite, isSnowflake, resolveInvite } from "../../../utils";
-import { botControlCmd } from "../types";
 import moment from "moment-timezone";
+import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils";
 import { isEligible } from "../functions/isEligible";
+import { botControlCmd } from "../types";
 
 export const AddServerFromInviteCmd = botControlCmd({
   trigger: ["add_server_from_invite", "allow_server_from_invite", "adv"],
@@ -19,23 +18,19 @@ export const AddServerFromInviteCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const invite = await resolveInvite(pluginData.client, args.inviteCode, true);
     if (!invite || !isGuildInvite(invite)) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not resolve invite"); // :D
+      sendErrorMessage(pluginData, msg.channel, "Could not resolve invite"); // :D
       return;
     }
 
     const existing = await pluginData.state.allowedGuilds.find(invite.guild.id);
     if (existing) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Server is already allowed!");
+      sendErrorMessage(pluginData, msg.channel, "Server is already allowed!");
       return;
     }
 
     const { result, explanation } = await isEligible(pluginData, args.user, invite);
     if (!result) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel as TextChannel,
-        `Could not add server because it's not eligible: ${explanation}`,
-      );
+      sendErrorMessage(pluginData, msg.channel, `Could not add server because it's not eligible: ${explanation}`);
       return;
     }
 
@@ -56,10 +51,6 @@ export const AddServerFromInviteCmd = botControlCmd({
       );
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel as TextChannel,
-      "Server was eligible and is now allowed to use Zeppelin!",
-    );
+    sendSuccessMessage(pluginData, msg.channel, "Server was eligible and is now allowed to use Zeppelin!");
   },
 });

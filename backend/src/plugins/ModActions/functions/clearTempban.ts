@@ -5,14 +5,14 @@ import moment from "moment-timezone";
 import { LogType } from "src/data/LogType";
 import { logger } from "src/logger";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { resolveUser, SECONDS } from "../../../utils";
+import { Tempban } from "../../../data/entities/Tempban";
+import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { Tempban } from "../../../data/entities/Tempban";
 
 export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginType>, tempban: Tempban) {
   if (!(await isBanned(pluginData, tempban.user_id))) {

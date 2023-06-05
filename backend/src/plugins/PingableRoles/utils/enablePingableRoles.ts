@@ -11,11 +11,6 @@ export function enablePingableRoles(
     const role = pluginData.guild.roles.cache.get(pingableRole.role_id as Snowflake);
     if (!role) continue;
 
-    role.edit(
-      {
-        mentionable: true,
-      },
-      "Enable pingable role",
-    );
+    role.setMentionable(true, "Enable pingable role");
   }
 }

@@ -1,16 +1,16 @@
-import { typedGuildCommand } from "knub";
+import { guildPluginMessageCommand } from "knub";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CountersPluginType } from "../types";
 
-export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
+export const CountersListCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters list", "counter list", "counters"],
   permission: "can_view",
 
   signature: {},
 
-  async run({ pluginData, message, args }) {
+  async run({ pluginData, message }) {
     const config = await pluginData.config.getForMessage(message);
 
     const countersToShow = Array.from(Object.values(config.counters)).filter((c) => c.can_view !== false);
@@ -44,7 +44,7 @@ export const CountersListCmd = typedGuildCommand<CountersPluginType>()({
     message.channel.send(
       trimMultilineString(`
       ${counterLines.join("\n\n")}
-      
+
       ${hintLines.join("\n")}
     `),
     );

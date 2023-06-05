@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { BaseConfig, Knub } from "knub";
 
-export interface ZeppelinGuildConfig extends BaseConfig<any> {
+export interface ZeppelinGuildConfig extends BaseConfig {
   success_emoji?: string;
   error_emoji?: string;
 
@@ -26,7 +26,7 @@ export const ZeppelinGuildConfigSchema = t.type({
 });
 export const PartialZeppelinGuildConfigSchema = t.partial(ZeppelinGuildConfigSchema.props);
 
-export interface ZeppelinGlobalConfig extends BaseConfig<any> {
+export interface ZeppelinGlobalConfig extends BaseConfig {
   url: string;
   owners?: string[];
 }
@@ -37,7 +37,7 @@ export const ZeppelinGlobalConfigSchema = t.type({
   plugins: t.record(t.string, t.unknown),
 });
 
-export type TZeppelinKnub = Knub<ZeppelinGuildConfig, ZeppelinGlobalConfig>;
+export type TZeppelinKnub = Knub;
 
 /**
  * Wrapper for the string type that indicates the text will be parsed as Markdown later
@@ -63,41 +63,4 @@ export interface CommandInfo {
   optionDescriptions?: {
     [key: string]: TMarkdown;
   };
-}
-
-export enum ChannelTypeStrings {
-  TEXT = "GUILD_TEXT",
-  DM = "DM",
-  VOICE = "GUILD_VOICE",
-  GROUP = "GROUP_DM",
-  CATEGORY = "GUILD_CATEGORY",
-  NEWS = "GUILD_NEWS",
-  STORE = "GUILD_STORE",
-  NEWS_THREAD = "GUILD_NEWS_THREAD",
-  PUBLIC_THREAD = "GUILD_PUBLIC_THREAD",
-  PRIVATE_THREAD = "GUILD_PRIVATE_THREAD",
-  STAGE = "GUILD_STAGE_VOICE",
-  UNKNOWN = "UNKNOWN",
-}
-
-export enum MessageTypeStrings {
-  "DEFAULT",
-  "RECIPIENT_ADD",
-  "RECIPIENT_REMOVE",
-  "CALL",
-  "CHANNEL_NAME_CHANGE",
-  "CHANNEL_ICON_CHANGE",
-  "PINS_ADD",
-  "GUILD_MEMBER_JOIN",
-  "USER_PREMIUM_GUILD_SUBSCRIPTION",
-  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_1",
-  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_2",
-  "USER_PREMIUM_GUILD_SUBSCRIPTION_TIER_3",
-  "CHANNEL_FOLLOW_ADD",
-  "GUILD_DISCOVERY_DISQUALIFIED",
-  "GUILD_DISCOVERY_REQUALIFIED",
-  "GUILD_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING",
-  "GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING",
-  "REPLY",
-  "APPLICATION_COMMAND",
 }

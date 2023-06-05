@@ -6,15 +6,16 @@ import { cleanupConfigs } from "./cleanup/configs";
 import { connection } from "./db";
 import { Config } from "./entities/Config";
 
+const CLEANUP_INTERVAL = 1 * HOURS;
+
+async function cleanup() {
+  await cleanupConfigs();
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
 if (isAPI()) {
-  const CLEANUP_INTERVAL = 1 * HOURS;
-
-  async function cleanup() {
-    await cleanupConfigs();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
   // Start first cleanup 30 seconds after startup
+  // TODO: Move to bot startup code
   setTimeout(cleanup, 30 * SECONDS);
 }
 

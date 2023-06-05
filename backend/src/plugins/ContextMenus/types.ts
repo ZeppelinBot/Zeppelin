@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 
 export const ConfigSchema = t.type({
@@ -22,4 +22,4 @@ export interface ContextMenuPluginType extends BasePluginType {
   };
 }
 
-export const contextMenuEvt = typedGuildEventListener<ContextMenuPluginType>();
+export const contextMenuEvt = guildPluginEventListener<ContextMenuPluginType>();

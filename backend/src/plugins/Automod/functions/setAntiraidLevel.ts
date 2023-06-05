@@ -1,7 +1,5 @@
 import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { runAutomodOnAntiraidLevel } from "../events/runAutomodOnAntiraidLevel";
 import { AutomodPluginType } from "../types";

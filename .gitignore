@@ -6,6 +6,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.clinic
+.clinic-bot
+.clinic-api
 
 # Runtime data
 pids

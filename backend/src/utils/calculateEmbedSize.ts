@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from "discord.js";
+import { APIEmbed, EmbedData } from "discord.js";
 
 function sumStringLengthsRecursively(obj: any): number {
   if (obj == null) return 0;
@@ -12,6 +12,6 @@ function sumStringLengthsRecursively(obj: any): number {
   return 0;
 }
 
-export function calculateEmbedSize(embed: MessageEmbedOptions): number {
+export function calculateEmbedSize(embed: APIEmbed | EmbedData): number {
   return sumStringLengthsRecursively(embed);
 }

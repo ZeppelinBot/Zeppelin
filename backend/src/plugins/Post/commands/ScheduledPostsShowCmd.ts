@@ -1,4 +1,3 @@
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { sorter } from "../../../utils";
@@ -22,6 +21,6 @@ export const ScheduledPostsShowCmd = postCmd({
       return;
     }
 
-    postMessage(pluginData, msg.channel as TextChannel, post.content, post.attachments, post.enable_mentions);
+    postMessage(pluginData, msg.channel, post.content, post.attachments, post.enable_mentions);
   },
 });

@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, Role } from "discord.js";
+import { APIEmbed } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -28,7 +28,7 @@ export async function getUserInfoEmbed(
   userId: string,
   compact = false,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {
     return null;

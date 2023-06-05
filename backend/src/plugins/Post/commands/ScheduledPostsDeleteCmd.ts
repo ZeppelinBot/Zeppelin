@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { clearUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { sorter } from "../../../utils";
 import { postCmd } from "../types";
-import { clearUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 
 export const ScheduledPostsDeleteCmd = postCmd({
   trigger: ["scheduled_posts delete", "scheduled_posts d"],

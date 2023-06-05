@@ -1,13 +1,13 @@
 import { ApiPermissions } from "@shared/apiPermissions";
 import express, { Request, Response } from "express";
-import { requireGuildPermission } from "../permissions";
-import { clientError, ok } from "../responses";
-import { GuildCases } from "../../data/GuildCases";
-import { z } from "zod";
-import { Case } from "../../data/entities/Case";
-import { rateLimit } from "../rateLimits";
-import { MINUTES } from "../../utils";
 import moment from "moment-timezone";
+import { z } from "zod";
+import { GuildCases } from "../../data/GuildCases";
+import { Case } from "../../data/entities/Case";
+import { MINUTES } from "../../utils";
+import { requireGuildPermission } from "../permissions";
+import { rateLimit } from "../rateLimits";
+import { clientError, ok } from "../responses";
 
 const caseHandlingModeSchema = z.union([
   z.literal("replace"),
@@ -50,7 +50,7 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
   importExportRouter.get(
     "/:guildId/pre-import",
     requireGuildPermission(ApiPermissions.ManageAccess),
-    async (req: Request, res: Response) => {
+    async (req: Request) => {
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);
       const minNum = await guildCases.getMinCaseNumber();
       const maxNum = await guildCases.getMaxCaseNumber();

@@ -1,6 +1,5 @@
-import { GuildPluginData } from "knub";
-import { getDefaultPrefix } from "knub/dist/commands/commandUtils";
+import { getDefaultMessageCommandPrefix, GuildPluginData } from "knub";
 
 export function getGuildPrefix(pluginData: GuildPluginData<any>) {
-  return pluginData.fullConfig.prefix || getDefaultPrefix(pluginData.client);
+  return pluginData.fullConfig.prefix || getDefaultMessageCommandPrefix(pluginData.client);
 }

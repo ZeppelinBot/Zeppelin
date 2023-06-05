@@ -1,15 +1,15 @@
+import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, User } from "discord.js";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { resolveChannelIds } from "../../../utils/resolveChannelIds";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogCleanData {
   mod: User;
-  channel: BaseGuildTextChannel;
+  channel: GuildTextBasedChannel;
   count: number;
   archiveUrl: string;
 }

@@ -1,15 +1,15 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { GuildMember } from "discord.js";
+import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { UnknownUser } from "../../../utils";
 import {
   memberToTemplateSafeMember,
   TemplateSafeUnknownMember,
   TemplateSafeUnknownUser,
 } from "../../../utils/templateSafeObjects";
-import { UnknownUser } from "../../../utils";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMemberMuteExpiredData {
   member: GuildMember | UnknownUser;

@@ -1,20 +1,20 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, RoleManagerPluginType } from "./types";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
-import { mapToPublicFn } from "../../pluginUtils";
-import { addRole } from "./functions/addRole";
-import { removeRole } from "./functions/removeRole";
-import { addPriorityRole } from "./functions/addPriorityRole";
-import { removePriorityRole } from "./functions/removePriorityRole";
-import { runRoleAssignmentLoop } from "./functions/runRoleAssignmentLoop";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { addPriorityRole } from "./functions/addPriorityRole";
+import { addRole } from "./functions/addRole";
+import { removePriorityRole } from "./functions/removePriorityRole";
+import { removeRole } from "./functions/removeRole";
+import { runRoleAssignmentLoop } from "./functions/runRoleAssignmentLoop";
+import { ConfigSchema, RoleManagerPluginType } from "./types";
 
 export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   name: "role_manager",
-  configSchema: ConfigSchema,
   showInDocs: false,
 
   dependencies: () => [LogsPlugin],
+  configParser: makeIoTsConfigParser(ConfigSchema),
 
   public: {
     addRole: mapToPublicFn(addRole),
@@ -24,8 +24,10 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   },
 
   beforeLoad(pluginData) {
-    pluginData.state.roleQueue = GuildRoleQueue.getGuildInstance(pluginData.guild.id);
-    pluginData.state.pendingRoleAssignmentPromise = Promise.resolve();
+    const { state, guild } = pluginData;
+
+    state.roleQueue = GuildRoleQueue.getGuildInstance(guild.id);
+    state.pendingRoleAssignmentPromise = Promise.resolve();
   },
 
   afterLoad(pluginData) {
@@ -33,7 +35,9 @@ export const RoleManagerPlugin = zeppelinGuildPlugin<RoleManagerPluginType>()({
   },
 
   async afterUnload(pluginData) {
-    pluginData.state.abortRoleAssignmentLoop = true;
-    await pluginData.state.pendingRoleAssignmentPromise;
+    const { state } = pluginData;
+
+    state.abortRoleAssignmentLoop = true;
+    await state.pendingRoleAssignmentPromise;
   },
 });

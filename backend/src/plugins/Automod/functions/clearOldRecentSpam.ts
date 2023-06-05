@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
+import { startProfiling } from "../../../utils/easyProfiler";
 import { RECENT_SPAM_EXPIRY_TIME } from "../constants";
 import { AutomodPluginType } from "../types";
-import { startProfiling } from "../../../utils/easyProfiler";
 
 export function clearOldRecentSpam(pluginData: GuildPluginData<AutomodPluginType>) {
   const stopProfiling = startProfiling(pluginData.getKnubInstance().profiler, "automod:fns:clearOldRecentSpam");

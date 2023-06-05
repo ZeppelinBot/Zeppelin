@@ -8,8 +8,8 @@ import { ApiLogins } from "../data/ApiLogins";
 import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
-import { ok } from "./responses";
 import { env } from "../env";
+import { ok } from "./responses";
 
 interface IPassportApiUser {
   apiKey: string;
@@ -18,7 +18,6 @@ interface IPassportApiUser {
 
 declare global {
   namespace Express {
-    // tslint:disable-next-line:no-empty-interface
     interface User extends IPassportApiUser {}
   }
 }
@@ -56,7 +55,7 @@ export function initAuth(app: express.Express) {
   app.use(passport.initialize());
 
   passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((user, done) => done(null, user));
+  passport.deserializeUser((user, done) => done(null, user as IPassportApiUser));
 
   const apiLogins = new ApiLogins();
   const apiUserInfo = new ApiUserInfo();
@@ -151,6 +150,7 @@ export function initAuth(app: express.Express) {
 export function apiTokenAuthHandlers() {
   return [
     passport.authenticate("api-token", { failWithError: true }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (err, req: Request, res: Response, next) => {
       return res.status(401).json({ error: err.message });
     },

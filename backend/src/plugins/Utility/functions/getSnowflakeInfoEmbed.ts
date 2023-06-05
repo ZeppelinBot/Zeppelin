@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from "discord.js";
+import { APIEmbed } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
@@ -14,14 +14,13 @@ export async function getSnowflakeInfoEmbed(
   snowflake: string,
   showUnknownWarning = false,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions> {
-  const embed: EmbedWith<"fields"> = {
+): Promise<APIEmbed> {
+  const embed: EmbedWith<"fields" | "author"> = {
     fields: [],
-  };
-
-  embed.author = {
-    name: `Snowflake:  ${snowflake}`,
-    icon_url: SNOWFLAKE_ICON,
+    author: {
+      name: `Snowflake:  ${snowflake}`,
+      icon_url: SNOWFLAKE_ICON,
+    },
   };
 
   if (showUnknownWarning) {

@@ -14,7 +14,7 @@ export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
 
   defaultConfig: {},
 
-  async match({ triggerConfig, context, pluginData }) {
+  async match({ triggerConfig, context }) {
     if (!context.counterTrigger) {
       return;
     }
@@ -37,7 +37,7 @@ export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
     };
   },
 
-  renderMatchInformation({ matchResult, pluginData, contexts, triggerConfig }) {
+  renderMatchInformation({ contexts }) {
     let str = `Matched counter trigger \`${contexts[0].counterTrigger!.prettyCounter} / ${
       contexts[0].counterTrigger!.prettyTrigger
     }\``;

@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { getRepository, Repository } from "typeorm";
-import { Tempban } from "./entities/Tempban";
-import { BaseRepository } from "./BaseRepository";
 import { DBDateFormat } from "../utils";
+import { BaseRepository } from "./BaseRepository";
+import { Tempban } from "./entities/Tempban";
 
 export class Tempbans extends BaseRepository {
   private tempbans: Repository<Tempban>;

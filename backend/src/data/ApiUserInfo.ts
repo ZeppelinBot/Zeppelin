@@ -3,7 +3,7 @@ import { getRepository, Repository } from "typeorm";
 import { DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
 import { connection } from "./db";
-import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/ApiUserInfo";
+import { ApiUserInfoData, ApiUserInfo as ApiUserInfoEntity } from "./entities/ApiUserInfo";
 
 export class ApiUserInfo extends BaseRepository {
   private apiUserInfo: Repository<ApiUserInfoEntity>;

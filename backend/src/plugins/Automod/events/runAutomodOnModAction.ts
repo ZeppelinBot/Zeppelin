@@ -9,7 +9,7 @@ export async function runAutomodOnModAction(
   modAction: ModActionType,
   userId: string,
   reason?: string,
-  isAutomodAction: boolean = false,
+  isAutomodAction = false,
 ) {
   const [user, member] = await Promise.all([
     resolveUser(pluginData.client, userId),

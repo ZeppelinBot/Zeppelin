@@ -1,4 +1,4 @@
-import { Awaitable } from "knub/dist/utils";
+import { Awaitable } from "./typeUtils";
 
 export async function asyncReduce<T, V>(
   arr: T[],
@@ -15,7 +15,7 @@ export async function asyncReduce<T, V>(
     arrayToIterate = arr.slice(1);
   }
 
-  for (const [i, currentValue] of arr.entries()) {
+  for (const [i, currentValue] of arrayToIterate.entries()) {
     accumulator = await callback(accumulator, currentValue, i, arr);
   }
 

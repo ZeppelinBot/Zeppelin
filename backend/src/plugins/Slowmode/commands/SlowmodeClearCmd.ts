@@ -1,5 +1,4 @@
-import { Util } from "discord.js";
-import { ChannelTypeStrings } from "src/types";
+import { ChannelType, escapeInlineCode } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine } from "../../../utils";
@@ -39,7 +38,7 @@ export const SlowmodeClearCmd = slowmodeCmd({
     }
 
     try {
-      if (args.channel.type === ChannelTypeStrings.TEXT) {
+      if (args.channel.type === ChannelType.GuildText) {
         await clearBotSlowmodeFromUserId(pluginData, args.channel, args.user.id, args.force);
       } else {
         sendErrorMessage(
@@ -58,7 +57,7 @@ export const SlowmodeClearCmd = slowmodeCmd({
         msg.channel,
         asSingleLine(`
           Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
-          \`${Util.escapeInlineCode(e.message)}\`
+          \`${escapeInlineCode(e.message)}\`
         `),
       );
       return;

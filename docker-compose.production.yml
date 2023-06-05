@@ -55,6 +55,8 @@ services:
       - prepare_backend
     volumes:
       - ./:/zeppelin
+    environment:
+      DEBUG: ${DEBUG-}
     command: ["/bin/bash", "/zeppelin/docker/production/start-api.sh"]
 
   bot:
@@ -68,6 +70,8 @@ services:
       - prepare_backend
     volumes:
       - ./:/zeppelin
+    environment:
+      DEBUG: ${DEBUG-}
     command: ["/bin/bash", "/zeppelin/docker/production/start-bot.sh"]
 
   build_dashboard:

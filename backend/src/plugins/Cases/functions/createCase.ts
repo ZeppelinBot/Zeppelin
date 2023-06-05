@@ -1,4 +1,4 @@
-import type { Snowflake } from "discord-api-types/globals";
+import type { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { resolveUser } from "../../../utils";

@@ -1,9 +1,9 @@
-import { Permissions, Snowflake, TextChannel, PermissionString } from "discord.js";
+import { PermissionsBitField, PermissionsString, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export const SetChannelPermissionOverridesAction = t.type({
   type: t.literal("set_channel_permission_overrides"),
@@ -22,19 +22,19 @@ export type TSetChannelPermissionOverridesAction = t.TypeOf<typeof SetChannelPer
 export async function setChannelPermissionOverridesAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
   action: TSetChannelPermissionOverridesAction,
-  values: TemplateSafeValueContainer,
-  event: TCustomEvent,
-  eventData: any,
+  values: TemplateSafeValueContainer, // eslint-disable-line @typescript-eslint/no-unused-vars
+  event: TCustomEvent, // eslint-disable-line @typescript-eslint/no-unused-vars
+  eventData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
-  const channel = pluginData.guild.channels.cache.get(action.channel as Snowflake) as TextChannel;
-  if (!channel) {
+  const channel = pluginData.guild.channels.cache.get(action.channel as Snowflake);
+  if (!channel || channel.isThread() || !("guild" in channel)) {
     throw new ActionError(`Unknown channel: ${action.channel}`);
   }
 
   for (const override of action.overrides) {
-    const allow = new Permissions(BigInt(override.allow)).serialize();
-    const deny = new Permissions(BigInt(override.deny)).serialize();
-    const perms: Partial<Record<PermissionString, boolean | null>> = {};
+    const allow = new PermissionsBitField(BigInt(override.allow)).serialize();
+    const deny = new PermissionsBitField(BigInt(override.deny)).serialize();
+    const perms: Partial<Record<PermissionsString, boolean | null>> = {};
     for (const key in allow) {
       if (allow[key]) {
         perms[key] = true;

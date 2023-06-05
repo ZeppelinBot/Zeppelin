@@ -4,7 +4,7 @@ export class AddTypeAndPermissionsToApiPermissions1573158035867 implements Migra
   public async up(queryRunner: QueryRunner): Promise<any> {
     try {
       await queryRunner.dropPrimaryKey("api_permissions");
-    } catch {} // tslint:disable-line
+    } catch {} // eslint-disable-line no-empty
 
     const table = (await queryRunner.getTable("api_permissions"))!;
     if (table.indices.length) {

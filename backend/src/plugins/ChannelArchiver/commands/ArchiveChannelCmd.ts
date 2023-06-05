@@ -1,8 +1,8 @@
-import { Collection, Message, Snowflake } from "discord.js";
+import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwner, sendErrorMessage } from "../../../pluginUtils";
-import { confirm, noop, SECONDS } from "../../../utils";
+import { SECONDS, confirm, noop } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { rehostAttachment } from "../rehostAttachment";
 import { channelArchiverCmd } from "../types";

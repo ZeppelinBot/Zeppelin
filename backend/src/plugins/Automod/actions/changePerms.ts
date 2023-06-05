@@ -1,24 +1,76 @@
-import { Permissions, PermissionString } from "discord.js";
+import { PermissionsBitField, PermissionsString } from "discord.js";
 import * as t from "io-ts";
-import { automodAction } from "../helpers";
-import { tNullable, isValidSnowflake, tPartialDictionary } from "../../../utils";
-import { noop } from "knub/dist/utils";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { isValidSnowflake, noop, tNullable, tPartialDictionary } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { automodAction } from "../helpers";
+
+type LegacyPermMap = Record<string, keyof (typeof PermissionsBitField)["Flags"]>;
+const legacyPermMap = {
+  CREATE_INSTANT_INVITE: "CreateInstantInvite",
+  KICK_MEMBERS: "KickMembers",
+  BAN_MEMBERS: "BanMembers",
+  ADMINISTRATOR: "Administrator",
+  MANAGE_CHANNELS: "ManageChannels",
+  MANAGE_GUILD: "ManageGuild",
+  ADD_REACTIONS: "AddReactions",
+  VIEW_AUDIT_LOG: "ViewAuditLog",
+  PRIORITY_SPEAKER: "PrioritySpeaker",
+  STREAM: "Stream",
+  VIEW_CHANNEL: "ViewChannel",
+  SEND_MESSAGES: "SendMessages",
+  SEND_TTSMESSAGES: "SendTTSMessages",
+  MANAGE_MESSAGES: "ManageMessages",
+  EMBED_LINKS: "EmbedLinks",
+  ATTACH_FILES: "AttachFiles",
+  READ_MESSAGE_HISTORY: "ReadMessageHistory",
+  MENTION_EVERYONE: "MentionEveryone",
+  USE_EXTERNAL_EMOJIS: "UseExternalEmojis",
+  VIEW_GUILD_INSIGHTS: "ViewGuildInsights",
+  CONNECT: "Connect",
+  SPEAK: "Speak",
+  MUTE_MEMBERS: "MuteMembers",
+  DEAFEN_MEMBERS: "DeafenMembers",
+  MOVE_MEMBERS: "MoveMembers",
+  USE_VAD: "UseVAD",
+  CHANGE_NICKNAME: "ChangeNickname",
+  MANAGE_NICKNAMES: "ManageNicknames",
+  MANAGE_ROLES: "ManageRoles",
+  MANAGE_WEBHOOKS: "ManageWebhooks",
+  MANAGE_EMOJIS_AND_STICKERS: "ManageEmojisAndStickers",
+  USE_APPLICATION_COMMANDS: "UseApplicationCommands",
+  REQUEST_TO_SPEAK: "RequestToSpeak",
+  MANAGE_EVENTS: "ManageEvents",
+  MANAGE_THREADS: "ManageThreads",
+  CREATE_PUBLIC_THREADS: "CreatePublicThreads",
+  CREATE_PRIVATE_THREADS: "CreatePrivateThreads",
+  USE_EXTERNAL_STICKERS: "UseExternalStickers",
+  SEND_MESSAGES_IN_THREADS: "SendMessagesInThreads",
+  USE_EMBEDDED_ACTIVITIES: "UseEmbeddedActivities",
+  MODERATE_MEMBERS: "ModerateMembers",
+} satisfies LegacyPermMap;
+
+const realToLegacyMap = Object.entries(legacyPermMap).reduce((map, pair) => {
+  map[pair[1]] = pair[0];
+  return map;
+}, {}) as Record<keyof typeof PermissionsBitField.Flags, keyof typeof legacyPermMap>;
 
 export const ChangePermsAction = automodAction({
   configType: t.type({
     target: t.string,
     channel: tNullable(t.string),
-    perms: tPartialDictionary(t.keyof(Permissions.FLAGS), tNullable(t.boolean)),
+    perms: tPartialDictionary(
+      t.union([t.keyof(PermissionsBitField.Flags), t.keyof(legacyPermMap)]),
+      tNullable(t.boolean),
+    ),
   }),
   defaultConfig: {},
 
-  async apply({ pluginData, contexts, actionConfig, ruleName }) {
+  async apply({ pluginData, contexts, actionConfig }) {
     const user = contexts.find((c) => c.user)?.user;
     const message = contexts.find((c) => c.message)?.message;
 
@@ -52,13 +104,15 @@ export const ChangePermsAction = automodAction({
       const channel = pluginData.guild.channels.resolve(channelId);
       if (!channel || channel.isThread()) return;
       const overwrite = channel.permissionOverwrites.cache.find((pw) => pw.id === target);
-      const allow = new Permissions(overwrite?.allow ?? 0n).serialize();
-      const deny = new Permissions(overwrite?.deny ?? 0n).serialize();
-      const newPerms: Partial<Record<PermissionString, boolean | null>> = {};
+      const allow = new PermissionsBitField(overwrite?.allow ?? 0n).serialize();
+      const deny = new PermissionsBitField(overwrite?.deny ?? 0n).serialize();
+      const newPerms: Partial<Record<PermissionsString, boolean | null>> = {};
 
       for (const key in allow) {
-        if (typeof actionConfig.perms[key] !== "undefined") {
-          newPerms[key] = actionConfig.perms[key];
+        const legacyKey = realToLegacyMap[key];
+        const configEntry = actionConfig.perms[key] ?? actionConfig.perms[legacyKey];
+        if (typeof configEntry !== "undefined") {
+          newPerms[key] = configEntry;
           continue;
         }
         if (allow[key]) {
@@ -86,11 +140,12 @@ export const ChangePermsAction = automodAction({
 
     if (!role) return;
 
-    const perms = new Permissions(role.permissions).serialize();
+    const perms = new PermissionsBitField(role.permissions).serialize();
     for (const key in actionConfig.perms) {
-      perms[key] = actionConfig.perms[key];
+      const realKey = legacyPermMap[key] ?? key;
+      perms[realKey] = actionConfig.perms[key];
     }
-    const permsArray = <PermissionString[]>Object.keys(perms).filter((key) => perms[key]);
-    await role.setPermissions(new Permissions(permsArray)).catch(noop);
+    const permsArray = <PermissionsString[]>Object.keys(perms).filter((key) => perms[key]);
+    await role.setPermissions(new PermissionsBitField(permsArray)).catch(noop);
   },
 });

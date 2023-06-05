@@ -1,7 +1,6 @@
-import { Permissions, Snowflake, TextChannel } from "discord.js";
+import { ChannelType, PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
 import { resolveUser, verboseChannelMention } from "../../../utils";
@@ -17,8 +16,8 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
 
   scheduleNextDeletion(pluginData);
 
-  const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id as Snowflake) as TextChannel;
-  if (!channel) {
+  const channel = pluginData.guild.channels.cache.get(itemToDelete.message.channel_id as Snowflake);
+  if (!channel || channel.type === ChannelType.GuildCategory) {
     // Channel was deleted, ignore
     return;
   }
@@ -26,7 +25,9 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const logs = pluginData.getPlugin(LogsPlugin);
   const perms = channel.permissionsFor(pluginData.client.user!.id);
 
-  if (!hasDiscordPermissions(perms, Permissions.FLAGS.VIEW_CHANNEL | Permissions.FLAGS.READ_MESSAGE_HISTORY)) {
+  if (
+    !hasDiscordPermissions(perms, PermissionsBitField.Flags.ViewChannel | PermissionsBitField.Flags.ReadMessageHistory)
+  ) {
     logs.logBotAlert({
       body: `Missing permissions to read messages or message history in auto-delete channel ${verboseChannelMention(
         channel,
@@ -35,7 +36,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
     return;
   }
 
-  if (!hasDiscordPermissions(perms, Permissions.FLAGS.MANAGE_MESSAGES)) {
+  if (!hasDiscordPermissions(perms, PermissionsBitField.Flags.ManageMessages)) {
     logs.logBotAlert({
       body: `Missing permissions to delete messages in auto-delete channel ${verboseChannelMention(channel)}`,
     });
@@ -45,7 +46,7 @@ export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePlugi
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   pluginData.state.guildLogs.ignoreLog(LogType.MESSAGE_DELETE, itemToDelete.message.id);
-  (channel as TextChannel).messages.delete(itemToDelete.message.id as Snowflake).catch((err) => {
+  channel.messages.delete(itemToDelete.message.id as Snowflake).catch((err) => {
     if (err.code === 10008) {
       // "Unknown Message", probably already deleted by automod or another bot, ignore
       return;

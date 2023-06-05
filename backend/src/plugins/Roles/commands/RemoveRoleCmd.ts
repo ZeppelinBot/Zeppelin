@@ -1,11 +1,10 @@
 import { GuildChannel } from "discord.js";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { resolveRoleId, verboseUserMention } from "../../../utils";
-import { rolesCmd } from "../types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
+import { rolesCmd } from "../types";
 
 export const RemoveRoleCmd = rolesCmd({
   trigger: "removerole",
@@ -50,10 +49,7 @@ export const RemoveRoleCmd = rolesCmd({
       return;
     }
 
-    pluginData.state.logs.ignoreLog(LogType.MEMBER_ROLE_REMOVE, args.member.id);
-
-    await args.member.roles.remove(roleId);
-
+    pluginData.getPlugin(RoleManagerPlugin).removeRole(args.member.id, roleId);
     pluginData.getPlugin(LogsPlugin).logMemberRoleRemove({
       mod: msg.author,
       member: args.member,
