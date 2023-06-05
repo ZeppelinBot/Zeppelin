@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -20,5 +20,5 @@ export interface AutoReactionsPluginType extends BasePluginType {
   };
 }
 
-export const autoReactionsCmd = typedGuildCommand<AutoReactionsPluginType>();
-export const autoReactionsEvt = typedGuildEventListener<AutoReactionsPluginType>();
+export const autoReactionsCmd = guildPluginMessageCommand<AutoReactionsPluginType>();
+export const autoReactionsEvt = guildPluginEventListener<AutoReactionsPluginType>();

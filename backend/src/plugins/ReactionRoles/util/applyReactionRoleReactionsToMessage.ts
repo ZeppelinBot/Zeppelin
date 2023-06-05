@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ReactionRole } from "../../../data/entities/ReactionRole";
 import { isDiscordAPIError, sleep } from "../../../utils";
@@ -16,15 +16,15 @@ export async function applyReactionRoleReactionsToMessage(
   messageId: string,
   reactionRoles: ReactionRole[],
 ): Promise<string[] | undefined> {
-  const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
-  if (!channel) return;
+  const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
+  if (!channel?.isTextBased()) return;
 
   const errors: string[] = [];
   const logs = pluginData.getPlugin(LogsPlugin);
 
   let targetMessage;
   try {
-    targetMessage = await channel.messages.fetch(messageId, { force: true });
+    targetMessage = await channel.messages.fetch({ message: messageId, force: true });
   } catch (e) {
     if (isDiscordAPIError(e)) {
       if (e.code === 10008) {

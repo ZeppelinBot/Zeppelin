@@ -1,6 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
+import { BasePluginType } from "knub";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
 
 export const ConfigSchema = t.type({});

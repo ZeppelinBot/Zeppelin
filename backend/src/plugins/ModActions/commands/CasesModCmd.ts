@@ -1,4 +1,4 @@
-import { MessageEmbedOptions, User } from "discord.js";
+import { APIEmbed, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { emptyEmbedValue, resolveUser, trimLines } from "../../../utils";
@@ -54,10 +54,10 @@ export const CasesModCmd = modActionsCmd({
         const lastCaseNum = page * casesPerPage;
         const title = `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${totalCases} by ${modName}`;
 
-        const embed: MessageEmbedOptions = {
+        const embed = {
           author: {
             name: title,
-            iconURL: mod instanceof User ? mod.displayAvatarURL() : undefined,
+            icon_url: mod instanceof User ? mod.displayAvatarURL() : undefined,
           },
           fields: [
             ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
@@ -69,7 +69,7 @@ export const CasesModCmd = modActionsCmd({
               `),
             },
           ],
-        };
+        } satisfies APIEmbed;
 
         return { embeds: [embed] };
       },

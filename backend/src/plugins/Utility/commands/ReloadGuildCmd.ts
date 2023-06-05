@@ -7,7 +7,7 @@ export const ReloadGuildCmd = utilityCmd({
   description: "Reload the Zeppelin configuration and all plugins for the server. This can sometimes fix issues.",
   permission: "can_reload_guild",
 
-  async run({ message: msg, args, pluginData }) {
+  async run({ message: msg, pluginData }) {
     if (activeReloads.has(pluginData.guild.id)) return;
     activeReloads.set(pluginData.guild.id, msg.channel as TextChannel);
 

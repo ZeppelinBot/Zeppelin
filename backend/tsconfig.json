@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "commonjs",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es2020",
-    "lib": ["esnext"],
+    "target": "esnext",
+    "lib": ["es2023"],
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,

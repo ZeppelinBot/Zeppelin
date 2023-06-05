@@ -1,6 +1,6 @@
+import { createHash } from "crypto";
 import { GuildPluginData } from "knub";
 import { RoleButtonsPluginType } from "../types";
-import { createHash } from "crypto";
 import { applyRoleButtons } from "./applyRoleButtons";
 
 export async function applyAllRoleButtons(pluginData: GuildPluginData<RoleButtonsPluginType>) {

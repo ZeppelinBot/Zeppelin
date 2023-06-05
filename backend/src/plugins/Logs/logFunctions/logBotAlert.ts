@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogBotAlertData {
   body: string;

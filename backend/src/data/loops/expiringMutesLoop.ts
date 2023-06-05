@@ -1,11 +1,11 @@
 // tslint:disable:no-console
 
-import { lazyMemoize, memoize, MINUTES } from "../../utils";
-import { Mutes } from "../Mutes";
-import Timeout = NodeJS.Timeout;
 import moment from "moment-timezone";
+import { lazyMemoize, MINUTES, SECONDS } from "../../utils";
 import { Mute } from "../entities/Mute";
 import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents";
+import { Mutes, TIMEOUT_RENEWAL_THRESHOLD } from "../Mutes";
+import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;
 const MAX_TRIES_PER_SERVER = 3;
@@ -16,19 +16,44 @@ function muteToKey(mute: Mute) {
   return `${mute.guild_id}/${mute.user_id}`;
 }
 
-function broadcastExpiredMute(mute: Mute, tries = 0) {
+async function broadcastExpiredMute(guildId: string, userId: string, tries = 0) {
+  const mute = await getMutesRepository().findMute(guildId, userId);
+  if (!mute) {
+    // Mute was already cleared
+    return;
+  }
+  if (!mute.expires_at || moment(mute.expires_at).diff(moment()) > 10 * SECONDS) {
+    // Mute duration was changed and it's no longer expiring now
+    return;
+  }
+
   console.log(`[EXPIRING MUTES LOOP] Broadcasting expired mute: ${mute.guild_id}/${mute.user_id}`);
   if (!hasGuildEventListener(mute.guild_id, "expiredMute")) {
     // If there are no listeners registered for the server yet, try again in a bit
     if (tries < MAX_TRIES_PER_SERVER) {
       timeouts.set(
         muteToKey(mute),
-        setTimeout(() => broadcastExpiredMute(mute, tries + 1), 1 * MINUTES),
+        setTimeout(() => broadcastExpiredMute(guildId, userId, tries + 1), 1 * MINUTES),
       );
     }
     return;
   }
   emitGuildEvent(mute.guild_id, "expiredMute", [mute]);
+}
+
+function broadcastTimeoutMuteToRenew(mute: Mute, tries = 0) {
+  console.log(`[EXPIRING MUTES LOOP] Broadcasting timeout mute to renew: ${mute.guild_id}/${mute.user_id}`);
+  if (!hasGuildEventListener(mute.guild_id, "timeoutMuteToRenew")) {
+    // If there are no listeners registered for the server yet, try again in a bit
+    if (tries < MAX_TRIES_PER_SERVER) {
+      timeouts.set(
+        muteToKey(mute),
+        setTimeout(() => broadcastTimeoutMuteToRenew(mute, tries + 1), 1 * MINUTES),
+      );
+    }
+    return;
+  }
+  emitGuildEvent(mute.guild_id, "timeoutMuteToRenew", [mute]);
 }
 
 export async function runExpiringMutesLoop() {
@@ -46,8 +71,14 @@ export async function runExpiringMutesLoop() {
     const remaining = Math.max(0, moment.utc(mute.expires_at!).diff(moment.utc()));
     timeouts.set(
       muteToKey(mute),
-      setTimeout(() => broadcastExpiredMute(mute), remaining),
+      setTimeout(() => broadcastExpiredMute(mute.guild_id, mute.user_id), remaining),
     );
+  }
+
+  console.log("[EXPIRING MUTES LOOP] Broadcasting timeout mutes to renew");
+  const timeoutMutesToRenew = await getMutesRepository().getTimeoutMutesToRenew(TIMEOUT_RENEWAL_THRESHOLD);
+  for (const mute of timeoutMutesToRenew) {
+    broadcastTimeoutMuteToRenew(mute);
   }
 
   console.log("[EXPIRING MUTES LOOP] Scheduling next loop");
@@ -69,7 +100,7 @@ export function registerExpiringMute(mute: Mute) {
 
   timeouts.set(
     muteToKey(mute),
-    setTimeout(() => broadcastExpiredMute(mute), remaining),
+    setTimeout(() => broadcastExpiredMute(mute.guild_id, mute.user_id), remaining),
   );
 }
 

@@ -1,4 +1,4 @@
-import { Guild, GuildAuditLogsAction, GuildAuditLogsEntry } from "discord.js";
+import { AuditLogEvent, Guild, GuildAuditLogsEntry } from "discord.js";
 import { SECONDS, sleep } from "../utils";
 
 const BATCH_DEBOUNCE_TIME = 2 * SECONDS;
@@ -19,7 +19,7 @@ const batches = new Map<string, Batch>();
  */
 export async function findMatchingAuditLogEntry(
   guild: Guild,
-  action?: GuildAuditLogsAction,
+  action?: AuditLogEvent,
   targetId?: string,
 ): Promise<GuildAuditLogsEntry | undefined> {
   let candidates: GuildAuditLogsEntry[];
@@ -49,7 +49,8 @@ export async function findMatchingAuditLogEntry(
         const _candidates = Array.from(result?.entries.values() ?? []);
 
         batches.delete(guild.id);
-        resolve(_candidates);
+        // TODO: Figure out the type
+        resolve(_candidates as any);
       }),
       join() {
         batch._waitUntil = Date.now() + BATCH_DEBOUNCE_TIME;

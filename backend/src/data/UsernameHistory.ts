@@ -5,15 +5,16 @@ import { BaseRepository } from "./BaseRepository";
 import { cleanupUsernames } from "./cleanup/usernames";
 import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
 
+const CLEANUP_INTERVAL = 5 * MINUTES;
+
+async function cleanup() {
+  await cleanupUsernames();
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
 if (!isAPI()) {
-  const CLEANUP_INTERVAL = 5 * MINUTES;
-
-  async function cleanup() {
-    await cleanupUsernames();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
   // Start first cleanup 30 seconds after startup
+  // TODO: Move to bot startup code
   setTimeout(cleanup, 30 * SECONDS);
 }
 

@@ -1,11 +1,11 @@
-import { typedGuildCommand } from "knub";
+import { guildPluginMessageCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { confirm, noop, trimMultilineString } from "../../../utils";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
 import { CountersPluginType } from "../types";
 
-export const ResetAllCounterValuesCmd = typedGuildCommand<CountersPluginType>()({
+export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],
   permission: "can_reset_all",
 

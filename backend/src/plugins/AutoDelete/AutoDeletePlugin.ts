@@ -1,6 +1,7 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -23,10 +24,11 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
     prettyName: "Auto-delete",
     description: "Allows Zeppelin to auto-delete messages from a channel after a delay",
     configurationGuide: "Maximum deletion delay is currently 5 minutes",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   beforeLoad(pluginData) {
@@ -43,7 +45,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   },
 
   afterLoad(pluginData) {
-    const { state, guild } = pluginData;
+    const { state } = pluginData;
 
     state.onMessageCreateFn = (msg) => onMessageCreate(pluginData, msg);
     state.guildSavedMessages.events.on("create", state.onMessageCreateFn);
@@ -56,8 +58,10 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.guildSavedMessages.events.off("create", pluginData.state.onMessageCreateFn);
-    pluginData.state.guildSavedMessages.events.off("delete", pluginData.state.onMessageDeleteFn);
-    pluginData.state.guildSavedMessages.events.off("deleteBulk", pluginData.state.onMessageDeleteBulkFn);
+    const { state } = pluginData;
+
+    state.guildSavedMessages.events.off("create", state.onMessageCreateFn);
+    state.guildSavedMessages.events.off("delete", state.onMessageDeleteFn);
+    state.guildSavedMessages.events.off("deleteBulk", state.onMessageDeleteBulkFn);
   },
 });

@@ -1,5 +1,4 @@
-import { Permissions, Snowflake, TextChannel } from "discord.js";
-import { LogType } from "../../../data/LogType";
+import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
 import { resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -39,7 +38,7 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
 
       const botMember = await resolveMember(pluginData.client, pluginData.guild, pluginData.client.user!.id);
       const botPerms = alertChannel.permissionsFor(botMember ?? pluginData.client.user!.id);
-      if (!hasDiscordPermissions(botPerms, Permissions.FLAGS.SEND_MESSAGES)) {
+      if (!hasDiscordPermissions(botPerms, PermissionsBitField.Flags.SendMessages)) {
         logs.logBotAlert({
           body: `Missing "Send Messages" permissions for the \`alert_channel\` configured in \`mod_actions\`: \`${alertChannelId}\``,
         });

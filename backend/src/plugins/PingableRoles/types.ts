@@ -1,7 +1,7 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
-import { PingableRole } from "../../data/entities/PingableRole";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles";
+import { PingableRole } from "../../data/entities/PingableRole";
 
 export const ConfigSchema = t.type({
   can_manage: t.boolean,
@@ -18,5 +18,5 @@ export interface PingableRolesPluginType extends BasePluginType {
   };
 }
 
-export const pingableRolesCmd = typedGuildCommand<PingableRolesPluginType>();
-export const pingableRolesEvt = typedGuildEventListener<PingableRolesPluginType>();
+export const pingableRolesCmd = guildPluginMessageCommand<PingableRolesPluginType>();
+export const pingableRolesEvt = guildPluginEventListener<PingableRolesPluginType>();

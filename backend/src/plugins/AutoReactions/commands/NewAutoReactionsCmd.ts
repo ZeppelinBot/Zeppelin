@@ -1,4 +1,4 @@
-import { GuildChannel, Permissions } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
@@ -7,7 +7,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { autoReactionsCmd } from "../types";
 
-const requiredPermissions = readChannelPermissions | Permissions.FLAGS.ADD_REACTIONS;
+const requiredPermissions = readChannelPermissions | PermissionsBitField.Flags.AddReactions;
 
 export const NewAutoReactionsCmd = autoReactionsCmd({
   trigger: "auto_reactions",

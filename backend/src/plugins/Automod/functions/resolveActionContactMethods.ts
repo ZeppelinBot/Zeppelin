@@ -1,7 +1,7 @@
-import { Snowflake, TextChannel, ThreadChannel } from "discord.js";
+import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
+import { UserNotificationMethod, disableUserNotificationStrings } from "../../../utils";
 import { AutomodPluginType } from "../types";
 
 export function resolveActionContactMethods(
@@ -19,7 +19,7 @@ export function resolveActionContactMethods(
     }
 
     const channel = pluginData.guild.channels.cache.get(actionConfig.notifyChannel as Snowflake);
-    if (!channel?.isText()) {
+    if (!channel?.isTextBased()) {
       throw new RecoverablePluginError(ERRORS.INVALID_USER_NOTIFICATION_CHANNEL);
     }
 

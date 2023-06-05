@@ -1,16 +1,10 @@
-import { PluginOptions, typedGuildCommand } from "knub";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
+import { PluginOptions } from "knub";
+import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
+import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, PhishermanPluginType } from "./types";
-import {
-  getPhishermanDomainInfo,
-  hasPhishermanMasterAPIKey,
-  phishermanApiKeyIsValid,
-  reportTrackedDomainsToPhisherman,
-} from "../../data/Phisherman";
-import { mapToPublicFn } from "../../pluginUtils";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { pluginInfo } from "./info";
+import { ConfigSchema, PhishermanPluginType } from "./types";
 
 const defaultOptions: PluginOptions<PhishermanPluginType> = {
   config: {
@@ -24,7 +18,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
   showInDocs: true,
   info: pluginInfo,
 
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
@@ -33,6 +27,8 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
   },
 
   async beforeLoad(pluginData) {
+    const { state } = pluginData;
+
     pluginData.state.validApiKey = null;
 
     if (!hasPhishermanMasterAPIKey()) {
@@ -49,7 +45,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
         return false;
       });
       if (isValid) {
-        pluginData.state.validApiKey = apiKey;
+        state.validApiKey = apiKey;
       }
     }
   },

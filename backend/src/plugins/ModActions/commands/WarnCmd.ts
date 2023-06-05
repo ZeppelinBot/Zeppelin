@@ -1,4 +1,3 @@
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
@@ -94,7 +93,7 @@ export const WarnCmd = modActionsCmd({
         ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
         reason,
       },
-      retryPromptChannel: msg.channel as TextChannel,
+      retryPromptChannel: msg.channel,
     });
 
     if (warnResult.status === "failed") {

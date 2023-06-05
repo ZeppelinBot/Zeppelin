@@ -1,6 +1,6 @@
+import { WebhookClient } from "discord.js";
 import { GuildPluginData } from "knub";
 import { InternalPosterPluginType } from "../types";
-import { WebhookClient } from "discord.js";
 import { getOrCreateWebhookForChannel, WebhookableChannel } from "./getOrCreateWebhookForChannel";
 
 export async function getOrCreateWebhookClientForChannel(

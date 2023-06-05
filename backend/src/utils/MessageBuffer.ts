@@ -1,6 +1,6 @@
 import { StrictMessageContent } from "../utils";
-import Timeout = NodeJS.Timeout;
 import { calculateEmbedSize } from "./calculateEmbedSize";
+import Timeout = NodeJS.Timeout;
 
 type ConsumeFn = (part: StrictMessageContent) => void;
 
@@ -31,7 +31,7 @@ export class MessageBuffer {
 
   protected timeoutMs: number | null = null;
 
-  protected textSeparator: string = "";
+  protected textSeparator = "";
 
   protected chunk: Chunk | null = null;
 

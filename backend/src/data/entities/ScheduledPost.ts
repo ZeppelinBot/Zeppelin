@@ -1,5 +1,5 @@
-import { MessageAttachment } from "discord.js";
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Attachment } from "discord.js";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { StrictMessageContent } from "../../utils";
 
 @Entity("scheduled_posts")
@@ -17,7 +17,7 @@ export class ScheduledPost {
 
   @Column("simple-json") content: StrictMessageContent;
 
-  @Column("simple-json") attachments: MessageAttachment[];
+  @Column("simple-json") attachments: Attachment[];
 
   @Column({ type: String, nullable: true }) post_at: string | null;
 

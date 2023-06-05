@@ -1,5 +1,5 @@
-import { get, post } from "../api";
-import { ActionTree, Module } from "vuex";
+import { Module } from "vuex";
+import { post } from "../api";
 import { AuthState, IntervalType, RootState } from "./types";
 
 // Refresh auth every 15 minutes

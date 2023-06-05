@@ -1,7 +1,4 @@
-import { ChannelType } from "discord-api-types/v9";
 import { CategoryChannel, Channel } from "discord.js";
-import { ChannelTypes } from "discord.js/typings/enums";
-import { ChannelTypeStrings } from "src/types";
 import { isDmChannel } from "./isDmChannel";
 import { isGuildChannel } from "./isGuildChannel";
 import { isThreadChannel } from "./isThreadChannel";

@@ -1,6 +1,10 @@
+// KEEP THIS AS FIRST IMPORT
+// See comment in module for details
+import "../threadsSignalFix";
+
 import { connect } from "../data/db";
-import { setIsAPI } from "../globals";
 import { env } from "../env";
+import { setIsAPI } from "../globals";
 
 if (!env.KEY) {
   // tslint:disable-next-line:no-console
@@ -20,5 +24,5 @@ setIsAPI(true);
 // Connect to the database before loading the rest of the code (that depend on the database connection)
 console.log("Connecting to database..."); // tslint:disable-line
 connect().then(() => {
-  import("./start");
+  import("./start.js");
 });

@@ -1,8 +1,7 @@
-import { BaseRepository } from "./BaseRepository";
 import { getRepository, Repository } from "typeorm/index";
-import { ApiAuditLogEntry } from "./entities/ApiAuditLogEntry";
-import { ApiLogin } from "./entities/ApiLogin";
 import { AuditLogEventData, AuditLogEventType } from "./apiAuditLogTypes";
+import { BaseRepository } from "./BaseRepository";
+import { ApiAuditLogEntry } from "./entities/ApiAuditLogEntry";
 
 export class ApiAuditLog extends BaseRepository {
   private auditLog: Repository<ApiAuditLogEntry<any>>;

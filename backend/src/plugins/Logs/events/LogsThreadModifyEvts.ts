@@ -1,12 +1,10 @@
-import { LogType } from "../../../data/LogType";
+import { ThreadChannel } from "discord.js";
 import { differenceToString, getScalarDifference } from "../../../utils";
-import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
-import { logsEvt } from "../types";
+import { filterObject } from "../../../utils/filterObject";
 import { logThreadCreate } from "../logFunctions/logThreadCreate";
 import { logThreadDelete } from "../logFunctions/logThreadDelete";
 import { logThreadUpdate } from "../logFunctions/logThreadUpdate";
-import { TextChannel, ThreadChannel, VoiceChannel } from "discord.js";
-import { filterObject } from "../../../utils/filterObject";
+import { logsEvt } from "../types";
 
 export const LogsThreadCreateEvt = logsEvt({
   event: "threadCreate",
