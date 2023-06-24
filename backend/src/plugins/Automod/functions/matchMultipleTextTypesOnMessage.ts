@@ -1,7 +1,7 @@
 import { ActivityType, Embed } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { resolveMember } from "../../../utils";
+import { renderUsername, resolveMember } from "../../../utils";
 import { DeepMutable } from "../../../utils/typeUtils.js";
 import { AutomodPluginType } from "../types";
 
@@ -46,7 +46,7 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   if (trigger.match_usernames) {
-    yield ["username", `${msg.data.author.username}#${msg.data.author.discriminator}`];
+    yield ["username", renderUsername(msg.data.author.username, msg.data.author.discriminator)];
   }
 
   if (trigger.match_nicknames && member.nickname) {
