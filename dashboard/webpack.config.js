@@ -1,8 +1,8 @@
 const path = require("path");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const DotenvPlugin = require("dotenv-webpack");
-const merge = require("webpack-merge");
+const { merge } = require("webpack-merge");
 const webpack = require("webpack");
 
 const targetDir = path.normalize(path.join(__dirname, "dist"));
@@ -28,10 +28,28 @@ const pathAliases = Object.entries(tsconfig.compilerOptions.paths || []).reduce(
   return aliases;
 }, {});
 
+const postcssPlugins = [
+  require("postcss-import")({
+    resolve(id, base, options) {
+      // Since WebStorm doesn't resolve imports from node_modules without a tilde (~) prefix,
+      // strip the tilde here to get the best of both worlds (webstorm support + postcss-import support)
+      if (id[0] === "~") id = id.slice(1);
+      // Call the original resolver after stripping the tilde
+      return require("postcss-import/lib/resolve-id")(id, base, options);
+    },
+  }),
+  require("postcss-nesting")(),
+  require("tailwindcss")(),
+];
+
+if (process.env.NODE_ENV === "production") {
+  postcssPlugins.push(require("postcss-preset-env")(), require("cssnano")());
+}
+
 let config = {
   entry: "./src/main.ts",
   output: {
-    filename: "[name].[hash].js",
+    filename: "[name].[fullhash].js",
     path: targetDir,
     publicPath: "/",
   },
@@ -86,27 +104,9 @@ let config = {
           {
             loader: "postcss-loader",
             options: {
-              ident: "postcss",
-              plugins: (loader) => {
-                const plugins = [
-                  require("postcss-import")({
-                    resolve(id, base, options) {
-                      // Since WebStorm doesn't resolve imports from node_modules without a tilde (~) prefix,
-                      // strip the tilde here to get the best of both worlds (webstorm support + postcss-import support)
-                      if (id[0] === "~") id = id.slice(1);
-                      // Call the original resolver after stripping the tilde
-                      return require("postcss-import/lib/resolve-id")(id, base, options);
-                    },
-                  }),
-                  require("postcss-nesting")(),
-                  require("tailwindcss")(),
-                ];
-
-                if (process.env.NODE_ENV === "production") {
-                  plugins.push(require("postcss-preset-env")(), require("cssnano")());
-                }
-
-                return plugins;
+              // ident: "postcss",
+              postcssOptions: {
+                plugins: postcssPlugins,
               },
             },
           },
@@ -131,12 +131,9 @@ let config = {
           {
             loader: "html-loader",
             options: {
-              root: path.resolve(__dirname, "src"),
-              attrs: ["img:src", "link:href"],
+              esModule: false,
               ...(process.env.NODE_ENV === "production" && {
                 minimize: true,
-                removeComments: true,
-                collapseWhitespace: true,
               }),
             },
           },
@@ -160,6 +157,7 @@ let config = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".mjs", ".vue"],
     alias: pathAliases,
+    roots: [path.resolve(__dirname, "src")],
   },
 };
 

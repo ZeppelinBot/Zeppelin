@@ -2,10 +2,10 @@ import "./style/app.pcss";
 
 import Vue from "vue";
 
-import hljs from "highlight.js/lib/highlight.js";
+import VueHighlightJS from "@highlightjs/vue-plugin";
+import hljs from "highlight.js/lib/core";
 import hljsYaml from "highlight.js/lib/languages/yaml.js";
-import "highlight.js/styles/ocean.css";
-import VueHighlightJS from "vue-highlightjs";
+import "highlight.js/styles/base16/ocean.css";
 
 import { router } from "./routes";
 import { RootStore } from "./store";
