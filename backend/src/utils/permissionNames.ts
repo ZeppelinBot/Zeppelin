@@ -43,4 +43,9 @@ export const PERMISSION_NAMES = {
   ViewGuildInsights: "View Guild Insights",
   ModerateMembers: "Moderate Members",
   ManageEvents: "Manage Events",
+  ManageGuildExpressions: "Manage Expressions",
+  SendVoiceMessages: "Send Voice Messages",
+  UseExternalSounds: "Use External Sounds",
+  UseSoundboard: "Use Soundboard",
+  ViewCreatorMonetizationAnalytics: "View Creator Monetization Analytics",
 } as const satisfies Record<keyof typeof PermissionFlagsBits, string>;
