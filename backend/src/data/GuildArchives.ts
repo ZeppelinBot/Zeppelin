@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import { isDefaultSticker } from "src/utils/isDefaultSticker";
 import { Repository, getRepository } from "typeorm";
 import { TemplateSafeValueContainer, renderTemplate } from "../templateFormatter";
-import { trimLines } from "../utils";
+import { renderUsername, trimLines } from "../utils";
 import { decrypt, encrypt } from "../utils/crypt";
 import { channelToTemplateSafeChannel, guildToTemplateSafeGuild } from "../utils/templateSafeObjects";
 import { BaseGuildRepository } from "./BaseGuildRepository";
@@ -16,7 +16,7 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
   Server: {guild.name} ({guild.id})
 `);
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
-  "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}{stickers}";
+  "[#{channel.name}] [{user.id}] [{timestamp}] {username}: {content}{attachments}{stickers}";
 
 export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
   protected archives: Repository<ArchiveEntry>;
@@ -97,6 +97,7 @@ export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
           }),
           user: partialUser,
           channel: channel ? channelToTemplateSafeChannel(channel) : null,
+          username: renderUsername(msg.data.author.username, msg.data.author.discriminator),
         }),
       );
 

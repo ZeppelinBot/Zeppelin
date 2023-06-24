@@ -7,6 +7,7 @@ import {
   EmbedWith,
   messageLink,
   preEmbedPadding,
+  renderUsername,
   resolveMember,
   resolveUser,
   sorter,
@@ -43,7 +44,7 @@ export async function getUserInfoEmbed(
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
-    name: `${user.bot ? "Bot" : "User"}:  ${user.tag}`,
+    name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user.username, user.discriminator)}`,
   };
 
   const avatarURL = user.displayAvatarURL();
@@ -89,14 +90,16 @@ export async function getUserInfoEmbed(
     return embed;
   }
 
+  const userInfoLines = [`ID: \`${user.id}\``, `Username: **${user.username}**`];
+  if (user.discriminator !== "0") {
+    userInfoLines.push(`Discriminator: **${user.discriminator}**`);
+  }
+  userInfoLines.push(`Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)`);
+  userInfoLines.push(`Mention: <@!${user.id}>`);
+
   embed.fields.push({
     name: preEmbedPadding + `${user.bot ? "Bot" : "User"} information`,
-    value: trimLines(`
-        Name: **${user.tag}**
-        ID: \`${user.id}\`
-        Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
-        Mention: <@!${user.id}>
-        `),
+    value: userInfoLines.join("\n"),
   });
 
   if (member) {

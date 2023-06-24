@@ -2,7 +2,7 @@ import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwner, sendErrorMessage } from "../../../pluginUtils";
-import { SECONDS, confirm, noop } from "../../../utils";
+import { SECONDS, confirm, noop, renderUsername } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { rehostAttachment } from "../rehostAttachment";
 import { channelArchiverCmd } from "../types";
@@ -68,9 +68,10 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
       for (const message of messages.values()) {
         const ts = moment.utc(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss");
-        let content = `[${ts}] [${message.author.id}] [${message.author.username}#${message.author.discriminator}]: ${
-          message.content || "<no text content>"
-        }`;
+        let content = `[${ts}] [${message.author.id}] [${renderUsername(
+          message.author.username,
+          message.author.discriminator,
+        )}]: ${message.content || "<no text content>"}`;
 
         if (message.attachments.size) {
           if (args["attachment-channel"]) {

@@ -1602,3 +1602,10 @@ export function isTruthy<T>(value: T): value is Exclude<T, false | null | undefi
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
+
+export function renderUsername(username: string, discriminator: string) {
+  if (discriminator === "0") {
+    return username;
+  }
+  return `${username}#${discriminator}`;
+}

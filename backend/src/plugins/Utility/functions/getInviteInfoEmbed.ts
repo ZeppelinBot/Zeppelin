@@ -9,6 +9,7 @@ import {
   isGroupDMInvite,
   isGuildInvite,
   preEmbedPadding,
+  renderUsername,
   resolveInvite,
   trimLines,
 } from "../../../utils";
@@ -93,7 +94,7 @@ export async function getInviteInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Invite creator",
         value: trimLines(`
-          Name: **${invite.inviter.tag}**
+          Name: **${renderUsername(invite.inviter.username, invite.inviter.discriminator)}**
           ID: \`${invite.inviter.id}\`
           Mention: <@!${invite.inviter.id}>
         `),
@@ -139,7 +140,7 @@ export async function getInviteInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Invite creator",
         value: trimLines(`
-          Name: **${invite.inviter.tag}**
+          Name: **${renderUsername(invite.inviter.username, invite.inviter.discriminator)}**
           ID: \`${invite.inviter.id}\`
           Mention: <@!${invite.inviter.id}>
         `),

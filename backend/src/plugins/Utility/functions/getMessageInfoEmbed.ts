@@ -2,7 +2,15 @@ import { APIEmbed, MessageType, Snowflake, TextChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData, getDefaultMessageCommandPrefix } from "knub";
 import moment from "moment-timezone";
-import { EmbedWith, chunkMessageLines, messageLink, preEmbedPadding, trimEmptyLines, trimLines } from "../../../utils";
+import {
+  EmbedWith,
+  chunkMessageLines,
+  messageLink,
+  preEmbedPadding,
+  renderUsername,
+  trimEmptyLines,
+  trimLines,
+} from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
@@ -109,7 +117,7 @@ export async function getMessageInfoEmbed(
   embed.fields.push({
     name: preEmbedPadding + "Author information",
     value: trimLines(`
-      Name: **${message.author.tag}**
+      Name: **${renderUsername(message.author.username, message.author.discriminator)}**
       ID: \`${message.author.id}\`
       Created: **${authorAccountAge} ago** (\`${prettyAuthorCreatedAt}\`)
       ${authorJoinedAt ? `Joined: **${authorServerAge} ago** (\`${prettyAuthorJoinedAt}\`)` : ""}
