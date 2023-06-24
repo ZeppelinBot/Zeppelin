@@ -69,7 +69,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
 
     if (config.user_cooldown) {
       const delay = convertDelayStringToMS(String(config.user_cooldown), "s");
-      cooldowns.push([`tags-user-${tagResult.tagName}`, delay]);
+      cooldowns.push([`tags-user-${msg.user_id}`, delay]);
     }
 
     if (config.global_cooldown) {
