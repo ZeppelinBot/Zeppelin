@@ -1,7 +1,7 @@
 import { APIEmbed, ImageFormat } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { UnknownUser } from "../../../utils";
+import { UnknownUser, renderUserUsername } from "../../../utils";
 import { utilityCmd } from "../types";
 
 export const AvatarCmd = utilityCmd({
@@ -20,7 +20,7 @@ export const AvatarCmd = utilityCmd({
         image: {
           url: user.displayAvatarURL({ extension: ImageFormat.PNG, size: 2048 }),
         },
-        title: `Avatar of ${user.tag}:`,
+        title: `Avatar of ${renderUserUsername(user)}:`,
       };
       msg.channel.send({ embeds: [embed] });
     } else {

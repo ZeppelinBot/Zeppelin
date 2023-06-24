@@ -1,7 +1,7 @@
 import { ChannelType, escapeInlineCode } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine } from "../../../utils";
+import { asSingleLine, renderUserUsername } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
@@ -45,7 +45,7 @@ export const SlowmodeClearCmd = slowmodeCmd({
           pluginData,
           msg.channel,
           asSingleLine(`
-            Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
+            Failed to clear slowmode from **${renderUserUsername(args.user)}** in <#${args.channel.id}>:
             Threads cannot have Bot Slowmode
           `),
         );
@@ -56,13 +56,17 @@ export const SlowmodeClearCmd = slowmodeCmd({
         pluginData,
         msg.channel,
         asSingleLine(`
-          Failed to clear slowmode from **${args.user.tag}** in <#${args.channel.id}>:
+          Failed to clear slowmode from **${renderUserUsername(args.user)}** in <#${args.channel.id}>:
           \`${escapeInlineCode(e.message)}\`
         `),
       );
       return;
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `Slowmode cleared from **${args.user.tag}** in <#${args.channel.id}>`);
+    sendSuccessMessage(
+      pluginData,
+      msg.channel,
+      `Slowmode cleared from **${renderUserUsername(args.user)}** in <#${args.channel.id}>`,
+    );
   },
 });

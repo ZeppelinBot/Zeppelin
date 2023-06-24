@@ -1,5 +1,5 @@
 import { PermissionsBitField, Snowflake, TextChannel } from "discord.js";
-import { resolveMember } from "../../../utils";
+import { renderUserUsername, resolveMember } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { modActionsEvt } from "../types";
@@ -46,7 +46,9 @@ export const PostAlertOnMemberJoinEvt = modActionsEvt({
       }
 
       await alertChannel.send(
-        `<@!${member.id}> (${member.user.tag} \`${member.id}\`) joined with ${actions.length} prior record(s)`,
+        `<@!${member.id}> (${renderUserUsername(member.user)} \`${member.id}\`) joined with ${
+          actions.length
+        } prior record(s)`,
       );
     }
   },

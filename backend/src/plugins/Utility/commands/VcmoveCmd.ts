@@ -1,7 +1,7 @@
 import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { channelMentionRegex, isSnowflake, simpleClosestStringMatch } from "../../../utils";
+import { channelMentionRegex, isSnowflake, renderUserUsername, simpleClosestStringMatch } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { utilityCmd } from "../types";
 
@@ -80,7 +80,11 @@ export const VcmoveCmd = utilityCmd({
       newChannel: channel,
     });
 
-    sendSuccessMessage(pluginData, msg.channel, `**${args.member.user.tag}** moved to **${channel.name}**`);
+    sendSuccessMessage(
+      pluginData,
+      msg.channel,
+      `**${renderUserUsername(args.member.user)}** moved to **${channel.name}**`,
+    );
   },
 });
 
@@ -153,7 +157,7 @@ export const VcmoveAllCmd = utilityCmd({
         sendErrorMessage(
           pluginData,
           msg.channel,
-          `Failed to move ${currMember.user.tag} (${currMember.id}): You cannot act on this member`,
+          `Failed to move ${renderUserUsername(currMember.user)} (${currMember.id}): You cannot act on this member`,
         );
         errAmt++;
         continue;
@@ -168,7 +172,11 @@ export const VcmoveAllCmd = utilityCmd({
           sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
           return;
         }
-        sendErrorMessage(pluginData, msg.channel, `Failed to move ${currMember.user.tag} (${currMember.id})`);
+        sendErrorMessage(
+          pluginData,
+          msg.channel,
+          `Failed to move ${renderUserUsername(currMember.user)} (${currMember.id})`,
+        );
         errAmt++;
         continue;
       }

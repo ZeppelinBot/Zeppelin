@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { UnknownUser, chunkArray, emptyEmbedValue, resolveUser, trimLines } from "../../../utils";
+import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
@@ -61,7 +61,8 @@ export const CasesUserCmd = modActionsCmd({
     const normalCases = cases.filter((c) => !c.is_hidden);
     const hiddenCases = cases.filter((c) => c.is_hidden);
 
-    const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : user.tag;
+    const userName =
+      user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUserUsername(user);
 
     if (cases.length === 0) {
       msg.channel.send(`No cases found for **${userName}**`);

@@ -1431,18 +1431,18 @@ export function messageSummary(msg: SavedMessage) {
 
 export function verboseUserMention(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.tag}**`;
+    return `**${renderUsername(user.username, user.discriminator)}**`;
   }
 
-  return `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`;
+  return `<@!${user.id}> (**${renderUsername(user.username, user.discriminator)}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.tag}**`;
+    return `**${renderUsername(user.username, user.discriminator)}**`;
   }
 
-  return `**${user.tag}** (\`${user.id}\`)`;
+  return `**${renderUsername(user.username, user.discriminator)}** (\`${user.id}\`)`;
 }
 
 export function verboseChannelMention(channel: GuildBasedChannel): string {
@@ -1603,9 +1603,13 @@ export function isTruthy<T>(value: T): value is Exclude<T, false | null | undefi
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
 
-export function renderUsername(username: string, discriminator: string) {
+export function renderUsername(username: string, discriminator: string): string {
   if (discriminator === "0") {
     return username;
   }
   return `${username}#${discriminator}`;
+}
+
+export function renderUserUsername(user: User | UnknownUser): string {
+  return renderUsername(user.username, user.discriminator);
 }

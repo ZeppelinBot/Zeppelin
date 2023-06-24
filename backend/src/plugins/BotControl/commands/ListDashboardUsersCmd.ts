@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser } from "../../../utils";
+import { renderUserUsername, resolveUser } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const ListDashboardUsersCmd = botControlCmd({
@@ -27,7 +27,7 @@ export const ListDashboardUsersCmd = botControlCmd({
     );
     const userNameList = users.map(
       ({ user, permission }) =>
-        `<@!${user.id}> (**${user.tag}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
+        `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
     );
 
     sendSuccessMessage(

@@ -67,7 +67,7 @@ export const StartThreadAction = automodAction({
             msg: savedMessageToTemplateSafeSavedMessage(threadContext.message!),
           }),
         );
-      const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
+      const threadName = await renderThreadName(actionConfig.name ?? "{user.renderedUsername}'s thread");
       const threadOptions: GuildTextThreadCreateOptions<unknown> = {
         name: threadName,
         autoArchiveDuration: autoArchive,

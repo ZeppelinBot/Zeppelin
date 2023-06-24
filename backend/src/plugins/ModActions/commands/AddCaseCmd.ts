@@ -3,7 +3,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveMember, resolveUser } from "../../../utils";
+import { renderUserUsername, resolveMember, resolveUser } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
@@ -72,7 +72,11 @@ export const AddCaseCmd = modActionsCmd({
     });
 
     if (user) {
-      sendSuccessMessage(pluginData, msg.channel, `Case #${theCase.case_number} created for **${user.tag}**`);
+      sendSuccessMessage(
+        pluginData,
+        msg.channel,
+        `Case #${theCase.case_number} created for **${renderUserUsername(user)}**`,
+      );
     } else {
       sendSuccessMessage(pluginData, msg.channel, `Case #${theCase.case_number} created`);
     }
