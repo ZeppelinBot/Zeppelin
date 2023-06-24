@@ -1,7 +1,5 @@
 import { APIEmbed, ChannelType, GuildPremiumTier, Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
 import {
   EmbedWith,
   MINUTES,
@@ -15,7 +13,6 @@ import {
   trimLines,
 } from "../../../utils";
 import { idToTimestamp } from "../../../utils/idToTimestamp";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
 
@@ -51,19 +48,10 @@ export async function getServerInfoEmbed(
   };
 
   // BASIC INFORMATION
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
-  const tzCreatedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
-    : timeAndDate.inGuildTz(createdAt);
-  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const serverAge = humanizeDuration(moment.utc().valueOf() - createdAt.valueOf(), {
-    largest: 2,
-    round: true,
-  });
+  const createdAtTs = Number(idToTimestamp((guildPreview || restGuild)!.id)!);
 
   const basicInformation: string[] = [];
-  basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
+  basicInformation.push(`Created: **<t:${Math.round(createdAtTs / 1000)}:R>**`);
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerId);

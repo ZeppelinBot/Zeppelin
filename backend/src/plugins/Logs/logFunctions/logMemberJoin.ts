@@ -26,6 +26,7 @@ export function logMemberJoin(pluginData: GuildPluginData<LogsPluginType>, data:
       member: memberToTemplateSafeMember(data.member),
       new: data.member.user.createdTimestamp >= newThreshold ? " :new:" : "",
       account_age: accountAge,
+      account_age_ts: Math.round(data.member.user.createdTimestamp / 1000).toString(),
     }),
     {
       userId: data.member.id,

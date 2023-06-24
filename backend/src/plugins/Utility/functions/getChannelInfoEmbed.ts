@@ -1,9 +1,7 @@
 import { APIEmbed, ChannelType, Snowflake, StageChannel, VoiceChannel } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
 import { EmbedWith, MINUTES, formatNumber, preEmbedPadding, trimLines, verboseUserMention } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const TEXT_CHANNEL_ICON =
@@ -74,17 +72,6 @@ export async function getChannelInfoEmbed(
     channelName = channel.name;
   }
 
-  const createdAt = moment.utc(channel.createdAt!, "x");
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const tzCreatedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
-    : timeAndDate.inGuildTz(createdAt);
-  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const channelAge = humanizeDuration(Date.now() - channel.createdTimestamp!, {
-    largest: 2,
-    round: true,
-  });
-
   const showMention = channel.type !== ChannelType.GuildCategory;
 
   embed.fields.push({
@@ -92,7 +79,7 @@ export async function getChannelInfoEmbed(
     value: trimLines(`
       Name: **${channelName}**
       ID: \`${channel.id}\`
-      Created: **${channelAge} ago** (\`${prettyCreatedAt}\`)
+      Created: **<t:${Math.round(channel.createdTimestamp! / 1000)}:R>**
       Type: **${channelType}**
       ${showMention ? `Mention: <#${channel.id}>` : ""}
     `),

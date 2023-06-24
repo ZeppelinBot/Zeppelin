@@ -11,7 +11,7 @@
   "MEMBER_UNBAN": "{timestamp} 🔓 User (`{userId}`) was unbanned by {userMention(mod)}",
   "MEMBER_FORCEBAN": "{timestamp} 🔨 User (`{userId}`) was forcebanned by {userMention(mod)}",
   "MEMBER_SOFTBAN": "{timestamp} 🔨 {userMention(member)} was softbanned by {userMention(mod)}",
-  "MEMBER_JOIN": "{timestamp} 📥 {new} {userMention(member)} joined (created {account_age} ago)",
+  "MEMBER_JOIN": "{timestamp} 📥 {new} {userMention(member)} joined (created <t:{account_age_ts}:R>)",
   "MEMBER_LEAVE": "{timestamp} 📤 {userMention(member)} left the server",
   "MEMBER_ROLE_ADD": "{timestamp} 🔑 {userMention(mod)} added roles for {userMention(member)}: **{roles}**",
   "MEMBER_ROLE_REMOVE": "{timestamp} 🔑 {userMention(mod)} removed roles from {userMention(member)}: **{roles}**",

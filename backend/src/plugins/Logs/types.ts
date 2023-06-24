@@ -150,6 +150,7 @@ export const LogTypeData = z.object({
     member: z.instanceof(TemplateSafeMember),
     new: z.string(),
     account_age: z.string(),
+    account_age_ts: z.string(),
   }),
 
   [LogType.MEMBER_LEAVE]: z.object({

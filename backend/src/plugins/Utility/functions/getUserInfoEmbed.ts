@@ -1,7 +1,5 @@
 import { APIEmbed } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
 import {
   EmbedWith,
@@ -50,36 +48,18 @@ export async function getUserInfoEmbed(
   const avatarURL = user.displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
-  const createdAt = moment.utc(user.createdAt, "x");
-  const tzCreatedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
-    : timeAndDate.inGuildTz(createdAt);
-  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const accountAge = humanizeDuration(moment.utc().valueOf() - user.createdTimestamp, {
-    largest: 2,
-    round: true,
-  });
-
   if (compact) {
     embed.fields.push({
       name: preEmbedPadding + `${user.bot ? "Bot" : "User"} information`,
       value: trimLines(`
           Profile: <@!${user.id}>
-          Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)
+          Created: **<t:${Math.round(user.createdTimestamp / 1000)}:R>**
           `),
     });
     if (member) {
-      const joinedAt = moment.utc(member.joinedTimestamp!, "x");
-      const tzJoinedAt = requestMemberId
-        ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
-        : timeAndDate.inGuildTz(joinedAt);
-      const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-      const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedTimestamp!, {
-        largest: 2,
-        round: true,
-      });
-
-      embed.fields[0].value += `\n${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)`;
+      embed.fields[0].value += `\n${user.bot ? "Added" : "Joined"}: **<t:${Math.round(
+        member.joinedTimestamp! / 1000,
+      )}:R>**`;
     } else {
       embed.fields.push({
         name: preEmbedPadding + "!! NOTE !!",
@@ -94,7 +74,7 @@ export async function getUserInfoEmbed(
   if (user.discriminator !== "0") {
     userInfoLines.push(`Discriminator: **${user.discriminator}**`);
   }
-  userInfoLines.push(`Created: **${accountAge} ago** (\`${prettyCreatedAt}\`)`);
+  userInfoLines.push(`Created: **<t:${Math.round(user.createdTimestamp / 1000)}:R>**`);
   userInfoLines.push(`Mention: <@!${user.id}>`);
 
   embed.fields.push({
@@ -103,22 +83,13 @@ export async function getUserInfoEmbed(
   });
 
   if (member) {
-    const joinedAt = moment.utc(member.joinedTimestamp!, "x");
-    const tzJoinedAt = requestMemberId
-      ? await timeAndDate.inMemberTz(requestMemberId, joinedAt)
-      : timeAndDate.inGuildTz(joinedAt);
-    const prettyJoinedAt = tzJoinedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-    const joinAge = humanizeDuration(moment.utc().valueOf() - member.joinedTimestamp!, {
-      largest: 2,
-      round: true,
-    });
     const roles = Array.from(member.roles.cache.values()).filter((r) => r.id !== pluginData.guild.id);
     roles.sort(sorter("position", "DESC"));
 
     embed.fields.push({
       name: preEmbedPadding + "Member information",
       value: trimLines(`
-          ${user.bot ? "Added" : "Joined"}: **${joinAge} ago** (\`${prettyJoinedAt}\`)
+          ${user.bot ? "Added" : "Joined"}: **<t:${Math.round(member.joinedTimestamp! / 1000)}:R>**
           ${roles.length > 0 ? "Roles: " + trimRoles(roles.map((r) => `<@&${r.id}>`)) : ""}
         `),
     });
