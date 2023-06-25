@@ -8,7 +8,9 @@ ENV TZ=UTC
 
 # Set up some core packages
 RUN apt-get update
-RUN apt-get install -y sudo git curl
+RUN apt-get install -y sudo curl software-properties-common
+
+RUN add-apt-repository ppa:git-core/ppa && apt-get update && apt-get install -y git
 
 # Set up SSH access
 RUN apt-get install -y openssh-server iptables
