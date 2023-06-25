@@ -26,4 +26,4 @@ RUN chown -R ubuntu /home/ubuntu
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs gcc g++ make python3
 
-CMD /usr/sbin/sshd -D -e
+CMD ["/usr/sbin/sshd", "-D", "-e"]
