@@ -4,7 +4,7 @@
 # Exec is used to forward signals: https://unix.stackexchange.com/a/196053
 
 cd /zeppelin/backend
-if [ -n "$DEBUG" ]; then
+if [ "$DEBUG" == "true" ]; then
   echo "DEBUG MODE: Starting bot container without starting the bot"
   exec tail -f /dev/null
 else

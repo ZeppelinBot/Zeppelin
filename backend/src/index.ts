@@ -197,6 +197,10 @@ setInterval(() => {
   avgCount = 0;
 }, 5 * 60 * 1000);
 
+if (env.DEBUG) {
+  logger.info("NOTE: Bot started in DEBUG mode");
+}
+
 logger.info("Connecting to database");
 connect().then(async (connection) => {
   const client = new Client({
@@ -429,27 +433,30 @@ connect().then(async (connection) => {
   logger.info("Logging in...");
   await client.login(env.BOT_TOKEN);
 
-  let stopping = false;
-  const cleanupAndStop = async (code) => {
-    if (stopping) {
-      return;
-    }
-    stopping = true;
-    logger.info("Cleaning up before exit...");
-    // Force exit after 10sec
-    setTimeout(() => process.exit(code), 10 * SECONDS);
-    await bot.stop();
-    await connection.close();
-    logger.info("Done! Exiting now.");
-    process.exit(code);
-  };
-  process.on("beforeExit", () => cleanupAndStop(0));
-  process.on("SIGINT", () => {
-    logger.info("Received SIGINT, exiting...");
-    cleanupAndStop(0);
-  });
-  process.on("SIGTERM", () => {
-    logger.info("Received SIGTERM, exiting...");
-    cleanupAndStop(0);
-  });
+  // Don't intercept any signals in DEBUG mode: https://github.com/clinicjs/node-clinic/issues/444#issuecomment-1474997090
+  if (!env.DEBUG) {
+    let stopping = false;
+    const cleanupAndStop = async (code) => {
+      if (stopping) {
+        return;
+      }
+      stopping = true;
+      logger.info("Cleaning up before exit...");
+      // Force exit after 10sec
+      setTimeout(() => process.exit(code), 10 * SECONDS);
+      await bot.stop();
+      await connection.close();
+      logger.info("Done! Exiting now.");
+      process.exit(code);
+    };
+    process.on("beforeExit", () => cleanupAndStop(0));
+    process.on("SIGINT", () => {
+      logger.info("Received SIGINT, exiting...");
+      cleanupAndStop(0);
+    });
+    process.on("SIGTERM", () => {
+      logger.info("Received SIGTERM, exiting...");
+      cleanupAndStop(0);
+    });
+  }
 });

@@ -50,6 +50,11 @@ const envType = z.object({
   DB_USER: z.string().optional().default("zeppelin"),
   DB_PASSWORD: z.string().optional(), // Default is set to DOCKER_MYSQL_PASSWORD further below
   DB_DATABASE: z.string().optional().default("zeppelin"),
+
+  DEBUG: z
+    .string()
+    .optional()
+    .transform((str) => str === "true"),
 });
 
 let toValidate = { ...process.env };
