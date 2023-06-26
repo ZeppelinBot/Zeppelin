@@ -220,7 +220,7 @@
     },
     methods: {
       renderConfiguration(options) {
-        return yaml.safeDump({
+        return yaml.dump({
           [this.pluginName]: options,
         });
       },
