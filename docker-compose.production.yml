@@ -58,7 +58,8 @@ services:
       - ./:/zeppelin
     environment:
       DEBUG: ${DEBUG-}
-    command: ["/bin/bash", "/zeppelin/docker/production/start-api.sh"]
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-api-prod"]
 
   bot:
     build:
