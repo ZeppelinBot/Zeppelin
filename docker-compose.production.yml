@@ -52,7 +52,8 @@ services:
         DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     restart: on-failure
     depends_on:
-      - prepare_backend
+      prepare_backend:
+        condition: service_completed_successfully
     volumes:
       - ./:/zeppelin
     environment:
@@ -67,7 +68,8 @@ services:
         DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
     restart: on-failure
     depends_on:
-      - prepare_backend
+      prepare_backend:
+        condition: service_completed_successfully
     volumes:
       - ./:/zeppelin
     environment:
