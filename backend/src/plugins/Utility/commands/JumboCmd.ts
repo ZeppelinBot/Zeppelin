@@ -77,7 +77,13 @@ export const JumboCmd = utilityCmd({
       } catch (err) {
         if (url.toLocaleLowerCase().endsWith("fe0f.png")) {
           url = url.slice(0, url.lastIndexOf("-fe0f")) + ".png";
-          image = await resizeBuffer(await getBufferFromUrl(url), size, size);
+          try {
+            image = resizeBuffer(await getBufferFromUrl(url), size, size);
+          } catch {
+            // It's fine if this fails, we just don't jumbo then.
+            // The errors here are usually some internal errors in the photon WASM code anyway,
+            // so we can't do anything about it.
+          }
         }
       }
       if (!image) {
