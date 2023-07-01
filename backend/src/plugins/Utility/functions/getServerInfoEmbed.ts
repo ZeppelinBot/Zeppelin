@@ -16,6 +16,12 @@ import { idToTimestamp } from "../../../utils/idToTimestamp";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
 
+const prettifyFeature = (feature: string): string =>
+  `\`${feature
+    .split("_")
+    .map((e) => `${e.substring(0, 1).toUpperCase()}${e.substring(1).toLowerCase()}`)
+    .join(" ")}\``;
+
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
@@ -62,19 +68,16 @@ export async function getServerInfoEmbed(
   }
 
   if (features.length > 0) {
-    basicInformation.push(`Features: ${features.join(", ")}`);
+    basicInformation.push(`Features: ${features.map(prettifyFeature).join(", ")}`);
   }
 
-  embed.fields.push({
-    name: preEmbedPadding + "Basic information",
-    value: basicInformation.join("\n"),
-  });
+  embed.description = `${preEmbedPadding}**Basic Information**\n${basicInformation.join("\n")}`;
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ size: 2048 })})`;
-  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ size: 2048 })})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL()})` : "None";
   const splashUrl = (restGuild || guildPreview)!.splash
-    ? `[Link](${(restGuild || guildPreview)!.splashURL({ size: 2048 })})`
+    ? `[Link](${(restGuild || guildPreview)!.splashURL()})`
     : "None";
 
   embed.fields.push(
@@ -142,15 +145,21 @@ export async function getServerInfoEmbed(
 
   // CHANNEL COUNTS
   if (thisServer) {
-    const totalChannels = thisServer.channels.cache.size;
     const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildCategory);
     const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
     const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
-    const threadChannels = thisServer.channels.cache.filter((channel) => channel.isThread());
+    const forumChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildForum);
+    const threadChannelsText = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type !== ChannelType.GuildForum,
+    );
+    const threadChannelsForums = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type === ChannelType.GuildForum,
+    );
     const announcementChannels = thisServer.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildAnnouncement,
     );
     const stageChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildStageVoice);
+    const totalChannels = thisServer.channels.cache.filter((channel) => !channel.isThread()).size;
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
@@ -158,7 +167,8 @@ export async function getServerInfoEmbed(
       value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.size}**
-          Text: **${textChannels.size}** (**${threadChannels.size} threads**)
+          Text: **${textChannels.size}** (**${threadChannelsText.size} threads**)
+          Forums: **${forumChannels.size}** (**${threadChannelsForums.size} threads**)
           Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
           Stage: **${stageChannels.size}**
@@ -172,6 +182,12 @@ export async function getServerInfoEmbed(
   if (thisServer) {
     otherStats.push(`Roles: **${thisServer.roles.cache.size}** / 250`);
   }
+
+  const roleLockedEmojis =
+    (restGuild
+      ? restGuild?.emojis?.cache.filter((e) => e.roles.cache.size)
+      : guildPreview?.emojis.filter((e) => e.roles.length)
+    )?.size ?? 0;
 
   if (restGuild) {
     const maxEmojis =
@@ -189,15 +205,25 @@ export async function getServerInfoEmbed(
         [GuildPremiumTier.Tier3]: 60,
       }[restGuild.premiumTier] ?? 0;
 
-    otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
+    otherStats.push(
+      `Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}${
+        roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""
+      }`,
+    );
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
-    otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
+    otherStats.push(
+      `Emojis: **${guildPreview!.emojis.size}**${roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""}`,
+    );
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
   }
 
   if (thisServer) {
-    otherStats.push(`Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${thisServer.premiumTier})`);
+    otherStats.push(
+      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}**${
+        thisServer.premiumTier ? ` (level ${thisServer.premiumTier})` : ""
+      }`,
+    );
   }
 
   embed.fields.push({
