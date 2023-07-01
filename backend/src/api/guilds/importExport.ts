@@ -35,7 +35,7 @@ const caseData = z.object({
   is_hidden: z.boolean(),
   pp_id: z.nullable(z.string()),
   pp_name: z.nullable(z.string()),
-  log_message_id: z.nullable(z.string()),
+  log_message_id: z.string().optional(),
   notes: z.array(caseNoteData),
 });
 
@@ -75,9 +75,8 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       try {
         data = importExportData.parse(req.body.data);
       } catch (err) {
-        const prettyMessage = `${err.issues[0].code}: expected ${err.issues[0].expected}, received ${
-          err.issues[0].received
-        } at /${err.issues[0].path.join("/")}`;
+        const prettyMessage = `${err.issues[0].code}: expected ${err.issues[0].expected}, received ${err.issues[0].received
+          } at /${err.issues[0].path.join("/")}`;
         return clientError(res, `Invalid import data format: ${prettyMessage}`);
         return;
       }
@@ -168,7 +167,7 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
             is_hidden: theCase.is_hidden,
             pp_id: theCase.pp_id,
             pp_name: theCase.pp_name,
-            log_message_id: theCase.log_message_id,
+            log_message_id: theCase.log_message_id ?? undefined,
             notes: theCase.notes.map((note) => ({
               mod_id: note.mod_id,
               mod_name: note.mod_name,
