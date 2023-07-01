@@ -84,9 +84,7 @@ export const AboutCmd = utilityCmd({
 
       aboutEmbed.fields!.push({
         name: "Zeppelin supporters 🎉",
-        value:
-          "These amazing people have supported Zeppelin development by pledging on [Patreon](https://www.patreon.com/zeppelinbot):\n\n" +
-          formattedSupporters,
+        value: "These amazing people have supported Zeppelin development:\n\n" + formattedSupporters,
         inline: false,
       });
     }
