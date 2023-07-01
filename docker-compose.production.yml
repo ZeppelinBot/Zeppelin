@@ -3,7 +3,8 @@ name: zeppelin-prod
 services:
   nginx:
     build:
-      context: ./docker/production/nginx
+      context: .
+      dockerfile: docker/production/nginx/Dockerfile
       args:
         API_PORT: ${API_PORT:?Missing API_PORT}
         DOCKER_PROD_DOMAIN: ${DOCKER_PROD_DOMAIN:?Missing DOCKER_PROD_DOMAIN}
@@ -30,60 +31,32 @@ services:
       timeout: 300s
       retries: 60
 
-  prepare_backend:
+  migrate:
     build:
-      context: ./docker/production/node
-      args:
-        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
-        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./:/zeppelin
-    command: |-
-      bash -c "cd /zeppelin/backend && npm ci && npm run build && npm run migrate-prod"
+      context: .
+      dockerfile: docker/production/backend/Dockerfile
+    command: ["npm", "run", "migrate-prod"]
 
   api:
-    build:
-      context: ./docker/production/node
-      args:
-        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
-        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
-    restart: on-failure
     depends_on:
-      prepare_backend:
+      migrate:
         condition: service_completed_successfully
-    volumes:
-      - ./:/zeppelin
+    build:
+      context: .
+      dockerfile: docker/production/backend/Dockerfile
+    restart: on-failure
     environment:
       DEBUG: ${DEBUG-}
-    working_dir: /zeppelin/backend
     command: ["npm", "run", "start-api-prod"]
 
   bot:
-    build:
-      context: ./docker/production/node
-      args:
-        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
-        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
-    restart: on-failure
     depends_on:
-      prepare_backend:
+      migrate:
         condition: service_completed_successfully
-    volumes:
-      - ./:/zeppelin
+    build:
+      context: .
+      dockerfile: docker/production/backend/Dockerfile
+    restart: on-failure
     environment:
       DEBUG: ${DEBUG-}
     command: ["/bin/bash", "/zeppelin/docker/production/start-bot.sh"]
-
-  build_dashboard:
-    build:
-      context: ./docker/production/node
-      args:
-        DOCKER_USER_UID: ${DOCKER_USER_UID:?Missing DOCKER_USER_UID}
-        DOCKER_USER_GID: ${DOCKER_USER_GID:?Missing DOCKER_USER_GID}
-    volumes:
-      - ./:/zeppelin
-    command: |-
-      bash -c "cd /zeppelin/dashboard && npm ci && npm run build"
