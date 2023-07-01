@@ -110,7 +110,7 @@ export const TemplateFunctions: TemplateFunction[] = [
  {
     name: "strlen",
     description: "Returns the length of a string argument.",
-    returnValue: "string",
+    returnValue: "number",
     arguments: ["string"],
     examples: ['strlen("hello World")'],
   },
