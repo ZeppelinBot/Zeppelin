@@ -16,8 +16,8 @@
       </p>
       <p>
         The bot's source code is available at
-        <a href="https://github.com/Dragory/ZeppelinBot">
-          https://github.com/Dragory/ZeppelinBot
+        <a href="https://github.com/ZeppelinBot/Zeppelin">
+          https://github.com/ZeppelinBot/Zeppelin
         </a>
       </p>
 
