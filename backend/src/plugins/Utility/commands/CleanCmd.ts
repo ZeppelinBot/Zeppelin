@@ -6,12 +6,15 @@ import { LogType } from "../../../data/LogType";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { allowTimeout } from "../../../RegExpRunner";
+import { chunkArray, DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
+import { utilityCmd, UtilityPluginType } from "../types";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { DAYS, SECONDS, getInviteCodesInString, noop } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { UtilityPluginType, utilityCmd } from "../types";
 
-const MAX_CLEAN_COUNT = 150;
+const MAX_CLEAN_COUNT = 300;
 const MAX_CLEAN_TIME = 1 * DAYS;
 const MAX_CLEAN_API_REQUESTS = 20;
 const CLEAN_COMMAND_DELETE_DELAY = 10 * SECONDS;
@@ -33,9 +36,14 @@ export async function cleanMessages(
   idsToDelete.forEach((id) => pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id));
   pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE_BULK, idsToDelete[0]);
 
-  // Actually delete the messages
-  channel.bulkDelete(idsToDelete);
-  await pluginData.state.savedMessages.markBulkAsDeleted(idsToDelete);
+  // Actually delete the messages (in chunks of 100)
+
+  const chunks = chunkArray(idsToDelete, 100);
+  await Promise.all(
+    chunks.map((chunk) =>
+      Promise.all([channel.bulkDelete(chunk), pluginData.state.savedMessages.markBulkAsDeleted(chunk)]),
+    ),
+  );
 
   // Create an archive
   const archiveId = await pluginData.state.archives.createFromSavedMessages(savedMessages, pluginData.guild);
