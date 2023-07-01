@@ -5,15 +5,16 @@ import { BaseGuildRepository } from "./BaseGuildRepository";
 import { cleanupNicknames } from "./cleanup/nicknames";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
 
+const CLEANUP_INTERVAL = 5 * MINUTES;
+
+async function cleanup() {
+  await cleanupNicknames();
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
 if (!isAPI()) {
-  const CLEANUP_INTERVAL = 5 * MINUTES;
-
-  async function cleanup() {
-    await cleanupNicknames();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
   // Start first cleanup 30 seconds after startup
+  // TODO: Move to bot startup code
   setTimeout(cleanup, 30 * SECONDS);
 }
 

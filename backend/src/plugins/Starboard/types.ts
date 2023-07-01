@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
@@ -44,5 +44,5 @@ export interface StarboardPluginType extends BasePluginType {
   };
 }
 
-export const starboardCmd = typedGuildCommand<StarboardPluginType>();
-export const starboardEvt = typedGuildEventListener<StarboardPluginType>();
+export const starboardCmd = guildPluginMessageCommand<StarboardPluginType>();
+export const starboardEvt = guildPluginEventListener<StarboardPluginType>();

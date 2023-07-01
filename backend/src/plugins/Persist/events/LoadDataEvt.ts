@@ -1,15 +1,50 @@
-import { GuildMemberEditData, Permissions } from "discord.js";
+import { GuildMember, PermissionFlagsBits } from "discord.js";
+import { GuildPluginData } from "knub";
 import intersection from "lodash.intersection";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
+import { PersistedData } from "../../../data/entities/PersistedData";
+import { SECONDS } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { persistEvt } from "../types";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
+import { PersistPluginType, persistEvt } from "../types";
 
-const p = Permissions.FLAGS;
+const p = PermissionFlagsBits;
+
+async function applyPersistedData(
+  pluginData: GuildPluginData<PersistPluginType>,
+  persistedData: PersistedData,
+  member: GuildMember,
+): Promise<string[]> {
+  const config = await pluginData.config.getForMember(member);
+  const guildRoles = Array.from(pluginData.guild.roles.cache.keys());
+  const restoredData: string[] = [];
+
+  const persistedRoles = config.persisted_roles;
+  if (persistedRoles.length) {
+    const roleManager = pluginData.getPlugin(RoleManagerPlugin);
+    const rolesToRestore = intersection(persistedRoles, persistedData.roles, guildRoles).filter(
+      (roleId) => !member.roles.cache.has(roleId),
+    );
+
+    if (rolesToRestore.length) {
+      restoredData.push("roles");
+      for (const roleId of rolesToRestore) {
+        roleManager.addRole(member.id, roleId);
+      }
+    }
+  }
+
+  if (config.persist_nicknames && persistedData.nickname && member.nickname !== persistedData.nickname) {
+    restoredData.push("nickname");
+    await member.edit({
+      nick: persistedData.nickname,
+    });
+  }
+
+  return restoredData;
+}
 
 export const LoadDataEvt = persistEvt({
   event: "guildMemberAdd",
@@ -18,23 +53,19 @@ export const LoadDataEvt = persistEvt({
     const member = meta.args.member;
     const pluginData = meta.pluginData;
 
-    const memberRoleLock = await pluginData.locks.acquire(memberRolesLock(member));
-
     const persistedData = await pluginData.state.persistedData.find(member.id);
     if (!persistedData) {
-      memberRoleLock.unlock();
       return;
     }
+    await pluginData.state.persistedData.clear(member.id);
 
-    const toRestore: GuildMemberEditData = {};
     const config = await pluginData.config.getForMember(member);
-    const restoredData: string[] = [];
 
     // Check permissions
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     let requiredPermissions = 0n;
-    if (config.persist_nicknames) requiredPermissions |= p.MANAGE_NICKNAMES;
-    if (config.persisted_roles) requiredPermissions |= p.MANAGE_ROLES;
+    if (config.persist_nicknames) requiredPermissions |= p.ManageNicknames;
+    if (config.persisted_roles) requiredPermissions |= p.ManageRoles;
     const missingPermissions = getMissingPermissions(me.permissions, requiredPermissions);
     if (missingPermissions) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -57,31 +88,17 @@ export const LoadDataEvt = persistEvt({
       }
     }
 
-    const persistedRoles = config.persisted_roles;
-    if (persistedRoles.length) {
-      const rolesToRestore = intersection(persistedRoles, persistedData.roles, guildRoles);
-
-      if (rolesToRestore.length) {
-        restoredData.push("roles");
-        toRestore.roles = Array.from(new Set([...rolesToRestore, ...member.roles.cache.keys()]));
-      }
-    }
-
-    if (config.persist_nicknames && persistedData.nickname) {
-      restoredData.push("nickname");
-      toRestore.nick = persistedData.nickname;
-    }
+    const restoredData = await applyPersistedData(pluginData, persistedData, member);
+    setTimeout(() => {
+      // Reapply persisted data after a while for better interop with other bots that restore roles
+      void applyPersistedData(pluginData, persistedData, member);
+    }, 5 * SECONDS);
 
     if (restoredData.length) {
-      await member.edit(toRestore, "Restored upon rejoin");
-      await pluginData.state.persistedData.clear(member.id);
-
       pluginData.getPlugin(LogsPlugin).logMemberRestore({
         member,
         restoredData: restoredData.join(", "),
       });
     }
-
-    memberRoleLock.unlock();
   },
 });

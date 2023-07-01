@@ -1,15 +1,18 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
+import { allowTimeout } from "../../../RegExpRunner";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { LogType } from "../../../data/LogType";
-import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { allowTimeout } from "../../../RegExpRunner";
 import { chunkArray, DAYS, getInviteCodesInString, noop, SECONDS } from "../../../utils";
 import { utilityCmd, UtilityPluginType } from "../types";
+import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
+import { DAYS, SECONDS, getInviteCodesInString, noop } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
+import { UtilityPluginType, utilityCmd } from "../types";
 
 const MAX_CLEAN_COUNT = 300;
 const MAX_CLEAN_TIME = 1 * DAYS;
@@ -86,7 +89,7 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
   }
 
   const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
-  if (!targetChannel?.isText()) {
+  if (!targetChannel?.isTextBased()) {
     sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`);
     return;
   }

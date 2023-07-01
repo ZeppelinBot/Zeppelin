@@ -1,42 +1,52 @@
-import { Client, Constants, Intents, Options, TextChannel, ThreadChannel } from "discord.js";
-import { Knub, PluginError } from "knub";
-import { PluginLoadError } from "knub/dist/plugins/PluginLoadError";
-// Always use UTC internally
-// This is also enforced for the database in data/db.ts
+// KEEP THIS AS FIRST IMPORT
+// See comment in module for details
+import "./threadsSignalFix";
+
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  Options,
+  Partials,
+  RESTEvents,
+  TextChannel,
+  ThreadChannel,
+} from "discord.js";
+import { EventEmitter } from "events";
+import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
-import { AllowedGuilds } from "./data/AllowedGuilds";
-import { Configs } from "./data/Configs";
-import { connect } from "./data/db";
-import { GuildLogs } from "./data/GuildLogs";
-import { LogType } from "./data/LogType";
+import { performance } from "perf_hooks";
+import process from "process";
 import { DiscordJSError } from "./DiscordJSError";
-import { logger } from "./logger";
-import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
 import { RecoverablePluginError } from "./RecoverablePluginError";
 import { SimpleError } from "./SimpleError";
-import { ZeppelinGlobalConfig, ZeppelinGuildConfig } from "./types";
-import { startUptimeCounter } from "./uptime";
-import { errorMessage, isDiscordAPIError, isDiscordHTTPError, MINUTES, SECONDS, sleep, successMessage } from "./utils";
-import { loadYamlSafely } from "./utils/loadYamlSafely";
-import { DecayingCounter } from "./utils/DecayingCounter";
-import { PluginNotLoadedError } from "knub/dist/plugins/PluginNotLoadedError";
-import { logRestCall } from "./restCallStats";
-import { logRateLimit } from "./rateLimitStats";
+import { AllowedGuilds } from "./data/AllowedGuilds";
+import { Configs } from "./data/Configs";
+import { GuildLogs } from "./data/GuildLogs";
+import { LogType } from "./data/LogType";
+import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { connect } from "./data/db";
+import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
+import { runExpiredMemberCacheDeletionLoop } from "./data/loops/expiredMemberCacheDeletionLoop";
 import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
-import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
-import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
 import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
 import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
-import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
-import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
-import { performance } from "perf_hooks";
-import { setProfiler } from "./profiler";
-import { enableProfiling } from "./utils/easyProfiler";
+import { runMemberCacheDeletionLoop } from "./data/loops/memberCacheDeletionLoop";
 import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
-import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
+import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
+import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
 import { consumeQueryStats } from "./data/queryLogger";
-import { EventEmitter } from "events";
 import { env } from "./env";
+import { logger } from "./logger";
+import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
+import { setProfiler } from "./profiler";
+import { logRateLimit } from "./rateLimitStats";
+import { startUptimeCounter } from "./uptime";
+import { MINUTES, SECONDS, errorMessage, isDiscordAPIError, isDiscordHTTPError, sleep, successMessage } from "./utils";
+import { DecayingCounter } from "./utils/DecayingCounter";
+import { enableProfiling } from "./utils/easyProfiler";
+import { loadYamlSafely } from "./utils/loadYamlSafely";
 
 // Error handling
 let recentPluginErrors = 0;
@@ -58,8 +68,8 @@ const SAFE_TO_IGNORE_ERIS_ERROR_CODES = [
 const SAFE_TO_IGNORE_ERIS_ERROR_MESSAGES = ["Server didn't acknowledge previous heartbeat, possible lost connection"];
 
 function errorHandler(err) {
-  const guildName = err.guild?.name || "Global";
-  const guildId = err.guild?.id || "0";
+  const guildId = err.guild?.id || err.guildId || "0";
+  const guildName = err.guild?.name || (guildId && guildId !== "0" ? "Unknown" : "Global");
 
   if (err instanceof RecoverablePluginError) {
     // Recoverable plugin errors can be, well, recovered from.
@@ -162,6 +172,8 @@ for (const [i, part] of actualVersionParts.entries()) {
   throw new SimpleError(`Unsupported Node.js version! Must be at least ${REQUIRED_NODE_VERSION}`);
 }
 
+// Always use UTC internally
+// This is also enforced for the database in data/db.ts
 moment.tz.setDefault("UTC");
 
 // Blocking check
@@ -185,20 +197,26 @@ setInterval(() => {
   avgCount = 0;
 }, 5 * 60 * 1000);
 
+if (env.DEBUG) {
+  logger.info("NOTE: Bot started in DEBUG mode");
+}
+
 logger.info("Connecting to database");
-connect().then(async () => {
+connect().then(async (connection) => {
   const client = new Client({
-    partials: ["USER", "CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION"],
+    partials: [Partials.User, Partials.Channel, Partials.GuildMember, Partials.Message, Partials.Reaction],
 
     makeCache: Options.cacheWithLimits({
-      ...Options.defaultMakeCacheSettings,
+      ...Options.DefaultMakeCacheSettings,
       MessageManager: 1,
       // GuildMemberManager: 15000,
       GuildInviteManager: 0,
     }),
 
-    restGlobalRateLimit: 50,
-    // restTimeOffset: 1000,
+    rest: {
+      // globalRequestsPerSecond: 50,
+      // offset: 1000,
+    },
 
     // Disable mentions by default
     allowedMentions: {
@@ -209,33 +227,29 @@ connect().then(async () => {
     },
     intents: [
       // Privileged
-      Intents.FLAGS.GUILD_MEMBERS,
-      // Intents.FLAGS.GUILD_PRESENCES,
-      Intents.FLAGS.GUILD_MESSAGE_TYPING,
+      GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.MessageContent,
+      // GatewayIntentBits.GuildPresences,
 
       // Regular
-      Intents.FLAGS.DIRECT_MESSAGES,
-      Intents.FLAGS.GUILD_BANS,
-      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-      Intents.FLAGS.GUILD_INVITES,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_VOICE_STATES,
+      GatewayIntentBits.GuildMessageTyping,
+      GatewayIntentBits.DirectMessages,
+      GatewayIntentBits.GuildModeration,
+      GatewayIntentBits.GuildEmojisAndStickers,
+      GatewayIntentBits.GuildInvites,
+      GatewayIntentBits.GuildMessageReactions,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildVoiceStates,
     ],
   });
   // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
   (client as unknown as EventEmitter).setMaxListeners(200);
 
-  client.on(Constants.Events.RATE_LIMIT, (data) => {
-    // tslint:disable-next-line:no-console
-    // console.log(`[DEBUG] [RATE_LIMIT] ${JSON.stringify(data)}`);
-  });
-
   const safe429DecayInterval = 5 * SECONDS;
   const safe429MaxCount = 5;
   const safe429Counter = new DecayingCounter(safe429DecayInterval);
-  client.on(Constants.Events.DEBUG, (errorText) => {
+  client.on(Events.Debug, (errorText) => {
     if (!errorText.includes("429")) {
       return;
     }
@@ -258,7 +272,7 @@ connect().then(async () => {
   const allowedGuilds = new AllowedGuilds();
   const guildConfigs = new Configs();
 
-  const bot = new Knub<ZeppelinGuildConfig, ZeppelinGlobalConfig>(client, {
+  const bot = new Knub(client, {
     guildPlugins,
     globalPlugins,
 
@@ -283,7 +297,7 @@ connect().then(async () => {
 
         return Array.from(plugins.keys()).filter((pluginName) => {
           if (basePluginNames.includes(pluginName)) return true;
-          return configuredPlugins[pluginName] && configuredPlugins[pluginName].enabled !== false;
+          return configuredPlugins[pluginName] && (configuredPlugins[pluginName] as any).enabled !== false;
         });
       },
 
@@ -299,7 +313,11 @@ connect().then(async () => {
         const row = await guildConfigs.getActiveByKey(key);
         if (row) {
           try {
-            return loadYamlSafely(row.config);
+            const loaded = loadYamlSafely(row.config);
+            // Remove deprecated properties some may still have in their config
+            delete loaded.success_emoji;
+            delete loaded.error_emoji;
+            return loaded;
           } catch (err) {
             logger.error(`Error while loading config "${key}": ${err.message}`);
             return {};
@@ -329,6 +347,7 @@ connect().then(async () => {
       sendSuccessMessageFn(channel, body) {
         const guildId =
           channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
+        // @ts-expect-error
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.success_emoji : undefined;
         channel.send(successMessage(body, emoji));
       },
@@ -336,6 +355,7 @@ connect().then(async () => {
       sendErrorMessageFn(channel, body) {
         const guildId =
           channel instanceof TextChannel || channel instanceof ThreadChannel ? channel.guild.id : undefined;
+        // @ts-expect-error
         const emoji = guildId ? bot.getLoadedGuild(guildId)!.config.error_emoji : undefined;
         channel.send(errorMessage(body, emoji));
       },
@@ -346,11 +366,16 @@ connect().then(async () => {
     startUptimeCounter();
   });
 
-  client.on(Constants.Events.RATE_LIMIT, (data) => {
+  client.rest.on(RESTEvents.RateLimited, (data) => {
     logRateLimit(data);
   });
 
   bot.on("loadingFinished", async () => {
+    setProfiler(bot.profiler);
+    if (process.env.PROFILING === "true") {
+      enableProfiling();
+    }
+
     runExpiringMutesLoop();
     await sleep(10 * SECONDS);
     runExpiringTempbansLoop();
@@ -364,6 +389,10 @@ connect().then(async () => {
     runExpiredArchiveDeletionLoop();
     await sleep(10 * SECONDS);
     runSavedMessageCleanupLoop();
+    await sleep(10 * SECONDS);
+    runExpiredMemberCacheDeletionLoop();
+    await sleep(10 * SECONDS);
+    runMemberCacheDeletionLoop();
 
     if (hasPhishermanMasterAPIKey()) {
       await sleep(10 * SECONDS);
@@ -372,11 +401,6 @@ connect().then(async () => {
       runPhishermanReportingLoop();
     }
   });
-
-  setProfiler(bot.profiler);
-  if (process.env.PROFILING === "true") {
-    enableProfiling();
-  }
 
   let lowestGlobalRemaining = Infinity;
   setInterval(() => {
@@ -408,4 +432,31 @@ connect().then(async () => {
   logger.info("Bot Initialized");
   logger.info("Logging in...");
   await client.login(env.BOT_TOKEN);
+
+  // Don't intercept any signals in DEBUG mode: https://github.com/clinicjs/node-clinic/issues/444#issuecomment-1474997090
+  if (!env.DEBUG) {
+    let stopping = false;
+    const cleanupAndStop = async (code) => {
+      if (stopping) {
+        return;
+      }
+      stopping = true;
+      logger.info("Cleaning up before exit...");
+      // Force exit after 10sec
+      setTimeout(() => process.exit(code), 10 * SECONDS);
+      await bot.stop();
+      await connection.close();
+      logger.info("Done! Exiting now.");
+      process.exit(code);
+    };
+    process.on("beforeExit", () => cleanupAndStop(0));
+    process.on("SIGINT", () => {
+      logger.info("Received SIGINT, exiting...");
+      cleanupAndStop(0);
+    });
+    process.on("SIGTERM", () => {
+      logger.info("Received SIGTERM, exiting...");
+      cleanupAndStop(0);
+    });
+  }
 });

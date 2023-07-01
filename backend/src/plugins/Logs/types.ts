@@ -1,15 +1,14 @@
 import * as t from "io-ts";
+import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import { z } from "zod";
-import { BasePluginType, CooldownManager, typedGuildEventListener } from "knub";
+import { RegExpRunner } from "../../RegExpRunner";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { RegExpRunner } from "../../RegExpRunner";
-import { StrictMessageContent, tMessageContent, tNullable } from "../../utils";
-import { TRegex } from "../../validatorUtils";
 import { LogType } from "../../data/LogType";
-import { GuildMember } from "discord.js";
+import { tMessageContent, tNullable } from "../../utils";
+import { MessageBuffer } from "../../utils/MessageBuffer";
 import {
   TemplateSafeCase,
   TemplateSafeChannel,
@@ -23,12 +22,7 @@ import {
   TemplateSafeUnknownUser,
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects";
-import {
-  TemplateSafeValue,
-  TemplateSafeValueContainer,
-  TypedTemplateSafeValueContainer,
-} from "../../templateFormatter";
-import { MessageBuffer } from "../../utils/MessageBuffer";
+import { TRegex } from "../../validatorUtils";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;
@@ -96,7 +90,7 @@ export interface LogsPluginType extends BasePluginType {
   };
 }
 
-export const logsEvt = typedGuildEventListener<LogsPluginType>();
+export const logsEvt = guildPluginEventListener<LogsPluginType>();
 
 export const LogTypeData = z.object({
   [LogType.MEMBER_WARN]: z.object({
@@ -156,6 +150,7 @@ export const LogTypeData = z.object({
     member: z.instanceof(TemplateSafeMember),
     new: z.string(),
     account_age: z.string(),
+    account_age_ts: z.string(),
   }),
 
   [LogType.MEMBER_LEAVE]: z.object({
@@ -280,7 +275,7 @@ export const LogTypeData = z.object({
   }),
 
   [LogType.STAGE_INSTANCE_UPDATE]: z.object({
-    oldStageInstance: z.instanceof(TemplateSafeStage),
+    oldStageInstance: z.instanceof(TemplateSafeStage).or(z.null()),
     newStageInstance: z.instanceof(TemplateSafeStage),
     stageChannel: z.instanceof(TemplateSafeChannel),
     differenceString: z.string(),

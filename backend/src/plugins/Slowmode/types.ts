@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
@@ -27,5 +27,5 @@ export interface SlowmodePluginType extends BasePluginType {
   };
 }
 
-export const slowmodeCmd = typedGuildCommand<SlowmodePluginType>();
-export const slowmodeEvt = typedGuildEventListener<SlowmodePluginType>();
+export const slowmodeCmd = guildPluginMessageCommand<SlowmodePluginType>();
+export const slowmodeEvt = guildPluginEventListener<SlowmodePluginType>();

@@ -1,10 +1,7 @@
-import { MessageEmbedOptions, Permissions, Role } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { APIEmbed, PermissionFlagsBits, Role } from "discord.js";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
 import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
 import { PERMISSION_NAMES } from "../../../utils/permissionNames.js";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
@@ -13,31 +10,18 @@ export async function getRoleInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   role: Role,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions> {
-  const embed: EmbedWith<"fields"> = {
+): Promise<APIEmbed> {
+  const embed: EmbedWith<"fields" | "author" | "color"> = {
     fields: [],
+    author: {
+      name: `Role:  ${role.name}`,
+      icon_url: MENTION_ICON,
+    },
+    color: role.color,
   };
 
-  embed.author = {
-    name: `Role:  ${role.name}`,
-    icon_url: MENTION_ICON,
-  };
-
-  embed.color = role.color;
-
-  const createdAt = moment.utc(role.createdAt, "x");
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const tzCreatedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
-    : timeAndDate.inGuildTz(createdAt);
-  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const roleAge = humanizeDuration(Date.now() - role.createdTimestamp, {
-    largest: 2,
-    round: true,
-  });
-
-  const rolePerms = role.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-    ? [PERMISSION_NAMES.ADMINISTRATOR]
+  const rolePerms = role.permissions.has(PermissionFlagsBits.Administrator)
+    ? [PERMISSION_NAMES.Administrator]
     : role.permissions.toArray().map((p) => PERMISSION_NAMES[p]);
 
   // -1 because of the @everyone role
@@ -48,7 +32,7 @@ export async function getRoleInfoEmbed(
     value: trimLines(`
       Name: **${role.name}**
       ID: \`${role.id}\`
-      Created: **${roleAge} ago** (\`${prettyCreatedAt}\`)
+      Created: **<t:${Math.round(role.createdTimestamp / 1000)}:R>**
       Position: **${role.position} / ${totalGuildRoles}**
       Color: **#${role.color.toString(16).toUpperCase().padStart(6, "0")}**
       Mentionable: **${role.mentionable ? "Yes" : "No"}**

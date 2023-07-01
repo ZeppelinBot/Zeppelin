@@ -1,7 +1,7 @@
 import { ApiPermissions } from "@shared/apiPermissions";
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { renderUserUsername } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const AddDashboardUserCmd = botControlCmd({
@@ -19,7 +19,7 @@ export const AddDashboardUserCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Server is not using Zeppelin");
+      sendErrorMessage(pluginData, msg.channel, "Server is not using Zeppelin");
       return;
     }
 
@@ -35,10 +35,10 @@ export const AddDashboardUserCmd = botControlCmd({
       await pluginData.state.apiPermissionAssignments.addUser(args.guildId, user.id, [ApiPermissions.EditConfig]);
     }
 
-    const userNameList = args.users.map((user) => `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`);
+    const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`)`);
     sendSuccessMessage(
       pluginData,
-      msg.channel as TextChannel,
+      msg.channel,
       `The following users were given dashboard access for **${guild.name}**:\n\n${userNameList}`,
     );
   },

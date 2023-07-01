@@ -1,12 +1,12 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { GuildMember } from "discord.js";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import moment from "moment-timezone";
 import humanizeDuration from "humanize-duration";
+import { GuildPluginData } from "knub";
+import moment from "moment-timezone";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMemberJoinData {
   member: GuildMember;
@@ -26,6 +26,7 @@ export function logMemberJoin(pluginData: GuildPluginData<LogsPluginType>, data:
       member: memberToTemplateSafeMember(data.member),
       new: data.member.user.createdTimestamp >= newThreshold ? " :new:" : "",
       account_age: accountAge,
+      account_age_ts: Math.round(data.member.user.createdTimestamp / 1000).toString(),
     }),
     {
       userId: data.member.id,

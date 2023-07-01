@@ -19,8 +19,6 @@ export type RemoveApiPermissionEventData = {
   target_id: string;
 };
 
-export type EditConfigEventData = {};
-
 export interface AuditLogEventData extends Record<AuditLogEventType, unknown> {
   ADD_API_PERMISSION: {
     type: ApiPermissionTypes;
@@ -41,7 +39,7 @@ export interface AuditLogEventData extends Record<AuditLogEventType, unknown> {
     target_id: string;
   };
 
-  EDIT_CONFIG: {};
+  EDIT_CONFIG: Record<string, never>;
 }
 
 export type AnyAuditLogEventData = AuditLogEventData[AuditLogEventType];

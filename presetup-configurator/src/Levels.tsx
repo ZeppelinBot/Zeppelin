@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const LEVEL_ADMIN = 100;
 const LEVEL_MODERATOR = 50;

@@ -1,18 +1,14 @@
-import { Guild, Snowflake, User } from "discord.js";
+import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { isDefaultSticker } from "src/utils/isDefaultSticker";
-import { getRepository, Repository } from "typeorm";
-import { renderTemplate, TemplateSafeValueContainer } from "../templateFormatter";
-import { trimLines } from "../utils";
+import { Repository, getRepository } from "typeorm";
+import { TemplateSafeValueContainer, renderTemplate } from "../templateFormatter";
+import { renderUsername, trimLines } from "../utils";
+import { decrypt, encrypt } from "../utils/crypt";
+import { channelToTemplateSafeChannel, guildToTemplateSafeGuild } from "../utils/templateSafeObjects";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
-import {
-  channelToTemplateSafeChannel,
-  guildToTemplateSafeGuild,
-  userToTemplateSafeUser,
-} from "../utils/templateSafeObjects";
 import { SavedMessage } from "./entities/SavedMessage";
-import { decrypt, encrypt } from "../utils/crypt";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
@@ -20,7 +16,7 @@ const MESSAGE_ARCHIVE_HEADER_FORMAT = trimLines(`
   Server: {guild.name} ({guild.id})
 `);
 const MESSAGE_ARCHIVE_MESSAGE_FORMAT =
-  "[#{channel.name}] [{user.id}] [{timestamp}] {user.username}#{user.discriminator}: {content}{attachments}{stickers}";
+  "[#{channel.name}] [{user.id}] [{timestamp}] {username}: {content}{attachments}{stickers}";
 
 export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
   protected archives: Repository<ArchiveEntry>;
@@ -101,6 +97,7 @@ export class GuildArchives extends BaseGuildRepository<ArchiveEntry> {
           }),
           user: partialUser,
           channel: channel ? channelToTemplateSafeChannel(channel) : null,
+          username: renderUsername(msg.data.author.username, msg.data.author.discriminator),
         }),
       );
 

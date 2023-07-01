@@ -1,11 +1,11 @@
+import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { UnknownUser } from "../../../utils";
-import { User } from "discord.js";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogDmFailedData {
   source: string;

@@ -1,9 +1,13 @@
-import { GuildFeature, ThreadAutoArchiveDuration } from "discord-api-types/v9";
-import { TextChannel } from "discord.js";
+import {
+  ChannelType,
+  GuildFeature,
+  GuildTextThreadCreateOptions,
+  ThreadAutoArchiveDuration,
+  ThreadChannel,
+} from "discord.js";
 import * as t from "io-ts";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { ChannelTypeStrings } from "../../../types";
-import { convertDelayStringToMS, MINUTES, noop, tDelayString, tNullable } from "../../../utils";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { MINUTES, convertDelayStringToMS, noop, tDelayString, tNullable } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { automodAction } from "../helpers";
 
@@ -27,17 +31,16 @@ export const StartThreadAction = automodAction({
     limit_per_channel: 5,
   },
 
-  async apply({ pluginData, contexts, actionConfig, ruleName }) {
+  async apply({ pluginData, contexts, actionConfig }) {
     // check if the message still exists, we don't want to create threads for deleted messages
     const threads = contexts.filter((c) => {
       if (!c.message || !c.user) return false;
       const channel = pluginData.guild.channels.cache.get(c.message.channel_id);
-      if (channel?.type !== ChannelTypeStrings.TEXT || !channel.isText()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
+      if (channel?.type !== ChannelType.GuildText || !channel.isTextBased()) return false; // for some reason the typing here for channel.type defaults to ThreadChannelTypes (?)
       // check against max threads per channel
       if (actionConfig.limit_per_channel && actionConfig.limit_per_channel > 0) {
         const threadCount = channel.threads.cache.filter(
-          (tr) =>
-            tr.ownerId === pluginData.client.user!.id && !tr.deleted && !tr.archived && tr.parentId === channel.id,
+          (tr) => tr.ownerId === pluginData.client.user!.id && !tr.archived && tr.parentId === channel.id,
         ).size;
         if (threadCount >= actionConfig.limit_per_channel) return false;
       }
@@ -53,7 +56,9 @@ export const StartThreadAction = automodAction({
       : ThreadAutoArchiveDuration.OneHour;
 
     for (const threadContext of threads) {
-      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id) as TextChannel;
+      const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id);
+      if (!channel || !("threads" in channel) || channel.type === ChannelType.GuildForum) continue;
+
       const renderThreadName = async (str: string) =>
         renderTemplate(
           str,
@@ -62,21 +67,36 @@ export const StartThreadAction = automodAction({
             msg: savedMessageToTemplateSafeSavedMessage(threadContext.message!),
           }),
         );
-      const threadName = await renderThreadName(actionConfig.name ?? "{user.tag}s thread");
-      const thread = await channel.threads
-        .create({
-          name: threadName,
-          autoArchiveDuration: autoArchive,
-          type:
-            actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-              ? ChannelTypeStrings.PRIVATE_THREAD
-              : ChannelTypeStrings.PUBLIC_THREAD,
-          startMessage:
-            !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-              ? threadContext.message!.id
-              : undefined,
-        })
-        .catch(noop);
+      const threadName = await renderThreadName(actionConfig.name ?? "{user.renderedUsername}'s thread");
+      const threadOptions: GuildTextThreadCreateOptions<unknown> = {
+        name: threadName,
+        autoArchiveDuration: autoArchive,
+        startMessage:
+          !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
+            ? threadContext.message!.id
+            : undefined,
+      };
+
+      let thread: ThreadChannel | undefined;
+      if (channel.type === ChannelType.GuildNews) {
+        thread = await channel.threads
+          .create({
+            ...threadOptions,
+            type: ChannelType.AnnouncementThread,
+          })
+          .catch(() => undefined);
+      } else {
+        thread = await channel.threads
+          .create({
+            ...threadOptions,
+            type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
+            startMessage:
+              !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
+                ? threadContext.message!.id
+                : undefined,
+          })
+          .catch(() => undefined);
+      }
       if (actionConfig.slowmode && thread) {
         const dur = Math.ceil(Math.max(convertDelayStringToMS(actionConfig.slowmode) ?? 0, 0) / 1000);
         if (dur > 0) {

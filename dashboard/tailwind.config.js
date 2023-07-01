@@ -21,4 +21,8 @@ module.exports = {
   },
   variants: {},
   plugins: [],
+  purge: ["./src/**/*.{html,vue}"],
+  future: {
+    purgeLayersByDefault: true,
+  },
 };

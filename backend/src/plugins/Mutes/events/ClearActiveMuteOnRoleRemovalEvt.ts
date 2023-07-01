@@ -6,7 +6,7 @@ import { mutesEvt } from "../types";
  */
 export const ClearActiveMuteOnRoleRemovalEvt = mutesEvt({
   event: "guildMemberUpdate",
-  async listener({ pluginData, args: { oldMember, newMember: member } }) {
+  async listener({ pluginData, args: { newMember: member } }) {
     const muteRole = pluginData.config.get().mute_role;
     if (!muteRole) return;
 

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# This wrapper script is used for two purposes:
-# 1. Waiting for the prepare_backend container to finish before starting (see https://github.com/docker/compose/issues/5007#issuecomment-335815508)
-# 2. Forwarding signals to the app (see https://unix.stackexchange.com/a/196053)
+# This wrapper script is used to run different things based on the DEBUG env variable
+# Exec is used to forward signals: https://unix.stackexchange.com/a/196053
 
-# Wait for the backend preparations to finish before continuing
-echo "Waiting for prepare_backend to finish before starting the bot..."
-while ping -c1 prepare_backend &>/dev/null; do sleep 1; done;
-
-echo "Starting the bot"
 cd /zeppelin/backend
-exec npm run start-bot-prod
+if [ "$DEBUG" == "true" ]; then
+  echo "DEBUG MODE: Starting bot container without starting the bot"
+  exec tail -f /dev/null
+else
+  echo "Starting bot"
+  exec npm run start-bot-prod
+fi

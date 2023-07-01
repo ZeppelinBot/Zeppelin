@@ -1,20 +1,18 @@
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema, RoleButtonsPluginType } from "./types";
-import { mapToPublicFn } from "../../pluginUtils";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
+import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { StrictValidationError } from "../../validatorUtils";
+import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { resetButtonsCmd } from "./commands/resetButtons";
 import { onButtonInteraction } from "./events/buttonInteraction";
-import { pluginInfo } from "./info";
+import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { createButtonComponents } from "./functions/createButtonComponents";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError";
-import { resetButtonsCmd } from "./commands/resetButtons";
+import { pluginInfo } from "./info";
+import { ConfigSchema, RoleButtonsPluginType } from "./types";
 
 export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
-  configSchema: ConfigSchema,
   info: pluginInfo,
   showInDocs: true,
 
@@ -33,11 +31,10 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
     ],
   },
 
-  configPreprocessor(options) {
+  configParser(input) {
     // Auto-fill "name" property for buttons based on the object key
-    const buttonsArray = Array.isArray(options.config?.buttons) ? options.config.buttons : [];
     const seenMessages = new Set();
-    for (const [name, buttonsConfig] of Object.entries(options.config?.buttons ?? {})) {
+    for (const [name, buttonsConfig] of Object.entries<any>((input as any).buttons ?? {})) {
       if (name.length > 16) {
         throw new StrictValidationError(["Name for role buttons can be at most 16 characters long"]);
       }
@@ -67,14 +64,14 @@ export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
       }
     }
 
-    return options;
+    return parseIoTsSchema(ConfigSchema, input);
   },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],
 
   events: [onButtonInteraction],
 
-  commands: [resetButtonsCmd],
+  messageCommands: [resetButtonsCmd],
 
   beforeLoad(pluginData) {
     pluginData.state.roleButtons = GuildRoleButtons.getGuildInstance(pluginData.guild.id);

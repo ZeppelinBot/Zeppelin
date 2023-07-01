@@ -1,7 +1,6 @@
-import { TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveUser } from "../../../utils";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { renderUserUsername, resolveUser } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const ListDashboardUsersCmd = botControlCmd({
@@ -15,7 +14,7 @@ export const ListDashboardUsersCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Server is not using Zeppelin");
+      sendErrorMessage(pluginData, msg.channel, "Server is not using Zeppelin");
       return;
     }
 
@@ -28,12 +27,12 @@ export const ListDashboardUsersCmd = botControlCmd({
     );
     const userNameList = users.map(
       ({ user, permission }) =>
-        `<@!${user.id}> (**${user.tag}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
+        `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
     );
 
     sendSuccessMessage(
       pluginData,
-      msg.channel as TextChannel,
+      msg.channel,
       `The following users have dashboard access for **${guild.name}**:\n\n${userNameList.join("\n")}`,
       {},
     );

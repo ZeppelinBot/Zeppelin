@@ -1,11 +1,11 @@
 import * as t from "io-ts";
-import { BasePluginType, typedGuildCommand, typedGuildEventListener } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { RegExpRunner } from "../../RegExpRunner";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { RegExpRunner } from "../../RegExpRunner";
 
 export const ConfigSchema = t.type({
   can_roles: t.boolean,
@@ -52,5 +52,5 @@ export interface UtilityPluginType extends BasePluginType {
   };
 }
 
-export const utilityCmd = typedGuildCommand<UtilityPluginType>();
-export const utilityEvt = typedGuildEventListener<UtilityPluginType>();
+export const utilityCmd = guildPluginMessageCommand<UtilityPluginType>();
+export const utilityEvt = guildPluginEventListener<UtilityPluginType>();

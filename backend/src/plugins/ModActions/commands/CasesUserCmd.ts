@@ -1,9 +1,9 @@
-import { MessageEmbedOptions, User } from "discord.js";
+import { APIEmbed, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { chunkArray, emptyEmbedValue, resolveUser, trimLines, UnknownUser } from "../../../utils";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
+import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
@@ -61,7 +61,8 @@ export const CasesUserCmd = modActionsCmd({
     const normalCases = cases.filter((c) => !c.is_hidden);
     const hiddenCases = cases.filter((c) => c.is_hidden);
 
-    const userName = user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : user.tag;
+    const userName =
+      user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUserUsername(user);
 
     if (cases.length === 0) {
       msg.channel.send(`No cases found for **${userName}**`);
@@ -116,7 +117,7 @@ export const CasesUserCmd = modActionsCmd({
           const chunkStart = i * linesPerChunk + 1;
           const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
 
-          const embed: MessageEmbedOptions = {
+          const embed = {
             author: {
               name:
                 lineChunks.length === 1
@@ -128,7 +129,7 @@ export const CasesUserCmd = modActionsCmd({
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
               ...(isLastChunk ? [footerField] : []),
             ],
-          };
+          } satisfies APIEmbed;
 
           msg.channel.send({ embeds: [embed] });
         }

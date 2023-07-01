@@ -97,6 +97,7 @@ test("Supports base values in renderTemplate", async (t) => {
 });
 
 test("Edge case #1", async (t) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const result = await renderTemplate("{foo} {bar()}");
   // No "Unclosed function" exception = success
   t.pass();

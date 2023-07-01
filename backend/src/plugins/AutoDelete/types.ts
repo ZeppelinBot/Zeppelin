@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { SavedMessage } from "../../data/entities/SavedMessage";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { SavedMessage } from "../../data/entities/SavedMessage";
 import { MINUTES, tDelayString } from "../../utils";
 import Timeout = NodeJS.Timeout;
 

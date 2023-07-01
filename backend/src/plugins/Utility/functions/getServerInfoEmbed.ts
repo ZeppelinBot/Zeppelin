@@ -1,36 +1,32 @@
-import { MessageEmbedOptions, PremiumTier, Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { APIEmbed, ChannelType, GuildPremiumTier, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import moment from "moment-timezone";
-import { ChannelTypeStrings } from "../../../types";
 import {
   EmbedWith,
+  MINUTES,
   formatNumber,
   inviteHasCounts,
   memoize,
-  MINUTES,
   preEmbedPadding,
+  renderUsername,
   resolveInvite,
   resolveUser,
   trimLines,
 } from "../../../utils";
 import { idToTimestamp } from "../../../utils/idToTimestamp";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 import { getGuildPreview } from "./getGuildPreview";
 
-const PremiumTiers: Record<PremiumTier, number> = {
-  NONE: 0,
-  TIER_1: 1,
-  TIER_2: 2,
-  TIER_3: 3,
-};
+const prettifyFeature = (feature: string): string =>
+  `\`${feature
+    .split("_")
+    .map((e) => `${e.substring(0, 1).toUpperCase()}${e.substring(1).toLowerCase()}`)
+    .join(" ")}\``;
 
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
   requestMemberId?: string,
-): Promise<MessageEmbedOptions | null> {
+): Promise<APIEmbed | null> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([
     thisServer
@@ -54,46 +50,34 @@ export async function getServerInfoEmbed(
 
   embed.author = {
     name: `Server:  ${(guildPreview || restGuild)!.name}`,
-    iconURL: (guildPreview || restGuild)!.iconURL() ?? undefined,
+    icon_url: (guildPreview || restGuild)!.iconURL() ?? undefined,
   };
 
   // BASIC INFORMATION
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-  const createdAt = moment.utc(idToTimestamp((guildPreview || restGuild)!.id)!, "x");
-  const tzCreatedAt = requestMemberId
-    ? await timeAndDate.inMemberTz(requestMemberId, createdAt)
-    : timeAndDate.inGuildTz(createdAt);
-  const prettyCreatedAt = tzCreatedAt.format(timeAndDate.getDateFormat("pretty_datetime"));
-  const serverAge = humanizeDuration(moment.utc().valueOf() - createdAt.valueOf(), {
-    largest: 2,
-    round: true,
-  });
+  const createdAtTs = Number(idToTimestamp((guildPreview || restGuild)!.id)!);
 
   const basicInformation: string[] = [];
-  basicInformation.push(`Created: **${serverAge} ago** (\`${prettyCreatedAt}\`)`);
+  basicInformation.push(`Created: **<t:${Math.round(createdAtTs / 1000)}:R>**`);
 
   if (thisServer) {
     const owner = await resolveUser(pluginData.client, thisServer.ownerId);
-    const ownerName = owner.tag;
+    const ownerName = renderUsername(owner.username, owner.discriminator);
 
     basicInformation.push(`Owner: **${ownerName}** (\`${thisServer.ownerId}\`)`);
     // basicInformation.push(`Voice region: **${thisServer.region}**`); Outdated, as automatic voice regions are fully live
   }
 
   if (features.length > 0) {
-    basicInformation.push(`Features: ${features.join(", ")}`);
+    basicInformation.push(`Features: ${features.map(prettifyFeature).join(", ")}`);
   }
 
-  embed.fields.push({
-    name: preEmbedPadding + "Basic information",
-    value: basicInformation.join("\n"),
-  });
+  embed.description = `${preEmbedPadding}**Basic Information**\n${basicInformation.join("\n")}`;
 
   // IMAGE LINKS
-  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL({ dynamic: true, format: "png", size: 2048 })})`;
-  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL({ format: "png", size: 2048 })})` : "None";
+  const iconUrl = `[Link](${(restGuild || guildPreview)!.iconURL()})`;
+  const bannerUrl = restGuild?.banner ? `[Link](${restGuild.bannerURL()})` : "None";
   const splashUrl = (restGuild || guildPreview)!.splash
-    ? `[Link](${(restGuild || guildPreview)!.splashURL({ format: "png", size: 2048 })})`
+    ? `[Link](${(restGuild || guildPreview)!.splashURL()})`
     : "None";
 
   embed.fields.push(
@@ -161,10 +145,21 @@ export async function getServerInfoEmbed(
 
   // CHANNEL COUNTS
   if (thisServer) {
-    const totalChannels = thisServer.channels.cache.size;
-    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.CATEGORY);
-    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.TEXT);
-    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelTypeStrings.VOICE);
+    const categories = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildCategory);
+    const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
+    const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
+    const forumChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildForum);
+    const threadChannelsText = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type !== ChannelType.GuildForum,
+    );
+    const threadChannelsForums = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type === ChannelType.GuildForum,
+    );
+    const announcementChannels = thisServer.channels.cache.filter(
+      (channel) => channel.type === ChannelType.GuildAnnouncement,
+    );
+    const stageChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildStageVoice);
+    const totalChannels = thisServer.channels.cache.filter((channel) => !channel.isThread()).size;
 
     embed.fields.push({
       name: preEmbedPadding + "Channels",
@@ -172,8 +167,11 @@ export async function getServerInfoEmbed(
       value: trimLines(`
           Total: **${totalChannels}** / 500
           Categories: **${categories.size}**
-          Text: **${textChannels.size}**
+          Text: **${textChannels.size}** (**${threadChannelsText.size} threads**)
+          Forums: **${forumChannels.size}** (**${threadChannelsForums.size} threads**)
+          Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
+          Stage: **${stageChannels.size}**
         `),
     });
   }
@@ -185,34 +183,46 @@ export async function getServerInfoEmbed(
     otherStats.push(`Roles: **${thisServer.roles.cache.size}** / 250`);
   }
 
-  if (restGuild) {
-    const premiumTierValue = PremiumTiers[restGuild.premiumTier];
+  const roleLockedEmojis =
+    (restGuild
+      ? restGuild?.emojis?.cache.filter((e) => e.roles.cache.size)
+      : guildPreview?.emojis.filter((e) => e.roles.length)
+    )?.size ?? 0;
 
+  if (restGuild) {
     const maxEmojis =
       {
-        0: 50,
-        1: 100,
-        2: 150,
-        3: 250,
-      }[premiumTierValue] ?? 50;
+        [GuildPremiumTier.None]: 50,
+        [GuildPremiumTier.Tier1]: 100,
+        [GuildPremiumTier.Tier2]: 150,
+        [GuildPremiumTier.Tier3]: 250,
+      }[restGuild.premiumTier] ?? 50;
     const maxStickers =
       {
-        0: 0,
-        1: 15,
-        2: 30,
-        3: 60,
-      }[premiumTierValue] ?? 0;
+        [GuildPremiumTier.None]: 0,
+        [GuildPremiumTier.Tier1]: 15,
+        [GuildPremiumTier.Tier2]: 30,
+        [GuildPremiumTier.Tier3]: 60,
+      }[restGuild.premiumTier] ?? 0;
 
-    otherStats.push(`Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}`);
+    otherStats.push(
+      `Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}${
+        roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""
+      }`,
+    );
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
   } else {
-    otherStats.push(`Emojis: **${guildPreview!.emojis.size}**`);
+    otherStats.push(
+      `Emojis: **${guildPreview!.emojis.size}**${roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""}`,
+    );
     // otherStats.push(`Stickers: **${guildPreview!.stickers.size}**`); Wait on DJS
   }
 
   if (thisServer) {
     otherStats.push(
-      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}** (level ${PremiumTiers[thisServer.premiumTier]})`,
+      `Boosts: **${thisServer.premiumSubscriptionCount ?? 0}**${
+        thisServer.premiumTier ? ` (level ${thisServer.premiumTier})` : ""
+      }`,
     );
   }
 

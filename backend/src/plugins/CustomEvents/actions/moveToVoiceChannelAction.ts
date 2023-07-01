@@ -2,7 +2,7 @@ import { Snowflake, VoiceChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
 import { canActOn } from "../../../pluginUtils";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { resolveMember } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";

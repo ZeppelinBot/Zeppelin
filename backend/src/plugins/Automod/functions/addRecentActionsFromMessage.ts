@@ -1,13 +1,12 @@
 import { GuildPluginData } from "knub";
 import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
-import { RecentActionType, RECENT_ACTION_EXPIRY_TIME } from "../constants";
+import { RecentActionType } from "../constants";
 import { AutomodContext, AutomodPluginType } from "../types";
 
 export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const message = context.message!;
   const globalIdentifier = message.user_id;
   const perChannelIdentifier = `${message.channel_id}-${message.user_id}`;
-  const expiresAt = Date.now() + RECENT_ACTION_EXPIRY_TIME;
 
   pluginData.state.recentActions.push({
     context,

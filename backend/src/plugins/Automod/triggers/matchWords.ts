@@ -1,4 +1,3 @@
-import { Util } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import * as t from "io-ts";
 import { normalizeText } from "../../../utils/normalizeText";

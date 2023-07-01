@@ -1,5 +1,6 @@
-import { Profiler } from "knub/dist/Profiler";
+import type { Knub } from "knub";
 
+type Profiler = Knub["profiler"];
 let profiler: Profiler | null = null;
 
 export function getProfiler() {

@@ -1,8 +1,8 @@
-import path from "path";
-import fs from "fs";
 import dotenv from "dotenv";
-import { rootDir } from "./paths";
+import fs from "fs";
+import path from "path";
 import { z } from "zod";
+import { rootDir } from "./paths";
 
 const envType = z.object({
   KEY: z.string().length(32),
@@ -50,13 +50,18 @@ const envType = z.object({
   DB_USER: z.string().optional().default("zeppelin"),
   DB_PASSWORD: z.string().optional(), // Default is set to DOCKER_MYSQL_PASSWORD further below
   DB_DATABASE: z.string().optional().default("zeppelin"),
+
+  DEBUG: z
+    .string()
+    .optional()
+    .transform((str) => str === "true"),
 });
 
-let toValidate = {};
+let toValidate = { ...process.env };
 const envPath = path.join(rootDir, ".env");
 if (fs.existsSync(envPath)) {
   const buf = fs.readFileSync(envPath);
-  toValidate = dotenv.parse(buf);
+  toValidate = { ...toValidate, ...dotenv.parse(buf) };
 }
 
 export const env = envType.parse(toValidate);

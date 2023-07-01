@@ -1,11 +1,11 @@
-import { Permissions } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 
 const permissionNumberToName: Map<bigint, string> = new Map();
 const ignoredPermissionConstants = ["all", "allGuild", "allText", "allVoice"];
 
-for (const key in Permissions.FLAGS) {
+for (const key in PermissionsBitField.Flags) {
   if (ignoredPermissionConstants.includes(key)) continue;
-  permissionNumberToName.set(BigInt(Permissions.FLAGS[key]), key);
+  permissionNumberToName.set(BigInt(PermissionsBitField.Flags[key]), key);
 }
 
 /**

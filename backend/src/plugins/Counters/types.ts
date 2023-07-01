@@ -1,8 +1,8 @@
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { CounterTrigger } from "../../data/entities/CounterTrigger";
 import { GuildCounters } from "../../data/GuildCounters";
+import { CounterTrigger } from "../../data/entities/CounterTrigger";
 import { tDelayString, tNullable } from "../../utils";
 import Timeout = NodeJS.Timeout;
 

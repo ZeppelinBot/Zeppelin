@@ -1,4 +1,4 @@
-import { Snowflake, TextChannel } from "discord.js";
+import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import * as t from "io-ts";
 import { LogType } from "../../../data/LogType";
 import { noop } from "../../../utils";
@@ -32,7 +32,7 @@ export const CleanAction = automodAction({
         pluginData.state.logs.ignoreLog(LogType.MESSAGE_DELETE, id);
       }
 
-      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as TextChannel;
+      const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;
       await channel.bulkDelete(messageIds as Snowflake[]).catch(noop);
     }
   },

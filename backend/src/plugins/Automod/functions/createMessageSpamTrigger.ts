@@ -14,7 +14,6 @@ const MessageSpamTriggerConfig = t.type({
   within: tDelayString,
   per_channel: tNullable(t.boolean),
 });
-type TMessageSpamTriggerConfig = t.TypeOf<typeof MessageSpamTriggerConfig>;
 
 interface TMessageSpamMatchResultType {
   archiveId: string;
