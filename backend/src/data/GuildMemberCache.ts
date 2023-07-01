@@ -1,8 +1,9 @@
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Blocker } from "../Blocker";
 import { DBDateFormat, MINUTES } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
+import { dataSource } from "./dataSource";
 import { MemberCacheItem } from "./entities/MemberCacheItem";
 
 const SAVE_PENDING_BLOCKER_KEY = "save-pending" as const;
@@ -20,7 +21,7 @@ export class GuildMemberCache extends BaseGuildRepository {
 
   constructor(guildId: string) {
     super(guildId);
-    this.#memberCache = getRepository(MemberCacheItem);
+    this.#memberCache = dataSource.getRepository(MemberCacheItem);
     this.#pendingUpdates = new Map();
     this.#blocker = new Blocker();
   }

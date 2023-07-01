@@ -1,33 +1,15 @@
-import path from "path";
-import { Connection, createConnection } from "typeorm";
 import { SimpleError } from "../SimpleError";
-import { backendDir } from "../paths";
-import { QueryLogger } from "./queryLogger";
+import { dataSource } from "./dataSource";
 
-const ormconfigPath = path.join(backendDir, "ormconfig.js");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const connectionOptions = require(ormconfigPath);
-
-let connectionPromise: Promise<Connection>;
-
-export let connection: Connection;
+let connectionPromise: Promise<void>;
 
 export function connect() {
   if (!connectionPromise) {
-    connectionPromise = createConnection({
-      ...(connectionOptions as any),
-      logging: ["query", "error"],
-      logger: new QueryLogger(),
-    }).then((newConnection) => {
-      // Verify the DB timezone is set to UTC
-      return newConnection.query("SELECT TIMEDIFF(NOW(), UTC_TIMESTAMP) AS tz").then((r) => {
-        if (r[0].tz !== "00:00:00") {
-          throw new SimpleError(`Database timezone must be UTC (detected ${r[0].tz})`);
-        }
-
-        connection = newConnection;
-        return newConnection;
-      });
+    connectionPromise = dataSource.initialize().then(async (initializedDataSource) => {
+      const tzResult = await initializedDataSource.query("SELECT TIMEDIFF(NOW(), UTC_TIMESTAMP) AS tz");
+      if (tzResult[0].tz !== "00:00:00") {
+        throw new SimpleError(`Database timezone must be UTC (detected ${tzResult[0].tz})`);
+      }
     });
   }
 

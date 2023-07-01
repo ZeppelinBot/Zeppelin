@@ -1,8 +1,9 @@
 import crypto from "crypto";
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { env } from "../env";
 import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
+import { dataSource } from "./dataSource";
 import { PhishermanCacheEntry } from "./entities/PhishermanCacheEntry";
 import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry";
 import { PhishermanDomainInfo, PhishermanUnknownDomain } from "./types/phisherman";
@@ -39,7 +40,7 @@ const KEY_VALIDITY_LIFETIME = 24 * HOURS;
 let cacheRepository: Repository<PhishermanCacheEntry> | null = null;
 function getCacheRepository(): Repository<PhishermanCacheEntry> {
   if (cacheRepository == null) {
-    cacheRepository = getRepository(PhishermanCacheEntry);
+    cacheRepository = dataSource.getRepository(PhishermanCacheEntry);
   }
   return cacheRepository;
 }
@@ -47,7 +48,7 @@ function getCacheRepository(): Repository<PhishermanCacheEntry> {
 let keyCacheRepository: Repository<PhishermanKeyCacheEntry> | null = null;
 function getKeyCacheRepository(): Repository<PhishermanKeyCacheEntry> {
   if (keyCacheRepository == null) {
-    keyCacheRepository = getRepository(PhishermanKeyCacheEntry);
+    keyCacheRepository = dataSource.getRepository(PhishermanKeyCacheEntry);
   }
   return keyCacheRepository;
 }
@@ -153,7 +154,9 @@ export async function getPhishermanDomainInfo(domain: string): Promise<Phisherma
     }
 
     const dbCache = getCacheRepository();
-    const existingCachedEntry = await dbCache.findOne({ domain });
+    const existingCachedEntry = await dbCache.findOne({
+      where: { domain },
+    });
     if (existingCachedEntry) {
       return existingCachedEntry.data;
     }
@@ -196,7 +199,9 @@ export async function phishermanApiKeyIsValid(apiKey: string): Promise<boolean> 
 
   const keyCache = getKeyCacheRepository();
   const hash = crypto.createHash("sha256").update(apiKey).digest("hex");
-  const entry = await keyCache.findOne({ hash });
+  const entry = await keyCache.findOne({
+    where: { hash },
+  });
   if (entry) {
     return entry.is_valid;
   }

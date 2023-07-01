@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 // tslint:disable-next-line:no-submodule-imports
 import uuidv4 from "uuid/v4";
 import { DAYS, DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
+import { dataSource } from "./dataSource";
 import { ApiLogin } from "./entities/ApiLogin";
 
 const LOGIN_EXPIRY_TIME = 1 * DAYS;
@@ -14,7 +15,7 @@ export class ApiLogins extends BaseRepository {
 
   constructor() {
     super();
-    this.apiLogins = getRepository(ApiLogin);
+    this.apiLogins = dataSource.getRepository(ApiLogin);
   }
 
   async getUserIdByApiKey(apiKey: string): Promise<string | null> {

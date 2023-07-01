@@ -25,6 +25,7 @@ import { Configs } from "./data/Configs";
 import { GuildLogs } from "./data/GuildLogs";
 import { LogType } from "./data/LogType";
 import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
+import { dataSource } from "./data/dataSource";
 import { connect } from "./data/db";
 import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
 import { runExpiredMemberCacheDeletionLoop } from "./data/loops/expiredMemberCacheDeletionLoop";
@@ -445,7 +446,7 @@ connect().then(async (connection) => {
       // Force exit after 10sec
       setTimeout(() => process.exit(code), 10 * SECONDS);
       await bot.stop();
-      await connection.close();
+      await dataSource.destroy();
       logger.info("Done! Exiting now.");
       process.exit(code);
     };

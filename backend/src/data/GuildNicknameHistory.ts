@@ -1,8 +1,9 @@
-import { getRepository, In, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { isAPI } from "../globals";
 import { MINUTES, SECONDS } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { cleanupNicknames } from "./cleanup/nicknames";
+import { dataSource } from "./dataSource";
 import { NicknameHistoryEntry } from "./entities/NicknameHistoryEntry";
 
 const CLEANUP_INTERVAL = 5 * MINUTES;
@@ -25,7 +26,7 @@ export class GuildNicknameHistory extends BaseGuildRepository {
 
   constructor(guildId) {
     super(guildId);
-    this.nicknameHistory = getRepository(NicknameHistoryEntry);
+    this.nicknameHistory = dataSource.getRepository(NicknameHistoryEntry);
   }
 
   async getByUserId(userId): Promise<NicknameHistoryEntry[]> {
@@ -40,7 +41,7 @@ export class GuildNicknameHistory extends BaseGuildRepository {
     });
   }
 
-  getLastEntry(userId): Promise<NicknameHistoryEntry | undefined> {
+  getLastEntry(userId): Promise<NicknameHistoryEntry | null> {
     return this.nicknameHistory.findOne({
       where: {
         guild_id: this.guildId,

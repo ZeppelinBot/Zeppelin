@@ -1,7 +1,8 @@
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
+import { dataSource } from "./dataSource";
 import { ScheduledPost } from "./entities/ScheduledPost";
 
 export class ScheduledPosts extends BaseRepository {
@@ -9,7 +10,7 @@ export class ScheduledPosts extends BaseRepository {
 
   constructor() {
     super();
-    this.scheduledPosts = getRepository(ScheduledPost);
+    this.scheduledPosts = dataSource.getRepository(ScheduledPost);
   }
 
   getScheduledPostsDueSoon(threshold: number): Promise<ScheduledPost[]> {

@@ -1,13 +1,13 @@
 import moment from "moment-timezone";
-import { getRepository, In } from "typeorm";
+import { In } from "typeorm";
 import { DBDateFormat } from "../../utils";
-import { connection } from "../db";
+import { dataSource } from "../dataSource";
 import { Config } from "../entities/Config";
 
 const CLEAN_PER_LOOP = 50;
 
 export async function cleanupConfigs() {
-  const configRepository = getRepository(Config);
+  const configRepository = dataSource.getRepository(Config);
 
   // FIXME: The query below doesn't work on MySQL 8.0. Pending an update.
   return;
@@ -18,7 +18,7 @@ export async function cleanupConfigs() {
   // >1 month old: 1 config retained per month
   const oneMonthCutoff = moment.utc().subtract(30, "days").format(DBDateFormat);
   do {
-    rows = await connection.query(
+    rows = await dataSource.query(
       `
       WITH _configs
       AS (
@@ -56,7 +56,7 @@ export async function cleanupConfigs() {
   // >2 weeks old: 1 config retained per day
   const twoWeekCutoff = moment.utc().subtract(2, "weeks").format(DBDateFormat);
   do {
-    rows = await connection.query(
+    rows = await dataSource.query(
       `
       WITH _configs
       AS (

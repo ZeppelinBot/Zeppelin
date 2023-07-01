@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
-import { getRepository, In } from "typeorm";
+import { In } from "typeorm";
 import { DAYS, DBDateFormat } from "../../utils";
-import { connection } from "../db";
+import { dataSource } from "../dataSource";
 import { UsernameHistoryEntry } from "../entities/UsernameHistoryEntry";
 
 export const USERNAME_RETENTION_PERIOD = 30 * DAYS;
@@ -10,13 +10,13 @@ const CLEAN_PER_LOOP = 500;
 export async function cleanupUsernames(): Promise<number> {
   let cleaned = 0;
 
-  const usernameHistoryRepository = getRepository(UsernameHistoryEntry);
+  const usernameHistoryRepository = dataSource.getRepository(UsernameHistoryEntry);
   const dateThreshold = moment.utc().subtract(USERNAME_RETENTION_PERIOD, "ms").format(DBDateFormat);
 
   // Clean old usernames (USERNAME_RETENTION_PERIOD)
   let rows;
   do {
-    rows = await connection.query(
+    rows = await dataSource.query(
       `
       SELECT id
       FROM username_history

@@ -1,5 +1,6 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
+import { dataSource } from "./dataSource";
 import { PersistedData } from "./entities/PersistedData";
 
 export class GuildPersistedData extends BaseGuildRepository {
@@ -7,7 +8,7 @@ export class GuildPersistedData extends BaseGuildRepository {
 
   constructor(guildId) {
     super(guildId);
-    this.persistedData = getRepository(PersistedData);
+    this.persistedData = dataSource.getRepository(PersistedData);
   }
 
   async find(userId: string) {
