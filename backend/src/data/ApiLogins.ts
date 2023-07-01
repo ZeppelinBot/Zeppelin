@@ -2,7 +2,7 @@ import crypto from "crypto";
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
 // tslint:disable-next-line:no-submodule-imports
-import uuidv4 from "uuid/v4";
+import { v4 as uuidv4 } from "uuid";
 import { DAYS, DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
 import { dataSource } from "./dataSource";

@@ -8,7 +8,7 @@ import {
   MessageCreateOptions,
 } from "discord.js";
 import moment from "moment";
-import uuidv4 from "uuid/v4";
+import { v4 as uuidv4 } from "uuid";
 import { noop } from "../utils";
 
 export async function waitForButtonConfirm(
