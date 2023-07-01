@@ -20,7 +20,9 @@ export const TagListCmd = tagsCmd({
 
     const prefix = (await pluginData.config.getForMessage(msg)).prefix;
     const tagNames = tags.map((tag) => tag.tag).sort();
-    const searchRegex = args.search ? new RegExp([...args.search].map((s) => escapeStringRegexp(s)).join(".*"), "i") : null;
+    const searchRegex = args.search
+      ? new RegExp([...args.search].map((s) => escapeStringRegexp(s)).join(".*"), "i")
+      : null;
 
     const filteredTags = args.search ? tagNames.filter((tag) => searchRegex!.test(tag)) : tagNames;
 
