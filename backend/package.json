@@ -70,7 +70,7 @@
     "tmp": "0.0.33",
     "tsconfig-paths": "^3.9.0",
     "twemoji": "^12.1.4",
-    "typeorm": "^0.2.31",
+    "typeorm": "^0.3.17",
     "utf-8-validate": "^5.0.5",
     "uuid": "^3.3.2",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
