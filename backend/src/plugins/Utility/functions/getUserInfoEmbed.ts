@@ -9,6 +9,7 @@ import {
   resolveMember,
   resolveUser,
   sorter,
+  trimEmptyLines,
   trimLines,
   UnknownUser,
 } from "../../../utils";
@@ -98,10 +99,12 @@ export async function getUserInfoEmbed(
     if (voiceChannel || member.voice.mute || member.voice.deaf) {
       embed.fields.push({
         name: preEmbedPadding + "Voice information",
-        value: trimLines(`
+        value: trimEmptyLines(`
           ${voiceChannel ? `Current voice channel: **${voiceChannel.name ?? "None"}**` : ""}
-          ${member.voice.mute ? "Server voice muted: **Yes**" : ""}
-          ${member.voice.deaf ? "Server voice deafened: **Yes**" : ""}
+          ${member.voice.serverMute ? "Server-muted: **Yes**" : ""}
+          ${member.voice.serverDeaf ? "Server-deafened: **Yes**" : ""}
+          ${member.voice.selfMute ? "Self-muted: **Yes**" : ""}
+          ${member.voice.selfDeaf ? "Self-deafened: **Yes**" : ""}
         `),
       });
     }
