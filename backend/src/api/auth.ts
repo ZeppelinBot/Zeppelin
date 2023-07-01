@@ -149,7 +149,7 @@ export function initAuth(app: express.Express) {
 
 export function apiTokenAuthHandlers() {
   return [
-    passport.authenticate("api-token", { failWithError: true }),
+    passport.authenticate("api-token", { failWithError: true, session: false }),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (err, req: Request, res: Response, next) => {
       return res.status(401).json({ error: err.message });
