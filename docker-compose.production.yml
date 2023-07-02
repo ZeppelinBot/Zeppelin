@@ -32,6 +32,9 @@ services:
       retries: 60
 
   migrate:
+    depends_on:
+      mysql:
+        condition: service_healthy
     build:
       context: .
       dockerfile: docker/production/backend/Dockerfile
