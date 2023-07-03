@@ -259,7 +259,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     discriminator: user.discriminator,
     mention: `<@${user.id}>`,
     tag: user.tag,
-    avatarURL: user.displayAvatarURL(),
+    avatarURL: user.displayAvatarURL?.(),
     bot: user.bot,
     createdAt: user.createdTimestamp,
     renderedUsername: renderUserUsername(user),
@@ -285,7 +285,7 @@ export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMem
     nick: member.nickname ?? "*None*",
     roles: [...member.roles.cache.mapValues((r) => roleToTemplateSafeRole(r)).values()],
     joinedAt: member.joinedTimestamp ?? undefined,
-    guildAvatarURL: member.displayAvatarURL(),
+    guildAvatarURL: member.displayAvatarURL?.(),
     guildName: member.guild.name,
   });
 }
