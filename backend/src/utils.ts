@@ -1611,7 +1611,7 @@ export function renderUsername(username: string, discriminator: string): string 
 }
 
 export function renderUserUsername(user: GuildMember | User | UnknownUser): string {
-  if(user instanceof GuildMember) {
+  if (user instanceof GuildMember) {
     return renderUsername(user.user.username, user.user.discriminator);
   }
   return renderUsername(user.username, user.discriminator);
