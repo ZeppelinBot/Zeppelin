@@ -10,11 +10,11 @@ export const AvatarCmd = utilityCmd({
   permission: "can_avatar",
 
   signature: {
-    user: ct.resolvedUserLoose({ required: false }),
+    user: ct.resolvedMember({ required: false }) || ct.resolvedUserLoose({ required: false }),
   },
 
   async run({ message: msg, args, pluginData }) {
-    const user = args.user || msg.author;
+    const user = args.user || msg.member || msg.author;
     if (!(user instanceof UnknownUser)) {
       const embed: APIEmbed = {
         image: {

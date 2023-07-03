@@ -1610,6 +1610,7 @@ export function renderUsername(username: string, discriminator: string): string 
   return `${username}#${discriminator}`;
 }
 
-export function renderUserUsername(user: User | UnknownUser): string {
+export function renderUserUsername(user: GuildMember | User | UnknownUser): string {
+  user instanceof GuildMember ? (user = user.user) : null;
   return renderUsername(user.username, user.discriminator);
 }

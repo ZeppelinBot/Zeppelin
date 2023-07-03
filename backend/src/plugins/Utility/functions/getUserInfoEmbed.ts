@@ -46,7 +46,7 @@ export async function getUserInfoEmbed(
     name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user.username, user.discriminator)}`,
   };
 
-  const avatarURL = user.displayAvatarURL();
+  const avatarURL = (member || user).displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   if (compact) {

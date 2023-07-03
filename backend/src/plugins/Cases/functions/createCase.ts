@@ -11,7 +11,7 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
   const userName = renderUserUsername(user);
 
   const mod = await resolveUser(pluginData.client, args.modId);
-  const modName = mod.tag;
+  const modName = renderUserUsername(mod);
 
   let ppName: string | null = null;
   let ppId: Snowflake | null = null;

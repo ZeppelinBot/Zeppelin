@@ -495,7 +495,7 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
       line = `${paddedId} ${renderUserUsername(member.user)}`;
       if (member.nickname) line += ` (${member.nickname})`;
     } else {
-      line = `${paddedId} ${member.tag}`;
+      line = `${paddedId} ${renderUserUsername(member)}`;
     }
     return line;
   });

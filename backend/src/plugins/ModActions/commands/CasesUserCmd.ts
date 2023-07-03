@@ -1,9 +1,17 @@
-import { APIEmbed, User } from "discord.js";
+import { APIEmbed, GuildMember, User } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
+import {
+  UnknownUser,
+  chunkArray,
+  emptyEmbedValue,
+  renderUserUsername,
+  resolveMember,
+  resolveUser,
+  trimLines,
+} from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
@@ -35,7 +43,9 @@ export const CasesUserCmd = modActionsCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    const user = await resolveUser(pluginData.client, args.user);
+    const user =
+      (await resolveMember(pluginData.client, pluginData.guild, args.user)) ||
+      (await resolveUser(pluginData.client, args.user));
     if (!user.id) {
       sendErrorMessage(pluginData, msg.channel, `User not found`);
       return;
@@ -123,7 +133,7 @@ export const CasesUserCmd = modActionsCmd({
                 lineChunks.length === 1
                   ? `Cases for ${userName} (${lines.length} total)`
                   : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
+              icon_url: user instanceof GuildMember || user instanceof User ? user.displayAvatarURL() : undefined,
             },
             fields: [
               ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
