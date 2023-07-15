@@ -1,25 +1,52 @@
+import { APIEmbed, Awaitable } from "discord.js";
 import * as t from "io-ts";
-import { BasePluginType, guildPluginEventListener } from "knub";
-import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
+import { BasePluginType } from "knub";
+import { GuildCases } from "../../data/GuildCases";
+import { GuildLogs } from "../../data/GuildLogs";
+import { GuildMutes } from "../../data/GuildMutes";
+import { GuildTempbans } from "../../data/GuildTempbans";
+import { tNullable } from "../../utils";
 
 export const ConfigSchema = t.type({
   can_use: t.boolean,
 
-  user_muteindef: t.boolean,
-  user_mute1d: t.boolean,
-  user_mute1h: t.boolean,
-  user_info: t.boolean,
-  message_clean10: t.boolean,
-  message_clean25: t.boolean,
-  message_clean50: t.boolean,
+  can_open_mod_menu: t.boolean,
+
+  log_channel: tNullable(t.string),
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface ContextMenuPluginType extends BasePluginType {
   config: TConfigSchema;
   state: {
-    contextMenuLinks: GuildContextMenuLinks;
+    mutes: GuildMutes;
+    cases: GuildCases;
+    tempbans: GuildTempbans;
+    serverLogs: GuildLogs;
   };
 }
 
-export const contextMenuEvt = guildPluginEventListener<ContextMenuPluginType>();
+export const enum ModMenuActionType {
+  PAGE = "page",
+  NOTE = "note",
+  WARN = "warn",
+  CLEAN = "clean",
+  MUTE = "mute",
+  BAN = "ban",
+}
+
+export const enum ModMenuNavigationType {
+  FIRST = "first",
+  PREV = "prev",
+  NEXT = "next",
+  LAST = "last",
+  INFO = "info",
+  CASES = "cases",
+}
+
+export interface ModMenuActionOpts {
+  action: ModMenuActionType;
+  target: string;
+}
+
+export type LoadModMenuPageFn = (page: number) => Awaitable<APIEmbed>;

@@ -10,15 +10,12 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { convertDelayStringToMS } from "../../../utils";
+import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuCmd";
 import { ContextMenuPluginType } from "../types";
 
-async function muteAction(
+async function banAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   duration: string | undefined,
   reason: string | undefined,
@@ -32,51 +29,43 @@ async function muteAction(
   });
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
-  if (!userCfg.can_use || !(await modactions.hasMutePermission(executingMember, interaction.channelId))) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+  if (!userCfg.can_use || !(await modactions.hasBanPermission(executingMember, interaction.channelId))) {
+    await interaction.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+    await interaction.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
   const caseArgs: Partial<CaseArgs> = {
     modId: executingMember.id,
   };
-  const mutes = pluginData.getPlugin(MutesPlugin);
+
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
-
-  try {
-    const result = await mutes.muteUser(target, durationMs, reason, { caseArgs });
-
-    const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
-    const muteMessage = `Muted **${result.case.user_name}** ${
-      durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number})${messageResultText}`;
-
-    await interaction.editReply({ content: muteMessage, embeds: [], components: [] });
-  } catch (e) {
-    await interaction.editReply({ content: "Plugin error, please check your BOT_ALERTs", embeds: [], components: [] });
-
-    if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Failed to mute <@!${target}> in ContextMenu action \`mute\` because a mute role has not been specified in server config`,
-      });
-    } else {
-      throw e;
-    }
+  const result = await modactions.banUserId(target, reason, { caseArgs }, durationMs);
+  if (result.status === "failed") {
+    await interaction.editReply({ content: "ERROR: Failed to ban user", embeds: [], components: [] });
+    return;
   }
+
+  const userName = renderUserUsername(targetMember.user);
+  const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
+  const banMessage = `Banned **${userName}** ${
+    durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
+  } (Case #${result.case.case_number})${messageResultText}`;
+
+  await interaction.editReply({ content: banMessage, embeds: [], components: [] });
 }
 
-export async function launchMuteActionModal(
+export async function launchBanActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   interaction: ButtonInteraction,
   target: string,
 ) {
-  const modal = new ModalBuilder().setCustomId("mute").setTitle("Mute");
+  const modal = new ModalBuilder().setCustomId("ban").setTitle("Ban");
 
   const durationIn = new TextInputBuilder()
     .setCustomId("duration")
@@ -103,6 +92,6 @@ export async function launchMuteActionModal(
     const duration = submitted.fields.getTextInputValue("duration");
     const reason = submitted.fields.getTextInputValue("reason");
 
-    await muteAction(pluginData, duration, reason, target, interaction);
+    await banAction(pluginData, duration, reason, target, interaction);
   }
 }
