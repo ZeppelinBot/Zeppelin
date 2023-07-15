@@ -36,7 +36,7 @@ async function noteAction(
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+    await interaction.editReply({ content: "Cannot note: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
@@ -69,11 +69,8 @@ export async function launchNoteActionModal(
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("note").setTitle("Note");
-
   const reasonIn = new TextInputBuilder().setCustomId("reason").setLabel("Note").setStyle(TextInputStyle.Paragraph);
-
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-
   modal.addComponents(reasonRow);
 
   await interaction.showModal(modal);

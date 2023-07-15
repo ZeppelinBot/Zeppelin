@@ -4,6 +4,7 @@ import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -15,8 +16,6 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
     can_use: false,
 
     can_open_mod_menu: false,
-
-    log_channel: null,
   },
   overrides: [
     {
@@ -41,8 +40,9 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
     configSchema: ConfigSchema,
   },
 
-  dependencies: () => [CasesPlugin, MutesPlugin, LogsPlugin, UtilityPlugin],
+  dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
   configParser: makeIoTsConfigParser(ConfigSchema),
+
   defaultOptions,
 
   contextMenuCommands: [ModMenuCmd],

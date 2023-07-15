@@ -47,7 +47,7 @@ async function banAction(
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
   const result = await modactions.banUserId(target, reason, { caseArgs }, durationMs);
   if (result.status === "failed") {
-    await interaction.editReply({ content: "ERROR: Failed to ban user", embeds: [], components: [] });
+    await interaction.editReply({ content: "Error: Failed to ban user", embeds: [], components: [] });
     return;
   }
 
@@ -66,22 +66,18 @@ export async function launchBanActionModal(
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("ban").setTitle("Ban");
-
   const durationIn = new TextInputBuilder()
     .setCustomId("duration")
     .setLabel("Duration (Optional)")
     .setRequired(false)
     .setStyle(TextInputStyle.Short);
-
   const reasonIn = new TextInputBuilder()
     .setCustomId("reason")
     .setLabel("Reason (Optional)")
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph);
-
   const durationRow = new ActionRowBuilder<TextInputBuilder>().addComponents(durationIn);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-
   modal.addComponents(durationRow, reasonRow);
 
   await interaction.showModal(modal);

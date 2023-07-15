@@ -84,33 +84,24 @@ export const ModMenuCmd = guildPluginUserContextMenuCommand({
           lines.length == 0
             ? `${userName}`
             : `Most recent cases for ${userName} | ${firstCaseNum}-${lastCaseNum} of ${totalCases}`;
-        const embedFields =
-          lines.length == 0
-            ? [
-                {
-                  name: `**No cases found**`,
-                  value: "",
-                },
-              ]
-            : [
-                ...getChunkedEmbedFields(
-                  emptyEmbedValue,
-                  lines.length == 0 ? `No cases found for **${userName}**` : lines.join("\n"),
-                ),
-                {
-                  name: emptyEmbedValue,
-                  value: trimLines(`
-                  Use \`${prefix}case <num>\` to see more information about an individual case 
-                `),
-                },
-              ];
 
         const embed = {
           author: {
             name: title,
             icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
           },
-          fields: embedFields,
+          fields: [
+            ...getChunkedEmbedFields(
+              emptyEmbedValue,
+              lines.length == 0 ? `No cases found for **${userName}**` : lines.join("\n"),
+            ),
+            {
+              name: emptyEmbedValue,
+              value: trimLines(
+                lines.length == 0 ? "" : `Use \`${prefix}case <num>\` to see more information about an individual case`,
+              ),
+            },
+          ],
           footer: { text: `Page ${page}/${totalPages}` },
         } satisfies APIEmbed;
 

@@ -34,7 +34,7 @@ async function warnAction(
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+    await interaction.editReply({ content: "Cannot warn: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
@@ -44,7 +44,7 @@ async function warnAction(
 
   const result = await modactions.warnMember(targetMember, reason, { caseArgs });
   if (result.status === "failed") {
-    await interaction.editReply({ content: "Failed to warn user", embeds: [], components: [] });
+    await interaction.editReply({ content: "Error: Failed to warn user", embeds: [], components: [] });
     return;
   }
 
@@ -61,11 +61,8 @@ export async function launchWarnActionModal(
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("warn").setTitle("Warn");
-
   const reasonIn = new TextInputBuilder().setCustomId("reason").setLabel("Reason").setStyle(TextInputStyle.Paragraph);
-
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-
   modal.addComponents(reasonRow);
 
   await interaction.showModal(modal);

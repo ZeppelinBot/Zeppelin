@@ -43,11 +43,8 @@ export async function launchCleanActionModal(
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("clean").setTitle("Clean");
-
   const amountIn = new TextInputBuilder().setCustomId("amount").setLabel("Amount").setStyle(TextInputStyle.Short);
-
   const amountRow = new ActionRowBuilder<TextInputBuilder>().addComponents(amountIn);
-
   modal.addComponents(amountRow);
 
   await interaction.showModal(modal);
@@ -57,7 +54,7 @@ export async function launchCleanActionModal(
 
     const amount = submitted.fields.getTextInputValue("amount");
     if (isNaN(Number(amount))) {
-      interaction.editReply({ content: `ERROR: Amount ${amount} is invalid`, embeds: [], components: [] });
+      interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
       return;
     }
 
