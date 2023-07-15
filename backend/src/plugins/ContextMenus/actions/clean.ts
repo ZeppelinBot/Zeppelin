@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { GuildPluginData } from "knub";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuCmd";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType } from "../types";
 
 export async function cleanAction(

@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  ContextMenuCommandInteraction,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -13,15 +14,17 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { renderUserUsername } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuCmd";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType } from "../types";
 
 async function noteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   reason: string,
   target: string,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
+  submitInteraction: ModalSubmitInteraction,
 ) {
+  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -30,13 +33,21 @@ async function noteAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasNotePermission(executingMember, interaction.channelId))) {
-    await interaction.editReply({ content: "Cannot note: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({
+      content: "Cannot note: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot note: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({
+      content: "Cannot note: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
@@ -56,7 +67,7 @@ async function noteAction(
   });
 
   const userName = renderUserUsername(targetMember.user);
-  await interaction.editReply({
+  await interactionToReply.editReply({
     content: `Note added on **${userName}** (Case #${createdCase.case_number})`,
     embeds: [],
     components: [],
@@ -65,7 +76,7 @@ async function noteAction(
 
 export async function launchNoteActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("note").setTitle("Note");
@@ -76,10 +87,14 @@ export async function launchNoteActionModal(
   await interaction.showModal(modal);
   const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
   if (submitted) {
-    await submitted.deferUpdate();
+    if (interaction instanceof ButtonInteraction) {
+      await submitted.deferUpdate();
+    } else {
+      await submitted.deferReply({ ephemeral: true });
+    }
 
     const reason = submitted.fields.getTextInputValue("reason");
 
-    await noteAction(pluginData, reason, target, interaction);
+    await noteAction(pluginData, reason, target, interaction, submitted);
   }
 }

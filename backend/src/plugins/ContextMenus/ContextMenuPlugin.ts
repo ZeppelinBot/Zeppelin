@@ -8,7 +8,11 @@ import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { ModMenuCmd } from "./commands/ModMenuCmd";
+import { BanCmd } from "./commands/BanUserCtxCmd";
+import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd";
+import { MuteCmd } from "./commands/MuteUserCtxCmd";
+import { NoteCmd } from "./commands/NoteUserCtxCmd";
+import { WarnCmd } from "./commands/WarnUserCtxCmd";
 import { ConfigSchema, ContextMenuPluginType } from "./types";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
@@ -45,7 +49,7 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
 
   defaultOptions,
 
-  contextMenuCommands: [ModMenuCmd],
+  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd],
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

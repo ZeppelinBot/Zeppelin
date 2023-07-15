@@ -9,13 +9,13 @@ import {
 } from "discord.js";
 import { GuildPluginData, guildPluginUserContextMenuCommand } from "knub";
 import { Case } from "../../../data/entities/Case";
-import { getUserInfoEmbed } from "../../../plugins/Utility/functions/getUserInfoEmbed";
 import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { UtilityPlugin } from "../../Utility/UtilityPlugin";
+import { getUserInfoEmbed } from "../../Utility/functions/getUserInfoEmbed";
 import { launchBanActionModal } from "../actions/ban";
 import { launchCleanActionModal } from "../actions/clean";
 import { launchMuteActionModal } from "../actions/mute";

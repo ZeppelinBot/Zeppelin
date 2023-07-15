@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  ContextMenuCommandInteraction,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -12,7 +13,7 @@ import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
-import { MODAL_TIMEOUT } from "../commands/ModMenuCmd";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType } from "../types";
 
 async function banAction(
@@ -20,8 +21,10 @@ async function banAction(
   duration: string | undefined,
   reason: string | undefined,
   target: string,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
+  submitInteraction: ModalSubmitInteraction,
 ) {
+  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -30,13 +33,13 @@ async function banAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasBanPermission(executingMember, interaction.channelId))) {
-    await interaction.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
@@ -47,7 +50,7 @@ async function banAction(
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
   const result = await modactions.banUserId(target, reason, { caseArgs }, durationMs);
   if (result.status === "failed") {
-    await interaction.editReply({ content: "Error: Failed to ban user", embeds: [], components: [] });
+    await interactionToReply.editReply({ content: "Error: Failed to ban user", embeds: [], components: [] });
     return;
   }
 
@@ -57,12 +60,12 @@ async function banAction(
     durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
   } (Case #${result.case.case_number})${messageResultText}`;
 
-  await interaction.editReply({ content: banMessage, embeds: [], components: [] });
+  await interactionToReply.editReply({ content: banMessage, embeds: [], components: [] });
 }
 
 export async function launchBanActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("ban").setTitle("Ban");
@@ -83,11 +86,15 @@ export async function launchBanActionModal(
   await interaction.showModal(modal);
   const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
   if (submitted) {
-    await submitted.deferUpdate();
+    if (interaction instanceof ButtonInteraction) {
+      await submitted.deferUpdate();
+    } else {
+      await submitted.deferReply({ ephemeral: true });
+    }
 
     const duration = submitted.fields.getTextInputValue("duration");
     const reason = submitted.fields.getTextInputValue("reason");
 
-    await banAction(pluginData, duration, reason, target, interaction);
+    await banAction(pluginData, duration, reason, target, interaction, submitted);
   }
 }

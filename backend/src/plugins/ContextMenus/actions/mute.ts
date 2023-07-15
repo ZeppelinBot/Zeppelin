@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  ContextMenuCommandInteraction,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
@@ -15,7 +16,7 @@ import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuCmd";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType } from "../types";
 
 async function muteAction(
@@ -23,8 +24,10 @@ async function muteAction(
   duration: string | undefined,
   reason: string | undefined,
   target: string,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
+  submitInteraction: ModalSubmitInteraction,
 ) {
+  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -33,13 +36,21 @@ async function muteAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasMutePermission(executingMember, interaction.channelId))) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({
+      content: "Cannot mute: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interaction.editReply({ content: "Cannot mute: insufficient permissions", embeds: [], components: [] });
+    await interactionToReply.editReply({
+      content: "Cannot mute: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
@@ -57,9 +68,13 @@ async function muteAction(
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
     } (Case #${result.case.case_number})${messageResultText}`;
 
-    await interaction.editReply({ content: muteMessage, embeds: [], components: [] });
+    await interactionToReply.editReply({ content: muteMessage, embeds: [], components: [] });
   } catch (e) {
-    await interaction.editReply({ content: "Plugin error, please check your BOT_ALERTs", embeds: [], components: [] });
+    await interactionToReply.editReply({
+      content: "Plugin error, please check your BOT_ALERTs",
+      embeds: [],
+      components: [],
+    });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -73,7 +88,7 @@ async function muteAction(
 
 export async function launchMuteActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
-  interaction: ButtonInteraction,
+  interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
   const modal = new ModalBuilder().setCustomId("mute").setTitle("Mute");
@@ -94,11 +109,15 @@ export async function launchMuteActionModal(
   await interaction.showModal(modal);
   const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
   if (submitted) {
-    await submitted.deferUpdate();
+    if (interaction instanceof ButtonInteraction) {
+      await submitted.deferUpdate();
+    } else {
+      await submitted.deferReply({ ephemeral: true });
+    }
 
     const duration = submitted.fields.getTextInputValue("duration");
     const reason = submitted.fields.getTextInputValue("reason");
 
-    await muteAction(pluginData, duration, reason, target, interaction);
+    await muteAction(pluginData, duration, reason, target, interaction, submitted);
   }
 }
