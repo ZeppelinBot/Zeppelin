@@ -34,21 +34,25 @@ async function noteAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasNotePermission(executingMember, interaction.channelId))) {
-    await interactionToReply.editReply({
-      content: "Cannot note: insufficient permissions",
-      embeds: [],
-      components: [],
-    });
+    await interactionToReply
+      .editReply({
+        content: "Cannot note: insufficient permissions",
+        embeds: [],
+        components: [],
+      })
+      .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interactionToReply.editReply({
-      content: "Cannot note: insufficient permissions",
-      embeds: [],
-      components: [],
-    });
+    await interactionToReply
+      .editReply({
+        content: "Cannot note: insufficient permissions",
+        embeds: [],
+        components: [],
+      })
+      .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
     return;
   }
 
@@ -68,11 +72,13 @@ async function noteAction(
   });
 
   const userName = renderUserUsername(targetMember.user);
-  await interactionToReply.editReply({
-    content: `Note added on **${userName}** (Case #${createdCase.case_number})`,
-    embeds: [],
-    components: [],
-  });
+  await interactionToReply
+    .editReply({
+      content: `Note added on **${userName}** (Case #${createdCase.case_number})`,
+      embeds: [],
+      components: [],
+    })
+    .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
 }
 
 export async function launchNoteActionModal(
@@ -91,9 +97,11 @@ export async function launchNoteActionModal(
     .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
     .then(async (submitted) => {
       if (interaction.isButton()) {
-        await submitted.deferUpdate();
+        await submitted.deferUpdate().catch((err) => logger.error(`Note interaction defer failed: ${err}`));
       } else if (interaction.isContextMenuCommand()) {
-        await submitted.deferReply({ ephemeral: true });
+        await submitted
+          .deferReply({ ephemeral: true })
+          .catch((err) => logger.error(`Note interaction defer failed: ${err}`));
       }
 
       const reason = submitted.fields.getTextInputValue("reason");

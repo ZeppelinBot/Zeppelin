@@ -19,16 +19,20 @@ export async function cleanAction(
   const utility = pluginData.getPlugin(UtilityPlugin);
 
   if (!userCfg.can_use || !(await utility.hasPermission(executingMember, interaction.channelId, "can_clean"))) {
-    await interaction.editReply({ content: "Cannot clean: insufficient permissions", embeds: [], components: [] });
+    await interaction
+      .editReply({ content: "Cannot clean: insufficient permissions", embeds: [], components: [] })
+      .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
     return;
   }
 
   // TODO: Implement message cleaning
-  await interaction.editReply({
-    content: `TODO: Implementation incomplete`,
-    embeds: [],
-    components: [],
-  });
+  await interaction
+    .editReply({
+      content: `TODO: Implementation incomplete`,
+      embeds: [],
+      components: [],
+    })
+    .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
 }
 
 export async function launchCleanActionModal(
@@ -46,11 +50,13 @@ export async function launchCleanActionModal(
   await interaction
     .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
     .then(async (submitted) => {
-      await submitted.deferUpdate();
+      await submitted.deferUpdate().catch((err) => logger.error(`Clean interaction defer failed: ${err}`));
 
       const amount = submitted.fields.getTextInputValue("amount");
       if (isNaN(Number(amount))) {
-        interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
+        interaction
+          .editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] })
+          .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
         return;
       }
 
