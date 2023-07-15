@@ -1,15 +1,9 @@
-import {
-  ActionRowBuilder,
-  ButtonInteraction,
-  ModalBuilder,
-  ModalSubmitInteraction,
-  TextInputBuilder,
-  TextInputStyle,
-} from "discord.js";
+import { ActionRowBuilder, ButtonInteraction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
 import { GuildPluginData } from "knub";
+import { logger } from "../../../logger";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType } from "../types";
+import { ContextMenuPluginType, ModMenuActionType } from "../types";
 
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
@@ -42,22 +36,25 @@ export async function launchCleanActionModal(
   interaction: ButtonInteraction,
   target: string,
 ) {
-  const modal = new ModalBuilder().setCustomId("clean").setTitle("Clean");
+  const modalId = `${ModMenuActionType.CLEAN}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Clean");
   const amountIn = new TextInputBuilder().setCustomId("amount").setLabel("Amount").setStyle(TextInputStyle.Short);
   const amountRow = new ActionRowBuilder<TextInputBuilder>().addComponents(amountIn);
   modal.addComponents(amountRow);
 
   await interaction.showModal(modal);
-  const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
-  if (submitted) {
-    await submitted.deferUpdate();
+  await interaction
+    .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
+    .then(async (submitted) => {
+      await submitted.deferUpdate();
 
-    const amount = submitted.fields.getTextInputValue("amount");
-    if (isNaN(Number(amount))) {
-      interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
-      return;
-    }
+      const amount = submitted.fields.getTextInputValue("amount");
+      if (isNaN(Number(amount))) {
+        interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
+        return;
+      }
 
-    await cleanAction(pluginData, Number(amount), target, interaction);
-  }
+      await cleanAction(pluginData, Number(amount), target, interaction);
+    })
+    .catch((err) => logger.error(`Clean modal interaction failed: ${err}`));
 }

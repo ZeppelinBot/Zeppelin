@@ -10,10 +10,11 @@ import {
 import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
+import { logger } from "../../../logger";
 import { renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType } from "../types";
+import { ContextMenuPluginType, ModMenuActionType } from "../types";
 
 async function warnAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
@@ -22,7 +23,7 @@ async function warnAction(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
 ) {
-  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
+  const interactionToReply = interaction.isButton() ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -71,22 +72,25 @@ export async function launchWarnActionModal(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
-  const modal = new ModalBuilder().setCustomId("warn").setTitle("Warn");
+  const modalId = `${ModMenuActionType.WARN}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Warn");
   const reasonIn = new TextInputBuilder().setCustomId("reason").setLabel("Reason").setStyle(TextInputStyle.Paragraph);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
   modal.addComponents(reasonRow);
 
   await interaction.showModal(modal);
-  const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
-  if (submitted) {
-    if (interaction instanceof ButtonInteraction) {
-      await submitted.deferUpdate();
-    } else {
-      await submitted.deferReply({ ephemeral: true });
-    }
+  await interaction
+    .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
+    .then(async (submitted) => {
+      if (interaction.isButton()) {
+        await submitted.deferUpdate();
+      } else if (interaction.isContextMenuCommand()) {
+        await submitted.deferReply({ ephemeral: true });
+      }
 
-    const reason = submitted.fields.getTextInputValue("reason");
+      const reason = submitted.fields.getTextInputValue("reason");
 
-    await warnAction(pluginData, reason, target, interaction, submitted);
-  }
+      await warnAction(pluginData, reason, target, interaction, submitted);
+    })
+    .catch((err) => logger.error(`Mute modal interaction failed: ${err}`));
 }

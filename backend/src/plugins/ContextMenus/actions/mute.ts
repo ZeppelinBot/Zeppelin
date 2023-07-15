@@ -12,12 +12,13 @@ import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { logger } from "../../../logger";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType } from "../types";
+import { ContextMenuPluginType, ModMenuActionType } from "../types";
 
 async function muteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
@@ -27,7 +28,7 @@ async function muteAction(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
 ) {
-  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
+  const interactionToReply = interaction.isButton() ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -91,7 +92,8 @@ export async function launchMuteActionModal(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
-  const modal = new ModalBuilder().setCustomId("mute").setTitle("Mute");
+  const modalId = `${ModMenuActionType.MUTE}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Mute");
   const durationIn = new TextInputBuilder()
     .setCustomId("duration")
     .setLabel("Duration (Optional)")
@@ -107,17 +109,19 @@ export async function launchMuteActionModal(
   modal.addComponents(durationRow, reasonRow);
 
   await interaction.showModal(modal);
-  const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
-  if (submitted) {
-    if (interaction instanceof ButtonInteraction) {
-      await submitted.deferUpdate();
-    } else {
-      await submitted.deferReply({ ephemeral: true });
-    }
+  await interaction
+    .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
+    .then(async (submitted) => {
+      if (interaction.isButton()) {
+        await submitted.deferUpdate();
+      } else if (interaction.isContextMenuCommand()) {
+        await submitted.deferReply({ ephemeral: true });
+      }
 
-    const duration = submitted.fields.getTextInputValue("duration");
-    const reason = submitted.fields.getTextInputValue("reason");
+      const duration = submitted.fields.getTextInputValue("duration");
+      const reason = submitted.fields.getTextInputValue("reason");
 
-    await muteAction(pluginData, duration, reason, target, interaction, submitted);
-  }
+      await muteAction(pluginData, duration, reason, target, interaction, submitted);
+    })
+    .catch((err) => logger.error(`Mute modal interaction failed: ${err}`));
 }

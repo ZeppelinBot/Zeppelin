@@ -11,11 +11,12 @@ import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { logger } from "../../../logger";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { renderUserUsername } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType } from "../types";
+import { ContextMenuPluginType, ModMenuActionType } from "../types";
 
 async function noteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
@@ -24,7 +25,7 @@ async function noteAction(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
 ) {
-  const interactionToReply = interaction instanceof ButtonInteraction ? interaction : submitInteraction;
+  const interactionToReply = interaction.isButton() ? interaction : submitInteraction;
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
     channelId: interaction.channelId,
@@ -79,22 +80,25 @@ export async function launchNoteActionModal(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
-  const modal = new ModalBuilder().setCustomId("note").setTitle("Note");
+  const modalId = `${ModMenuActionType.NOTE}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Note");
   const reasonIn = new TextInputBuilder().setCustomId("reason").setLabel("Note").setStyle(TextInputStyle.Paragraph);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
   modal.addComponents(reasonRow);
 
   await interaction.showModal(modal);
-  const submitted: ModalSubmitInteraction = await interaction.awaitModalSubmit({ time: MODAL_TIMEOUT });
-  if (submitted) {
-    if (interaction instanceof ButtonInteraction) {
-      await submitted.deferUpdate();
-    } else {
-      await submitted.deferReply({ ephemeral: true });
-    }
+  await interaction
+    .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
+    .then(async (submitted) => {
+      if (interaction.isButton()) {
+        await submitted.deferUpdate();
+      } else if (interaction.isContextMenuCommand()) {
+        await submitted.deferReply({ ephemeral: true });
+      }
 
-    const reason = submitted.fields.getTextInputValue("reason");
+      const reason = submitted.fields.getTextInputValue("reason");
 
-    await noteAction(pluginData, reason, target, interaction, submitted);
-  }
+      await noteAction(pluginData, reason, target, interaction, submitted);
+    })
+    .catch((err) => logger.error(`Note modal interaction failed: ${err}`));
 }
