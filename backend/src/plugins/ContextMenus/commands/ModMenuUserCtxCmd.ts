@@ -5,11 +5,14 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ContextMenuCommandInteraction,
+  GuildMember,
+  PermissionFlagsBits,
   User,
 } from "discord.js";
 import { GuildPluginData, guildPluginUserContextMenuCommand } from "knub";
 import { Case } from "../../../data/entities/Case";
 import { logger } from "../../../logger";
+import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
@@ -18,7 +21,6 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { UtilityPlugin } from "../../Utility/UtilityPlugin";
 import { getUserInfoEmbed } from "../../Utility/functions/getUserInfoEmbed";
 import { launchBanActionModal } from "../actions/ban";
-import { launchCleanActionModal } from "../actions/clean";
 import { launchMuteActionModal } from "../actions/mute";
 import { launchNoteActionModal } from "../actions/note";
 import { launchWarnActionModal } from "../actions/warn";
@@ -36,6 +38,7 @@ const CASES_PER_PAGE = 10;
 
 export const ModMenuCmd = guildPluginUserContextMenuCommand({
   name: "Mod Menu",
+  defaultMemberPermissions: PermissionFlagsBits.ViewAuditLog.toString(),
   async run({ pluginData, interaction }) {
     await interaction
       .deferReply({ ephemeral: true })
@@ -115,6 +118,7 @@ export const ModMenuCmd = guildPluginUserContextMenuCommand({
         return embed;
       },
       infoEmbed,
+      executingMember,
     );
   },
 });
@@ -125,58 +129,65 @@ async function displayModMenu(
   totalPages: number,
   loadPage: LoadModMenuPageFn,
   infoEmbed: APIEmbed | null,
+  executingMember: GuildMember,
 ) {
   if (interaction.deferred == false) {
     await interaction.deferReply().catch((err) => logger.error(`Mod menu interaction defer failed: ${err}`));
   }
 
   const firstButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Primary)
-    .setLabel("<<")
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("⏪")
     .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.FIRST }))
     .setDisabled(true);
   const prevButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Primary)
-    .setLabel("<")
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("⬅")
     .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.PREV }))
     .setDisabled(true);
   const infoButton = new ButtonBuilder()
     .setStyle(ButtonStyle.Primary)
     .setLabel("Info")
+    .setEmoji("ℹ")
     .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.INFO }))
     .setDisabled(infoEmbed != null ? false : true);
   const nextButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Primary)
-    .setLabel(">")
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("➡")
     .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.NEXT }))
     .setDisabled(totalPages > 1 ? false : true);
   const lastButton = new ButtonBuilder()
-    .setStyle(ButtonStyle.Primary)
-    .setLabel(">>")
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji("⏩")
     .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.LAST }))
     .setDisabled(totalPages > 1 ? false : true);
   const navigationButtons = [firstButton, prevButton, infoButton, nextButton, lastButton] satisfies ButtonBuilder[];
 
+  const modactions = pluginData.getPlugin(ModActionsPlugin);
   const moderationButtons = [
     new ButtonBuilder()
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Primary)
       .setLabel("Note")
+      .setEmoji("📝")
+      .setDisabled(!(await modactions.hasNotePermission(executingMember, interaction.channelId)))
       .setCustomId(serializeCustomId({ action: ModMenuActionType.NOTE, target: interaction.targetId })),
     new ButtonBuilder()
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Primary)
       .setLabel("Warn")
+      .setEmoji("⚠️")
+      .setDisabled(!(await modactions.hasWarnPermission(executingMember, interaction.channelId)))
       .setCustomId(serializeCustomId({ action: ModMenuActionType.WARN, target: interaction.targetId })),
     new ButtonBuilder()
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel("Clean")
-      .setCustomId(serializeCustomId({ action: ModMenuActionType.CLEAN, target: interaction.targetId })),
-    new ButtonBuilder()
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Primary)
       .setLabel("Mute")
+      .setEmoji("🔇")
+      .setDisabled(!(await modactions.hasMutePermission(executingMember, interaction.channelId)))
       .setCustomId(serializeCustomId({ action: ModMenuActionType.MUTE, target: interaction.targetId })),
     new ButtonBuilder()
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Primary)
       .setLabel("Ban")
+      .setEmoji("🚫")
+      .setDisabled(!(await modactions.hasBanPermission(executingMember, interaction.channelId)))
       .setCustomId(serializeCustomId({ action: ModMenuActionType.BAN, target: interaction.targetId })),
   ] satisfies ButtonBuilder[];
 
@@ -204,6 +215,7 @@ async function displayModMenu(
         if (opts.action == ModMenuActionType.PAGE && opts.target == ModMenuNavigationType.INFO && infoEmbed != null) {
           infoButton
             .setLabel("Cases")
+            .setEmoji("📋")
             .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.CASES }));
           firstButton.setDisabled(true);
           prevButton.setDisabled(true);
@@ -219,6 +231,7 @@ async function displayModMenu(
         } else if (opts.action == ModMenuActionType.PAGE && opts.target == ModMenuNavigationType.CASES) {
           infoButton
             .setLabel("Info")
+            .setEmoji("ℹ")
             .setCustomId(serializeCustomId({ action: ModMenuActionType.PAGE, target: ModMenuNavigationType.INFO }));
           updateNavButtonState(firstButton, prevButton, nextButton, lastButton, page, totalPages);
 
@@ -264,8 +277,6 @@ async function displayModMenu(
           await launchNoteActionModal(pluginData, i as ButtonInteraction, opts.target);
         } else if (opts.action == ModMenuActionType.WARN) {
           await launchWarnActionModal(pluginData, i as ButtonInteraction, opts.target);
-        } else if (opts.action == ModMenuActionType.CLEAN) {
-          await launchCleanActionModal(pluginData, i as ButtonInteraction, opts.target);
         } else if (opts.action == ModMenuActionType.MUTE) {
           await launchMuteActionModal(pluginData, i as ButtonInteraction, opts.target);
         } else if (opts.action == ModMenuActionType.BAN) {
