@@ -15,10 +15,12 @@ import { renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
+import { updateAction } from "./update";
 
 async function warnAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   reason: string,
+  evidence: string | undefined,
   target: string,
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
@@ -70,6 +72,10 @@ async function warnAction(
   const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
   const muteMessage = `Warned **${userName}** (Case #${result.case.case_number})${messageResultText}`;
 
+  if (evidence) {
+    await updateAction(pluginData, executingMember, result.case, evidence);
+  }
+
   await interactionToReply
     .editReply({ content: muteMessage, embeds: [], components: [] })
     .catch((err) => logger.error(`Warn interaction reply failed: ${err}`));
@@ -83,8 +89,14 @@ export async function launchWarnActionModal(
   const modalId = `${ModMenuActionType.WARN}:${interaction.id}`;
   const modal = new ModalBuilder().setCustomId(modalId).setTitle("Warn");
   const reasonIn = new TextInputBuilder().setCustomId("reason").setLabel("Reason").setStyle(TextInputStyle.Paragraph);
+  const evidenceIn = new TextInputBuilder()
+    .setCustomId("evidence")
+    .setLabel("Evidence (Optional)")
+    .setRequired(false)
+    .setStyle(TextInputStyle.Paragraph);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-  modal.addComponents(reasonRow);
+  const evidenceRow = new ActionRowBuilder<TextInputBuilder>().addComponents(evidenceIn);
+  modal.addComponents(reasonRow, evidenceRow);
 
   await interaction.showModal(modal);
   await interaction
@@ -99,8 +111,9 @@ export async function launchWarnActionModal(
       }
 
       const reason = submitted.fields.getTextInputValue("reason");
+      const evidence = submitted.fields.getTextInputValue("evidence");
 
-      await warnAction(pluginData, reason, target, interaction, submitted);
+      await warnAction(pluginData, reason, evidence, target, interaction, submitted);
     })
     .catch((err) => logger.error(`Warn modal interaction failed: ${err}`));
 }

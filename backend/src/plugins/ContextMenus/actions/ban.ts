@@ -16,11 +16,13 @@ import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
+import { updateAction } from "./update";
 
 async function banAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   duration: string | undefined,
   reason: string | undefined,
+  evidence: string | undefined,
   target: string,
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
@@ -67,6 +69,10 @@ async function banAction(
     durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
   } (Case #${result.case.case_number})${messageResultText}`;
 
+  if (evidence) {
+    await updateAction(pluginData, executingMember, result.case, evidence);
+  }
+
   await interactionToReply
     .editReply({ content: banMessage, embeds: [], components: [] })
     .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
@@ -89,9 +95,15 @@ export async function launchBanActionModal(
     .setLabel("Reason (Optional)")
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph);
+  const evidenceIn = new TextInputBuilder()
+    .setCustomId("evidence")
+    .setLabel("Evidence (Optional)")
+    .setRequired(false)
+    .setStyle(TextInputStyle.Paragraph);
   const durationRow = new ActionRowBuilder<TextInputBuilder>().addComponents(durationIn);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-  modal.addComponents(durationRow, reasonRow);
+  const evidenceRow = new ActionRowBuilder<TextInputBuilder>().addComponents(evidenceIn);
+  modal.addComponents(durationRow, reasonRow, evidenceRow);
 
   await interaction.showModal(modal);
   await interaction
@@ -107,8 +119,9 @@ export async function launchBanActionModal(
 
       const duration = submitted.fields.getTextInputValue("duration");
       const reason = submitted.fields.getTextInputValue("reason");
+      const evidence = submitted.fields.getTextInputValue("evidence");
 
-      await banAction(pluginData, duration, reason, target, interaction, submitted);
+      await banAction(pluginData, duration, reason, evidence, target, interaction, submitted);
     })
     .catch((err) => logger.error(`Ban modal interaction failed: ${err}`));
 }
