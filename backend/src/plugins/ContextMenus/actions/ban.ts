@@ -77,7 +77,7 @@ export async function launchBanActionModal(
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
-  const modalId = `${ModMenuActionType.WARN}:${interaction.id}`;
+  const modalId = `${ModMenuActionType.BAN}:${interaction.id}`;
   const modal = new ModalBuilder().setCustomId(modalId).setTitle("Ban");
   const durationIn = new TextInputBuilder()
     .setCustomId("duration")
