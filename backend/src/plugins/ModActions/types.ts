@@ -23,6 +23,7 @@ export const ConfigSchema = t.type({
   kick_message: tNullable(t.string),
   ban_message: tNullable(t.string),
   tempban_message: tNullable(t.string),
+  default_ban_reason: tNullable(t.string),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
   warn_notify_enabled: t.boolean,
@@ -91,36 +92,36 @@ export interface IIgnoredEvent {
 
 export type WarnResult =
   | {
-      status: "failed";
-      error: string;
-    }
+    status: "failed";
+    error: string;
+  }
   | {
-      status: "success";
-      case: Case;
-      notifyResult: UserNotificationResult;
-    };
+    status: "success";
+    case: Case;
+    notifyResult: UserNotificationResult;
+  };
 
 export type KickResult =
   | {
-      status: "failed";
-      error: string;
-    }
+    status: "failed";
+    error: string;
+  }
   | {
-      status: "success";
-      case: Case;
-      notifyResult: UserNotificationResult;
-    };
+    status: "success";
+    case: Case;
+    notifyResult: UserNotificationResult;
+  };
 
 export type BanResult =
   | {
-      status: "failed";
-      error: string;
-    }
+    status: "failed";
+    error: string;
+  }
   | {
-      status: "success";
-      case: Case;
-      notifyResult: UserNotificationResult;
-    };
+    status: "success";
+    case: Case;
+    notifyResult: UserNotificationResult;
+  };
 
 export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 
