@@ -1,4 +1,12 @@
-import { ActionRowBuilder, ButtonInteraction, ModalBuilder, TextInputBuilder, TextInputStyle } from "discord.js";
+import {
+  ActionRowBuilder,
+  Message,
+  MessageContextMenuCommandInteraction,
+  ModalBuilder,
+  ModalSubmitInteraction,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
 import { GuildPluginData } from "knub";
 import { logger } from "../../../logger";
 import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
@@ -9,7 +17,9 @@ export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   amount: number,
   target: string,
-  interaction: ButtonInteraction,
+  targetMessage: Message,
+  targetChannel: string,
+  interaction: ModalSubmitInteraction,
 ) {
   const executingMember = await pluginData.guild.members.fetch(interaction.user.id);
   const userCfg = await pluginData.config.getMatchingConfig({
@@ -18,26 +28,27 @@ export async function cleanAction(
   });
   const utility = pluginData.getPlugin(UtilityPlugin);
 
-  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, interaction.channelId, "can_clean"))) {
+  if (!userCfg.can_use || !(await utility.hasPermission(executingMember, targetChannel, "can_clean"))) {
     await interaction
       .editReply({ content: "Cannot clean: insufficient permissions", embeds: [], components: [] })
       .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
     return;
   }
 
-  // TODO: Implement message cleaning
   await interaction
     .editReply({
-      content: `TODO: Implementation incomplete`,
+      content: `Cleaning ${amount} messages from ${target}...`,
       embeds: [],
       components: [],
     })
     .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
+
+  await utility.clean({ count: amount, channel: targetChannel, "response-interaction": interaction }, targetMessage);
 }
 
 export async function launchCleanActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
-  interaction: ButtonInteraction,
+  interaction: MessageContextMenuCommandInteraction,
   target: string,
 ) {
   const modalId = `${ModMenuActionType.CLEAN}:${interaction.id}`;
@@ -50,7 +61,9 @@ export async function launchCleanActionModal(
   await interaction
     .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
     .then(async (submitted) => {
-      await submitted.deferUpdate().catch((err) => logger.error(`Clean interaction defer failed: ${err}`));
+      await submitted
+        .deferReply({ ephemeral: true })
+        .catch((err) => logger.error(`Clean interaction defer failed: ${err}`));
 
       const amount = submitted.fields.getTextInputValue("amount");
       if (isNaN(Number(amount))) {
@@ -60,7 +73,14 @@ export async function launchCleanActionModal(
         return;
       }
 
-      await cleanAction(pluginData, Number(amount), target, interaction);
+      await cleanAction(
+        pluginData,
+        Number(amount),
+        target,
+        interaction.targetMessage,
+        interaction.channelId,
+        submitted,
+      );
     })
     .catch((err) => logger.error(`Clean modal interaction failed: ${err}`));
 }
