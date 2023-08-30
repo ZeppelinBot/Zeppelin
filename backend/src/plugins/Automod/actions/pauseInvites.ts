@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 
-export const DisableInvitesAction = automodAction({
+export const PauseInvitesAction = automodAction({
   configType: t.boolean,
   defaultConfig: true,
 

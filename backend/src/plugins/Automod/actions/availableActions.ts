@@ -8,10 +8,10 @@ import { BanAction } from "./ban";
 import { ChangeNicknameAction } from "./changeNickname";
 import { ChangePermsAction } from "./changePerms";
 import { CleanAction } from "./clean";
-import { DisableInvitesAction } from "./disableInvites";
 import { KickAction } from "./kick";
 import { LogAction } from "./log";
 import { MuteAction } from "./mute";
+import { PauseInvitesAction } from "./pauseInvites";
 import { RemoveRolesAction } from "./removeRoles";
 import { ReplyAction } from "./reply";
 import { SetAntiraidLevelAction } from "./setAntiraidLevel";
@@ -39,7 +39,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   start_thread: StartThreadAction,
   archive_thread: ArchiveThreadAction,
   change_perms: ChangePermsAction,
-  disable_invites: DisableInvitesAction,
+  pause_invites: PauseInvitesAction,
 };
 
 export const AvailableActions = t.type({
@@ -61,5 +61,5 @@ export const AvailableActions = t.type({
   start_thread: StartThreadAction.configType,
   archive_thread: ArchiveThreadAction.configType,
   change_perms: ChangePermsAction.configType,
-  disable_invites: DisableInvitesAction.configType,
+  pause_invites: PauseInvitesAction.configType,
 });
