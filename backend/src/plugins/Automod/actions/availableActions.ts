@@ -8,6 +8,7 @@ import { BanAction } from "./ban";
 import { ChangeNicknameAction } from "./changeNickname";
 import { ChangePermsAction } from "./changePerms";
 import { CleanAction } from "./clean";
+import { DisableInvitesAction } from "./disableInvites";
 import { KickAction } from "./kick";
 import { LogAction } from "./log";
 import { MuteAction } from "./mute";
@@ -17,7 +18,6 @@ import { SetAntiraidLevelAction } from "./setAntiraidLevel";
 import { SetCounterAction } from "./setCounter";
 import { SetSlowmodeAction } from "./setSlowmode";
 import { StartThreadAction } from "./startThread";
-import { ToggleInvitesAction } from "./toggleInvites";
 import { WarnAction } from "./warn";
 
 export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
@@ -39,7 +39,7 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   start_thread: StartThreadAction,
   archive_thread: ArchiveThreadAction,
   change_perms: ChangePermsAction,
-  toggle_invites: ToggleInvitesAction,
+  disable_invites: DisableInvitesAction,
 };
 
 export const AvailableActions = t.type({
@@ -61,5 +61,5 @@ export const AvailableActions = t.type({
   start_thread: StartThreadAction.configType,
   archive_thread: ArchiveThreadAction.configType,
   change_perms: ChangePermsAction.configType,
-  toggle_invites: ToggleInvitesAction.configType,
+  disable_invites: DisableInvitesAction.configType,
 });
