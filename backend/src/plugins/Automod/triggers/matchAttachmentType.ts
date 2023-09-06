@@ -1,5 +1,6 @@
 import { escapeInlineCode, Snowflake } from "discord.js";
 import * as t from "io-ts";
+import { extname } from "path";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
@@ -33,7 +34,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     }
 
     for (const attachment of context.message.data.attachments) {
-      const attachmentType = attachment.url.split(".").pop()!.toLowerCase();
+      const attachmentType = extname(new URL(attachment.url).pathname).slice(1).toLowerCase();
 
       const blacklist = trigger.blacklist_enabled
         ? (trigger.filetype_blacklist || []).map((_t) => _t.toLowerCase())
