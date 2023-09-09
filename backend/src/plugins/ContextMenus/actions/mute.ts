@@ -19,13 +19,11 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
-import { updateAction } from "./update";
 
 async function muteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   duration: string | undefined,
   reason: string | undefined,
-  evidence: string | undefined,
   target: string,
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   submitInteraction: ModalSubmitInteraction,
@@ -71,12 +69,9 @@ async function muteAction(
     const result = await mutes.muteUser(target, durationMs, reason, { caseArgs });
 
     const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
-    const muteMessage = `Muted **${result.case.user_name}** ${durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-      } (Case #${result.case.case_number})${messageResultText}`;
-
-    if (evidence) {
-      await updateAction(pluginData, executingMember, result.case, evidence);
-    }
+    const muteMessage = `Muted **${result.case.user_name}** ${
+      durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
+    } (Case #${result.case.case_number})${messageResultText}`;
 
     await interactionToReply
       .editReply({ content: muteMessage, embeds: [], components: [] })
@@ -117,15 +112,9 @@ export async function launchMuteActionModal(
     .setLabel("Reason (Optional)")
     .setRequired(false)
     .setStyle(TextInputStyle.Paragraph);
-  const evidenceIn = new TextInputBuilder()
-    .setCustomId("evidence")
-    .setLabel("Evidence (Optional)")
-    .setRequired(false)
-    .setStyle(TextInputStyle.Paragraph);
   const durationRow = new ActionRowBuilder<TextInputBuilder>().addComponents(durationIn);
   const reasonRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonIn);
-  const evidenceRow = new ActionRowBuilder<TextInputBuilder>().addComponents(evidenceIn);
-  modal.addComponents(durationRow, reasonRow, evidenceRow);
+  modal.addComponents(durationRow, reasonRow);
 
   await interaction.showModal(modal);
   await interaction
@@ -141,9 +130,8 @@ export async function launchMuteActionModal(
 
       const duration = submitted.fields.getTextInputValue("duration");
       const reason = submitted.fields.getTextInputValue("reason");
-      const evidence = submitted.fields.getTextInputValue("evidence");
 
-      await muteAction(pluginData, duration, reason, evidence, target, interaction, submitted);
+      await muteAction(pluginData, duration, reason, target, interaction, submitted);
     })
     .catch((err) => logger.error(`Mute modal interaction failed: ${err}`));
 }
