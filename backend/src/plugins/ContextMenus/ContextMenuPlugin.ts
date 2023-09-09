@@ -50,7 +50,7 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
 
   defaultOptions,
 
-  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd, CleanCmd],
+  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd],
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
