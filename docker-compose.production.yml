@@ -14,7 +14,7 @@ services:
       - ./:/zeppelin
 
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.32
     environment:
       MYSQL_ROOT_PASSWORD: ${DOCKER_PROD_MYSQL_ROOT_PASSWORD?:Missing DOCKER_PROD_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: zeppelin
