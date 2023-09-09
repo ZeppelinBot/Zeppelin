@@ -42,10 +42,12 @@ export async function banUserId(
     };
   }
 
+  reason = reason || (config.default_ban_reason || "No reason specified");
+
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   const member = await resolveMember(pluginData.client, pluginData.guild, userId);
   let notifyResult: UserNotificationResult = { method: null, success: true };
-  if (reason && member) {
+  if (member) {
     const contactMethods = banOptions?.contactMethods
       ? banOptions.contactMethods
       : getDefaultContactMethods(pluginData, "ban");
@@ -91,7 +93,7 @@ export async function banUserId(
     const deleteMessageDays = Math.min(7, Math.max(0, banOptions.deleteMessageDays ?? 1));
     await pluginData.guild.bans.create(userId as Snowflake, {
       deleteMessageSeconds: (deleteMessageDays * DAYS) / SECONDS,
-      reason: reason ?? undefined,
+      reason,
     });
   } catch (e) {
     let errorMessage;
@@ -149,7 +151,7 @@ export async function banUserId(
       mod,
       user,
       caseNumber: createdCase.case_number,
-      reason: reason ?? "",
+      reason,
       banTime: humanizeDuration(banTime),
     });
   } else {
@@ -157,7 +159,7 @@ export async function banUserId(
       mod,
       user,
       caseNumber: createdCase.case_number,
-      reason: reason ?? "",
+      reason,
     });
   }
 
