@@ -41,7 +41,12 @@ import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManua
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt";
 import { banUserId } from "./functions/banUserId";
 import { clearTempban } from "./functions/clearTempban";
-import { hasMutePermission } from "./functions/hasMutePerm";
+import {
+  hasBanPermission,
+  hasMutePermission,
+  hasNotePermission,
+  hasWarnPermission,
+} from "./functions/hasModActionPerm";
 import { kickMember } from "./functions/kickMember";
 import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
@@ -159,7 +164,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   public: {
     warnMember(pluginData) {
       return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
-        warnMember(pluginData, member, reason, warnOptions);
+        return warnMember(pluginData, member, reason, warnOptions);
       };
     },
 
@@ -171,7 +176,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
     banUserId(pluginData) {
       return (userId: string, reason?: string, banOptions?: BanOptions, banTime?: number) => {
-        banUserId(pluginData, userId, reason, banOptions, banTime);
+        return banUserId(pluginData, userId, reason, banOptions, banTime);
       };
     },
 
@@ -181,9 +186,27 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
       };
     },
 
+    hasNotePermission(pluginData) {
+      return (member: GuildMember, channelId: Snowflake) => {
+        return hasNotePermission(pluginData, member, channelId);
+      };
+    },
+
+    hasWarnPermission(pluginData) {
+      return (member: GuildMember, channelId: Snowflake) => {
+        return hasWarnPermission(pluginData, member, channelId);
+      };
+    },
+
     hasMutePermission(pluginData) {
       return (member: GuildMember, channelId: Snowflake) => {
         return hasMutePermission(pluginData, member, channelId);
+      };
+    },
+
+    hasBanPermission(pluginData) {
+      return (member: GuildMember, channelId: Snowflake) => {
+        return hasBanPermission(pluginData, member, channelId);
       };
     },
 
