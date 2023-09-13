@@ -9,10 +9,9 @@ import {
 } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { logger } from "../../../logger";
-import { convertDelayStringToMS, renderUserUsername, resolveMember } from "../../../utils";
+import { convertDelayStringToMS, renderUserUsername, resolveUser } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
@@ -40,10 +39,10 @@ async function banAction(
     return;
   }
 
-  const targetMember = await resolveMember(pluginData.client, pluginData.guild, target);
-  if (!canActOn(pluginData, executingMember, targetMember)) {
+  const user = await resolveUser(pluginData.client, target);
+  if (!user.id) {
     await interactionToReply
-      .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
+      .editReply({ content: "User not found", embeds: [], components: [] })
       .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
     return;
   }
@@ -53,7 +52,7 @@ async function banAction(
   };
 
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
-  const result = await modactions.banUserId(targetMember.id, reason, { caseArgs }, durationMs);
+  const result = await modactions.banUserId(user.id, reason, { caseArgs }, durationMs);
   if (result.status === "failed") {
     await interactionToReply
       .editReply({ content: "Error: Failed to ban user", embeds: [], components: [] })
@@ -61,7 +60,7 @@ async function banAction(
     return;
   }
 
-  const userName = renderUserUsername(targetMember.user);
+  const userName = renderUserUsername(user);
   const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
   const banMessage = `Banned **${userName}** ${
     durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
@@ -104,6 +103,8 @@ export async function launchBanActionModal(
           .deferReply({ ephemeral: true })
           .catch((err) => logger.error(`Ban interaction defer failed: ${err}`));
       }
+
+      logger.info(`TargeT: ${target}`);
 
       const duration = submitted.fields.getTextInputValue("duration");
       const reason = submitted.fields.getTextInputValue("reason");
