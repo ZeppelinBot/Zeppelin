@@ -12,7 +12,7 @@ import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { logger } from "../../../logger";
-import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
+import { convertDelayStringToMS, renderUserUsername, resolveMember } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
@@ -40,7 +40,7 @@ async function banAction(
     return;
   }
 
-  const targetMember = await pluginData.guild.members.fetch(target);
+  const targetMember = await resolveMember(pluginData.client, pluginData.guild, target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
     await interactionToReply
       .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
