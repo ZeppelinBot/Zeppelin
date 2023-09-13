@@ -66,7 +66,7 @@ async function muteAction(
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
 
   try {
-    const result = await mutes.muteUser(target, durationMs, reason, { caseArgs });
+    const result = await mutes.muteUser(targetMember.id, durationMs, reason, { caseArgs });
 
     const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
     const muteMessage = `Muted **${result.case.user_name}** ${

@@ -92,36 +92,36 @@ export interface IIgnoredEvent {
 
 export type WarnResult =
   | {
-    status: "failed";
-    error: string;
-  }
+      status: "failed";
+      error: string;
+    }
   | {
-    status: "success";
-    case: Case;
-    notifyResult: UserNotificationResult;
-  };
+      status: "success";
+      case: Case;
+      notifyResult: UserNotificationResult;
+    };
 
 export type KickResult =
   | {
-    status: "failed";
-    error: string;
-  }
+      status: "failed";
+      error: string;
+    }
   | {
-    status: "success";
-    case: Case;
-    notifyResult: UserNotificationResult;
-  };
+      status: "success";
+      case: Case;
+      notifyResult: UserNotificationResult;
+    };
 
 export type BanResult =
   | {
-    status: "failed";
-    error: string;
-  }
+      status: "failed";
+      error: string;
+    }
   | {
-    status: "success";
-    case: Case;
-    notifyResult: UserNotificationResult;
-  };
+      status: "success";
+      case: Case;
+      notifyResult: UserNotificationResult;
+    };
 
 export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 

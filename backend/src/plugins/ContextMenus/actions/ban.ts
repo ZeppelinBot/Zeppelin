@@ -53,7 +53,7 @@ async function banAction(
   };
 
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
-  const result = await modactions.banUserId(target, reason, { caseArgs }, durationMs);
+  const result = await modactions.banUserId(targetMember.id, reason, { caseArgs }, durationMs);
   if (result.status === "failed") {
     await interactionToReply
       .editReply({ content: "Error: Failed to ban user", embeds: [], components: [] })
