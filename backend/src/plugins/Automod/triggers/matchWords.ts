@@ -54,7 +54,7 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
       const looseMatchingThreshold = Math.min(Math.max(trigger.loose_matching_threshold, 1), 64);
       const patterns = trigger.words.map((word) => {
         let pattern = trigger.loose_matching
-          ? [...word].map((c) => escapeStringRegexp(c)).join(`(?:\\s*|.{0,${looseMatchingThreshold})`)
+          ? [...word].map((c) => escapeStringRegexp(c)).join(`(?:\\s*|.{0,${looseMatchingThreshold}})`)
           : escapeStringRegexp(word);
 
         if (trigger.only_full_words) {
