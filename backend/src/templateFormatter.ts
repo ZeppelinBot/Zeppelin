@@ -395,6 +395,10 @@ const baseValues = {
   ucfirst(arg) {
     return baseValues.upperFirst(arg);
   },
+  arrlen(arg) {
+    if (!Array.isArray(arg)) return 0;
+    return arg.length;
+  },
   strlen(arg) {
     if (typeof arg !== "string") return 0;
     return [...arg].length;
