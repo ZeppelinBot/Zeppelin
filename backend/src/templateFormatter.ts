@@ -465,6 +465,12 @@ const baseValues = {
     if (isNaN(base) || isNaN(power)) return 0;
     return Math.pow(parseFloat(base), parseFloat(power));
   },
+  map(obj, key) {
+    if (Array.isArray(obj)) {
+      return obj.map((tobj) => tobj[key]);
+    }
+    return obj[key];
+  },
   cases(mod, ...cases) {
     if (cases.length === 0) return "";
     if (isNaN(mod)) return "";
@@ -474,6 +480,10 @@ const baseValues = {
   choose(...cases) {
     const mod = Math.floor(Math.random() * cases.length) + 1;
     return baseValues.cases(mod, ...cases);
+  },
+  get_snowflake(str) {
+    if (!str || typeof str !== "string") return "";
+    return str.replaceAll(/[^\d]+/g, "");
   },
 };
 
