@@ -538,11 +538,16 @@ const baseValues = {
     return math_constants[str.toLowerCase()] ?? "";
   },
   map(obj, key) {
-    if (typeof obj !== "object" || typeof key !== "string" || typeof obj === "function" || !obj) return "";
-    if (Array.isArray(obj)) {
-      return obj.map((tobj) => tobj[key]);
+    return actualMap(obj, key);
+
+    function actualMap(obj, key, depth = 0) {
+      if (depth > 5) return "";
+      if (!obj || !key || typeof obj !== "object" || typeof key !== "string") return "";
+      if (Array.isArray(obj)) {
+        return obj.map((tobj) => actualMap(tobj, key, depth + 1));
+      }
+      return obj[key];
     }
-    return obj[key];
   },
   cases(mod, ...cases) {
     if (cases.length === 0) return "";
