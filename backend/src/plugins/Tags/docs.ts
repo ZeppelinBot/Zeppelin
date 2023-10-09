@@ -7,7 +7,7 @@ export function generateTemplateMarkdown(definitions: TemplateFunction[]): strin
       const usage = def.signature ?? `(${def.arguments.join(", ")})`;
       const examples = def.examples?.map((ex) => `> \`{${ex}}\``).join("\n") ?? null;
       return trimPluginDescription(`
-        ## ${def.name}
+        ## ${def.name}${def.plugin ? ` (${def.plugin} only)` : ""}
         **${def.description}**\n
         __Usage__: \`{${def.name}${usage}}\`\n
         ${examples ? `__Examples__:\n${examples}` : ""}\n\n
