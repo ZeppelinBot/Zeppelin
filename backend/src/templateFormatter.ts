@@ -557,6 +557,11 @@ const baseValues = {
     if (!str || typeof str !== "string") return "";
     return str.replaceAll(/[^\d]+/g, "");
   },
+  get_snowflake(str) {
+    // couldn't find a better way of aliasing :(
+    if (!str || typeof str !== "string") return "";
+    return str.replaceAll(/[^\d]+/g, "");
+  },
   convert_base(value, from, to) {
     try {
       // :joy:
