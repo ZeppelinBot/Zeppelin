@@ -538,6 +538,7 @@ const baseValues = {
     return math_constants[str.toLowerCase()] ?? "";
   },
   map(obj, key) {
+    if (typeof obj !== "object" || typeof key !== "string" || typeof obj === "function" || !obj) return "";
     if (Array.isArray(obj)) {
       return obj.map((tobj) => tobj[key]);
     }
