@@ -1,3 +1,4 @@
+import { convertBase } from "baseroo";
 import seedrandom from "seedrandom";
 import { get, has } from "./utils";
 
@@ -434,6 +435,10 @@ const baseValues = {
     if (isNaN(arg)) return 0;
     return Math.ceil(parseFloat(arg));
   },
+  abs(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.abs(parseFloat(arg));
+  },
   add(...args) {
     return args.reduce((result, arg) => {
       if (isNaN(arg)) return result;
@@ -465,6 +470,73 @@ const baseValues = {
     if (isNaN(base) || isNaN(power)) return 0;
     return Math.pow(parseFloat(base), parseFloat(power));
   },
+  sqrt(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.sqrt(parseFloat(arg));
+  },
+  cbrt(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cbrt(parseFloat(arg));
+  },
+  sin(radians) {
+    if (isNaN(radians)) return 0;
+    return Math.sin(parseFloat(radians));
+  },
+  sinh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.sinh(parseFloat(arg));
+  },
+  tan(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.tan(parseFloat(arg));
+  },
+  tanh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.tanh(parseFloat(arg));
+  },
+  log(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log(parseFloat(arg));
+  },
+  log2(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log2(parseFloat(arg));
+  },
+  log10(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log10(parseFloat(arg));
+  },
+  log1p(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log1p(parseFloat(arg));
+  },
+  hypot(...args) {
+    if (!args.every((e) => !isNaN(e))) return ""; // TODO: Improve validation
+    return Math.hypot(...args.map((e) => parseFloat(e)));
+  },
+  cos(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cos(parseFloat(arg));
+  },
+  cosh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cosh(parseFloat(arg));
+  },
+  const(str) {
+    // math constants lmao :joy:
+    const math_constants = {
+      pi: Math.PI,
+      e: Math.E,
+      sqrt2: Math.SQRT2,
+      "sqrt0.5": Math.SQRT1_2,
+      ln10: Math.LN10,
+      ln2: Math.LN2,
+      log10e: Math.LOG10E,
+      log2e: Math.LOG2E,
+    };
+    if (typeof str !== "string") return "";
+    return math_constants[str.toLowerCase()] ?? "";
+  },
   map(obj, key) {
     if (Array.isArray(obj)) {
       return obj.map((tobj) => tobj[key]);
@@ -484,6 +556,14 @@ const baseValues = {
   trim_text(str) {
     if (!str || typeof str !== "string") return "";
     return str.replaceAll(/[^\d]+/g, "");
+  },
+  convert_base(value, from, to) {
+    try {
+      // :joy:
+      return convertBase(value, from, to);
+    } catch (_) {
+      return "";
+    }
   },
 };
 

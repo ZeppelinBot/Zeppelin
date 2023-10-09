@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@silvia-odwyer/photon-node": "^0.3.1",
+    "baseroo": "^1.2.0",
     "bufferutil": "^4.0.3",
     "clinic": "^13.0.0",
     "cors": "^2.8.5",
