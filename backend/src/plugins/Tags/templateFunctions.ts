@@ -206,18 +206,11 @@ export const TemplateFunctions: TemplateFunction[] = [
     examples: ['map(user, "id")'],
   },
   {
-    name: "find_i",
-    description: "Returns the index of the first argument in the array",
-    returnValue: "number",
-    arguments: ["array", "value"],
-    examples: ['find_i(["Hello", "World"], "World")'],
-  },
-  {
-    name: "get_snowflake",
+    name: "trim_text",
     description: "Trims all non-numeric characters from a string",
     returnValue: "string",
     arguments: ["string"],
-    examples: ['get_snowflake("<@!344837487526412300>")'],
+    examples: ['trim_text("<@!344837487526412300>")'],
   },
   {
     name: "tag",

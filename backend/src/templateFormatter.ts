@@ -481,7 +481,7 @@ const baseValues = {
     const mod = Math.floor(Math.random() * cases.length) + 1;
     return baseValues.cases(mod, ...cases);
   },
-  get_snowflake(str) {
+  trim_text(str) {
     if (!str || typeof str !== "string") return "";
     return str.replaceAll(/[^\d]+/g, "");
   },
