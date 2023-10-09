@@ -564,7 +564,7 @@ const baseValues = {
   },
   convert_base(value, from, to) {
     try {
-      // :joy:
+      if (typeof value === "number") value = value.toString();
       return convertBase(value, from, to);
     } catch (_) {
       return "";
