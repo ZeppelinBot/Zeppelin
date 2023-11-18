@@ -418,7 +418,10 @@ const baseValues = {
     return Math.round(randValue * (to - from) + from);
   },
   round(arg, decimals = 0) {
-    if (isNaN(arg)) return 0;
+    if (typeof arg !== "number") {
+      arg = parseFloat(arg);
+    }
+    if (Number.isNaN(arg)) return 0;
     return decimals === 0 ? Math.round(arg) : arg.toFixed(Math.max(0, Math.min(decimals, 100)));
   },
   add(...args) {
