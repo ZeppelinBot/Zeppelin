@@ -419,7 +419,7 @@ const baseValues = {
   },
   round(arg, decimals = 0) {
     if (isNaN(arg)) return 0;
-    return decimals === 0 ? Math.round(arg) : arg.toFixed(decimals);
+    return decimals === 0 ? Math.round(arg) : arg.toFixed(Math.max(0, Math.min(decimals, 100)));
   },
   add(...args) {
     return args.reduce((result, arg) => {
