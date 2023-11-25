@@ -353,6 +353,7 @@ const baseValues = {
     return [...args].join("");
   },
   concatArr(arr, separator = "") {
+    if (!Array.isArray(arr)) return "";
     return arr.join(separator);
   },
   eq(...args) {
