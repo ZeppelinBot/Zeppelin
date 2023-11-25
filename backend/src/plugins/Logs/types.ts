@@ -23,6 +23,7 @@ import {
   TemplateSafeUser,
 } from "../../utils/templateSafeObjects";
 import { TRegex } from "../../validatorUtils";
+import { tBoundedString } from "../../utils/iotsUtils";
 
 export const tLogFormats = t.record(t.string, t.union([t.string, tMessageContent]));
 export type TLogFormats = t.TypeOf<typeof tLogFormats>;
@@ -53,12 +54,12 @@ export const ConfigSchema = t.type({
   format: t.intersection([
     tLogFormats,
     t.type({
-      timestamp: t.string, // Legacy/deprecated
+      timestamp: tBoundedString(0, 64), // Legacy/deprecated
     }),
   ]),
   ping_user: t.boolean, // Legacy/deprecated, if below is false mentions wont actually ping
   allow_user_mentions: t.boolean,
-  timestamp_format: t.string,
+  timestamp_format: tBoundedString(0, 64),
   include_embed_timestamp: t.boolean,
 });
 export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;

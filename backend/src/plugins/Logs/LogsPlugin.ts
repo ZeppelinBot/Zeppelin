@@ -110,6 +110,7 @@ import { logVoiceChannelForceMove } from "./logFunctions/logVoiceChannelForceMov
 import { logVoiceChannelJoin } from "./logFunctions/logVoiceChannelJoin";
 import { logVoiceChannelLeave } from "./logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "./logFunctions/logVoiceChannelMove";
+import { asBoundedString } from "../../utils/iotsUtils";
 
 // The `any` cast here is to prevent TypeScript from locking up from the circular dependency
 function getCasesPlugin(): Promise<any> {
@@ -120,12 +121,12 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
     format: {
-      timestamp: FORMAT_NO_TIMESTAMP, // Legacy/deprecated, use timestamp_format below instead
+      timestamp: asBoundedString(FORMAT_NO_TIMESTAMP), // Legacy/deprecated, use timestamp_format below instead
       ...DefaultLogMessages,
     },
     ping_user: true, // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
     allow_user_mentions: false,
-    timestamp_format: "[<t:]X[>]",
+    timestamp_format: asBoundedString("[<t:]X[>]"),
     include_embed_timestamp: true,
   },
 
