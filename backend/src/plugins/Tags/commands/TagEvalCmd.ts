@@ -5,6 +5,7 @@ import { TemplateParseError } from "../../../templateFormatter";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
+import { logger } from "../../../logger";
 
 export const TagEvalCmd = tagsCmd({
   trigger: "tag eval",
@@ -34,12 +35,17 @@ export const TagEvalCmd = tagsCmd({
 
       msg.channel.send(rendered);
     } catch (e) {
-      if (e instanceof TemplateParseError) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to render tag: ${e.message}`);
-        return;
+      const errorMessage = e instanceof TemplateParseError
+        ? e.message
+        : "Internal error";
+
+      sendErrorMessage(pluginData, msg.channel, `Failed to render tag: ${errorMessage}`);
+
+      if (! (e instanceof TemplateParseError)) {
+        logger.warn(`Internal error evaluating tag in ${pluginData.guild.id}: ${e}`);
       }
 
-      throw e;
+      return;
     }
   },
 });
