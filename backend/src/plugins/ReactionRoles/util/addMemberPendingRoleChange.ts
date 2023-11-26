@@ -33,7 +33,7 @@ export async function addMemberPendingRoleChange(
           try {
             await member.roles.set(Array.from(newRoleIds.values()), "Reaction roles");
           } catch (e) {
-            logger.warn(`Failed to apply role changes to ${renderUsername(member.user)} (${member.id}): ${e.message}`);
+            logger.warn(`Failed to apply role changes to ${renderUsername(member)} (${member.id}): ${e.message}`);
           }
         }
         lock.unlock();
