@@ -625,6 +625,7 @@ const plainLinkRegex = /((?!https?:\/\/)\S)+\.\S+/; // anything.anything, withou
 // Both of the above, with precedence on the first one
 const urlRegex = new RegExp(`(${realLinkRegex.source}|${plainLinkRegex.source})`, "g");
 const protocolRegex = /^[a-z]+:\/\//;
+const hostnameTldRegex = /^[a-z]$/;
 
 interface MatchedURL extends URL {
   input: string;
@@ -647,7 +648,15 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    const hostname = matchUrl.hostname.endsWith(".") ? matchUrl.hostname.slice(0, -1) : matchUrl.hostname;
+    //let hostname = matchUrl.hostname.endsWith(".") ? matchUrl.hostname.slice(0, -1) : matchUrl.hostname;
+    let hostname = matchUrl.hostname.toLowerCase();
+
+    if (hostname.length > 3) {
+      while (!hostnameTldRegex.test(hostname.at(-1)!)) {
+        if (!hostname.length) break;
+        hostname = hostname.slice(0, -1);
+      }
+    }
 
     const hostnameParts = hostname.split(".");
     const tld = hostnameParts[hostnameParts.length - 1];
