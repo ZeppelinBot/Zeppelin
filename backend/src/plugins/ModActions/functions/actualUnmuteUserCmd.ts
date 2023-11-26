@@ -3,7 +3,7 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { UnknownUser, asSingleLine, renderUserUsername } from "../../../utils";
+import { UnknownUser, asSingleLine, renderUsername } from "../../../utils";
 import { ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 
@@ -48,7 +48,7 @@ export async function actualUnmuteCmd(
       pluginData,
       msg.channel,
       asSingleLine(`
-        Unmuting **${renderUserUsername(user)}**
+        Unmuting **${renderUsername(user)}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
       `),
     );
@@ -57,7 +57,7 @@ export async function actualUnmuteCmd(
       pluginData,
       msg.channel,
       asSingleLine(`
-        Unmuted **${renderUserUsername(user)}**
+        Unmuted **${renderUsername(user)}**
         (Case #${result.case.case_number})
       `),
     );

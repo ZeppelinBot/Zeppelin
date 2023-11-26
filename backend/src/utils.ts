@@ -1607,15 +1607,11 @@ export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
 //export function renderUsername(username: GuildMember): string;
 //export function renderUsername(username: User): string;
 //export function renderUsername(username: string, discriminator?: string): string;
-export function renderUsername(username: string | User | GuildMember, discriminator?: string): string {
+export function renderUsername(username: string | User | GuildMember | UnknownUser, discriminator?: string): string {
   if (username instanceof GuildMember) return username.user.tag;
-  if (username instanceof User) return username.tag;
+  if (username instanceof User || username instanceof UnknownUser) return username.tag;
   if (discriminator === "0" || discriminator === "0000") {
     return username;
   }
   return `${username}#${discriminator}`;
-}
-
-export function renderUserUsername(user: User | UnknownUser): string {
-  return renderUsername(user.username, user.discriminator);
 }

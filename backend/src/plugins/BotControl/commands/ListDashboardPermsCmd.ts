@@ -2,7 +2,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { AllowedGuild } from "../../../data/entities/AllowedGuild";
 import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { renderUserUsername, resolveUser } from "../../../utils";
+import { renderUsername, resolveUser } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const ListDashboardPermsCmd = botControlCmd({
@@ -42,7 +42,7 @@ export const ListDashboardPermsCmd = botControlCmd({
 
     // If we have user, always display which guilds they have permissions in (or only specified guild permissions)
     if (args.user) {
-      const userInfo = `**${renderUserUsername(args.user)}** (\`${args.user.id}\`)`;
+      const userInfo = `**${renderUsername(args.user)}** (\`${args.user.id}\`)`;
 
       for (const assignment of existingUserAssignment!) {
         if (guild != null && assignment.guild_id !== args.guildId) continue;
@@ -74,7 +74,7 @@ export const ListDashboardPermsCmd = botControlCmd({
       finalMessage += `The server ${guildInfo} has the following assigned permissions:\n`; // Double \n for consistency with AddDashboardUserCmd
       for (const assignment of existingGuildAssignment) {
         const user = await resolveUser(pluginData.client, assignment.target_id);
-        finalMessage += `\n**${renderUserUsername(user)}**, \`${assignment.target_id}\`: ${assignment.permissions.join(
+        finalMessage += `\n**${renderUsername(user)}**, \`${assignment.target_id}\`: ${assignment.permissions.join(
           ", ",
         )}`;
       }

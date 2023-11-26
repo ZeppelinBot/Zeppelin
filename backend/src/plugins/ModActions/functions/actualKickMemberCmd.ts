@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/helpers";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DAYS, SECONDS, errorMessage, renderUserUsername, resolveMember, resolveUser } from "../../../utils";
+import { DAYS, SECONDS, errorMessage, renderUsername, resolveMember, resolveUser } from "../../../utils";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
@@ -103,7 +103,7 @@ export async function actualKickMemberCmd(
   }
 
   // Confirm the action to the moderator
-  let response = `Kicked **${renderUserUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
+  let response = `Kicked **${renderUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
   sendSuccessMessage(pluginData, msg.channel, response);

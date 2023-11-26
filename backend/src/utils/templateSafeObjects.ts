@@ -13,7 +13,7 @@ import {
   User,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { UnknownUser, renderUserUsername } from "src/utils";
+import { UnknownUser, renderUsername } from "src/utils";
 import { Case } from "../data/entities/Case";
 import {
   ISavedMessageAttachmentData,
@@ -250,7 +250,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
       discriminator: "0000",
       mention: `<@${user.id}>`,
       tag: "Unknown#0000",
-      renderedUsername: renderUserUsername(user),
+      renderedUsername: renderUsername(user),
     });
   }
 
@@ -264,7 +264,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     avatarURL: user.displayAvatarURL(),
     bot: user.bot,
     createdAt: user.createdTimestamp,
-    renderedUsername: renderUserUsername(user),
+    renderedUsername: renderUsername(user),
   });
 }
 
