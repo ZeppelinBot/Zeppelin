@@ -647,7 +647,9 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    const hostnameParts = matchUrl.hostname.split(".");
+    const hostname = matchUrl.hostname.endsWith(".") ? matchUrl.hostname.slice(0, -1) : matchUrl.hostname;
+
+    const hostnameParts = hostname.split(".");
     const tld = hostnameParts[hostnameParts.length - 1];
     if (tlds.includes(tld)) {
       urls.push(matchUrl);
