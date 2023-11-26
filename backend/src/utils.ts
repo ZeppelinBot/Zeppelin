@@ -648,7 +648,6 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    //let hostname = matchUrl.hostname.endsWith(".") ? matchUrl.hostname.slice(0, -1) : matchUrl.hostname;
     let hostname = matchUrl.hostname.toLowerCase();
 
     if (hostname.length > 3) {
