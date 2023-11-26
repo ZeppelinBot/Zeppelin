@@ -57,9 +57,10 @@ export async function clearMute(
           await member.timeout(null);
         }
       }
+      pluginData.getPlugin(LogsPlugin).logMemberMuteExpired({ member });
     } catch {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Failed to remove mute role from ${verboseUserMention(member.user)}`,
+        body: `Failed to clear mute from ${verboseUserMention(member.user)}`,
       });
     } finally {
       lock.unlock();
