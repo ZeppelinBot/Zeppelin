@@ -44,6 +44,7 @@ export async function muteUser(
   const muteType = getDefaultMuteType(pluginData);
   const muteExpiresAt = muteTime ? Date.now() + muteTime : null;
   const timeoutUntil = getTimeoutExpiryTime(muteExpiresAt);
+  console.log("timeoutUntil", timeoutUntil, muteTime);
 
   // No mod specified -> mark Zeppelin as the mod
   if (!muteOptions.caseArgs?.modId) {
