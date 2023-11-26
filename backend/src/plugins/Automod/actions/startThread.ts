@@ -57,7 +57,13 @@ export const StartThreadAction = automodAction({
 
     for (const threadContext of threads) {
       const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id);
-      if (!channel || !("threads" in channel) || channel.type === ChannelType.GuildForum) continue;
+      if (
+        !channel ||
+        !("threads" in channel) ||
+        channel.type === ChannelType.GuildForum ||
+        channel.type === ChannelType.GuildMedia
+      )
+        continue;
 
       const renderThreadName = async (str: string) =>
         renderTemplate(
@@ -90,10 +96,7 @@ export const StartThreadAction = automodAction({
           .create({
             ...threadOptions,
             type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
-            startMessage:
-              !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-                ? threadContext.message!.id
-                : undefined,
+            startMessage: !actionConfig.private ? threadContext.message!.id : undefined,
           })
           .catch(() => undefined);
       }
