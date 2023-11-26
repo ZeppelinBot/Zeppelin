@@ -50,13 +50,7 @@ export const StartThreadAction = automodAction({
 
     for (const threadContext of threads) {
       const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id);
-      if (
-        !channel ||
-        !("threads" in channel) ||
-        channel.type === ChannelType.GuildForum ||
-        channel.type === ChannelType.GuildMedia
-      )
-        continue;
+      if (!channel || !("threads" in channel) || channel.isThreadOnly()) continue;
 
       const renderThreadName = async (str: string) =>
         renderTemplate(
