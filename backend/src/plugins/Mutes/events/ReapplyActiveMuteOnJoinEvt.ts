@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 import { MuteTypes } from "../../../data/MuteTypes";
+import { noop } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { getTimeoutExpiryTime } from "../functions/getTimeoutExpiryTime";
@@ -25,7 +26,7 @@ export const ReapplyActiveMuteOnJoinEvt = mutesEvt({
       if (!member.isCommunicationDisabled()) {
         const expiresAt = mute.expires_at ? moment.utc(mute.expires_at).valueOf() : null;
         const timeoutExpiresAt = getTimeoutExpiryTime(expiresAt);
-        await member.disableCommunicationUntil(timeoutExpiresAt);
+        await member.disableCommunicationUntil(timeoutExpiresAt).catch(noop);
       }
     }
 

@@ -1,4 +1,4 @@
-import { Snowflake } from "discord.js";
+import { PermissionsBitField, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -54,8 +54,11 @@ export async function unmuteUser(
     }
 
     // Update timeout
-    if (existingMute?.type === MuteTypes.Timeout || createdMute?.type === MuteTypes.Timeout) {
-      await member?.disableCommunicationUntil(timeoutExpiresAt);
+    if (member && (existingMute?.type === MuteTypes.Timeout || createdMute?.type === MuteTypes.Timeout)) {
+      if (!member.manageable || !member.moderatable || member.permissions.has(PermissionsBitField.Flags.Administrator))
+        return null;
+
+      await member.disableCommunicationUntil(timeoutExpiresAt);
       await pluginData.state.mutes.updateTimeoutExpiresAt(userId, timeoutExpiresAt);
     }
   } else {

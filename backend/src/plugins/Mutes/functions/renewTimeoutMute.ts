@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes";
 import { Mute } from "../../../data/entities/Mute";
-import { DBDateFormat, resolveMember } from "../../../utils";
+import { DBDateFormat, noop, resolveMember } from "../../../utils";
 import { MutesPluginType } from "../types";
 
 export async function renewTimeoutMute(pluginData: GuildPluginData<MutesPluginType>, mute: Mute) {
@@ -24,6 +24,6 @@ export async function renewTimeoutMute(pluginData: GuildPluginData<MutesPluginTy
   }
 
   const expiryTimestamp = moment.utc(newExpiryTime).valueOf();
-  await member.disableCommunicationUntil(expiryTimestamp);
+  await member.disableCommunicationUntil(expiryTimestamp).catch(noop);
   await pluginData.state.mutes.updateTimeoutExpiresAt(mute.user_id, expiryTimestamp);
 }
