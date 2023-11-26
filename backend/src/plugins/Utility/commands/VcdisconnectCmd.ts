@@ -43,7 +43,7 @@ export const VcdisconnectCmd = utilityCmd({
     sendSuccessMessage(
       pluginData,
       msg.channel,
-      `**${renderUsername(args.member.user)}** disconnected from **${channel.name}**`,
+      `**${renderUsername(args.member)}** disconnected from **${channel.name}**`,
     );
   },
 });

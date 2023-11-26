@@ -74,7 +74,7 @@ export const MutesCmd = mutesCmd({
       totalMutes = manuallyMutedMembers.length;
 
       lines = manuallyMutedMembers.map((member) => {
-        return `<@!${member.id}> (**${renderUsername(member.user)}**, \`${member.id}\`)   🔧 Manual mute`;
+        return `<@!${member.id}> (**${renderUsername(member)}**, \`${member.id}\`)   🔧 Manual mute`;
       });
     } else {
       // Show filtered active mutes (but not manual mutes)

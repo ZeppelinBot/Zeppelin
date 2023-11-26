@@ -42,7 +42,7 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   if (trigger.match_visible_names) {
-    yield ["visiblename", member.nickname || member.user.globalName || msg.data.author.username];
+    yield ["visiblename", member.displayName || msg.data.author.username];
   }
 
   if (trigger.match_usernames) {

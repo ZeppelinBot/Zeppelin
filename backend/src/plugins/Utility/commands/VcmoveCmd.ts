@@ -80,7 +80,7 @@ export const VcmoveCmd = utilityCmd({
       newChannel: channel,
     });
 
-    sendSuccessMessage(pluginData, msg.channel, `**${renderUsername(args.member.user)}** moved to **${channel.name}**`);
+    sendSuccessMessage(pluginData, msg.channel, `**${renderUsername(args.member)}** moved to **${channel.name}**`);
   },
 });
 
@@ -153,7 +153,7 @@ export const VcmoveAllCmd = utilityCmd({
         sendErrorMessage(
           pluginData,
           msg.channel,
-          `Failed to move ${renderUsername(currMember.user)} (${currMember.id}): You cannot act on this member`,
+          `Failed to move ${renderUsername(currMember)} (${currMember.id}): You cannot act on this member`,
         );
         errAmt++;
         continue;
@@ -168,11 +168,7 @@ export const VcmoveAllCmd = utilityCmd({
           sendErrorMessage(pluginData, msg.channel, "Unknown error when trying to move members");
           return;
         }
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Failed to move ${renderUsername(currMember.user)} (${currMember.id})`,
-        );
+        sendErrorMessage(pluginData, msg.channel, `Failed to move ${renderUsername(currMember)} (${currMember.id})`);
         errAmt++;
         continue;
       }

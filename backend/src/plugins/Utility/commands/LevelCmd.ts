@@ -18,6 +18,6 @@ export const LevelCmd = utilityCmd({
   run({ message, args, pluginData }) {
     const member = args.member || message.member;
     const level = getMemberLevel(pluginData, member);
-    message.channel.send(`The permission level of ${renderUsername(member.user)} is **${level}**`);
+    message.channel.send(`The permission level of ${renderUsername(member)} is **${level}**`);
   },
 });

@@ -1,7 +1,7 @@
-import { APIEmbed, GuildMember, User } from "discord.js";
+import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils";
+import { UnknownUser, emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
@@ -31,7 +31,7 @@ export const CasesModCmd = modActionsCmd({
     const mod =
       (await resolveMember(pluginData.client, pluginData.guild, modId)) ||
       (await resolveUser(pluginData.client, modId));
-    const modName = mod instanceof User ? renderUsername(mod) : modId;
+    const modName = mod instanceof UnknownUser ? modId : renderUsername(mod);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const totalCases = await casesPlugin.getTotalCasesByMod(modId);
@@ -59,7 +59,7 @@ export const CasesModCmd = modActionsCmd({
         const embed = {
           author: {
             name: title,
-            icon_url: mod instanceof User || mod instanceof GuildMember ? mod.displayAvatarURL() : undefined,
+            icon_url: mod instanceof UnknownUser ? undefined : mod.displayAvatarURL(),
           },
           fields: [
             ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),

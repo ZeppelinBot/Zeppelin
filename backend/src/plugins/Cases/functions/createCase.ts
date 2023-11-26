@@ -8,16 +8,16 @@ import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 
 export async function createCase(pluginData: GuildPluginData<CasesPluginType>, args: CaseArgs) {
   const user = await resolveUser(pluginData.client, args.userId);
-  const userName = renderUsername(user.username, user.discriminator);
+  const name = renderUsername(user);
 
   const mod = await resolveUser(pluginData.client, args.modId);
-  const modName = renderUsername(mod.username, mod.discriminator);
+  const modName = renderUsername(mod);
 
   let ppName: string | null = null;
   let ppId: Snowflake | null = null;
   if (args.ppId) {
     const pp = await resolveUser(pluginData.client, args.ppId);
-    ppName = renderUsername(pp.username, pp.discriminator);
+    ppName = renderUsername(pp);
     ppId = pp.id;
   }
 
@@ -32,7 +32,7 @@ export async function createCase(pluginData: GuildPluginData<CasesPluginType>, a
   const createdCase = await pluginData.state.cases.create({
     type: args.type,
     user_id: user.id,
-    user_name: userName,
+    user_name: name,
     mod_id: mod.id,
     mod_name: modName,
     audit_log_id: args.auditLogId,

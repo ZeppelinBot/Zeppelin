@@ -38,7 +38,7 @@ export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
     const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId as Snowflake);
     const roleName = role?.name || "Unknown";
     const member = contexts[0].member!;
-    const memberName = `**${renderUsername(member.user)}** (\`${member.id}\`)`;
+    const memberName = `**${renderUsername(member)}** (\`${member.id}\`)`;
     return `Role ${roleName} (\`${matchResult.extra.matchedRoleId}\`) was removed from ${memberName}`;
   },
 });

@@ -381,7 +381,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = renderUsername(member.user);
+      const fullUsername = renderUsername(member);
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -492,7 +492,7 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
     if (member instanceof GuildMember) {
-      line = `${paddedId} ${renderUsername(member.user)}`;
+      line = `${paddedId} ${renderUsername(member)}`;
       if (member.nickname) line += ` (${member.nickname})`;
     } else {
       line = `${paddedId} ${renderUsername(member)}`;

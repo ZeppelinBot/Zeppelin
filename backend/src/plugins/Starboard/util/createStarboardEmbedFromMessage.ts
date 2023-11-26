@@ -28,7 +28,7 @@ export function createStarboardEmbedFromMessage(
     embed.color = color;
   }
 
-  embed.author.icon_url = (msg.member || msg.author).displayAvatarURL();
+  embed.author.icon_url = (msg.member ?? msg.author).displayAvatarURL();
 
   // The second condition here checks for messages with only an image link that is then embedded.
   // The message content in that case is hidden by the Discord client, so we hide it here too.

@@ -103,7 +103,7 @@ export async function actualKickMemberCmd(
   }
 
   // Confirm the action to the moderator
-  let response = `Kicked **${renderUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
+  let response = `Kicked **${renderUsername(memberToKick)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
   sendSuccessMessage(pluginData, msg.channel, response);

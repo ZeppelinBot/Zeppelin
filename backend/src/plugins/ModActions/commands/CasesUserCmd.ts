@@ -46,7 +46,7 @@ export const CasesUserCmd = modActionsCmd({
     const user =
       (await resolveMember(pluginData.client, pluginData.guild, args.user)) ||
       (await resolveUser(pluginData.client, args.user));
-    if (!user.id || user instanceof UnknownUser) {
+    if (user instanceof UnknownUser) {
       sendErrorMessage(pluginData, msg.channel, `User not found`);
       return;
     }

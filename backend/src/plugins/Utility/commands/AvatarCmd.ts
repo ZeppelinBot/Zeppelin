@@ -14,7 +14,7 @@ export const AvatarCmd = utilityCmd({
   },
 
   async run({ message: msg, args, pluginData }) {
-    const user = args.user || msg.member || msg.author;
+    const user = args.user ?? msg.member ?? msg.author;
     if (!(user instanceof UnknownUser)) {
       const embed: APIEmbed = {
         image: {

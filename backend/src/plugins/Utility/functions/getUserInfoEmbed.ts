@@ -43,7 +43,7 @@ export async function getUserInfoEmbed(
     name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user)}`,
   };
 
-  const avatarURL = (member || user).displayAvatarURL();
+  const avatarURL = (member ?? user).displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   if (compact) {
