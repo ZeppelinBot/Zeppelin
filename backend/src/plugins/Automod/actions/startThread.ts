@@ -1,10 +1,4 @@
-import {
-  ChannelType,
-  GuildFeature,
-  GuildTextThreadCreateOptions,
-  ThreadAutoArchiveDuration,
-  ThreadChannel,
-} from "discord.js";
+import { ChannelType, GuildTextThreadCreateOptions, ThreadAutoArchiveDuration, ThreadChannel } from "discord.js";
 import * as t from "io-ts";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { MINUTES, convertDelayStringToMS, noop, tDelayString, tNullable } from "../../../utils";
@@ -77,10 +71,7 @@ export const StartThreadAction = automodAction({
       const threadOptions: GuildTextThreadCreateOptions<unknown> = {
         name: threadName,
         autoArchiveDuration: autoArchive,
-        startMessage:
-          !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-            ? threadContext.message!.id
-            : undefined,
+        startMessage: !actionConfig.private ? threadContext.message!.id : undefined,
       };
 
       let thread: ThreadChannel | undefined;
