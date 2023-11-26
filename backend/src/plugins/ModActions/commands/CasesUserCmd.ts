@@ -6,7 +6,6 @@ import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { modActionsCmd } from "../types";
 
@@ -107,7 +106,7 @@ export const CasesUserCmd = modActionsCmd({
 
             const isLastPage = page === totalPages;
             const firstCaseNum = (page - 1) * casesPerPage + 1;
-            const lastCaseNum = page * casesPerPage;
+            const lastCaseNum = isLastPage ? cases.length : page * casesPerPage;
             const title =
               totalPages === 1
                 ? `Cases for ${userName} (${lines.length} total)`
@@ -118,13 +117,11 @@ export const CasesUserCmd = modActionsCmd({
                 name: title,
                 icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
               },
+              description: lines.join("\n"),
               fields: [
-                ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
                 {
                   name: emptyEmbedValue,
-                  value: trimLines(`
-                    Use \`${prefix}case <num>\` to see more information about an individual case
-                  `),
+                  value: trimLines(`Use \`${prefix}case <num>\` to see more information about an individual case`),
                 },
               ],
             } satisfies APIEmbed;
