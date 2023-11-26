@@ -13,7 +13,6 @@ import {
   trimLines,
   UnknownUser,
 } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const MAX_ROLES_TO_DISPLAY = 15;
@@ -40,13 +39,11 @@ export async function getUserInfoEmbed(
     fields: [],
   };
 
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-
   embed.author = {
     name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user)}`,
   };
 
-  const avatarURL = user.displayAvatarURL();
+  const avatarURL = (member || user).displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   if (compact) {

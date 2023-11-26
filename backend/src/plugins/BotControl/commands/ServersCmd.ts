@@ -1,7 +1,7 @@
 import escapeStringRegexp from "escape-string-regexp";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
-import { createChunkedMessage, getUser, sorter } from "../../../utils";
+import { createChunkedMessage, getUser, renderUsername, sorter } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const ServersCmd = botControlCmd({
@@ -48,7 +48,9 @@ export const ServersCmd = botControlCmd({
         const lines = filteredGuilds.map((g) => {
           const paddedId = g.id.padEnd(longestId, " ");
           const owner = getUser(pluginData.client, g.ownerId);
-          return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${owner.tag}** \`${owner.id}\`)`;
+          return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${renderUsername(owner.tag)}** \`${
+            owner.id
+          }\`)`;
         });
         createChunkedMessage(msg.channel, lines.join("\n"));
       } else {

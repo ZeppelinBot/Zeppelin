@@ -14,7 +14,7 @@ import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
-import { MINUTES, multiSorter, renderUserUsername, sorter, trimLines } from "../../utils";
+import { MINUTES, multiSorter, renderUsername, sorter, trimLines } from "../../utils";
 import { asyncFilter } from "../../utils/async";
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
 import { InvalidRegexError, inputPatternToRegExp } from "../../validatorUtils";
@@ -381,7 +381,7 @@ async function performMemberSearch(
         return true;
       }
 
-      const fullUsername = renderUserUsername(member.user);
+      const fullUsername = renderUsername(member.user);
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
 
       return false;
@@ -448,7 +448,7 @@ async function performBanSearch(
 
     const execRegExp = getOptimizedRegExpRunner(pluginData, isSafeRegex);
     matchingBans = await asyncFilter(matchingBans, async (user) => {
-      const fullUsername = renderUserUsername(user);
+      const fullUsername = renderUsername(user);
       if (await execRegExp(queryRegex, fullUsername).catch(allowTimeout)) return true;
       return false;
     });
@@ -492,10 +492,10 @@ function formatSearchResultList(members: Array<GuildMember | User>): string {
     const paddedId = member.id.padEnd(longestId, " ");
     let line;
     if (member instanceof GuildMember) {
-      line = `${paddedId} ${renderUserUsername(member.user)}`;
+      line = `${paddedId} ${renderUsername(member.user)}`;
       if (member.nickname) line += ` (${member.nickname})`;
     } else {
-      line = `${paddedId} ${member.tag}`;
+      line = `${paddedId} ${renderUsername(member)}`;
     }
     return line;
   });

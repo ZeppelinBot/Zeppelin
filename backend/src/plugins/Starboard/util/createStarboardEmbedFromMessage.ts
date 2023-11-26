@@ -1,6 +1,6 @@
 import { GuildChannel, Message } from "discord.js";
 import path from "path";
-import { EMPTY_CHAR, EmbedWith } from "../../../utils";
+import { EMPTY_CHAR, EmbedWith, renderUsername } from "../../../utils";
 
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 const audioAttachmentExtensions = ["wav", "mp3", "m4a"];
@@ -18,7 +18,7 @@ export function createStarboardEmbedFromMessage(
       text: `#${(msg.channel as GuildChannel).name}`,
     },
     author: {
-      name: msg.author.tag,
+      name: renderUsername(msg.author),
     },
     fields: [],
     timestamp: msg.createdAt.toISOString(),
@@ -28,7 +28,7 @@ export function createStarboardEmbedFromMessage(
     embed.color = color;
   }
 
-  embed.author.icon_url = msg.author.displayAvatarURL();
+  embed.author.icon_url = (msg.member || msg.author).displayAvatarURL();
 
   // The second condition here checks for messages with only an image link that is then embedded.
   // The message content in that case is hidden by the Discord client, so we hide it here too.

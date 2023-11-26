@@ -48,7 +48,7 @@ export async function sendMessage(
         ...content,
         ...(pluginData.client.user && {
           username: pluginData.client.user.username,
-          avatarURL: pluginData.client.user.avatarURL() || pluginData.client.user.defaultAvatarURL,
+          avatarURL: pluginData.client.user.displayAvatarURL(),
         }),
       })
       .then((apiMessage) => ({

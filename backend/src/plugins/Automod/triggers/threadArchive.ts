@@ -1,6 +1,6 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
 import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import { renderUsername, tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface ThreadArchiveResult {
@@ -48,7 +48,7 @@ export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     const base = `Thread **#${threadName}** (\`${threadId}\`) has been archived in the **#${parentName}** (\`${parentId}\`) channel`;
     if (threadOwner) {
-      return `${base} by **${escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
+      return `${base} by **${escapeBold(renderUsername(threadOwner.tag))}** (\`${threadOwner.id}\`)`;
     }
     return base;
   },

@@ -1,5 +1,6 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
 import * as t from "io-ts";
+import { renderUsername } from "../../../utils.js";
 import { automodTrigger } from "../helpers";
 
 interface ThreadDeleteResult {
@@ -40,7 +41,7 @@ export const ThreadDeleteTrigger = automodTrigger<ThreadDeleteResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     if (threadOwner) {
       return `Thread **#${threadName ?? "Unknown"}** (\`${threadId}\`) created by **${escapeBold(
-        threadOwner.tag,
+        renderUsername(threadOwner.tag),
       )}** (\`${threadOwner.id}\`) in the **#${parentName}** (\`${parentId}\`) channel has been deleted`;
     }
     return `Thread **#${
