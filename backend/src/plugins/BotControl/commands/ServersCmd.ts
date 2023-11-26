@@ -48,9 +48,10 @@ export const ServersCmd = botControlCmd({
         const lines = filteredGuilds.map((g) => {
           const paddedId = g.id.padEnd(longestId, " ");
           const owner = getUser(pluginData.client, g.ownerId);
-          return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${renderUsername(owner.tag)}** \`${
-            owner.id
-          }\`)`;
+          return `\`${paddedId}\` **${g.name}** (${g.memberCount} members) (owner **${renderUsername(
+            owner.username,
+            owner.discriminator,
+          )}** \`${owner.id}\`)`;
         });
         createChunkedMessage(msg.channel, lines.join("\n"));
       } else {
