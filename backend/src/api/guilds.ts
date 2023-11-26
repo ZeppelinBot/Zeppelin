@@ -126,7 +126,7 @@ export function initGuildsAPI(app: express.Express) {
         if (type !== ApiPermissionTypes.User) {
           return clientError(res, "Invalid type");
         }
-        if (!isSnowflake(targetId)) {
+        if (!isSnowflake(targetId) || targetId === req.user!.userId) {
           return clientError(res, "Invalid targetId");
         }
         const validPermissions = new Set(Object.values(ApiPermissions));
