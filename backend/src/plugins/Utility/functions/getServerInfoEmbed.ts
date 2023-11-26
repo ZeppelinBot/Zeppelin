@@ -205,9 +205,14 @@ export async function getServerInfoEmbed(
         [GuildPremiumTier.Tier3]: 60,
       }[restGuild.premiumTier] ?? 0;
 
+    const availableEmojis = restGuild.emojis.cache.filter((e) => e.available);
     otherStats.push(
-      `Emojis: **${restGuild.emojis.cache.size}** / ${maxEmojis * 2}${
+      `Emojis: **${availableEmojis.size}** / ${maxEmojis * 2}${
         roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""
+      }${
+        availableEmojis.size < restGuild.emojis.cache.size
+          ? ` (__${restGuild.emojis.cache.size - availableEmojis.size} unavailable__)`
+          : ""
       }`,
     );
     otherStats.push(`Stickers: **${restGuild.stickers.cache.size}** / ${maxStickers}`);
