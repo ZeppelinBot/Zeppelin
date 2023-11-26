@@ -41,7 +41,6 @@ export const StartThreadAction = automodAction({
       return true;
     });
 
-    const guild = pluginData.guild;
     const archiveSet = actionConfig.auto_archive
       ? Math.ceil(Math.max(convertDelayStringToMS(actionConfig.auto_archive) ?? 0, 0) / MINUTES)
       : ThreadAutoArchiveDuration.OneDay;

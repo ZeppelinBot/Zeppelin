@@ -26,7 +26,7 @@ export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
   compact = false,
-  requestMemberId?: string,
+  //  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {

@@ -25,7 +25,7 @@ const prettifyFeature = (feature: string): string =>
 export async function getServerInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   serverId: string,
-  requestMemberId?: string,
+  //  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const thisServer = serverId === pluginData.guild.id ? pluginData.guild : null;
   const [restGuild, guildPreview] = await Promise.all([

@@ -9,7 +9,7 @@ const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/
 export async function getRoleInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   role: Role,
-  requestMemberId?: string,
+  // requestMemberId?: string,
 ): Promise<APIEmbed> {
   const embed: EmbedWith<"fields" | "author" | "color"> = {
     fields: [],

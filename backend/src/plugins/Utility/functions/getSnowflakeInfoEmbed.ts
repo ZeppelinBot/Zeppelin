@@ -10,7 +10,7 @@ export async function getSnowflakeInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   snowflake: string,
   showUnknownWarning = false,
-  requestMemberId?: string,
+  //  requestMemberId?: string,
 ): Promise<APIEmbed> {
   const embed: EmbedWith<"fields" | "author"> = {
     fields: [],

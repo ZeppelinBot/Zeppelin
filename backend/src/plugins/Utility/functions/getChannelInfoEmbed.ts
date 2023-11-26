@@ -24,7 +24,7 @@ const MEDIA_CHANNEL_ICON = "https://cdn.discordapp.com/attachments/8761342052292
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
-  requestMemberId?: string,
+  //  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
   if (!channel) {

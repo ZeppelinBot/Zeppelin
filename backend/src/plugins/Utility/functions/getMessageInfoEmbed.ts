@@ -9,7 +9,6 @@ import {
   trimEmptyLines,
   trimLines,
 } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
@@ -18,7 +17,7 @@ export async function getMessageInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
   messageId: string,
-  requestMemberId?: string,
+  //  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const message = await (pluginData.guild.channels.resolve(channelId as Snowflake) as TextChannel).messages
     .fetch(messageId as Snowflake)
@@ -26,8 +25,6 @@ export async function getMessageInfoEmbed(
   if (!message) {
     return null;
   }
-
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   const embed: EmbedWith<"fields" | "author"> = {
     fields: [],
