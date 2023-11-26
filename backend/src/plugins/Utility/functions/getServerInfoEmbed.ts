@@ -149,11 +149,15 @@ export async function getServerInfoEmbed(
     const textChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildText);
     const voiceChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildVoice);
     const forumChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildForum);
+    const mediaChannels = thisServer.channels.cache.filter((channel) => channel.type === ChannelType.GuildMedia);
     const threadChannelsText = thisServer.channels.cache.filter(
       (channel) => channel.isThread() && channel.parent?.type !== ChannelType.GuildForum,
     );
     const threadChannelsForums = thisServer.channels.cache.filter(
       (channel) => channel.isThread() && channel.parent?.type === ChannelType.GuildForum,
+    );
+    const threadChannelsMedia = thisServer.channels.cache.filter(
+      (channel) => channel.isThread() && channel.parent?.type === ChannelType.GuildMedia,
     );
     const announcementChannels = thisServer.channels.cache.filter(
       (channel) => channel.type === ChannelType.GuildAnnouncement,
@@ -169,6 +173,7 @@ export async function getServerInfoEmbed(
           Categories: **${categories.size}**
           Text: **${textChannels.size}** (**${threadChannelsText.size} threads**)
           Forums: **${forumChannels.size}** (**${threadChannelsForums.size} threads**)
+          Media: **${mediaChannels.size}** (**${threadChannelsMedia.size} threads**)
           Announcement: **${announcementChannels.size}**
           Voice: **${voiceChannels.size}**
           Stage: **${stageChannels.size}**

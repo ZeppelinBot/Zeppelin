@@ -56,6 +56,7 @@ export async function getChannelInfoEmbed(
       [ChannelType.AnnouncementThread]: "News Thread channel",
       [ChannelType.GuildDirectory]: "Hub channel",
       [ChannelType.GuildForum]: "Forum channel",
+      [ChannelType.GuildMedia]: "Media channel",
     }[channel.type] ?? "Channel";
 
   embed.author = {
