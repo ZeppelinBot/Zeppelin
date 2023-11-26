@@ -1,4 +1,4 @@
-import { PermissionsBitField, Snowflake } from "discord.js";
+import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
@@ -91,7 +91,6 @@ export async function muteUser(
       rolesToRestore = currentUserRoles.filter((x) => (<string[]>restoreRoles).includes(x));
     }
 
-    const zep = await pluginData.guild.members.fetchMe();
     if (muteType === MuteTypes.Role) {
       // Verify the configured mute role is valid
       const actualMuteRole = pluginData.guild.roles.cache.get(muteRole!);
@@ -104,6 +103,7 @@ export async function muteUser(
       }
 
       // Verify the mute role is not above Zep's roles
+      const zep = await pluginData.guild.members.fetchMe();
       const zepRoles = pluginData.guild.roles.cache.filter((x) => zep.roles.cache.has(x.id));
       if (zepRoles.size === 0 || !zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
         lock.unlock();
@@ -125,7 +125,7 @@ export async function muteUser(
         throw new RecoverablePluginError(ERRORS.USER_ABOVE_ZEP, pluginData.guild);
       }
 
-      if (!member.moderatable || member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+      if (!member.moderatable) {
         // redundant safety, since canActOn already checks this
         lock.unlock();
         logs.logBotAlert({
