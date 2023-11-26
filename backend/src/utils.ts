@@ -1222,11 +1222,25 @@ export function resolveUserId(bot: Client, value: string) {
   }
 
   // A non-mention, full username?
-  const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+  const oldUsernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+  if (oldUsernameMatch) {
+    const profiler = getProfiler();
+    const start = performance.now();
+    const user = bot.users.cache.find(
+      (u) => u.username === oldUsernameMatch[1] && u.discriminator === oldUsernameMatch[2],
+    );
+    profiler?.addDataPoint("utils:resolveUserId:usernameMatch", performance.now() - start);
+    if (user) {
+      return user.id;
+    }
+  }
+
+  // new usernames system
+  const usernameMatch = value.match(/^@?([^#]+)$/);
   if (usernameMatch) {
     const profiler = getProfiler();
     const start = performance.now();
-    const user = bot.users.cache.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    const user = bot.users.cache.find((u) => u.username === usernameMatch[1]);
     profiler?.addDataPoint("utils:resolveUserId:usernameMatch", performance.now() - start);
     if (user) {
       return user.id;
