@@ -211,7 +211,7 @@ export async function getServerInfoEmbed(
         roleLockedEmojis ? ` (__${roleLockedEmojis} role-locked__)` : ""
       }${
         availableEmojis.size < restGuild.emojis.cache.size
-          ? ` (__${restGuild.emojis.cache.size - availableEmojis.size} unavailable__)`
+          ? ` (__+${restGuild.emojis.cache.size - availableEmojis.size} unavailable__)`
           : ""
       }`,
     );
