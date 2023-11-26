@@ -49,6 +49,7 @@ export class TemplateSafeUser extends TemplateSafeValueContainer {
   id: Snowflake | string;
   username: string;
   discriminator: string;
+  globalName?: string;
   mention: string;
   tag: string;
   avatarURL?: string;
@@ -257,6 +258,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     id: user.id,
     username: user.username,
     discriminator: user.discriminator,
+    globalName: user.globalName,
     mention: `<@${user.id}>`,
     tag: user.tag,
     avatarURL: user.displayAvatarURL?.(),

@@ -43,7 +43,7 @@ export async function getUserInfoEmbed(
   const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
-    name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user.username, user.discriminator)}`,
+    name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user)}`,
   };
 
   const avatarURL = user.displayAvatarURL();
@@ -72,9 +72,8 @@ export async function getUserInfoEmbed(
   }
 
   const userInfoLines = [`ID: \`${user.id}\``, `Username: **${user.username}**`];
-  if (user.discriminator !== "0") {
-    userInfoLines.push(`Discriminator: **${user.discriminator}**`);
-  }
+  if (user.discriminator !== "0") userInfoLines.push(`Discriminator: **${user.discriminator}**`);
+  if (user.globalName) userInfoLines.push(`Display Name: **${user.globalName}**`);
   userInfoLines.push(`Created: **<t:${Math.round(user.createdTimestamp / 1000)}:R>**`);
   userInfoLines.push(`Mention: <@!${user.id}>`);
 
