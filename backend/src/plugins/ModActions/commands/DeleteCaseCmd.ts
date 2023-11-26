@@ -2,7 +2,7 @@ import { helpers } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { SECONDS, trimLines } from "../../../utils";
+import { SECONDS, renderUsername, trimLines } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -60,7 +60,7 @@ export const DeleteCaseCmd = modActionsCmd({
         }
       }
 
-      const deletedByName = message.author.tag;
+      const deletedByName = renderUsername(message.author);
 
       const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
       const deletedAt = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));
