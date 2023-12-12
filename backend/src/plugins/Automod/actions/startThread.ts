@@ -2,6 +2,7 @@ import {
   ChannelType,
   GuildFeature,
   GuildTextThreadCreateOptions,
+  TextChannel,
   ThreadAutoArchiveDuration,
   ThreadChannel,
 } from "discord.js";
@@ -86,7 +87,7 @@ export const StartThreadAction = automodAction({
           })
           .catch(() => undefined);
       } else {
-        thread = await channel.threads
+        thread = await (channel as TextChannel).threads
           .create({
             ...threadOptions,
             type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
