@@ -1,11 +1,8 @@
-import { escapeInlineCode, PermissionsBitField } from "discord.js";
+import { escapeInlineCode } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
+import { DAYS, HOURS, MINUTES, asSingleLine } from "../../../utils";
 import { slowmodeCmd } from "../types";
 import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
 import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
@@ -85,39 +82,6 @@ export const SlowmodeSetCmd = slowmodeCmd({
         `),
       );
       return;
-    }
-
-    // Verify permissions
-    const channelPermissions = channel.permissionsFor(pluginData.client.user!.id);
-
-    if (mode === "native") {
-      const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new PermissionsBitField(),
-        NATIVE_SLOWMODE_PERMISSIONS,
-      );
-      if (missingPermissions) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Unable to set native slowmode. ${missingPermissionError(missingPermissions)}`,
-        );
-        return;
-      }
-    }
-
-    if (mode === "bot") {
-      const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new PermissionsBitField(),
-        BOT_SLOWMODE_PERMISSIONS,
-      );
-      if (missingPermissions) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Unable to set bot managed slowmode. ${missingPermissionError(missingPermissions)}`,
-        );
-        return;
-      }
     }
 
     // Apply the slowmode!
