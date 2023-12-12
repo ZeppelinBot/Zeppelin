@@ -67,7 +67,7 @@ export async function getCaseSummary(
   let caseType = (caseAbbreviations[theCase.type] || String(theCase.type)).toUpperCase();
   caseType = (caseType + "    ").slice(0, 4);
 
-  let line = `${icon} **\`${caseType}\`** \`[${prettyTimestamp}]\` ${caseTitle} ${reason}`;
+  let line = `${icon} **\`${caseType}\`** \`[${prettyTimestamp}]\` ${caseTitle} **Mod:** ${theCase.mod_name}\n${reason}`;
   if (leftoverNotes > 1) {
     line += ` *(+${leftoverNotes} ${leftoverNotes === 1 ? "note" : "notes"})*`;
   }
