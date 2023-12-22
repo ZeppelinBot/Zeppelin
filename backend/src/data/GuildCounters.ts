@@ -285,7 +285,11 @@ export class GuildCounters extends BaseGuildRepository {
         reverse_comparison_value: reverseComparisonValue,
       });
 
-      return (await entityManager.findOne(CounterTrigger, insertResult.identifiers[0].id))!;
+      return (await entityManager.findOne(CounterTrigger, {
+        where: {
+          id: insertResult.identifiers[0].id
+        }
+      }))!;
     });
   }
 
