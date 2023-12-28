@@ -16,7 +16,7 @@ export class StarboardReaction {
   @Column()
   reactor_id: string;
 
-  @OneToOne((type) => SavedMessage)
+  @OneToOne(() => SavedMessage)
   @JoinColumn({ name: "message_id" })
   message: SavedMessage;
 }

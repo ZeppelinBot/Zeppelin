@@ -13,7 +13,7 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
     new_threshold: "1h",
   },
 
-  async match({ pluginData, context, triggerConfig }) {
+  async match({ context, triggerConfig }) {
     if (!context.joined || !context.member) {
       return;
     }
@@ -26,7 +26,7 @@ export const MemberJoinTrigger = automodTrigger<unknown>()({
     return {};
   },
 
-  renderMatchInformation({ pluginData, contexts, triggerConfig }) {
+  renderMatchInformation() {
     return "";
   },
 });

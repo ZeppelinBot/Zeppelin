@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import marked from "marked";
+  import { marked } from "marked";
   import hljs from "highlight.js";
 
   export default {

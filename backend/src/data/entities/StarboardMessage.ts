@@ -16,7 +16,7 @@ export class StarboardMessage {
   @Column()
   guild_id: string;
 
-  @OneToOne((type) => SavedMessage)
+  @OneToOne(() => SavedMessage)
   @JoinColumn({ name: "message_id" })
   message: SavedMessage;
 }

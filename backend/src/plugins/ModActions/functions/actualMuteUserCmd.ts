@@ -1,10 +1,10 @@
-import { GuildMember, Message, TextChannel, ThreadChannel, User } from "discord.js";
+import { GuildMember, GuildTextBasedChannel, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { asSingleLine, isDiscordAPIError, UnknownUser } from "../../../utils";
+import { UnknownUser, asSingleLine, isDiscordAPIError, renderUserUsername } from "../../../utils";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MuteResult } from "../../Mutes/types";
 import { ModActionsPluginType } from "../types";
@@ -25,7 +25,7 @@ export async function actualMuteUserCmd(
     reason?: string;
     mod: GuildMember;
     notify?: string;
-    "notify-channel"?: TextChannel | ThreadChannel;
+    "notify-channel"?: GuildTextBasedChannel;
   },
 ) {
   // The moderator who did the action is the message author or, if used, the specified -mod
@@ -34,7 +34,7 @@ export async function actualMuteUserCmd(
 
   if (args.mod) {
     if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "You don't have permission to use -mod");
+      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
       return;
     }
 
@@ -55,7 +55,7 @@ export async function actualMuteUserCmd(
   try {
     contactMethods = readContactMethodsFromArgs(args);
   } catch (e) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, e.message);
+    sendErrorMessage(pluginData, msg.channel, e.message);
     return;
   }
 
@@ -69,9 +69,9 @@ export async function actualMuteUserCmd(
     });
   } catch (e) {
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user: no mute role set in config");
+      sendErrorMessage(pluginData, msg.channel, "Could not mute the user: no mute role set in config");
     } else if (isDiscordAPIError(e) && e.code === 10007) {
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user: unknown member");
+      sendErrorMessage(pluginData, msg.channel, "Could not mute the user: unknown member");
     } else {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
       if (user.id == null) {
@@ -79,40 +79,40 @@ export async function actualMuteUserCmd(
         // tslint:disable-next-line:no-console
         console.trace("[DEBUG] Null user.id for mute");
       }
-      sendErrorMessage(pluginData, msg.channel as TextChannel, "Could not mute the user");
+      sendErrorMessage(pluginData, msg.channel, "Could not mute the user");
     }
 
     return;
   }
 
   // Confirm the action to the moderator
-  let response;
+  let response: string;
   if (args.time) {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${user.tag}**'s
+        Updated **${renderUserUsername(user)}**'s
         mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${user.tag}**
+        Muted **${renderUserUsername(user)}**
         for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     }
   } else {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${user.tag}**'s
+        Updated **${renderUserUsername(user)}**'s
         mute to indefinite (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${user.tag}**
+        Muted **${renderUserUsername(user)}**
         indefinitely (Case #${muteResult.case.case_number})
       `);
     }
   }
 
   if (muteResult.notifyResult.text) response += ` (${muteResult.notifyResult.text})`;
-  sendSuccessMessage(pluginData, msg.channel as TextChannel, response);
+  sendSuccessMessage(pluginData, msg.channel, response);
 }

@@ -1,20 +1,21 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { isAPI } from "../globals";
 import { HOURS, SECONDS } from "../utils";
 import { BaseRepository } from "./BaseRepository";
 import { cleanupConfigs } from "./cleanup/configs";
-import { connection } from "./db";
+import { dataSource } from "./dataSource";
 import { Config } from "./entities/Config";
 
+const CLEANUP_INTERVAL = 1 * HOURS;
+
+async function cleanup() {
+  await cleanupConfigs();
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
 if (isAPI()) {
-  const CLEANUP_INTERVAL = 1 * HOURS;
-
-  async function cleanup() {
-    await cleanupConfigs();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
   // Start first cleanup 30 seconds after startup
+  // TODO: Move to bot startup code
   setTimeout(cleanup, 30 * SECONDS);
 }
 
@@ -23,7 +24,7 @@ export class Configs extends BaseRepository {
 
   constructor() {
     super();
-    this.configs = getRepository(Config);
+    this.configs = dataSource.getRepository(Config);
   }
 
   getActiveByKey(key) {
@@ -36,7 +37,7 @@ export class Configs extends BaseRepository {
   }
 
   async getHighestId(): Promise<number> {
-    const rows = await connection.query("SELECT MAX(id) AS highest_id FROM configs");
+    const rows = await dataSource.query("SELECT MAX(id) AS highest_id FROM configs");
     return (rows.length && rows[0].highest_id) || 0;
   }
 
@@ -61,7 +62,7 @@ export class Configs extends BaseRepository {
   }
 
   async saveNewRevision(key, config, editedBy) {
-    return connection.transaction(async (entityManager) => {
+    return dataSource.transaction(async (entityManager) => {
       const repo = entityManager.getRepository(Config);
       // Mark all old revisions inactive
       await repo.update({ key }, { is_active: false });

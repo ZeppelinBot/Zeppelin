@@ -1,15 +1,14 @@
+import { HTTPError, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { RemindersPluginType } from "../types";
-import { Reminder } from "../../../data/entities/Reminder";
-import { Snowflake, TextChannel } from "discord.js";
+import { disableLinkPreviews } from "knub/helpers";
 import moment from "moment-timezone";
-import { disableLinkPreviews } from "knub/dist/helpers";
-import { DBDateFormat, SECONDS } from "../../../utils";
-import humanizeDuration from "humanize-duration";
+import { Reminder } from "../../../data/entities/Reminder";
+import { DBDateFormat } from "../../../utils";
+import { RemindersPluginType } from "../types";
 
 export async function postReminder(pluginData: GuildPluginData<RemindersPluginType>, reminder: Reminder) {
   const channel = pluginData.guild.channels.cache.get(reminder.channel_id as Snowflake);
-  if (channel && (channel.isText() || channel.isThread())) {
+  if (channel && (channel.isTextBased() || channel.isThread())) {
     try {
       // Only show created at date if one exists
       if (moment.utc(reminder.created_at).isValid()) {
@@ -31,10 +30,13 @@ export async function postReminder(pluginData: GuildPluginData<RemindersPluginTy
         });
       }
     } catch (err) {
-      // If we were unable to post the reminder, we'll try again later
       // tslint:disable-next-line:no-console
       console.warn(`Error when posting reminder for ${reminder.user_id} in guild ${reminder.guild_id}: ${String(err)}`);
-      return;
+
+      if (err instanceof HTTPError && err.status >= 500) {
+        // If we get a server error, try again later
+        return;
+      }
     }
   }
 

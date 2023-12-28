@@ -25,6 +25,9 @@ export async function setCounterValue(
     throw new Error(`Counter is per user but no user ID was supplied`);
   }
 
+  channelId = counter.per_channel ? channelId : null;
+  userId = counter.per_user ? userId : null;
+
   const counterId = pluginData.state.counterIds[counterName];
   const lock = await pluginData.locks.acquire(counterIdLock(counterId));
 

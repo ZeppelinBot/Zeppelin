@@ -1,10 +1,9 @@
-import { Message, MessageOptions, NewsChannel, TextChannel, WebhookClient } from "discord.js";
+import { GuildTextBasedChannel, MessageCreateOptions, WebhookClient } from "discord.js";
 import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
-import { getOrCreateWebhookForChannel } from "./getOrCreateWebhookForChannel";
-import { APIMessage } from "discord-api-types";
 import { isDiscordAPIError } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 import { getOrCreateWebhookClientForChannel } from "./getOrCreateWebhookClientForChannel";
+import { channelIsWebhookable } from "./getOrCreateWebhookForChannel";
 
 export type InternalPosterMessageResult = {
   id: string;
@@ -12,8 +11,8 @@ export type InternalPosterMessageResult = {
 };
 
 async function sendDirectly(
-  channel: TextChannel | NewsChannel,
-  content: MessageOptions,
+  channel: GuildTextBasedChannel,
+  content: MessageCreateOptions,
 ): Promise<InternalPosterMessageResult | null> {
   return channel.send(content).then((message) => ({
     id: message.id,
@@ -26,17 +25,26 @@ async function sendDirectly(
  */
 export async function sendMessage(
   pluginData: GuildPluginData<InternalPosterPluginType>,
-  channel: TextChannel | NewsChannel,
-  content: MessageOptions,
+  channel: GuildTextBasedChannel,
+  content: MessageCreateOptions,
 ): Promise<InternalPosterMessageResult | null> {
   return pluginData.state.queue.add(async () => {
-    const webhookClient = await getOrCreateWebhookClientForChannel(pluginData, channel);
+    let webhookClient: WebhookClient | null = null;
+    let threadId: string | undefined;
+    if (channelIsWebhookable(channel)) {
+      webhookClient = await getOrCreateWebhookClientForChannel(pluginData, channel);
+    } else if (channel.isThread() && channelIsWebhookable(channel.parent!)) {
+      webhookClient = await getOrCreateWebhookClientForChannel(pluginData, channel.parent!);
+      threadId = channel.id;
+    }
+
     if (!webhookClient) {
       return sendDirectly(channel, content);
     }
 
     return webhookClient
       .send({
+        threadId,
         ...content,
         ...(pluginData.client.user && {
           username: pluginData.client.user.username,
@@ -50,7 +58,7 @@ export async function sendMessage(
       .catch(async (err) => {
         // Unknown Webhook
         if (isDiscordAPIError(err) && err.code === 10015) {
-          await pluginData.state.webhooks.delete(webhookClient.id);
+          await pluginData.state.webhooks.delete(webhookClient!.id);
           pluginData.state.webhookClientCache.delete(channel.id);
 
           // Fallback to regular message for this log message

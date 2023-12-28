@@ -1,5 +1,6 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepository";
+import { dataSource } from "./dataSource";
 import { Supporter } from "./entities/Supporter";
 
 export class Supporters extends BaseRepository {
@@ -7,7 +8,7 @@ export class Supporters extends BaseRepository {
 
   constructor() {
     super();
-    this.supporters = getRepository(Supporter);
+    this.supporters = dataSource.getRepository(Supporter);
   }
 
   getAll() {

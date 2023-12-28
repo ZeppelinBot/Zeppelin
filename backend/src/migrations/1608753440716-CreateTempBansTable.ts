@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from "typeorm";
 
 export class CreateTempBansTable1608753440716 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    const table = await queryRunner.createTable(
+    await queryRunner.createTable(
       new Table({
         name: "tempbans",
         columns: [

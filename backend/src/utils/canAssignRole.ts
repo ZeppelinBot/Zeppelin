@@ -1,9 +1,9 @@
-import { Guild, GuildMember, Permissions, Role, Snowflake } from "discord.js";
+import { Guild, GuildMember, PermissionsBitField, Role, Snowflake } from "discord.js";
 import { getMissingPermissions } from "./getMissingPermissions";
 import { hasDiscordPermissions } from "./hasDiscordPermissions";
 
 export function canAssignRole(guild: Guild, member: GuildMember, roleId: string) {
-  if (getMissingPermissions(member.permissions, Permissions.FLAGS.MANAGE_ROLES)) {
+  if (getMissingPermissions(member.permissions, PermissionsBitField.Flags.ManageRoles)) {
     return false;
   }
 
@@ -18,7 +18,7 @@ export function canAssignRole(guild: Guild, member: GuildMember, roleId: string)
 
   const memberRoles = member.roles.cache;
   const highestRoleWithManageRoles = memberRoles.reduce<Role | null>((highest, role) => {
-    if (!hasDiscordPermissions(role.permissions, Permissions.FLAGS.MANAGE_ROLES)) return highest;
+    if (!hasDiscordPermissions(role.permissions, PermissionsBitField.Flags.ManageRoles)) return highest;
     if (highest == null) return role;
     if (role.position > highest.position) return role;
     return highest;

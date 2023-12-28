@@ -1,9 +1,7 @@
 import * as t from "io-ts";
-import { LogType } from "../../../data/LogType";
-import { isTruthy, stripObjectToScalars, unique } from "../../../utils";
+import { isTruthy, unique } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 
 export const LogAction = automodAction({
   configType: t.boolean,

@@ -8,7 +8,6 @@ export const MessageDeletedEvt = reactionRolesEvt({
   async listener(meta) {
     const pluginData = meta.pluginData;
 
-    await pluginData.state.buttonRoles.removeAllForMessageId(meta.args.message.id);
     await pluginData.state.reactionRoles.removeFromMessage(meta.args.message.id);
   },
 });

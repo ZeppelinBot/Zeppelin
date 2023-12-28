@@ -1,14 +1,13 @@
-import { Message, TextChannel } from "discord.js";
+import { Message } from "discord.js";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { parseReason } from "./parseReason.js";
 import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types.js";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 
 export async function updateCase(pluginData: GuildPluginData<ModActionsPluginType>, msg: Message, args) {
   let theCase: Case | undefined;
@@ -19,12 +18,12 @@ export async function updateCase(pluginData: GuildPluginData<ModActionsPluginTyp
   }
 
   if (!theCase) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, "Case not found");
+    sendErrorMessage(pluginData, msg.channel, "Case not found");
     return;
   }
 
   if (!args.note && msg.attachments.size === 0) {
-    sendErrorMessage(pluginData, msg.channel as TextChannel, "Text or attachment required");
+    sendErrorMessage(pluginData, msg.channel, "Text or attachment required");
     return;
   }
   const config = pluginData.config.get();
@@ -46,5 +45,5 @@ export async function updateCase(pluginData: GuildPluginData<ModActionsPluginTyp
     note,
   });
 
-  sendSuccessMessage(pluginData, msg.channel as TextChannel, `Case \`#${theCase.case_number}\` updated`);
+  sendSuccessMessage(pluginData, msg.channel, `Case \`#${theCase.case_number}\` updated`);
 }

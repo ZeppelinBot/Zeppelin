@@ -1,13 +1,13 @@
-import { Snowflake, TextChannel } from "discord.js";
-import { waitForReply } from "knub/dist/helpers";
+import { Snowflake } from "discord.js";
+import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { logger } from "../../../logger";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { modActionsCmd } from "../types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { parseReason } from "../functions/parseReason";
 
 export const MassmuteCmd = modActionsCmd({
@@ -30,7 +30,7 @@ export const MassmuteCmd = modActionsCmd({
 
     // Ask for mute reason
     msg.channel.send("Mute reason? `cancel` to cancel");
-    const muteReasonReceived = await waitForReply(pluginData.client, msg.channel as TextChannel, msg.author.id);
+    const muteReasonReceived = await waitForReply(pluginData.client, msg.channel, msg.author.id);
     if (
       !muteReasonReceived ||
       !muteReasonReceived.content ||

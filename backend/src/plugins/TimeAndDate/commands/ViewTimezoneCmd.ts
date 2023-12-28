@@ -7,7 +7,7 @@ export const ViewTimezoneCmd = timeAndDateCmd({
 
   signature: {},
 
-  async run({ pluginData, message, args }) {
+  async run({ pluginData, message }) {
     const memberTimezone = await pluginData.state.memberTimezones.get(message.author.id);
     if (memberTimezone) {
       message.channel.send(`Your timezone is currently set to **${memberTimezone.timezone}**`);

@@ -18,7 +18,7 @@ export const UnbanTrigger = automodTrigger<UnbanTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was unbanned`;
   },
 });

@@ -1,14 +1,15 @@
+import { GuildMember, GuildTextBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, GuildChannel, GuildMember, ThreadChannel } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMessageSpamDetectedData {
   member: GuildMember;
-  channel: GuildChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   description: string;
   limit: number;
   interval: number;
@@ -30,9 +31,8 @@ export function logMessageSpamDetected(pluginData: GuildPluginData<LogsPluginTyp
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.channel.id,
-      category: data.channel.parentId,
       bot: data.member.user.bot,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

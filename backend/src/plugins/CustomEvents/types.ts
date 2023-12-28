@@ -15,10 +15,8 @@ const CommandTrigger = t.type({
   params: t.string,
   can_use: t.boolean,
 });
-type TCommandTrigger = t.TypeOf<typeof CommandTrigger>;
 
 const AnyTrigger = CommandTrigger; // TODO: Make into a union once we have more triggers
-type TAnyTrigger = t.TypeOf<typeof AnyTrigger>;
 
 const AnyAction = t.union([
   AddRoleAction,
@@ -29,7 +27,6 @@ const AnyAction = t.union([
   MakeRoleUnmentionableAction,
   SetChannelPermissionOverridesAction,
 ]);
-type TAnyAction = t.TypeOf<typeof AnyAction>;
 
 export const CustomEvent = t.type({
   name: t.string,

@@ -4,7 +4,7 @@ export function unauthorized(res: Response) {
   res.status(403).json({ error: "Unauthorized" });
 }
 
-export function error(res: Response, message: string, statusCode: number = 500) {
+export function error(res: Response, message: string, statusCode = 500) {
   res.status(statusCode).json({ error: message });
 }
 

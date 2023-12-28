@@ -1,11 +1,8 @@
-import { TextChannel } from "discord.js";
 import { helpers } from "knub";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { Case } from "../../../data/entities/Case";
-import { LogType } from "../../../data/LogType";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { SECONDS, stripObjectToScalars, trimLines } from "../../../utils";
+import { SECONDS, trimLines } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -54,12 +51,7 @@ export const DeleteCaseCmd = modActionsCmd({
           content: "Delete the following case? Answer 'Yes' to continue, 'No' to cancel.",
         });
 
-        const reply = await helpers.waitForReply(
-          pluginData.client,
-          message.channel as TextChannel,
-          message.author.id,
-          15 * SECONDS,
-        );
+        const reply = await helpers.waitForReply(pluginData.client, message.channel, message.author.id, 15 * SECONDS);
         const normalizedReply = (reply?.content || "").toLowerCase().trim();
         if (normalizedReply !== "yes" && normalizedReply !== "y") {
           message.channel.send("Cancelled. Case was not deleted.");

@@ -1,5 +1,5 @@
-import { locateUserEvt } from "../types";
 import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
+import { locateUserEvt } from "../types";
 
 export const GuildBanRemoveAlertsEvt = locateUserEvt({
   event: "guildBanAdd",

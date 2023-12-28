@@ -1,14 +1,15 @@
+import { GuildMember, VoiceBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildVoiceChannel, GuildMember } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogVoiceChannelJoinData {
   member: GuildMember;
-  channel: BaseGuildVoiceChannel;
+  channel: VoiceBasedChannel;
 }
 
 export function logVoiceChannelJoin(pluginData: GuildPluginData<LogsPluginType>, data: LogVoiceChannelJoinData) {
@@ -22,8 +23,7 @@ export function logVoiceChannelJoin(pluginData: GuildPluginData<LogsPluginType>,
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
       bot: data.member.user.bot,
     },
   );

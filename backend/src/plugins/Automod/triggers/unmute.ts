@@ -18,7 +18,7 @@ export const UnmuteTrigger = automodTrigger<UnmuteTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was unmuted`;
   },
 });

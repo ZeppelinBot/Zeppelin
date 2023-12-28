@@ -25,7 +25,7 @@ export const BanAction = automodAction({
     const reason = actionConfig.reason || "Kicked automatically";
     const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : undefined;
     const contactMethods = actionConfig.notify ? resolveActionContactMethods(pluginData, actionConfig) : undefined;
-    const deleteMessageDays = actionConfig.deleteMessageDays || undefined;
+    const deleteMessageDays = actionConfig.deleteMessageDays ?? undefined;
 
     const caseArgs: Partial<CaseArgs> = {
       modId: pluginData.client.user!.id,

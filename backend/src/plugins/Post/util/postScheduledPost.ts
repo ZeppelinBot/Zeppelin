@@ -1,13 +1,13 @@
-import { Snowflake, TextChannel, User } from "discord.js";
+import { Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { logger } from "../../../logger";
-import { DBDateFormat, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { PostPluginType } from "../types";
-import { postMessage } from "./postMessage";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ScheduledPost } from "../../../data/entities/ScheduledPost";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
+import { logger } from "../../../logger";
+import { DBDateFormat, verboseChannelMention, verboseUserMention } from "../../../utils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { PostPluginType } from "../types";
+import { postMessage } from "./postMessage";
 
 export async function postScheduledPost(pluginData: GuildPluginData<PostPluginType>, post: ScheduledPost) {
   // First, update the scheduled post or delete it from the database *before* we try posting it.
@@ -45,7 +45,7 @@ export async function postScheduledPost(pluginData: GuildPluginData<PostPluginTy
 
   // Post the message
   const channel = pluginData.guild.channels.cache.get(post.channel_id as Snowflake);
-  if (channel?.isText() || channel?.isThread()) {
+  if (channel?.isTextBased() || channel?.isThread()) {
     const [username, discriminator] = post.author_name.split("#");
     const author: User = (await pluginData.client.users.fetch(post.author_id as Snowflake)) || {
       id: post.author_id,

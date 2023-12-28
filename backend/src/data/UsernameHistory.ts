@@ -1,19 +1,21 @@
-import { getRepository, In, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { isAPI } from "../globals";
 import { MINUTES, SECONDS } from "../utils";
 import { BaseRepository } from "./BaseRepository";
 import { cleanupUsernames } from "./cleanup/usernames";
+import { dataSource } from "./dataSource";
 import { UsernameHistoryEntry } from "./entities/UsernameHistoryEntry";
 
+const CLEANUP_INTERVAL = 5 * MINUTES;
+
+async function cleanup() {
+  await cleanupUsernames();
+  setTimeout(cleanup, CLEANUP_INTERVAL);
+}
+
 if (!isAPI()) {
-  const CLEANUP_INTERVAL = 5 * MINUTES;
-
-  async function cleanup() {
-    await cleanupUsernames();
-    setTimeout(cleanup, CLEANUP_INTERVAL);
-  }
-
   // Start first cleanup 30 seconds after startup
+  // TODO: Move to bot startup code
   setTimeout(cleanup, 30 * SECONDS);
 }
 
@@ -24,7 +26,7 @@ export class UsernameHistory extends BaseRepository {
 
   constructor() {
     super();
-    this.usernameHistory = getRepository(UsernameHistoryEntry);
+    this.usernameHistory = dataSource.getRepository(UsernameHistoryEntry);
   }
 
   async getByUserId(userId): Promise<UsernameHistoryEntry[]> {
@@ -39,7 +41,7 @@ export class UsernameHistory extends BaseRepository {
     });
   }
 
-  getLastEntry(userId): Promise<UsernameHistoryEntry | undefined> {
+  getLastEntry(userId): Promise<UsernameHistoryEntry | null> {
     return this.usernameHistory.findOne({
       where: {
         user_id: userId,

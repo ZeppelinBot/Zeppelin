@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 export const TRIGGER_COMPARISON_OPS = ["=", "!=", ">", "<", ">=", "<="] as const;
 
-export type TriggerComparisonOp = typeof TRIGGER_COMPARISON_OPS[number];
+export type TriggerComparisonOp = (typeof TRIGGER_COMPARISON_OPS)[number];
 
 const REVERSE_OPS: Record<TriggerComparisonOp, TriggerComparisonOp> = {
   "=": "!=",

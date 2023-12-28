@@ -1,6 +1,6 @@
 import { MessagePayload, User } from "discord.js";
 import { logger } from "../logger";
-import { createChunkedMessage, HOURS, isDiscordAPIError } from "../utils";
+import { HOURS, createChunkedMessage, isDiscordAPIError } from "../utils";
 import Timeout = NodeJS.Timeout;
 
 let dmsDisabled = false;

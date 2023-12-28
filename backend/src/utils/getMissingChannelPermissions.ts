@@ -1,4 +1,4 @@
-import { GuildChannel, GuildMember, ThreadChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel } from "discord.js";
 import { getMissingPermissions } from "./getMissingPermissions";
 
 /**
@@ -7,7 +7,7 @@ import { getMissingPermissions } from "./getMissingPermissions";
  */
 export function getMissingChannelPermissions(
   member: GuildMember,
-  channel: GuildChannel | ThreadChannel,
+  channel: GuildTextBasedChannel,
   requiredPermissions: number | bigint,
 ): bigint {
   const memberChannelPermissions = channel.permissionsFor(member.id);

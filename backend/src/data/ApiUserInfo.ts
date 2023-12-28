@@ -1,16 +1,16 @@
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
-import { connection } from "./db";
-import { ApiUserInfo as ApiUserInfoEntity, ApiUserInfoData } from "./entities/ApiUserInfo";
+import { dataSource } from "./dataSource";
+import { ApiUserInfoData, ApiUserInfo as ApiUserInfoEntity } from "./entities/ApiUserInfo";
 
 export class ApiUserInfo extends BaseRepository {
   private apiUserInfo: Repository<ApiUserInfoEntity>;
 
   constructor() {
     super();
-    this.apiUserInfo = getRepository(ApiUserInfoEntity);
+    this.apiUserInfo = dataSource.getRepository(ApiUserInfoEntity);
   }
 
   get(id) {
@@ -22,7 +22,7 @@ export class ApiUserInfo extends BaseRepository {
   }
 
   update(id, data: ApiUserInfoData) {
-    return connection.transaction(async (entityManager) => {
+    return dataSource.transaction(async (entityManager) => {
       const repo = entityManager.getRepository(ApiUserInfoEntity);
 
       const existingInfo = await repo.findOne({ where: { id } });

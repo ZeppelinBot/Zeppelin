@@ -1,10 +1,11 @@
-import { getRepository, Repository } from "typeorm";
-import { Webhook } from "./entities/Webhook";
-import { BaseRepository } from "./BaseRepository";
+import { Repository } from "typeorm";
 import { decrypt, encrypt } from "../utils/crypt";
+import { BaseRepository } from "./BaseRepository";
+import { dataSource } from "./dataSource";
+import { Webhook } from "./entities/Webhook";
 
 export class Webhooks extends BaseRepository {
-  repository: Repository<Webhook> = getRepository(Webhook);
+  repository: Repository<Webhook> = dataSource.getRepository(Webhook);
 
   protected async _processEntityFromDB(entity) {
     entity.token = await decrypt(entity.token);

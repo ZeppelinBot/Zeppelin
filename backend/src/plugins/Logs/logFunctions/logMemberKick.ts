@@ -1,11 +1,11 @@
+import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { GuildMember, User } from "discord.js";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { UnknownUser } from "../../../utils";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMemberKickData {
   mod: User | UnknownUser | null;

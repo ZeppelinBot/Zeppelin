@@ -1,7 +1,8 @@
-import { MessageOptions } from "discord.js";
+import { MessageCreateOptions } from "discord.js";
+import { StrictMessageContent } from "../utils.js";
 
 function embedHasContent(embed: any) {
-  for (const [key, value] of Object.entries(embed)) {
+  for (const [, value] of Object.entries(embed)) {
     if (typeof value === "string" && value.trim() !== "") {
       return true;
     }
@@ -18,7 +19,7 @@ function embedHasContent(embed: any) {
   return false;
 }
 
-export function messageHasContent(content: string | MessageOptions): boolean {
+export function messageHasContent(content: string | MessageCreateOptions | StrictMessageContent): boolean {
   if (typeof content === "string") {
     return content.trim() !== "";
   }

@@ -1,10 +1,10 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { MINUTES, SECONDS } from "../../../utils";
 import { locateUserCmd } from "../types";
-import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 
 export const FollowCmd = locateUserCmd({
   trigger: ["follow", "f"],
