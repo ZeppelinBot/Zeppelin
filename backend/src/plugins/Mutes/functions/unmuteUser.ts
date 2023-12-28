@@ -5,7 +5,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { AddMuteParams } from "../../../data/GuildMutes";
 import { MuteTypes } from "../../../data/MuteTypes";
 import { Mute } from "../../../data/entities/Mute";
-import { resolveMember, resolveUser } from "../../../utils";
+import { noop, resolveMember, resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -54,8 +54,10 @@ export async function unmuteUser(
     }
 
     // Update timeout
-    if (existingMute?.type === MuteTypes.Timeout || createdMute?.type === MuteTypes.Timeout) {
-      await member?.disableCommunicationUntil(timeoutExpiresAt);
+    if (member && (existingMute?.type === MuteTypes.Timeout || createdMute?.type === MuteTypes.Timeout)) {
+      if (!member.moderatable) return null;
+
+      await member.disableCommunicationUntil(timeoutExpiresAt).catch(noop);
       await pluginData.state.mutes.updateTimeoutExpiresAt(userId, timeoutExpiresAt);
     }
   } else {

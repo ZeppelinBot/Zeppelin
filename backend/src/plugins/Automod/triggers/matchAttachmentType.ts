@@ -1,5 +1,6 @@
 import { escapeInlineCode, Snowflake } from "discord.js";
 import * as t from "io-ts";
+import { extname } from "path";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 import { extname } from "path";
