@@ -7,8 +7,8 @@ import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginU
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { modActionsCmd } from "../types";
 import { parseReason } from "../functions/parseReason";
+import { modActionsCmd } from "../types";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",

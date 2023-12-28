@@ -9,8 +9,8 @@ import { resolveUser } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { IgnoredEventType, modActionsCmd } from "../types";
 import { parseReason } from "../functions/parseReason";
+import { IgnoredEventType, modActionsCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),

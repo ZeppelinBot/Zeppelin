@@ -1,4 +1,4 @@
-import { GuildMember, GuildTextBasedChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel, Message, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/helpers";
 import { LogType } from "../../../data/LogType";

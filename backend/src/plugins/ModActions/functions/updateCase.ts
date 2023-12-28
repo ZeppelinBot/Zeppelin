@@ -1,16 +1,16 @@
 import { Message } from "discord.js";
+import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { parseReason } from "./parseReason.js";
-import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types.js";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { parseReason } from "./parseReason.js";
 
 export async function updateCase(pluginData: GuildPluginData<ModActionsPluginType>, msg: Message, args) {
-  let theCase: Case | undefined;
+  let theCase: Case | null;
   if (args.caseNumber != null) {
     theCase = await pluginData.state.cases.findByCaseNumber(args.caseNumber);
   } else {

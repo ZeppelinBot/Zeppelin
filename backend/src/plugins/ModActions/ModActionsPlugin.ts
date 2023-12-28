@@ -117,7 +117,7 @@ const defaultOptions = {
 /**
  * Config preprocessor to fix values
  */
-const configPreprocessor: ConfigPreprocessorFn<ModActionsPluginType> = (options) => {
+const configPreprocessor = (options) => {
   if (options.config?.reason_aliases) {
     options.config.reason_aliases = Object.fromEntries(
       Object.entries(options.config.reason_aliases).map(([k, v]) => [k.toLowerCase(), v]),

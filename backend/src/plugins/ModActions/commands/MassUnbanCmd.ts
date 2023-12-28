@@ -9,8 +9,8 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
-import { IgnoredEventType, modActionsCmd } from "../types";
 import { parseReason } from "../functions/parseReason";
+import { IgnoredEventType, modActionsCmd } from "../types";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",
