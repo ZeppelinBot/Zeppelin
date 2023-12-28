@@ -6,7 +6,7 @@ export const MemberLeaveTrigger = automodTrigger<unknown>()({
 
   defaultConfig: {},
 
-  async match({ pluginData, context, triggerConfig }) {
+  async match({ context }) {
     if (!context.joined || !context.member) {
       return;
     }
@@ -14,7 +14,7 @@ export const MemberLeaveTrigger = automodTrigger<unknown>()({
     return {};
   },
 
-  renderMatchInformation({ pluginData, contexts, triggerConfig }) {
+  renderMatchInformation() {
     return "";
   },
 });

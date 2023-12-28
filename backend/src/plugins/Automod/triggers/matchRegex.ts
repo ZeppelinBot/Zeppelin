@@ -1,12 +1,12 @@
 import * as t from "io-ts";
 import { allowTimeout } from "../../../RegExpRunner";
+import { mergeRegexes } from "../../../utils/mergeRegexes";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
 import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
-import { mergeRegexes } from "../../../utils/mergeRegexes";
 
 interface MatchResultType {
   pattern: string;

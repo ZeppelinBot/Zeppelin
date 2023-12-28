@@ -11,11 +11,6 @@ export function disablePingableRoles(
     const role = pluginData.guild.roles.cache.get(pingableRole.role_id as Snowflake);
     if (!role) continue;
 
-    role.edit(
-      {
-        mentionable: false,
-      },
-      "Disable pingable role",
-    );
+    role.setMentionable(false, "Disable pingable role");
   }
 }

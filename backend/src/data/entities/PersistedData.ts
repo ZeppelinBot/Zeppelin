@@ -14,5 +14,5 @@ export class PersistedData {
 
   @Column() nickname: string;
 
-  @Column() is_voice_muted: number;
+  @Column({ type: "boolean" }) is_voice_muted: boolean;
 }

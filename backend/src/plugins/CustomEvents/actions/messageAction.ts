@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType } from "../types";
 

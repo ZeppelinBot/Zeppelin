@@ -1,5 +1,6 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
+import { dataSource } from "./dataSource";
 import { StatValue } from "./entities/StatValue";
 
 export class GuildStats extends BaseGuildRepository {
@@ -7,7 +8,7 @@ export class GuildStats extends BaseGuildRepository {
 
   constructor(guildId) {
     super(guildId);
-    this.stats = getRepository(StatValue);
+    this.stats = dataSource.getRepository(StatValue);
   }
 
   async saveValue(source: string, key: string, value: number): Promise<void> {

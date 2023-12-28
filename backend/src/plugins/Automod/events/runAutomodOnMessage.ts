@@ -1,13 +1,12 @@
-import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
+import { performance } from "perf_hooks";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
+import { profilingEnabled } from "../../../utils/easyProfiler";
 import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage";
 import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage";
 import { runAutomod } from "../functions/runAutomod";
 import { AutomodContext, AutomodPluginType } from "../types";
-import { performance } from "perf_hooks";
-import { profilingEnabled } from "../../../utils/easyProfiler";
 
 export async function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,

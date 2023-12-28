@@ -1,11 +1,11 @@
 import { Snowflake } from "discord.js";
-import { createChunkedMessage, disableCodeBlocks } from "knub/dist/helpers";
+import { createChunkedMessage, disableCodeBlocks } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory";
 import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory";
+import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { DAYS } from "../../../utils";
+import { DAYS, renderUserUsername } from "../../../utils";
 import { nameHistoryCmd } from "../types";
 
 export const NamesCmd = nameHistoryCmd({
@@ -31,7 +31,7 @@ export const NamesCmd = nameHistoryCmd({
     const usernameRows = usernames.map((r) => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
     const user = await pluginData.client.users.fetch(args.userId as Snowflake).catch(() => null);
-    const currentUsername = user ? user.tag : args.userId;
+    const currentUsername = user ? renderUserUsername(user) : args.userId;
 
     const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);
     const usernameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);

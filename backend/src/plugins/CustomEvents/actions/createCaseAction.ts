@@ -20,7 +20,7 @@ export async function createCaseAction(
   action: TCreateCaseAction,
   values: TemplateSafeValueContainer,
   event: TCustomEvent,
-  eventData: any,
+  eventData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
   const modId = await renderTemplate(action.mod, values, false);
   const targetId = await renderTemplate(action.target, values, false);

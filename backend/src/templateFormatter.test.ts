@@ -8,7 +8,7 @@ test("Parses plain string templates correctly", (t) => {
 
 test("Parses templates with variables correctly", (t) => {
   const result = parseTemplate("foo {bar} baz");
-  t.deepEqual<any>(result, [
+  t.deepEqual(result, [
     "foo ",
     {
       identifier: "bar",
@@ -20,7 +20,7 @@ test("Parses templates with variables correctly", (t) => {
 
 test("Parses templates with function variables correctly", (t) => {
   const result = parseTemplate('foo {bar("str", 5.07)} baz');
-  t.deepEqual<any>(result, [
+  t.deepEqual(result, [
     "foo ",
     {
       identifier: "bar",
@@ -32,7 +32,7 @@ test("Parses templates with function variables correctly", (t) => {
 
 test("Parses function variables with variable arguments correctly", (t) => {
   const result = parseTemplate('foo {bar("str", 5.07, someVar)} baz');
-  t.deepEqual<any>(result, [
+  t.deepEqual(result, [
     "foo ",
     {
       identifier: "bar",
@@ -51,7 +51,7 @@ test("Parses function variables with variable arguments correctly", (t) => {
 
 test("Parses function variables with function variable arguments correctly", (t) => {
   const result = parseTemplate('foo {bar("str", 5.07, deeply(nested(8)))} baz');
-  t.deepEqual<any>(result, [
+  t.deepEqual(result, [
     "foo ",
     {
       identifier: "bar",
@@ -97,6 +97,7 @@ test("Supports base values in renderTemplate", async (t) => {
 });
 
 test("Edge case #1", async (t) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const result = await renderTemplate("{foo} {bar()}");
   // No "Unclosed function" exception = success
   t.pass();
@@ -104,7 +105,7 @@ test("Edge case #1", async (t) => {
 
 test("Parses empty string args as empty strings", async (t) => {
   const result = parseTemplate('{foo("")}');
-  t.deepEqual<any>(result, [
+  t.deepEqual(result, [
     {
       identifier: "foo",
       args: [""],

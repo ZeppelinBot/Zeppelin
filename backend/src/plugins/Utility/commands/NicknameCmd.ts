@@ -1,7 +1,7 @@
-import { Util } from "discord.js";
+import { escapeBold } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { errorMessage } from "../../../utils";
 import { canActOn, sendSuccessMessage } from "../../../pluginUtils";
+import { errorMessage } from "../../../utils";
 import { utilityCmd } from "../types";
 
 export const NicknameCmd = utilityCmd({
@@ -20,7 +20,7 @@ export const NicknameCmd = utilityCmd({
       if (!args.member.nickname) {
         msg.channel.send(`<@!${args.member.id}> does not have a nickname`);
       } else {
-        msg.channel.send(`The nickname of <@!${args.member.id}> is **${Util.escapeBold(args.member.nickname)}**`);
+        msg.channel.send(`The nickname of <@!${args.member.id}> is **${escapeBold(args.member.nickname)}**`);
       }
       return;
     }

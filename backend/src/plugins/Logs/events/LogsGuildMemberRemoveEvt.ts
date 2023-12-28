@@ -1,7 +1,5 @@
-import { LogType } from "../../../data/LogType";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { logsEvt } from "../types";
 import { logMemberLeave } from "../logFunctions/logMemberLeave";
+import { logsEvt } from "../types";
 
 export const LogsGuildMemberRemoveEvt = logsEvt({
   event: "guildMemberRemove",

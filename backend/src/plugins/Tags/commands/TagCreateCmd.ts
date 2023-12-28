@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { parseTemplate, TemplateParseError } from "../../../templateFormatter";
+import { TemplateParseError, parseTemplate } from "../../../templateFormatter";
 import { tagsCmd } from "../types";
 
 export const TagCreateCmd = tagsCmd({

@@ -1,6 +1,5 @@
-import { Permissions, TextChannel, ThreadChannel, Util } from "discord.js";
+import { escapeInlineCode, PermissionsBitField } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { ChannelTypeStrings } from "src/types";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
@@ -23,7 +22,6 @@ export const SlowmodeSetCmd = slowmodeCmd({
   permission: "can_manage",
   source: "guild",
 
-  // prettier-ignore
   signature: [
     {
       time: ct.delay(),
@@ -35,11 +33,16 @@ export const SlowmodeSetCmd = slowmodeCmd({
       time: ct.delay(),
 
       mode: ct.string({ option: true, shortcut: "m" }),
-    }
+    },
   ],
 
   async run({ message: msg, args, pluginData }) {
-    const channel: TextChannel | ThreadChannel = args.channel || msg.channel;
+    const channel = args.channel || msg.channel;
+
+    if (!channel.isTextBased() || channel.isThread()) {
+      sendErrorMessage(pluginData, msg.channel, "Slowmode can only be set on non-thread text-based channels");
+      return;
+    }
 
     if (args.time === 0) {
       // Workaround until we can call SlowmodeDisableCmd from here
@@ -89,7 +92,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "native") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new Permissions(),
+        channelPermissions ?? new PermissionsBitField(),
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -104,7 +107,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     if (mode === "bot") {
       const missingPermissions = getMissingPermissions(
-        channelPermissions ?? new Permissions(),
+        channelPermissions ?? new PermissionsBitField(),
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
@@ -123,25 +126,21 @@ export const SlowmodeSetCmd = slowmodeCmd({
     if (mode === "native") {
       // If there is an existing bot-maintained slowmode, disable that first
       const existingBotSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
-      if (existingBotSlowmode && channel.type === ChannelTypeStrings.TEXT) {
+      if (existingBotSlowmode && channel.isTextBased()) {
         await disableBotSlowmodeForChannel(pluginData, channel);
       }
 
       // Set native slowmode
       try {
-        await channel.edit({
-          rateLimitPerUser: rateLimitSeconds,
-        });
+        await channel.setRateLimitPerUser(rateLimitSeconds);
       } catch (e) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${Util.escapeInlineCode(e.message)}`);
+        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${escapeInlineCode(e.message)}`);
         return;
       }
     } else {
       // If there is an existing native slowmode, disable that first
       if (channel.rateLimitPerUser) {
-        await channel.edit({
-          rateLimitPerUser: 0,
-        });
+        await channel.setRateLimitPerUser(0);
       }
 
       // Set bot-maintained slowmode
@@ -149,7 +148,7 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
       // Update cache
       const slowmode = await pluginData.state.slowmodes.getChannelSlowmode(channel.id);
-      await pluginData.state.channelSlowmodeCache.set(channel.id, slowmode ?? null);
+      pluginData.state.channelSlowmodeCache.set(channel.id, slowmode ?? null);
     }
 
     const humanizedSlowmodeTime = humanizeDuration(args.time);

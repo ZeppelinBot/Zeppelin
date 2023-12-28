@@ -1,19 +1,20 @@
+import { GuildMember, User, VoiceBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildVoiceChannel, GuildMember, User } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogVoiceChannelForceDisconnectData {
   mod: User;
   member: GuildMember;
-  oldChannel: BaseGuildVoiceChannel;
+  oldChannel: VoiceBasedChannel;
 }
 
 export function logVoiceChannelForceDisconnect(
@@ -31,8 +32,7 @@ export function logVoiceChannelForceDisconnect(
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.oldChannel.id,
-      category: data.oldChannel.parentId,
+      ...resolveChannelIds(data.oldChannel),
       bot: data.member.user.bot,
     },
   );

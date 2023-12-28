@@ -51,6 +51,7 @@ test("delay strings: reverse conversion (conservative)", (t) => {
 
 test("tAllowedMentions matches Eris's AllowedMentions", (t) => {
   type TAllowedMentions = ioTs.TypeOf<typeof tAllowedMentions>;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const typeTest: AssertEquals<TAllowedMentions, ErisAllowedMentionFormat> = true;
   t.pass();
 });

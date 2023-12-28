@@ -1,19 +1,20 @@
 import cors from "cors";
 import express from "express";
+import multer from "multer";
 import { TokenError } from "passport-oauth2";
+import { env } from "../env";
 import { initArchives } from "./archives";
 import { initAuth } from "./auth";
 import { initDocs } from "./docs";
 import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
-import multer from "multer";
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.DASHBOARD_URL,
+    origin: env.DASHBOARD_URL,
   }),
 );
 app.use(
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 });
 
 // Error response
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {
   if (err instanceof TokenError) {
     clientError(res, "Invalid code");
@@ -44,11 +46,12 @@ app.use((err, req, res, next) => {
 });
 
 // 404 response
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((req, res, next) => {
   return notFound(res);
 });
 
-const port = (process.env.PORT && parseInt(process.env.PORT, 10)) || 3000;
+const port = env.API_PORT;
 app.listen(port, "0.0.0.0", () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
 
 startBackgroundTasks();

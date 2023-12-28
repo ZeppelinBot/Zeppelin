@@ -1,5 +1,6 @@
 import { CooldownManager } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
+import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -22,10 +23,11 @@ export const CompanionChannelsPlugin = zeppelinGuildPlugin<CompanionChannelsPlug
       Once set up, any time a user joins one of the specified voice channels,
       they'll get channel permissions applied to them for the text channels.
     `),
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   events: [VoiceStateUpdateEvt],

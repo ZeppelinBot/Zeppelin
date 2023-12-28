@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { resolveUser, UnknownUser } from "../../../utils";
+import { UnknownUser, resolveUser } from "../../../utils";
 import { CaseNoteArgs, CasesPluginType } from "../types";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { resolveCaseId } from "./resolveCaseId";
@@ -39,7 +39,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     });
   }
 
-  const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9\-]+/g);
+  const archiveLinkMatch = body && body.match(/(?<=\/archives\/)[a-zA-Z0-9-]+/g);
   if (archiveLinkMatch) {
     for (const archiveId of archiveLinkMatch) {
       pluginData.state.archives.makePermanent(archiveId);

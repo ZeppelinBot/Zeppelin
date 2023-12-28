@@ -30,7 +30,7 @@ export const BanTrigger = automodTrigger<BanTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `User was banned`;
   },
 });

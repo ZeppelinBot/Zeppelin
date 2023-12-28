@@ -1,8 +1,8 @@
 import * as t from "io-ts";
 import { BasePluginType } from "knub";
+import { RegExpRunner } from "../../RegExpRunner";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { RegExpRunner } from "../../RegExpRunner";
 import { tNullable } from "../../utils";
 import { TRegex } from "../../validatorUtils";
 

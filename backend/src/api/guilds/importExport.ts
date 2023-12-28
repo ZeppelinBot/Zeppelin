@@ -1,13 +1,13 @@
 import { ApiPermissions } from "@shared/apiPermissions";
 import express, { Request, Response } from "express";
-import { requireGuildPermission } from "../permissions";
-import { clientError, ok } from "../responses";
-import { GuildCases } from "../../data/GuildCases";
-import { z } from "zod";
-import { Case } from "../../data/entities/Case";
-import { rateLimit } from "../rateLimits";
-import { MINUTES } from "../../utils";
 import moment from "moment-timezone";
+import { z } from "zod";
+import { GuildCases } from "../../data/GuildCases";
+import { Case } from "../../data/entities/Case";
+import { MINUTES } from "../../utils";
+import { requireGuildPermission } from "../permissions";
+import { rateLimit } from "../rateLimits";
+import { clientError, ok } from "../responses";
 
 const caseHandlingModeSchema = z.union([
   z.literal("replace"),
@@ -50,7 +50,7 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
   importExportRouter.get(
     "/:guildId/pre-import",
     requireGuildPermission(ApiPermissions.ManageAccess),
-    async (req: Request, res: Response) => {
+    async (req: Request) => {
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);
       const minNum = await guildCases.getMinCaseNumber();
       const maxNum = await guildCases.getMaxCaseNumber();
@@ -75,7 +75,10 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       try {
         data = importExportData.parse(req.body.data);
       } catch (err) {
-        return clientError(res, "Invalid import data format");
+        const prettyMessage = `${err.issues[0].code}: expected ${err.issues[0].expected}, received ${
+          err.issues[0].received
+        } at /${err.issues[0].path.join("/")}`;
+        return clientError(res, `Invalid import data format: ${prettyMessage}`);
         return;
       }
 
@@ -85,6 +88,14 @@ export function initGuildsImportExportAPI(guildRouter: express.Router) {
       } catch (err) {
         return clientError(res, "Invalid case handling mode");
         return;
+      }
+
+      const seenCaseNumbers = new Set();
+      for (const theCase of data.cases) {
+        if (seenCaseNumbers.has(theCase.case_number)) {
+          return clientError(res, `Duplicate case number: ${theCase.case_number}`);
+        }
+        seenCaseNumbers.add(theCase.case_number);
       }
 
       const guildCases = GuildCases.getGuildInstance(req.params.guildId);

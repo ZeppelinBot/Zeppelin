@@ -1,9 +1,7 @@
-import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { LogType } from "../../../data/LogType";
-import { logsEvt } from "../types";
-import { logVoiceChannelLeave } from "../logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelJoin } from "../logFunctions/logVoiceChannelJoin";
+import { logVoiceChannelLeave } from "../logFunctions/logVoiceChannelLeave";
 import { logVoiceChannelMove } from "../logFunctions/logVoiceChannelMove";
+import { logsEvt } from "../types";
 
 export const LogsVoiceStateUpdateEvt = logsEvt({
   event: "voiceStateUpdate",

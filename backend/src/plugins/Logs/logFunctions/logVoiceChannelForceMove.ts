@@ -1,20 +1,21 @@
+import { GuildMember, User, VoiceBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildVoiceChannel, GuildMember, User } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogVoiceChannelForceMoveData {
   mod: User;
   member: GuildMember;
-  oldChannel: BaseGuildVoiceChannel;
-  newChannel: BaseGuildVoiceChannel;
+  oldChannel: VoiceBasedChannel;
+  newChannel: VoiceBasedChannel;
 }
 
 export function logVoiceChannelForceMove(
@@ -33,8 +34,7 @@ export function logVoiceChannelForceMove(
     {
       userId: data.member.id,
       roles: Array.from(data.member.roles.cache.keys()),
-      channel: data.newChannel.id,
-      category: data.newChannel.parentId,
+      ...resolveChannelIds(data.newChannel),
       bot: data.member.user.bot,
     },
   );

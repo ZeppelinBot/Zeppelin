@@ -1,34 +1,41 @@
-import { GuildMember } from "discord.js";
-import intersection from "lodash.intersection";
-import { IPartialPersistData } from "../../../data/GuildPersistedData";
+import { PersistedData } from "../../../data/entities/PersistedData";
+import { GuildMemberCachePlugin } from "../../GuildMemberCache/GuildMemberCachePlugin";
 import { persistEvt } from "../types";
 
 export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",
 
-  async listener(meta) {
-    const member = meta.args.member as GuildMember;
-    const pluginData = meta.pluginData;
-
-    let persist = false;
-    const persistData: IPartialPersistData = {};
+  async listener({ pluginData, args: { member } }) {
     const config = await pluginData.config.getForUser(member.user);
+    const persistData: Partial<PersistedData> = {};
 
-    const persistedRoles = config.persisted_roles;
-    if (persistedRoles.length && member.roles) {
-      const rolesToPersist = intersection(persistedRoles, [...member.roles.cache.keys()]);
+    if (member.partial) {
+      // Djs hasn't cached member data => use db cache
+      const data = await pluginData.getPlugin(GuildMemberCachePlugin).getCachedMemberData(member.id);
+      if (!data) {
+        return;
+      }
+
+      const rolesToPersist = config.persisted_roles.filter((roleId) => data.roles.includes(roleId));
       if (rolesToPersist.length) {
-        persist = true;
         persistData.roles = rolesToPersist;
+      }
+      if (config.persist_nicknames && data.nickname) {
+        persistData.nickname = data.nickname;
+      }
+    } else {
+      // Djs has cached member data => use that
+      const memberRoles = Array.from(member.roles.cache.keys());
+      const rolesToPersist = config.persisted_roles.filter((roleId) => memberRoles.includes(roleId));
+      if (rolesToPersist.length) {
+        persistData.roles = rolesToPersist;
+      }
+      if (config.persist_nicknames && member.nickname) {
+        persistData.nickname = member.nickname as any;
       }
     }
 
-    if (config.persist_nicknames && member.nickname) {
-      persist = true;
-      persistData.nickname = member.nickname;
-    }
-
-    if (persist) {
+    if (Object.keys(persistData).length) {
       pluginData.state.persistedData.set(member.id, persistData);
     }
   },

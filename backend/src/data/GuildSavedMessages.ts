@@ -1,15 +1,14 @@
 import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { Repository } from "typeorm";
 import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
-import { buildEntity } from "./buildEntity";
 import { noop } from "../utils";
-import { decrypt } from "../utils/crypt";
-import { decryptJson, encryptJson } from "../utils/cryptHelpers";
 import { asyncMap } from "../utils/async";
+import { decryptJson, encryptJson } from "../utils/cryptHelpers";
+import { BaseGuildRepository } from "./BaseGuildRepository";
+import { buildEntity } from "./buildEntity";
+import { dataSource } from "./dataSource";
+import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
 
 export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
   private messages: Repository<SavedMessage>;
@@ -19,7 +18,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
 
   constructor(guildId) {
     super(guildId);
-    this.messages = getRepository(SavedMessage);
+    this.messages = dataSource.getRepository(SavedMessage);
     this.events = new QueuedEventEmitter();
 
     this.toBePermanent = new Set();
@@ -53,13 +52,13 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
         title: embed.title,
         description: embed.description,
         url: embed.url,
-        timestamp: embed.timestamp,
+        timestamp: embed.timestamp ? Date.parse(embed.timestamp) : null,
         color: embed.color,
 
         fields: embed.fields.map((field) => ({
           name: field.name,
           value: field.value,
-          inline: field.inline,
+          inline: field.inline ?? false,
         })),
 
         author: embed.author
@@ -128,7 +127,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
       return entity;
     }
 
-    entity.data = await decryptJson(entity.data as unknown as string);
+    entity.data = (await decryptJson(entity.data as unknown as string)) as ISavedMessageData;
     return entity;
   }
 
@@ -139,7 +138,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     return entity;
   }
 
-  async find(id: string, includeDeleted = false): Promise<SavedMessage | undefined> {
+  async find(id: string, includeDeleted = false): Promise<SavedMessage | null> {
     let query = this.messages
       .createQueryBuilder()
       .where("guild_id = :guild_id", { guild_id: this.guildId })

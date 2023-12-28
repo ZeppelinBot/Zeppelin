@@ -15,7 +15,7 @@ export class CaseNote {
 
   @Column() created_at: string;
 
-  @ManyToOne((type) => Case, (theCase) => theCase.notes)
+  @ManyToOne(() => Case, (theCase) => theCase.notes)
   @JoinColumn({ name: "case_id" })
   case: Case;
 }

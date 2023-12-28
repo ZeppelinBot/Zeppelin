@@ -7,7 +7,7 @@ export class SimpleError extends Error {
     super(message);
   }
 
-  [util.inspect.custom](depth, options) {
+  [util.inspect.custom]() {
     return `Error: ${this.message}`;
   }
 }

@@ -2,13 +2,13 @@ import "./style/app.pcss";
 
 import Vue from "vue";
 
-import hljs from "highlight.js/lib/highlight.js";
+import VueHighlightJS from "@highlightjs/vue-plugin";
+import hljs from "highlight.js/lib/core";
 import hljsYaml from "highlight.js/lib/languages/yaml.js";
-import VueHighlightJS from "vue-highlightjs";
-import "highlight.js/styles/ocean.css";
+import "highlight.js/styles/base16/ocean.css";
 
-import { RootStore } from "./store";
 import { router } from "./routes";
+import { RootStore } from "./store";
 
 import "./directives/trim-indents";
 

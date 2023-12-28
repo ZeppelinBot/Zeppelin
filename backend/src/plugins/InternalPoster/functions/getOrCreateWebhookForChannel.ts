@@ -1,17 +1,20 @@
+import { GuildBasedChannel, PermissionsBitField } from "discord.js";
 import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
-import { NewsChannel, Permissions, TextChannel } from "discord.js";
 import { isDiscordAPIError } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 
 type WebhookInfo = [id: string, token: string];
 
+export type WebhookableChannel = Extract<GuildBasedChannel, { createWebhook: (...args: any[]) => any }>;
+
+export function channelIsWebhookable(channel: GuildBasedChannel): channel is WebhookableChannel {
+  return "createWebhook" in channel;
+}
+
 export async function getOrCreateWebhookForChannel(
   pluginData: GuildPluginData<InternalPosterPluginType>,
-  channel: TextChannel | NewsChannel,
+  channel: WebhookableChannel,
 ): Promise<WebhookInfo | null> {
-  // tslint:disable-next-line:no-console FIXME: Here for debugging purposes
-  console.log(`getOrCreateWebhookForChannel(${channel.id})`);
-
   // Database cache
   const fromDb = await pluginData.state.webhooks.findByChannelId(channel.id);
   if (fromDb) {
@@ -24,9 +27,9 @@ export async function getOrCreateWebhookForChannel(
 
   // Create new webhook
   const member = pluginData.client.user && pluginData.guild.members.cache.get(pluginData.client.user.id);
-  if (!member || member.permissions.has(Permissions.FLAGS.MANAGE_WEBHOOKS)) {
+  if (!member || member.permissions.has(PermissionsBitField.Flags.ManageWebhooks)) {
     try {
-      const webhook = await channel.createWebhook(`Zephook ${channel.id}`);
+      const webhook = await channel.createWebhook({ name: `Zephook ${channel.id}` });
       await pluginData.state.webhooks.create({
         id: webhook.id,
         guild_id: pluginData.guild.id,

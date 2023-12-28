@@ -1,9 +1,7 @@
-import { Constants, Message, MessageType, Snowflake } from "discord.js";
+import { Message, MessageType } from "discord.js";
 import { messageSaverEvt } from "../types";
-import { SECONDS } from "../../../utils";
-import moment from "moment-timezone";
 
-const AFFECTED_MESSAGE_TYPES: MessageType[] = ["DEFAULT", "REPLY", "APPLICATION_COMMAND"];
+const AFFECTED_MESSAGE_TYPES: MessageType[] = [MessageType.Default, MessageType.Reply, MessageType.ChatInputCommand];
 
 export const MessageCreateEvt = messageSaverEvt({
   event: "messageCreate",

@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import { GuildPluginData } from "knub";
-import { Awaitable } from "knub/dist/utils";
+import { Awaitable } from "../../utils/typeUtils";
 import { AutomodContext, AutomodPluginType } from "./types";
 
 interface BaseAutomodTriggerMatchResult {
@@ -12,7 +12,7 @@ interface BaseAutomodTriggerMatchResult {
   fullSummary?: string;
 }
 
-export type AutomodTriggerMatchResult<TExtra extends any = unknown> = unknown extends TExtra
+export type AutomodTriggerMatchResult<TExtra = unknown> = unknown extends TExtra
   ? BaseAutomodTriggerMatchResult
   : BaseAutomodTriggerMatchResult & { extra: TExtra };
 

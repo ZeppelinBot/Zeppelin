@@ -1,7 +1,7 @@
 import { User } from "discord.js";
-import { BotControlPluginType } from "../types";
 import { GlobalPluginData } from "knub";
 import { GuildInvite } from "../../../utils";
+import { BotControlPluginType } from "../types";
 
 const REQUIRED_MEMBER_COUNT = 5000;
 

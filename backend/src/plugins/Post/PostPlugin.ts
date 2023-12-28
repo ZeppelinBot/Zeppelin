@@ -1,7 +1,10 @@
 import { PluginOptions } from "knub";
+import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
+import { makeIoTsConfigParser } from "../../pluginUtils";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { EditCmd } from "./commands/EditCmd";
@@ -12,8 +15,6 @@ import { ScheduledPostsDeleteCmd } from "./commands/ScheduledPostsDeleteCmd";
 import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
 import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
 import { ConfigSchema, PostPluginType } from "./types";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { onGuildEvent } from "../../data/GuildEvents";
 import { postScheduledPost } from "./util/postScheduledPost";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
@@ -35,14 +36,15 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Post",
+    configSchema: ConfigSchema,
   },
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configSchema: ConfigSchema,
+  configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
   // prettier-ignore
-  commands: [
+  messageCommands: [
       PostCmd,
       PostEmbedCmd,
       EditCmd,
@@ -61,12 +63,16 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   },
 
   afterLoad(pluginData) {
-    pluginData.state.unregisterGuildEventListener = onGuildEvent(pluginData.guild.id, "scheduledPost", (post) =>
+    const { state, guild } = pluginData;
+
+    state.unregisterGuildEventListener = onGuildEvent(guild.id, "scheduledPost", (post) =>
       postScheduledPost(pluginData, post),
     );
   },
 
   beforeUnload(pluginData) {
-    pluginData.state.unregisterGuildEventListener?.();
+    const { state } = pluginData;
+
+    state.unregisterGuildEventListener?.();
   },
 });
