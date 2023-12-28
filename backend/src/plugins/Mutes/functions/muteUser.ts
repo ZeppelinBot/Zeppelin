@@ -13,6 +13,7 @@ import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFor
 import {
   UserNotificationMethod,
   UserNotificationResult,
+  noop,
   notifyUser,
   resolveMember,
   resolveUser,
@@ -108,7 +109,7 @@ export async function muteUser(
       if (zepRoles.size === 0 || !zepRoles.some((zepRole) => zepRole.position > actualMuteRole.position)) {
         lock.unlock();
         logs.logBotAlert({
-          body: `Cannot mute users, specified mute role is above Zeppelin in the role hierarchy`,
+          body: `Cannot mute user, specified mute role is above Zeppelin in the role hierarchy`,
         });
         throw new RecoverablePluginError(ERRORS.MUTE_ROLE_ABOVE_ZEP, pluginData.guild);
       }
@@ -117,7 +118,24 @@ export async function muteUser(
         pluginData.getPlugin(RoleManagerPlugin).addPriorityRole(member.id, muteRole!);
       }
     } else {
-      await member.disableCommunicationUntil(timeoutUntil);
+      if (!member.manageable) {
+        lock.unlock();
+        logs.logBotAlert({
+          body: `Cannot mute user, specified user is above Zeppelin in the role hierarchy`,
+        });
+        throw new RecoverablePluginError(ERRORS.USER_ABOVE_ZEP, pluginData.guild);
+      }
+
+      if (!member.moderatable) {
+        // redundant safety, since canActOn already checks this
+        lock.unlock();
+        logs.logBotAlert({
+          body: `Cannot mute user, specified user is not moderatable`,
+        });
+        throw new RecoverablePluginError(ERRORS.USER_NOT_MODERATABLE, pluginData.guild);
+      }
+
+      await member.disableCommunicationUntil(timeoutUntil).catch(noop);
     }
 
     // If enabled, move the user to the mute voice channel (e.g. afk - just to apply the voice perms from the mute role)
