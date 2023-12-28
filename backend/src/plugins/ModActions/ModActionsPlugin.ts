@@ -47,6 +47,7 @@ import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOption
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { clearTempban } from "./functions/clearTempban";
+import { ConfigPreprocessorFn } from "knub/dist/config/configTypes";
 
 const defaultOptions = {
   config: {
@@ -84,6 +85,7 @@ const defaultOptions = {
     can_deletecase: false,
     can_act_as_other: false,
     create_cases_for_manual_actions: true,
+    reason_aliases: {},
   },
   overrides: [
     {
@@ -112,6 +114,19 @@ const defaultOptions = {
   ],
 };
 
+/**
+ * Config preprocessor to fix values
+ */
+const configPreprocessor: ConfigPreprocessorFn<ModActionsPluginType> = (options) => {
+  if (options.config?.reason_aliases) {
+    options.config.reason_aliases = Object.fromEntries(
+      Object.entries(options.config.reason_aliases).map(([k, v]) => [k.toLowerCase(), v]),
+    );
+  }
+
+  return options;
+};
+
 export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   name: "mod_actions",
   showInDocs: true,
@@ -125,6 +140,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
   configSchema: ConfigSchema,
   defaultOptions,
+  configPreprocessor,
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt],
 
