@@ -28,13 +28,14 @@
     <h2>Moderation Commands</h2>
     <p>
       So that your moderators may use Zeppelin moderation, you must define the
-      moderator role Id in the config and assign it a level (50).
+      moderator role Id in the config, assign it a level (50), and enable the
+      Mod actions plugin.
       <CodeBlock code-lang="yaml" trim="start">
         levels:
           "PRETEND-ROLE-ID": 50 # Mod
 
         plugins:
-        ...
+          mod_actions: {}
       </CodeBlock>
     </p>
     <p>
