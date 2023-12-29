@@ -647,7 +647,13 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    const hostnameParts = matchUrl.hostname.split(".");
+    let hostname = matchUrl.hostname.toLowerCase();
+
+    if (hostname.length > 3) {
+      hostname = hostname.replace(/[^a-z]+$/, "");
+    }
+
+    const hostnameParts = hostname.split(".");
     const tld = hostnameParts[hostnameParts.length - 1];
     if (tlds.includes(tld)) {
       urls.push(matchUrl);
