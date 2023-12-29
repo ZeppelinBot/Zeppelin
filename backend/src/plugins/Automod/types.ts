@@ -130,6 +130,7 @@ export interface AutomodContext {
   };
   antiraid?: {
     level: string | null;
+    oldLevel?: string | null;
   };
   threadChange?: {
     created?: ThreadChannel;

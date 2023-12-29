@@ -5,13 +5,15 @@ import { AutomodContext, AutomodPluginType } from "../types";
 
 export async function runAutomodOnAntiraidLevel(
   pluginData: GuildPluginData<AutomodPluginType>,
-  level: string | null,
+  newLevel: string | null,
+  oldLevel: string | null,
   user?: User,
 ) {
   const context: AutomodContext = {
     timestamp: Date.now(),
     antiraid: {
-      level,
+      level: newLevel,
+      oldLevel,
     },
     user,
   };
