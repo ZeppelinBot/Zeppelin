@@ -3,7 +3,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
+import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
@@ -121,7 +121,7 @@ export const CasesUserCmd = modActionsCmd({
               fields: [
                 {
                   name: emptyEmbedValue,
-                  value: trimLines(`Use \`${prefix}case <num>\` to see more information about an individual case`),
+                  value: `Use \`${prefix}case <num>\` to see more information about an individual case`,
                 },
               ],
             } satisfies APIEmbed;
