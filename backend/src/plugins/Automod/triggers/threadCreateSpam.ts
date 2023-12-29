@@ -45,7 +45,7 @@ export const ThreadCreateSpamTrigger = automodTrigger<unknown>()({
     }
   },
 
-  renderMatchInformation({ pluginData, contexts, triggerConfig }) {
+  renderMatchInformation() {
     return "";
   },
 });

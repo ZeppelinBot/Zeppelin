@@ -1,5 +1,6 @@
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { BaseGuildRepository } from "./BaseGuildRepository";
+import { dataSource } from "./dataSource";
 import { PingableRole } from "./entities/PingableRole";
 
 export class GuildPingableRoles extends BaseGuildRepository {
@@ -7,7 +8,7 @@ export class GuildPingableRoles extends BaseGuildRepository {
 
   constructor(guildId) {
     super(guildId);
-    this.pingableRoles = getRepository(PingableRole);
+    this.pingableRoles = dataSource.getRepository(PingableRole);
   }
 
   async all(): Promise<PingableRole[]> {
@@ -27,7 +28,7 @@ export class GuildPingableRoles extends BaseGuildRepository {
     });
   }
 
-  async getByChannelAndRoleId(channelId: string, roleId: string): Promise<PingableRole | undefined> {
+  async getByChannelAndRoleId(channelId: string, roleId: string): Promise<PingableRole | null> {
     return this.pingableRoles.findOne({
       where: {
         guild_id: this.guildId,

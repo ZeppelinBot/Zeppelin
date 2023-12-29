@@ -11,9 +11,9 @@ import { KickTrigger } from "./kick";
 import { LineSpamTrigger } from "./lineSpam";
 import { LinkSpamTrigger } from "./linkSpam";
 import { MatchAttachmentTypeTrigger } from "./matchAttachmentType";
-import { MatchMimeTypeTrigger } from "./matchMimeType";
 import { MatchInvitesTrigger } from "./matchInvites";
 import { MatchLinksTrigger } from "./matchLinks";
+import { MatchMimeTypeTrigger } from "./matchMimeType";
 import { MatchRegexTrigger } from "./matchRegex";
 import { MatchWordsTrigger } from "./matchWords";
 import { MemberJoinTrigger } from "./memberJoin";
@@ -26,14 +26,14 @@ import { NoteTrigger } from "./note";
 import { RoleAddedTrigger } from "./roleAdded";
 import { RoleRemovedTrigger } from "./roleRemoved";
 import { StickerSpamTrigger } from "./stickerSpam";
+import { ThreadArchiveTrigger } from "./threadArchive";
 import { ThreadCreateTrigger } from "./threadCreate";
 import { ThreadCreateSpamTrigger } from "./threadCreateSpam";
 import { ThreadDeleteTrigger } from "./threadDelete";
+import { ThreadUnarchiveTrigger } from "./threadUnarchive";
 import { UnbanTrigger } from "./unban";
 import { UnmuteTrigger } from "./unmute";
 import { WarnTrigger } from "./warn";
-import { ThreadArchiveTrigger } from "./threadArchive";
-import { ThreadUnarchiveTrigger } from "./threadUnarchive";
 
 export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>> = {
   any_message: AnyMessageTrigger,

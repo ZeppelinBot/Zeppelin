@@ -1,4 +1,4 @@
-import { GuildChannel, Permissions } from "discord.js";
+import { PermissionsBitField } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
@@ -7,7 +7,7 @@ import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
 import { autoReactionsCmd } from "../types";
 
-const requiredPermissions = readChannelPermissions | Permissions.FLAGS.ADD_REACTIONS;
+const requiredPermissions = readChannelPermissions | PermissionsBitField.Flags.AddReactions;
 
 export const NewAutoReactionsCmd = autoReactionsCmd({
   trigger: "auto_reactions",
@@ -15,7 +15,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
   usage: "!auto_reactions 629990160477585428 👍 👎",
 
   signature: {
-    channel: ct.channel(),
+    channel: ct.guildTextBasedChannel(),
     reactions: ct.string({ rest: true }),
   },
 
@@ -23,7 +23,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
     const finalReactions: string[] = [];
 
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
-    const missingPermissions = getMissingChannelPermissions(me, args.channel as GuildChannel, requiredPermissions);
+    const missingPermissions = getMissingChannelPermissions(me, args.channel, requiredPermissions);
     if (missingPermissions) {
       sendErrorMessage(
         pluginData,

@@ -1,8 +1,7 @@
-import { get, post } from "../api";
-import { Module } from "vuex";
-import { GuildState, LoadStatus, RootState } from "./types";
-import { ApiPermissions } from "@shared/apiPermissions";
 import Vue from "vue";
+import { Module } from "vuex";
+import { get, post } from "../api";
+import { GuildState, LoadStatus, RootState } from "./types";
 
 export const GuildStore: Module<GuildState, RootState> = {
   namespaced: true,

@@ -1,12 +1,10 @@
-import { BaseGuildTextChannel, MessageEmbed, Snowflake, ThreadChannel } from "discord.js";
+import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { resolveUser } from "../../../utils";
-import { LogsPluginType } from "../types";
 import { logMessageEdit } from "../logFunctions/logMessageEdit";
+import { LogsPluginType } from "../types";
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,
@@ -16,13 +14,13 @@ export async function onMessageUpdate(
   // To log a message update, either the message content or a rich embed has to change
   let logUpdate = false;
 
-  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as MessageEmbed[])
+  const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as EmbedData[])
     .map((e) => cloneDeep(e))
-    .filter((e) => (e as MessageEmbed).type === "rich");
+    .filter((e) => (e as EmbedData).type === "rich");
 
-  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as MessageEmbed[])
+  const newEmbedsToCompare = ((savedMessage.data.embeds || []) as EmbedData[])
     .map((e) => cloneDeep(e))
-    .filter((e) => (e as MessageEmbed).type === "rich");
+    .filter((e) => (e as EmbedData).type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {
@@ -49,9 +47,7 @@ export async function onMessageUpdate(
   }
 
   const user = await resolveUser(pluginData.client, savedMessage.user_id);
-  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as
-    | BaseGuildTextChannel
-    | ThreadChannel;
+  const channel = pluginData.guild.channels.resolve(savedMessage.channel_id as Snowflake)! as GuildTextBasedChannel;
 
   logMessageEdit(pluginData, {
     user,

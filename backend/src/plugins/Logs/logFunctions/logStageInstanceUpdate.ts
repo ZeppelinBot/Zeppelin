@@ -1,13 +1,14 @@
-import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
-import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { StageChannel, StageInstance } from "discord.js";
+import { GuildPluginData } from "knub";
+import { LogType } from "../../../data/LogType";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel, stageToTemplateSafeStage } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogStageInstanceUpdateData {
-  oldStageInstance: StageInstance;
+  oldStageInstance: StageInstance | null;
   newStageInstance: StageInstance;
   stageChannel: StageChannel;
   differenceString: string;
@@ -18,14 +19,13 @@ export function logStageInstanceUpdate(pluginData: GuildPluginData<LogsPluginTyp
     pluginData,
     LogType.STAGE_INSTANCE_UPDATE,
     createTypedTemplateSafeValueContainer({
-      oldStageInstance: stageToTemplateSafeStage(data.oldStageInstance),
+      oldStageInstance: data.oldStageInstance ? stageToTemplateSafeStage(data.oldStageInstance) : null,
       newStageInstance: stageToTemplateSafeStage(data.newStageInstance),
       stageChannel: channelToTemplateSafeChannel(data.stageChannel),
       differenceString: data.differenceString,
     }),
     {
-      channel: data.newStageInstance.channel!.id,
-      category: data.newStageInstance.channel!.parentId,
+      ...resolveChannelIds(data.newStageInstance.channel!),
     },
   );
 }

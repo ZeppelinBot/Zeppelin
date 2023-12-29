@@ -18,7 +18,7 @@ export const NoteTrigger = automodTrigger<NoteTriggerResultType>()({
     };
   },
 
-  renderMatchInformation({ matchResult }) {
+  renderMatchInformation() {
     return `Note was added on user`;
   },
 });

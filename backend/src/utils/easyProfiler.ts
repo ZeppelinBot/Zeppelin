@@ -1,6 +1,8 @@
-import { Profiler } from "knub/dist/Profiler";
+import type { Knub } from "knub";
 import { performance } from "perf_hooks";
-import { SECONDS, noop } from "../utils";
+import { noop, SECONDS } from "../utils";
+
+type Profiler = Knub["profiler"];
 
 let _profilingEnabled = false;
 

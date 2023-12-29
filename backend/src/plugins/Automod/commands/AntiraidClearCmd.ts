@@ -1,9 +1,9 @@
-import { typedGuildCommand } from "knub";
+import { guildPluginMessageCommand } from "knub";
 import { sendSuccessMessage } from "../../../pluginUtils";
 import { setAntiraidLevel } from "../functions/setAntiraidLevel";
 import { AutomodPluginType } from "../types";
 
-export const AntiraidClearCmd = typedGuildCommand<AutomodPluginType>()({
+export const AntiraidClearCmd = guildPluginMessageCommand<AutomodPluginType>()({
   trigger: ["antiraid clear", "antiraid reset", "antiraid none", "antiraid off"],
   permission: "can_set_antiraid",
 

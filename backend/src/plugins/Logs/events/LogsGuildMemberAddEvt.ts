@@ -1,10 +1,5 @@
-import humanizeDuration from "humanize-duration";
-import moment from "moment-timezone";
-import { LogType } from "../../../data/LogType";
-import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { logsEvt } from "../types";
 import { logMemberJoin } from "../logFunctions/logMemberJoin";
-import { logMemberJoinWithPriorRecords } from "../logFunctions/logMemberJoinWithPriorRecords";
+import { logsEvt } from "../types";
 
 export const LogsGuildMemberAddEvt = logsEvt({
   event: "guildMemberAdd",

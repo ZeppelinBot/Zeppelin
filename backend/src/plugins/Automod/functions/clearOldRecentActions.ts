@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
+import { startProfiling } from "../../../utils/easyProfiler";
 import { RECENT_ACTION_EXPIRY_TIME } from "../constants";
 import { AutomodPluginType } from "../types";
-import { startProfiling } from "../../../utils/easyProfiler";
 
 export function clearOldRecentActions(pluginData: GuildPluginData<AutomodPluginType>) {
   const stopProfiling = startProfiling(pluginData.getKnubInstance().profiler, "automod:fns:clearOldRecentActions");

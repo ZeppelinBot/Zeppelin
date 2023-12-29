@@ -1,0 +1,11 @@
+.git
+.github
+.idea
+.devcontainer
+
+/docker/development/data
+/docker/production/data
+
+node_modules
+/backend/dist
+/dashboard/dist

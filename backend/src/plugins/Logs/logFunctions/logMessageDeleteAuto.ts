@@ -1,21 +1,22 @@
+import { GuildBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
+import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, User } from "discord.js";
+import { UnknownUser } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { UnknownUser } from "../../../utils";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMessageDeleteAutoData {
   message: SavedMessage;
   user: User | UnknownUser;
-  channel: BaseGuildTextChannel;
+  channel: GuildBasedChannel;
   messageDate: string;
 }
 
@@ -32,8 +33,7 @@ export function logMessageDeleteAuto(pluginData: GuildPluginData<LogsPluginType>
     {
       userId: data.user.id,
       bot: data.user instanceof User ? data.user.bot : false,
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

@@ -77,6 +77,6 @@ export class MigrateUsernamesToNewHistoryTable1556909512501 implements Migration
     await queryRunner.query("START TRANSACTION");
   }
 
-  // tslint:disable-next-line:no-empty
-  public async down(queryRunner: QueryRunner): Promise<any> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public async down(): Promise<any> {}
 }

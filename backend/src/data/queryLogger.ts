@@ -1,5 +1,4 @@
 import { AdvancedConsoleLogger } from "typeorm/logger/AdvancedConsoleLogger";
-import type { QueryRunner } from "typeorm";
 
 let groupedQueryStats: Map<string, number> = new Map();
 
@@ -9,7 +8,7 @@ const deleteTableRegex = /FROM `?([^\s`]+)/;
 const insertTableRegex = /INTO `?([^\s`]+)/;
 
 export class QueryLogger extends AdvancedConsoleLogger {
-  logQuery(query: string, parameters?: any[], queryRunner?: QueryRunner): any {
+  logQuery(query: string): any {
     let type: string | undefined;
     let table: string | undefined;
 

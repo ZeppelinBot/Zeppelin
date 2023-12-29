@@ -1,13 +1,14 @@
+import { AnyThreadChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { ThreadChannel } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogThreadDeleteData {
-  thread: ThreadChannel;
+  thread: AnyThreadChannel;
 }
 
 export function logThreadDelete(pluginData: GuildPluginData<LogsPluginType>, data: LogThreadDeleteData) {
@@ -18,8 +19,7 @@ export function logThreadDelete(pluginData: GuildPluginData<LogsPluginType>, dat
       thread: channelToTemplateSafeChannel(data.thread),
     }),
     {
-      channel: data.thread.parentId,
-      category: data.thread.parent?.parentId,
+      ...resolveChannelIds(data.thread),
     },
   );
 }

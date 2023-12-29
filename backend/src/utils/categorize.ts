@@ -6,17 +6,14 @@ type CategoryReturnType<T, C extends Categories<T>> = {
   [key in keyof C]: T[];
 };
 
-function initCategories<T extends unknown, C extends Categories<T>>(categories: C): CategoryReturnType<T, C> {
+function initCategories<T, C extends Categories<T>>(categories: C): CategoryReturnType<T, C> {
   return Object.keys(categories).reduce((map, key) => {
     map[key] = [];
     return map;
   }, {}) as CategoryReturnType<T, C>;
 }
 
-export function categorize<T extends unknown, C extends Categories<T>>(
-  arr: T[],
-  categories: C,
-): CategoryReturnType<T, C> {
+export function categorize<T, C extends Categories<T>>(arr: T[], categories: C): CategoryReturnType<T, C> {
   const result = initCategories<T, C>(categories);
   const categoryEntries = Object.entries(categories);
 

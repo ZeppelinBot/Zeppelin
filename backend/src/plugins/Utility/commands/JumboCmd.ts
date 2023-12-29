@@ -1,6 +1,6 @@
-import { MessageAttachment } from "discord.js";
-import fs from "fs";
 import photon from "@silvia-odwyer/photon-node";
+import { AttachmentBuilder } from "discord.js";
+import fs from "fs";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
@@ -31,8 +31,6 @@ function resizeBuffer(input: Buffer, width: number, height: number): Buffer {
   return photonImageToBuffer(photonImage);
 }
 
-const CDN_URL = "https://twemoji.maxcdn.com/";
-
 export const JumboCmd = utilityCmd({
   trigger: "jumbo",
   description: "Makes an emoji jumbo",
@@ -50,7 +48,7 @@ export const JumboCmd = utilityCmd({
     const emojiRegex = new RegExp(`(<.*:).*:(\\d+)`);
     const results = emojiRegex.exec(args.emoji);
     let extension = ".png";
-    let file: MessageAttachment | undefined;
+    let file: AttachmentBuilder | undefined;
 
     if (!isEmoji(args.emoji)) {
       sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
@@ -65,21 +63,27 @@ export const JumboCmd = utilityCmd({
       url += `${results[2]}${extension}`;
       if (extension === ".png") {
         const image = resizeBuffer(await getBufferFromUrl(url), size, size);
-        file = new MessageAttachment(image, `emoji${extension}`);
+        file = new AttachmentBuilder(image, { name: `emoji${extension}` });
       } else {
         const image = await getBufferFromUrl(url);
-        file = new MessageAttachment(image, `emoji${extension}`);
+        file = new AttachmentBuilder(image, { name: `emoji${extension}` });
       }
     } else {
       let url = `${twemoji.base}${twemoji.size}/${twemoji.convert.toCodePoint(args.emoji)}${twemoji.ext}`;
       let image: Buffer | undefined;
       try {
         const downloadedBuffer = await getBufferFromUrl(url);
-        image = resizeBuffer(await getBufferFromUrl(url), size, size);
+        image = resizeBuffer(downloadedBuffer, size, size);
       } catch (err) {
         if (url.toLocaleLowerCase().endsWith("fe0f.png")) {
           url = url.slice(0, url.lastIndexOf("-fe0f")) + ".png";
-          image = await resizeBuffer(await getBufferFromUrl(url), size, size);
+          try {
+            image = resizeBuffer(await getBufferFromUrl(url), size, size);
+          } catch {
+            // It's fine if this fails, we just don't jumbo then.
+            // The errors here are usually some internal errors in the photon WASM code anyway,
+            // so we can't do anything about it.
+          }
         }
       }
       if (!image) {
@@ -87,7 +91,7 @@ export const JumboCmd = utilityCmd({
         return;
       }
 
-      file = new MessageAttachment(image, "emoji.png");
+      file = new AttachmentBuilder(image, { name: "emoji.png" });
     }
 
     msg.channel.send({ files: [file] });

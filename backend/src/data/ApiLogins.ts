@@ -1,10 +1,11 @@
 import crypto from "crypto";
 import moment from "moment-timezone";
-import { getRepository, Repository } from "typeorm";
+import { Repository } from "typeorm";
 // tslint:disable-next-line:no-submodule-imports
-import uuidv4 from "uuid/v4";
+import { v4 as uuidv4 } from "uuid";
 import { DAYS, DBDateFormat } from "../utils";
 import { BaseRepository } from "./BaseRepository";
+import { dataSource } from "./dataSource";
 import { ApiLogin } from "./entities/ApiLogin";
 
 const LOGIN_EXPIRY_TIME = 1 * DAYS;
@@ -14,7 +15,7 @@ export class ApiLogins extends BaseRepository {
 
   constructor() {
     super();
-    this.apiLogins = getRepository(ApiLogin);
+    this.apiLogins = dataSource.getRepository(ApiLogin);
   }
 
   async getUserIdByApiKey(apiKey: string): Promise<string | null> {
@@ -90,10 +91,15 @@ export class ApiLogins extends BaseRepository {
     const [loginId, token] = apiKey.split(".");
     if (!loginId || !token) return;
 
+    const updatedTime = moment().utc().add(LOGIN_EXPIRY_TIME, "ms");
+
+    const login = await this.apiLogins.createQueryBuilder().where("id = :id", { id: loginId }).getOne();
+    if (!login || moment.utc(login.expires_at).isSameOrAfter(updatedTime)) return;
+
     await this.apiLogins.update(
       { id: loginId },
       {
-        expires_at: moment().utc().add(LOGIN_EXPIRY_TIME, "ms").format(DBDateFormat),
+        expires_at: updatedTime.format(DBDateFormat),
       },
     );
   }

@@ -1,14 +1,15 @@
+import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, ThreadChannel, User } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogRepeatedMessageData {
   author: User;
-  channel: BaseGuildTextChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   datetime: string;
   date: string;
   time: string;
@@ -32,8 +33,7 @@ export function logRepeatedMessage(pluginData: GuildPluginData<LogsPluginType>, 
     {
       userId: data.author.id,
       bot: data.author.bot,
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

@@ -1,13 +1,14 @@
+import { GuildBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPluginType } from "../types";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { GuildChannel, NewsChannel } from "discord.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects";
+import { LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogChannelCreateData {
-  channel: GuildChannel | NewsChannel;
+  channel: GuildBasedChannel;
 }
 
 export function logChannelCreate(pluginData: GuildPluginData<LogsPluginType>, data: LogChannelCreateData) {
@@ -18,8 +19,7 @@ export function logChannelCreate(pluginData: GuildPluginData<LogsPluginType>, da
       channel: channelToTemplateSafeChannel(data.channel),
     }),
     {
-      channel: data.channel.id,
-      category: data.channel.parentId,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

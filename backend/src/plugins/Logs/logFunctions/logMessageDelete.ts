@@ -1,22 +1,23 @@
+import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
+import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType";
-import { log } from "../util/log";
+import { ISavedMessageAttachmentData, SavedMessage } from "../../../data/entities/SavedMessage";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { BaseGuildTextChannel, ThreadChannel, User } from "discord.js";
+import { UnknownUser, useMediaUrls } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
-import moment from "moment-timezone";
-import { ISavedMessageAttachmentData, SavedMessage } from "../../../data/entities/SavedMessage";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { UnknownUser, useMediaUrls } from "../../../utils";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
+import { log } from "../util/log";
 
 interface LogMessageDeleteData {
   user: User | UnknownUser;
-  channel: BaseGuildTextChannel | ThreadChannel;
+  channel: GuildTextBasedChannel;
   message: SavedMessage;
 }
 
@@ -47,10 +48,9 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
     }),
     {
       userId: data.user.id,
-      channel: data.channel.id,
-      category: data.channel.parentId,
       messageTextContent: data.message.data.content,
       bot: data.user instanceof User ? data.user.bot : false,
+      ...resolveChannelIds(data.channel),
     },
   );
 }

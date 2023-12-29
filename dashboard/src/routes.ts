@@ -1,5 +1,5 @@
 import Vue from "vue";
-import VueRouter, { RouteConfig } from "vue-router";
+import VueRouter from "vue-router";
 import { authGuard, authRedirectGuard, loginCallbackGuard } from "./auth";
 
 Vue.use(VueRouter);

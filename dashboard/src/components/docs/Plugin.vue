@@ -8,6 +8,20 @@
     <!-- Description -->
     <MarkdownBlock :content="data.info.description" class="content"></MarkdownBlock>
 
+    <div v-if="data.info.legacy">
+      <div class="px-3 py-2 mb-4 rounded bg-gray-800 shadow-md inline-block flex">
+        <div class="flex-none mr-2">
+          <alert class="inline-icon mr-1 text-yellow-300" />
+        </div>
+        <div class="flex-auto">
+          <strong>Note!</strong> This is a legacy plugin which is no longer actively maintained and may be removed in a future update.
+          <div v-if="typeof data.info.legacy === 'string'" class="mt-4">
+            <MarkdownBlock v-if="typeof data.info.legacy === 'string'" :content="data.info.legacy"></MarkdownBlock>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <Tabs>
       <Tab :active="tab === 'usage'">
         <router-link class="unstyled" v-bind:to="'/docs/plugins/' + pluginName + '/usage'">Usage</router-link>
@@ -31,10 +45,10 @@
         <MarkdownBlock :content="data.info.usageGuide" class="content" />
       </div>
 
-      <!-- Command list -->
-      <div v-if="data.commands.length">
-        <h3 id="commands" class="text-2xl">Commands</h3>
-        <div v-for="command in data.commands"
+      <!-- Message Command list -->
+      <div v-if="data.messageCommands && data.messageCommands.length">
+        <h3 id="commands" class="text-2xl">Message commands</h3>
+        <div v-for="command in (data.messageCommands || [])"
              class="command mb-4"
              v-bind:ref="getCommandSlug(command)" v-bind:class="{target: targetCommandId === getCommandSlug(command)}">
           <h4 class="text-xl font-semibold mb-0">
@@ -172,12 +186,13 @@
   import Tab from "../Tab.vue";
   import Expandable from "../Expandable.vue";
   import { DocsState } from "../../store/types";
+  import Alert from 'vue-material-design-icons/Alert.vue';
 
   const validTabs = ['usage', 'configuration'];
   const defaultTab = 'usage';
 
   export default {
-    components: { CodeBlock, MarkdownBlock, Tabs, Tab, Expandable },
+    components: { CodeBlock, MarkdownBlock, Tabs, Tab, Expandable, Alert },
 
     async mounted() {
       this.loading = true;
@@ -205,7 +220,7 @@
     },
     methods: {
       renderConfiguration(options) {
-        return yaml.safeDump({
+        return yaml.dump({
           [this.pluginName]: options,
         });
       },
@@ -294,8 +309,9 @@
         },
         hasUsageInfo() {
           if (!this.data) return true;
-          if (this.data.commands.length) return true;
-          if (this.data.info.usageGuide) return true;
+          if (this.data.messageCommands?.length) return true;
+          if (this.data.slashCommands?.length) return true;
+          if (this.data.info?.usageGuide) return true;
           return false;
         },
       }),

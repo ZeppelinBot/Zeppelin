@@ -1,6 +1,6 @@
 import { asyncMap } from "../utils/async";
 
-export class BaseRepository<TEntity extends unknown = unknown> {
+export class BaseRepository<TEntity = unknown> {
   private nextRelations: string[];
 
   constructor() {
@@ -40,7 +40,7 @@ export class BaseRepository<TEntity extends unknown = unknown> {
     return entity;
   }
 
-  protected async processEntityFromDB<T extends TEntity | undefined>(entity: T): Promise<T> {
+  protected async processEntityFromDB<T extends TEntity | null>(entity: T): Promise<T> {
     return this._processEntityFromDB(entity);
   }
 

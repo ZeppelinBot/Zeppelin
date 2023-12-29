@@ -7,7 +7,7 @@ export const SetAntiraidLevelAction = automodAction({
   configType: tNullable(t.string),
   defaultConfig: "",
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, actionConfig }) {
     setAntiraidLevel(pluginData, actionConfig ?? null);
   },
 });

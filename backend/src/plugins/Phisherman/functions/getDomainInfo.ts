@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { PhishermanPluginType } from "../types";
-import { PhishermanDomainInfo } from "../../../data/types/phisherman";
 import { getPhishermanDomainInfo, phishermanDomainIsSafe, trackPhishermanCaughtDomain } from "../../../data/Phisherman";
+import { PhishermanDomainInfo } from "../../../data/types/phisherman";
+import { PhishermanPluginType } from "../types";
 
 export async function getDomainInfo(
   pluginData: GuildPluginData<PhishermanPluginType>,

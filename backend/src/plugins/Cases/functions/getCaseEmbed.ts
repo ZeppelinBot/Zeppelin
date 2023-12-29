@@ -1,4 +1,4 @@
-import { MessageEditOptions, MessageOptions } from "discord.js";
+import { escapeCodeBlock, MessageCreateOptions, MessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes";
@@ -14,7 +14,7 @@ export async function getCaseEmbed(
   caseOrCaseId: Case | number,
   requestMemberId?: string,
   noOriginalCaseLink?: boolean,
-): Promise<MessageOptions & MessageEditOptions> {
+): Promise<MessageCreateOptions & MessageEditOptions> {
   const theCase = await pluginData.state.cases.with("notes").find(resolveCaseId(caseOrCaseId));
   if (!theCase) {
     throw new Error("Unknown case");
@@ -67,7 +67,7 @@ export async function getCaseEmbed(
   if (theCase.notes.length) {
     for (const note of theCase.notes) {
       const noteDate = moment.utc(note.created_at);
-      let noteBody = note.body.trim();
+      let noteBody = escapeCodeBlock(note.body.trim());
       if (noteBody === "") {
         noteBody = emptyEmbedValue;
       }

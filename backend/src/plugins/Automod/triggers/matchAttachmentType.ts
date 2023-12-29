@@ -1,5 +1,6 @@
-import { Snowflake, TextChannel, Util } from "discord.js";
+import { escapeInlineCode, Snowflake } from "discord.js";
 import * as t from "io-ts";
+import { extname } from "path";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
@@ -23,7 +24,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     whitelist_enabled: false,
   },
 
-  async match({ pluginData, context, triggerConfig: trigger }) {
+  async match({ context, triggerConfig: trigger }) {
     if (!context.message) {
       return;
     }
@@ -33,7 +34,7 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
     }
 
     for (const attachment of context.message.data.attachments) {
-      const attachmentType = attachment.url.split(".").pop()!.toLowerCase();
+      const attachmentType = extname(new URL(attachment.url).pathname).slice(1).toLowerCase();
 
       const blacklist = trigger.blacklist_enabled
         ? (trigger.filetype_blacklist || []).map((_t) => _t.toLowerCase())
@@ -66,13 +67,13 @@ export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
   },
 
   renderMatchInformation({ pluginData, contexts, matchResult }) {
-    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake) as TextChannel;
+    const channel = pluginData.guild.channels.cache.get(contexts[0].message!.channel_id as Snowflake)!;
     const prettyChannel = verboseChannelMention(channel);
 
     return (
       asSingleLine(`
-        Matched attachment type \`${Util.escapeInlineCode(matchResult.extra.matchedType)}\`
-        (${matchResult.extra.mode === "blacklist" ? "(blacklisted)" : "(not in whitelist)"})
+        Matched attachment type \`${escapeInlineCode(matchResult.extra.matchedType)}\`
+        (${matchResult.extra.mode === "blacklist" ? "blacklisted" : "not in whitelist"})
         in message (\`${contexts[0].message!.id}\`) in ${prettyChannel}:
       `) + messageSummary(contexts[0].message!)
     );

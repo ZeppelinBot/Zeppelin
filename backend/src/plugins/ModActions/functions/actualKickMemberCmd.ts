@@ -1,9 +1,9 @@
-import { GuildMember, TextChannel, ThreadChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { hasPermission } from "knub/dist/helpers";
+import { hasPermission } from "knub/helpers";
 import { LogType } from "../../../data/LogType";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { errorMessage, resolveMember, resolveUser } from "../../../utils";
+import { DAYS, SECONDS, errorMessage, renderUserUsername, resolveMember, resolveUser } from "../../../utils";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
@@ -19,7 +19,7 @@ export async function actualKickMemberCmd(
     reason: string;
     mod: GuildMember;
     notify?: string;
-    "notify-channel"?: TextChannel | ThreadChannel;
+    "notify-channel"?: GuildTextBasedChannel;
     clean?: boolean;
   },
 ) {
@@ -82,7 +82,7 @@ export async function actualKickMemberCmd(
     ignoreEvent(pluginData, IgnoredEventType.Ban, memberToKick.id);
 
     try {
-      await memberToKick.ban({ days: 1, reason: "kick -clean" });
+      await memberToKick.ban({ deleteMessageSeconds: (1 * DAYS) / SECONDS, reason: "kick -clean" });
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
     }
@@ -103,7 +103,7 @@ export async function actualKickMemberCmd(
   }
 
   // Confirm the action to the moderator
-  let response = `Kicked **${memberToKick.user.tag}** (Case #${kickResult.case.case_number})`;
+  let response = `Kicked **${renderUserUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
   sendSuccessMessage(pluginData, msg.channel, response);

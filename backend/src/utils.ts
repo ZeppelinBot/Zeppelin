@@ -1,30 +1,30 @@
 import {
+  APIEmbed,
+  ChannelType,
   Client,
-  Constants,
   DiscordAPIError,
+  EmbedData,
+  EmbedType,
   Emoji,
+  escapeCodeBlock,
   Guild,
-  GuildAuditLogs,
-  GuildAuditLogsEntry,
+  GuildBasedChannel,
   GuildChannel,
   GuildMember,
+  GuildTextBasedChannel,
   Invite,
   InviteGuild,
   LimitedCollection,
   Message,
-  MessageAttachment,
-  MessageEmbed,
-  MessageEmbedOptions,
+  MessageCreateOptions,
   MessageMentionOptions,
-  MessageOptions,
   PartialChannelData,
   PartialMessage,
+  RoleResolvable,
   Snowflake,
   Sticker,
-  TextChannel,
-  ThreadChannel,
+  TextBasedChannel,
   User,
-  Util,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
 import { either } from "fp-ts/lib/Either";
@@ -35,18 +35,17 @@ import humanizeDuration from "humanize-duration";
 import * as t from "io-ts";
 import { isEqual } from "lodash";
 import moment from "moment-timezone";
+import { performance } from "perf_hooks";
 import tlds from "tlds";
 import tmp from "tmp";
 import { URL } from "url";
+import { z, ZodError } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
+import { getProfiler } from "./profiler";
 import { SimpleCache } from "./SimpleCache";
-import { ChannelTypeStrings } from "./types";
 import { sendDM } from "./utils/sendDM";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
 import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
-import { z, ZodError } from "zod";
-import { getProfiler } from "./profiler";
-import { performance } from "perf_hooks";
 
 const fsp = fs.promises;
 
@@ -96,19 +95,11 @@ export function tNullable<T extends t.Type<any, any>>(type: T) {
   return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
 }
 
-function typeHasProps(type: any): type is t.TypeC<any> {
-  return type.props != null;
-}
-
-function typeIsArray(type: any): type is t.ArrayC<any> {
-  return type._tag === "ArrayType";
-}
-
 export const tNormalizedNullOrUndefined = new t.Type<undefined, null | undefined>(
   "tNormalizedNullOrUndefined",
   (v): v is undefined => typeof v === "undefined",
   (v, c) => (v == null ? t.success(undefined) : t.failure(v, c, "Value must be null or undefined")),
-  (s) => undefined,
+  () => undefined,
 );
 
 /**
@@ -167,17 +158,7 @@ export function tDeepPartial<T>(type: T): TDeepPartial<T> {
   }
 }
 
-function tDeepPartialProp(prop: any) {
-  if (typeHasProps(prop)) {
-    return tDeepPartial(prop);
-  } else if (typeIsArray(prop)) {
-    return t.array(tDeepPartialProp(prop.type));
-  } else {
-    return prop;
-  }
-}
-
-export function getScalarDifference<T>(
+export function getScalarDifference<T extends object>(
   base: T,
   object: T,
   ignoreKeys: string[] = [],
@@ -256,7 +237,7 @@ export function nonNullish<V>(v: V): v is NonNullable<V> {
 export type GuildInvite = Invite & { guild: InviteGuild | Guild };
 export type GroupDMInvite = Invite & {
   channel: PartialChannelData;
-  type: typeof Constants.ChannelTypes.GROUP_DM;
+  type: typeof ChannelType.GroupDM;
 };
 
 /**
@@ -327,7 +308,7 @@ export const zEmbedInput = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   url: z.string().optional(),
-  timestamp: z.number().optional(),
+  timestamp: z.string().optional(),
   color: z.number().optional(),
 
   footer: z.optional(
@@ -390,8 +371,7 @@ export const zEmbedInput = z.object({
     .nullable(),
 });
 
-export type EmbedWith<T extends keyof MessageEmbedOptions> = MessageEmbedOptions &
-  Pick<Required<MessageEmbedOptions>, T>;
+export type EmbedWith<T extends keyof APIEmbed> = APIEmbed & Pick<Required<APIEmbed>, T>;
 
 export const zStrictMessageContent = z.object({
   content: z.string().optional(),
@@ -404,7 +384,7 @@ export type ZStrictMessageContent = z.infer<typeof zStrictMessageContent>;
 export type StrictMessageContent = {
   content?: string;
   tts?: boolean;
-  embeds?: MessageEmbedOptions[];
+  embeds?: APIEmbed[];
 };
 
 export const tStrictMessageContent = t.type({
@@ -482,7 +462,9 @@ export const tAllowedMentions = t.type({
 });
 
 export function dropPropertiesByName(obj, propName) {
-  if (obj.hasOwnProperty(propName)) delete obj[propName];
+  if (Object.hasOwn(obj, propName)) {
+    delete obj[propName];
+  }
   for (const value of Object.values(obj)) {
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       dropPropertiesByName(value, propName);
@@ -571,7 +553,7 @@ export function convertMSToDelayString(ms: number): string {
   return result;
 }
 
-export function successMessage(str, emoji = "<:zep_check:650361014180904971>") {
+export function successMessage(str: string, emoji = "<:zep_check:906897402101891093>") {
   return emoji ? `${emoji} ${str}` : str;
 }
 
@@ -581,10 +563,13 @@ export function errorMessage(str, emoji = "⚠") {
 
 export function get(obj, path, def?): any {
   let cursor = obj;
-  const pathParts = path.split(".");
+  const pathParts = path
+    .split(".")
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
   for (const part of pathParts) {
-    // hasOwnProperty check here is necessary to prevent prototype traversal in tags
-    if (!cursor.hasOwnProperty(part)) return def;
+    // hasOwn check here is necessary to prevent prototype traversal in tags
+    if (!Object.hasOwn(cursor, part)) return def;
     cursor = cursor[part];
     if (cursor === undefined) return def;
     if (cursor == null) return null;
@@ -646,7 +631,7 @@ interface MatchedURL extends URL {
 }
 
 export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
-  let matches = str.match(urlRegex) || [];
+  let matches = [...(str.match(urlRegex) ?? [])];
   if (onlyUnique) {
     matches = unique(matches);
   }
@@ -662,7 +647,13 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    const hostnameParts = matchUrl.hostname.split(".");
+    let hostname = matchUrl.hostname.toLowerCase();
+
+    if (hostname.length > 3) {
+      hostname = hostname.replace(/[^a-z]+$/, "");
+    }
+
+    const hostnameParts = hostname.split(".");
     const tld = hostnameParts[hostnameParts.length - 1];
     if (tlds.includes(tld)) {
       urls.push(matchUrl);
@@ -680,7 +671,7 @@ export function parseInviteCodeInput(str: string): string {
   return getInviteCodesInString(str)[0];
 }
 
-export function isNotNull(value): value is Exclude<typeof value, null> {
+export function isNotNull<T>(value: T): value is Exclude<T, null | undefined> {
   return value != null;
 }
 
@@ -690,10 +681,10 @@ export function isNotNull(value): value is Exclude<typeof value, null> {
 // discord.gg/<code>
 // discord.com/friend-invite/<code>
 const quickInviteDetection =
-  /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9\-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9\-]+)/gi;
+  /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9-]+)/gi;
 
 const isInviteHostRegex = /(?:^|\.)(?:discord.gg|discord.com|discordapp.com)$/i;
-const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9\-]+)$/i;
+const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9-]+)$/i;
 
 export function getInviteCodesInString(str: string): string[] {
   const inviteCodes: string[] = [];
@@ -876,7 +867,7 @@ export function chunkArray<T>(arr: T[], chunkSize): T[][] {
 
   for (let i = 0; i < arr.length; i++) {
     currentChunk.push(arr[i]);
-    if ((i !== 0 && i % chunkSize === 0) || i === arr.length - 1) {
+    if ((i !== 0 && (i + 1) % chunkSize === 0) || i === arr.length - 1) {
       chunks.push(currentChunk);
       currentChunk = [];
     }
@@ -951,7 +942,7 @@ export function chunkMessageLines(str: string, maxChunkLength = 1990): string[] 
 }
 
 export async function createChunkedMessage(
-  channel: TextChannel | ThreadChannel | User,
+  channel: TextBasedChannel | User,
   messageText: string,
   allowedMentions?: MessageMentionOptions,
 ) {
@@ -1085,7 +1076,7 @@ export type CustomEmoji = {
   id: string;
 } & Emoji;
 
-export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: TextChannel | ThreadChannel };
+export type UserNotificationMethod = { type: "dm" } | { type: "channel"; channel: GuildTextBasedChannel };
 
 export const disableUserNotificationStrings = ["no", "none", "off"];
 
@@ -1186,12 +1177,12 @@ const keyMods = ["+", "-", "="];
 export function deepKeyIntersect(obj, keyReference) {
   const result = {};
   for (let [key, value] of Object.entries(obj)) {
-    if (!keyReference.hasOwnProperty(key)) {
+    if (!Object.hasOwn(keyReference, key)) {
       // Temporary solution so we don't erase keys with modifiers
       // Modifiers will be removed soon(tm) so we can remove this when that happens as well
       let found = false;
       for (const mod of keyMods) {
-        if (keyReference.hasOwnProperty(mod + key)) {
+        if (Object.hasOwn(keyReference, mod + key)) {
           key = mod + key;
           found = true;
           break;
@@ -1266,7 +1257,7 @@ export function getUser(client: Client, userResolvable: string): User | UnknownU
  */
 export async function resolveUser(bot: Client, value: string): Promise<User | UnknownUser>;
 export async function resolveUser<T>(bot: Client, value: Not<T, string>): Promise<UnknownUser>;
-export async function resolveUser<T>(bot, value) {
+export async function resolveUser(bot, value) {
   if (typeof value !== "string") {
     return new UnknownUser();
   }
@@ -1367,24 +1358,40 @@ export async function resolveRoleId(bot: Client, guildId: string, value: string)
   return null;
 }
 
+export class UnknownRole {
+  public id: string;
+  public name: string;
+
+  constructor(props = {}) {
+    for (const key in props) {
+      this[key] = props[key];
+    }
+  }
+}
+
+export function resolveRole(guild: Guild, roleResolvable: RoleResolvable) {
+  const roleId = guild.roles.resolveId(roleResolvable);
+  return guild.roles.resolve(roleId) ?? new UnknownRole({ id: roleId, name: roleId });
+}
+
 const inviteCache = new SimpleCache<Promise<Invite | null>>(10 * MINUTES, 200);
 
-type ResolveInviteReturnType<T extends boolean> = Promise<Invite | null>;
+type ResolveInviteReturnType = Promise<Invite | null>;
 export async function resolveInvite<T extends boolean>(
   client: Client,
   code: string,
   withCounts?: T,
-): ResolveInviteReturnType<T> {
+): ResolveInviteReturnType {
   const key = `${code}:${withCounts ? 1 : 0}`;
 
   if (inviteCache.has(key)) {
-    return inviteCache.get(key) as ResolveInviteReturnType<T>;
+    return inviteCache.get(key) as ResolveInviteReturnType;
   }
 
   const promise = client.fetchInvite(code).catch(() => null);
   inviteCache.set(key, promise);
 
-  return promise as ResolveInviteReturnType<T>;
+  return promise as ResolveInviteReturnType;
 }
 
 const internalStickerCache: LimitedCollection<Snowflake, Sticker> = new LimitedCollection({ maxSize: 500 });
@@ -1401,17 +1408,21 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
   return fetchedSticker;
 }
 
-export async function confirm(channel: TextChannel, userId: string, content: MessageOptions): Promise<boolean> {
+export async function confirm(
+  channel: GuildTextBasedChannel,
+  userId: string,
+  content: MessageCreateOptions,
+): Promise<boolean> {
   return waitForButtonConfirm(channel, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {
   // Regular text content
-  let result = "```\n" + (msg.data.content ? Util.escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
+  let result = "```\n" + (msg.data.content ? escapeCodeBlock(msg.data.content) : "<no text content>") + "```";
 
   // Rich embed
-  const richEmbed = (msg.data.embeds || []).find((e) => (e as MessageEmbed).type === "rich");
-  if (richEmbed) result += "Embed:```" + Util.escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
+  const richEmbed = (msg.data.embeds || []).find((e) => (e as EmbedData).type === EmbedType.Rich);
+  if (richEmbed) result += "Embed:```" + escapeCodeBlock(JSON.stringify(richEmbed)) + "```";
 
   // Attachments
   if (msg.data.attachments && msg.data.attachments.length) {
@@ -1426,23 +1437,23 @@ export function messageSummary(msg: SavedMessage) {
 
 export function verboseUserMention(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.tag}**`;
+    return `**${renderUsername(user.username, user.discriminator)}**`;
   }
 
-  return `<@!${user.id}> (**${user.tag}**, \`${user.id}\`)`;
+  return `<@!${user.id}> (**${renderUsername(user.username, user.discriminator)}**, \`${user.id}\`)`;
 }
 
 export function verboseUserName(user: User | UnknownUser): string {
   if (user.id == null) {
-    return `**${user.tag}**`;
+    return `**${renderUsername(user.username, user.discriminator)}**`;
   }
 
-  return `**${user.tag}** (\`${user.id}\`)`;
+  return `**${renderUsername(user.username, user.discriminator)}** (\`${user.id}\`)`;
 }
 
-export function verboseChannelMention(channel: GuildChannel | ThreadChannel): string {
+export function verboseChannelMention(channel: GuildBasedChannel): string {
   const plainTextName =
-    channel.type === ChannelTypeStrings.VOICE || channel.type === ChannelTypeStrings.STAGE
+    channel.type === ChannelType.GuildVoice || channel.type === ChannelType.GuildStageVoice
       ? channel.name
       : `#${channel.name}`;
   return `<#${channel.id}> (**${plainTextName}**, \`${channel.id}\`)`;
@@ -1576,7 +1587,7 @@ export function isGuildInvite(invite: Invite): invite is GuildInvite {
 }
 
 export function isGroupDMInvite(invite: Invite): invite is GroupDMInvite {
-  return invite.guild == null && invite.channel?.type === ChannelTypeStrings.GROUP;
+  return invite.guild == null && invite.channel?.type === ChannelType.GroupDM;
 }
 
 export function inviteHasCounts(invite: Invite): invite is Invite {
@@ -1584,7 +1595,7 @@ export function inviteHasCounts(invite: Invite): invite is Invite {
 }
 
 export function asyncMap<T, R>(arr: T[], fn: (item: T) => Promise<R>): Promise<R[]> {
-  return Promise.all(arr.map((item, index) => fn(item)));
+  return Promise.all(arr.map((item) => fn(item)));
 }
 
 export function unique<T>(arr: T[]): T[] {
@@ -1597,3 +1608,14 @@ export function isTruthy<T>(value: T): value is Exclude<T, false | null | undefi
 }
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
+
+export function renderUsername(username: string, discriminator: string): string {
+  if (discriminator === "0") {
+    return username;
+  }
+  return `${username}#${discriminator}`;
+}
+
+export function renderUserUsername(user: User | UnknownUser): string {
+  return renderUsername(user.username, user.discriminator);
+}

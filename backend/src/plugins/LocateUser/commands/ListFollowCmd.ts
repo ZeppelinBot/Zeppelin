@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { createChunkedMessage, sorter } from "../../../utils";
 import { locateUserCmd } from "../types";
-import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 
 export const ListFollowCmd = locateUserCmd({
   trigger: ["follows", "fs"],

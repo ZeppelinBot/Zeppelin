@@ -2,13 +2,12 @@ import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
 import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { validate } from "../../../validatorUtils";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -17,8 +16,8 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   const member = await resolveMember(pluginData.client, pluginData.guild, msg.user_id);
   if (!member) return;
 
-  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake) as TextChannel;
-  if (!channel) return;
+  const channel = pluginData.guild.channels.cache.get(msg.channel_id as Snowflake);
+  if (!channel?.isTextBased()) return;
 
   const config = await pluginData.config.getMatchingConfig({
     member,
@@ -70,7 +69,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
 
     if (config.user_cooldown) {
       const delay = convertDelayStringToMS(String(config.user_cooldown), "s");
-      cooldowns.push([`tags-user-${tagResult.tagName}`, delay]);
+      cooldowns.push([`tags-user-${msg.user_id}`, delay]);
     }
 
     if (config.global_cooldown) {

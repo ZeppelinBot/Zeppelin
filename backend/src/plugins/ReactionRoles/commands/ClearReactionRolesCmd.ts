@@ -1,4 +1,4 @@
-import { Message, Snowflake } from "discord.js";
+import { Message } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { isDiscordAPIError } from "../../../utils";

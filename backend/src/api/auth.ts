@@ -8,6 +8,7 @@ import { ApiLogins } from "../data/ApiLogins";
 import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { ApiUserInfo } from "../data/ApiUserInfo";
 import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
+import { env } from "../env";
 import { ok } from "./responses";
 
 interface IPassportApiUser {
@@ -17,7 +18,6 @@ interface IPassportApiUser {
 
 declare global {
   namespace Express {
-    // tslint:disable-next-line:no-empty-interface
     interface User extends IPassportApiUser {}
   }
 }
@@ -54,24 +54,8 @@ function simpleDiscordAPIRequest(bearerToken, path): Promise<any> {
 export function initAuth(app: express.Express) {
   app.use(passport.initialize());
 
-  if (!process.env.CLIENT_ID) {
-    throw new Error("Auth: CLIENT ID missing");
-  }
-
-  if (!process.env.CLIENT_SECRET) {
-    throw new Error("Auth: CLIENT SECRET missing");
-  }
-
-  if (!process.env.OAUTH_CALLBACK_URL) {
-    throw new Error("Auth: OAUTH CALLBACK URL missing");
-  }
-
-  if (!process.env.DASHBOARD_URL) {
-    throw new Error("DASHBOARD_URL missing!");
-  }
-
   passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((user, done) => done(null, user));
+  passport.deserializeUser((user, done) => done(null, user as IPassportApiUser));
 
   const apiLogins = new ApiLogins();
   const apiUserInfo = new ApiUserInfo();
@@ -101,9 +85,9 @@ export function initAuth(app: express.Express) {
       {
         authorizationURL: "https://discord.com/api/oauth2/authorize",
         tokenURL: "https://discord.com/api/oauth2/token",
-        clientID: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        callbackURL: process.env.OAUTH_CALLBACK_URL,
+        clientID: env.CLIENT_ID,
+        clientSecret: env.CLIENT_SECRET,
+        callbackURL: `${env.API_URL}/auth/oauth-callback`,
         scope: ["identify"],
       },
       async (accessToken, refreshToken, profile, cb) => {
@@ -132,9 +116,9 @@ export function initAuth(app: express.Express) {
     passport.authenticate("oauth2", { failureRedirect: "/", session: false }),
     (req: Request, res: Response) => {
       if (req.user && req.user.apiKey) {
-        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
+        res.redirect(`${env.DASHBOARD_URL}/login-callback/?apiKey=${req.user.apiKey}`);
       } else {
-        res.redirect(`${process.env.DASHBOARD_URL}/login-callback/?error=noAccess`);
+        res.redirect(`${env.DASHBOARD_URL}/login-callback/?error=noAccess`);
       }
     },
   );
@@ -165,7 +149,8 @@ export function initAuth(app: express.Express) {
 
 export function apiTokenAuthHandlers() {
   return [
-    passport.authenticate("api-token", { failWithError: true }),
+    passport.authenticate("api-token", { failWithError: true, session: false }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (err, req: Request, res: Response, next) => {
       return res.status(401).json({ error: err.message });
     },

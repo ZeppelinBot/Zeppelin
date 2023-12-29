@@ -1,6 +1,7 @@
-import { Message, TextChannel } from "discord.js";
+import { Message } from "discord.js";
 import { GuildPluginData } from "knub";
 import { sendErrorMessage } from "../../../pluginUtils";
+import { TemplateSafeValueContainer } from "../../../templateFormatter";
 import { ActionError } from "../ActionError";
 import { addRoleAction } from "../actions/addRoleAction";
 import { createCaseAction } from "../actions/createCaseAction";
@@ -10,7 +11,6 @@ import { messageAction } from "../actions/messageAction";
 import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
 import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
 
 export async function runEvent(
   pluginData: GuildPluginData<CustomEventsPluginType>,
@@ -39,7 +39,7 @@ export async function runEvent(
   } catch (e) {
     if (e instanceof ActionError) {
       if (event.trigger.type === "command") {
-        sendErrorMessage(pluginData, (eventData.msg as Message).channel as TextChannel, e.message);
+        sendErrorMessage(pluginData, (eventData.msg as Message).channel, e.message);
       } else {
         // TODO: Where to log action errors from other kinds of triggers?
       }

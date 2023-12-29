@@ -1,6 +1,6 @@
 import React from "react";
-import { Configurator } from "./Configurator";
 import "./App.css";
+import { Configurator } from "./Configurator";
 
 export function App() {
   return (

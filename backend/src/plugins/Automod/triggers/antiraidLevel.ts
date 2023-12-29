@@ -2,7 +2,6 @@ import * as t from "io-ts";
 import { tNullable } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
-// tslint:disable-next-line
 interface AntiraidLevelTriggerResult {}
 
 export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()({
@@ -12,7 +11,7 @@ export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()
 
   defaultConfig: {},
 
-  async match({ triggerConfig, context, pluginData }) {
+  async match({ triggerConfig, context }) {
     if (!context.antiraid) {
       return;
     }
@@ -26,7 +25,7 @@ export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()
     };
   },
 
-  renderMatchInformation({ matchResult, pluginData, contexts, triggerConfig }) {
+  renderMatchInformation({ contexts }) {
     const newLevel = contexts[0].antiraid!.level;
     return newLevel ? `Antiraid level was set to ${newLevel}` : `Antiraid was turned off`;
   },

@@ -1,7 +1,7 @@
-import { Message, MessageOptions, NewsChannel, TextChannel, WebhookClient } from "discord.js";
+import { Message, MessageEditOptions, WebhookClient, WebhookMessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { InternalPosterPluginType } from "../types";
 import { isDiscordAPIError, noop } from "../../../utils";
+import { InternalPosterPluginType } from "../types";
 
 /**
  * Sends a message using a webhook or direct API requests, preferring webhooks when possible.
@@ -9,13 +9,12 @@ import { isDiscordAPIError, noop } from "../../../utils";
 export async function editMessage(
   pluginData: GuildPluginData<InternalPosterPluginType>,
   message: Message,
-  content: MessageOptions,
+  content: MessageEditOptions & WebhookMessageEditOptions,
 ): Promise<void> {
-  if (!(message.channel instanceof TextChannel || message.channel instanceof NewsChannel)) {
+  const channel = message.channel;
+  if (!channel.isTextBased()) {
     return;
   }
-
-  const channel = message.channel as TextChannel | NewsChannel;
 
   await pluginData.state.queue.add(async () => {
     if (message.webhookId) {

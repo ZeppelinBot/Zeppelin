@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ApiUserInfo } from "./ApiUserInfo";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { AuditLogEventData, AuditLogEventType } from "../apiAuditLogTypes";
 
 @Entity("api_audit_log")

@@ -1,8 +1,8 @@
+import yaml from "js-yaml";
 import React, { useEffect, useState } from "react";
+import "./Configurator.css";
 import { LevelEntry, Levels } from "./Levels";
 import { LogChannel, LogChannels } from "./LogChannels";
-import yaml from "js-yaml";
-import "./Configurator.css";
 
 export function Configurator() {
   const [prefix, setPrefix] = useState("!");

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ApiUserInfo } from "./ApiUserInfo";
 import { ApiPermissionTypes } from "../ApiPermissionAssignments";
+import { ApiUserInfo } from "./ApiUserInfo";
 
 @Entity("api_permissions")
 export class ApiPermissionAssignment {
@@ -22,7 +22,7 @@ export class ApiPermissionAssignment {
   @Column({ type: String, nullable: true })
   expires_at: string | null;
 
-  @ManyToOne((type) => ApiUserInfo, (userInfo) => userInfo.permissionAssignments)
+  @ManyToOne(() => ApiUserInfo, (userInfo) => userInfo.permissionAssignments)
   @JoinColumn({ name: "target_id" })
   userInfo: ApiUserInfo;
 }
