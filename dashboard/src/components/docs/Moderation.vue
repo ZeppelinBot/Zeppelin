@@ -13,14 +13,14 @@
         plugin. To best use this guide, read the default configuration of the
         Mod actions plugin alongside this. This plugin does
         <strong>not</strong> cover muting members, please see the
-        <router-link to="/docs/plugins/mutes">Mutes</router-link> plugin.
+        <router-link to="/docs/plugins/mutes">Mutes</router-link> plugin for that.
       </p>
       <p>
         Please ensure you understand how
         <router-link to="/docs/plugins/plugin-configuration">plugin
           configuration</router-link> and
         <router-link to="/docs/configuration/permissions">plugin
-          permissions </router-link>work before reading this guide since
+          permissions</router-link> work before reading this guide since
         the configs defined here rely on your these concepts.
       </p>
     </header>
@@ -28,7 +28,7 @@
     <h2>Moderation Commands</h2>
     <p>
       So that your moderators may use Zeppelin moderation, you must define the
-      moderator role Id in the config, assign it a level (50), and enable the
+      moderator role id in the config, assign it a level (50), and enable the
       Mod actions plugin.
       <CodeBlock code-lang="yaml" trim="start">
         levels:
@@ -62,7 +62,7 @@
       An alternative way to notify members about sanctions is through
       mentioning them in a message sent in a channel. To enable this feature,
       set <code>message_on_warn</code>, <code>message_on_kick</code>, and
-      and <code>message_on_ban</code> to true (enabling them), then assign a
+      and <code>message_on_ban</code> to true, then assign a
       <code>message_channel</code>.
     </p>
 
