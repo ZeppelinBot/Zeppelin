@@ -13,7 +13,8 @@
         plugin. To best use this guide, read the default configuration of the
         Mod actions plugin alongside this. This plugin does
         <strong>not</strong> cover muting members, please see the
-        <router-link to="/docs/plugins/mutes">Mutes</router-link> plugin for that.
+        <router-link to="/docs/plugins/mutes">Mutes</router-link>
+        plugin for that.
       </p>
       <p>
         Please ensure you understand how
@@ -21,7 +22,7 @@
           configuration</router-link> and
         <router-link to="/docs/configuration/permissions">plugin
           permissions</router-link> work before reading this guide since
-        the configs defined here rely on your these concepts.
+        the configs defined here rely on these concepts.
       </p>
     </header>
 
@@ -78,31 +79,33 @@
     </p>
 
     <h3>Summary Example</h3>
-    Employing what we have learnt so far, we can write a configuration that:
-      <ul>
-        <li>Alerts members of their warns in a channel, instead of DMs.</li>
-        <li>Alerts members of kicks and bans in their DMs.</li>
-        <li>Makes use of multi-line strings to prepare a tidy message.</li>
-        <li>Includes the remaining ban time if a ban was temporary.</li>
-      </ul>
-    <CodeBlock code-lang="yaml" trim="start">
-      plugins:
-        mod_actions:
-          config:
-            dm_on_warn: false
-            message_on_warn: true
-            message_channel: "PRETEND-CHANNEL-ID"
+    <p>
+      Employing what we have learnt so far, we can write a configuration that:
+        <ul>
+          <li>Alerts members of their warns in a channel, instead of DMs.</li>
+          <li>Alerts members of kicks and bans in their DMs.</li>
+          <li>Makes use of multi-line strings to prepare a tidy message.</li>
+          <li>Includes the remaining ban time if a ban was temporary.</li>
+        </ul>
+      <CodeBlock code-lang="yaml" trim="start">
+        plugins:
+          mod_actions:
+            config:
+              dm_on_warn: false
+              message_on_warn: true
+              message_channel: "PRETEND-CHANNEL-ID"
 
-            dm_on_kick: true
+              dm_on_kick: true
 
-            dm_on_ban: true
-            tempban_message: |-
-              Dear {user.username},
+              dm_on_ban: true
+              tempban_message: |-
+                Dear {user.username},
 
-              As a result of {reason}, you have been banned from {guildName}
-              for {banTime}. We welcome you back provided you do not do this
-              again.
-    </CodeBlock>
+                As a result of {reason}, you have been banned from {guildName}
+                for {banTime}. We welcome you back provided you do not do this
+                again.
+      </CodeBlock>
+    </p>
 
     <h2>Alerts</h2>
     <p>
