@@ -33,7 +33,6 @@ export async function banUserId(
   banOptions: BanOptions = {},
   banTime?: number,
 ): Promise<BanResult> {
-  const config = pluginData.config.get();
   const user = await resolveUser(pluginData.client, userId);
   if (!user.id) {
     return {
@@ -42,7 +41,8 @@ export async function banUserId(
     };
   }
 
-  reason = reason || (config.default_ban_reason || "No reason specified");
+  const config = pluginData.config.get();
+  reason ||= config.default_reasons?.ban || "No reason specified";
 
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   const member = await resolveMember(pluginData.client, pluginData.guild, userId);
