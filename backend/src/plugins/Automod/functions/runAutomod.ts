@@ -85,7 +85,6 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         }
 
         if (matchResult) {
-          // Apply cooldowns
           if (rule.cooldown) applyCooldown(pluginData, rule, context);
 
           contexts = [context, ...(matchResult.extraContexts || [])];
