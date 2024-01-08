@@ -76,7 +76,7 @@
     "uuid": "^9.0.0",
     "yawn-yaml": "github:dragory/yawn-yaml#string-number-fix-build",
     "zlib-sync": "^0.1.7",
-    "zod": "^3.7.2"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.5",
