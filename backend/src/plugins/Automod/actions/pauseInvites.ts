@@ -1,3 +1,4 @@
+import { GuildFeature } from "discord.js";
 import * as t from "io-ts";
 import { automodAction } from "../helpers";
 
@@ -9,6 +10,10 @@ export const PauseInvitesAction = automodAction({
   defaultConfig: {},
 
   async apply({ pluginData, actionConfig }) {
-    await pluginData.guild.disableInvites(actionConfig.paused);
+    const hasInvitesDisabled = pluginData.guild.features.includes(GuildFeature.InvitesDisabled);
+
+    if (actionConfig.paused !== hasInvitesDisabled) {
+      await pluginData.guild.disableInvites(actionConfig.paused);
+    }
   },
 });
