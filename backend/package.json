@@ -38,7 +38,6 @@
     "discord.js": "^14.11.0",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
-    "erlpack": "github:discord/erlpack",
     "escape-string-regexp": "^1.0.5",
     "express": "^4.17.0",
     "fp-ts": "^2.0.1",
