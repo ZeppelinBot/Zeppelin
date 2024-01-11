@@ -136,7 +136,7 @@
                       mute:
                         reason: "You have been muted for tripping too many automod filters"
                         remove_roles_on_mute: true
-                        restore_roles_on_mute: true
+                        restore_roles_on_unmute: true
         </CodeBlock>
       </template>
     </Expandable>
