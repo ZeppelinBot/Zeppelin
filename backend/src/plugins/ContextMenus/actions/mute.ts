@@ -45,9 +45,9 @@ export async function muteAction(
   try {
     const result = await mutes.muteUser(userId, durationMs, "Context Menu Action", { caseArgs });
 
-    const muteMessage = `Muted **${result.case.user_name}** ${
+    const muteMessage = `Muted **${result.case!.user_name}** ${
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number}) (user notified via ${
+    } (Case #${result.case!.case_number}) (user notified via ${
       result.notifyResult.method ?? "dm"
     })\nPlease update the new case with the \`update\` command`;
 

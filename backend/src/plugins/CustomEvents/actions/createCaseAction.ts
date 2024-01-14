@@ -1,19 +1,20 @@
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import z from "zod";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { zBoundedCharacters, zSnowflake } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
-export const CreateCaseAction = t.type({
-  type: t.literal("create_case"),
-  case_type: t.string,
-  mod: t.string,
-  target: t.string,
-  reason: t.string,
+export const zCreateCaseAction = z.strictObject({
+  type: z.literal("create_case"),
+  case_type: zBoundedCharacters(0, 32),
+  mod: zSnowflake,
+  target: zSnowflake,
+  reason: zBoundedCharacters(0, 4000),
 });
-export type TCreateCaseAction = t.TypeOf<typeof CreateCaseAction>;
+export type TCreateCaseAction = z.infer<typeof zCreateCaseAction>;
 
 export async function createCaseAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,
@@ -32,7 +33,7 @@ export async function createCaseAction(
   }
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
-  await casesPlugin.createCase({
+  await casesPlugin!.createCase({
     userId: targetId,
     modId,
     type: CaseTypes[action.case_type],

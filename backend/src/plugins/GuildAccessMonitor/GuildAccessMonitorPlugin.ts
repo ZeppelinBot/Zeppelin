@@ -1,11 +1,10 @@
 import { Guild } from "discord.js";
-import * as t from "io-ts";
 import { BasePluginType, GlobalPluginData, globalPluginEventListener } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { Configs } from "../../data/Configs";
 import { env } from "../../env";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
+import z from "zod";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   state: {
@@ -26,7 +25,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
  */
 export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configParser: makeIoTsConfigParser(t.type({})),
+  configParser: (input) => z.strictObject({}).parse(input),
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({

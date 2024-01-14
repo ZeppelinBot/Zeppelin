@@ -1,14 +1,14 @@
 import { Snowflake } from "discord.js";
-import * as t from "io-ts";
 import { verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
+import z from "zod";
 
 interface AnyMessageResultType {}
 
-export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
-  configType: t.type({}),
+const configSchema = z.strictObject({});
 
-  defaultConfig: {},
+export const AnyMessageTrigger = automodTrigger<AnyMessageResultType>()({
+  configSchema,
 
   async match({ context }) {
     if (!context.message) {

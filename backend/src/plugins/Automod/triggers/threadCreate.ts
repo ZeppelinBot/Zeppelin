@@ -1,5 +1,5 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import * as t from "io-ts";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 interface ThreadCreateResult {
@@ -10,9 +10,10 @@ interface ThreadCreateResult {
   matchedThreadOwner: User | undefined;
 }
 
+const configSchema = z.strictObject({});
+
 export const ThreadCreateTrigger = automodTrigger<ThreadCreateResult>()({
-  configType: t.type({}),
-  defaultConfig: {},
+  configSchema,
 
   async match({ context }) {
     if (!context.threadChange?.created) {

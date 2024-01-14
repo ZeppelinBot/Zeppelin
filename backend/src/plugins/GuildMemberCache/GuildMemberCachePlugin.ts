@@ -1,6 +1,6 @@
-import * as t from "io-ts";
+import z from "zod";
 import { GuildMemberCache } from "../../data/GuildMemberCache";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { SECONDS } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { cancelDeletionOnMemberJoin } from "./events/cancelDeletionOnMemberJoin";
@@ -18,7 +18,7 @@ export const GuildMemberCachePlugin = zeppelinGuildPlugin<GuildMemberCachePlugin
   name: "guild_member_cache",
   showInDocs: false,
 
-  configParser: makeIoTsConfigParser(t.type({})),
+  configParser: (input) => z.strictObject({}).parse(input),
 
   events: [
     updateMemberCacheOnMemberUpdate,

@@ -1,10 +1,10 @@
 import { PluginOptions } from "knub";
 import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { pluginInfo } from "./info";
-import { ConfigSchema, PhishermanPluginType } from "./types";
+import { PhishermanPluginType, zPhishermanConfig } from "./types";
 
 const defaultOptions: PluginOptions<PhishermanPluginType> = {
   config: {
@@ -18,7 +18,7 @@ export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
   showInDocs: true,
   info: pluginInfo,
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zPhishermanConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

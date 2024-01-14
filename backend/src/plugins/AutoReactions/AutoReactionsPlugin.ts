@@ -1,14 +1,13 @@
 import { PluginOptions } from "knub";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
-import { AutoReactionsPluginType, ConfigSchema } from "./types";
+import { AutoReactionsPluginType, zAutoReactionsConfig } from "./types";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -32,7 +31,7 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
     description: trimPluginDescription(`
       Allows setting up automatic reactions to all new messages on a channel
     `),
-    configSchema: ConfigSchema,
+    configSchema: zAutoReactionsConfig,
   },
 
   // prettier-ignore
@@ -40,7 +39,7 @@ export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>(
     LogsPlugin,
   ],
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zAutoReactionsConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

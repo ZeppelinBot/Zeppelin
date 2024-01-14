@@ -1,15 +1,14 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles";
 import { PingableRole } from "../../data/entities/PingableRole";
 
-export const ConfigSchema = t.type({
-  can_manage: t.boolean,
+export const zPingableRolesConfig = z.strictObject({
+  can_manage: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface PingableRolesPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zPingableRolesConfig>;
 
   state: {
     pingableRoles: GuildPingableRoles;

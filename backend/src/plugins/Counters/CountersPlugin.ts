@@ -1,15 +1,12 @@
 import { EventEmitter } from "events";
 import { PluginOptions } from "knub";
-import {
-  buildCounterConditionString,
-  CounterTrigger,
-  getReverseCounterComparisonOp,
-  parseCounterConditionString,
-} from "../../data/entities/CounterTrigger";
 import { GuildCounters } from "../../data/GuildCounters";
+import {
+  CounterTrigger,
+  parseCounterConditionString
+} from "../../data/entities/CounterTrigger";
 import { mapToPublicFn } from "../../pluginUtils";
-import { convertDelayStringToMS, MINUTES } from "../../utils";
-import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
+import { MINUTES, convertDelayStringToMS, values } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
@@ -25,10 +22,8 @@ import { getPrettyNameForCounterTrigger } from "./functions/getPrettyNameForCoun
 import { offCounterEvent } from "./functions/offCounterEvent";
 import { onCounterEvent } from "./functions/onCounterEvent";
 import { setCounterValue } from "./functions/setCounterValue";
-import { ConfigSchema, CountersPluginType, TTrigger } from "./types";
+import { CountersPluginType, zCountersConfig } from "./types";
 
-const MAX_COUNTERS = 5;
-const MAX_TRIGGERS_PER_COUNTER = 5;
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
 const defaultOptions: PluginOptions<CountersPluginType> = {
@@ -72,50 +67,12 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
     description:
       "Keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number",
     configurationGuide: "See <a href='/docs/setup-guides/counters'>Counters setup guide</a>",
-    configSchema: ConfigSchema,
+    configSchema: zCountersConfig,
   },
 
   defaultOptions,
   // TODO: Separate input and output types
-  configParser: (input) => {
-    for (const [counterName, counter] of Object.entries<any>((input as any).counters || {})) {
-      counter.name = counterName;
-      counter.per_user = counter.per_user ?? false;
-      counter.per_channel = counter.per_channel ?? false;
-      counter.initial_value = counter.initial_value ?? 0;
-      counter.triggers = counter.triggers || {};
-
-      if (Object.values(counter.triggers).length > MAX_TRIGGERS_PER_COUNTER) {
-        throw new StrictValidationError([`You can only have at most ${MAX_TRIGGERS_PER_COUNTER} triggers per counter`]);
-      }
-
-      // Normalize triggers
-      for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
-        const triggerObj = (typeof trigger === "string" ? { condition: trigger } : trigger) as Partial<TTrigger>;
-
-        triggerObj.name = triggerName;
-        const parsedCondition = parseCounterConditionString(triggerObj.condition || "");
-        if (!parsedCondition) {
-          throw new StrictValidationError([
-            `Invalid comparison in counter trigger ${counterName}/${triggerName}: "${triggerObj.condition}"`,
-          ]);
-        }
-
-        triggerObj.condition = buildCounterConditionString(parsedCondition[0], parsedCondition[1]);
-        triggerObj.reverse_condition =
-          triggerObj.reverse_condition ||
-          buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
-
-        counter.triggers[triggerName] = triggerObj as TTrigger;
-      }
-    }
-
-    if (Object.values((input as any).counters || {}).length > MAX_COUNTERS) {
-      throw new StrictValidationError([`You can only have at most ${MAX_COUNTERS} counters`]);
-    }
-
-    return parseIoTsSchema(ConfigSchema, input);
-  },
+  configParser: (input) => zCountersConfig.parse(input),
 
   public: {
     counterExists: mapToPublicFn(counterExists),
@@ -163,13 +120,12 @@ export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
       state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
 
       // Initialize triggers
-      for (const trigger of Object.values(counter.triggers)) {
-        const theTrigger = trigger as TTrigger;
-        const parsedCondition = parseCounterConditionString(theTrigger.condition)!;
-        const parsedReverseCondition = parseCounterConditionString(theTrigger.reverse_condition)!;
+      for (const trigger of values(counter.triggers)) {
+        const parsedCondition = parseCounterConditionString(trigger.condition)!;
+        const parsedReverseCondition = parseCounterConditionString(trigger.reverse_condition)!;
         const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,
-          theTrigger.name,
+          trigger.name,
           parsedCondition[0],
           parsedCondition[1],
           parsedReverseCondition[0],

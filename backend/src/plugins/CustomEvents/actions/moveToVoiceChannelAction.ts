@@ -1,18 +1,18 @@
 import { Snowflake, VoiceChannel } from "discord.js";
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import z from "zod";
 import { canActOn } from "../../../pluginUtils";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { resolveMember } from "../../../utils";
+import { resolveMember, zSnowflake } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
-export const MoveToVoiceChannelAction = t.type({
-  type: t.literal("move_to_vc"),
-  target: t.string,
-  channel: t.string,
+export const zMoveToVoiceChannelAction = z.strictObject({
+  type: z.literal("move_to_vc"),
+  target: zSnowflake,
+  channel: zSnowflake,
 });
-export type TMoveToVoiceChannelAction = t.TypeOf<typeof MoveToVoiceChannelAction>;
+export type TMoveToVoiceChannelAction = z.infer<typeof zMoveToVoiceChannelAction>;
 
 export async function moveToVoiceChannelAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,

@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { CountersPluginType, TTrigger } from "../types";
+import { CountersPluginType } from "../types";
 
 export function getPrettyNameForCounterTrigger(
   pluginData: GuildPluginData<CountersPluginType>,
@@ -12,6 +12,6 @@ export function getPrettyNameForCounterTrigger(
     return "Unknown Counter Trigger";
   }
 
-  const trigger = counter.triggers[triggerName] as TTrigger | undefined;
+  const trigger = counter.triggers[triggerName];
   return trigger ? trigger.pretty_name || trigger.name : "Unknown Counter Trigger";
 }

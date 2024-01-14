@@ -17,6 +17,7 @@ import { createTypeHelper } from "knub-command-manager";
 import {
   channelMentionRegex,
   convertDelayStringToMS,
+  inputPatternToRegExp,
   isValidSnowflake,
   resolveMember,
   resolveUser,
@@ -26,7 +27,6 @@ import {
 } from "./utils";
 import { isValidTimezone } from "./utils/isValidTimezone";
 import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
-import { inputPatternToRegExp } from "./validatorUtils";
 
 export const commandTypes = {
   ...messageCommandBaseTypeConverters,

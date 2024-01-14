@@ -1,16 +1,17 @@
 import { Snowflake, TextChannel } from "discord.js";
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import z from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { zBoundedCharacters, zSnowflake } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType } from "../types";
 
-export const MessageAction = t.type({
-  type: t.literal("message"),
-  channel: t.string,
-  content: t.string,
+export const zMessageAction = z.strictObject({
+  type: z.literal("message"),
+  channel: zSnowflake,
+  content: zBoundedCharacters(0, 4000),
 });
-export type TMessageAction = t.TypeOf<typeof MessageAction>;
+export type TMessageAction = z.infer<typeof zMessageAction>;
 
 export async function messageAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,

@@ -1,4 +1,3 @@
-import * as t from "io-ts";
 import { AutomodTriggerBlueprint } from "../helpers";
 import { AntiraidLevelTrigger } from "./antiraidLevel";
 import { AnyMessageTrigger } from "./anyMessage";
@@ -45,6 +44,7 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   match_attachment_type: MatchAttachmentTypeTrigger,
   match_mime_type: MatchMimeTypeTrigger,
   member_join: MemberJoinTrigger,
+  member_leave: MemberLeaveTrigger,
   role_added: RoleAddedTrigger,
   role_removed: RoleRemovedTrigger,
 
@@ -76,46 +76,3 @@ export const availableTriggers: Record<string, AutomodTriggerBlueprint<any, any>
   thread_archive: ThreadArchiveTrigger,
   thread_unarchive: ThreadUnarchiveTrigger,
 };
-
-export const AvailableTriggers = t.type({
-  any_message: AnyMessageTrigger.configType,
-
-  match_words: MatchWordsTrigger.configType,
-  match_regex: MatchRegexTrigger.configType,
-  match_invites: MatchInvitesTrigger.configType,
-  match_links: MatchLinksTrigger.configType,
-  match_attachment_type: MatchAttachmentTypeTrigger.configType,
-  match_mime_type: MatchMimeTypeTrigger.configType,
-  member_join: MemberJoinTrigger.configType,
-  member_leave: MemberLeaveTrigger.configType,
-  role_added: RoleAddedTrigger.configType,
-  role_removed: RoleRemovedTrigger.configType,
-
-  message_spam: MessageSpamTrigger.configType,
-  mention_spam: MentionSpamTrigger.configType,
-  link_spam: LinkSpamTrigger.configType,
-  attachment_spam: AttachmentSpamTrigger.configType,
-  emoji_spam: EmojiSpamTrigger.configType,
-  line_spam: LineSpamTrigger.configType,
-  character_spam: CharacterSpamTrigger.configType,
-  member_join_spam: MemberJoinSpamTrigger.configType,
-  sticker_spam: StickerSpamTrigger.configType,
-  thread_create_spam: ThreadCreateSpamTrigger.configType,
-
-  counter_trigger: CounterTrigger.configType,
-
-  note: NoteTrigger.configType,
-  warn: WarnTrigger.configType,
-  mute: MuteTrigger.configType,
-  unmute: UnmuteTrigger.configType,
-  kick: KickTrigger.configType,
-  ban: BanTrigger.configType,
-  unban: UnbanTrigger.configType,
-
-  antiraid_level: AntiraidLevelTrigger.configType,
-
-  thread_create: ThreadCreateTrigger.configType,
-  thread_delete: ThreadDeleteTrigger.configType,
-  thread_archive: ThreadArchiveTrigger.configType,
-  thread_unarchive: ThreadUnarchiveTrigger.configType,
-});

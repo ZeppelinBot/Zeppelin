@@ -1,16 +1,15 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
 
-export const ConfigSchema = t.type({
-  can_assign: t.boolean,
-  can_mass_assign: t.boolean,
-  assignable_roles: t.array(t.string),
+export const zRolesConfig = z.strictObject({
+  can_assign: z.boolean(),
+  can_mass_assign: z.boolean(),
+  assignable_roles: z.array(z.string()).max(100),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface RolesPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zRolesConfig>;
   state: {
     logs: GuildLogs;
   };

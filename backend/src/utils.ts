@@ -21,31 +21,26 @@ import {
   PartialChannelData,
   PartialMessage,
   RoleResolvable,
-  Snowflake,
   Sticker,
   TextBasedChannel,
   User,
 } from "discord.js";
 import emojiRegex from "emoji-regex";
-import { either } from "fp-ts/lib/Either";
-import { unsafeCoerce } from "fp-ts/lib/function";
 import fs from "fs";
 import https from "https";
 import humanizeDuration from "humanize-duration";
-import * as t from "io-ts";
 import { isEqual } from "lodash";
-import moment from "moment-timezone";
 import { performance } from "perf_hooks";
 import tlds from "tlds";
 import tmp from "tmp";
 import { URL } from "url";
-import { z, ZodError } from "zod";
+import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
 import { getProfiler } from "./profiler";
 import { SimpleCache } from "./SimpleCache";
 import { sendDM } from "./utils/sendDM";
+import { Brand } from "./utils/typeUtils";
 import { waitForButtonConfirm } from "./utils/waitForInteraction";
-import { decodeAndValidateStrict, StrictValidationError } from "./validatorUtils";
 
 const fsp = fs.promises;
 
@@ -91,71 +86,9 @@ export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
   return err instanceof DiscordAPIError;
 }
 
-export function tNullable<T extends t.Type<any, any>>(type: T) {
-  return t.union([type, t.undefined, t.null], `Nullable<${type.name}>`);
-}
-
-export const tNormalizedNullOrUndefined = new t.Type<undefined, null | undefined>(
-  "tNormalizedNullOrUndefined",
-  (v): v is undefined => typeof v === "undefined",
-  (v, c) => (v == null ? t.success(undefined) : t.failure(v, c, "Value must be null or undefined")),
-  () => undefined,
-);
-
-/**
- * Similar to `tNullable`, but normalizes both `null` and `undefined` to `undefined`.
- * This allows adding optional config options that can be "removed" by setting the value to `null`.
- */
-export function tNormalizedNullOptional<T extends t.Type<any, any>>(type: T) {
-  return t.union(
-    [type, tNormalizedNullOrUndefined],
-    `Optional<${type.name}>`, // Simplified name for errors and config schema views
-  );
-}
-
-export type TDeepPartial<T> = T extends t.InterfaceType<any>
-  ? TDeepPartialProps<T["props"]>
-  : T extends t.DictionaryType<any, any>
-  ? t.DictionaryType<T["domain"], TDeepPartial<T["codomain"]>>
-  : T extends t.UnionType<any[]>
-  ? t.UnionType<Array<TDeepPartial<T["types"][number]>>>
-  : T extends t.IntersectionType<any>
-  ? t.IntersectionType<Array<TDeepPartial<T["types"][number]>>>
-  : T extends t.ArrayType<any>
-  ? t.ArrayType<TDeepPartial<T["type"]>>
-  : T;
-
-// Based on t.PartialC
-export interface TDeepPartialProps<P extends t.Props>
-  extends t.PartialType<
-    P,
-    {
-      [K in keyof P]?: TDeepPartial<t.TypeOf<P[K]>>;
-    },
-    {
-      [K in keyof P]?: TDeepPartial<t.OutputOf<P[K]>>;
-    }
-  > {}
-
-export function tDeepPartial<T>(type: T): TDeepPartial<T> {
-  if (type instanceof t.InterfaceType || type instanceof t.PartialType) {
-    const newProps = {};
-    for (const [key, prop] of Object.entries(type.props)) {
-      newProps[key] = tDeepPartial(prop);
-    }
-    return t.partial(newProps) as TDeepPartial<T>;
-  } else if (type instanceof t.DictionaryType) {
-    return t.record(type.domain, tDeepPartial(type.codomain)) as TDeepPartial<T>;
-  } else if (type instanceof t.UnionType) {
-    return t.union(type.types.map((unionType) => tDeepPartial(unionType))) as TDeepPartial<T>;
-  } else if (type instanceof t.IntersectionType) {
-    const types = type.types.map((intersectionType) => tDeepPartial(intersectionType));
-    return t.intersection(types as [t.Mixed, t.Mixed]) as unknown as TDeepPartial<T>;
-  } else if (type instanceof t.ArrayType) {
-    return t.array(tDeepPartial(type.type)) as TDeepPartial<T>;
-  } else {
-    return type as TDeepPartial<T>;
-  }
+// null | undefined -> undefined
+export function zNullishToUndefined<T extends z.ZodTypeAny>(type: T): ZodEffects<T, NonNullable<z.output<T>> | undefined> {
+  return type.transform(v => v ?? undefined);
 }
 
 export function getScalarDifference<T extends object>(
@@ -207,29 +140,6 @@ export function differenceToString(diff: Map<string, { was: any; is: any }>): st
 // https://stackoverflow.com/a/49262929/316944
 export type Not<T, E> = T & Exclude<T, E>;
 
-// io-ts partial dictionary type
-// From https://github.com/gcanti/io-ts/issues/429#issuecomment-655394345
-export interface PartialDictionaryC<D extends t.Mixed, C extends t.Mixed>
-  extends t.DictionaryType<
-    D,
-    C,
-    {
-      [K in t.TypeOf<D>]?: t.TypeOf<C>;
-    },
-    {
-      [K in t.OutputOf<D>]?: t.OutputOf<C>;
-    },
-    unknown
-  > {}
-
-export const tPartialDictionary = <D extends t.Mixed, C extends t.Mixed>(
-  domain: D,
-  codomain: C,
-  name?: string,
-): PartialDictionaryC<D, C> => {
-  return unsafeCoerce(t.record(t.union([domain, t.undefined]), codomain, name));
-};
-
 export function nonNullish<V>(v: V): v is NonNullable<V> {
   return v != null;
 }
@@ -240,69 +150,59 @@ export type GroupDMInvite = Invite & {
   type: typeof ChannelType.GroupDM;
 };
 
-/**
- * Mirrors EmbedOptions from Eris
- */
-export const tEmbed = t.type({
-  title: tNullable(t.string),
-  description: tNullable(t.string),
-  url: tNullable(t.string),
-  timestamp: tNullable(t.string),
-  color: tNullable(t.number),
-  footer: tNullable(
-    t.type({
-      text: t.string,
-      icon_url: tNullable(t.string),
-      proxy_icon_url: tNullable(t.string),
-    }),
-  ),
-  image: tNullable(
-    t.type({
-      url: tNullable(t.string),
-      proxy_url: tNullable(t.string),
-      width: tNullable(t.number),
-      height: tNullable(t.number),
-    }),
-  ),
-  thumbnail: tNullable(
-    t.type({
-      url: tNullable(t.string),
-      proxy_url: tNullable(t.string),
-      width: tNullable(t.number),
-      height: tNullable(t.number),
-    }),
-  ),
-  video: tNullable(
-    t.type({
-      url: tNullable(t.string),
-      width: tNullable(t.number),
-      height: tNullable(t.number),
-    }),
-  ),
-  provider: tNullable(
-    t.type({
-      name: t.string,
-      url: tNullable(t.string),
-    }),
-  ),
-  fields: tNullable(
-    t.array(
-      t.type({
-        name: tNullable(t.string),
-        value: tNullable(t.string),
-        inline: tNullable(t.boolean),
-      }),
-    ),
-  ),
-  author: tNullable(
-    t.type({
-      name: t.string,
-      url: tNullable(t.string),
-      width: tNullable(t.number),
-      height: tNullable(t.number),
-    }),
-  ),
+function isBoundedString(str: unknown, min: number, max: number): str is string {
+  if (typeof str !== "string") {
+    return false;
+  }
+  return (str.length >= min && str.length <= max);
+}
+
+export function zBoundedCharacters(min: number, max: number) {
+  return z.string().refine(str => {
+    const len = [...str].length; // Unicode aware character split
+    return (len >= min && len <= max);
+  }, {
+    message: `String must be between ${min} and ${max} characters long`,
+  });
+}
+
+export const zSnowflake = z.string().refine(str => isSnowflake(str), {
+  message: "Invalid snowflake ID",
 });
+
+const regexWithFlags = /^\/(.*?)\/([i]*)$/;
+
+export class InvalidRegexError extends Error {}
+
+/**
+ * This function supports two input syntaxes for regexes: /<pattern>/<flags> and just <pattern>
+ */
+export function inputPatternToRegExp(pattern: string) {
+  const advancedSyntaxMatch = pattern.match(regexWithFlags);
+  const [finalPattern, flags] = advancedSyntaxMatch ? [advancedSyntaxMatch[1], advancedSyntaxMatch[2]] : [pattern, ""];
+  try {
+    return new RegExp(finalPattern, flags);
+  } catch (e) {
+    throw new InvalidRegexError(e.message);
+  }
+}
+
+export function zRegex<T extends ZodString>(zStr: T) {
+  return zStr.transform((str, ctx) => {
+    try {
+      return inputPatternToRegExp(str);
+    } catch (err) {
+      if (err instanceof InvalidRegexError) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid regex"
+        });
+        return z.NEVER;
+      }
+      throw err;
+    }
+  });
+}
 
 export const zEmbedInput = z.object({
   title: z.string().optional(),
@@ -387,15 +287,7 @@ export type StrictMessageContent = {
   embeds?: APIEmbed[];
 };
 
-export const tStrictMessageContent = t.type({
-  content: tNullable(t.string),
-  tts: tNullable(t.boolean),
-  disableEveryone: tNullable(t.boolean),
-  embed: tNullable(tEmbed),
-  embeds: tNullable(t.array(tEmbed)),
-});
-
-export const tMessageContent = t.union([t.string, tStrictMessageContent]);
+export const zMessageContent = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {
@@ -454,11 +346,11 @@ function dropNullValuesRecursively(obj: any) {
 /**
  * Mirrors AllowedMentions from Eris
  */
-export const tAllowedMentions = t.type({
-  everyone: tNormalizedNullOptional(t.boolean),
-  users: tNormalizedNullOptional(t.union([t.boolean, t.array(t.string)])),
-  roles: tNormalizedNullOptional(t.union([t.boolean, t.array(t.string)])),
-  repliedUser: tNormalizedNullOptional(t.boolean),
+export const zAllowedMentions = z.strictObject({
+  everyone: zNullishToUndefined(z.boolean().nullable().optional()),
+  users: zNullishToUndefined(z.union([z.boolean(), z.array(z.string())]).nullable().optional()),
+  roles: zNullishToUndefined(z.union([z.boolean(), z.array(z.string())]).nullable().optional()),
+  replied_user: zNullishToUndefined(z.boolean().nullable().optional()),
 });
 
 export function dropPropertiesByName(obj, propName) {
@@ -472,39 +364,18 @@ export function dropPropertiesByName(obj, propName) {
   }
 }
 
-export const tAlphanumeric = new t.Type<string, string>(
-  "tAlphanumeric",
-  (s): s is string => typeof s === "string",
-  (from, to) =>
-    either.chain(t.string.validate(from, to), (s) => {
-      return s.match(/\W/) ? t.failure(from, to, "String must be alphanumeric") : t.success(s);
-    }),
-  (s) => s,
-);
+export function zBoundedRecord<TRecord extends ZodRecord<any, any>>(record: TRecord, minKeys: number, maxKeys: number): ZodEffects<TRecord> {
+  return record.refine(data => {
+    const len = Object.keys(data).length;
+    return (len >= minKeys && len <= maxKeys);
+  }, {
+    message: `Object must have ${minKeys}-${maxKeys} keys`,
+  });
+}
 
-export const tDateTime = new t.Type<string, string>(
-  "tDateTime",
-  (s): s is string => typeof s === "string",
-  (from, to) =>
-    either.chain(t.string.validate(from, to), (s) => {
-      const parsed =
-        s.length === 10 ? moment.utc(s, "YYYY-MM-DD") : s.length === 19 ? moment.utc(s, "YYYY-MM-DD HH:mm:ss") : null;
-
-      return parsed && parsed.isValid() ? t.success(s) : t.failure(from, to, "Invalid datetime");
-    }),
-  (s) => s,
-);
-
-export const tDelayString = new t.Type<string, string>(
-  "tDelayString",
-  (s): s is string => typeof s === "string",
-  (from, to) =>
-    either.chain(t.string.validate(from, to), (s) => {
-      const ms = convertDelayStringToMS(s);
-      return ms === null ? t.failure(from, to, "Invalid delay string") : t.success(s);
-    }),
-  (s) => s,
-);
+export const zDelayString = z.string().max(32).refine(str => convertDelayStringToMS(str) !== null, {
+  message: "Invalid delay string",
+});
 
 // To avoid running into issues with the JS max date vaLue, we cap maximum delay strings *far* below that.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#The_ECMAScript_epoch_and_timestamps
@@ -609,9 +480,11 @@ export function stripObjectToScalars(obj, includedNested: string[] = []) {
 
 export const snowflakeRegex = /[1-9][0-9]{5,19}/;
 
+export type Snowflake = Brand<string, "Snowflake">;
+
 const isSnowflakeRegex = new RegExp(`^${snowflakeRegex.source}$`);
-export function isSnowflake(v: string): boolean {
-  return isSnowflakeRegex.test(v);
+export function isSnowflake(v: unknown): v is Snowflake {
+  return typeof v === "string" && isSnowflakeRegex.test(v);
 }
 
 export function sleep(ms: number): Promise<void> {
@@ -1474,8 +1347,7 @@ export function messageLink(guildIdOrMessage: string | Message | null, channelId
 }
 
 export function isValidEmbed(embed: any): boolean {
-  const result = decodeAndValidateStrict(tEmbed, embed);
-  return !(result instanceof StrictValidationError);
+  return zEmbedInput.safeParse(embed).success;
 }
 
 const formatter = new Intl.NumberFormat("en-US");
@@ -1612,4 +1484,20 @@ export function renderUsername(username: string, discriminator: string): string 
 
 export function renderUserUsername(user: User | UnknownUser): string {
   return renderUsername(user.username, user.discriminator);
+}
+
+type Entries<T> = Array<{
+  [Key in keyof T]-?: [Key, T[Key]];
+}[keyof T]>;
+
+export function entries<T extends object>(object: T) {
+  return Object.entries(object) as Entries<T>;
+}
+
+export function keys<T extends object>(object: T) {
+  return Object.keys(object) as Array<keyof T>;
+}
+
+export function values<T extends object>(object: T) {
+  return Object.values(object) as Array<T[keyof T]>;
 }

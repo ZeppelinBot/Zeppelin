@@ -1,15 +1,16 @@
 import { Snowflake } from "discord.js";
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import z from "zod";
 import { TemplateSafeValueContainer } from "../../../templateFormatter";
+import { zSnowflake } from "../../../utils";
 import { ActionError } from "../ActionError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
-export const MakeRoleUnmentionableAction = t.type({
-  type: t.literal("make_role_unmentionable"),
-  role: t.string,
+export const zMakeRoleUnmentionableAction = z.strictObject({
+  type: z.literal("make_role_unmentionable"),
+  role: zSnowflake,
 });
-export type TMakeRoleUnmentionableAction = t.TypeOf<typeof MakeRoleUnmentionableAction>;
+export type TMakeRoleUnmentionableAction = z.infer<typeof zMakeRoleUnmentionableAction>;
 
 export async function makeRoleUnmentionableAction(
   pluginData: GuildPluginData<CustomEventsPluginType>,

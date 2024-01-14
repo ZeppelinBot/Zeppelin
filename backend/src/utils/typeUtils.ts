@@ -14,3 +14,11 @@ export type Awaitable<T = unknown> = T | Promise<T>;
 export type DeepMutable<T> = {
   -readonly [P in keyof T]: DeepMutable<T[P]>;
 };
+
+// From https://stackoverflow.com/a/70262876/316944
+export declare abstract class As<Tag extends keyof never> {
+  private static readonly $as$: unique symbol;
+  private [As.$as$]: Record<Tag, true>;
+}
+
+export type Brand<T, B extends keyof never> = T & As<B>;
