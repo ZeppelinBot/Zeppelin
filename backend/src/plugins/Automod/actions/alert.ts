@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import z from "zod";
 import { LogType } from "../../../data/LogType";
 import {
@@ -19,6 +18,7 @@ import {
   zNullishToUndefined,
   zSnowflake
 } from "../../../utils";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";

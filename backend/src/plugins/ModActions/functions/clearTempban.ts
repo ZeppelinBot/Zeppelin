@@ -2,8 +2,6 @@ import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { LogType } from "src/data/LogType";
-import { logger } from "src/logger";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Tempban } from "../../../data/entities/Tempban";
 import { resolveUser } from "../../../utils";
@@ -13,6 +11,8 @@ import { IgnoredEventType, ModActionsPluginType } from "../types";
 import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
+import { LogType } from "../../../data/LogType";
+import { logger } from "../../../logger";
 
 export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginType>, tempban: Tempban) {
   if (!(await isBanned(pluginData, tempban.user_id))) {

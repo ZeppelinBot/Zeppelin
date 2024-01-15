@@ -1,6 +1,5 @@
 import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
-import { isDefaultSticker } from "src/utils/isDefaultSticker";
 import { Repository } from "typeorm";
 import { TemplateSafeValueContainer, renderTemplate } from "../templateFormatter";
 import { renderUsername, trimLines } from "../utils";
@@ -10,6 +9,7 @@ import { BaseGuildRepository } from "./BaseGuildRepository";
 import { dataSource } from "./dataSource";
 import { ArchiveEntry } from "./entities/ArchiveEntry";
 import { SavedMessage } from "./entities/SavedMessage";
+import { isDefaultSticker } from "../utils/isDefaultSticker";
 
 const DEFAULT_EXPIRY_DAYS = 30;
 
