@@ -16,7 +16,7 @@ export const zCasesConfig = z.strictObject({
   show_relative_times: z.boolean(),
   relative_time_cutoff: zDelayString.default("1w"),
   case_colors: z.record(z.enum(caseKeys), zColor).nullable(),
-  case_icons: z.record(z.enum(caseKeys), zBoundedCharacters(0, 32)).nullable(),
+  case_icons: z.record(z.enum(caseKeys), zBoundedCharacters(0, 100)).nullable(),
 });
 
 export interface CasesPluginType extends BasePluginType {
