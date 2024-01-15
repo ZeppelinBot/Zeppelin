@@ -16,7 +16,7 @@ interface TMessageSpamMatchResultType {
 const configSchema = z.strictObject({
   amount: z.number().int(),
   within: zDelayString,
-  per_channel: z.boolean().optional(),
+  per_channel: z.boolean().nullable().default(false),
 });
 
 export function createMessageSpamTrigger(spamType: RecentActionType, prettyName: string) {

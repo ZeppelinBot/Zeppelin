@@ -21,18 +21,18 @@ const regexCache = new WeakMap<any, RegExp[]>();
 const quickLinkCheck = /^https?:\/\//i;
 
 const configSchema = z.strictObject({
-  include_domains: z.array(z.string().max(255)).max(255).optional(),
-  exclude_domains: z.array(z.string().max(255)).max(255).optional(),
+  include_domains: z.array(z.string().max(255)).max(700).optional(),
+  exclude_domains: z.array(z.string().max(255)).max(700).optional(),
   include_subdomains: z.boolean().default(true),
-  include_words: z.array(z.string().max(2000)).max(512).optional(),
-  exclude_words: z.array(z.string().max(2000)).max(512).optional(),
+  include_words: z.array(z.string().max(2000)).max(700).optional(),
+  exclude_words: z.array(z.string().max(2000)).max(700).optional(),
   include_regex: z.array(zRegex(z.string().max(2000))).max(512).optional(),
   exclude_regex: z.array(zRegex(z.string().max(2000))).max(512).optional(),
   phisherman: z.strictObject({
     include_suspected: z.boolean().optional(),
     include_verified: z.boolean().optional(),
   }).optional(),
-  only_real_links: z.boolean(),
+  only_real_links: z.boolean().default(true),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(true),
   match_visible_names: z.boolean().default(false),

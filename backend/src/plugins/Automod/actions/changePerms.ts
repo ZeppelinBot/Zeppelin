@@ -2,7 +2,7 @@ import { PermissionsBitField, PermissionsString } from "discord.js";
 import { U } from "ts-toolbelt";
 import z from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { isValidSnowflake, keys, noop, zSnowflake } from "../../../utils";
+import { isValidSnowflake, keys, noop, zBoundedCharacters, zSnowflake } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
@@ -66,8 +66,8 @@ const allPermissionNames = [...permissionNames, ...legacyPermissionNames] as con
 
 export const ChangePermsAction = automodAction({
   configSchema: z.strictObject({
-    target: zSnowflake,
-    channel: zSnowflake.nullable().default(null),
+    target: zBoundedCharacters(1, 255),
+    channel: zBoundedCharacters(1, 255).nullable().default(null),
     perms: z.record(
       z.enum(allPermissionNames),
       z.boolean().nullable(),
