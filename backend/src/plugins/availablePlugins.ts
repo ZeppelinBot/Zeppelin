@@ -12,7 +12,6 @@ import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigReloaderPlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
-import { GuildMemberCachePlugin } from "./GuildMemberCache/GuildMemberCachePlugin";
 import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
 import { LocateUserPlugin } from "./LocateUser/LocateUserPlugin";
 import { LogsPlugin } from "./Logs/LogsPlugin";
@@ -54,7 +53,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   PostPlugin,
   ReactionRolesPlugin,
   MessageSaverPlugin,
-  GuildMemberCachePlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   ModActionsPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
@@ -93,7 +92,7 @@ export const baseGuildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   GuildInfoSaverPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
-  GuildMemberCachePlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   CasesPlugin,
   MutesPlugin,
   TimeAndDatePlugin,
