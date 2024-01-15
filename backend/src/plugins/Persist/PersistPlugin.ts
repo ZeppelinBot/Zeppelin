@@ -3,7 +3,6 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildPersistedData } from "../../data/GuildPersistedData";
 import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
-import { GuildMemberCachePlugin } from "../GuildMemberCache/GuildMemberCachePlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -31,7 +30,7 @@ export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
     configSchema: ConfigSchema,
   },
 
-  dependencies: () => [LogsPlugin, RoleManagerPlugin, GuildMemberCachePlugin],
+  dependencies: () => [LogsPlugin, RoleManagerPlugin],
   configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
 
