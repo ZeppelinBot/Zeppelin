@@ -24,6 +24,7 @@
     "migrate-rollback": "npm run typeorm -- migration:revert -d dist/backend/src/data/dataSource.js",
     "migrate-rollback-prod": "cross-env NODE_ENV=production npm run migrate",
     "migrate-rollback-dev": "cross-env NODE_ENV=development npm run build && npm run migrate",
+    "validate-active-configs": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --enable-source-maps dist/backend/src/validateActiveConfigs.js > ../config-errors.txt",
     "test": "npm run build && npm run run-tests",
     "run-tests": "ava",
     "test-watch": "tsc-watch --onSuccess \"npx ava\""
