@@ -65,11 +65,6 @@ const zRule = z.strictObject({
 });
 export type TRule = z.infer<typeof zRule>;
 
-export const zNotify = z.union([
-  z.literal("dm"),
-  z.literal("channel"),
-]);
-
 export const zAutomodConfig = z.strictObject({
   rules: zBoundedRecord(
     z.record(z.string().max(100), zRule),

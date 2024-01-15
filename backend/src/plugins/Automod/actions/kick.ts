@@ -4,7 +4,7 @@ import { CaseArgs } from "../../Cases/types";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../types";
+import { zNotify } from "../constants";
 
 export const KickAction = automodAction({
   configSchema: z.strictObject({

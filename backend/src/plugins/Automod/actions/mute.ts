@@ -6,7 +6,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../types";
+import { zNotify } from "../constants";
 
 export const MuteAction = automodAction({
   configSchema: z.strictObject({

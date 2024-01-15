@@ -4,7 +4,7 @@ import { CaseArgs } from "../../Cases/types";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../types";
+import { zNotify } from "../constants";
 
 const configSchema = z.strictObject({
   reason: zBoundedCharacters(0, 4000).nullable().default(null),
