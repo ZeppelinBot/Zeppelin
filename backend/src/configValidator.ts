@@ -1,9 +1,10 @@
-import { PluginConfigManager } from "knub";
+import { ConfigValidationError, PluginConfigManager } from "knub";
 import moment from "moment-timezone";
 import { ZodError } from "zod";
 import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinGuildConfig, zZeppelinGuildConfig } from "./types";
+import { formatZodIssue } from "./utils/formatZodIssue";
 
 const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
 for (const plugin of guildPlugins) {
@@ -13,7 +14,7 @@ for (const plugin of guildPlugins) {
 export async function validateGuildConfig(config: any): Promise<string | null> {
   const validationResult = zZeppelinGuildConfig.safeParse(config);
   if (!validationResult.success) {
-    return validationResult.error.issues.join("\n");
+    return validationResult.error.issues.map(formatZodIssue).join("\n");
   }
 
   const guildConfig = config as ZeppelinGuildConfig;
@@ -44,7 +45,10 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
         await configManager.init();
       } catch (err) {
         if (err instanceof ZodError) {
-          return `${pluginName}: ${err.issues.join("\n")}`;
+          return `${pluginName}: ${err.issues.map(formatZodIssue).join("\n")}`;
+        }
+        if (err instanceof ConfigValidationError) {
+          return `${pluginName}: ${err.message}`;
         }
 
         throw err;
