@@ -10,7 +10,7 @@ const MAX_COUNTERS = 5;
 const MAX_TRIGGERS_PER_COUNTER = 5;
 
 export const zTrigger = z.strictObject({
-  // Dummy type because name gets replaced by the property key in zTriggerInput
+  // Dummy type because name gets replaced by the property key in transform()
   name: z.never().optional().transform(() => ""),
   pretty_name: zBoundedCharacters(0, 100).nullable().default(null),
   condition: zBoundedCharacters(1, 64).refine(
@@ -20,33 +20,44 @@ export const zTrigger = z.strictObject({
   reverse_condition: zBoundedCharacters(1, 64).refine(
     (str) => parseCounterConditionString(str) !== null,
     { message: "Invalid counter trigger reverse condition" },
-  ),
-});
-
-const zTriggerInput = z.union([zBoundedCharacters(0, 100), zTrigger])
+  ).optional(),
+})
   .transform((val, ctx) => {
     const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-    if (typeof val === "string") {
-      const parsedCondition = parseCounterConditionString(val);
-      if (!parsedCondition) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Invalid counter trigger condition",
-        });
-        return z.NEVER;
-      }
-      return {
-        name: ruleName,
-        pretty_name: null,
-        condition: buildCounterConditionString(parsedCondition[0], parsedCondition[1]),
-        reverse_condition: buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]),
-      };
+
+    let reverseCondition = val.reverse_condition;
+    if (! reverseCondition) {
+      const parsedCondition = parseCounterConditionString(val.condition)!;
+      reverseCondition = buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]);
     }
+
     return {
       ...val,
       name: ruleName,
+      reverse_condition: reverseCondition,
     };
   });
+
+const zTriggerFromString = zBoundedCharacters(0, 100)
+  .transform((val, ctx) => {
+    const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
+    const parsedCondition = parseCounterConditionString(val);
+    if (!parsedCondition) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid counter trigger condition",
+      });
+      return z.NEVER;
+    }
+    return {
+      name: ruleName,
+      pretty_name: null,
+      condition: buildCounterConditionString(parsedCondition[0], parsedCondition[1]),
+      reverse_condition: buildCounterConditionString(getReverseCounterComparisonOp(parsedCondition[0]), parsedCondition[1]),
+    };
+  });
+
+const zTriggerInput = z.union([zTrigger, zTriggerFromString]);
 
 export const zCounter = z.strictObject({
   // Typed as "never" because you are not expected to supply this directly.
@@ -78,9 +89,9 @@ export const zCounter = z.strictObject({
     amount: z.number(),
     every: zDelayString,
   }).nullable().default(null),
-  can_view: z.boolean(),
-  can_edit: z.boolean(),
-  can_reset_all: z.boolean(),
+  can_view: z.boolean().default(false),
+  can_edit: z.boolean().default(false),
+  can_reset_all: z.boolean().default(false),
 });
 
 export const zCountersConfig = z.strictObject({
