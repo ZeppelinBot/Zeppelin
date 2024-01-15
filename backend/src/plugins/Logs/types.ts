@@ -1,12 +1,12 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
-import { z } from "zod";
+import { ZodString, z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
-import { zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils";
+import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils";
 import { MessageBuffer } from "../../utils/MessageBuffer";
 import {
   TemplateSafeCase,
@@ -26,10 +26,13 @@ const DEFAULT_BATCH_TIME = 1000;
 const MIN_BATCH_TIME = 250;
 const MAX_BATCH_TIME = 5000;
 
-export const zLogFormats = z.record(
-  zBoundedCharacters(1, 255),
-  zMessageContent,
-);
+type ZLogFormatsHelper = {
+  -readonly [K in keyof typeof LogType]: typeof zMessageContent;
+};
+export const zLogFormats = z.strictObject(keys(LogType).reduce((map, logType) => {
+  map[logType] = zMessageContent;
+  return map;
+}, {} as ZLogFormatsHelper));
 export type TLogFormats = z.infer<typeof zLogFormats>;
 
 const zLogChannel = z.strictObject({
@@ -44,7 +47,7 @@ const zLogChannel = z.strictObject({
   excluded_threads: z.array(zSnowflake).nullable().default(null),
   exclude_bots: z.boolean().default(false),
   excluded_roles: z.array(zSnowflake).nullable().default(null),
-  format: zLogFormats.default({}),
+  format: zLogFormats.partial().default({}),
   timestamp_format: z.string().nullable().default(null),
   include_embed_timestamp: z.boolean().nullable().default(null),
 });
@@ -55,7 +58,7 @@ export type TLogChannelMap = z.infer<typeof zLogChannelMap>;
 
 export const zLogsConfig = z.strictObject({
   channels: zLogChannelMap,
-  format: z.intersection(zLogFormats, z.strictObject({
+  format: zLogFormats.merge(z.strictObject({
     // Legacy/deprecated, use timestamp_format below instead
     timestamp: zBoundedCharacters(0, 64).nullable(),
   })),
