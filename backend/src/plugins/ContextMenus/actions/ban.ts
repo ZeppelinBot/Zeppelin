@@ -11,17 +11,14 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { canActOn } from "src/pluginUtils";
 import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
-import { convertDelayStringToMS } from "../../../utils";
+import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
 import { updateAction } from "./update";
 
-async function muteAction(
+async function banAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   duration: string | undefined,
   reason: string | undefined,
@@ -38,76 +35,56 @@ async function muteAction(
   });
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
-  if (!userCfg.can_use || !(await modactions.hasMutePermission(executingMember, interaction.channelId))) {
+  if (!userCfg.can_use || !(await modactions.hasBanPermission(executingMember, interaction.channelId))) {
     await interactionToReply
-      .editReply({
-        content: "Cannot mute: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+      .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
+      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
     await interactionToReply
-      .editReply({
-        content: "Cannot mute: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+      .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
+      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
     return;
   }
 
   const caseArgs: Partial<CaseArgs> = {
     modId: executingMember.id,
   };
-  const mutes = pluginData.getPlugin(MutesPlugin);
+
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
-
-  try {
-    const result = await mutes.muteUser(target, durationMs, reason, { caseArgs });
-
-    const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
-    const muteMessage = `Muted **${result.case.user_name}** ${
-      durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number})${messageResultText}`;
-
-    if (evidence) {
-      await updateAction(pluginData, executingMember, result.case, evidence);
-    }
-
+  const result = await modactions.banUserId(target, reason, { caseArgs }, durationMs);
+  if (result.status === "failed") {
     await interactionToReply
-      .editReply({ content: muteMessage, embeds: [], components: [] })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
-  } catch (e) {
-    await interactionToReply
-      .editReply({
-        content: "Plugin error, please check your BOT_ALERTs",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
-
-    if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.getPlugin(LogsPlugin).logBotAlert({
-        body: `Failed to mute <@!${target}> in ContextMenu action \`mute\` because a mute role has not been specified in server config`,
-      });
-    } else {
-      throw e;
-    }
+      .editReply({ content: "Error: Failed to ban user", embeds: [], components: [] })
+      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
+    return;
   }
+
+  const userName = renderUserUsername(targetMember.user);
+  const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
+  const banMessage = `Banned **${userName}** ${
+    durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
+  } (Case #${result.case.case_number})${messageResultText}`;
+
+  if (evidence) {
+    await updateAction(pluginData, executingMember, result.case, evidence);
+  }
+
+  await interactionToReply
+    .editReply({ content: banMessage, embeds: [], components: [] })
+    .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
 }
 
-export async function launchMuteActionModal(
+export async function launchBanActionModal(
   pluginData: GuildPluginData<ContextMenuPluginType>,
   interaction: ButtonInteraction | ContextMenuCommandInteraction,
   target: string,
 ) {
-  const modalId = `${ModMenuActionType.MUTE}:${interaction.id}`;
-  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Mute");
+  const modalId = `${ModMenuActionType.BAN}:${interaction.id}`;
+  const modal = new ModalBuilder().setCustomId(modalId).setTitle("Ban");
   const durationIn = new TextInputBuilder()
     .setCustomId("duration")
     .setLabel("Duration (Optional)")
@@ -133,18 +110,18 @@ export async function launchMuteActionModal(
     .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
     .then(async (submitted) => {
       if (interaction.isButton()) {
-        await submitted.deferUpdate().catch((err) => logger.error(`Mute interaction defer failed: ${err}`));
+        await submitted.deferUpdate().catch((err) => logger.error(`Ban interaction defer failed: ${err}`));
       } else if (interaction.isContextMenuCommand()) {
         await submitted
           .deferReply({ ephemeral: true })
-          .catch((err) => logger.error(`Mute interaction defer failed: ${err}`));
+          .catch((err) => logger.error(`Ban interaction defer failed: ${err}`));
       }
 
       const duration = submitted.fields.getTextInputValue("duration");
       const reason = submitted.fields.getTextInputValue("reason");
       const evidence = submitted.fields.getTextInputValue("evidence");
 
-      await muteAction(pluginData, duration, reason, evidence, target, interaction, submitted);
+      await banAction(pluginData, duration, reason, evidence, target, interaction, submitted);
     })
-    .catch((err) => logger.error(`Mute modal interaction failed: ${err}`));
+    .catch((err) => logger.error(`Ban modal interaction failed: ${err}`));
 }
