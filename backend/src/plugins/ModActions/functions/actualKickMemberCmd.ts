@@ -1,4 +1,4 @@
-import { GuildMember, GuildTextBasedChannel } from "discord.js";
+import { GuildMember, GuildTextBasedChannel, Message, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/helpers";
 import { LogType } from "../../../data/LogType";
@@ -9,11 +9,12 @@ import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
 import { kickMember } from "./kickMember";
+import { parseReason } from "./parseReason";
 import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
 
 export async function actualKickMemberCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  msg,
+  msg: Message,
   args: {
     user: string;
     reason: string;
@@ -24,8 +25,9 @@ export async function actualKickMemberCmd(
   },
 ) {
   const user = await resolveUser(pluginData.client, args.user);
-  if (!user.id) {
-    sendErrorMessage(pluginData, msg.channel, `User not found`);
+  const channel = msg.channel as TextChannel;
+  if (!user.id || !msg.member) {
+    sendErrorMessage(pluginData, channel, `User not found`);
     return;
   }
 
@@ -34,9 +36,9 @@ export async function actualKickMemberCmd(
   if (!memberToKick) {
     const banned = await isBanned(pluginData, user.id);
     if (banned) {
-      sendErrorMessage(pluginData, msg.channel, `User is banned`);
+      sendErrorMessage(pluginData, channel, `User is banned`);
     } else {
-      sendErrorMessage(pluginData, msg.channel, `User not found on the server`);
+      sendErrorMessage(pluginData, channel, `User not found on the server`);
     }
 
     return;
@@ -44,7 +46,7 @@ export async function actualKickMemberCmd(
 
   // Make sure we're allowed to kick this member
   if (!canActOn(pluginData, msg.member, memberToKick)) {
-    sendErrorMessage(pluginData, msg.channel, "Cannot kick: insufficient permissions");
+    sendErrorMessage(pluginData, channel, "Cannot kick: insufficient permissions");
     return;
   }
 
@@ -52,7 +54,7 @@ export async function actualKickMemberCmd(
   let mod = msg.member;
   if (args.mod) {
     if (!(await hasPermission(await pluginData.config.getForMessage(msg), "can_act_as_other"))) {
-      sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+      sendErrorMessage(pluginData, channel, "You don't have permission to use -mod");
       return;
     }
 
@@ -63,17 +65,18 @@ export async function actualKickMemberCmd(
   try {
     contactMethods = readContactMethodsFromArgs(args);
   } catch (e) {
-    sendErrorMessage(pluginData, msg.channel, e.message);
+    sendErrorMessage(pluginData, channel, e.message);
     return;
   }
 
-  const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  const config = pluginData.config.get();
+  const reason = formatReasonWithAttachments(parseReason(config, args.reason), [...msg.attachments.values()]);
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,
     caseArgs: {
       modId: mod.id,
-      ppId: mod.id !== msg.author.id ? msg.author.id : null,
+      ppId: mod.id !== msg.author.id ? msg.author.id : undefined,
     },
   });
 
@@ -84,7 +87,7 @@ export async function actualKickMemberCmd(
     try {
       await memberToKick.ban({ deleteMessageSeconds: (1 * DAYS) / SECONDS, reason: "kick -clean" });
     } catch {
-      sendErrorMessage(pluginData, msg.channel, "Failed to ban the user to clean messages (-clean)");
+      sendErrorMessage(pluginData, channel, "Failed to ban the user to clean messages (-clean)");
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToKick.id);
@@ -93,7 +96,7 @@ export async function actualKickMemberCmd(
     try {
       await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
-      sendErrorMessage(pluginData, msg.channel, "Failed to unban the user after banning them (-clean)");
+      sendErrorMessage(pluginData, channel, "Failed to unban the user after banning them (-clean)");
     }
   }
 
@@ -106,5 +109,5 @@ export async function actualKickMemberCmd(
   let response = `Kicked **${renderUserUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
-  sendSuccessMessage(pluginData, msg.channel, response);
+  sendSuccessMessage(pluginData, channel, response);
 }

@@ -1,11 +1,12 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { renderUserUsername, resolveMember, resolveUser } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { parseReason } from "../functions/parseReason";
 import { modActionsCmd } from "../types";
 
 const opts = {
@@ -58,8 +59,8 @@ export const AddCaseCmd = modActionsCmd({
       sendErrorMessage(pluginData, msg.channel, "Cannot add case: invalid case type");
       return;
     }
-
-    const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const reason = formatReasonWithAttachments(parseReason(config, args.reason), [...msg.attachments.values()]);
 
     // Create the case
     const casesPlugin = pluginData.getPlugin(CasesPlugin);

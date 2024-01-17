@@ -22,6 +22,7 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
 import { ignoreEvent } from "./ignoreEvent";
+import { parseReason } from "./parseReason";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.
@@ -41,6 +42,7 @@ export async function banUserId(
       error: "Invalid user",
     };
   }
+  reason &&= parseReason(config, reason);
 
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   const member = await resolveMember(pluginData.client, pluginData.guild, userId);

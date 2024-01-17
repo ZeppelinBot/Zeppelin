@@ -7,6 +7,7 @@ import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginU
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
+import { parseReason } from "../functions/parseReason";
 import { modActionsCmd } from "../types";
 
 export const MassmuteCmd = modActionsCmd({
@@ -39,7 +40,10 @@ export const MassmuteCmd = modActionsCmd({
       return;
     }
 
-    const muteReason = formatReasonWithAttachments(muteReasonReceived.content, [...msg.attachments.values()]);
+    const config = pluginData.config.get();
+    const muteReason = formatReasonWithAttachments(parseReason(config, muteReasonReceived.content), [
+      ...msg.attachments.values(),
+    ]);
 
     // Verify we can act upon all users
     for (const userId of args.userIds) {

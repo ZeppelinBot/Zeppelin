@@ -9,6 +9,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
 import { getDefaultContactMethods } from "./getDefaultContactMethods";
+import { parseReason } from "./parseReason";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -17,7 +18,7 @@ export async function warnMember(
   warnOptions: WarnOptions = {},
 ): Promise<WarnResult> {
   const config = pluginData.config.get();
-
+  reason = parseReason(config, reason);
   let notifyResult: UserNotificationResult;
   if (config.warn_message) {
     const warnMessage = await renderTemplate(

@@ -85,6 +85,7 @@ const defaultOptions = {
     can_deletecase: false,
     can_act_as_other: false,
     create_cases_for_manual_actions: true,
+    reason_aliases: {},
   },
   overrides: [
     {
@@ -113,6 +114,19 @@ const defaultOptions = {
   ],
 };
 
+/**
+ * Config preprocessor to fix values
+ */
+const configPreprocessor = (options) => {
+  if (options.config?.reason_aliases) {
+    options.config.reason_aliases = Object.fromEntries(
+      Object.entries(options.config.reason_aliases).map(([k, v]) => [k.toLowerCase(), v]),
+    );
+  }
+
+  return options;
+};
+
 export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   name: "mod_actions",
   showInDocs: true,
@@ -127,6 +141,7 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
   configParser: makeIoTsConfigParser(ConfigSchema),
   defaultOptions,
+  configPreprocessor,
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 
