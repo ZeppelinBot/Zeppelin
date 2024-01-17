@@ -135,7 +135,7 @@ export interface TDeepPartialProps<P extends t.Props>
     {
       [K in keyof P]?: TDeepPartial<t.OutputOf<P[K]>>;
     }
-  > { }
+  > {}
 
 export function tDeepPartial<T>(type: T): TDeepPartial<T> {
   if (type instanceof t.InterfaceType || type instanceof t.PartialType) {
@@ -220,7 +220,7 @@ export interface PartialDictionaryC<D extends t.Mixed, C extends t.Mixed>
       [K in t.OutputOf<D>]?: t.OutputOf<C>;
     },
     unknown
-  > { }
+  > {}
 
 export const tPartialDictionary = <D extends t.Mixed, C extends t.Mixed>(
   domain: D,
@@ -652,7 +652,13 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
       return urls;
     }
 
-    const hostnameParts = matchUrl.hostname.split(".");
+    let hostname = matchUrl.hostname.toLowerCase();
+
+    if (hostname.length > 3) {
+      hostname = hostname.replace(/[^a-z]+$/, "");
+    }
+
+    const hostnameParts = hostname.split(".");
     const tld = hostnameParts[hostnameParts.length - 1];
     if (tlds.includes(tld)) {
       urls.push(matchUrl);
