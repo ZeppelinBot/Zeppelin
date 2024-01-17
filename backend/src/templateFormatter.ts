@@ -1,3 +1,4 @@
+import { convertBase } from "baseroo";
 import seedrandom from "seedrandom";
 import { get, has } from "./utils";
 
@@ -396,6 +397,10 @@ const baseValues = {
   ucfirst(arg) {
     return baseValues.upperFirst(arg);
   },
+  arrlen(arg) {
+    if (!Array.isArray(arg)) return 0;
+    return arg.length;
+  },
   strlen(arg) {
     if (typeof arg !== "string") return 0;
     return [...arg].length;
@@ -420,7 +425,20 @@ const baseValues = {
   },
   round(arg, decimals = 0) {
     if (isNaN(arg)) return 0;
+    if (typeof arg !== "number") arg = parseFloat(arg); // should be safe since we check above if it's not a number
     return decimals === 0 ? Math.round(arg) : arg.toFixed(decimals);
+  },
+  floor(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.floor(parseFloat(arg));
+  },
+  ceil(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.ceil(parseFloat(arg));
+  },
+  abs(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.abs(parseFloat(arg));
   },
   add(...args) {
     return args.reduce((result, arg) => {
@@ -449,6 +467,89 @@ const baseValues = {
       return result / parseFloat(arg);
     }, args[0]);
   },
+  exp(base, power) {
+    if (isNaN(base) || isNaN(power)) return 0;
+    return Math.pow(parseFloat(base), parseFloat(power));
+  },
+  sqrt(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.sqrt(parseFloat(arg));
+  },
+  cbrt(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cbrt(parseFloat(arg));
+  },
+  sin(radians) {
+    if (isNaN(radians)) return 0;
+    return Math.sin(parseFloat(radians));
+  },
+  sinh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.sinh(parseFloat(arg));
+  },
+  tan(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.tan(parseFloat(arg));
+  },
+  tanh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.tanh(parseFloat(arg));
+  },
+  log(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log(parseFloat(arg));
+  },
+  log2(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log2(parseFloat(arg));
+  },
+  log10(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log10(parseFloat(arg));
+  },
+  log1p(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.log1p(parseFloat(arg));
+  },
+  hypot(...args) {
+    if (!args.every((e) => !isNaN(e))) return ""; // TODO: Improve validation
+    return Math.hypot(...args.map((e) => parseFloat(e)));
+  },
+  cos(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cos(parseFloat(arg));
+  },
+  cosh(arg) {
+    if (isNaN(arg)) return 0;
+    return Math.cosh(parseFloat(arg));
+  },
+  const(str) {
+    // math constants lmao :joy:
+    const math_constants = {
+      pi: Math.PI,
+      e: Math.E,
+      sqrt2: Math.SQRT2,
+      "sqrt0.5": Math.SQRT1_2,
+      ln10: Math.LN10,
+      ln2: Math.LN2,
+      log10e: Math.LOG10E,
+      log2e: Math.LOG2E,
+    };
+    if (typeof str !== "string") return "";
+    return math_constants[str.toLowerCase()] ?? "";
+  },
+  map(obj, key) {
+    return actualMap(obj, key);
+
+    function actualMap(obj, key, depth = 0) {
+      if (depth > 5) return "";
+      if (!obj || !key || typeof obj !== "object" || typeof key !== "string") return "";
+      if (Array.isArray(obj)) {
+        return obj.map((tobj) => actualMap(tobj, key, depth + 1));
+      }
+      return obj[key];
+    }
+  },
   cases(mod, ...cases) {
     if (cases.length === 0) return "";
     if (isNaN(mod)) return "";
@@ -458,6 +559,23 @@ const baseValues = {
   choose(...cases) {
     const mod = Math.floor(Math.random() * cases.length) + 1;
     return baseValues.cases(mod, ...cases);
+  },
+  trim_text(str) {
+    if (!str || typeof str !== "string") return "";
+    return str.replaceAll(/[^\d]+/g, "");
+  },
+  get_snowflake(str) {
+    // couldn't find a better way of aliasing :(
+    if (!str || typeof str !== "string") return "";
+    return str.replaceAll(/[^\d]+/g, "");
+  },
+  convert_base(value, from, to) {
+    try {
+      if (typeof value === "number") value = value.toString();
+      return convertBase(value, from, to);
+    } catch (_) {
+      return "";
+    }
   },
 };
 

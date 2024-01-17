@@ -1,6 +1,7 @@
 import { ExtendedMatchParams, GuildPluginData } from "knub";
 import { TemplateSafeValue, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { StrictMessageContent, renderRecursively } from "../../../utils";
+import { StrictMessageContent, UnknownUser, renderRecursively, resolveUser } from "../../../utils";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
 import { TTag, TagsPluginType } from "../types";
 import { findTagByName } from "./findTagByName";
 
@@ -38,6 +39,12 @@ export async function renderTagBody(
       if (typeof name !== "string") return "";
       if (emptyObject[name]) return;
       return !Object.hasOwn(dynamicVars, name) || dynamicVars[name] == null ? "" : dynamicVars[name];
+    },
+    async get_user(str) {
+      if (!str || typeof str !== "string") return "";
+      const resolved = await resolveUser(pluginData.client, str);
+      if (resolved instanceof UnknownUser) return "";
+      return userToTemplateSafeUser(resolved);
     },
     tag: async (name, ...subTagArgs) => {
       if (++tagFnCallsObj.calls > MAX_TAG_FN_CALLS) return "";
