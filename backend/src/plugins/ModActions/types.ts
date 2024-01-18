@@ -12,6 +12,7 @@ import { UserNotificationMethod, UserNotificationResult, tNullable } from "../..
 import { CaseArgs } from "../Cases/types";
 
 export const ConfigSchema = t.type({
+  main_guild: tNullable(t.string),
   dm_on_warn: t.boolean,
   dm_on_kick: t.boolean,
   dm_on_ban: t.boolean,
