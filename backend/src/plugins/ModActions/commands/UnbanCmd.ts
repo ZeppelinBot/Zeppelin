@@ -50,10 +50,8 @@ export const UnbanCmd = modActionsCmd({
     const config = pluginData.config.get();
     const guild = pluginData.client.guilds.cache.get(config.main_guild as Snowflake);
     if (!guild) {
-      return {
-        status: "failed",
-        error: "Guild not found!",
-      };
+      sendErrorMessage(pluginData, msg.channel, "Main guild not found!");
+      return;
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
