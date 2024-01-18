@@ -23,6 +23,13 @@ export const ConfigSchema = t.type({
   kick_message: tNullable(t.string),
   ban_message: tNullable(t.string),
   tempban_message: tNullable(t.string),
+  default_reasons: tNullable(
+    t.type({
+      mute: t.string,
+      kick: t.string,
+      ban: t.string,
+    }),
+  ),
   alert_on_rejoin: t.boolean,
   alert_channel: tNullable(t.string),
   warn_notify_enabled: t.boolean,
