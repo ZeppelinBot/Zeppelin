@@ -6,13 +6,13 @@ import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from ".
 import { renderUserUsername, resolveMember, resolveUser } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const AddCaseCmd = modActionsCmd({
+export const AddCaseCmd = modActionsMsgCmd({
   trigger: "addcase",
   permission: "can_addcase",
   description: "Add an arbitrary case to the specified user without taking any action",

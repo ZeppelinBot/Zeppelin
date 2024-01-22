@@ -2,13 +2,13 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const ForceUnmuteCmd = modActionsCmd({
+export const ForceUnmuteCmd = modActionsMsgCmd({
   trigger: "forceunmute",
   permission: "can_mute",
   description: "Force-unmute the specified user, even if they're not on the server",

@@ -8,9 +8,9 @@ import { formatReasonWithAttachments } from "../functions/formatReasonWithAttach
 import { isBanned } from "../functions/isBanned";
 import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
 import { warnMember } from "../functions/warnMember";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const WarnCmd = modActionsCmd({
+export const WarnCmd = modActionsMsgCmd({
   trigger: "warn",
   permission: "can_warn",
   description: "Send a warning to the specified user",

@@ -53,8 +53,8 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   PostPlugin,
   ReactionRolesPlugin,
   MessageSaverPlugin,
-  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   ModActionsPlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   NameHistoryPlugin,
   RemindersPlugin,
   RolesPlugin,

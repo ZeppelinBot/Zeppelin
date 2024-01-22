@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const HideCaseCmd = modActionsCmd({
+export const HideCaseCmd = modActionsMsgCmd({
   trigger: ["hide", "hidecase", "hide_case"],
   permission: "can_hidecase",
   description: "Hide the specified case so it doesn't appear in !cases or !info",

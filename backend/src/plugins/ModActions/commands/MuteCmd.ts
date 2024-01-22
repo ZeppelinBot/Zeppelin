@@ -4,7 +4,7 @@ import { resolveMember, resolveUser } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { actualMuteUserCmd } from "../functions/actualMuteUserCmd";
 import { isBanned } from "../functions/isBanned";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -12,7 +12,7 @@ const opts = {
   "notify-channel": ct.textChannel({ option: true }),
 };
 
-export const MuteCmd = modActionsCmd({
+export const MuteCmd = modActionsMsgCmd({
   trigger: "mute",
   permission: "can_mute",
   description: "Mute the specified member",

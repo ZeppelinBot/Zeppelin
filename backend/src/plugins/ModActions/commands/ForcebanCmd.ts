@@ -9,13 +9,13 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { IgnoredEventType, modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const ForcebanCmd = modActionsCmd({
+export const ForcebanCmd = modActionsMsgCmd({
   trigger: "forceban",
   permission: "can_ban",
   description: "Force-ban the specified user, even if they aren't on the server",

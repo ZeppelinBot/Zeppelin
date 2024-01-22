@@ -7,9 +7,9 @@ import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginU
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const MassmuteCmd = modActionsCmd({
+export const MassmuteCmd = modActionsMsgCmd({
   trigger: "massmute",
   permission: "can_massmute",
   description: "Mass-mute a list of user IDs",

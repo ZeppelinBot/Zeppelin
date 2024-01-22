@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const UnhideCaseCmd = modActionsCmd({
+export const UnhideCaseCmd = modActionsMsgCmd({
   trigger: ["unhide", "unhidecase", "unhide_case"],
   permission: "can_hidecase",
   description: "Un-hide the specified case, making it appear in !cases and !info again",

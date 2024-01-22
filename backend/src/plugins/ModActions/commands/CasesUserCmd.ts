@@ -7,7 +7,7 @@ import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUs
 import { asyncMap } from "../../../utils/async";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),
@@ -21,7 +21,7 @@ const opts = {
   unbans: ct.switchOption({ def: false, shortcut: "ub" }),
 };
 
-export const CasesUserCmd = modActionsCmd({
+export const CasesUserCmd = modActionsMsgCmd({
   trigger: ["cases", "modlogs"],
   permission: "can_view",
   description: "Show a list of cases the specified user has",

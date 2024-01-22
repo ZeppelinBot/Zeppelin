@@ -6,9 +6,9 @@ import { SECONDS, trimLines } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const DeleteCaseCmd = modActionsCmd({
+export const DeleteCaseCmd = modActionsMsgCmd({
   trigger: ["delete_case", "deletecase"],
   permission: "can_deletecase",
   description: trimLines(`

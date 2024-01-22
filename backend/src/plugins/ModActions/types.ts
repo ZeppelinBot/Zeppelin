@@ -1,7 +1,7 @@
 import { GuildTextBasedChannel } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
 import { Queue } from "../../Queue";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -147,5 +147,6 @@ export interface BanOptions {
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
 
-export const modActionsCmd = guildPluginMessageCommand<ModActionsPluginType>();
+export const modActionsMsgCmd = guildPluginMessageCommand<ModActionsPluginType>();
+export const modActionsSlashGroup = guildPluginSlashGroup<ModActionsPluginType>();
 export const modActionsEvt = guildPluginEventListener<ModActionsPluginType>();

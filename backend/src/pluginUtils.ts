@@ -3,6 +3,7 @@
  */
 
 import {
+  ChatInputCommandInteraction,
   GuildMember,
   Message,
   MessageCreateOptions,
@@ -100,12 +101,19 @@ export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema)
   };
 }
 
+function isContextInteraction(
+  context: TextBasedChannel | ChatInputCommandInteraction,
+): context is ChatInputCommandInteraction {
+  return "commandId" in context && !!context.commandId;
+}
+
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
+  context: TextBasedChannel | ChatInputCommandInteraction,
   body: string,
   allowedMentions?: MessageMentionOptions,
   responseInteraction?: ModalSubmitInteraction,
+  ephemeral = false,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
@@ -117,23 +125,44 @@ export async function sendSuccessMessage(
     await responseInteraction
       .editReply({ content: formattedBody, embeds: [], components: [] })
       .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-  } else {
-    return channel
+
+    return;
+  }
+
+  if (!isContextInteraction(context)) {
+    // noinspection TypeScriptValidateJSTypes
+    return context
       .send({ ...content }) // Force line break
       .catch((err) => {
-        const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
+        const channelInfo = "guild" in context ? `${context.id} (${context.guild.id})` : context.id;
         logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
+
         return undefined;
       });
   }
+
+  const replyMethod = context.replied ? "followUp" : "reply";
+
+  return context[replyMethod]({
+    content: formattedBody,
+    embeds: [],
+    components: [],
+    fetchReply: true,
+    ephemeral,
+  }).catch((err) => {
+    logger.error(`Context reply failed: ${err}`);
+
+    return undefined;
+  });
 }
 
 export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
+  context: TextBasedChannel | ChatInputCommandInteraction,
   body: string,
   allowedMentions?: MessageMentionOptions,
   responseInteraction?: ModalSubmitInteraction,
+  ephemeral = false,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
   const formattedBody = errorMessage(body, emoji);
@@ -145,15 +174,34 @@ export async function sendErrorMessage(
     await responseInteraction
       .editReply({ content: formattedBody, embeds: [], components: [] })
       .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-  } else {
-    return channel
+
+    return;
+  }
+
+  if (!isContextInteraction(context)) {
+    // noinspection TypeScriptValidateJSTypes
+    return context
       .send({ ...content }) // Force line break
       .catch((err) => {
-        const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
+        const channelInfo = "guild" in context ? `${context.id} (${context.guild.id})` : context.id;
         logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
         return undefined;
       });
   }
+
+  const replyMethod = context.replied ? "followUp" : "reply";
+
+  return context[replyMethod]({
+    content: formattedBody,
+    embeds: [],
+    components: [],
+    fetchReply: true,
+    ephemeral,
+  }).catch((err) => {
+    logger.error(`Context reply failed: ${err}`);
+
+    return undefined;
+  });
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

@@ -9,9 +9,9 @@ import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
 import { isBanned } from "../functions/isBanned";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { IgnoredEventType, modActionsMsgCmd } from "../types";
 
-export const MassunbanCmd = modActionsCmd({
+export const MassunbanCmd = modActionsMsgCmd({
   trigger: "massunban",
   permission: "can_massunban",
   description: "Mass-unban a list of user IDs",

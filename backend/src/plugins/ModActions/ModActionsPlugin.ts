@@ -28,13 +28,14 @@ import { MassbanCmd } from "./commands/MassBanCmd";
 import { MassunbanCmd } from "./commands/MassUnbanCmd";
 import { MassmuteCmd } from "./commands/MassmuteCmd";
 import { MuteCmd } from "./commands/MuteCmd";
-import { NoteCmd } from "./commands/NoteCmd";
 import { SoftbanCmd } from "./commands/SoftbanCommand";
 import { UnbanCmd } from "./commands/UnbanCmd";
 import { UnhideCaseCmd } from "./commands/UnhideCaseCmd";
 import { UnmuteCmd } from "./commands/UnmuteCmd";
 import { UpdateCmd } from "./commands/UpdateCmd";
 import { WarnCmd } from "./commands/WarnCmd";
+import { NoteMsgCmd } from "./commands/note/NoteMsgCmd";
+import { NoteSlashCmd } from "./commands/note/NoteSlashCmd";
 import { AuditLogEvents } from "./events/AuditLogEvents";
 import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt";
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt";
@@ -52,7 +53,14 @@ import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
-import { BanOptions, ConfigSchema, KickOptions, ModActionsPluginType, WarnOptions } from "./types";
+import {
+  BanOptions,
+  ConfigSchema,
+  KickOptions,
+  ModActionsPluginType,
+  WarnOptions,
+  modActionsSlashGroup,
+} from "./types";
 
 const defaultOptions = {
   config: {
@@ -135,9 +143,18 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 
+  slashCommands: [
+    modActionsSlashGroup({
+      name: "mod",
+      description: "Moderation actions",
+      defaultMemberPermissions: "0",
+      subcommands: [{ type: "slash", ...NoteSlashCmd }],
+    }),
+  ],
+
   messageCommands: [
     UpdateCmd,
-    NoteCmd,
+    NoteMsgCmd,
     WarnCmd,
     MuteCmd,
     ForcemuteCmd,

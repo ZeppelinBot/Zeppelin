@@ -7,7 +7,7 @@ import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
 import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.userId({ option: true }),
@@ -15,7 +15,7 @@ const opts = {
 
 const casesPerPage = 5;
 
-export const CasesModCmd = modActionsCmd({
+export const CasesModCmd = modActionsMsgCmd({
   trigger: ["cases", "modlogs", "infractions"],
   permission: "can_view",
   description: "Show the most recent 5 cases by the specified -mod",

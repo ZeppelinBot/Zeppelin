@@ -1,9 +1,9 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const CaseCmd = modActionsCmd({
+export const CaseCmd = modActionsMsgCmd({
   trigger: "case",
   permission: "can_view",
   description: "Show information about a specific case",

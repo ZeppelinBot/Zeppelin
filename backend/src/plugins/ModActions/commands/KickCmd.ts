@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -9,7 +9,7 @@ const opts = {
   clean: ct.bool({ option: true, isSwitch: true }),
 };
 
-export const KickCmd = modActionsCmd({
+export const KickCmd = modActionsMsgCmd({
   trigger: "kick",
   permission: "can_kick",
   description: "Kick the specified member",

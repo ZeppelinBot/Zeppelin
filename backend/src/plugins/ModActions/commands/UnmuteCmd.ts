@@ -5,13 +5,13 @@ import { resolveMember, resolveUser } from "../../../utils";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { actualUnmuteCmd } from "../functions/actualUnmuteUserCmd";
 import { isBanned } from "../functions/isBanned";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
 };
 
-export const UnmuteCmd = modActionsCmd({
+export const UnmuteCmd = modActionsMsgCmd({
   trigger: "unmute",
   permission: "can_mute",
   description: "Unmute the specified member",

@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { updateCase } from "../functions/updateCase";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
-export const UpdateCmd = modActionsCmd({
+export const UpdateCmd = modActionsMsgCmd({
   trigger: ["update", "reason"],
   permission: "can_note",
   description:

@@ -11,9 +11,9 @@ import { DAYS, MINUTES, SECONDS, noop } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
 import { ignoreEvent } from "../functions/ignoreEvent";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { IgnoredEventType, modActionsMsgCmd } from "../types";
 
-export const MassbanCmd = modActionsCmd({
+export const MassbanCmd = modActionsMsgCmd({
   trigger: "massban",
   permission: "can_massban",
   description: "Mass-ban a list of user IDs",

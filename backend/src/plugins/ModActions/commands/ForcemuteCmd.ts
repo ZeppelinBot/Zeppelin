@@ -2,7 +2,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn, sendErrorMessage } from "../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../utils";
 import { actualMuteUserCmd } from "../functions/actualMuteUserCmd";
-import { modActionsCmd } from "../types";
+import { modActionsMsgCmd } from "../types";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -10,7 +10,7 @@ const opts = {
   "notify-channel": ct.textChannel({ option: true }),
 };
 
-export const ForcemuteCmd = modActionsCmd({
+export const ForcemuteCmd = modActionsMsgCmd({
   trigger: "forcemute",
   permission: "can_mute",
   description: "Force-mute the specified user, even if they're not on the server",
