@@ -1,4 +1,4 @@
-import { Message, Snowflake, TextChannel, User } from "discord.js";
+import { Message, ModalSubmitInteraction, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { allowTimeout } from "../../../RegExpRunner";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
@@ -77,17 +77,24 @@ export interface CleanArgs {
   "has-invites"?: boolean;
   match?: RegExp;
   "to-id"?: string;
+  "response-interaction"?: ModalSubmitInteraction;
 }
 
 export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, args: CleanArgs | any, msg) {
   if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-    sendErrorMessage(pluginData, msg.channel, `Clean count must be between 1 and ${MAX_CLEAN_COUNT}`);
+    sendErrorMessage(
+      pluginData,
+      msg.channel,
+      `Clean count must be between 1 and ${MAX_CLEAN_COUNT}`,
+      undefined,
+      args["response-interaction"],
+    );
     return;
   }
 
   const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
   if (!targetChannel?.isTextBased()) {
-    sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`);
+    sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`, undefined, args["response-interaction"]);
     return;
   }
 
@@ -99,12 +106,21 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       categoryId: targetChannel.parentId,
     });
     if (configForTargetChannel.can_clean !== true) {
-      sendErrorMessage(pluginData, msg.channel, `Missing permissions to use clean on that channel`);
+      sendErrorMessage(
+        pluginData,
+        msg.channel,
+        `Missing permissions to use clean on that channel`,
+        undefined,
+        args["response-interaction"],
+      );
       return;
     }
   }
 
-  const cleaningMessage = msg.channel.send("Cleaning...");
+  let cleaningMessage: Message | undefined = undefined;
+  if (!args["response-interaction"]) {
+    cleaningMessage = await msg.channel.send("Cleaning...");
+  }
 
   const messagesToClean: Message[] = [];
   let beforeId = msg.id;
@@ -202,19 +218,31 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       }
     }
 
-    responseMsg = await sendSuccessMessage(pluginData, msg.channel, responseText);
+    responseMsg = await sendSuccessMessage(
+      pluginData,
+      msg.channel,
+      responseText,
+      undefined,
+      args["response-interaction"],
+    );
   } else {
     const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
-    responseMsg = await sendErrorMessage(pluginData, msg.channel, responseText);
+    responseMsg = await sendErrorMessage(
+      pluginData,
+      msg.channel,
+      responseText,
+      undefined,
+      args["response-interaction"],
+    );
   }
 
-  await (await cleaningMessage).delete();
+  cleaningMessage?.delete();
 
   if (targetChannel.id === msg.channel.id) {
     // Delete the !clean command and the bot response if a different channel wasn't specified
     // (so as not to spam the cleaned channel with the command itself)
+    msg.delete().catch(noop);
     setTimeout(() => {
-      msg.delete().catch(noop);
       responseMsg?.delete().catch(noop);
     }, CLEAN_COMMAND_DELETE_DELAY);
   }

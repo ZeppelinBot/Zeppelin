@@ -7,6 +7,7 @@ import {
   Message,
   MessageCreateOptions,
   MessageMentionOptions,
+  ModalSubmitInteraction,
   PermissionsBitField,
   TextBasedChannel,
 } from "discord.js";
@@ -104,6 +105,7 @@ export async function sendSuccessMessage(
   channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
+  responseInteraction?: ModalSubmitInteraction,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
@@ -111,13 +113,19 @@ export async function sendSuccessMessage(
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
-    });
+  if (responseInteraction) {
+    await responseInteraction
+      .editReply({ content: formattedBody, embeds: [], components: [] })
+      .catch((err) => logger.error(`Interaction reply failed: ${err}`));
+  } else {
+    return channel
+      .send({ ...content }) // Force line break
+      .catch((err) => {
+        const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
+        logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
+        return undefined;
+      });
+  }
 }
 
 export async function sendErrorMessage(
@@ -125,6 +133,7 @@ export async function sendErrorMessage(
   channel: TextBasedChannel,
   body: string,
   allowedMentions?: MessageMentionOptions,
+  responseInteraction?: ModalSubmitInteraction,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.error_emoji || undefined;
   const formattedBody = errorMessage(body, emoji);
@@ -132,13 +141,19 @@ export async function sendErrorMessage(
     ? { content: formattedBody, allowedMentions }
     : { content: formattedBody };
 
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
-    });
+  if (responseInteraction) {
+    await responseInteraction
+      .editReply({ content: formattedBody, embeds: [], components: [] })
+      .catch((err) => logger.error(`Interaction reply failed: ${err}`));
+  } else {
+    return channel
+      .send({ ...content }) // Force line break
+      .catch((err) => {
+        const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
+        logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
+        return undefined;
+      });
+  }
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {
