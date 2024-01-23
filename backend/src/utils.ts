@@ -275,6 +275,7 @@ export const tEmbed = t.type({
   video: tNullable(
     t.type({
       url: tNullable(t.string),
+      proxy_url: tNullable(t.string),
       width: tNullable(t.number),
       height: tNullable(t.number),
     }),
@@ -298,8 +299,8 @@ export const tEmbed = t.type({
     t.type({
       name: t.string,
       url: tNullable(t.string),
-      width: tNullable(t.number),
-      height: tNullable(t.number),
+      icon_url: tNullable(t.string),
+      proxy_icon_url: tNullable(t.string),
     }),
   ),
 });
@@ -315,12 +316,14 @@ export const zEmbedInput = z.object({
     z.object({
       text: z.string(),
       icon_url: z.string().optional(),
+      proxy_icon_url: z.string().optional(),
     }),
   ),
 
   image: z.optional(
     z.object({
       url: z.string().optional(),
+      proxy_url: z.string().optional(),
       width: z.number().optional(),
       height: z.number().optional(),
     }),
@@ -329,6 +332,7 @@ export const zEmbedInput = z.object({
   thumbnail: z.optional(
     z.object({
       url: z.string().optional(),
+      proxy_url: z.string().optional(),
       width: z.number().optional(),
       height: z.number().optional(),
     }),
@@ -337,6 +341,7 @@ export const zEmbedInput = z.object({
   video: z.optional(
     z.object({
       url: z.string().optional(),
+      proxy_url: z.string().optional(),
       width: z.number().optional(),
       height: z.number().optional(),
     }),
@@ -364,8 +369,8 @@ export const zEmbedInput = z.object({
       z.object({
         name: z.string(),
         url: z.string().optional(),
-        width: z.number().optional(),
-        height: z.number().optional(),
+        icon_url: z.string().optional(),
+        proxy_icon_url: z.string().optional(),
       }),
     )
     .nullable(),
