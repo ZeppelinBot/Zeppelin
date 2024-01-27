@@ -1,4 +1,5 @@
 import z from "zod";
+import { MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../../data/GuildCounters";
 import { zBoundedCharacters } from "../../../utils";
 import { CountersPlugin } from "../../Counters/CountersPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -7,7 +8,7 @@ import { automodAction } from "../helpers";
 export const SetCounterAction = automodAction({
   configSchema: z.strictObject({
     counter: zBoundedCharacters(0, 100),
-    value: z.number(),
+    value: z.number().min(MIN_COUNTER_VALUE).max(MAX_COUNTER_VALUE),
   }),
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {

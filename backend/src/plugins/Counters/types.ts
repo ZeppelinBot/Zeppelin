@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { BasePluginType } from "knub";
 import z from "zod";
-import { GuildCounters } from "../../data/GuildCounters";
+import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters";
 import {
   CounterTrigger,
   buildCounterConditionString,
@@ -93,7 +93,7 @@ export const zCounter = z.strictObject({
   pretty_name: zBoundedCharacters(0, 100).nullable().default(null),
   per_channel: z.boolean().default(false),
   per_user: z.boolean().default(false),
-  initial_value: z.number().default(0),
+  initial_value: z.number().min(MIN_COUNTER_VALUE).max(MAX_COUNTER_VALUE).default(0),
   triggers: zBoundedRecord(z.record(zBoundedCharacters(0, 100), zTriggerInput), 1, MAX_TRIGGERS_PER_COUNTER),
   decay: z
     .strictObject({
