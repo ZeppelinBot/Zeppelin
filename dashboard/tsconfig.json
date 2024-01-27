@@ -1,11 +1,18 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2018",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": false,
     "lib": ["esnext", "dom"],
     "baseUrl": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "allowJs": true,
     "paths": {
       "@shared/*": ["../shared/src/*"]
