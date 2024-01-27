@@ -1,6 +1,5 @@
 import {
   ChannelType,
-  GuildFeature,
   GuildTextThreadCreateOptions,
   ThreadAutoArchiveDuration,
   ThreadChannel,
@@ -43,7 +42,6 @@ export const StartThreadAction = automodAction({
       return true;
     });
 
-    const guild = pluginData.guild;
     const archiveSet = actionConfig.auto_archive
       ? Math.ceil(Math.max(convertDelayStringToMS(actionConfig.auto_archive) ?? 0, 0) / MINUTES)
       : ThreadAutoArchiveDuration.OneDay;
@@ -53,7 +51,7 @@ export const StartThreadAction = automodAction({
 
     for (const threadContext of threads) {
       const channel = pluginData.guild.channels.cache.get(threadContext.message!.channel_id);
-      if (!channel || !("threads" in channel) || channel.type === ChannelType.GuildForum) continue;
+      if (!channel || !("threads" in channel) || channel.isThreadOnly()) continue;
 
       const renderThreadName = async (str: string) =>
         renderTemplate(
@@ -67,10 +65,7 @@ export const StartThreadAction = automodAction({
       const threadOptions: GuildTextThreadCreateOptions<unknown> = {
         name: threadName,
         autoArchiveDuration: autoArchive,
-        startMessage:
-          !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-            ? threadContext.message!.id
-            : undefined,
+        startMessage: !actionConfig.private ? threadContext.message!.id : undefined,
       };
 
       let thread: ThreadChannel | undefined;
@@ -86,10 +81,7 @@ export const StartThreadAction = automodAction({
           .create({
             ...threadOptions,
             type: actionConfig.private ? ChannelType.PrivateThread : ChannelType.PublicThread,
-            startMessage:
-              !actionConfig.private && guild.features.includes(GuildFeature.PrivateThreads)
-                ? threadContext.message!.id
-                : undefined,
+            startMessage: !actionConfig.private ? threadContext.message!.id : undefined,
           })
           .catch(() => undefined);
       }

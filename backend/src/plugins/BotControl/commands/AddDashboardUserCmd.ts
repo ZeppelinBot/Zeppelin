@@ -1,7 +1,7 @@
 import { ApiPermissions } from "@shared/apiPermissions";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { renderUserUsername } from "../../../utils";
+import { renderUsername } from "../../../utils";
 import { botControlCmd } from "../types";
 
 export const AddDashboardUserCmd = botControlCmd({
@@ -35,7 +35,7 @@ export const AddDashboardUserCmd = botControlCmd({
       await pluginData.state.apiPermissionAssignments.addUser(args.guildId, user.id, [ApiPermissions.EditConfig]);
     }
 
-    const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`)`);
+    const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`)`);
     sendSuccessMessage(
       pluginData,
       msg.channel,

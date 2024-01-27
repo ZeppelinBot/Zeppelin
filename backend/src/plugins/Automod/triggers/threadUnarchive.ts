@@ -1,5 +1,6 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
 import z from "zod";
+import { renderUsername } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface ThreadUnarchiveResult {
@@ -47,7 +48,7 @@ export const ThreadUnarchiveTrigger = automodTrigger<ThreadUnarchiveResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     const base = `Thread **#${threadName}** (\`${threadId}\`) has been unarchived in the **#${parentName}** (\`${parentId}\`) channel`;
     if (threadOwner) {
-      return `${base} by **${escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
+      return `${base} by **${escapeBold(renderUsername(threadOwner))}** (\`${threadOwner.id}\`)`;
     }
     return base;
   },

@@ -19,6 +19,8 @@ const PRIVATE_THREAD_ICON =
 const FORUM_CHANNEL_ICON =
   "https://cdn.discordapp.com/attachments/740650744830623756/1091681253364875294/forum-channel-icon.png";
 
+const MEDIA_CHANNEL_ICON = "https://cdn.discordapp.com/attachments/876134205229252658/1178335624940490792/media.png";
+
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
@@ -41,6 +43,7 @@ export async function getChannelInfoEmbed(
       [ChannelType.PrivateThread]: PRIVATE_THREAD_ICON,
       [ChannelType.AnnouncementThread]: PUBLIC_THREAD_ICON,
       [ChannelType.GuildForum]: FORUM_CHANNEL_ICON,
+      [ChannelType.GuildMedia]: MEDIA_CHANNEL_ICON,
     }[channel.type] ?? TEXT_CHANNEL_ICON;
 
   const channelType =
@@ -55,6 +58,7 @@ export async function getChannelInfoEmbed(
       [ChannelType.AnnouncementThread]: "News Thread channel",
       [ChannelType.GuildDirectory]: "Hub channel",
       [ChannelType.GuildForum]: "Forum channel",
+      [ChannelType.GuildMedia]: "Media channel",
     }[channel.type] ?? "Channel";
 
   embed.author = {

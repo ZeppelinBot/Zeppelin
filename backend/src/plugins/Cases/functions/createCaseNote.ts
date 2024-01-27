@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { UnknownUser, resolveUser } from "../../../utils";
+import { UnknownUser, renderUsername, resolveUser } from "../../../utils";
 import { CaseNoteArgs, CasesPluginType } from "../types";
 import { postCaseToCaseLogChannel } from "./postToCaseLogChannel";
 import { resolveCaseId } from "./resolveCaseId";
@@ -16,7 +16,7 @@ export async function createCaseNote(pluginData: GuildPluginData<CasesPluginType
     throw new RecoverablePluginError(ERRORS.INVALID_USER);
   }
 
-  const modName = mod.tag;
+  const modName = renderUsername(mod);
 
   let body = args.body;
 
