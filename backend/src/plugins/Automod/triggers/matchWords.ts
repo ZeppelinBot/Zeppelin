@@ -14,7 +14,7 @@ interface MatchResultType {
 const regexCache = new WeakMap<any, RegExp[]>();
 
 const configSchema = z.strictObject({
-  words: z.array(z.string().max(2000)).max(512),
+  words: z.array(z.string().max(2000)).max(1024),
   case_sensitive: z.boolean().default(false),
   only_full_words: z.boolean().default(true),
   normalize: z.boolean().default(false),

@@ -27,7 +27,7 @@ import { automodAction } from "../helpers";
 
 const configSchema = z.object({
   channel: zSnowflake,
-  text: zBoundedCharacters(1, 4000),
+  text: zBoundedCharacters(0, 4000),
   allowed_mentions: zNullishToUndefined(zAllowedMentions.nullable().default(null)),
 });
 
