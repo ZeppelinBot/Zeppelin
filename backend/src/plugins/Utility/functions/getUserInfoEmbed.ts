@@ -13,7 +13,6 @@ import {
   trimLines,
   UnknownUser,
 } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const MAX_ROLES_TO_DISPLAY = 15;
@@ -27,7 +26,6 @@ export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
   compact = false,
-  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {
@@ -39,8 +37,6 @@ export async function getUserInfoEmbed(
   const embed: EmbedWith<"fields"> = {
     fields: [],
   };
-
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
 
   embed.author = {
     name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user.username, user.discriminator)}`,

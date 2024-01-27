@@ -42,7 +42,7 @@ export const InfoCmd = utilityCmd({
       const channelId = getChannelId(value);
       const channel = channelId && pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (channel) {
-        const embed = await getChannelInfoEmbed(pluginData, channelId!, message.author.id);
+        const embed = await getChannelInfoEmbed(pluginData, channelId!);
         if (embed) {
           message.channel.send({ embeds: [embed] });
           return;
@@ -54,7 +54,7 @@ export const InfoCmd = utilityCmd({
     if (userCfg.can_server) {
       const guild = await pluginData.client.guilds.fetch(value as Snowflake).catch(noop);
       if (guild) {
-        const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
+        const embed = await getServerInfoEmbed(pluginData, value);
         if (embed) {
           message.channel.send({ embeds: [embed] });
           return;
@@ -66,7 +66,7 @@ export const InfoCmd = utilityCmd({
     if (userCfg.can_userinfo) {
       const user = await resolveUser(pluginData.client, value);
       if (user && userCfg.can_userinfo) {
-        const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact), message.author.id);
+        const embed = await getUserInfoEmbed(pluginData, user.id, Boolean(args.compact));
         if (embed) {
           message.channel.send({ embeds: [embed] });
           return;
@@ -83,7 +83,6 @@ export const InfoCmd = utilityCmd({
             pluginData,
             messageTarget.channel.id,
             messageTarget.messageId,
-            message.author.id,
           );
           if (embed) {
             message.channel.send({ embeds: [embed] });
@@ -112,7 +111,7 @@ export const InfoCmd = utilityCmd({
     if (userCfg.can_server) {
       const serverPreview = await getGuildPreview(pluginData.client, value).catch(() => null);
       if (serverPreview) {
-        const embed = await getServerInfoEmbed(pluginData, value, message.author.id);
+        const embed = await getServerInfoEmbed(pluginData, value);
         if (embed) {
           message.channel.send({ embeds: [embed] });
           return;
@@ -125,7 +124,7 @@ export const InfoCmd = utilityCmd({
       const roleId = getRoleId(value);
       const role = roleId && pluginData.guild.roles.cache.get(roleId as Snowflake);
       if (role) {
-        const embed = await getRoleInfoEmbed(pluginData, role, message.author.id);
+        const embed = await getRoleInfoEmbed(pluginData, role);
         message.channel.send({ embeds: [embed] });
         return;
       }
@@ -145,7 +144,7 @@ export const InfoCmd = utilityCmd({
 
     // 9. Arbitrary ID
     if (isValidSnowflake(value) && userCfg.can_snowflake) {
-      const embed = await getSnowflakeInfoEmbed(pluginData, value, true, message.author.id);
+      const embed = await getSnowflakeInfoEmbed(value, true);
       message.channel.send({ embeds: [embed] });
       return;
     }

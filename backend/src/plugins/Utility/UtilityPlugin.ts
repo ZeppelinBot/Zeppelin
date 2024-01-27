@@ -169,8 +169,8 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     },
 
     userInfo(pluginData) {
-      return (userId: Snowflake, requestMemberId?: Snowflake) => {
-        return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
+      return (userId: Snowflake) => {
+        return getUserInfoEmbed(pluginData, userId, false);
       };
     },
 

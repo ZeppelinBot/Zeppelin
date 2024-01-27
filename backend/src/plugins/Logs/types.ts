@@ -1,5 +1,5 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
-import { ZodString, z } from "zod";
+import { z } from "zod";
 import { RegExpRunner } from "../../RegExpRunner";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";

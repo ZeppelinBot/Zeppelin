@@ -1,16 +1,12 @@
 import { APIEmbed } from "discord.js";
-import { GuildPluginData } from "knub";
 import { EmbedWith, preEmbedPadding } from "../../../utils";
 import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
-import { UtilityPluginType } from "../types";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 
 export async function getSnowflakeInfoEmbed(
-  pluginData: GuildPluginData<UtilityPluginType>,
   snowflake: string,
   showUnknownWarning = false,
-  requestMemberId?: string,
 ): Promise<APIEmbed> {
   const embed: EmbedWith<"fields" | "author"> = {
     fields: [],

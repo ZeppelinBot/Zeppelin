@@ -24,7 +24,6 @@ export const MessageInfoCmd = utilityCmd({
       pluginData,
       args.message.channel.id,
       args.message.messageId,
-      message.author.id,
     );
     if (!embed) {
       sendErrorMessage(pluginData, message.channel, "Unknown message");

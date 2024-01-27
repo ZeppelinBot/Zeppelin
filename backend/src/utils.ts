@@ -150,13 +150,6 @@ export type GroupDMInvite = Invite & {
   type: typeof ChannelType.GroupDM;
 };
 
-function isBoundedString(str: unknown, min: number, max: number): str is string {
-  if (typeof str !== "string") {
-    return false;
-  }
-  return (str.length >= min && str.length <= max);
-}
-
 export function zBoundedCharacters(min: number, max: number) {
   return z.string().refine(str => {
     const len = [...str].length; // Unicode aware character split
