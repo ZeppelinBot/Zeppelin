@@ -8,7 +8,7 @@ import { Mute } from "./entities/Mute";
 
 const OLD_EXPIRED_MUTE_THRESHOLD = 7 * DAYS;
 
-export const MAX_TIMEOUT_DURATION = 28 * DAYS;
+export const MAX_TIMEOUT_DURATION = 27 * DAYS;
 // When a timeout is under this duration but the mute expires later, the timeout will be reset to max duration
 export const TIMEOUT_RENEWAL_THRESHOLD = 21 * DAYS;
 

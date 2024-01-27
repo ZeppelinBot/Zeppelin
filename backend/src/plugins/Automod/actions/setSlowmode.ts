@@ -10,14 +10,17 @@ export const SetSlowmodeAction = automodAction({
     duration: zDelayString.nullable().default("10s"),
   }),
 
-  async apply({ pluginData, actionConfig }) {
+  async apply({ pluginData, actionConfig, contexts }) {
     const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);
-
-    for (const channelId of actionConfig.channels) {
+    const channels: Snowflake[] = actionConfig.channels ?? [];
+    if (channels.length === 0) {
+      channels.push(...contexts.filter((c) => c.message?.channel_id).map((c) => c.message!.channel_id));
+    }
+    for (const channelId of channels) {
       const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
-
       // Only text channels and text channels within categories support slowmodes
-      if (!channel || (!channel.isTextBased() && channel.type !== ChannelType.GuildCategory)) {
+
+      if (!channel?.isTextBased() && channel?.type !== ChannelType.GuildCategory) {
         continue;
       }
 

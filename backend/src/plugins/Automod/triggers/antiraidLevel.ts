@@ -5,6 +5,7 @@ interface AntiraidLevelTriggerResult {}
 
 const configSchema = z.strictObject({
   level: z.nullable(z.string().max(100)),
+  only_on_change: z.nullable(z.boolean()),
 });
 
 export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()({
@@ -16,6 +17,14 @@ export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()
     }
 
     if (context.antiraid.level !== triggerConfig.level) {
+      return;
+    }
+
+    if (
+      triggerConfig.only_on_change &&
+      context.antiraid.oldLevel !== undefined &&
+      context.antiraid.level === context.antiraid.oldLevel
+    ) {
       return;
     }
 

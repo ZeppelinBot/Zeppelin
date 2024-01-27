@@ -10,6 +10,7 @@ import { CleanAction } from "./clean";
 import { KickAction } from "./kick";
 import { LogAction } from "./log";
 import { MuteAction } from "./mute";
+import { PauseInvitesAction } from "./pauseInvites";
 import { RemoveRolesAction } from "./removeRoles";
 import { ReplyAction } from "./reply";
 import { SetAntiraidLevelAction } from "./setAntiraidLevel";
@@ -37,4 +38,5 @@ export const availableActions = {
   start_thread: StartThreadAction,
   archive_thread: ArchiveThreadAction,
   change_perms: ChangePermsAction,
+  pause_invites: PauseInvitesAction,
 } satisfies Record<string, AutomodActionBlueprint<any>>;

@@ -8,6 +8,7 @@ import { GuildMutes } from "../../data/GuildMutes";
 import { mapToPublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
@@ -68,7 +69,7 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     configSchema: zMutesConfig,
   },
 
-  dependencies: () => [CasesPlugin, LogsPlugin],
+  dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
   configParser: (input) => zMutesConfig.parse(input),
   defaultOptions,
 
