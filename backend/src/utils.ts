@@ -1120,12 +1120,12 @@ export function resolveUserId(bot: Client, value: string) {
     return mentionMatch[1];
   }
 
-  // A non-mention, full username?
-  const usernameMatch = value.match(/^@?([^#]+)#(\d{4})$/);
+  // a username
+  const usernameMatch = value.match(/^@?(\S{3,})$/);
   if (usernameMatch) {
     const profiler = getProfiler();
     const start = performance.now();
-    const user = bot.users.cache.find((u) => u.username === usernameMatch[1] && u.discriminator === usernameMatch[2]);
+    const user = bot.users.cache.find((u) => u.tag === usernameMatch[1]);
     profiler?.addDataPoint("utils:resolveUserId:usernameMatch", performance.now() - start);
     if (user) {
       return user.id;
@@ -1501,7 +1501,11 @@ export function isTruthy<T>(value: T): value is Exclude<T, false | null | undefi
 
 export const DBDateFormat = "YYYY-MM-DD HH:mm:ss";
 
-export function renderUsername(username: string, discriminator: string): string {
+export function renderUsername(memberOrUser: GuildMember | UnknownUser | User): string;
+export function renderUsername(username: string, discriminator: string): string;
+export function renderUsername(username: string | User | GuildMember | UnknownUser, discriminator?: string): string {
+  if (username instanceof GuildMember) return username.user.tag;
+  if (username instanceof User || username instanceof UnknownUser) return username.tag;
   if (discriminator === "0") {
     return username;
   }

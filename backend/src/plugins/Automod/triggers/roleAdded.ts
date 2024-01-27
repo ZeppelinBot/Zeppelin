@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
 import z from "zod";
-import { renderUserUsername, zSnowflake } from "../../../utils";
+import { zSnowflake } from "../../../utils";
 import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
 import { automodTrigger } from "../helpers";
 
@@ -38,7 +38,7 @@ export const RoleAddedTrigger = automodTrigger<RoleAddedMatchResult>()({
     const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId as Snowflake);
     const roleName = role?.name || "Unknown";
     const member = contexts[0].member!;
-    const memberName = `**${renderUserUsername(member.user)}** (\`${member.id}\`)`;
+    const memberName = `**${renderUsername(member)}** (\`${member.id}\`)`;
     return `Role ${roleName} (\`${matchResult.extra.matchedRoleId}\`) was added to ${memberName}`;
   },
 });
