@@ -4,7 +4,6 @@ import { sendErrorMessage } from "../../../pluginUtils";
 import { UnknownUser, emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { modActionsCmd } from "../types";
@@ -52,8 +51,9 @@ export const CasesModCmd = modActionsCmd({
         const cases = await casesPlugin.getRecentCasesByMod(modId, casesPerPage, (page - 1) * casesPerPage);
         const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
+        const isLastPage = page === totalPages;
         const firstCaseNum = (page - 1) * casesPerPage + 1;
-        const lastCaseNum = page * casesPerPage;
+        const lastCaseNum = isLastPage ? totalCases : page * casesPerPage;
         const title = `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${totalCases} by ${modName}`;
 
         const embed = {
@@ -61,8 +61,8 @@ export const CasesModCmd = modActionsCmd({
             name: title,
             icon_url: mod instanceof UnknownUser ? undefined : mod.displayAvatarURL(),
           },
+          description: lines.join("\n"),
           fields: [
-            ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
             {
               name: emptyEmbedValue,
               value: trimLines(`
