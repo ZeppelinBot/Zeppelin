@@ -5,6 +5,7 @@ import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFor
 import { zBoundedCharacters, zSnowflake } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { ActionError } from "../ActionError";
+import { catchTemplateError } from "../catchTemplateError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const zCreateCaseAction = z.strictObject({
@@ -23,10 +24,12 @@ export async function createCaseAction(
   event: TCustomEvent,
   eventData: any, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
-  const modId = await renderTemplate(action.mod, values, false);
-  const targetId = await renderTemplate(action.target, values, false);
-
-  const reason = await renderTemplate(action.reason, values, false);
+  const modId = await catchTemplateError(() => renderTemplate(action.mod, values, false), "Invalid mod format");
+  const targetId = await catchTemplateError(
+    () => renderTemplate(action.target, values, false),
+    "Invalid target format",
+  );
+  const reason = await catchTemplateError(() => renderTemplate(action.reason, values, false), "Invalid reason format");
 
   if (CaseTypes[action.case_type] == null) {
     throw new ActionError(`Invalid case type: ${action.type}`);

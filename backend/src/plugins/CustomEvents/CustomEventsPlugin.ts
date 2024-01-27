@@ -11,6 +11,7 @@ import {
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects";
+import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { runEvent } from "./functions/runEvent";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types";
@@ -25,6 +26,7 @@ export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()(
   name: "custom_events",
   showInDocs: false,
 
+  dependencies: () => [LogsPlugin],
   configParser: (input) => zCustomEventsConfig.parse(input),
   defaultOptions,
 

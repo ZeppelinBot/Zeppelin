@@ -4,6 +4,7 @@ import { canActOn } from "../../../pluginUtils";
 import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { resolveMember, zSnowflake } from "../../../utils";
 import { ActionError } from "../ActionError";
+import { catchTemplateError } from "../catchTemplateError";
 import { CustomEventsPluginType, TCustomEvent } from "../types";
 
 export const zAddRoleAction = z.strictObject({
@@ -20,7 +21,10 @@ export async function addRoleAction(
   event: TCustomEvent,
   eventData: any,
 ) {
-  const targetId = await renderTemplate(action.target, values, false);
+  const targetId = await catchTemplateError(
+    () => renderTemplate(action.target, values, false),
+    "Invalid target format",
+  );
   const target = await resolveMember(pluginData.client, pluginData.guild, targetId);
   if (!target) throw new ActionError(`Unknown target member: ${targetId}`);
 

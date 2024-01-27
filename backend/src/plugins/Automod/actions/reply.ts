@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import z from "zod";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,
@@ -58,10 +58,21 @@ export const ReplyAction = automodAction({
           }),
         );
 
-      const formatted =
-        typeof actionConfig === "string"
-          ? await renderReplyText(actionConfig)
-          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
+      let formatted: string | MessageCreateOptions;
+      try {
+        formatted =
+          typeof actionConfig === "string"
+            ? await renderReplyText(actionConfig)
+            : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
+      } catch (err) {
+        if (err instanceof TemplateParseError) {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
+            body: `Error in reply format of automod rule \`${ruleName}\`: ${err.message}`,
+          });
+          return;
+        }
+        throw err;
+      }
 
       if (formatted) {
         const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;

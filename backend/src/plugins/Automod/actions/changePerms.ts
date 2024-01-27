@@ -1,13 +1,14 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import { U } from "ts-toolbelt";
 import z from "zod";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 
 type LegacyPermMap = Record<string, keyof (typeof PermissionsBitField)["Flags"]>;
@@ -71,30 +72,52 @@ export const ChangePermsAction = automodAction({
     perms: z.record(z.enum(allPermissionNames), z.boolean().nullable()),
   }),
 
-  async apply({ pluginData, contexts, actionConfig }) {
+  async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const user = contexts.find((c) => c.user)?.user;
     const message = contexts.find((c) => c.message)?.message;
 
-    const renderTarget = async (str: string) =>
-      renderTemplate(
-        str,
+    let target: string;
+    try {
+      target = await renderTemplate(
+        actionConfig.target,
         new TemplateSafeValueContainer({
           user: user ? userToTemplateSafeUser(user) : null,
           guild: guildToTemplateSafeGuild(pluginData.guild),
           message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
-    const renderChannel = async (str: string) =>
-      renderTemplate(
-        str,
-        new TemplateSafeValueContainer({
-          user: user ? userToTemplateSafeUser(user) : null,
-          guild: guildToTemplateSafeGuild(pluginData.guild),
-          message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
-        }),
-      );
-    const target = await renderTarget(actionConfig.target);
-    const channelId = actionConfig.channel ? await renderChannel(actionConfig.channel) : null;
+    } catch (err) {
+      if (err instanceof TemplateParseError) {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
+          body: `Error in target format of automod rule ${ruleName}: ${err.message}`,
+        });
+        return;
+      }
+      throw err;
+    }
+
+    let channelId: string | null = null;
+    if (actionConfig.channel) {
+      try {
+        channelId = await renderTemplate(
+          actionConfig.channel,
+          new TemplateSafeValueContainer({
+            user: user ? userToTemplateSafeUser(user) : null,
+            guild: guildToTemplateSafeGuild(pluginData.guild),
+            message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
+          }),
+        );
+      } catch (err) {
+        if (err instanceof TemplateParseError) {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
+            body: `Error in channel format of automod rule ${ruleName}: ${err.message}`,
+          });
+          return;
+        }
+        throw err;
+      }
+    }
+
     const role = pluginData.guild.roles.resolve(target);
     if (!role) {
       const member = await pluginData.guild.members.fetch(target).catch(noop);

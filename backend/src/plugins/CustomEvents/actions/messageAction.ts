@@ -4,6 +4,7 @@ import z from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { zBoundedCharacters, zSnowflake } from "../../../utils";
 import { ActionError } from "../ActionError";
+import { catchTemplateError } from "../catchTemplateError";
 import { CustomEventsPluginType } from "../types";
 
 export const zMessageAction = z.strictObject({
@@ -18,7 +19,10 @@ export async function messageAction(
   action: TMessageAction,
   values: TemplateSafeValueContainer,
 ) {
-  const targetChannelId = await renderTemplate(action.channel, values, false);
+  const targetChannelId = await catchTemplateError(
+    () => renderTemplate(action.channel, values, false),
+    "Invalid channel format",
+  );
   const targetChannel = pluginData.guild.channels.cache.get(targetChannelId as Snowflake);
   if (!targetChannel) throw new ActionError("Unknown target channel");
   if (!(targetChannel instanceof TextChannel)) throw new ActionError("Target channel is not a text channel");
