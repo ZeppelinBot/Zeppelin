@@ -557,11 +557,12 @@ export function getUrlsInString(str: string, onlyUnique = false): MatchedURL[] {
 }
 
 export function parseInviteCodeInput(str: string): string {
-  if (str.match(/^[a-z0-9]{6,}$/i)) {
-    return str;
+  const parsedInviteCodes = getInviteCodesInString(str);
+  if (parsedInviteCodes.length) {
+    return parsedInviteCodes[0];
   }
 
-  return getInviteCodesInString(str)[0];
+  return str;
 }
 
 export function isNotNull<T>(value: T): value is Exclude<T, null | undefined> {
