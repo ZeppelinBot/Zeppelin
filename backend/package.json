@@ -25,6 +25,7 @@
     "migrate-rollback-prod": "cross-env NODE_ENV=production npm run migrate",
     "migrate-rollback-dev": "cross-env NODE_ENV=development npm run build && npm run migrate",
     "validate-active-configs": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --enable-source-maps dist/backend/src/validateActiveConfigs.js > ../config-errors.txt",
+    "export-config-json-schema": "cross-env NODE_ENV=development node -r ./register-tsconfig-paths.js --unhandled-rejections=strict --enable-source-maps dist/backend/src/exportSchemas.js > ../config-schema.json",
     "test": "npm run build && npm run run-tests",
     "run-tests": "ava",
     "test-watch": "tsc-watch --onSuccess \"npx ava\""
@@ -97,7 +98,8 @@
     "@types/uuid": "^9.0.2",
     "ava": "^5.3.1",
     "rimraf": "^2.6.2",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "zod-to-json-schema": "^3.22.3"
   },
   "ava": {
     "files": [

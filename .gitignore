@@ -84,3 +84,4 @@ npm-audit.txt
 .vscode/
 
 config-errors.txt
+/config-schema.json
