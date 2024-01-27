@@ -15,3 +15,9 @@ export function connect() {
 
   return connectionPromise;
 }
+
+export function disconnect() {
+  if (connectionPromise) {
+    connectionPromise.then(() => dataSource.destroy());
+  }
+}

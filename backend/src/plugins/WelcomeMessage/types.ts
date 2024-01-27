@@ -1,17 +1,15 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
-import { tNullable } from "../../utils";
 
-export const ConfigSchema = t.type({
-  send_dm: t.boolean,
-  send_to_channel: tNullable(t.string),
-  message: tNullable(t.string),
+export const zWelcomeMessageConfig = z.strictObject({
+  send_dm: z.boolean(),
+  send_to_channel: z.string().nullable(),
+  message: z.string().nullable(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface WelcomeMessagePluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zWelcomeMessageConfig>;
   state: {
     logs: GuildLogs;
     sentWelcomeMessages: Set<string>;

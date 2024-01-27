@@ -1,28 +1,27 @@
-import * as t from "io-ts";
+import z from "zod";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
-import { convertDelayStringToMS, sorter, tDelayString, tNullable } from "../../../utils";
+import { convertDelayStringToMS, sorter, zDelayString } from "../../../utils";
 import { RecentActionType } from "../constants";
 import { automodTrigger } from "../helpers";
 import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
 import { getMessageSpamIdentifier } from "./getSpamIdentifier";
 
-const MessageSpamTriggerConfig = t.type({
-  amount: t.number,
-  within: tDelayString,
-  per_channel: tNullable(t.boolean),
-});
-
 interface TMessageSpamMatchResultType {
   archiveId: string;
 }
 
+const configSchema = z.strictObject({
+  amount: z.number().int(),
+  within: zDelayString,
+  per_channel: z.boolean().nullable().default(false),
+});
+
 export function createMessageSpamTrigger(spamType: RecentActionType, prettyName: string) {
   return automodTrigger<TMessageSpamMatchResultType>()({
-    configType: MessageSpamTriggerConfig,
-    defaultConfig: {},
+    configSchema,
 
     async match({ pluginData, context, triggerConfig }) {
       if (!context.message) {

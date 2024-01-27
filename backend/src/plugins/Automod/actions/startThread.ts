@@ -5,9 +5,9 @@ import {
   ThreadAutoArchiveDuration,
   ThreadChannel,
 } from "discord.js";
-import * as t from "io-ts";
+import z from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { MINUTES, convertDelayStringToMS, noop, tDelayString, tNullable } from "../../../utils";
+import { MINUTES, convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils";
 import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { automodAction } from "../helpers";
 
@@ -19,17 +19,13 @@ const validThreadAutoArchiveDurations: ThreadAutoArchiveDuration[] = [
 ];
 
 export const StartThreadAction = automodAction({
-  configType: t.type({
-    name: tNullable(t.string),
-    auto_archive: tDelayString,
-    private: tNullable(t.boolean),
-    slowmode: tNullable(tDelayString),
-    limit_per_channel: tNullable(t.number),
+  configSchema: z.strictObject({
+    name: zBoundedCharacters(1, 100).nullable(),
+    auto_archive: zDelayString,
+    private: z.boolean().default(false),
+    slowmode: zDelayString.nullable().default(null),
+    limit_per_channel: z.number().nullable().default(5),
   }),
-
-  defaultConfig: {
-    limit_per_channel: 5,
-  },
 
   async apply({ pluginData, contexts, actionConfig }) {
     // check if the message still exists, we don't want to create threads for deleted messages

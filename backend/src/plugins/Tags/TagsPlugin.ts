@@ -2,7 +2,6 @@ import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { PluginOptions } from "knub";
 import moment from "moment-timezone";
-import { parseIoTsSchema, StrictValidationError } from "src/validatorUtils";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
@@ -19,7 +18,7 @@ import { TagListCmd } from "./commands/TagListCmd";
 import { TagSourceCmd } from "./commands/TagSourceCmd";
 import { generateTemplateMarkdown } from "./docs";
 import { TemplateFunctions } from "./templateFunctions";
-import { ConfigSchema, TagsPluginType } from "./types";
+import { TagsPluginType, zTagsConfig } from "./types";
 import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
@@ -71,7 +70,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
 
       ${generateTemplateMarkdown(TemplateFunctions)}
     `),
-    configSchema: ConfigSchema,
+    configSchema: zTagsConfig,
   },
 
   dependencies: () => [LogsPlugin],
@@ -96,28 +95,7 @@ export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
     findTagByName: mapToPublicFn(findTagByName),
   },
 
-  configParser(_input) {
-    const input = _input as any;
-
-    if (input.delete_with_command && input.auto_delete_command) {
-      throw new StrictValidationError([
-        `Cannot have both (global) delete_with_command and global_delete_invoke enabled`,
-      ]);
-    }
-
-    // Check each category for conflicting options
-    if (input.categories) {
-      for (const [name, cat] of Object.entries(input.categories)) {
-        if ((cat as any).delete_with_command && (cat as any).auto_delete_command) {
-          throw new StrictValidationError([
-            `Cannot have both (category specific) delete_with_command and category_delete_invoke enabled at <categories/${name}>`,
-          ]);
-        }
-      }
-    }
-
-    return parseIoTsSchema(ConfigSchema, input);
-  },
+  configParser: (input) => zTagsConfig.parse(input),
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;

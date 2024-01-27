@@ -1,12 +1,12 @@
 import { ContextMenuCommandInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { canActOn } from "src/pluginUtils";
-import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { canActOn } from "../../../pluginUtils";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { ContextMenuPluginType } from "../types";
 
@@ -45,9 +45,9 @@ export async function muteAction(
   try {
     const result = await mutes.muteUser(userId, durationMs, "Context Menu Action", { caseArgs });
 
-    const muteMessage = `Muted **${result.case.user_name}** ${
+    const muteMessage = `Muted **${result.case!.user_name}** ${
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number}) (user notified via ${
+    } (Case #${result.case!.case_number}) (user notified via ${
       result.notifyResult.method ?? "dm"
     })\nPlease update the new case with the \`update\` command`;
 

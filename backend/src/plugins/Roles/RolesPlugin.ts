@@ -1,6 +1,5 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
@@ -9,13 +8,13 @@ import { AddRoleCmd } from "./commands/AddRoleCmd";
 import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
 import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
-import { ConfigSchema, RolesPluginType } from "./types";
+import { RolesPluginType, zRolesConfig } from "./types";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {
     can_assign: false,
     can_mass_assign: false,
-    assignable_roles: ["558037973581430785"],
+    assignable_roles: [],
   },
   overrides: [
     {
@@ -41,11 +40,11 @@ export const RolesPlugin = zeppelinGuildPlugin<RolesPluginType>()({
     description: trimPluginDescription(`
       Enables authorised users to add and remove whitelisted roles with a command.
     `),
-    configSchema: ConfigSchema,
+    configSchema: zRolesConfig,
   },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zRolesConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

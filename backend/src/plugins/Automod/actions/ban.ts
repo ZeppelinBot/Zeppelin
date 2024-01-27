@@ -1,25 +1,30 @@
-import * as t from "io-ts";
-import { convertDelayStringToMS, nonNullish, tDelayString, tNullable, unique } from "../../../utils";
+import z from "zod";
+import {
+  convertDelayStringToMS,
+  nonNullish,
+  unique,
+  zBoundedCharacters,
+  zDelayString,
+  zSnowflake,
+} from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { zNotify } from "../constants";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
 
-export const BanAction = automodAction({
-  configType: t.type({
-    reason: tNullable(t.string),
-    duration: tNullable(tDelayString),
-    notify: tNullable(t.string),
-    notifyChannel: tNullable(t.string),
-    deleteMessageDays: tNullable(t.number),
-    postInCaseLog: tNullable(t.boolean),
-    hide_case: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  reason: zBoundedCharacters(0, 4000).nullable().default(null),
+  duration: zDelayString.nullable().default(null),
+  notify: zNotify.nullable().default(null),
+  notifyChannel: zSnowflake.nullable().default(null),
+  deleteMessageDays: z.number().nullable().default(null),
+  postInCaseLog: z.boolean().nullable().default(null),
+  hide_case: z.boolean().nullable().default(false),
+});
 
-  defaultConfig: {
-    notify: null, // Use defaults from ModActions
-    hide_case: false,
-  },
+export const BanAction = automodAction({
+  configSchema,
 
   async apply({ pluginData, contexts, actionConfig, matchResult }) {
     const reason = actionConfig.reason || "Kicked automatically";

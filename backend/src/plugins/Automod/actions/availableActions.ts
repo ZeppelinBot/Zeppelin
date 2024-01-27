@@ -1,4 +1,3 @@
-import * as t from "io-ts";
 import { AutomodActionBlueprint } from "../helpers";
 import { AddRolesAction } from "./addRoles";
 import { AddToCounterAction } from "./addToCounter";
@@ -20,7 +19,7 @@ import { SetSlowmodeAction } from "./setSlowmode";
 import { StartThreadAction } from "./startThread";
 import { WarnAction } from "./warn";
 
-export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
+export const availableActions = {
   clean: CleanAction,
   warn: WarnAction,
   mute: MuteAction,
@@ -40,26 +39,4 @@ export const availableActions: Record<string, AutomodActionBlueprint<any>> = {
   archive_thread: ArchiveThreadAction,
   change_perms: ChangePermsAction,
   pause_invites: PauseInvitesAction,
-};
-
-export const AvailableActions = t.type({
-  clean: CleanAction.configType,
-  warn: WarnAction.configType,
-  mute: MuteAction.configType,
-  kick: KickAction.configType,
-  ban: BanAction.configType,
-  alert: AlertAction.configType,
-  change_nickname: ChangeNicknameAction.configType,
-  log: LogAction.configType,
-  add_roles: AddRolesAction.configType,
-  remove_roles: RemoveRolesAction.configType,
-  set_antiraid_level: SetAntiraidLevelAction.configType,
-  reply: ReplyAction.configType,
-  add_to_counter: AddToCounterAction.configType,
-  set_counter: SetCounterAction.configType,
-  set_slowmode: SetSlowmodeAction.configType,
-  start_thread: StartThreadAction.configType,
-  archive_thread: ArchiveThreadAction.configType,
-  change_perms: ChangePermsAction.configType,
-  pause_invites: PauseInvitesAction.configType,
-});
+} satisfies Record<string, AutomodActionBlueprint<any>>;

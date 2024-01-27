@@ -1,5 +1,5 @@
 import escapeStringRegexp from "escape-string-regexp";
-import * as t from "io-ts";
+import z from "zod";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
@@ -13,37 +13,24 @@ interface MatchResultType {
 
 const regexCache = new WeakMap<any, RegExp[]>();
 
-export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
-  configType: t.type({
-    words: t.array(t.string),
-    case_sensitive: t.boolean,
-    only_full_words: t.boolean,
-    normalize: t.boolean,
-    loose_matching: t.boolean,
-    loose_matching_threshold: t.number,
-    strip_markdown: t.boolean,
-    match_messages: t.boolean,
-    match_embeds: t.boolean,
-    match_visible_names: t.boolean,
-    match_usernames: t.boolean,
-    match_nicknames: t.boolean,
-    match_custom_status: t.boolean,
-  }),
+const configSchema = z.strictObject({
+  words: z.array(z.string().max(2000)).max(1024),
+  case_sensitive: z.boolean().default(false),
+  only_full_words: z.boolean().default(true),
+  normalize: z.boolean().default(false),
+  loose_matching: z.boolean().default(false),
+  loose_matching_threshold: z.number().int().default(4),
+  strip_markdown: z.boolean().default(false),
+  match_messages: z.boolean().default(true),
+  match_embeds: z.boolean().default(false),
+  match_visible_names: z.boolean().default(false),
+  match_usernames: z.boolean().default(false),
+  match_nicknames: z.boolean().default(false),
+  match_custom_status: z.boolean().default(false),
+});
 
-  defaultConfig: {
-    case_sensitive: false,
-    only_full_words: true,
-    normalize: false,
-    loose_matching: false,
-    loose_matching_threshold: 4,
-    strip_markdown: false,
-    match_messages: true,
-    match_embeds: false,
-    match_visible_names: false,
-    match_usernames: false,
-    match_nicknames: false,
-    match_custom_status: false,
-  },
+export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
+  configSchema,
 
   async match({ pluginData, context, triggerConfig: trigger }) {
     if (!context.message) {

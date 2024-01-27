@@ -1,5 +1,5 @@
-import * as t from "io-ts";
-import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, tNullable } from "../../../utils";
+import z from "zod";
+import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, zSnowflake } from "../../../utils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
@@ -10,30 +10,22 @@ interface MatchResultType {
   invite?: GuildInvite;
 }
 
-export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
-  configType: t.type({
-    include_guilds: tNullable(t.array(t.string)),
-    exclude_guilds: tNullable(t.array(t.string)),
-    include_invite_codes: tNullable(t.array(t.string)),
-    exclude_invite_codes: tNullable(t.array(t.string)),
-    allow_group_dm_invites: t.boolean,
-    match_messages: t.boolean,
-    match_embeds: t.boolean,
-    match_visible_names: t.boolean,
-    match_usernames: t.boolean,
-    match_nicknames: t.boolean,
-    match_custom_status: t.boolean,
-  }),
+const configSchema = z.strictObject({
+  include_guilds: z.array(zSnowflake).max(255).optional(),
+  exclude_guilds: z.array(zSnowflake).max(255).optional(),
+  include_invite_codes: z.array(z.string().max(32)).max(255).optional(),
+  exclude_invite_codes: z.array(z.string().max(32)).max(255).optional(),
+  allow_group_dm_invites: z.boolean().default(false),
+  match_messages: z.boolean().default(true),
+  match_embeds: z.boolean().default(false),
+  match_visible_names: z.boolean().default(false),
+  match_usernames: z.boolean().default(false),
+  match_nicknames: z.boolean().default(false),
+  match_custom_status: z.boolean().default(false),
+});
 
-  defaultConfig: {
-    allow_group_dm_invites: false,
-    match_messages: true,
-    match_embeds: false,
-    match_visible_names: false,
-    match_usernames: false,
-    match_nicknames: false,
-    match_custom_status: false,
-  },
+export const MatchInvitesTrigger = automodTrigger<MatchResultType>()({
+  configSchema,
 
   async match({ pluginData, context, triggerConfig: trigger }) {
     if (!context.message) {

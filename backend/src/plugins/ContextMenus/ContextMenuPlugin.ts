@@ -1,12 +1,11 @@
 import { PluginOptions } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ContextClickedEvt } from "./events/ContextClickedEvt";
-import { ConfigSchema, ContextMenuPluginType } from "./types";
+import { ContextMenuPluginType, zContextMenusConfig } from "./types";
 import { loadAllCommands } from "./utils/loadAllCommands";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
@@ -37,7 +36,7 @@ export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
   showInDocs: false,
 
   dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zContextMenusConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

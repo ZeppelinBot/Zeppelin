@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
 import { parseArguments } from "knub-command-manager";
+import { logger } from "../../../logger";
 import { TemplateParseError } from "../../../templateFormatter";
 import { StrictMessageContent, validateAndParseMessageContent } from "../../../utils";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -34,14 +35,16 @@ export async function renderTagFromString(
 
     return validateAndParseMessageContent(rendered);
   } catch (e) {
-    if (e instanceof TemplateParseError) {
-      const logs = pluginData.getPlugin(LogsPlugin);
-      logs.logBotAlert({
-        body: `Failed to render tag \`${prefix}${tagName}\`: ${e.message}`,
-      });
-      return null;
+    const logs = pluginData.getPlugin(LogsPlugin);
+    const errorMessage = e instanceof TemplateParseError ? e.message : "Internal error";
+    logs.logBotAlert({
+      body: `Failed to render tag \`${prefix}${tagName}\`: ${errorMessage}`,
+    });
+
+    if (!(e instanceof TemplateParseError)) {
+      logger.warn(`Internal error rendering tag ${tagName} in ${pluginData.guild.id}: ${e}`);
     }
 
-    throw e;
+    return null;
   }
 }

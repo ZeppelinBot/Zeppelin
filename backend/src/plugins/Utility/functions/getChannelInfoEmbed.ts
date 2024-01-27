@@ -22,7 +22,6 @@ const FORUM_CHANNEL_ICON =
 export async function getChannelInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   channelId: string,
-  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const channel = pluginData.guild.channels.cache.get(channelId as Snowflake);
   if (!channel) {

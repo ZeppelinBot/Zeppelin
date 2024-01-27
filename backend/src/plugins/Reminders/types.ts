@@ -1,14 +1,13 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildReminders } from "../../data/GuildReminders";
 
-export const ConfigSchema = t.type({
-  can_use: t.boolean,
+export const zRemindersConfig = z.strictObject({
+  can_use: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface RemindersPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zRemindersConfig>;
 
   state: {
     reminders: GuildReminders;

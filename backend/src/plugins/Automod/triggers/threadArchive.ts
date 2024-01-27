@@ -1,6 +1,5 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 interface ThreadArchiveResult {
@@ -11,12 +10,12 @@ interface ThreadArchiveResult {
   matchedThreadOwner: User | undefined;
 }
 
-export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
-  configType: t.type({
-    locked: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  locked: z.boolean().optional(),
+});
 
-  defaultConfig: {},
+export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
+  configSchema,
 
   async match({ context, triggerConfig }) {
     if (!context.threadChange?.archived) {

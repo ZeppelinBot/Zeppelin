@@ -5,7 +5,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
@@ -23,7 +23,7 @@ import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { renewTimeoutMute } from "./functions/renewTimeoutMute";
 import { unmuteUser } from "./functions/unmuteUser";
-import { ConfigSchema, MutesPluginType } from "./types";
+import { MutesPluginType, zMutesConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -66,11 +66,11 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Mutes",
-    configSchema: ConfigSchema,
+    configSchema: zMutesConfig,
   },
 
   dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zMutesConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

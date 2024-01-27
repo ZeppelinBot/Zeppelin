@@ -16,7 +16,7 @@ export async function userInfoAction(
   const utility = pluginData.getPlugin(UtilityPlugin);
 
   if (userCfg.can_use && (await utility.hasPermission(executingMember, interaction.channelId, "can_userinfo"))) {
-    const embed = await utility.userInfo(interaction.targetId, interaction.user.id);
+    const embed = await utility.userInfo(interaction.targetId);
     if (!embed) {
       await interaction.followUp({ content: "Cannot info: internal error" });
       return;

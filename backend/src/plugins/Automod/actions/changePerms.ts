@@ -1,7 +1,8 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
-import * as t from "io-ts";
+import { U } from "ts-toolbelt";
+import z from "zod";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { isValidSnowflake, noop, tNullable, tPartialDictionary } from "../../../utils";
+import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
@@ -59,16 +60,16 @@ const realToLegacyMap = Object.entries(legacyPermMap).reduce((map, pair) => {
   return map;
 }, {}) as Record<keyof typeof PermissionsBitField.Flags, keyof typeof legacyPermMap>;
 
+const permissionNames = keys(PermissionsBitField.Flags) as U.ListOf<keyof typeof PermissionsBitField.Flags>;
+const legacyPermissionNames = keys(legacyPermMap) as U.ListOf<keyof typeof legacyPermMap>;
+const allPermissionNames = [...permissionNames, ...legacyPermissionNames] as const;
+
 export const ChangePermsAction = automodAction({
-  configType: t.type({
-    target: t.string,
-    channel: tNullable(t.string),
-    perms: tPartialDictionary(
-      t.union([t.keyof(PermissionsBitField.Flags), t.keyof(legacyPermMap)]),
-      tNullable(t.boolean),
-    ),
+  configSchema: z.strictObject({
+    target: zBoundedCharacters(1, 2000),
+    channel: zBoundedCharacters(1, 2000).nullable().default(null),
+    perms: z.record(z.enum(allPermissionNames), z.boolean().nullable()),
   }),
-  defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig }) {
     const user = contexts.find((c) => c.user)?.user;

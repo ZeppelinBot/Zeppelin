@@ -27,6 +27,12 @@ export class Configs extends BaseRepository {
     this.configs = dataSource.getRepository(Config);
   }
 
+  getActive() {
+    return this.configs.find({
+      where: { is_active: true },
+    });
+  }
+
   getActiveByKey(key) {
     return this.configs.findOne({
       where: {

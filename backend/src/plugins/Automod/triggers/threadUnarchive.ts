@@ -1,6 +1,5 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 interface ThreadUnarchiveResult {
@@ -11,12 +10,12 @@ interface ThreadUnarchiveResult {
   matchedThreadOwner: User | undefined;
 }
 
-export const ThreadUnarchiveTrigger = automodTrigger<ThreadUnarchiveResult>()({
-  configType: t.type({
-    locked: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  locked: z.boolean().optional(),
+});
 
-  defaultConfig: {},
+export const ThreadUnarchiveTrigger = automodTrigger<ThreadUnarchiveResult>()({
+  configSchema,
 
   async match({ context, triggerConfig }) {
     if (!context.threadChange?.unarchived) {

@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { nonNullish, unique } from "../../../utils";
+import z from "zod";
+import { nonNullish, unique, zSnowflake } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
@@ -11,9 +11,10 @@ import { automodAction } from "../helpers";
 
 const p = PermissionFlagsBits;
 
+const configSchema = z.array(zSnowflake);
+
 export const AddRolesAction = automodAction({
-  configType: t.array(t.string),
-  defaultConfig: [],
+  configSchema,
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const members = unique(contexts.map((c) => c.member).filter(nonNullish));

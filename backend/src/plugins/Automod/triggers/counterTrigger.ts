@@ -1,18 +1,17 @@
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 // tslint:disable-next-line
 interface CounterTriggerResult {}
 
-export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
-  configType: t.type({
-    counter: t.string,
-    trigger: t.string,
-    reverse: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  counter: z.string().max(100),
+  trigger: z.string().max(100),
+  reverse: z.boolean().optional(),
+});
 
-  defaultConfig: {},
+export const CounterTrigger = automodTrigger<CounterTriggerResult>()({
+  configSchema,
 
   async match({ triggerConfig, context }) {
     if (!context.counterTrigger) {
