@@ -1,9 +1,9 @@
 import { CooldownManager } from "knub";
+import { Queue } from "../../Queue";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { Queue } from "../../Queue";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { MINUTES, SECONDS } from "../../utils";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
@@ -19,9 +19,9 @@ import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
-import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt";
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
+import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
 import {

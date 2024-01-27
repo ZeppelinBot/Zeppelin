@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
+import z from "zod";
 import { verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
-import z from "zod";
 
 interface AnyMessageResultType {}
 

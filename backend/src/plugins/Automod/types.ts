@@ -19,58 +19,62 @@ import { availableTriggers } from "./triggers/availableTriggers";
 import Timeout = NodeJS.Timeout;
 
 export type ZTriggersMapHelper = {
-  [TriggerName in keyof typeof availableTriggers]: typeof availableTriggers[TriggerName]["configSchema"];
+  [TriggerName in keyof typeof availableTriggers]: (typeof availableTriggers)[TriggerName]["configSchema"];
 };
-const zTriggersMap = z.strictObject(entries(availableTriggers).reduce((map, [triggerName, trigger]) => {
-  map[triggerName] = trigger.configSchema;
-  return map;
-}, {} as ZTriggersMapHelper)).partial();
+const zTriggersMap = z
+  .strictObject(
+    entries(availableTriggers).reduce((map, [triggerName, trigger]) => {
+      map[triggerName] = trigger.configSchema;
+      return map;
+    }, {} as ZTriggersMapHelper),
+  )
+  .partial();
 
 type ZActionsMapHelper = {
-  [ActionName in keyof typeof availableActions]: typeof availableActions[ActionName]["configSchema"];
+  [ActionName in keyof typeof availableActions]: (typeof availableActions)[ActionName]["configSchema"];
 };
-const zActionsMap = z.strictObject(entries(availableActions).reduce((map, [actionName, action]) => {
-  // @ts-expect-error TS can't infer this properly but it works fine thanks to our helper
-  map[actionName] = action.configSchema;
-  return map;
-}, {} as ZActionsMapHelper)).partial();
+const zActionsMap = z
+  .strictObject(
+    entries(availableActions).reduce((map, [actionName, action]) => {
+      // @ts-expect-error TS can't infer this properly but it works fine thanks to our helper
+      map[actionName] = action.configSchema;
+      return map;
+    }, {} as ZActionsMapHelper),
+  )
+  .partial();
 
 const zRule = z.strictObject({
   enabled: z.boolean().default(true),
   // Typed as "never" because you are not expected to supply this directly.
   // The transform instead picks it up from the property key and the output type is a string.
-  name: z.never().optional().transform((_, ctx) => {
-    const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-    if (! ruleName) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Automod rules must have names",
-      });
-      return z.NEVER;
-    }
-    return ruleName;
-  }),
+  name: z
+    .never()
+    .optional()
+    .transform((_, ctx) => {
+      const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
+      if (!ruleName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Automod rules must have names",
+        });
+        return z.NEVER;
+      }
+      return ruleName;
+    }),
   presets: z.array(z.string().max(100)).max(25).default([]),
   affects_bots: z.boolean().default(false),
   affects_self: z.boolean().default(false),
   cooldown: zDelayString.nullable().default(null),
   allow_further_rules: z.boolean().default(false),
   triggers: z.array(zTriggersMap),
-  actions: zActionsMap.refine(
-    (v) => ! (v.clean && v.start_thread),
-    {
-      message: "Cannot have both clean and start_thread active at the same time",
-    }
-  ),
+  actions: zActionsMap.refine((v) => !(v.clean && v.start_thread), {
+    message: "Cannot have both clean and start_thread active at the same time",
+  }),
 });
 export type TRule = z.infer<typeof zRule>;
 
 export const zAutomodConfig = z.strictObject({
-  rules: zBoundedRecord(
-    z.record(z.string().max(100), zRule),
-    0,
-    255,
-  ),
+  rules: zBoundedRecord(z.record(z.string().max(100), zRule), 0, 255),
   antiraid_levels: z.array(z.string().max(100)).max(10),
   can_set_antiraid: z.boolean(),
   can_view_antiraid: z.boolean(),

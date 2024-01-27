@@ -10,13 +10,7 @@ import {
   PermissionsBitField,
   TextBasedChannel,
 } from "discord.js";
-import {
-  AnyPluginData,
-  CommandContext,
-  ExtendedMatchParams,
-  GuildPluginData,
-  helpers
-} from "knub";
+import { AnyPluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
 import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";

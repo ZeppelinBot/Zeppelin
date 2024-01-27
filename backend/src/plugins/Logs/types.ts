@@ -29,10 +29,12 @@ const MAX_BATCH_TIME = 5000;
 type ZLogFormatsHelper = {
   -readonly [K in keyof typeof LogType]: typeof zMessageContent;
 };
-export const zLogFormats = z.strictObject(keys(LogType).reduce((map, logType) => {
-  map[logType] = zMessageContent;
-  return map;
-}, {} as ZLogFormatsHelper));
+export const zLogFormats = z.strictObject(
+  keys(LogType).reduce((map, logType) => {
+    map[logType] = zMessageContent;
+    return map;
+  }, {} as ZLogFormatsHelper),
+);
 export type TLogFormats = z.infer<typeof zLogFormats>;
 
 const zLogChannel = z.strictObject({
@@ -58,10 +60,12 @@ export type TLogChannelMap = z.infer<typeof zLogChannelMap>;
 
 export const zLogsConfig = z.strictObject({
   channels: zLogChannelMap,
-  format: zLogFormats.merge(z.strictObject({
-    // Legacy/deprecated, use timestamp_format below instead
-    timestamp: zBoundedCharacters(0, 64).nullable(),
-  })),
+  format: zLogFormats.merge(
+    z.strictObject({
+      // Legacy/deprecated, use timestamp_format below instead
+      timestamp: zBoundedCharacters(0, 64).nullable(),
+    }),
+  ),
   // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
   ping_user: z.boolean(),
   allow_user_mentions: z.boolean(),

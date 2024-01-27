@@ -2,9 +2,9 @@ import z from "zod";
 import { asyncMap, nonNullish, resolveMember, unique, zBoundedCharacters, zSnowflake } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { zNotify } from "../constants";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../constants";
 
 export const KickAction = automodAction({
   configSchema: z.strictObject({

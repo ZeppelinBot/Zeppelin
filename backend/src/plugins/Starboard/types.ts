@@ -18,11 +18,7 @@ const zStarboardOpts = z.strictObject({
 export type TStarboardOpts = z.infer<typeof zStarboardOpts>;
 
 export const zStarboardConfig = z.strictObject({
-  boards: zBoundedRecord(
-    z.record(z.string(), zStarboardOpts),
-    0,
-    100,
-  ),
+  boards: zBoundedRecord(z.record(z.string(), zStarboardOpts), 0, 100),
   can_migrate: z.boolean(),
 });
 

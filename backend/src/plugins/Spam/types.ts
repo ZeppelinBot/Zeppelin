@@ -11,14 +11,8 @@ const zBaseSingleSpamConfig = z.strictObject({
   count: z.number(),
   mute: z.boolean().default(false),
   mute_time: z.number().nullable().default(null),
-  remove_roles_on_mute: z.union([
-    z.boolean(),
-    z.array(zSnowflake),
-  ]).default(false),
-  restore_roles_on_mute: z.union([
-    z.boolean(),
-    z.array(zSnowflake),
-  ]).default(false),
+  remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
+  restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
   clean: z.boolean().default(false),
 });
 export type TBaseSingleSpamConfig = z.infer<typeof zBaseSingleSpamConfig>;

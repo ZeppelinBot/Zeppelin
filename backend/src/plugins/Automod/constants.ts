@@ -20,7 +20,4 @@ export enum RecentActionType {
   ThreadCreate,
 }
 
-export const zNotify = z.union([
-  z.literal("dm"),
-  z.literal("channel"),
-]);
+export const zNotify = z.union([z.literal("dm"), z.literal("channel")]);

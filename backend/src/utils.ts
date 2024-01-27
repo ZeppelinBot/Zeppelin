@@ -87,8 +87,10 @@ export function isDiscordAPIError(err: Error | string): err is DiscordAPIError {
 }
 
 // null | undefined -> undefined
-export function zNullishToUndefined<T extends z.ZodTypeAny>(type: T): ZodEffects<T, NonNullable<z.output<T>> | undefined> {
-  return type.transform(v => v ?? undefined);
+export function zNullishToUndefined<T extends z.ZodTypeAny>(
+  type: T,
+): ZodEffects<T, NonNullable<z.output<T>> | undefined> {
+  return type.transform((v) => v ?? undefined);
 }
 
 export function getScalarDifference<T extends object>(
@@ -151,15 +153,18 @@ export type GroupDMInvite = Invite & {
 };
 
 export function zBoundedCharacters(min: number, max: number) {
-  return z.string().refine(str => {
-    const len = [...str].length; // Unicode aware character split
-    return (len >= min && len <= max);
-  }, {
-    message: `String must be between ${min} and ${max} characters long`,
-  });
+  return z.string().refine(
+    (str) => {
+      const len = [...str].length; // Unicode aware character split
+      return len >= min && len <= max;
+    },
+    {
+      message: `String must be between ${min} and ${max} characters long`,
+    },
+  );
 }
 
-export const zSnowflake = z.string().refine(str => isSnowflake(str), {
+export const zSnowflake = z.string().refine((str) => isSnowflake(str), {
   message: "Invalid snowflake ID",
 });
 
@@ -188,7 +193,7 @@ export function zRegex<T extends ZodString>(zStr: T) {
       if (err instanceof InvalidRegexError) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Invalid regex"
+          message: "Invalid regex",
         });
         return z.NEVER;
       }
@@ -343,8 +348,18 @@ function dropNullValuesRecursively(obj: any) {
  */
 export const zAllowedMentions = z.strictObject({
   everyone: zNullishToUndefined(z.boolean().nullable().optional()),
-  users: zNullishToUndefined(z.union([z.boolean(), z.array(z.string())]).nullable().optional()),
-  roles: zNullishToUndefined(z.union([z.boolean(), z.array(z.string())]).nullable().optional()),
+  users: zNullishToUndefined(
+    z
+      .union([z.boolean(), z.array(z.string())])
+      .nullable()
+      .optional(),
+  ),
+  roles: zNullishToUndefined(
+    z
+      .union([z.boolean(), z.array(z.string())])
+      .nullable()
+      .optional(),
+  ),
   replied_user: zNullishToUndefined(z.boolean().nullable().optional()),
 });
 
@@ -359,18 +374,28 @@ export function dropPropertiesByName(obj, propName) {
   }
 }
 
-export function zBoundedRecord<TRecord extends ZodRecord<any, any>>(record: TRecord, minKeys: number, maxKeys: number): ZodEffects<TRecord> {
-  return record.refine(data => {
-    const len = Object.keys(data).length;
-    return (len >= minKeys && len <= maxKeys);
-  }, {
-    message: `Object must have ${minKeys}-${maxKeys} keys`,
-  });
+export function zBoundedRecord<TRecord extends ZodRecord<any, any>>(
+  record: TRecord,
+  minKeys: number,
+  maxKeys: number,
+): ZodEffects<TRecord> {
+  return record.refine(
+    (data) => {
+      const len = Object.keys(data).length;
+      return len >= minKeys && len <= maxKeys;
+    },
+    {
+      message: `Object must have ${minKeys}-${maxKeys} keys`,
+    },
+  );
 }
 
-export const zDelayString = z.string().max(32).refine(str => convertDelayStringToMS(str) !== null, {
-  message: "Invalid delay string",
-});
+export const zDelayString = z
+  .string()
+  .max(32)
+  .refine((str) => convertDelayStringToMS(str) !== null, {
+    message: "Invalid delay string",
+  });
 
 // To avoid running into issues with the JS max date vaLue, we cap maximum delay strings *far* below that.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#The_ECMAScript_epoch_and_timestamps
@@ -1487,9 +1512,11 @@ export function renderUserUsername(user: User | UnknownUser): string {
   return renderUsername(user.username, user.discriminator);
 }
 
-type Entries<T> = Array<{
-  [Key in keyof T]-?: [Key, T[Key]];
-}[keyof T]>;
+type Entries<T> = Array<
+  {
+    [Key in keyof T]-?: [Key, T[Key]];
+  }[keyof T]
+>;
 
 export function entries<T extends object>(object: T) {
   return Object.entries(object) as Entries<T>;

@@ -4,9 +4,10 @@ import { zBoundedCharacters, zBoundedRecord } from "../../utils";
 
 const zRoleMap = z.record(
   zBoundedCharacters(1, 100),
-  z.array(zBoundedCharacters(1, 2000))
+  z
+    .array(zBoundedCharacters(1, 2000))
     .max(100)
-    .transform((parsed) => parsed.map(v => v.toLowerCase())),
+    .transform((parsed) => parsed.map((v) => v.toLowerCase())),
 );
 
 const zSelfGrantableRoleEntry = z.strictObject({

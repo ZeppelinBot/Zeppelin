@@ -68,10 +68,7 @@ export const ChangePermsAction = automodAction({
   configSchema: z.strictObject({
     target: zBoundedCharacters(1, 2000),
     channel: zBoundedCharacters(1, 2000).nullable().default(null),
-    perms: z.record(
-      z.enum(allPermissionNames),
-      z.boolean().nullable(),
-    ),
+    perms: z.record(z.enum(allPermissionNames), z.boolean().nullable()),
   }),
 
   async apply({ pluginData, contexts, actionConfig }) {

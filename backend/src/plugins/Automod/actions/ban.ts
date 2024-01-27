@@ -1,10 +1,17 @@
 import z from "zod";
-import { convertDelayStringToMS, nonNullish, unique, zBoundedCharacters, zDelayString, zSnowflake } from "../../../utils";
+import {
+  convertDelayStringToMS,
+  nonNullish,
+  unique,
+  zBoundedCharacters,
+  zDelayString,
+  zSnowflake,
+} from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
+import { zNotify } from "../constants";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../constants";
 
 const configSchema = z.strictObject({
   reason: zBoundedCharacters(0, 4000).nullable().default(null),

@@ -1,21 +1,21 @@
 import { z } from "zod";
-import { guildPlugins } from "./plugins/availablePlugins";
 import zodToJsonSchema from "zod-to-json-schema";
+import { guildPlugins } from "./plugins/availablePlugins";
 import { zZeppelinGuildConfig } from "./types";
 
 const pluginSchemaMap = guildPlugins.reduce((map, plugin) => {
-  if (! plugin.info) {
+  if (!plugin.info) {
     return map;
   }
   map[plugin.name] = plugin.info.configSchema;
   return map;
 }, {});
 
-const fullSchema = zZeppelinGuildConfig
-  .omit({ plugins: true })
-  .merge(z.strictObject({
+const fullSchema = zZeppelinGuildConfig.omit({ plugins: true }).merge(
+  z.strictObject({
     plugins: z.strictObject(pluginSchemaMap).partial(),
-  }));
+  }),
+);
 
 const jsonSchema = zodToJsonSchema(fullSchema);
 

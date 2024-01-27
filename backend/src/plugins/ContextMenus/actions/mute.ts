@@ -2,13 +2,13 @@ import { ContextMenuCommandInteraction } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { canActOn } from "../../../pluginUtils";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { ContextMenuPluginType } from "../types";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { canActOn } from "../../../pluginUtils";
 
 export async function muteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

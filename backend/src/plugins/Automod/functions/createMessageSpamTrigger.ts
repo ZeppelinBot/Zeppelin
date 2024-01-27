@@ -1,3 +1,4 @@
+import z from "zod";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
@@ -7,7 +8,6 @@ import { automodTrigger } from "../helpers";
 import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
 import { getMessageSpamIdentifier } from "./getSpamIdentifier";
-import z from "zod";
 
 interface TMessageSpamMatchResultType {
   archiveId: string;

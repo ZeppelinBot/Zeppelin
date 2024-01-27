@@ -7,8 +7,8 @@ import {
   GuildPluginBlueprint,
   GuildPluginData,
 } from "knub";
-import { TMarkdown } from "../types";
 import { ZodTypeAny } from "zod";
+import { TMarkdown } from "../types";
 
 /**
  * GUILD PLUGINS

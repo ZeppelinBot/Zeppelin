@@ -10,7 +10,7 @@ import {
   verboseChannelMention,
   zBoundedCharacters,
   zDelayString,
-  zMessageContent
+  zMessageContent,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";

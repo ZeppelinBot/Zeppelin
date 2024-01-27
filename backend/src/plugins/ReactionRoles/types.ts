@@ -22,10 +22,7 @@ export type PendingMemberRoleChanges = {
   }>;
 };
 
-const zReactionRolePair = z.union([
-  z.tuple([z.string(), z.string(), z.string()]),
-  z.tuple([z.string(), z.string()]),
-]);
+const zReactionRolePair = z.union([z.tuple([z.string(), z.string(), z.string()]), z.tuple([z.string(), z.string()])]);
 export type TReactionRolePair = z.infer<typeof zReactionRolePair>;
 
 export interface ReactionRolesPluginType extends BasePluginType {

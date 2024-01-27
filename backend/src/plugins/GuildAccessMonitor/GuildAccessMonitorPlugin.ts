@@ -1,10 +1,10 @@
 import { Guild } from "discord.js";
 import { BasePluginType, GlobalPluginData, globalPluginEventListener } from "knub";
+import z from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { Configs } from "../../data/Configs";
 import { env } from "../../env";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
-import z from "zod";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   state: {

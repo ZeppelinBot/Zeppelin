@@ -7,7 +7,7 @@ import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
 
 export const zSlowmodeConfig = z.strictObject({
   use_native_slowmode: z.boolean(),
-  
+
   can_manage: z.boolean(),
   is_affected: z.boolean(),
 });

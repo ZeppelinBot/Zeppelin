@@ -2,11 +2,11 @@ import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { convertDelayStringToMS, resolveMember, zStrictMessageContent } from "../../../utils";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
-import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;
@@ -85,7 +85,7 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
   }
 
   const validated = zStrictMessageContent.safeParse(tagResult.renderedContent);
-  if (! validated.success) {
+  if (!validated.success) {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
       body: `Rendering tag ${tagResult.tagName} resulted in an invalid message: ${validated.error.message}`,
     });

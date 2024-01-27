@@ -9,14 +9,16 @@ import { CustomEventsPluginType, TCustomEvent } from "../types";
 export const zSetChannelPermissionOverridesAction = z.strictObject({
   type: z.literal("set_channel_permission_overrides"),
   channel: zSnowflake,
-  overrides: z.array(
-    z.strictObject({
-      type: z.union([z.literal("member"), z.literal("role")]),
-      id: zSnowflake,
-      allow: z.number(),
-      deny: z.number(),
-    }),
-  ).max(15),
+  overrides: z
+    .array(
+      z.strictObject({
+        type: z.union([z.literal("member"), z.literal("role")]),
+        id: zSnowflake,
+        allow: z.number(),
+        deny: z.number(),
+      }),
+    )
+    .max(15),
 });
 export type TSetChannelPermissionOverridesAction = z.infer<typeof zSetChannelPermissionOverridesAction>;
 

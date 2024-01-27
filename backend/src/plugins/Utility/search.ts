@@ -14,7 +14,15 @@ import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
 import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
-import { InvalidRegexError, MINUTES, inputPatternToRegExp, multiSorter, renderUserUsername, sorter, trimLines } from "../../utils";
+import {
+  InvalidRegexError,
+  MINUTES,
+  inputPatternToRegExp,
+  multiSorter,
+  renderUserUsername,
+  sorter,
+  trimLines,
+} from "../../utils";
 import { asyncFilter } from "../../utils/async";
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
 import { banSearchSignature } from "./commands/BanSearchCmd";

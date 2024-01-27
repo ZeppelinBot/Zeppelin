@@ -26,12 +26,20 @@ const configSchema = z.strictObject({
   include_subdomains: z.boolean().default(true),
   include_words: z.array(z.string().max(2000)).max(700).optional(),
   exclude_words: z.array(z.string().max(2000)).max(700).optional(),
-  include_regex: z.array(zRegex(z.string().max(2000))).max(512).optional(),
-  exclude_regex: z.array(zRegex(z.string().max(2000))).max(512).optional(),
-  phisherman: z.strictObject({
-    include_suspected: z.boolean().optional(),
-    include_verified: z.boolean().optional(),
-  }).optional(),
+  include_regex: z
+    .array(zRegex(z.string().max(2000)))
+    .max(512)
+    .optional(),
+  exclude_regex: z
+    .array(zRegex(z.string().max(2000)))
+    .max(512)
+    .optional(),
+  phisherman: z
+    .strictObject({
+      include_suspected: z.boolean().optional(),
+      include_verified: z.boolean().optional(),
+    })
+    .optional(),
   only_real_links: z.boolean().default(true),
   match_messages: z.boolean().default(true),
   match_embeds: z.boolean().default(true),

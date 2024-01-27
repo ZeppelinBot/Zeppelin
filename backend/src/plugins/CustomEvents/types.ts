@@ -36,11 +36,7 @@ export const zCustomEvent = z.strictObject({
 export type TCustomEvent = z.infer<typeof zCustomEvent>;
 
 export const zCustomEventsConfig = z.strictObject({
-  events: zBoundedRecord(
-    z.record(zBoundedCharacters(0, 100), zCustomEvent),
-    0,
-    100,
-  ),
+  events: zBoundedRecord(z.record(zBoundedCharacters(0, 100), zCustomEvent), 0, 100),
 });
 
 export interface CustomEventsPluginType extends BasePluginType {

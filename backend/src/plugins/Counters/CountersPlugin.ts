@@ -1,10 +1,7 @@
 import { EventEmitter } from "events";
 import { PluginOptions } from "knub";
 import { GuildCounters } from "../../data/GuildCounters";
-import {
-  CounterTrigger,
-  parseCounterConditionString
-} from "../../data/entities/CounterTrigger";
+import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger";
 import { mapToPublicFn } from "../../pluginUtils";
 import { MINUTES, convertDelayStringToMS, values } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";

@@ -123,7 +123,7 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
       timestamp: FORMAT_NO_TIMESTAMP,
       ...DefaultLogMessages,
     },
-    ping_user: true, 
+    ping_user: true,
     allow_user_mentions: false,
     timestamp_format: "[<t:]X[>]",
     include_embed_timestamp: true,

@@ -1,12 +1,19 @@
 import z from "zod";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { convertDelayStringToMS, nonNullish, unique, zBoundedCharacters, zDelayString, zSnowflake } from "../../../utils";
+import {
+  convertDelayStringToMS,
+  nonNullish,
+  unique,
+  zBoundedCharacters,
+  zDelayString,
+  zSnowflake,
+} from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
+import { zNotify } from "../constants";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
-import { zNotify } from "../constants";
 
 export const MuteAction = automodAction({
   configSchema: z.strictObject({
@@ -14,8 +21,14 @@ export const MuteAction = automodAction({
     duration: zDelayString.nullable().default(null),
     notify: zNotify.nullable().default(null),
     notifyChannel: zSnowflake.nullable().default(null),
-    remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).nullable().default(null),
-    restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).nullable().default(null),
+    remove_roles_on_mute: z
+      .union([z.boolean(), z.array(zSnowflake)])
+      .nullable()
+      .default(null),
+    restore_roles_on_mute: z
+      .union([z.boolean(), z.array(zSnowflake)])
+      .nullable()
+      .default(null),
     postInCaseLog: z.boolean().nullable().default(null),
     hide_case: z.boolean().nullable().default(false),
   }),

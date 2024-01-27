@@ -6,7 +6,10 @@ import { loadYamlSafely } from "./utils/loadYamlSafely";
 import { ObjectAliasError } from "./utils/validateNoObjectAliases";
 
 function writeError(key: string, error: string) {
-  const indented = error.split("\n").map(s => " ".repeat(64) + s).join("\n");
+  const indented = error
+    .split("\n")
+    .map((s) => " ".repeat(64) + s)
+    .join("\n");
   const prefix = `Invalid config ${key}:`;
   const prefixed = prefix + indented.slice(prefix.length);
   console.log(prefixed + "\n\n");

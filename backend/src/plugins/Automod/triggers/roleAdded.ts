@@ -8,10 +8,7 @@ interface RoleAddedMatchResult {
   matchedRoleId: string;
 }
 
-const configSchema = z.union([
-  zSnowflake,
-  z.array(zSnowflake).max(255),
-]).default([]);
+const configSchema = z.union([zSnowflake, z.array(zSnowflake).max(255)]).default([]);
 
 export const RoleAddedTrigger = automodTrigger<RoleAddedMatchResult>()({
   configSchema,

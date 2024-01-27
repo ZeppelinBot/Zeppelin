@@ -1,5 +1,5 @@
-import { automodTrigger } from "../helpers";
 import z from "zod";
+import { automodTrigger } from "../helpers";
 
 interface AntiraidLevelTriggerResult {}
 
