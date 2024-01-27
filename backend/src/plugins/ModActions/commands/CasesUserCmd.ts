@@ -28,7 +28,7 @@ const opts = {
   unbans: ct.switchOption({ def: false, shortcut: "ub" }),
 };
 
-const casesPerPage = 10;
+const casesPerPage = 5;
 
 export const CasesUserCmd = modActionsCmd({
   trigger: ["cases", "modlogs"],

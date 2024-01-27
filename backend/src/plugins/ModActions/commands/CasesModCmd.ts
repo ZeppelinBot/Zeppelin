@@ -12,7 +12,7 @@ const opts = {
   mod: ct.userId({ option: true }),
 };
 
-const casesPerPage = 10;
+const casesPerPage = 5;
 
 export const CasesModCmd = modActionsCmd({
   trigger: ["cases", "modlogs", "infractions"],
