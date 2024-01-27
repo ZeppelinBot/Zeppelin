@@ -4,10 +4,7 @@ import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 
-export async function getSnowflakeInfoEmbed(
-  snowflake: string,
-  showUnknownWarning = false,
-): Promise<APIEmbed> {
+export async function getSnowflakeInfoEmbed(snowflake: string, showUnknownWarning = false): Promise<APIEmbed> {
   const embed: EmbedWith<"fields" | "author"> = {
     fields: [],
     author: {

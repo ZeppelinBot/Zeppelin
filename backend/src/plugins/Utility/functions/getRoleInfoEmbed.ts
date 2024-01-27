@@ -6,10 +6,7 @@ import { UtilityPluginType } from "../types";
 
 const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
 
-export async function getRoleInfoEmbed(
-  pluginData: GuildPluginData<UtilityPluginType>,
-  role: Role,
-): Promise<APIEmbed> {
+export async function getRoleInfoEmbed(pluginData: GuildPluginData<UtilityPluginType>, role: Role): Promise<APIEmbed> {
   const embed: EmbedWith<"fields" | "author" | "color"> = {
     fields: [],
     author: {
