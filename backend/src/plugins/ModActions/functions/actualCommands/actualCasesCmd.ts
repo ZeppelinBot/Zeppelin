@@ -1,0 +1,258 @@
+import { APIEmbed, ChatInputCommandInteraction, TextBasedChannel, User } from "discord.js";
+import { GuildPluginData } from "knub";
+import { In } from "typeorm";
+import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
+import { CaseTypes } from "../../../../data/CaseTypes";
+import { Case } from "../../../../data/entities/Case";
+import { sendContextResponse, sendErrorMessage } from "../../../../pluginUtils";
+import {
+  UnknownUser,
+  chunkArray,
+  emptyEmbedValue,
+  renderUserUsername,
+  resolveUser,
+  trimLines,
+} from "../../../../utils";
+import { asyncMap } from "../../../../utils/async";
+import { createPaginatedMessage } from "../../../../utils/createPaginatedMessage";
+import { getChunkedEmbedFields } from "../../../../utils/getChunkedEmbedFields";
+import { getGuildPrefix } from "../../../../utils/getGuildPrefix";
+import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { ModActionsPluginType } from "../../types";
+
+const casesPerPage = 5;
+const maxExpandedCases = 8;
+
+async function sendExpandedCases(
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  context: TextBasedChannel | ChatInputCommandInteraction,
+  casesCount: number,
+  cases: Case[],
+) {
+  if (casesCount > maxExpandedCases) {
+    await sendContextResponse(context, "Too many cases for expanded view. Please use compact view instead.");
+
+    return;
+  }
+
+  const casesPlugin = pluginData.getPlugin(CasesPlugin);
+
+  for (const theCase of cases) {
+    const embed = await casesPlugin.getCaseEmbed(theCase.id);
+    await sendContextResponse(context, embed);
+  }
+}
+
+async function casesUserCmd(
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  context: TextBasedChannel | ChatInputCommandInteraction,
+  author: User,
+  modId: string | null,
+  user: User | UnknownUser,
+  modName: string,
+  typesToShow: CaseTypes[],
+  hidden: boolean | null,
+  expand: boolean | null,
+) {
+  const casesPlugin = pluginData.getPlugin(CasesPlugin);
+  const casesFilters: Omit<FindOptionsWhere<Case>, "guild_id" | "user_id"> = { type: In(typesToShow) };
+
+  if (modId) {
+    casesFilters.mod_id = modId;
+  }
+
+  const cases = await pluginData.state.cases.with("notes").getByUserId(user.id, casesFilters);
+  const normalCases = cases.filter((c) => !c.is_hidden);
+  const hiddenCases = cases.filter((c) => c.is_hidden);
+
+  const userName =
+    user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUserUsername(user);
+
+  if (cases.length === 0) {
+    await sendContextResponse(context, `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`);
+    return;
+  }
+
+  const casesToDisplay = hidden ? cases : normalCases;
+
+  if (!casesToDisplay.length) {
+    await sendContextResponse(
+      context,
+      `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
+    );
+
+    return;
+  }
+
+  if (expand) {
+    sendExpandedCases(pluginData, context, casesToDisplay.length, casesToDisplay);
+    return;
+  }
+
+  // Compact view (= regular message with a preview of each case)
+  const lines = await asyncMap(casesToDisplay, (c) => casesPlugin.getCaseSummary(c, true, author.id));
+
+  const prefix = getGuildPrefix(pluginData);
+  const linesPerChunk = 10;
+  const lineChunks = chunkArray(lines, linesPerChunk);
+
+  const footerField = {
+    name: emptyEmbedValue,
+    value: trimLines(`
+            Use \`${prefix}case <num>\` to see more information about an individual case
+          `),
+  };
+
+  for (const [i, linesInChunk] of lineChunks.entries()) {
+    const isLastChunk = i === lineChunks.length - 1;
+
+    if (isLastChunk && !hidden && hiddenCases.length) {
+      if (hiddenCases.length === 1) {
+        linesInChunk.push(`*+${hiddenCases.length} hidden case, use "-hidden" to show it*`);
+      } else {
+        linesInChunk.push(`*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`);
+      }
+    }
+
+    const chunkStart = i * linesPerChunk + 1;
+    const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
+
+    const embed = {
+      author: {
+        name:
+          lineChunks.length === 1
+            ? `Cases for ${userName}${modId ? ` by ${modName}` : ""} (${lines.length} total)`
+            : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
+        icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
+      },
+      fields: [
+        ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
+        ...(isLastChunk ? [footerField] : []),
+      ],
+    } satisfies APIEmbed;
+
+    sendContextResponse(context, { embeds: [embed] });
+  }
+}
+
+async function casesModCmd(
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  context: TextBasedChannel | ChatInputCommandInteraction,
+  author: User,
+  modId: string | null,
+  mod: User | UnknownUser,
+  modName: string,
+  typesToShow: CaseTypes[],
+  hidden: boolean | null,
+  expand: boolean | null,
+) {
+  const casesPlugin = pluginData.getPlugin(CasesPlugin);
+  const caseFilters = { type: In(typesToShow), is_hidden: !!hidden };
+
+  const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, caseFilters);
+
+  if (totalCases === 0) {
+    sendErrorMessage(pluginData, context, `No cases by **${modName}**`);
+    return;
+  }
+
+  const totalPages = Math.max(Math.ceil(totalCases / casesPerPage), 1);
+  const prefix = getGuildPrefix(pluginData);
+
+  if (expand) {
+    // Expanded view (= individual case embeds)
+    const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, caseFilters);
+
+    sendExpandedCases(pluginData, context, totalCases, cases);
+    return;
+  }
+
+  createPaginatedMessage(
+    pluginData.client,
+    context,
+    totalPages,
+    async (page) => {
+      const cases = await casesPlugin.getRecentCasesByMod(
+        modId ?? author.id,
+        casesPerPage,
+        (page - 1) * casesPerPage,
+        caseFilters,
+      );
+
+      const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, author.id));
+      const firstCaseNum = (page - 1) * casesPerPage + 1;
+      const lastCaseNum = firstCaseNum - 1 + Math.min(cases.length, casesPerPage);
+      const title = `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${totalCases} by ${modName}`;
+
+      const embed = {
+        author: {
+          name: title,
+          icon_url: mod instanceof User ? mod.displayAvatarURL() : undefined,
+        },
+        fields: [
+          ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
+          {
+            name: emptyEmbedValue,
+            value: trimLines(`
+                Use \`${prefix}case <num>\` to see more information about an individual case
+                Use \`${prefix}cases <user>\` to see a specific user's cases
+              `),
+          },
+        ],
+      } satisfies APIEmbed;
+
+      return { embeds: [embed] };
+    },
+    {
+      limitToUserId: author.id,
+    },
+  );
+}
+
+export async function actualCasesCmd(
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  context: TextBasedChannel | ChatInputCommandInteraction,
+  modId: string | null,
+  user: User | UnknownUser | null,
+  author: User,
+  notes: boolean | null,
+  warns: boolean | null,
+  mutes: boolean | null,
+  unmutes: boolean | null,
+  bans: boolean | null,
+  unbans: boolean | null,
+  reverseFilters: boolean | null,
+  hidden: boolean | null,
+  expand: boolean | null,
+) {
+  const mod = modId ? await resolveUser(pluginData.client, modId) : null;
+  const modName = modId ? (mod instanceof User ? renderUserUsername(mod) : modId) : renderUserUsername(author);
+
+  let typesToShow: CaseTypes[] = [];
+
+  if (notes) typesToShow.push(CaseTypes.Note);
+  if (warns) typesToShow.push(CaseTypes.Warn);
+  if (mutes) typesToShow.push(CaseTypes.Mute);
+  if (unmutes) typesToShow.push(CaseTypes.Unmute);
+  if (bans) typesToShow.push(CaseTypes.Ban);
+  if (unbans) typesToShow.push(CaseTypes.Unban);
+
+  if (typesToShow.length === 0) {
+    typesToShow = [CaseTypes.Note, CaseTypes.Warn, CaseTypes.Mute, CaseTypes.Unmute, CaseTypes.Ban, CaseTypes.Unban];
+  } else {
+    if (reverseFilters) {
+      typesToShow = [
+        CaseTypes.Note,
+        CaseTypes.Warn,
+        CaseTypes.Mute,
+        CaseTypes.Unmute,
+        CaseTypes.Ban,
+        CaseTypes.Unban,
+      ].filter((t) => !typesToShow.includes(t));
+    }
+  }
+
+  user
+    ? casesUserCmd(pluginData, context, author, modId!, user, modName, typesToShow, hidden, expand)
+    : casesModCmd(pluginData, context, author, modId!, mod!, modName, typesToShow, hidden, expand);
+}

@@ -1,6 +1,7 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
+import { isContextInteraction } from "../../../pluginUtils";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -39,20 +40,23 @@ export async function warnMember(
   }
 
   if (!notifyResult.success) {
-    if (warnOptions.retryPromptChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptChannel.id)) {
-      const reply = await waitForButtonConfirm(
-        warnOptions.retryPromptChannel,
-        { content: "Failed to message the user. Log the warning anyway?" },
-        { confirmText: "Yes", cancelText: "No", restrictToId: warnOptions.caseArgs?.modId },
-      );
+    const contextIsChannel = warnOptions.retryPromptContext && !isContextInteraction(warnOptions.retryPromptContext);
+    const isValidChannel = contextIsChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptContext!.id);
 
-      if (!reply) {
-        return {
-          status: "failed",
-          error: "Failed to message user",
-        };
-      }
-    } else {
+    if (!warnOptions.retryPromptContext || !isValidChannel) {
+      return {
+        status: "failed",
+        error: "Failed to message user",
+      };
+    }
+
+    const reply = await waitForButtonConfirm(
+      warnOptions.retryPromptContext,
+      { content: "Failed to message the user. Log the warning anyway?" },
+      { confirmText: "Yes", cancelText: "No", restrictToId: warnOptions.caseArgs?.modId },
+    );
+
+    if (!reply) {
       return {
         status: "failed",
         error: "Failed to message user",

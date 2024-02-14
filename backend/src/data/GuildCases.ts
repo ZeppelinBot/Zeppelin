@@ -1,4 +1,5 @@
 import { In, InsertResult, Repository } from "typeorm";
+import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
 import { Queue } from "../Queue";
 import { chunkArray } from "../utils";
 import { BaseGuildRepository } from "./BaseGuildRepository";
@@ -73,12 +74,16 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async getByUserId(userId: string): Promise<Case[]> {
+  async getByUserId(
+    userId: string,
+    filters: Omit<FindOptionsWhere<Case>, "guild_id" | "user_id"> = {},
+  ): Promise<Case[]> {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
         guild_id: this.guildId,
         user_id: userId,
+        ...filters,
       },
     });
   }
@@ -98,24 +103,40 @@ export class GuildCases extends BaseGuildRepository {
     });
   }
 
-  async getTotalCasesByModId(modId: string): Promise<number> {
+  async getTotalCasesByModId(
+    modId: string,
+    filters: Omit<FindOptionsWhere<Case>, "guild_id" | "mod_id" | "is_hidden"> = {},
+  ): Promise<number> {
     return this.cases.count({
       where: {
         guild_id: this.guildId,
         mod_id: modId,
         is_hidden: false,
+        ...filters,
       },
     });
   }
 
-  async getRecentByModId(modId: string, count: number, skip = 0): Promise<Case[]> {
+  async getRecentByModId(
+    modId: string,
+    count: number,
+    skip = 0,
+    filters: Omit<FindOptionsWhere<Case>, "guild_id" | "mod_id"> = {},
+  ): Promise<Case[]> {
+    const where: FindOptionsWhere<Case> = {
+      guild_id: this.guildId,
+      mod_id: modId,
+      is_hidden: false,
+      ...filters,
+    };
+
+    if (where.is_hidden === true) {
+      delete where.is_hidden;
+    }
+
     return this.cases.find({
       relations: this.getRelations(),
-      where: {
-        guild_id: this.guildId,
-        mod_id: modId,
-        is_hidden: false,
-      },
+      where,
       skip,
       take: count,
       order: {

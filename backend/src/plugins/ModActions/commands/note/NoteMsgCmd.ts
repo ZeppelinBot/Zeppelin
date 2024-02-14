@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { sendErrorMessage } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
-import { actualNoteCmd } from "../../functions/actualNoteCmd";
+import { actualNoteCmd } from "../../functions/actualCommands/actualNoteCmd";
 import { modActionsMsgCmd } from "../../types";
 
 export const NoteMsgCmd = modActionsMsgCmd({

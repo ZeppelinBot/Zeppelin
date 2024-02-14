@@ -11,6 +11,7 @@ import {
   ModalSubmitInteraction,
   PermissionsBitField,
   TextBasedChannel,
+  User,
 } from "discord.js";
 import * as t from "io-ts";
 import {
@@ -101,19 +102,32 @@ export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema)
   };
 }
 
-function isContextInteraction(
-  context: TextBasedChannel | ChatInputCommandInteraction,
+export function isContextInteraction(
+  context: TextBasedChannel | User | ChatInputCommandInteraction,
 ): context is ChatInputCommandInteraction {
   return "commandId" in context && !!context.commandId;
 }
 
+export function sendContextResponse(
+  context: TextBasedChannel | User | ChatInputCommandInteraction,
+  response: string | Omit<MessageCreateOptions, "flags">,
+): Promise<Message> {
+  if (isContextInteraction(context)) {
+    const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
+
+    return (context.replied ? context.followUp(options) : context.reply(options)) as Promise<Message>;
+  } else {
+    return context.send(response);
+  }
+}
+
 export async function sendSuccessMessage(
   pluginData: AnyPluginData<any>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: TextBasedChannel | User | ChatInputCommandInteraction,
   body: string,
   allowedMentions?: MessageMentionOptions,
   responseInteraction?: ModalSubmitInteraction,
-  ephemeral = false,
+  ephemeral = true,
 ): Promise<Message | undefined> {
   const emoji = pluginData.fullConfig.success_emoji || undefined;
   const formattedBody = successMessage(body, emoji);
@@ -153,12 +167,12 @@ export async function sendSuccessMessage(
     logger.error(`Context reply failed: ${err}`);
 
     return undefined;
-  });
+  }) as Promise<Message>;
 }
 
 export async function sendErrorMessage(
   pluginData: AnyPluginData<any>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: TextBasedChannel | User | ChatInputCommandInteraction,
   body: string,
   allowedMentions?: MessageMentionOptions,
   responseInteraction?: ModalSubmitInteraction,
@@ -201,7 +215,7 @@ export async function sendErrorMessage(
     logger.error(`Context reply failed: ${err}`);
 
     return undefined;
-  });
+  }) as Promise<Message>;
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

@@ -1,4 +1,5 @@
 import {
+  ChatInputCommandInteraction,
   Client,
   Message,
   MessageCreateOptions,
@@ -9,6 +10,7 @@ import {
   TextBasedChannel,
   User,
 } from "discord.js";
+import { sendContextResponse } from "../pluginUtils";
 import { MINUTES, noop } from "../utils";
 import { Awaitable } from "./typeUtils";
 import Timeout = NodeJS.Timeout;
@@ -27,14 +29,14 @@ const defaultOpts: PaginateMessageOpts = {
 
 export async function createPaginatedMessage(
   client: Client,
-  channel: TextBasedChannel | User,
+  context: TextBasedChannel | User | ChatInputCommandInteraction,
   totalPages: number,
   loadPageFn: LoadPageFn,
   opts: Partial<PaginateMessageOpts> = {},
 ): Promise<Message> {
   const fullOpts = { ...defaultOpts, ...opts } as PaginateMessageOpts;
   const firstPageContent = await loadPageFn(1);
-  const message = await channel.send(firstPageContent);
+  const message = await sendContextResponse(context, firstPageContent);
 
   let page = 1;
   let pageLoadId = 0; // Used to avoid race conditions when rapidly switching pages

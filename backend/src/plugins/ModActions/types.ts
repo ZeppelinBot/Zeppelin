@@ -1,4 +1,4 @@
-import { GuildTextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, TextBasedChannel } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
@@ -127,7 +127,7 @@ export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
-  retryPromptChannel?: GuildTextBasedChannel | null;
+  retryPromptContext?: TextBasedChannel | ChatInputCommandInteraction | null;
   isAutomodAction?: boolean;
 }
 
