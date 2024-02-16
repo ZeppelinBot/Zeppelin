@@ -14,6 +14,6 @@ export const MassUnbanMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    actualMassBanCmd(pluginData, msg.channel, args.userIds, msg.member);
+    actualMassBanCmd(pluginData, msg, args.userIds, msg.member);
   },
 });

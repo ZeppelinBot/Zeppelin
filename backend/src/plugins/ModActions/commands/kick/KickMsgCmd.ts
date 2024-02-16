@@ -1,7 +1,7 @@
 import { hasPermission } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { sendErrorMessage } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualKickCmd } from "../../functions/actualCommands/actualKickCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
@@ -30,7 +30,7 @@ export const KickMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -38,7 +38,7 @@ export const KickMsgCmd = modActionsMsgCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(await pluginData.config.getForMessage(msg), "can_act_as_other"))) {
-        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -49,13 +49,13 @@ export const KickMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
       return;
     }
 
     actualKickCmd(
       pluginData,
-      msg.channel,
+      msg,
       msg.member,
       user,
       args.reason,

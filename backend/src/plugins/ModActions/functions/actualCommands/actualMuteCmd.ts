@@ -1,9 +1,8 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../../RecoverablePluginError";
 import { logger } from "../../../../logger";
-import { sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
 import {
   UnknownUser,
   UserNotificationMethod,
@@ -11,10 +10,12 @@ import {
   isDiscordAPIError,
   renderUserUsername,
 } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { MuteResult } from "../../../Mutes/types";
 import { ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 
 /**
  * The actual function run by both !mute and !forcemute.
@@ -22,23 +23,32 @@ import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
  */
 export async function actualMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   user: User | UnknownUser,
-  attachments: Array<Attachment>,
+  attachments: Attachment[],
   mod: GuildMember,
   ppId?: string,
   time?: number,
   reason?: string,
   contactMethods?: UserNotificationMethod[],
 ) {
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
+    return;
+  }
+
   const timeUntilUnmute = time && humanizeDuration(time);
-  const formattedReason = reason ? formatReasonWithAttachments(reason, attachments) : undefined;
+  const formattedReason =
+    reason || attachments.length > 0
+      ? await formatReasonWithMessageLinkForAttachments(pluginData, reason ?? "", context, attachments)
+      : undefined;
+  const formattedReasonWithAttachments =
+    reason || attachments.length > 0 ? formatReasonWithAttachments(reason ?? "", attachments) : undefined;
 
   let muteResult: MuteResult;
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
 
   try {
-    muteResult = await mutesPlugin.muteUser(user.id, time, formattedReason, {
+    muteResult = await mutesPlugin.muteUser(user.id, time, formattedReason, formattedReasonWithAttachments, {
       contactMethods,
       caseArgs: {
         modId: mod.id,
@@ -47,9 +57,11 @@ export async function actualMuteCmd(
     });
   } catch (e) {
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      sendErrorMessage(pluginData, context, "Could not mute the user: no mute role set in config");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(context, "Could not mute the user: no mute role set in config");
     } else if (isDiscordAPIError(e) && e.code === 10007) {
-      sendErrorMessage(pluginData, context, "Could not mute the user: unknown member");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Could not mute the user: unknown member");
     } else {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
       if (user.id == null) {
@@ -57,7 +69,7 @@ export async function actualMuteCmd(
         // tslint:disable-next-line:no-console
         console.trace("[DEBUG] Null user.id for mute");
       }
-      sendErrorMessage(pluginData, context, "Could not mute the user");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Could not mute the user");
     }
 
     return;
@@ -92,5 +104,5 @@ export async function actualMuteCmd(
   }
 
   if (muteResult.notifyResult.text) response += ` (${muteResult.notifyResult.text})`;
-  sendSuccessMessage(pluginData, context, response);
+  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);
 }

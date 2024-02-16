@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { createChunkedMessage, sorter } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { locateUserCmd } from "../types";
 
 export const ListFollowCmd = locateUserCmd({
@@ -13,7 +13,7 @@ export const ListFollowCmd = locateUserCmd({
   async run({ message: msg, pluginData }) {
     const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.member.id);
     if (alerts.length === 0) {
-      sendErrorMessage(pluginData, msg.channel, "You have no active alerts!");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You have no active alerts!");
       return;
     }
 
@@ -46,7 +46,7 @@ export const DeleteFollowCmd = locateUserCmd({
     alerts.sort(sorter("expires_at"));
 
     if (args.num > alerts.length || args.num <= 0) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown alert!");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown alert!");
       return;
     }
 
@@ -54,6 +54,6 @@ export const DeleteFollowCmd = locateUserCmd({
     clearExpiringVCAlert(toDelete);
     await pluginData.state.alerts.delete(toDelete.id);
 
-    sendSuccessMessage(pluginData, msg.channel, "Alert deleted");
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Alert deleted");
   },
 });

@@ -1,7 +1,7 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { isContextInteraction } from "../../../pluginUtils";
+import { getContextChannel, isContextInteraction } from "../../../pluginUtils";
 import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -15,6 +15,7 @@ export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
   member: GuildMember,
   reason: string,
+  reasonWithAttachments: string,
   warnOptions: WarnOptions = {},
 ): Promise<WarnResult> {
   const config = pluginData.config.get();
@@ -25,7 +26,7 @@ export async function warnMember(
       config.warn_message,
       new TemplateSafeValueContainer({
         guildName: pluginData.guild.name,
-        reason,
+        reason: reasonWithAttachments,
         moderator: warnOptions.caseArgs?.modId
           ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
           : null,
@@ -40,8 +41,10 @@ export async function warnMember(
   }
 
   if (!notifyResult.success) {
-    const contextIsChannel = warnOptions.retryPromptContext && !isContextInteraction(warnOptions.retryPromptContext);
-    const isValidChannel = contextIsChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptContext!.id);
+    const contextIsNotInteraction =
+      warnOptions.retryPromptContext && !isContextInteraction(warnOptions.retryPromptContext);
+    const contextChannel = contextIsNotInteraction ? await getContextChannel(warnOptions.retryPromptContext!) : null;
+    const isValidChannel = contextIsNotInteraction && pluginData.guild.channels.resolve(contextChannel!.id);
 
     if (!warnOptions.retryPromptContext || !isValidChannel) {
       return {

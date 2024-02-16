@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { sendErrorMessage } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualNoteCmd } from "../../functions/actualCommands/actualNoteCmd";
 import { modActionsMsgCmd } from "../../types";
 
@@ -17,15 +17,15 @@ export const NoteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
     if (!args.note && msg.attachments.size === 0) {
-      sendErrorMessage(pluginData, msg.channel, "Text or attachment required");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Text or attachment required");
       return;
     }
 
-    actualNoteCmd(pluginData, msg.channel, msg.author, [...msg.attachments.values()], user, args.note || "");
+    actualNoteCmd(pluginData, msg, msg.author, [...msg.attachments.values()], user, args.note || "");
   },
 });

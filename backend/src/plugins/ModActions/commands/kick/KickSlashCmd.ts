@@ -1,8 +1,9 @@
 import { ChannelType } from "discord.js";
 import { slashOptions } from "knub";
-import { hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualKickCmd } from "../../functions/actualCommands/actualKickCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
@@ -48,7 +49,9 @@ export const KickSlashCmd = {
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      sendErrorMessage(pluginData, interaction, "Text or attachment required", undefined, undefined, true);
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
 
       return;
     }
@@ -61,7 +64,9 @@ export const KickSlashCmd = {
 
     if (options.mod) {
       if (!canActAsOther) {
-        sendErrorMessage(pluginData, interaction, "You don't have permission to act as another moderator");
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 
@@ -72,7 +77,7 @@ export const KickSlashCmd = {
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      sendErrorMessage(pluginData, interaction, e.message);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
       return;
     }
 

@@ -1,7 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { CaseTypes } from "../../../../data/CaseTypes";
-import { hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { hasPermission } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualAddCaseCmd } from "../../functions/actualCommands/actualAddCaseCmd";
 import { modActionsMsgCmd } from "../../types";
 
@@ -27,7 +28,7 @@ export const AddCaseMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -35,7 +36,7 @@ export const AddCaseMsgCmd = modActionsMsgCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -45,13 +46,13 @@ export const AddCaseMsgCmd = modActionsMsgCmd({
     // Verify the case type is valid
     const type: string = args.type[0].toUpperCase() + args.type.slice(1).toLowerCase();
     if (!CaseTypes[type]) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot add case: invalid case type");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot add case: invalid case type");
       return;
     }
 
     actualAddCaseCmd(
       pluginData,
-      msg.channel,
+      msg,
       msg.member,
       mod,
       [...msg.attachments.values()],

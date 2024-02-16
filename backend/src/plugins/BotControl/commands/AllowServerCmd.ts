@@ -1,8 +1,9 @@
 import { ApiPermissions } from "@shared/apiPermissions";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter } from "../../../pluginUtils";
 import { DBDateFormat, isSnowflake } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const AllowServerCmd = botControlCmd({
@@ -20,17 +21,17 @@ export const AllowServerCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const existing = await pluginData.state.allowedGuilds.find(args.guildId);
     if (existing) {
-      sendErrorMessage(pluginData, msg.channel, "Server is already allowed!");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Server is already allowed!");
       return;
     }
 
     if (!isSnowflake(args.guildId)) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid server ID!");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid server ID!");
       return;
     }
 
     if (args.userId && !isSnowflake(args.userId)) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid user ID!");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid user ID!");
       return;
     }
 
@@ -51,6 +52,6 @@ export const AllowServerCmd = botControlCmd({
       );
     }
 
-    sendSuccessMessage(pluginData, msg.channel, "Server is now allowed to use Zeppelin!");
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Server is now allowed to use Zeppelin!");
   },
 });

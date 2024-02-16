@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, TextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { EventEmitter } from "events";
 import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
@@ -10,6 +10,8 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import { Case } from "../../data/entities/Case";
 import { UserNotificationMethod, UserNotificationResult, tNullable } from "../../utils";
 import { CaseArgs } from "../Cases/types";
+
+export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null | undefined;
 
 export const ConfigSchema = t.type({
   dm_on_warn: t.boolean,
@@ -29,6 +31,8 @@ export const ConfigSchema = t.type({
   warn_notify_threshold: t.number,
   warn_notify_message: t.string,
   ban_delete_message_days: t.number,
+  attachment_link_reaction: tNullable(t.union([t.literal("none"), t.literal("warn"), t.literal("restrict")])),
+  attachment_storing_channel: tNullable(t.string),
   can_note: t.boolean,
   can_warn: t.boolean,
   can_mute: t.boolean,
@@ -127,7 +131,7 @@ export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
-  retryPromptContext?: TextBasedChannel | ChatInputCommandInteraction | null;
+  retryPromptContext?: Message | ChatInputCommandInteraction | null;
   isAutomodAction?: boolean;
 }
 

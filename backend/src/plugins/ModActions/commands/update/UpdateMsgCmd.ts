@@ -19,6 +19,6 @@ export const UpdateMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    await updateCase(pluginData, msg.channel, msg.author, args.caseNumber, args.note, [...msg.attachments.values()]);
+    await updateCase(pluginData, msg, msg.author, args.caseNumber, args.note, [...msg.attachments.values()]);
   },
 });

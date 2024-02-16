@@ -1,6 +1,6 @@
 import { slashOptions } from "knub";
-import { sendErrorMessage } from "../../../../pluginUtils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualNoteCmd } from "../../functions/actualCommands/actualNoteCmd";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
@@ -24,7 +24,9 @@ export const NoteSlashCmd = {
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.note || options.note.trim() === "") && attachments.length < 1) {
-      sendErrorMessage(pluginData, interaction, "Text or attachment required", undefined, undefined, true);
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
 
       return;
     }

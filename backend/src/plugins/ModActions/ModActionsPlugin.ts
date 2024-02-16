@@ -72,6 +72,7 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import {
+  AttachmentLinkReactionType,
   BanOptions,
   ConfigSchema,
   KickOptions,
@@ -100,6 +101,8 @@ const defaultOptions = {
     warn_notify_message:
       "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
     ban_delete_message_days: 1,
+    attachment_link_reaction: "warn" as AttachmentLinkReactionType,
+    attachment_storing_channel: null,
 
     can_note: false,
     can_warn: false,
@@ -217,26 +220,32 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
 
   public: {
     warnMember(pluginData) {
-      return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
-        return warnMember(pluginData, member, reason, warnOptions);
+      return (member: GuildMember, reason: string, reasonWithAttachments: string, warnOptions?: WarnOptions) => {
+        return warnMember(pluginData, member, reason, reasonWithAttachments, warnOptions);
       };
     },
 
     kickMember(pluginData) {
-      return (member: GuildMember, reason: string, kickOptions?: KickOptions) => {
-        kickMember(pluginData, member, reason, kickOptions);
+      return (member: GuildMember, reason: string, reasonWithAttachments: string, kickOptions?: KickOptions) => {
+        kickMember(pluginData, member, reason, reasonWithAttachments, kickOptions);
       };
     },
 
     banUserId(pluginData) {
-      return (userId: string, reason?: string, banOptions?: BanOptions, banTime?: number) => {
-        return banUserId(pluginData, userId, reason, banOptions, banTime);
+      return (
+        userId: string,
+        reason?: string,
+        reasonWithAttachments?: string,
+        banOptions?: BanOptions,
+        banTime?: number,
+      ) => {
+        return banUserId(pluginData, userId, reason, reasonWithAttachments, banOptions, banTime);
       };
     },
 
     updateCase(pluginData) {
       return (msg: Message, caseNumber: number | null, note: string) => {
-        updateCase(pluginData, msg.channel, msg.author, caseNumber ?? undefined, note, [...msg.attachments.values()]);
+        updateCase(pluginData, msg, msg.author, caseNumber ?? undefined, note, [...msg.attachments.values()]);
       };
     },
 

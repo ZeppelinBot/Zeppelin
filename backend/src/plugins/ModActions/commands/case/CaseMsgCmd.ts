@@ -14,6 +14,6 @@ export const CaseMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    actualCaseCmd(pluginData, msg.channel, msg.author.id, args.caseNumber);
+    actualCaseCmd(pluginData, msg, msg.author.id, args.caseNumber);
   },
 });

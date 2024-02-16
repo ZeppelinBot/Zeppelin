@@ -1,4 +1,4 @@
-import { sendSuccessMessage } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getGuildTz } from "../functions/getGuildTz";
 import { timeAndDateCmd } from "../types";
 
@@ -11,10 +11,8 @@ export const ResetTimezoneCmd = timeAndDateCmd({
   async run({ pluginData, message }) {
     await pluginData.state.memberTimezones.reset(message.author.id);
     const serverTimezone = getGuildTz(pluginData);
-    sendSuccessMessage(
-      pluginData,
-      message.channel,
-      `Your timezone has been reset to server default, **${serverTimezone}**`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(message, `Your timezone has been reset to server default, **${serverTimezone}**`);
   },
 });

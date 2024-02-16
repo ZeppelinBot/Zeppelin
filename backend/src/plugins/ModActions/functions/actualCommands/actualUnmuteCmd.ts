@@ -1,15 +1,16 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
 import { UnknownUser, asSingleLine, renderUserUsername } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   user: User | UnknownUser,
   attachments: Array<Attachment>,
   mod: GuildMember,
@@ -17,25 +18,31 @@ export async function actualUnmuteCmd(
   time?: number,
   reason?: string,
 ) {
-  const parsedReason = reason ? formatReasonWithAttachments(reason, attachments) : undefined;
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
+    return;
+  }
+
+  const formattedReason =
+    reason || attachments.length > 0
+      ? await formatReasonWithMessageLinkForAttachments(pluginData, reason ?? "", context, attachments)
+      : undefined;
 
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
   const result = await mutesPlugin.unmuteUser(user.id, time, {
     modId: mod.id,
     ppId: ppId ?? undefined,
-    reason: parsedReason,
+    reason: formattedReason,
   });
 
   if (!result) {
-    sendErrorMessage(pluginData, context, "User is not muted!");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "User is not muted!");
     return;
   }
 
   // Confirm the action to the moderator
   if (time) {
     const timeUntilUnmute = time && humanizeDuration(time);
-    sendSuccessMessage(
-      pluginData,
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
       context,
       asSingleLine(`
         Unmuting **${renderUserUsername(user)}**
@@ -43,8 +50,7 @@ export async function actualUnmuteCmd(
       `),
     );
   } else {
-    sendSuccessMessage(
-      pluginData,
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
       context,
       asSingleLine(`
         Unmuted **${renderUserUsername(user)}**

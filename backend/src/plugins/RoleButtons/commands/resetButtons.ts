@@ -1,6 +1,6 @@
 import { guildPluginMessageCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { applyAllRoleButtons } from "../functions/applyAllRoleButtons";
 import { RoleButtonsPluginType } from "../types";
 
@@ -16,12 +16,14 @@ export const resetButtonsCmd = guildPluginMessageCommand<RoleButtonsPluginType>(
   async run({ pluginData, args, message }) {
     const config = pluginData.config.get();
     if (!config.buttons[args.name]) {
-      sendErrorMessage(pluginData, message.channel, `Can't find role buttons with the name "${args.name}"`);
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(message, `Can't find role buttons with the name "${args.name}"`);
       return;
     }
 
     await pluginData.state.roleButtons.deleteRoleButtonItem(args.name);
     await applyAllRoleButtons(pluginData);
-    sendSuccessMessage(pluginData, message.channel, "Done!");
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(message, "Done!");
   },
 });

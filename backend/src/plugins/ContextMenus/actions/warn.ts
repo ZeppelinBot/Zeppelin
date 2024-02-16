@@ -60,7 +60,7 @@ async function warnAction(
     modId: executingMember.id,
   };
 
-  const result = await modactions.warnMember(targetMember, reason, { caseArgs });
+  const result = await modactions.warnMember(targetMember, reason, reason, { caseArgs });
   if (result.status === "failed") {
     await interactionToReply
       .editReply({ content: "Error: Failed to warn user", embeds: [], components: [] })

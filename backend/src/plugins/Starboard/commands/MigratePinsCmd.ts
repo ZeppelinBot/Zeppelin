@@ -1,6 +1,6 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { starboardCmd } from "../types";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
@@ -19,13 +19,13 @@ export const MigratePinsCmd = starboardCmd({
     const config = await pluginData.config.get();
     const starboard = config.boards[args.starboardName];
     if (!starboard) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown starboard specified");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown starboard specified");
       return;
     }
 
     const starboardChannel = pluginData.guild.channels.cache.get(starboard.channel_id as Snowflake);
     if (!starboardChannel || !(starboardChannel instanceof TextChannel)) {
-      sendErrorMessage(pluginData, msg.channel, "Starboard has an unknown/invalid channel id");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Starboard has an unknown/invalid channel id");
       return;
     }
 
@@ -43,10 +43,8 @@ export const MigratePinsCmd = starboardCmd({
       await saveMessageToStarboard(pluginData, pin, starboard);
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(msg, `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`);
   },
 });

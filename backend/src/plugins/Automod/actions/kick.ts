@@ -37,7 +37,7 @@ export const KickAction = automodAction({
     const modActions = pluginData.getPlugin(ModActionsPlugin);
     for (const member of membersToKick) {
       if (!member) continue;
-      await modActions.kickMember(member, reason, { contactMethods, caseArgs, isAutomodAction: true });
+      await modActions.kickMember(member, reason, reason, { contactMethods, caseArgs, isAutomodAction: true });
     }
   },
 });

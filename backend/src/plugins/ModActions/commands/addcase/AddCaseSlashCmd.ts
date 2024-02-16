@@ -1,7 +1,8 @@
 import { slashOptions } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
-import { hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { hasPermission } from "../../../../pluginUtils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualAddCaseCmd } from "../../functions/actualCommands/actualAddCaseCmd";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
@@ -44,7 +45,9 @@ export const AddCaseSlashCmd = {
 
     if (options.mod) {
       if (!canActAsOther) {
-        sendErrorMessage(pluginData, interaction, "You don't have permission to act as another moderator");
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 

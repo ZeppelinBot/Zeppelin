@@ -1,7 +1,7 @@
 import { Role } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { chunkArray, sorter, trimLines } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { refreshMembersIfNeeded } from "../refreshMembers";
 import { utilityCmd } from "../types";
 
@@ -62,7 +62,7 @@ export const RolesCmd = utilityCmd({
     } else if (sort === "name") {
       roles.sort(sorter((r) => r.name.toLowerCase(), sortDir));
     } else {
-      sendErrorMessage(pluginData, msg.channel, "Unknown sorting method");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown sorting method");
       return;
     }
 

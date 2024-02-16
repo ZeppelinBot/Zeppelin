@@ -14,6 +14,6 @@ export const HideCaseMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    actualHideCaseCmd(pluginData, msg.channel, args.caseNum);
+    actualHideCaseCmd(pluginData, msg, args.caseNum);
   },
 });

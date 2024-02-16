@@ -1,6 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { errorMessage, resolveMember, resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualWarnCmd } from "../../functions/actualCommands/actualWarnCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
@@ -23,7 +24,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -32,9 +33,9 @@ export const WarnMsgCmd = modActionsMsgCmd({
     if (!memberToWarn) {
       const _isBanned = await isBanned(pluginData, user.id);
       if (_isBanned) {
-        sendErrorMessage(pluginData, msg.channel, `User is banned`);
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User is banned`);
       } else {
-        sendErrorMessage(pluginData, msg.channel, `User not found on the server`);
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found on the server`);
       }
 
       return;
@@ -42,7 +43,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to warn this member
     if (!canActOn(pluginData, msg.member, memberToWarn)) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot warn: insufficient permissions");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot warn: insufficient permissions");
       return;
     }
 
@@ -61,13 +62,13 @@ export const WarnMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
       return;
     }
 
     actualWarnCmd(
       pluginData,
-      msg.channel,
+      msg,
       msg.author.id,
       mod,
       memberToWarn,

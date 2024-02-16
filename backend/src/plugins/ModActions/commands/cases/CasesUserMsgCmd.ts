@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { sendErrorMessage } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualCasesCmd } from "../../functions/actualCommands/actualCasesCmd";
 import { modActionsMsgCmd } from "../../types";
 
@@ -33,13 +33,13 @@ export const CasesUserMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
     return actualCasesCmd(
       pluginData,
-      msg.channel,
+      msg,
       args.mod,
       user,
       msg.author,

@@ -1,23 +1,28 @@
-import { Attachment, ChatInputCommandInteraction, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
-import { sendSuccessMessage } from "../../../../pluginUtils";
 import { UnknownUser, renderUserUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 
 export async function actualNoteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: User,
   attachments: Array<Attachment>,
   user: User | UnknownUser,
   note: string,
 ) {
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, note)) {
+    return;
+  }
+
   const userName = renderUserUsername(user);
-  const reason = formatReasonWithAttachments(note, attachments);
+  const reason = await formatReasonWithMessageLinkForAttachments(pluginData, note, context, attachments);
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const createdCase = await casesPlugin.createCase({
@@ -34,14 +39,15 @@ export async function actualNoteCmd(
     reason,
   });
 
-  sendSuccessMessage(
-    pluginData,
-    context,
-    `Note added on **${userName}** (Case #${createdCase.case_number})`,
-    undefined,
-    undefined,
-    true,
-  );
+  pluginData
+    .getPlugin(CommonPlugin)
+    .sendSuccessMessage(
+      context,
+      `Note added on **${userName}** (Case #${createdCase.case_number})`,
+      undefined,
+      undefined,
+      true,
+    );
 
   pluginData.state.events.emit("note", user.id, reason);
 }

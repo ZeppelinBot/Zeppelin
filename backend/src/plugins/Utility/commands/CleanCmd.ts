@@ -5,9 +5,10 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { LogType } from "../../../data/LogType";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { getBaseUrl } from "../../../pluginUtils";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { UtilityPluginType, utilityCmd } from "../types";
 
@@ -82,19 +83,22 @@ export interface CleanArgs {
 
 export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, args: CleanArgs | any, msg) {
   if (args.count > MAX_CLEAN_COUNT || args.count <= 0) {
-    sendErrorMessage(
-      pluginData,
-      msg.channel,
-      `Clean count must be between 1 and ${MAX_CLEAN_COUNT}`,
-      undefined,
-      args["response-interaction"],
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(
+        msg,
+        `Clean count must be between 1 and ${MAX_CLEAN_COUNT}`,
+        undefined,
+        args["response-interaction"],
+      );
     return;
   }
 
   const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
   if (!targetChannel?.isTextBased()) {
-    sendErrorMessage(pluginData, msg.channel, `Invalid channel specified`, undefined, args["response-interaction"]);
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(msg, `Invalid channel specified`, undefined, args["response-interaction"]);
     return;
   }
 
@@ -106,13 +110,14 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       categoryId: targetChannel.parentId,
     });
     if (configForTargetChannel.can_clean !== true) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
-        `Missing permissions to use clean on that channel`,
-        undefined,
-        args["response-interaction"],
-      );
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(
+          msg,
+          `Missing permissions to use clean on that channel`,
+          undefined,
+          args["response-interaction"],
+        );
       return;
     }
   }
@@ -218,22 +223,14 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       }
     }
 
-    responseMsg = await sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      responseText,
-      undefined,
-      args["response-interaction"],
-    );
+    responseMsg = await pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(msg, responseText, undefined, args["response-interaction"]);
   } else {
     const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
-    responseMsg = await sendErrorMessage(
-      pluginData,
-      msg.channel,
-      responseText,
-      undefined,
-      args["response-interaction"],
-    );
+    responseMsg = await pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(msg, responseText, undefined, args["response-interaction"]);
   }
 
   cleaningMessage?.delete();

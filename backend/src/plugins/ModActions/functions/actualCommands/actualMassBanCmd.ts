@@ -1,55 +1,58 @@
-import { ChatInputCommandInteraction, GuildMember, Snowflake, TextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { waitForReply } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { LogType } from "../../../../data/LogType";
 import { humanizeDurationShort } from "../../../../humanizeDurationShort";
-import {
-  canActOn,
-  isContextInteraction,
-  sendContextResponse,
-  sendErrorMessage,
-  sendSuccessMessage,
-} from "../../../../pluginUtils";
+import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 import { ignoreEvent } from "../ignoreEvent";
 
 export async function actualMassBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   userIds: string[],
   author: GuildMember,
 ) {
   // Limit to 100 users at once (arbitrary?)
   if (userIds.length > 100) {
-    sendErrorMessage(pluginData, context, `Can only massban max 100 users at once`);
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Can only massban max 100 users at once`);
     return;
   }
 
   // Ask for ban reason (cleaner this way instead of trying to cram it into the args)
   sendContextResponse(context, "Ban reason? `cancel` to cancel");
-  const banReasonReply = await waitForReply(
-    pluginData.client,
-    isContextInteraction(context) ? context.channel! : context,
-    author.id,
-  );
+  const banReasonReply = await waitForReply(pluginData.client, await getContextChannel(context), author.id);
 
   if (!banReasonReply || !banReasonReply.content || banReasonReply.content.toLowerCase().trim() === "cancel") {
-    sendErrorMessage(pluginData, context, "Cancelled");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Cancelled");
     return;
   }
 
-  const banReason = formatReasonWithAttachments(banReasonReply.content, [...banReasonReply.attachments.values()]);
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, banReasonReply.content)) {
+    return;
+  }
+
+  const banReason = await formatReasonWithMessageLinkForAttachments(pluginData, banReasonReply.content, context, [
+    ...banReasonReply.attachments.values(),
+  ]);
+  const banReasonWithAttachments = formatReasonWithAttachments(banReasonReply.content, [
+    ...banReasonReply.attachments.values(),
+  ]);
 
   // Verify we can act on each of the users specified
   for (const userId of userIds) {
     const member = pluginData.guild.members.cache.get(userId as Snowflake); // TODO: Get members on demand?
     if (member && !canActOn(pluginData, author, member)) {
-      sendErrorMessage(pluginData, context, "Cannot massban one or more users: insufficient permissions");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(context, "Cannot massban one or more users: insufficient permissions");
       return;
     }
   }
@@ -87,7 +90,7 @@ export async function actualMassBanCmd(
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const messageConfig = isContextInteraction(context)
       ? await pluginData.config.getForInteraction(context)
-      : await pluginData.config.getForChannel(context);
+      : await pluginData.config.getForChannel(await getContextChannel(context));
     const deleteDays = messageConfig.ban_delete_message_days;
 
     for (const [i, userId] of userIds.entries()) {
@@ -103,7 +106,7 @@ export async function actualMassBanCmd(
 
         await pluginData.guild.bans.create(userId as Snowflake, {
           deleteMessageSeconds: (deleteDays * DAYS) / SECONDS,
-          reason: banReason,
+          reason: banReasonWithAttachments,
         });
 
         await casesPlugin.createCase({
@@ -134,7 +137,7 @@ export async function actualMassBanCmd(
     const successfulBanCount = userIds.length - failedBans.length;
     if (successfulBanCount === 0) {
       // All bans failed - don't create a log entry and notify the user
-      sendErrorMessage(pluginData, context, "All bans failed. Make sure the IDs are valid.");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "All bans failed. Make sure the IDs are valid.");
     } else {
       // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
       pluginData.getPlugin(LogsPlugin).logMassBan({
@@ -144,19 +147,18 @@ export async function actualMassBanCmd(
       });
 
       if (failedBans.length) {
-        sendSuccessMessage(
-          pluginData,
-          context,
-          `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${failedBans.length} failed: ${failedBans.join(
-            " ",
-          )}`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendSuccessMessage(
+            context,
+            `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${
+              failedBans.length
+            } failed: ${failedBans.join(" ")}`,
+          );
       } else {
-        sendSuccessMessage(
-          pluginData,
-          context,
-          `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendSuccessMessage(context, `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`);
       }
     }
   });

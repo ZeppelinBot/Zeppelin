@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { autoReactionsCmd } from "../types";
 
 export const DisableAutoReactionsCmd = autoReactionsCmd({
@@ -14,12 +14,12 @@ export const DisableAutoReactionsCmd = autoReactionsCmd({
   async run({ message: msg, args, pluginData }) {
     const autoReaction = await pluginData.state.autoReactions.getForChannel(args.channelId);
     if (!autoReaction) {
-      sendErrorMessage(pluginData, msg.channel, `Auto-reactions aren't enabled in <#${args.channelId}>`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Auto-reactions aren't enabled in <#${args.channelId}>`);
       return;
     }
 
     await pluginData.state.autoReactions.removeFromChannel(args.channelId);
     pluginData.state.cache.delete(args.channelId);
-    sendSuccessMessage(pluginData, msg.channel, `Auto-reactions disabled in <#${args.channelId}>`);
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Auto-reactions disabled in <#${args.channelId}>`);
   },
 });

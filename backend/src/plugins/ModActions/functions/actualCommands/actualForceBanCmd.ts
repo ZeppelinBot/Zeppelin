@@ -1,25 +1,31 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, Snowflake, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { LogType } from "../../../../data/LogType";
-import { sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
 import { DAYS, MINUTES, UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 import { ignoreEvent } from "../ignoreEvent";
 
 export async function actualForceBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   authorId: string,
   user: User | UnknownUser,
   reason: string,
   attachments: Array<Attachment>,
   mod: GuildMember,
 ) {
-  const formattedReason = formatReasonWithAttachments(reason, attachments);
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
+    return;
+  }
+
+  const formattedReason = await formatReasonWithMessageLinkForAttachments(pluginData, reason, context, attachments);
+  const formattedReasonWithAttachments = formatReasonWithAttachments(reason, attachments);
 
   ignoreEvent(pluginData, IgnoredEventType.Ban, user.id);
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_BAN, user.id);
@@ -28,10 +34,10 @@ export async function actualForceBanCmd(
     // FIXME: Use banUserId()?
     await pluginData.guild.bans.create(user.id as Snowflake, {
       deleteMessageSeconds: (1 * DAYS) / MINUTES,
-      reason: formattedReason ?? undefined,
+      reason: formattedReasonWithAttachments ?? undefined,
     });
   } catch {
-    sendErrorMessage(pluginData, context, "Failed to forceban member");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Failed to forceban member");
     return;
   }
 
@@ -46,7 +52,9 @@ export async function actualForceBanCmd(
   });
 
   // Confirm the action
-  sendSuccessMessage(pluginData, context, `Member forcebanned (Case #${createdCase.case_number})`);
+  pluginData
+    .getPlugin(CommonPlugin)
+    .sendSuccessMessage(context, `Member forcebanned (Case #${createdCase.case_number})`);
 
   // Log the action
   pluginData.getPlugin(LogsPlugin).logMemberForceban({

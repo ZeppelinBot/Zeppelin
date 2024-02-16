@@ -1,33 +1,40 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, Snowflake, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { LogType } from "../../../../data/LogType";
 import { clearExpiringTempban } from "../../../../data/loops/expiringTempbansLoop";
-import { sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
 import { UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 import { ignoreEvent } from "../ignoreEvent";
 
 export async function actualUnbanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   authorId: string,
   user: User | UnknownUser,
   reason: string,
   attachments: Array<Attachment>,
   mod: GuildMember,
 ) {
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
+    return;
+  }
+
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
-  const formattedReason = formatReasonWithAttachments(reason, attachments);
+  const formattedReason = await formatReasonWithMessageLinkForAttachments(pluginData, reason, context, attachments);
 
   try {
     ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
     await pluginData.guild.bans.remove(user.id as Snowflake, formattedReason ?? undefined);
   } catch {
-    sendErrorMessage(pluginData, context, "Failed to unban member; are you sure they're banned?");
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(context, "Failed to unban member; are you sure they're banned?");
     return;
   }
 
@@ -49,7 +56,7 @@ export async function actualUnbanCmd(
   }
 
   // Confirm the action
-  sendSuccessMessage(pluginData, context, `Member unbanned (Case #${createdCase.case_number})`);
+  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Member unbanned (Case #${createdCase.case_number})`);
 
   // Log the action
   pluginData.getPlugin(LogsPlugin).logMemberUnban({

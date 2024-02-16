@@ -1,21 +1,17 @@
-import { ChatInputCommandInteraction, GuildMember, TextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { GuildPluginData, helpers } from "knub";
 import { Case } from "../../../../data/entities/Case";
-import {
-  isContextInteraction,
-  sendContextResponse,
-  sendErrorMessage,
-  sendSuccessMessage,
-} from "../../../../pluginUtils";
+import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
 import { SECONDS } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../../TimeAndDate/TimeAndDatePlugin";
 import { ModActionsPluginType } from "../../types";
 
 export async function actualDeleteCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: GuildMember,
   caseNumbers: number[],
   force: boolean,
@@ -35,7 +31,7 @@ export async function actualDeleteCaseCmd(
   }
 
   if (failed.length === caseNumbers.length) {
-    sendErrorMessage(pluginData, context, "None of the cases were found!");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "None of the cases were found!");
     return;
   }
 
@@ -50,7 +46,7 @@ export async function actualDeleteCaseCmd(
 
       const reply = await helpers.waitForReply(
         pluginData.client,
-        isContextInteraction(context) ? context.channel! : context,
+        await getContextChannel(context),
         author.id,
         15 * SECONDS,
       );
@@ -87,9 +83,13 @@ export async function actualDeleteCaseCmd(
       : "";
   const amt = validCases.length - cancelled;
   if (amt === 0) {
-    sendErrorMessage(pluginData, context, "All deletions were cancelled, no cases were deleted.");
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(context, "All deletions were cancelled, no cases were deleted.");
     return;
   }
 
-  sendSuccessMessage(pluginData, context, `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`);
+  pluginData
+    .getPlugin(CommonPlugin)
+    .sendSuccessMessage(context, `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`);
 }

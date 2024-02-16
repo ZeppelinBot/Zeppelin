@@ -1,19 +1,19 @@
-import { Attachment, ChatInputCommandInteraction, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../types";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { formatReasonWithMessageLinkForAttachments } from "./formatReasonForAttachments";
 
 export async function updateCase(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: User,
   caseNumber?: number,
-  note?: string,
+  note = "",
   attachments: Attachment[] = [],
 ) {
   let theCase: Case | null;
@@ -24,16 +24,16 @@ export async function updateCase(
   }
 
   if (!theCase) {
-    sendErrorMessage(pluginData, context, "Case not found");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Case not found");
     return;
   }
 
-  if (!note && attachments.length === 0) {
-    sendErrorMessage(pluginData, context, "Text or attachment required");
+  if (note.length === 0 && attachments.length === 0) {
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Text or attachment required");
     return;
   }
 
-  const formattedNote = formatReasonWithAttachments(note ?? "", attachments);
+  const formattedNote = await formatReasonWithMessageLinkForAttachments(pluginData, note, context, attachments);
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   await casesPlugin.createCaseNote({
@@ -49,5 +49,5 @@ export async function updateCase(
     note: formattedNote,
   });
 
-  sendSuccessMessage(pluginData, context, `Case \`#${theCase.case_number}\` updated`);
+  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Case \`#${theCase.case_number}\` updated`);
 }

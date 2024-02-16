@@ -14,6 +14,6 @@ export const MassMuteMsgCmd = modActionsMsgCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    actualMassMuteCmd(pluginData, msg.channel, args.userIds, msg.member);
+    actualMassMuteCmd(pluginData, msg, args.userIds, msg.member);
   },
 });

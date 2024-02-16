@@ -35,6 +35,7 @@ export async function muteUser(
   userId: string,
   muteTime?: number,
   reason?: string,
+  reasonWithAttachments?: string,
   muteOptions: MuteOptions = {},
   removeRolesOnMuteOverride: boolean | string[] | null = null,
   restoreRolesOnMuteOverride: boolean | string[] | null = null,
@@ -193,7 +194,7 @@ export async function muteUser(
       template,
       new TemplateSafeValueContainer({
         guildName: pluginData.guild.name,
-        reason: reason || "None",
+        reason: reasonWithAttachments || "None",
         time: timeUntilUnmuteStr,
         moderator: muteOptions.caseArgs?.modId
           ? userToTemplateSafeUser(await resolveUser(pluginData.client, muteOptions.caseArgs.modId))

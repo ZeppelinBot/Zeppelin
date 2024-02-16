@@ -1,7 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { actualUnmuteCmd } from "../../functions/actualCommands/actualUnmuteCmd";
 import { isBanned } from "../../functions/isBanned";
@@ -35,7 +36,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -49,7 +50,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
       !hasMuteRole &&
       !memberToUnmute?.isCommunicationDisabled()
     ) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot unmute: member is not muted");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: member is not muted");
       return;
     }
 
@@ -57,22 +58,20 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
       const banned = await isBanned(pluginData, user.id);
       const prefix = pluginData.fullConfig.prefix;
       if (banned) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`);
         return;
       } else {
         // Ask the mod if we should upgrade to a forceunmute as the user is not on the server
         const reply = await waitForButtonConfirm(
-          msg.channel,
+          msg,
           { content: "User not on server, forceunmute instead?" },
           { confirmText: "Yes", cancelText: "No", restrictToId: msg.member.id },
         );
 
         if (!reply) {
-          sendErrorMessage(pluginData, msg.channel, "User not on server, unmute cancelled by moderator");
+          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "User not on server, unmute cancelled by moderator");
           return;
         }
       }
@@ -80,7 +79,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to unmute this member
     if (memberToUnmute && !canActOn(pluginData, msg.member, memberToUnmute)) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot unmute: insufficient permissions");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: insufficient permissions");
       return;
     }
 
@@ -90,7 +89,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
 
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -100,7 +99,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
 
     actualUnmuteCmd(
       pluginData,
-      msg.channel,
+      msg,
       user,
       [...msg.attachments.values()],
       mod,

@@ -1,8 +1,9 @@
 import { GuildMember } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { logger } from "../../../logger";
-import { canActOn, sendErrorMessage } from "../../../pluginUtils";
+import { canActOn } from "../../../pluginUtils";
 import { resolveMember, resolveRoleId, successMessage } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
@@ -29,24 +30,22 @@ export const MassAddRoleCmd = rolesCmd({
 
     for (const member of members) {
       if (!canActOn(pluginData, msg.member, member, true)) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          "Cannot add roles to 1 or more specified members: insufficient permissions",
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, "Cannot add roles to 1 or more specified members: insufficient permissions");
         return;
       }
     }
 
     const roleId = await resolveRoleId(pluginData.client, pluginData.guild.id, args.role);
     if (!roleId) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid role id");
       return;
     }
 
     const config = await pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
-      sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You cannot assign that role");
       return;
     }
 
@@ -55,7 +54,7 @@ export const MassAddRoleCmd = rolesCmd({
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
-      sendErrorMessage(pluginData, msg.channel, "You cannot assign that role");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You cannot assign that role");
       return;
     }
 

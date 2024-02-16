@@ -1,19 +1,20 @@
-import { ChatInputCommandInteraction, TextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendContextResponse, sendErrorMessage } from "../../../../pluginUtils";
+import { sendContextResponse } from "../../../../pluginUtils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 export async function actualCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   authorId: string,
   caseNumber: number,
 ) {
   const theCase = await pluginData.state.cases.findByCaseNumber(caseNumber);
 
   if (!theCase) {
-    sendErrorMessage(pluginData, context, "Case not found");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Case not found");
     return;
   }
 

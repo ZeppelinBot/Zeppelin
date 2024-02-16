@@ -1,9 +1,9 @@
 import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { isValidEmbed, trimLines } from "../../../utils";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { postCmd } from "../types";
 import { formatContent } from "../util/formatContent";
 
@@ -30,14 +30,14 @@ export const EditEmbedCmd = postCmd({
       if (colorRgb) {
         color = rgbToInt(colorRgb);
       } else {
-        sendErrorMessage(pluginData, msg.channel, "Invalid color specified");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid color specified");
         return;
       }
     }
 
     const targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     if (!targetMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown message");
       return;
     }
 
@@ -51,12 +51,12 @@ export const EditEmbedCmd = postCmd({
         try {
           parsed = JSON.parse(content);
         } catch (e) {
-          sendErrorMessage(pluginData, msg.channel, `Syntax error in embed JSON: ${e.message}`);
+          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Syntax error in embed JSON: ${e.message}`);
           return;
         }
 
         if (!isValidEmbed(parsed)) {
-          sendErrorMessage(pluginData, msg.channel, "Embed is not valid");
+          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Embed is not valid");
           return;
         }
 
@@ -69,7 +69,7 @@ export const EditEmbedCmd = postCmd({
     args.message.channel.messages.edit(targetMessage.id, {
       embeds: [embed],
     });
-    await sendSuccessMessage(pluginData, msg.channel, "Embed edited");
+    await pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Embed edited");
 
     if (args.content) {
       const prefix = pluginData.fullConfig.prefix || "!";

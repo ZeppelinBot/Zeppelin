@@ -1,17 +1,19 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { Case } from "../../../../data/entities/Case";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
+import { canActOn } from "../../../../pluginUtils";
 import { UnknownUser, renderUserUsername, resolveMember } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 
 export async function actualAddCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: GuildMember,
   mod: GuildMember,
   attachments: Array<Attachment>,
@@ -19,14 +21,20 @@ export async function actualAddCaseCmd(
   type: keyof CaseTypes,
   reason: string,
 ) {
-  // If the user exists as a guild member, make sure we can act on them first
-  const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
-  if (member && !canActOn(pluginData, author, member)) {
-    sendErrorMessage(pluginData, context, "Cannot add case on this user: insufficient permissions");
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
     return;
   }
 
-  const formattedReason = formatReasonWithAttachments(reason, attachments);
+  // If the user exists as a guild member, make sure we can act on them first
+  const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
+  if (member && !canActOn(pluginData, author, member)) {
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(context, "Cannot add case on this user: insufficient permissions");
+    return;
+  }
+
+  const formattedReason = await formatReasonWithMessageLinkForAttachments(pluginData, reason, context, attachments);
 
   // Create the case
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
@@ -39,9 +47,11 @@ export async function actualAddCaseCmd(
   });
 
   if (user) {
-    sendSuccessMessage(pluginData, context, `Case #${theCase.case_number} created for **${renderUserUsername(user)}**`);
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(context, `Case #${theCase.case_number} created for **${renderUserUsername(user)}**`);
   } else {
-    sendSuccessMessage(pluginData, context, `Case #${theCase.case_number} created`);
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Case #${theCase.case_number} created`);
   }
 
   // Log the action

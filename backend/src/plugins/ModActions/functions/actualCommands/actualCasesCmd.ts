@@ -1,10 +1,10 @@
-import { APIEmbed, ChatInputCommandInteraction, TextBasedChannel, User } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { In } from "typeorm";
 import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { Case } from "../../../../data/entities/Case";
-import { sendContextResponse, sendErrorMessage } from "../../../../pluginUtils";
+import { sendContextResponse } from "../../../../pluginUtils";
 import {
   UnknownUser,
   chunkArray,
@@ -18,6 +18,7 @@ import { createPaginatedMessage } from "../../../../utils/createPaginatedMessage
 import { getChunkedEmbedFields } from "../../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 const casesPerPage = 5;
@@ -25,7 +26,7 @@ const maxExpandedCases = 8;
 
 async function sendExpandedCases(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   casesCount: number,
   cases: Case[],
 ) {
@@ -45,7 +46,7 @@ async function sendExpandedCases(
 
 async function casesUserCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: User,
   modId: string | null,
   user: User | UnknownUser,
@@ -137,7 +138,7 @@ async function casesUserCmd(
 
 async function casesModCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   author: User,
   modId: string | null,
   mod: User | UnknownUser,
@@ -152,7 +153,7 @@ async function casesModCmd(
   const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, caseFilters);
 
   if (totalCases === 0) {
-    sendErrorMessage(pluginData, context, `No cases by **${modName}**`);
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `No cases by **${modName}**`);
     return;
   }
 
@@ -211,7 +212,7 @@ async function casesModCmd(
 
 export async function actualCasesCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   modId: string | null,
   user: User | UnknownUser | null,
   author: User,

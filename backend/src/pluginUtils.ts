@@ -7,8 +7,6 @@ import {
   GuildMember,
   Message,
   MessageCreateOptions,
-  MessageMentionOptions,
-  ModalSubmitInteraction,
   PermissionsBitField,
   TextBasedChannel,
   User,
@@ -23,10 +21,9 @@ import {
   PluginOverrideCriteria,
   helpers,
 } from "knub";
-import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
-import { errorMessage, successMessage, tNullable } from "./utils";
+import { tNullable } from "./utils";
 import { Tail } from "./utils/typeUtils";
 import { StrictValidationError, parseIoTsSchema } from "./validatorUtils";
 
@@ -103,119 +100,48 @@ export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema)
 }
 
 export function isContextInteraction(
-  context: TextBasedChannel | User | ChatInputCommandInteraction,
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
 ): context is ChatInputCommandInteraction {
   return "commandId" in context && !!context.commandId;
 }
 
-export function sendContextResponse(
-  context: TextBasedChannel | User | ChatInputCommandInteraction,
+export function isContextMessage(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+): context is Message {
+  return "content" in context || "embeds" in context;
+}
+
+export async function getContextChannel(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+): Promise<TextBasedChannel> {
+  if (isContextInteraction(context)) {
+    // context is ChatInputCommandInteraction
+    return context.channel!;
+  } else if ("username" in context) {
+    // context is User
+    return await (context as User).createDM();
+  } else if ("send" in context) {
+    // context is TextBaseChannel
+    return context as TextBasedChannel;
+  } else {
+    // context is Message
+    return context.channel;
+  }
+}
+
+export async function sendContextResponse(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
   response: string | Omit<MessageCreateOptions, "flags">,
 ): Promise<Message> {
   if (isContextInteraction(context)) {
     const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
 
     return (context.replied ? context.followUp(options) : context.reply(options)) as Promise<Message>;
-  } else {
+  } else if ("send" in context) {
     return context.send(response);
+  } else {
+    return (await getContextChannel(context)).send(response);
   }
-}
-
-export async function sendSuccessMessage(
-  pluginData: AnyPluginData<any>,
-  context: TextBasedChannel | User | ChatInputCommandInteraction,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-  responseInteraction?: ModalSubmitInteraction,
-  ephemeral = true,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.success_emoji || undefined;
-  const formattedBody = successMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
-
-  if (responseInteraction) {
-    await responseInteraction
-      .editReply({ content: formattedBody, embeds: [], components: [] })
-      .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-
-    return;
-  }
-
-  if (!isContextInteraction(context)) {
-    // noinspection TypeScriptValidateJSTypes
-    return context
-      .send({ ...content }) // Force line break
-      .catch((err) => {
-        const channelInfo = "guild" in context ? `${context.id} (${context.guild.id})` : context.id;
-        logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
-
-        return undefined;
-      });
-  }
-
-  const replyMethod = context.replied ? "followUp" : "reply";
-
-  return context[replyMethod]({
-    content: formattedBody,
-    embeds: [],
-    components: [],
-    fetchReply: true,
-    ephemeral,
-  }).catch((err) => {
-    logger.error(`Context reply failed: ${err}`);
-
-    return undefined;
-  }) as Promise<Message>;
-}
-
-export async function sendErrorMessage(
-  pluginData: AnyPluginData<any>,
-  context: TextBasedChannel | User | ChatInputCommandInteraction,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-  responseInteraction?: ModalSubmitInteraction,
-  ephemeral = false,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.error_emoji || undefined;
-  const formattedBody = errorMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
-
-  if (responseInteraction) {
-    await responseInteraction
-      .editReply({ content: formattedBody, embeds: [], components: [] })
-      .catch((err) => logger.error(`Interaction reply failed: ${err}`));
-
-    return;
-  }
-
-  if (!isContextInteraction(context)) {
-    // noinspection TypeScriptValidateJSTypes
-    return context
-      .send({ ...content }) // Force line break
-      .catch((err) => {
-        const channelInfo = "guild" in context ? `${context.id} (${context.guild.id})` : context.id;
-        logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
-        return undefined;
-      });
-  }
-
-  const replyMethod = context.replied ? "followUp" : "reply";
-
-  return context[replyMethod]({
-    content: formattedBody,
-    embeds: [],
-    components: [],
-    fetchReply: true,
-    ephemeral,
-  }).catch((err) => {
-    logger.error(`Context reply failed: ${err}`);
-
-    return undefined;
-  }) as Promise<Message>;
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

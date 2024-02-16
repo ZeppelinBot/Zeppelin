@@ -1,23 +1,25 @@
-import { Attachment, ChatInputCommandInteraction, GuildMember, TextBasedChannel, User } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { getMemberLevel } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop";
-import { canActOn, isContextInteraction, sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
+import { canActOn, getContextChannel } from "../../../../pluginUtils";
 import { UnknownUser, UserNotificationMethod, renderUserUsername, resolveMember } from "../../../../utils";
 import { banLock } from "../../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
 import { banUserId } from "../banUserId";
-import { formatReasonWithAttachments } from "../formatReasonWithAttachments";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
 import { isBanned } from "../isBanned";
 
 export async function actualBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   user: User | UnknownUser,
   time: number | null,
   reason: string,
@@ -27,8 +29,13 @@ export async function actualBanCmd(
   contactMethods?: UserNotificationMethod[],
   deleteDays?: number,
 ) {
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
+    return;
+  }
+
   const memberToBan = await resolveMember(pluginData.client, pluginData.guild, user.id);
-  const formattedReason = formatReasonWithAttachments(reason, attachments);
+  const formattedReason = await formatReasonWithMessageLinkForAttachments(pluginData, reason, context, attachments);
+  const formattedReasonWithAttachments = formatReasonWithAttachments(reason, attachments);
 
   // acquire a lock because of the needed user-inputs below (if banned/not on server)
   const lock = await pluginData.locks.acquire(banLock(user));
@@ -47,7 +54,7 @@ export async function actualBanCmd(
       );
 
       if (!reply) {
-        sendErrorMessage(pluginData, context, "User not on server, ban cancelled by moderator");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "User not on server, ban cancelled by moderator");
         lock.unlock();
         return;
       } else {
@@ -57,7 +64,7 @@ export async function actualBanCmd(
 
     // Abort if trying to ban user indefinitely if they are already banned indefinitely
     if (!existingTempban && !time) {
-      sendErrorMessage(pluginData, context, `User is already banned indefinitely.`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `User is already banned indefinitely.`);
       return;
     }
 
@@ -69,7 +76,9 @@ export async function actualBanCmd(
     );
 
     if (!reply) {
-      sendErrorMessage(pluginData, context, "User already banned, update cancelled by moderator");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(context, "User already banned, update cancelled by moderator");
       lock.unlock();
       return;
     }
@@ -114,11 +123,12 @@ export async function actualBanCmd(
       });
     }
 
-    sendSuccessMessage(
-      pluginData,
-      context,
-      `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(
+        context,
+        `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
+      );
     lock.unlock();
     return;
   }
@@ -127,24 +137,26 @@ export async function actualBanCmd(
   if (!forceban && !canActOn(pluginData, author, memberToBan!)) {
     const ourLevel = getMemberLevel(pluginData, author);
     const targetLevel = getMemberLevel(pluginData, memberToBan!);
-    sendErrorMessage(
-      pluginData,
-      context,
-      `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(
+        context,
+        `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
+      );
     lock.unlock();
     return;
   }
 
   const matchingConfig = await pluginData.config.getMatchingConfig({
     member: author,
-    channel: isContextInteraction(context) ? context.channel : context,
+    channel: await getContextChannel(context),
   });
   const deleteMessageDays = deleteDays ?? matchingConfig.ban_delete_message_days;
   const banResult = await banUserId(
     pluginData,
     user.id,
     formattedReason,
+    formattedReasonWithAttachments,
     {
       contactMethods,
       caseArgs: {
@@ -158,7 +170,7 @@ export async function actualBanCmd(
   );
 
   if (banResult.status === "failed") {
-    sendErrorMessage(pluginData, context, `Failed to ban member: ${banResult.error}`);
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Failed to ban member: ${banResult.error}`);
     lock.unlock();
     return;
   }
@@ -178,5 +190,5 @@ export async function actualBanCmd(
   }
 
   lock.unlock();
-  sendSuccessMessage(pluginData, context, response);
+  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);
 }

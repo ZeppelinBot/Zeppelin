@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { parseInviteCodeInput } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
 import { utilityCmd } from "../types";
 
@@ -18,7 +18,7 @@ export const InviteInfoCmd = utilityCmd({
     const inviteCode = parseInviteCodeInput(args.inviteCode);
     const embed = await getInviteInfoEmbed(pluginData, inviteCode);
     if (!embed) {
-      sendErrorMessage(pluginData, message.channel, "Unknown invite");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Unknown invite");
       return;
     }
 

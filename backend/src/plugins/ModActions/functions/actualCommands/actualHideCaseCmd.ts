@@ -1,11 +1,11 @@
-import { ChatInputCommandInteraction, TextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage, sendSuccessMessage } from "../../../../pluginUtils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 export async function actualHideCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
-  context: TextBasedChannel | ChatInputCommandInteraction,
+  context: Message | ChatInputCommandInteraction,
   caseNumbers: number[],
 ) {
   const failed: number[] = [];
@@ -21,7 +21,7 @@ export async function actualHideCaseCmd(
   }
 
   if (failed.length === caseNumbers.length) {
-    sendErrorMessage(pluginData, context, "None of the cases were found!");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "None of the cases were found!");
     return;
   }
   const failedAddendum =
@@ -30,9 +30,10 @@ export async function actualHideCaseCmd(
       : "";
 
   const amt = caseNumbers.length - failed.length;
-  sendSuccessMessage(
-    pluginData,
-    context,
-    `${amt} case${amt === 1 ? " is" : "s are"} now hidden! Use \`unhidecase\` to unhide them.${failedAddendum}`,
-  );
+  pluginData
+    .getPlugin(CommonPlugin)
+    .sendSuccessMessage(
+      context,
+      `${amt} case${amt === 1 ? " is" : "s are"} now hidden! Use \`unhidecase\` to unhide them.${failedAddendum}`,
+    );
 }

@@ -1,6 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualUnmuteCmd } from "../../functions/actualCommands/actualUnmuteCmd";
 import { modActionsMsgCmd } from "../../types";
 
@@ -32,13 +33,13 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
     // Check if they're muted in the first place
     if (!(await pluginData.state.mutes.isMuted(user.id))) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot unmute: member is not muted");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: member is not muted");
       return;
     }
 
@@ -47,7 +48,7 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to unmute this member
     if (memberToUnmute && !canActOn(pluginData, msg.member, memberToUnmute)) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot unmute: insufficient permissions");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: insufficient permissions");
       return;
     }
 
@@ -57,7 +58,7 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
 
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -67,7 +68,7 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
 
     actualUnmuteCmd(
       pluginData,
-      msg.channel,
+      msg,
       user,
       [...msg.attachments.values()],
       mod,

@@ -1,6 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission, sendErrorMessage } from "../../../../pluginUtils";
+import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
+import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualForceBanCmd } from "../../functions/actualCommands/actualForceBanCmd";
 import { isBanned } from "../../functions/isBanned";
 import { modActionsMsgCmd } from "../../types";
@@ -26,21 +27,21 @@ export const ForceBanMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      sendErrorMessage(pluginData, msg.channel, `User not found`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
     // If the user exists as a guild member, make sure we can act on them first
     const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
     if (member && !canActOn(pluginData, msg.member, member)) {
-      sendErrorMessage(pluginData, msg.channel, "Cannot forceban this user: insufficient permissions");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot forceban this user: insufficient permissions");
       return;
     }
 
     // Make sure the user isn't already banned
     const banned = await isBanned(pluginData, user.id);
     if (banned) {
-      sendErrorMessage(pluginData, msg.channel, `User is already banned`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User is already banned`);
       return;
     }
 
@@ -48,13 +49,13 @@ export const ForceBanMsgCmd = modActionsMsgCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        sendErrorMessage(pluginData, msg.channel, "You don't have permission to use -mod");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
       mod = args.mod;
     }
 
-    actualForceBanCmd(pluginData, msg.channel, msg.author.id, user, args.reason, [...msg.attachments.values()], mod);
+    actualForceBanCmd(pluginData, msg, msg.author.id, user, args.reason, [...msg.attachments.values()], mod);
   },
 });
