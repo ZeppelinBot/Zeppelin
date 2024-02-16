@@ -1,19 +1,16 @@
-import * as t from "io-ts";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 // tslint:disable-next-line:no-empty-interface
 interface BanTriggerResultType {}
 
-export const BanTrigger = automodTrigger<BanTriggerResultType>()({
-  configType: t.type({
-    manual: t.boolean,
-    automatic: t.boolean,
-  }),
+const configSchema = z.strictObject({
+  manual: z.boolean().default(true),
+  automatic: z.boolean().default(true),
+});
 
-  defaultConfig: {
-    manual: true,
-    automatic: true,
-  },
+export const BanTrigger = automodTrigger<BanTriggerResultType>()({
+  configSchema,
 
   async match({ context, triggerConfig }) {
     if (context.modAction?.type !== "ban") {

@@ -1,28 +1,23 @@
-import * as t from "io-ts";
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
-import { tNullable } from "../../utils";
+import { zBoundedCharacters, zSnowflake } from "../../utils";
 
-// Permissions using these numbers: https://abal.moe/Eris/docs/reference (add all allowed/denied ones up)
-export const CompanionChannelOpts = t.type({
-  voice_channel_ids: t.array(t.string),
-  text_channel_ids: t.array(t.string),
-  permissions: t.number,
-  enabled: tNullable(t.boolean),
+export const zCompanionChannelOpts = z.strictObject({
+  voice_channel_ids: z.array(zSnowflake),
+  text_channel_ids: z.array(zSnowflake),
+  // See https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags
+  permissions: z.number(),
+  enabled: z.boolean().nullable().default(true),
 });
-export type TCompanionChannelOpts = t.TypeOf<typeof CompanionChannelOpts>;
+export type TCompanionChannelOpts = z.infer<typeof zCompanionChannelOpts>;
 
-export const ConfigSchema = t.type({
-  entries: t.record(t.string, CompanionChannelOpts),
+export const zCompanionChannelsConfig = z.strictObject({
+  entries: z.record(zBoundedCharacters(0, 100), zCompanionChannelOpts),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
-
-export interface ICompanionChannelMap {
-  [channelId: string]: TCompanionChannelOpts;
-}
 
 export interface CompanionChannelsPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zCompanionChannelsConfig>;
   state: {
     errorCooldownManager: CooldownManager;
     serverLogs: GuildLogs;

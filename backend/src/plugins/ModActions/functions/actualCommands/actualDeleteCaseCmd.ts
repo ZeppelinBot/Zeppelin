@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { GuildPluginData, helpers } from "knub";
 import { Case } from "../../../../data/entities/Case";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { SECONDS } from "../../../../utils";
+import { SECONDS, renderUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
@@ -58,7 +58,7 @@ export async function actualDeleteCaseCmd(
       }
     }
 
-    const deletedByName = author.user.tag;
+    const deletedByName = renderUsername(author);
 
     const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
     const deletedAt = timeAndDate.inGuildTz().format(timeAndDate.getDateFormat("pretty_datetime"));

@@ -1,7 +1,7 @@
 import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
-import { channelMentionRegex, isSnowflake, renderUserUsername, simpleClosestStringMatch } from "../../../utils";
+import { channelMentionRegex, isSnowflake, renderUsername, simpleClosestStringMatch } from "../../../utils";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { utilityCmd } from "../types";
@@ -83,7 +83,7 @@ export const VcmoveCmd = utilityCmd({
 
     pluginData
       .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, `**${renderUserUsername(args.member.user)}** moved to **${channel.name}**`);
+      .sendSuccessMessage(msg, `**${renderUsername(args.member)}** moved to **${channel.name}**`);
   },
 });
 
@@ -157,7 +157,7 @@ export const VcmoveAllCmd = utilityCmd({
           .getPlugin(CommonPlugin)
           .sendErrorMessage(
             msg,
-            `Failed to move ${renderUserUsername(currMember.user)} (${currMember.id}): You cannot act on this member`,
+            `Failed to move ${renderUsername(currMember)} (${currMember.id}): You cannot act on this member`,
           );
         errAmt++;
         continue;
@@ -174,7 +174,7 @@ export const VcmoveAllCmd = utilityCmd({
         }
         pluginData
           .getPlugin(CommonPlugin)
-          .sendErrorMessage(msg, `Failed to move ${renderUserUsername(currMember.user)} (${currMember.id})`);
+          .sendErrorMessage(msg, `Failed to move ${renderUsername(currMember)} (${currMember.id})`);
         errAmt++;
         continue;
       }

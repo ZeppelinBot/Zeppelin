@@ -1,6 +1,6 @@
 import { trimPluginDescription } from "../../utils";
 import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema } from "./types";
+import { zRoleButtonsConfig } from "./types";
 
 export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   prettyName: "Role buttons",
@@ -78,5 +78,5 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
               ... # See above for examples for options
     ~~~
   `),
-  configSchema: ConfigSchema,
+  configSchema: zRoleButtonsConfig,
 };

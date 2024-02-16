@@ -1,12 +1,14 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
-import * as t from "io-ts";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { isValidSnowflake, noop, tNullable, tPartialDictionary } from "../../../utils";
+import { U } from "ts-toolbelt";
+import z from "zod";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 
 type LegacyPermMap = Record<string, keyof (typeof PermissionsBitField)["Flags"]>;
@@ -59,41 +61,63 @@ const realToLegacyMap = Object.entries(legacyPermMap).reduce((map, pair) => {
   return map;
 }, {}) as Record<keyof typeof PermissionsBitField.Flags, keyof typeof legacyPermMap>;
 
-export const ChangePermsAction = automodAction({
-  configType: t.type({
-    target: t.string,
-    channel: tNullable(t.string),
-    perms: tPartialDictionary(
-      t.union([t.keyof(PermissionsBitField.Flags), t.keyof(legacyPermMap)]),
-      tNullable(t.boolean),
-    ),
-  }),
-  defaultConfig: {},
+const permissionNames = keys(PermissionsBitField.Flags) as U.ListOf<keyof typeof PermissionsBitField.Flags>;
+const legacyPermissionNames = keys(legacyPermMap) as U.ListOf<keyof typeof legacyPermMap>;
+const allPermissionNames = [...permissionNames, ...legacyPermissionNames] as const;
 
-  async apply({ pluginData, contexts, actionConfig }) {
+export const ChangePermsAction = automodAction({
+  configSchema: z.strictObject({
+    target: zBoundedCharacters(1, 2000),
+    channel: zBoundedCharacters(1, 2000).nullable().default(null),
+    perms: z.record(z.enum(allPermissionNames), z.boolean().nullable()),
+  }),
+
+  async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const user = contexts.find((c) => c.user)?.user;
     const message = contexts.find((c) => c.message)?.message;
 
-    const renderTarget = async (str: string) =>
-      renderTemplate(
-        str,
+    let target: string;
+    try {
+      target = await renderTemplate(
+        actionConfig.target,
         new TemplateSafeValueContainer({
           user: user ? userToTemplateSafeUser(user) : null,
           guild: guildToTemplateSafeGuild(pluginData.guild),
           message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
         }),
       );
-    const renderChannel = async (str: string) =>
-      renderTemplate(
-        str,
-        new TemplateSafeValueContainer({
-          user: user ? userToTemplateSafeUser(user) : null,
-          guild: guildToTemplateSafeGuild(pluginData.guild),
-          message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
-        }),
-      );
-    const target = await renderTarget(actionConfig.target);
-    const channelId = actionConfig.channel ? await renderChannel(actionConfig.channel) : null;
+    } catch (err) {
+      if (err instanceof TemplateParseError) {
+        pluginData.getPlugin(LogsPlugin).logBotAlert({
+          body: `Error in target format of automod rule ${ruleName}: ${err.message}`,
+        });
+        return;
+      }
+      throw err;
+    }
+
+    let channelId: string | null = null;
+    if (actionConfig.channel) {
+      try {
+        channelId = await renderTemplate(
+          actionConfig.channel,
+          new TemplateSafeValueContainer({
+            user: user ? userToTemplateSafeUser(user) : null,
+            guild: guildToTemplateSafeGuild(pluginData.guild),
+            message: message ? savedMessageToTemplateSafeSavedMessage(message) : null,
+          }),
+        );
+      } catch (err) {
+        if (err instanceof TemplateParseError) {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
+            body: `Error in channel format of automod rule ${ruleName}: ${err.message}`,
+          });
+          return;
+        }
+        throw err;
+      }
+    }
+
     const role = pluginData.guild.roles.resolve(target);
     if (!role) {
       const member = await pluginData.guild.members.fetch(target).catch(noop);

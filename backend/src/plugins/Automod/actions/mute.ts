@@ -1,28 +1,37 @@
-import * as t from "io-ts";
+import z from "zod";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { convertDelayStringToMS, nonNullish, tDelayString, tNullable, unique } from "../../../utils";
+import {
+  convertDelayStringToMS,
+  nonNullish,
+  unique,
+  zBoundedCharacters,
+  zDelayString,
+  zSnowflake,
+} from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
+import { zNotify } from "../constants";
 import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
 import { automodAction } from "../helpers";
 
 export const MuteAction = automodAction({
-  configType: t.type({
-    reason: tNullable(t.string),
-    duration: tNullable(tDelayString),
-    notify: tNullable(t.string),
-    notifyChannel: tNullable(t.string),
-    remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
-    restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
-    postInCaseLog: tNullable(t.boolean),
-    hide_case: tNullable(t.boolean),
+  configSchema: z.strictObject({
+    reason: zBoundedCharacters(0, 4000).nullable().default(null),
+    duration: zDelayString.nullable().default(null),
+    notify: zNotify.nullable().default(null),
+    notifyChannel: zSnowflake.nullable().default(null),
+    remove_roles_on_mute: z
+      .union([z.boolean(), z.array(zSnowflake)])
+      .nullable()
+      .default(null),
+    restore_roles_on_mute: z
+      .union([z.boolean(), z.array(zSnowflake)])
+      .nullable()
+      .default(null),
+    postInCaseLog: z.boolean().nullable().default(null),
+    hide_case: z.boolean().nullable().default(false),
   }),
-
-  defaultConfig: {
-    notify: null, // Use defaults from ModActions
-    hide_case: false,
-  },
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
     const duration = actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : undefined;

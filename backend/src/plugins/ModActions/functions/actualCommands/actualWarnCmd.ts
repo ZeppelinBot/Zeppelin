@@ -1,7 +1,7 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
-import { UserNotificationMethod, renderUserUsername } from "../../../../utils";
+import { UserNotificationMethod, renderUsername } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
@@ -63,6 +63,6 @@ export async function actualWarnCmd(
     .getPlugin(CommonPlugin)
     .sendSuccessMessage(
       context,
-      `Warned **${renderUserUsername(memberToWarn.user)}** (Case #${warnResult.case.case_number})${messageResultText}`,
+      `Warned **${renderUsername(memberToWarn.user)}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );
 }

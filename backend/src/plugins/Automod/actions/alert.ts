@@ -1,6 +1,5 @@
 import { Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
+import z from "zod";
 import { LogType } from "../../../data/LogType";
 import {
   createTypedTemplateSafeValueContainer,
@@ -12,25 +11,28 @@ import {
   chunkMessageLines,
   isTruthy,
   messageLink,
-  tAllowedMentions,
-  tNormalizedNullOptional,
   validateAndParseMessageContent,
   verboseChannelMention,
+  zAllowedMentions,
+  zBoundedCharacters,
+  zNullishToUndefined,
+  zSnowflake,
 } from "../../../utils";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 
-export const AlertAction = automodAction({
-  configType: t.type({
-    channel: t.string,
-    text: t.string,
-    allowed_mentions: tNormalizedNullOptional(tAllowedMentions),
-  }),
+const configSchema = z.object({
+  channel: zSnowflake,
+  text: zBoundedCharacters(0, 4000),
+  allowed_mentions: zNullishToUndefined(zAllowedMentions.nullable().default(null)),
+});
 
-  defaultConfig: {},
+export const AlertAction = automodAction({
+  configSchema,
 
   async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);

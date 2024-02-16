@@ -3,7 +3,6 @@ import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { CommonPlugin } from "../Common/CommonPlugin";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
@@ -23,7 +22,7 @@ import { ReloadServerCmd } from "./commands/ReloadServerCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
 import { ServersCmd } from "./commands/ServersCmd";
-import { BotControlPluginType, ConfigSchema } from "./types";
+import { BotControlPluginType, zBotControlConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -38,7 +37,7 @@ const defaultOptions = {
 
 export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zBotControlConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

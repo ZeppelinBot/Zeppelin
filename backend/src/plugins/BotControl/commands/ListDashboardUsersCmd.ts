@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { renderUserUsername, resolveUser } from "../../../utils";
+import { renderUsername, resolveUser } from "../../../utils";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
@@ -27,7 +27,7 @@ export const ListDashboardUsersCmd = botControlCmd({
     );
     const userNameList = users.map(
       ({ user, permission }) =>
-        `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
+        `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
     );
 
     pluginData

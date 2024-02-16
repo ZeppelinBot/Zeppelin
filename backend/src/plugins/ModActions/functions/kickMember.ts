@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
-import { renderTemplate, TemplateSafeValueContainer } from "../../../templateFormatter";
+import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter";
 import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
@@ -32,16 +32,27 @@ export async function kickMember(
 
     if (contactMethods.length) {
       if (config.kick_message) {
-        const kickMessage = await renderTemplate(
-          config.kick_message,
-          new TemplateSafeValueContainer({
-            guildName: pluginData.guild.name,
-            reason: reasonWithAttachments,
-            moderator: kickOptions.caseArgs?.modId
-              ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
-              : null,
-          }),
-        );
+        let kickMessage: string;
+        try {
+          kickMessage = await renderTemplate(
+            config.kick_message,
+            new TemplateSafeValueContainer({
+              guildName: pluginData.guild.name,
+              reason: reasonWithAttachments,
+              moderator: kickOptions.caseArgs?.modId
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
+                : null,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof TemplateParseError) {
+            return {
+              status: "failed",
+              error: `Invalid kick_message format: ${err.message}`,
+            };
+          }
+          throw err;
+        }
 
         notifyResult = await notifyUser(member.user, kickMessage, contactMethods);
       } else {

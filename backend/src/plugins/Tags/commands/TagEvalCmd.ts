@@ -1,5 +1,6 @@
 import { MessageCreateOptions } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
+import { logger } from "../../../logger";
 import { TemplateParseError } from "../../../templateFormatter";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { CommonPlugin } from "../../Common/CommonPlugin";
@@ -34,12 +35,15 @@ export const TagEvalCmd = tagsCmd({
 
       msg.channel.send(rendered);
     } catch (e) {
-      if (e instanceof TemplateParseError) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to render tag: ${e.message}`);
-        return;
+      const errorMessage = e instanceof TemplateParseError ? e.message : "Internal error";
+
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to render tag: ${errorMessage}`);
+
+      if (!(e instanceof TemplateParseError)) {
+        logger.warn(`Internal error evaluating tag in ${pluginData.guild.id}: ${e}`);
       }
 
-      throw e;
+      return;
     }
   },
 });

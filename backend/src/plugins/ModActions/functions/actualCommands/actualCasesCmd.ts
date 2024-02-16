@@ -1,4 +1,4 @@
-import { APIEmbed, ChatInputCommandInteraction, Message, User } from "discord.js";
+import { APIEmbed, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { In } from "typeorm";
 import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
@@ -9,13 +9,13 @@ import {
   UnknownUser,
   chunkArray,
   emptyEmbedValue,
-  renderUserUsername,
+  renderUsername,
+  resolveMember,
   resolveUser,
   trimLines,
 } from "../../../../utils";
 import { asyncMap } from "../../../../utils/async";
 import { createPaginatedMessage } from "../../../../utils/createPaginatedMessage";
-import { getChunkedEmbedFields } from "../../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
@@ -49,7 +49,7 @@ async function casesUserCmd(
   context: Message | ChatInputCommandInteraction,
   author: User,
   modId: string | null,
-  user: User | UnknownUser,
+  user: GuildMember | User | UnknownUser,
   modName: string,
   typesToShow: CaseTypes[],
   hidden: boolean | null,
@@ -67,7 +67,7 @@ async function casesUserCmd(
   const hiddenCases = cases.filter((c) => c.is_hidden);
 
   const userName =
-    user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUserUsername(user);
+    user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUsername(user);
 
   if (cases.length === 0) {
     await sendContextResponse(context, `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`);
@@ -92,7 +92,6 @@ async function casesUserCmd(
 
   // Compact view (= regular message with a preview of each case)
   const lines = await asyncMap(casesToDisplay, (c) => casesPlugin.getCaseSummary(c, true, author.id));
-
   const prefix = getGuildPrefix(pluginData);
   const linesPerChunk = 10;
   const lineChunks = chunkArray(lines, linesPerChunk);
@@ -124,12 +123,10 @@ async function casesUserCmd(
           lineChunks.length === 1
             ? `Cases for ${userName}${modId ? ` by ${modName}` : ""} (${lines.length} total)`
             : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-        icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
+        icon_url: user instanceof UnknownUser ? undefined : user.displayAvatarURL(),
       },
-      fields: [
-        ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
-        ...(isLastChunk ? [footerField] : []),
-      ],
+      description: linesInChunk.join("\n"),
+      fields: [...(isLastChunk ? [footerField] : [])],
     } satisfies APIEmbed;
 
     sendContextResponse(context, { embeds: [embed] });
@@ -141,7 +138,7 @@ async function casesModCmd(
   context: Message | ChatInputCommandInteraction,
   author: User,
   modId: string | null,
-  mod: User | UnknownUser,
+  mod: GuildMember | User | UnknownUser,
   modName: string,
   typesToShow: CaseTypes[],
   hidden: boolean | null,
@@ -188,10 +185,10 @@ async function casesModCmd(
       const embed = {
         author: {
           name: title,
-          icon_url: mod instanceof User ? mod.displayAvatarURL() : undefined,
+          icon_url: mod instanceof UnknownUser ? undefined : mod.displayAvatarURL(),
         },
+        description: lines.join("\n"),
         fields: [
-          ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
           {
             name: emptyEmbedValue,
             value: trimLines(`
@@ -214,7 +211,7 @@ export async function actualCasesCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
   context: Message | ChatInputCommandInteraction,
   modId: string | null,
-  user: User | UnknownUser | null,
+  user: GuildMember | User | UnknownUser | null,
   author: User,
   notes: boolean | null,
   warns: boolean | null,
@@ -226,8 +223,10 @@ export async function actualCasesCmd(
   hidden: boolean | null,
   expand: boolean | null,
 ) {
-  const mod = modId ? await resolveUser(pluginData.client, modId) : null;
-  const modName = modId ? (mod instanceof User ? renderUserUsername(mod) : modId) : renderUserUsername(author);
+  const mod = modId
+    ? (await resolveMember(pluginData.client, pluginData.guild, modId)) || (await resolveUser(pluginData.client, modId))
+    : null;
+  const modName = modId ? (mod instanceof UnknownUser ? modId : renderUsername(mod!)) : renderUsername(author);
 
   let typesToShow: CaseTypes[] = [];
 

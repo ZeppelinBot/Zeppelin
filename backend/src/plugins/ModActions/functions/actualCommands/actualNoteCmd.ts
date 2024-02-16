@@ -1,7 +1,7 @@
 import { Attachment, ChatInputCommandInteraction, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
-import { UnknownUser, renderUserUsername } from "../../../../utils";
+import { UnknownUser, renderUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
@@ -21,7 +21,7 @@ export async function actualNoteCmd(
     return;
   }
 
-  const userName = renderUserUsername(user);
+  const userName = renderUsername(user);
   const reason = await formatReasonWithMessageLinkForAttachments(pluginData, note, context, attachments);
 
   const casesPlugin = pluginData.getPlugin(CasesPlugin);

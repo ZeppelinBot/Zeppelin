@@ -4,7 +4,7 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory";
 import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory";
 import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
-import { DAYS, renderUserUsername } from "../../../utils";
+import { DAYS, renderUsername } from "../../../utils";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { nameHistoryCmd } from "../types";
 
@@ -31,7 +31,7 @@ export const NamesCmd = nameHistoryCmd({
     const usernameRows = usernames.map((r) => `\`[${r.timestamp}]\` **${disableCodeBlocks(r.username)}**`);
 
     const user = await pluginData.client.users.fetch(args.userId as Snowflake).catch(() => null);
-    const currentUsername = user ? renderUserUsername(user) : args.userId;
+    const currentUsername = user ? renderUsername(user) : args.userId;
 
     const nicknameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);
     const usernameDays = Math.round(NICKNAME_RETENTION_PERIOD / DAYS);

@@ -1,5 +1,6 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import * as t from "io-ts";
+import z from "zod";
+import { renderUsername } from "../../../utils.js";
 import { automodTrigger } from "../helpers";
 
 interface ThreadDeleteResult {
@@ -10,9 +11,10 @@ interface ThreadDeleteResult {
   matchedThreadOwner: User | undefined;
 }
 
+const configSchema = z.strictObject({});
+
 export const ThreadDeleteTrigger = automodTrigger<ThreadDeleteResult>()({
-  configType: t.type({}),
-  defaultConfig: {},
+  configSchema,
 
   async match({ context }) {
     if (!context.threadChange?.deleted) {
@@ -40,7 +42,7 @@ export const ThreadDeleteTrigger = automodTrigger<ThreadDeleteResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     if (threadOwner) {
       return `Thread **#${threadName ?? "Unknown"}** (\`${threadId}\`) created by **${escapeBold(
-        threadOwner.tag,
+        renderUsername(threadOwner),
       )}** (\`${threadOwner.id}\`) in the **#${parentName}** (\`${parentId}\`) channel has been deleted`;
     }
     return `Thread **#${

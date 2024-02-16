@@ -8,7 +8,7 @@ import {
   UserNotificationMethod,
   asSingleLine,
   isDiscordAPIError,
-  renderUserUsername,
+  renderUsername,
 } from "../../../../utils";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
@@ -80,24 +80,24 @@ export async function actualMuteCmd(
   if (time) {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${renderUserUsername(user)}**'s
+        Updated **${renderUsername(user)}**'s
         mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${renderUserUsername(user)}**
+        Muted **${renderUsername(user)}**
         for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     }
   } else {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${renderUserUsername(user)}**'s
+        Updated **${renderUsername(user)}**'s
         mute to indefinite (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${renderUserUsername(user)}**
+        Muted **${renderUsername(user)}**
         indefinitely (Case #${muteResult.case.case_number})
       `);
     }

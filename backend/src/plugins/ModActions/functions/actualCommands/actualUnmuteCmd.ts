@@ -1,7 +1,7 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { UnknownUser, asSingleLine, renderUserUsername } from "../../../../utils";
+import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { ModActionsPluginType } from "../../types";
@@ -45,7 +45,7 @@ export async function actualUnmuteCmd(
     pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
       context,
       asSingleLine(`
-        Unmuting **${renderUserUsername(user)}**
+        Unmuting **${renderUsername(user)}**
         in ${timeUntilUnmute} (Case #${result.case.case_number})
       `),
     );
@@ -53,7 +53,7 @@ export async function actualUnmuteCmd(
     pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
       context,
       asSingleLine(`
-        Unmuted **${renderUserUsername(user)}**
+        Unmuted **${renderUsername(user)}**
         (Case #${result.case.case_number})
       `),
     );

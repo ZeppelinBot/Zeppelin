@@ -1,5 +1,5 @@
-import * as t from "io-ts";
 import { GuildPluginData } from "knub";
+import z, { ZodTypeAny } from "zod";
 import { Awaitable } from "../../utils/typeUtils";
 import { AutomodContext, AutomodPluginType } from "./types";
 
@@ -31,21 +31,19 @@ type AutomodTriggerRenderMatchInformationFn<TConfigType, TMatchResultExtra> = (m
   matchResult: AutomodTriggerMatchResult<TMatchResultExtra>;
 }) => Awaitable<string>;
 
-export interface AutomodTriggerBlueprint<TConfigType extends t.Any, TMatchResultExtra> {
-  configType: TConfigType;
-  defaultConfig: Partial<t.TypeOf<TConfigType>>;
-
-  match: AutomodTriggerMatchFn<t.TypeOf<TConfigType>, TMatchResultExtra>;
-  renderMatchInformation: AutomodTriggerRenderMatchInformationFn<t.TypeOf<TConfigType>, TMatchResultExtra>;
+export interface AutomodTriggerBlueprint<TConfigSchema extends ZodTypeAny, TMatchResultExtra> {
+  configSchema: TConfigSchema;
+  match: AutomodTriggerMatchFn<z.output<TConfigSchema>, TMatchResultExtra>;
+  renderMatchInformation: AutomodTriggerRenderMatchInformationFn<z.output<TConfigSchema>, TMatchResultExtra>;
 }
 
-export function automodTrigger<TMatchResultExtra>(): <TConfigType extends t.Any>(
-  blueprint: AutomodTriggerBlueprint<TConfigType, TMatchResultExtra>,
-) => AutomodTriggerBlueprint<TConfigType, TMatchResultExtra>;
+export function automodTrigger<TMatchResultExtra>(): <TConfigSchema extends ZodTypeAny>(
+  blueprint: AutomodTriggerBlueprint<TConfigSchema, TMatchResultExtra>,
+) => AutomodTriggerBlueprint<TConfigSchema, TMatchResultExtra>;
 
-export function automodTrigger<TConfigType extends t.Any>(
-  blueprint: AutomodTriggerBlueprint<TConfigType, unknown>,
-): AutomodTriggerBlueprint<TConfigType, unknown>;
+export function automodTrigger<TConfigSchema extends ZodTypeAny>(
+  blueprint: AutomodTriggerBlueprint<TConfigSchema, unknown>,
+): AutomodTriggerBlueprint<TConfigSchema, unknown>;
 
 export function automodTrigger(...args) {
   if (args.length) {
@@ -63,15 +61,13 @@ type AutomodActionApplyFn<TConfigType> = (meta: {
   matchResult: AutomodTriggerMatchResult;
 }) => Awaitable<void>;
 
-export interface AutomodActionBlueprint<TConfigType extends t.Any> {
-  configType: TConfigType;
-  defaultConfig: Partial<t.TypeOf<TConfigType>>;
-
-  apply: AutomodActionApplyFn<t.TypeOf<TConfigType>>;
+export interface AutomodActionBlueprint<TConfigSchema extends ZodTypeAny> {
+  configSchema: TConfigSchema;
+  apply: AutomodActionApplyFn<z.output<TConfigSchema>>;
 }
 
-export function automodAction<TConfigType extends t.Any>(
-  blueprint: AutomodActionBlueprint<TConfigType>,
-): AutomodActionBlueprint<TConfigType> {
+export function automodAction<TConfigSchema extends ZodTypeAny>(
+  blueprint: AutomodActionBlueprint<TConfigSchema>,
+): AutomodActionBlueprint<TConfigSchema> {
   return blueprint;
 }

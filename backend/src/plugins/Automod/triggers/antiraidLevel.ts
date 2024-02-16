@@ -1,16 +1,15 @@
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 interface AntiraidLevelTriggerResult {}
 
-export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()({
-  configType: t.type({
-    level: tNullable(t.string),
-    only_on_change: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  level: z.nullable(z.string().max(100)),
+  only_on_change: z.nullable(z.boolean()),
+});
 
-  defaultConfig: {},
+export const AntiraidLevelTrigger = automodTrigger<AntiraidLevelTriggerResult>()({
+  configSchema,
 
   async match({ triggerConfig, context }) {
     if (!context.antiraid) {

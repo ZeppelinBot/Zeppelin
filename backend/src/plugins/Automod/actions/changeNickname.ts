@@ -1,17 +1,15 @@
-import * as t from "io-ts";
-import { nonNullish, unique } from "../../../utils";
+import z from "zod";
+import { nonNullish, unique, zBoundedCharacters } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 
 export const ChangeNicknameAction = automodAction({
-  configType: t.union([
-    t.string,
-    t.type({
-      name: t.string,
+  configSchema: z.union([
+    zBoundedCharacters(0, 32),
+    z.strictObject({
+      name: zBoundedCharacters(0, 32),
     }),
   ]),
-
-  defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig }) {
     const members = unique(contexts.map((c) => c.member).filter(nonNullish));

@@ -1,13 +1,11 @@
 import { GuildFeature } from "discord.js";
-import * as t from "io-ts";
+import z from "zod";
 import { automodAction } from "../helpers";
 
 export const PauseInvitesAction = automodAction({
-  configType: t.type({
-    paused: t.boolean,
+  configSchema: z.strictObject({
+    paused: z.boolean(),
   }),
-
-  defaultConfig: {},
 
   async apply({ pluginData, actionConfig }) {
     const hasInvitesDisabled = pluginData.guild.features.includes(GuildFeature.InvitesDisabled);

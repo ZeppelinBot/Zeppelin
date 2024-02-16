@@ -1,18 +1,16 @@
-import * as t from "io-ts";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 interface ExampleMatchResultType {
   isBanana: boolean;
 }
 
-export const ExampleTrigger = automodTrigger<ExampleMatchResultType>()({
-  configType: t.type({
-    allowedFruits: t.array(t.string),
-  }),
+const configSchema = z.strictObject({
+  allowedFruits: z.array(z.string().max(100)).max(50).default(["peach", "banana"]),
+});
 
-  defaultConfig: {
-    allowedFruits: ["peach", "banana"],
-  },
+export const ExampleTrigger = automodTrigger<ExampleMatchResultType>()({
+  configSchema,
 
   async match({ triggerConfig, context }) {
     const foundFruit = triggerConfig.allowedFruits.find((fruit) => context.message?.data.content === fruit);

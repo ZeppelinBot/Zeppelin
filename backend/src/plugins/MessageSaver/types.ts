@@ -1,14 +1,13 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 
-export const ConfigSchema = t.type({
-  can_manage: t.boolean,
+export const zMessageSaverConfig = z.strictObject({
+  can_manage: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface MessageSaverPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zMessageSaverConfig>;
   state: {
     savedMessages: GuildSavedMessages;
   };

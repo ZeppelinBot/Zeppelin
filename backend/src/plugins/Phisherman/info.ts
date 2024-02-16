@@ -1,6 +1,6 @@
 import { trimPluginDescription } from "../../utils";
 import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema } from "./types";
+import { zPhishermanConfig } from "./types";
 
 export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
   prettyName: "Phisherman",
@@ -39,5 +39,5 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
               clean: true
     ~~~
   `),
-  configSchema: ConfigSchema,
+  configSchema: zPhishermanConfig,
 };

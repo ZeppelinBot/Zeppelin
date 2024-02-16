@@ -1,15 +1,14 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
 
-export const ConfigSchema = t.type({
-  can_where: t.boolean,
-  can_alert: t.boolean,
+export const zLocateUserConfig = z.strictObject({
+  can_where: z.boolean(),
+  can_alert: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface LocateUserPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zLocateUserConfig>;
   state: {
     alerts: GuildVCAlerts;
     usersWithAlerts: string[];

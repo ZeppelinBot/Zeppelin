@@ -6,7 +6,7 @@ import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { MINUTES, trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -74,11 +74,11 @@ import { warnMember } from "./functions/warnMember";
 import {
   AttachmentLinkReactionType,
   BanOptions,
-  ConfigSchema,
   KickOptions,
   ModActionsPluginType,
   WarnOptions,
   modActionsSlashGroup,
+  zModActionsConfig,
 } from "./types";
 
 const defaultOptions = {
@@ -155,11 +155,11 @@ export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
     description: trimPluginDescription(`
       This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
     `),
-    configSchema: ConfigSchema,
+    configSchema: zModActionsConfig,
   },
 
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zModActionsConfig.parse(input),
   defaultOptions,
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],

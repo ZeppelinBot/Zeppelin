@@ -1,13 +1,11 @@
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
+import z from "zod";
 
-export const ConfigSchema = t.type({
-  success_emoji: t.string,
-  error_emoji: t.string,
+export const zCommonConfig = z.strictObject({
+  success_emoji: z.string(),
+  error_emoji: z.string(),
 });
 
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
-
 export interface CommonPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.output<typeof zCommonConfig>;
 }

@@ -3,7 +3,7 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
-import { DBDateFormat, MINUTES, StrictMessageContent, errorMessage } from "../../../utils";
+import { DBDateFormat, MINUTES, StrictMessageContent, errorMessage, renderUsername } from "../../../utils";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
@@ -131,7 +131,7 @@ export async function actualPostCmd(
 
     const post = await pluginData.state.scheduledPosts.create({
       author_id: msg.author.id,
-      author_name: msg.author.tag,
+      author_name: renderUsername(msg.author),
       channel_id: targetChannel.id,
       content,
       attachments: [...msg.attachments.values()],

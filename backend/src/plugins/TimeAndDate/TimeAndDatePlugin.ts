@@ -1,6 +1,6 @@
 import { PluginOptions } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
@@ -12,7 +12,7 @@ import { getGuildTz } from "./functions/getGuildTz";
 import { getMemberTz } from "./functions/getMemberTz";
 import { inGuildTz } from "./functions/inGuildTz";
 import { inMemberTz } from "./functions/inMemberTz";
-import { ConfigSchema, TimeAndDatePluginType } from "./types";
+import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {
@@ -39,10 +39,10 @@ export const TimeAndDatePlugin = zeppelinGuildPlugin<TimeAndDatePluginType>()({
     description: trimPluginDescription(`
       Allows controlling the displayed time/date formats and timezones
     `),
-    configSchema: ConfigSchema,
+    configSchema: zTimeAndDateConfig,
   },
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zTimeAndDateConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

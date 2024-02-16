@@ -1,11 +1,10 @@
 import { CooldownManager, PluginOptions } from "knub";
 import { trimPluginDescription } from "../../utils";
-import { parseIoTsSchema } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
 import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
-import { ConfigSchema, SelfGrantableRolesPluginType, defaultSelfGrantableRoleEntry } from "./types";
+import { SelfGrantableRolesPluginType, zSelfGrantableRolesConfig } from "./types";
 
 const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   config: {
@@ -66,25 +65,10 @@ export const SelfGrantableRolesPlugin = zeppelinGuildPlugin<SelfGrantableRolesPl
                   can_use: true
       ~~~
     `),
-    configSchema: ConfigSchema,
+    configSchema: zSelfGrantableRolesConfig,
   },
 
-  configParser: (input) => {
-    const entries = (input as any).entries;
-    for (const [key, entry] of Object.entries<any>(entries)) {
-      // Apply default entry config
-      entries[key] = { ...defaultSelfGrantableRoleEntry, ...entry };
-
-      // Normalize alias names
-      if (entry.roles) {
-        for (const [roleId, aliases] of Object.entries<string[]>(entry.roles)) {
-          entry.roles[roleId] = aliases.map((a) => a.toLowerCase());
-        }
-      }
-    }
-
-    return parseIoTsSchema(ConfigSchema, input);
-  },
+  configParser: (input) => zSelfGrantableRolesConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

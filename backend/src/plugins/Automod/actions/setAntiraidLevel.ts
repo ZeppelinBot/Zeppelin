@@ -1,11 +1,9 @@
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import { zBoundedCharacters } from "../../../utils";
 import { setAntiraidLevel } from "../functions/setAntiraidLevel";
 import { automodAction } from "../helpers";
 
 export const SetAntiraidLevelAction = automodAction({
-  configType: tNullable(t.string),
-  defaultConfig: "",
+  configSchema: zBoundedCharacters(0, 100).nullable(),
 
   async apply({ pluginData, actionConfig }) {
     setAntiraidLevel(pluginData, actionConfig ?? null);

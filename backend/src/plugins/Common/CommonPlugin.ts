@@ -9,11 +9,11 @@ import {
 } from "discord.js";
 import { PluginOptions } from "knub";
 import { logger } from "../../logger";
-import { isContextInteraction, makeIoTsConfigParser, sendContextResponse } from "../../pluginUtils";
+import { isContextInteraction, sendContextResponse } from "../../pluginUtils";
 import { errorMessage, successMessage } from "../../utils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji";
-import { CommonPluginType, ConfigSchema } from "./types";
+import { CommonPluginType, zCommonConfig } from "./types";
 
 const defaultOptions: PluginOptions<CommonPluginType> = {
   config: {
@@ -30,7 +30,7 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
   },
 
   dependencies: () => [],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zCommonConfig.parse(input),
   defaultOptions,
   public: {
     getSuccessEmoji(pluginData) {

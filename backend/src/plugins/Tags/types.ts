@@ -1,52 +1,59 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
-import { tEmbed, tNullable } from "../../utils";
+import { zEmbedInput } from "../../utils";
 
-export const Tag = t.union([t.string, tEmbed]);
-export type TTag = t.TypeOf<typeof Tag>;
+export const zTag = z.union([z.string(), zEmbedInput]);
+export type TTag = z.infer<typeof zTag>;
 
-export const TagCategory = t.type({
-  prefix: tNullable(t.string),
-  delete_with_command: tNullable(t.boolean),
+export const zTagCategory = z
+  .strictObject({
+    prefix: z.string().nullable().default(null),
+    delete_with_command: z.boolean().default(false),
 
-  user_tag_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag
-  user_category_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag category
-  global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
-  allow_mentions: tNullable(t.boolean), // Per user, per category
-  global_category_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per category
-  auto_delete_command: tNullable(t.boolean), // Any tag, per tag category
+    user_tag_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Per user, per tag
+    user_category_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Per user, per tag category
+    global_tag_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Any user, per tag
+    allow_mentions: z.boolean().nullable().default(null),
+    global_category_cooldown: z.union([z.string(), z.number()]).nullable().default(null), // Any user, per category
+    auto_delete_command: z.boolean().nullable().default(null),
 
-  tags: t.record(t.string, Tag),
+    tags: z.record(z.string(), zTag),
 
-  can_use: tNullable(t.boolean),
-});
-export type TTagCategory = t.TypeOf<typeof TagCategory>;
+    can_use: z.boolean().nullable().default(null),
+  })
+  .refine((parsed) => !(parsed.auto_delete_command && parsed.delete_with_command), {
+    message: "Cannot have both (category specific) delete_with_command and auto_delete_command enabled",
+  });
+export type TTagCategory = z.infer<typeof zTagCategory>;
 
-export const ConfigSchema = t.type({
-  prefix: t.string,
-  delete_with_command: t.boolean,
+export const zTagsConfig = z
+  .strictObject({
+    prefix: z.string(),
+    delete_with_command: z.boolean(),
 
-  user_tag_cooldown: tNullable(t.union([t.string, t.number])), // Per user, per tag
-  global_tag_cooldown: tNullable(t.union([t.string, t.number])), // Any user, per tag
-  user_cooldown: tNullable(t.union([t.string, t.number])), // Per user
-  allow_mentions: t.boolean, // Per user
-  global_cooldown: tNullable(t.union([t.string, t.number])), // Any tag use
-  auto_delete_command: t.boolean, // Any tag
+    user_tag_cooldown: z.union([z.string(), z.number()]).nullable(), // Per user, per tag
+    global_tag_cooldown: z.union([z.string(), z.number()]).nullable(), // Any user, per tag
+    user_cooldown: z.union([z.string(), z.number()]).nullable(), // Per user
+    allow_mentions: z.boolean(), // Per user
+    global_cooldown: z.union([z.string(), z.number()]).nullable(), // Any tag use
+    auto_delete_command: z.boolean(), // Any tag
 
-  categories: t.record(t.string, TagCategory),
+    categories: z.record(z.string(), zTagCategory),
 
-  can_create: t.boolean,
-  can_use: t.boolean,
-  can_list: t.boolean,
-});
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+    can_create: z.boolean(),
+    can_use: z.boolean(),
+    can_list: z.boolean(),
+  })
+  .refine((parsed) => !(parsed.auto_delete_command && parsed.delete_with_command), {
+    message: "Cannot have both (category specific) delete_with_command and auto_delete_command enabled",
+  });
 
 export interface TagsPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zTagsConfig>;
   state: {
     archives: GuildArchives;
     tags: GuildTags;

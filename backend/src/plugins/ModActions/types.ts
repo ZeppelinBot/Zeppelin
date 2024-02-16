@@ -1,55 +1,54 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { EventEmitter } from "events";
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
+import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import { Case } from "../../data/entities/Case";
-import { UserNotificationMethod, UserNotificationResult, tNullable } from "../../utils";
+import { UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
-export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null | undefined;
+export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null;
 
-export const ConfigSchema = t.type({
-  dm_on_warn: t.boolean,
-  dm_on_kick: t.boolean,
-  dm_on_ban: t.boolean,
-  message_on_warn: t.boolean,
-  message_on_kick: t.boolean,
-  message_on_ban: t.boolean,
-  message_channel: tNullable(t.string),
-  warn_message: tNullable(t.string),
-  kick_message: tNullable(t.string),
-  ban_message: tNullable(t.string),
-  tempban_message: tNullable(t.string),
-  alert_on_rejoin: t.boolean,
-  alert_channel: tNullable(t.string),
-  warn_notify_enabled: t.boolean,
-  warn_notify_threshold: t.number,
-  warn_notify_message: t.string,
-  ban_delete_message_days: t.number,
-  attachment_link_reaction: tNullable(t.union([t.literal("none"), t.literal("warn"), t.literal("restrict")])),
-  attachment_storing_channel: tNullable(t.string),
-  can_note: t.boolean,
-  can_warn: t.boolean,
-  can_mute: t.boolean,
-  can_kick: t.boolean,
-  can_ban: t.boolean,
-  can_unban: t.boolean,
-  can_view: t.boolean,
-  can_addcase: t.boolean,
-  can_massunban: t.boolean,
-  can_massban: t.boolean,
-  can_massmute: t.boolean,
-  can_hidecase: t.boolean,
-  can_deletecase: t.boolean,
-  can_act_as_other: t.boolean,
-  create_cases_for_manual_actions: t.boolean,
+export const zModActionsConfig = z.strictObject({
+  dm_on_warn: z.boolean(),
+  dm_on_kick: z.boolean(),
+  dm_on_ban: z.boolean(),
+  message_on_warn: z.boolean(),
+  message_on_kick: z.boolean(),
+  message_on_ban: z.boolean(),
+  message_channel: z.nullable(z.string()),
+  warn_message: z.nullable(z.string()),
+  kick_message: z.nullable(z.string()),
+  ban_message: z.nullable(z.string()),
+  tempban_message: z.nullable(z.string()),
+  alert_on_rejoin: z.boolean(),
+  alert_channel: z.nullable(z.string()),
+  warn_notify_enabled: z.boolean(),
+  warn_notify_threshold: z.number(),
+  warn_notify_message: z.string(),
+  ban_delete_message_days: z.number(),
+  attachment_link_reaction: z.nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")])),
+  attachment_storing_channel: z.nullable(z.string()),
+  can_note: z.boolean(),
+  can_warn: z.boolean(),
+  can_mute: z.boolean(),
+  can_kick: z.boolean(),
+  can_ban: z.boolean(),
+  can_unban: z.boolean(),
+  can_view: z.boolean(),
+  can_addcase: z.boolean(),
+  can_massunban: z.boolean(),
+  can_massban: z.boolean(),
+  can_massmute: z.boolean(),
+  can_hidecase: z.boolean(),
+  can_deletecase: z.boolean(),
+  can_act_as_other: z.boolean(),
+  create_cases_for_manual_actions: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface ModActionsEvents {
   note: (userId: string, reason?: string) => void;
@@ -66,7 +65,7 @@ export interface ModActionsEventEmitter extends EventEmitter {
 }
 
 export interface ModActionsPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zModActionsConfig>;
   state: {
     mutes: GuildMutes;
     cases: GuildCases;

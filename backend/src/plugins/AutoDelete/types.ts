@@ -1,9 +1,9 @@
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { SavedMessage } from "../../data/entities/SavedMessage";
-import { MINUTES, tDelayString } from "../../utils";
+import { MINUTES, zDelayString } from "../../utils";
 import Timeout = NodeJS.Timeout;
 
 export const MAX_DELAY = 5 * MINUTES;
@@ -13,14 +13,13 @@ export interface IDeletionQueueItem {
   message: SavedMessage;
 }
 
-export const ConfigSchema = t.type({
-  enabled: t.boolean,
-  delay: tDelayString,
+export const zAutoDeleteConfig = z.strictObject({
+  enabled: z.boolean(),
+  delay: zDelayString,
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface AutoDeletePluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.output<typeof zAutoDeleteConfig>;
   state: {
     guildSavedMessages: GuildSavedMessages;
     guildLogs: GuildLogs;

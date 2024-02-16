@@ -5,7 +5,6 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -43,7 +42,7 @@ import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 import { hasPermission } from "./functions/hasPermission";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
-import { ConfigSchema, UtilityPluginType } from "./types";
+import { UtilityPluginType, zUtilityConfig } from "./types";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -118,11 +117,11 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Utility",
-    configSchema: ConfigSchema,
+    configSchema: zUtilityConfig,
   },
 
   dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zUtilityConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

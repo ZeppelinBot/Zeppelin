@@ -9,13 +9,13 @@ import {
 } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { canActOn } from "src/pluginUtils";
-import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
+import { canActOn } from "../../../pluginUtils";
 import { convertDelayStringToMS } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
@@ -71,12 +71,12 @@ async function muteAction(
     const result = await mutes.muteUser(target, durationMs, reason, reason, { caseArgs });
 
     const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
-    const muteMessage = `Muted **${result.case.user_name}** ${
+    const muteMessage = `Muted **${result.case!.user_name}** ${
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"
-    } (Case #${result.case.case_number})${messageResultText}`;
+    } (Case #${result.case!.case_number})${messageResultText}`;
 
     if (evidence) {
-      await updateAction(pluginData, executingMember, result.case, evidence);
+      await updateAction(pluginData, executingMember, result.case!, evidence);
     }
 
     await interactionToReply

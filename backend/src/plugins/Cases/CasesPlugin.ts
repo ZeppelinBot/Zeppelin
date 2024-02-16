@@ -3,7 +3,7 @@ import { Case } from "../../data/entities/Case";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { trimPluginDescription } from "../../utils";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -16,7 +16,7 @@ import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUser
 import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
 import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
-import { CaseArgs, CaseNoteArgs, CasesPluginType, ConfigSchema } from "./types";
+import { CaseArgs, CaseNoteArgs, CasesPluginType, zCasesConfig } from "./types";
 
 // The `any` cast here is to prevent TypeScript from locking up from the circular dependency
 function getLogsPlugin(): Promise<any> {
@@ -42,11 +42,11 @@ export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
     description: trimPluginDescription(`
       This plugin contains basic configuration for cases created by other plugins
     `),
-    configSchema: ConfigSchema,
+    configSchema: zCasesConfig,
   },
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getLogsPlugin()).LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zCasesConfig.parse(input),
   defaultOptions,
 
   public: {

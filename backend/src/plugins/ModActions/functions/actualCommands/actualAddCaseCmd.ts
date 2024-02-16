@@ -3,7 +3,7 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { Case } from "../../../../data/entities/Case";
 import { canActOn } from "../../../../pluginUtils";
-import { UnknownUser, renderUserUsername, resolveMember } from "../../../../utils";
+import { UnknownUser, renderUsername, resolveMember } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
@@ -49,7 +49,7 @@ export async function actualAddCaseCmd(
   if (user) {
     pluginData
       .getPlugin(CommonPlugin)
-      .sendSuccessMessage(context, `Case #${theCase.case_number} created for **${renderUserUsername(user)}**`);
+      .sendSuccessMessage(context, `Case #${theCase.case_number} created for **${renderUsername(user)}**`);
   } else {
     pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Case #${theCase.case_number} created`);
   }

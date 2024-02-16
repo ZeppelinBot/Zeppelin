@@ -5,7 +5,7 @@ import { getMemberLevel } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop";
 import { canActOn, getContextChannel } from "../../../../pluginUtils";
-import { UnknownUser, UserNotificationMethod, renderUserUsername, resolveMember } from "../../../../utils";
+import { UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
 import { banLock } from "../../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
@@ -183,7 +183,7 @@ export async function actualBanCmd(
   // Confirm the action to the moderator
   let response = "";
   if (!forceban) {
-    response = `Banned **${renderUserUsername(user)}** ${forTime}(Case #${banResult.case.case_number})`;
+    response = `Banned **${renderUsername(user)}** ${forTime}(Case #${banResult.case.case_number})`;
     if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
   } else {
     response = `Member forcebanned ${forTime}(Case #${banResult.case.case_number})`;

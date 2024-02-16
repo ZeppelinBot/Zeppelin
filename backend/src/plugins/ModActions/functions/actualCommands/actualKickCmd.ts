@@ -2,14 +2,7 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } f
 import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType";
 import { canActOn } from "../../../../pluginUtils";
-import {
-  DAYS,
-  SECONDS,
-  UnknownUser,
-  UserNotificationMethod,
-  renderUserUsername,
-  resolveMember,
-} from "../../../../utils";
+import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
@@ -91,7 +84,7 @@ export async function actualKickCmd(
   }
 
   // Confirm the action to the moderator
-  let response = `Kicked **${renderUserUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
+  let response = `Kicked **${renderUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
   pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);

@@ -1,11 +1,10 @@
 import { PluginOptions } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
-import { ConfigSchema, MessageSaverPluginType } from "./types";
+import { MessageSaverPluginType, zMessageSaverConfig } from "./types";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {
@@ -25,7 +24,7 @@ export const MessageSaverPlugin = zeppelinGuildPlugin<MessageSaverPluginType>()(
   name: "message_saver",
   showInDocs: false,
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zMessageSaverConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

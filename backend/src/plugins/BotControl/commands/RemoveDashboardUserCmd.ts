@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
-import { renderUserUsername } from "../../../utils";
+import { renderUsername } from "../../../utils";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
@@ -35,7 +35,8 @@ export const RemoveDashboardUserCmd = botControlCmd({
       await pluginData.state.apiPermissionAssignments.removeUser(args.guildId, user.id);
     }
 
-    const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUserUsername(user)}**, \`${user.id}\`)`);
+    const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`)`);
+
     pluginData
       .getPlugin(CommonPlugin)
       .sendSuccessMessage(

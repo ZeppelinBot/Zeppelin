@@ -1,35 +1,34 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener } from "knub";
+import z from "zod";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { tNullable } from "../../utils";
+import { zSnowflake } from "../../utils";
 
-const BaseSingleSpamConfig = t.type({
-  interval: t.number,
-  count: t.number,
-  mute: tNullable(t.boolean),
-  mute_time: tNullable(t.number),
-  remove_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
-  restore_roles_on_mute: tNullable(t.union([t.boolean, t.array(t.string)])),
-  clean: tNullable(t.boolean),
+const zBaseSingleSpamConfig = z.strictObject({
+  interval: z.number(),
+  count: z.number(),
+  mute: z.boolean().default(false),
+  mute_time: z.number().nullable().default(null),
+  remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
+  restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
+  clean: z.boolean().default(false),
 });
-export type TBaseSingleSpamConfig = t.TypeOf<typeof BaseSingleSpamConfig>;
+export type TBaseSingleSpamConfig = z.infer<typeof zBaseSingleSpamConfig>;
 
-export const ConfigSchema = t.type({
-  max_censor: tNullable(BaseSingleSpamConfig),
-  max_messages: tNullable(BaseSingleSpamConfig),
-  max_mentions: tNullable(BaseSingleSpamConfig),
-  max_links: tNullable(BaseSingleSpamConfig),
-  max_attachments: tNullable(BaseSingleSpamConfig),
-  max_emojis: tNullable(BaseSingleSpamConfig),
-  max_newlines: tNullable(BaseSingleSpamConfig),
-  max_duplicates: tNullable(BaseSingleSpamConfig),
-  max_characters: tNullable(BaseSingleSpamConfig),
-  max_voice_moves: tNullable(BaseSingleSpamConfig),
+export const zSpamConfig = z.strictObject({
+  max_censor: zBaseSingleSpamConfig.nullable(),
+  max_messages: zBaseSingleSpamConfig.nullable(),
+  max_mentions: zBaseSingleSpamConfig.nullable(),
+  max_links: zBaseSingleSpamConfig.nullable(),
+  max_attachments: zBaseSingleSpamConfig.nullable(),
+  max_emojis: zBaseSingleSpamConfig.nullable(),
+  max_newlines: zBaseSingleSpamConfig.nullable(),
+  max_duplicates: zBaseSingleSpamConfig.nullable(),
+  max_characters: zBaseSingleSpamConfig.nullable(),
+  max_voice_moves: zBaseSingleSpamConfig.nullable(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export enum RecentActionType {
   Message = 1,
@@ -53,7 +52,7 @@ interface IRecentAction<T> {
 }
 
 export interface SpamPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zSpamConfig>;
   state: {
     logs: GuildLogs;
     archives: GuildArchives;
