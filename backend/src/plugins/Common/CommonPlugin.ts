@@ -98,7 +98,7 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
         body: string,
         allowedMentions?: MessageMentionOptions,
         responseInteraction?: ModalSubmitInteraction,
-        ephemeral = false,
+        ephemeral = true,
       ): Promise<Message | undefined> => {
         const emoji = getErrorEmoji(pluginData);
         const formattedBody = errorMessage(body, emoji);

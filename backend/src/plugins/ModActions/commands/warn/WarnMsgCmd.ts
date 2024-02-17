@@ -24,7 +24,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -33,9 +33,9 @@ export const WarnMsgCmd = modActionsMsgCmd({
     if (!memberToWarn) {
       const _isBanned = await isBanned(pluginData, user.id);
       if (_isBanned) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User is banned`);
+        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User is banned`);
       } else {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found on the server`);
+        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found on the server`);
       }
 
       return;
@@ -43,7 +43,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to warn this member
     if (!canActOn(pluginData, msg.member, memberToWarn)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot warn: insufficient permissions");
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot warn: insufficient permissions");
       return;
     }
 
@@ -62,7 +62,7 @@ export const WarnMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
       return;
     }
 

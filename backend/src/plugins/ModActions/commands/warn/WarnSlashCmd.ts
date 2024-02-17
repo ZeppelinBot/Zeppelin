@@ -45,7 +45,7 @@ export const WarnSlashCmd = {
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData
+      await pluginData
         .getPlugin(CommonPlugin)
         .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
 
@@ -57,9 +57,9 @@ export const WarnSlashCmd = {
     if (!memberToWarn) {
       const _isBanned = await isBanned(pluginData, options.user.id);
       if (_isBanned) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User is banned`);
+        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User is banned`);
       } else {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User not found on the server`);
+        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User not found on the server`);
       }
 
       return;
@@ -67,7 +67,7 @@ export const WarnSlashCmd = {
 
     // Make sure we're allowed to warn this member
     if (!canActOn(pluginData, interaction.member, memberToWarn)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot warn: insufficient permissions");
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot warn: insufficient permissions");
       return;
     }
 
@@ -79,7 +79,7 @@ export const WarnSlashCmd = {
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData
+        await pluginData
           .getPlugin(CommonPlugin)
           .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
@@ -92,7 +92,7 @@ export const WarnSlashCmd = {
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
       return;
     }
 

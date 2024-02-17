@@ -32,7 +32,7 @@ export const CasesModMsgCmd = modActionsMsgCmd({
       msg,
       args.mod,
       null,
-      msg.author,
+      msg.member,
       args.notes,
       args.warns,
       args.mutes,

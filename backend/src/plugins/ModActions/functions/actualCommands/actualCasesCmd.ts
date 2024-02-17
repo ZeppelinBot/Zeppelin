@@ -145,9 +145,9 @@ async function casesModCmd(
   expand: boolean | null,
 ) {
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
-  const caseFilters = { type: In(typesToShow), is_hidden: !!hidden };
+  const casesFilters = { type: In(typesToShow), is_hidden: !!hidden };
 
-  const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, caseFilters);
+  const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters);
 
   if (totalCases === 0) {
     pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `No cases by **${modName}**`);
@@ -159,7 +159,7 @@ async function casesModCmd(
 
   if (expand) {
     // Expanded view (= individual case embeds)
-    const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, caseFilters);
+    const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, casesFilters);
 
     sendExpandedCases(pluginData, context, totalCases, cases);
     return;
@@ -174,7 +174,7 @@ async function casesModCmd(
         modId ?? author.id,
         casesPerPage,
         (page - 1) * casesPerPage,
-        caseFilters,
+        casesFilters,
       );
 
       const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, author.id));
@@ -212,7 +212,7 @@ export async function actualCasesCmd(
   context: Message | ChatInputCommandInteraction,
   modId: string | null,
   user: GuildMember | User | UnknownUser | null,
-  author: User,
+  author: GuildMember,
   notes: boolean | null,
   warns: boolean | null,
   mutes: boolean | null,
@@ -253,6 +253,6 @@ export async function actualCasesCmd(
   }
 
   user
-    ? casesUserCmd(pluginData, context, author, modId!, user, modName, typesToShow, hidden, expand)
-    : casesModCmd(pluginData, context, author, modId!, mod!, modName, typesToShow, hidden, expand);
+    ? casesUserCmd(pluginData, context, author.user, modId!, user, modName, typesToShow, hidden, expand)
+    : casesModCmd(pluginData, context, author.user, modId!, mod ?? author, modName, typesToShow, hidden, expand);
 }

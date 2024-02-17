@@ -33,7 +33,7 @@ export const CasesSlashCmd = {
       interaction,
       options.mod,
       options.user,
-      interaction.user,
+      interaction.member,
       options.notes,
       options.warns,
       options.mutes,

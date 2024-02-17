@@ -37,7 +37,7 @@ export async function actualWarnCmd(
       { confirmText: "Yes", cancelText: "No", restrictToId: authorId },
     );
     if (!reply) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Warn cancelled by moderator");
+      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Warn cancelled by moderator");
       return;
     }
   }
@@ -53,13 +53,16 @@ export async function actualWarnCmd(
   });
 
   if (warnResult.status === "failed") {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Failed to warn user");
+    const failReason = warnResult.error ? `: ${warnResult.error}` : "";
+
+    await pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Failed to warn user${failReason}`);
+
     return;
   }
 
   const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
-  pluginData
+  await pluginData
     .getPlugin(CommonPlugin)
     .sendSuccessMessage(
       context,

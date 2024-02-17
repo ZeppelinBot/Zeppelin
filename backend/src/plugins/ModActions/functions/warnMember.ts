@@ -1,7 +1,6 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { getContextChannel, isContextInteraction } from "../../../pluginUtils";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
@@ -52,12 +51,7 @@ export async function warnMember(
   }
 
   if (!notifyResult.success) {
-    const contextIsNotInteraction =
-      warnOptions.retryPromptContext && !isContextInteraction(warnOptions.retryPromptContext);
-    const contextChannel = contextIsNotInteraction ? await getContextChannel(warnOptions.retryPromptContext!) : null;
-    const isValidChannel = contextIsNotInteraction && pluginData.guild.channels.resolve(contextChannel!.id);
-
-    if (!warnOptions.retryPromptContext || !isValidChannel) {
+    if (!warnOptions.retryPromptContext) {
       return {
         status: "failed",
         error: "Failed to message user",

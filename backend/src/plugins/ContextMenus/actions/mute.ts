@@ -69,7 +69,6 @@ async function muteAction(
 
   try {
     const result = await mutes.muteUser(target, durationMs, reason, reason, { caseArgs });
-
     const messageResultText = result.notifyResult.text ? ` (${result.notifyResult.text})` : "";
     const muteMessage = `Muted **${result.case!.user_name}** ${
       durationMs ? `for ${humanizeDuration(durationMs)}` : "indefinitely"

@@ -6,6 +6,7 @@ import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../types";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "./attachmentLinkReaction";
 import { formatReasonWithMessageLinkForAttachments } from "./formatReasonForAttachments";
 
 export async function updateCase(
@@ -30,6 +31,10 @@ export async function updateCase(
 
   if (note.length === 0 && attachments.length === 0) {
     pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Text or attachment required");
+    return;
+  }
+
+  if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, note)) {
     return;
   }
 

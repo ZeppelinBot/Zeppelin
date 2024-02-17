@@ -4,6 +4,7 @@ import { waitForReply } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { LogType } from "../../../../data/LogType";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
+import { MINUTES } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
@@ -45,8 +46,8 @@ export async function actualMassUnbanCmd(
   // We'll create our own cases below and post a single "mass unbanned" log instead
   userIds.forEach((userId) => {
     // Use longer timeouts since this can take a while
-    ignoreEvent(pluginData, IgnoredEventType.Unban, userId, 120 * 1000);
-    pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, userId, 120 * 1000);
+    ignoreEvent(pluginData, IgnoredEventType.Unban, userId, 2 * MINUTES);
+    pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, userId, 2 * MINUTES);
   });
 
   // Show a loading indicator since this can take a while
