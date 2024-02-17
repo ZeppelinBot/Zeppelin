@@ -29,6 +29,7 @@ async function sendExpandedCases(
   context: Message | ChatInputCommandInteraction,
   casesCount: number,
   cases: Case[],
+  show: boolean | null,
 ) {
   if (casesCount > maxExpandedCases) {
     await sendContextResponse(context, "Too many cases for expanded view. Please use compact view instead.");
@@ -40,7 +41,7 @@ async function sendExpandedCases(
 
   for (const theCase of cases) {
     const embed = await casesPlugin.getCaseEmbed(theCase.id);
-    await sendContextResponse(context, embed);
+    await sendContextResponse(context, { ...embed, ephemeral: !show });
   }
 }
 
@@ -54,6 +55,7 @@ async function casesUserCmd(
   typesToShow: CaseTypes[],
   hidden: boolean | null,
   expand: boolean | null,
+  show: boolean | null,
 ) {
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const casesFilters: Omit<FindOptionsWhere<Case>, "guild_id" | "user_id"> = { type: In(typesToShow) };
@@ -86,7 +88,7 @@ async function casesUserCmd(
   }
 
   if (expand) {
-    sendExpandedCases(pluginData, context, casesToDisplay.length, casesToDisplay);
+    sendExpandedCases(pluginData, context, casesToDisplay.length, casesToDisplay, show);
     return;
   }
 
@@ -129,7 +131,7 @@ async function casesUserCmd(
       fields: [...(isLastChunk ? [footerField] : [])],
     } satisfies APIEmbed;
 
-    sendContextResponse(context, { embeds: [embed] });
+    sendContextResponse(context, { embeds: [embed], ephemeral: !show });
   }
 }
 
@@ -143,6 +145,7 @@ async function casesModCmd(
   typesToShow: CaseTypes[],
   hidden: boolean | null,
   expand: boolean | null,
+  show: boolean | null,
 ) {
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const casesFilters = { type: In(typesToShow), is_hidden: !!hidden };
@@ -161,7 +164,7 @@ async function casesModCmd(
     // Expanded view (= individual case embeds)
     const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, casesFilters);
 
-    sendExpandedCases(pluginData, context, totalCases, cases);
+    sendExpandedCases(pluginData, context, totalCases, cases, show);
     return;
   }
 
@@ -199,7 +202,7 @@ async function casesModCmd(
         ],
       } satisfies APIEmbed;
 
-      return { embeds: [embed] };
+      return { embeds: [embed], ephemeral: !show };
     },
     {
       limitToUserId: author.id,
@@ -222,6 +225,7 @@ export async function actualCasesCmd(
   reverseFilters: boolean | null,
   hidden: boolean | null,
   expand: boolean | null,
+  show: boolean | null,
 ) {
   const mod = modId
     ? (await resolveMember(pluginData.client, pluginData.guild, modId)) || (await resolveUser(pluginData.client, modId))
@@ -253,6 +257,17 @@ export async function actualCasesCmd(
   }
 
   user
-    ? casesUserCmd(pluginData, context, author.user, modId!, user, modName, typesToShow, hidden, expand)
-    : casesModCmd(pluginData, context, author.user, modId!, mod ?? author, modName, typesToShow, hidden, expand);
+    ? casesUserCmd(pluginData, context, author.user, modId!, user, modName, typesToShow, hidden, expand, show === true)
+    : casesModCmd(
+        pluginData,
+        context,
+        author.user,
+        modId!,
+        mod ?? author,
+        modName,
+        typesToShow,
+        hidden,
+        expand,
+        show === true,
+      );
 }

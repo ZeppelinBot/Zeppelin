@@ -10,6 +10,7 @@ export async function actualCaseCmd(
   context: Message | ChatInputCommandInteraction,
   authorId: string,
   caseNumber: number,
+  show: boolean | null,
 ) {
   const theCase = await pluginData.state.cases.findByCaseNumber(caseNumber);
 
@@ -21,5 +22,5 @@ export async function actualCaseCmd(
   const casesPlugin = pluginData.getPlugin(CasesPlugin);
   const embed = await casesPlugin.getCaseEmbed(theCase.id, authorId);
 
-  sendContextResponse(context, embed);
+  sendContextResponse(context, { ...embed, ephemeral: show !== true });
 }

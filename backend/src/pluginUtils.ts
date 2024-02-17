@@ -5,6 +5,7 @@
 import {
   ChatInputCommandInteraction,
   GuildMember,
+  InteractionReplyOptions,
   Message,
   MessageCreateOptions,
   PermissionsBitField,
@@ -80,17 +81,19 @@ export async function getContextChannel(
 
 export async function sendContextResponse(
   context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
-  response: string | Omit<MessageCreateOptions, "flags">,
+  response: string | Omit<MessageCreateOptions, "flags"> | InteractionReplyOptions,
 ): Promise<Message> {
   if (isContextInteraction(context)) {
     const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
 
     return (context.replied ? context.followUp(options) : context.reply(options)) as Promise<Message>;
-  } else if ("send" in context) {
-    return context.send(response);
-  } else {
-    return (await getContextChannel(context)).send(response);
   }
+
+  if (typeof response !== "string" && "ephemeral" in response) {
+    delete response.ephemeral;
+  }
+
+  return (await getContextChannel(context)).send(response as string | Omit<MessageCreateOptions, "flags">);
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

@@ -17,6 +17,7 @@ const opts = [
   slashOptions.boolean({ name: "unmutes", description: "To filter unmutes", required: false }),
   slashOptions.boolean({ name: "bans", description: "To filter bans", required: false }),
   slashOptions.boolean({ name: "unbans", description: "To filter unbans", required: false }),
+  slashOptions.boolean({ name: "show", description: "To make the result visible to everyone", required: false }),
 ];
 
 export const CasesSlashCmd = {
@@ -43,6 +44,7 @@ export const CasesSlashCmd = {
       options["reverse-filters"],
       options.hidden,
       options.expand,
+      options.show,
     );
   },
 };
