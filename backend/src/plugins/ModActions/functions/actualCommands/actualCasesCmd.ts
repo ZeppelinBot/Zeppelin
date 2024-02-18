@@ -32,7 +32,10 @@ async function sendExpandedCases(
   show: boolean | null,
 ) {
   if (casesCount > maxExpandedCases) {
-    await sendContextResponse(context, "Too many cases for expanded view. Please use compact view instead.");
+    await sendContextResponse(context, {
+      content: "Too many cases for expanded view. Please use compact view instead.",
+      ephemeral: true,
+    });
 
     return;
   }
@@ -72,17 +75,21 @@ async function casesUserCmd(
     user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUsername(user);
 
   if (cases.length === 0) {
-    await sendContextResponse(context, `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`);
+    await sendContextResponse(context, {
+      content: `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`,
+      ephemeral: true,
+    });
+
     return;
   }
 
   const casesToDisplay = hidden ? cases : normalCases;
 
   if (!casesToDisplay.length) {
-    await sendContextResponse(
-      context,
-      `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
-    );
+    await sendContextResponse(context, {
+      content: `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
+      ephemeral: true,
+    });
 
     return;
   }
