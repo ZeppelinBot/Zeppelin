@@ -88,7 +88,7 @@ async function casesUserCmd(
   }
 
   if (expand) {
-    sendExpandedCases(pluginData, context, casesToDisplay.length, casesToDisplay, show);
+    await sendExpandedCases(pluginData, context, casesToDisplay.length, casesToDisplay, show);
     return;
   }
 
@@ -131,7 +131,7 @@ async function casesUserCmd(
       fields: [...(isLastChunk ? [footerField] : [])],
     } satisfies APIEmbed;
 
-    sendContextResponse(context, { embeds: [embed], ephemeral: !show });
+    await sendContextResponse(context, { embeds: [embed], ephemeral: !show });
   }
 }
 
@@ -164,11 +164,11 @@ async function casesModCmd(
     // Expanded view (= individual case embeds)
     const cases = totalCases > 8 ? [] : await casesPlugin.getRecentCasesByMod(modId ?? author.id, 8, 0, casesFilters);
 
-    sendExpandedCases(pluginData, context, totalCases, cases, show);
+    await sendExpandedCases(pluginData, context, totalCases, cases, show);
     return;
   }
 
-  createPaginatedMessage(
+  await createPaginatedMessage(
     pluginData.client,
     context,
     totalPages,
@@ -257,8 +257,19 @@ export async function actualCasesCmd(
   }
 
   user
-    ? casesUserCmd(pluginData, context, author.user, modId!, user, modName, typesToShow, hidden, expand, show === true)
-    : casesModCmd(
+    ? await casesUserCmd(
+        pluginData,
+        context,
+        author.user,
+        modId!,
+        user,
+        modName,
+        typesToShow,
+        hidden,
+        expand,
+        show === true,
+      )
+    : await casesModCmd(
         pluginData,
         context,
         author.user,
