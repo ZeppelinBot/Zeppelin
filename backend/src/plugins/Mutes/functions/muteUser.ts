@@ -246,10 +246,12 @@ export async function muteUser(
   if (theCase) {
     // Update old case
     const noteDetails = [`Mute updated to ${muteTime ? timeUntilUnmuteStr : "indefinite"}`];
-    const reasons = reason ? [reason] : [];
+    const reasons = reason ? [reason] : [""]; // Empty string so that there is a case update even without reason
+
     if (muteOptions.caseArgs?.extraNotes) {
       reasons.push(...muteOptions.caseArgs.extraNotes);
     }
+
     for (const noteReason of reasons) {
       await casesPlugin.createCaseNote({
         caseId: existingMute!.case_id,
