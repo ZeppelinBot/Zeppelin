@@ -227,6 +227,7 @@ export async function actualCasesCmd(
   warns: boolean | null,
   mutes: boolean | null,
   unmutes: boolean | null,
+  kicks: boolean | null,
   bans: boolean | null,
   unbans: boolean | null,
   reverseFilters: boolean | null,
@@ -239,27 +240,30 @@ export async function actualCasesCmd(
     : null;
   const modName = modId ? (mod instanceof UnknownUser ? modId : renderUsername(mod!)) : renderUsername(author);
 
+  const allTypes = [
+    CaseTypes.Note,
+    CaseTypes.Warn,
+    CaseTypes.Mute,
+    CaseTypes.Unmute,
+    CaseTypes.Kick,
+    CaseTypes.Ban,
+    CaseTypes.Unban,
+  ];
   let typesToShow: CaseTypes[] = [];
 
   if (notes) typesToShow.push(CaseTypes.Note);
   if (warns) typesToShow.push(CaseTypes.Warn);
   if (mutes) typesToShow.push(CaseTypes.Mute);
   if (unmutes) typesToShow.push(CaseTypes.Unmute);
+  if (kicks) typesToShow.push(CaseTypes.Kick);
   if (bans) typesToShow.push(CaseTypes.Ban);
   if (unbans) typesToShow.push(CaseTypes.Unban);
 
   if (typesToShow.length === 0) {
-    typesToShow = [CaseTypes.Note, CaseTypes.Warn, CaseTypes.Mute, CaseTypes.Unmute, CaseTypes.Ban, CaseTypes.Unban];
+    typesToShow = allTypes;
   } else {
     if (reverseFilters) {
-      typesToShow = [
-        CaseTypes.Note,
-        CaseTypes.Warn,
-        CaseTypes.Mute,
-        CaseTypes.Unmute,
-        CaseTypes.Ban,
-        CaseTypes.Unban,
-      ].filter((t) => !typesToShow.includes(t));
+      typesToShow = allTypes.filter((t) => !typesToShow.includes(t));
     }
   }
 
