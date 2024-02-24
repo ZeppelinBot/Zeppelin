@@ -57,9 +57,13 @@ export async function actualMassBanCmd(
   const waitTimeStart = performance.now();
   const waitingInterval = setInterval(() => {
     const waitTime = humanizeDurationShort(performance.now() - waitTimeStart, { round: true });
-    loadingMsg
-      .edit(`Massban queued. Still waiting for previous massban to finish (waited ${waitTime}).`)
-      .catch(() => clearInterval(waitingInterval));
+    const waitMessageContent = `Massban queued. Still waiting for previous massban to finish (waited ${waitTime}).`;
+
+    if (isContextInteraction(context)) {
+      context.editReply(waitMessageContent).catch(() => clearInterval(waitingInterval));
+    } else {
+      loadingMsg.edit(waitMessageContent).catch(() => clearInterval(waitingInterval));
+    }
   }, 1 * MINUTES);
 
   pluginData.state.massbanQueue.add(async () => {
