@@ -10,7 +10,7 @@ const opts = [
   slashOptions.user({ name: "mod", description: "The moderator to unban as", required: false }),
   ...generateAttachmentSlashOptions(NUMBER_ATTACHMENTS_CASE_CREATION, {
     name: "attachment",
-    description: "An attachment to add to the reason of the unban",
+    description: "An attachment to add to the reason",
   }),
 ];
 

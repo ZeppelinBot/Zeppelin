@@ -11,7 +11,7 @@ const opts = [
   slashOptions.user({ name: "mod", description: "The moderator to ban as", required: false }),
   ...generateAttachmentSlashOptions(NUMBER_ATTACHMENTS_CASE_CREATION, {
     name: "attachment",
-    description: "An attachment to add to the reason of the ban",
+    description: "An attachment to add to the reason",
   }),
 ];
 
