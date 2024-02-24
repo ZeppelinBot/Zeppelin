@@ -10,7 +10,9 @@ export async function formatReasonWithMessageLinkForAttachments(
   attachments: Attachment[],
 ) {
   if (isContextMessage(context)) {
-    return context.attachments.size > 0 ? ((reason || "") + " " + context.url).trim() : reason;
+    const allAttachments = [...new Set([...context.attachments.values(), ...attachments])];
+
+    return allAttachments.length > 0 ? ((reason || "") + " " + context.url).trim() : reason;
   }
 
   if (attachments.length < 1) {
