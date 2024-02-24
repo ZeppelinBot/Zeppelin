@@ -45,15 +45,6 @@ export const MuteSlashCmd = {
 
   async run({ interaction, options, pluginData }) {
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
-
-    if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
-
-      return;
-    }
-
     const memberToMute = await resolveMember(pluginData.client, pluginData.guild, options.user.id);
 
     if (!memberToMute) {
@@ -106,7 +97,7 @@ export const MuteSlashCmd = {
       ppId = interaction.user.id;
     }
 
-    const convertedTime = options.time ? convertDelayStringToMS(options.time) : null;
+    const convertedTime = options.time ? convertDelayStringToMS(options.time) ?? undefined : undefined;
     if (options.time && !convertedTime) {
       pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
       return;
@@ -127,7 +118,7 @@ export const MuteSlashCmd = {
       attachments,
       mod,
       ppId,
-      options.time,
+      convertedTime,
       options.reason,
       contactMethods,
     );

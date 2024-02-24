@@ -36,14 +36,14 @@ export async function waitForButtonConfirm(
     const sendMethod = () => {
       return contextIsInteraction
         ? context.replied
-          ? context.followUp.bind(context)
+          ? context.editReply.bind(context)
           : context.reply.bind(context)
         : "send" in context
         ? context.send.bind(context)
         : context.channel.send.bind(context.channel);
     };
-    const extraParameters = contextIsInteraction ? { fetchReply: true } : {};
-    const message = await sendMethod()({ ...toPost, components: [row], ...extraParameters });
+    const extraParameters = contextIsInteraction ? { fetchReply: true, ephemeral: true } : {};
+    const message = (await sendMethod()({ ...toPost, components: [row], ...extraParameters })) as Message;
 
     const collector = message.createMessageComponentCollector({ time: 10000 });
 
@@ -55,16 +55,16 @@ export async function waitForButtonConfirm(
           .catch((err) => console.trace(err.message));
       } else {
         if (interaction.customId.startsWith(`confirmButton:${idMod}:`)) {
-          message.delete();
+          if (!contextIsInteraction) message.delete();
           resolve(true);
         } else if (interaction.customId.startsWith(`cancelButton:${idMod}:`)) {
-          message.delete();
+          if (!contextIsInteraction) message.delete();
           resolve(false);
         }
       }
     });
     collector.on("end", () => {
-      if (message.deletable) message.delete().catch(noop);
+      if (!contextIsInteraction && message.deletable) message.delete().catch(noop);
       resolve(false);
     });
   });

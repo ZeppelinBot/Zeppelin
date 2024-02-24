@@ -76,7 +76,7 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
             });
         }
 
-        const replyMethod = context.replied ? "followUp" : "reply";
+        const replyMethod = context.replied ? "editReply" : "reply";
 
         return context[replyMethod]({
           content: formattedBody,
@@ -127,7 +127,7 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
             });
         }
 
-        const replyMethod = context.replied ? "followUp" : "reply";
+        const replyMethod = context.replied ? "editReply" : "reply";
 
         return context[replyMethod]({
           content: formattedBody,
