@@ -1,6 +1,6 @@
-import { GuildTextBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, Message } from "discord.js";
 import { EventEmitter } from "events";
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildCases } from "../../data/GuildCases";
@@ -10,6 +10,8 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import { Case } from "../../data/entities/Case";
 import { UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
+
+export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null;
 
 export const zModActionsConfig = z.strictObject({
   dm_on_warn: z.boolean(),
@@ -29,6 +31,8 @@ export const zModActionsConfig = z.strictObject({
   warn_notify_threshold: z.number(),
   warn_notify_message: z.string(),
   ban_delete_message_days: z.number(),
+  attachment_link_reaction: z.nullable(z.union([z.literal("none"), z.literal("warn"), z.literal("restrict")])),
+  attachment_storing_channel: z.nullable(z.string()),
   can_note: z.boolean(),
   can_warn: z.boolean(),
   can_mute: z.boolean(),
@@ -126,7 +130,7 @@ export type WarnMemberNotifyRetryCallback = () => boolean | Promise<boolean>;
 export interface WarnOptions {
   caseArgs?: Partial<CaseArgs> | null;
   contactMethods?: UserNotificationMethod[] | null;
-  retryPromptChannel?: GuildTextBasedChannel | null;
+  retryPromptContext?: Message | ChatInputCommandInteraction | null;
   isAutomodAction?: boolean;
 }
 
@@ -146,5 +150,6 @@ export interface BanOptions {
 
 export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban" | "unban";
 
-export const modActionsCmd = guildPluginMessageCommand<ModActionsPluginType>();
+export const modActionsMsgCmd = guildPluginMessageCommand<ModActionsPluginType>();
+export const modActionsSlashGroup = guildPluginSlashGroup<ModActionsPluginType>();
 export const modActionsEvt = guildPluginEventListener<ModActionsPluginType>();

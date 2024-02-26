@@ -1,8 +1,8 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { AllowedGuild } from "../../../data/entities/AllowedGuild";
 import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { renderUsername, resolveUser } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const ListDashboardPermsCmd = botControlCmd({
@@ -16,7 +16,7 @@ export const ListDashboardPermsCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     if (!args.user && !args.guildId) {
-      sendErrorMessage(pluginData, msg.channel, "Must specify at least guildId, user, or both.");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Must specify at least guildId, user, or both.");
       return;
     }
 
@@ -24,7 +24,7 @@ export const ListDashboardPermsCmd = botControlCmd({
     if (args.guildId) {
       guild = await pluginData.state.allowedGuilds.find(args.guildId);
       if (!guild) {
-        sendErrorMessage(pluginData, msg.channel, "Server is not using Zeppelin");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Server is not using Zeppelin");
         return;
       }
     }
@@ -33,7 +33,7 @@ export const ListDashboardPermsCmd = botControlCmd({
     if (args.user) {
       existingUserAssignment = await pluginData.state.apiPermissionAssignments.getByUserId(args.user.id);
       if (existingUserAssignment.length === 0) {
-        sendErrorMessage(pluginData, msg.channel, "The user has no assigned permissions.");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "The user has no assigned permissions.");
         return;
       }
     }
@@ -54,11 +54,9 @@ export const ListDashboardPermsCmd = botControlCmd({
       }
 
       if (finalMessage === "") {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `The user ${userInfo} has no assigned permissions on the specified server.`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `The user ${userInfo} has no assigned permissions on the specified server.`);
         return;
       }
       // Else display all users that have permissions on the specified guild
@@ -67,7 +65,9 @@ export const ListDashboardPermsCmd = botControlCmd({
 
       const existingGuildAssignment = await pluginData.state.apiPermissionAssignments.getByGuildId(guild.id);
       if (existingGuildAssignment.length === 0) {
-        sendErrorMessage(pluginData, msg.channel, `The server ${guildInfo} has no assigned permissions.`);
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `The server ${guildInfo} has no assigned permissions.`);
         return;
       }
 
@@ -80,6 +80,6 @@ export const ListDashboardPermsCmd = botControlCmd({
       }
     }
 
-    await sendSuccessMessage(pluginData, msg.channel, finalMessage.trim(), {});
+    await pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, finalMessage.trim(), {});
   },
 });

@@ -18,13 +18,14 @@ export async function kickMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
   member: GuildMember,
   reason?: string,
+  reasonWithAttachments?: string,
   kickOptions: KickOptions = {},
 ): Promise<KickResult> {
   const config = pluginData.config.get();
 
   // Attempt to message the user *before* kicking them, as doing it after may not be possible
   let notifyResult: UserNotificationResult = { method: null, success: true };
-  if (reason && member) {
+  if (reasonWithAttachments && member) {
     const contactMethods = kickOptions?.contactMethods
       ? kickOptions.contactMethods
       : getDefaultContactMethods(pluginData, "kick");
@@ -37,7 +38,7 @@ export async function kickMember(
             config.kick_message,
             new TemplateSafeValueContainer({
               guildName: pluginData.guild.name,
-              reason,
+              reason: reasonWithAttachments,
               moderator: kickOptions.caseArgs?.modId
                 ? userToTemplateSafeUser(await resolveUser(pluginData.client, kickOptions.caseArgs.modId))
                 : null,

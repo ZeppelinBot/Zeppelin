@@ -3,8 +3,8 @@ import { AttachmentBuilder } from "discord.js";
 import fs from "fs";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { downloadFile, isEmoji, SECONDS } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 const fsp = fs.promises;
@@ -51,7 +51,7 @@ export const JumboCmd = utilityCmd({
     let file: AttachmentBuilder | undefined;
 
     if (!isEmoji(args.emoji)) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid emoji");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid emoji");
       return;
     }
 
@@ -87,7 +87,7 @@ export const JumboCmd = utilityCmd({
         }
       }
       if (!image) {
-        sendErrorMessage(pluginData, msg.channel, "Error occurred while jumboing default emoji");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Error occurred while jumboing default emoji");
         return;
       }
 

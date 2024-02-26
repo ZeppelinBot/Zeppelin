@@ -2,8 +2,8 @@ import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { convertDelayStringToMS, messageLink } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { remindersCmd } from "../types";
 
@@ -38,7 +38,7 @@ export const RemindCmd = remindersCmd({
       // "Delay string" i.e. e.g. "2h30m"
       const ms = convertDelayStringToMS(args.time);
       if (ms === null) {
-        sendErrorMessage(pluginData, msg.channel, "Invalid reminder time");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid reminder time");
         return;
       }
 
@@ -46,7 +46,7 @@ export const RemindCmd = remindersCmd({
     }
 
     if (!reminderTime.isValid() || reminderTime.isBefore(now)) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid reminder time");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid reminder time");
       return;
     }
 
@@ -67,10 +67,8 @@ export const RemindCmd = remindersCmd({
       pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"),
     );
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(msg, `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`);
   },
 });

@@ -4,9 +4,9 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
-import { zEmbedInput } from "../../utils";
+import { zBoundedCharacters, zStrictMessageContent } from "../../utils";
 
-export const zTag = z.union([z.string(), zEmbedInput]);
+export const zTag = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 export type TTag = z.infer<typeof zTag>;
 
 export const zTagCategory = z

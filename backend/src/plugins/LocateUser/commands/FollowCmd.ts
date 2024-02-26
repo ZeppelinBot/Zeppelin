@@ -2,8 +2,8 @@ import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { MINUTES, SECONDS } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { locateUserCmd } from "../types";
 
 export const FollowCmd = locateUserCmd({
@@ -27,7 +27,9 @@ export const FollowCmd = locateUserCmd({
     const active = args.active || false;
 
     if (time < 30 * SECONDS) {
-      sendErrorMessage(pluginData, msg.channel, "Sorry, but the minimum duration for an alert is 30 seconds!");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(msg, "Sorry, but the minimum duration for an alert is 30 seconds!");
       return;
     }
 
@@ -46,19 +48,23 @@ export const FollowCmd = locateUserCmd({
     }
 
     if (active) {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
-        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
-          time,
-        )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
-      );
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendSuccessMessage(
+          msg,
+          `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
+            time,
+          )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
+        );
     } else {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
-        `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
-      );
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendSuccessMessage(
+          msg,
+          `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
+            time,
+          )} i will notify you`,
+        );
     }
   },
 });

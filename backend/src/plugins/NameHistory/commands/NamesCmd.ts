@@ -4,8 +4,8 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory";
 import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory";
 import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { DAYS, renderUsername } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { nameHistoryCmd } from "../types";
 
 export const NamesCmd = nameHistoryCmd({
@@ -21,7 +21,7 @@ export const NamesCmd = nameHistoryCmd({
     const usernames = await pluginData.state.usernameHistory.getByUserId(args.userId);
 
     if (nicknames.length === 0 && usernames.length === 0) {
-      sendErrorMessage(pluginData, msg.channel, "No name history found");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No name history found");
       return;
     }
 

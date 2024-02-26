@@ -1,10 +1,10 @@
 import { Snowflake } from "discord.js";
 import { getChannelId, getRoleId } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { isValidSnowflake, noop, parseInviteCodeInput, resolveInvite, resolveUser } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
 import { resolveMessageTarget } from "../../../utils/resolveMessageTarget";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
 import { getCustomEmojiId } from "../functions/getCustomEmojiId";
 import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
@@ -146,10 +146,11 @@ export const InfoCmd = utilityCmd({
     }
 
     // 10. No can do
-    sendErrorMessage(
-      pluginData,
-      message.channel,
-      "Could not find anything with that value or you are lacking permission for the snowflake type",
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(
+        message,
+        "Could not find anything with that value or you are lacking permission for the snowflake type",
+      );
   },
 });

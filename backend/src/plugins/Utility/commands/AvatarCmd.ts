@@ -1,7 +1,7 @@
 import { APIEmbed, ImageFormat } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { UnknownUser, renderUsername } from "../../../utils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const AvatarCmd = utilityCmd({
@@ -24,7 +24,7 @@ export const AvatarCmd = utilityCmd({
       };
       msg.channel.send({ embeds: [embed] });
     } else {
-      sendErrorMessage(pluginData, msg.channel, "Invalid user ID");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid user ID");
     }
   },
 });

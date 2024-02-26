@@ -1,6 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LocateUserPluginType } from "../types";
 
 export async function moveMember(
@@ -16,10 +16,14 @@ export async function moveMember(
         channel: target.voice.channelId,
       });
     } catch {
-      sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
       return;
     }
   } else {
-    sendErrorMessage(pluginData, errorChannel, "Failed to move you. Are you in a voice channel?");
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
   }
 }

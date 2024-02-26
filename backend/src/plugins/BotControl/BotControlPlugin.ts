@@ -3,7 +3,7 @@ import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { sendSuccessMessage } from "../../pluginUtils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
@@ -77,7 +77,7 @@ export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
       if (guild) {
         const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {
-          sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
+          pluginData.getPlugin(CommonPlugin).sendSuccessMessage(channel, "Global plugins reloaded!");
         }
       }
     }

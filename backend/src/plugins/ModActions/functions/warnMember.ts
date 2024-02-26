@@ -14,6 +14,7 @@ export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,
   member: GuildMember,
   reason: string,
+  reasonWithAttachments: string,
   warnOptions: WarnOptions = {},
 ): Promise<WarnResult> {
   const config = pluginData.config.get();
@@ -26,7 +27,7 @@ export async function warnMember(
         config.warn_message,
         new TemplateSafeValueContainer({
           guildName: pluginData.guild.name,
-          reason,
+          reason: reasonWithAttachments,
           moderator: warnOptions.caseArgs?.modId
             ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
             : null,
@@ -50,20 +51,20 @@ export async function warnMember(
   }
 
   if (!notifyResult.success) {
-    if (warnOptions.retryPromptChannel && pluginData.guild.channels.resolve(warnOptions.retryPromptChannel.id)) {
-      const reply = await waitForButtonConfirm(
-        warnOptions.retryPromptChannel,
-        { content: "Failed to message the user. Log the warning anyway?" },
-        { confirmText: "Yes", cancelText: "No", restrictToId: warnOptions.caseArgs?.modId },
-      );
+    if (!warnOptions.retryPromptContext) {
+      return {
+        status: "failed",
+        error: "Failed to message user",
+      };
+    }
 
-      if (!reply) {
-        return {
-          status: "failed",
-          error: "Failed to message user",
-        };
-      }
-    } else {
+    const reply = await waitForButtonConfirm(
+      warnOptions.retryPromptContext,
+      { content: "Failed to message the user. Log the warning anyway?" },
+      { confirmText: "Yes", cancelText: "No", restrictToId: warnOptions.caseArgs?.modId },
+    );
+
+    if (!reply) {
       return {
         status: "failed",
         error: "Failed to message user",

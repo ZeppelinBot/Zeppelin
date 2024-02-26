@@ -1,6 +1,7 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
+import { isStaffPreFilter } from "../../../pluginUtils";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const LeaveServerCmd = botControlCmd({
@@ -16,7 +17,7 @@ export const LeaveServerCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     if (!pluginData.client.guilds.cache.has(args.guildId as Snowflake)) {
-      sendErrorMessage(pluginData, msg.channel, "I am not in that guild");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "I am not in that guild");
       return;
     }
 
@@ -26,10 +27,10 @@ export const LeaveServerCmd = botControlCmd({
     try {
       await pluginData.client.guilds.cache.get(args.guildId as Snowflake)?.leave();
     } catch (e) {
-      sendErrorMessage(pluginData, msg.channel, `Failed to leave guild: ${e.message}`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to leave guild: ${e.message}`);
       return;
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `Left guild **${guildName}**`);
+    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Left guild **${guildName}**`);
   },
 });

@@ -13,7 +13,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
-import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
+import { getBaseUrl } from "../../pluginUtils";
 import {
   InvalidRegexError,
   MINUTES,
@@ -25,6 +25,7 @@ import {
 } from "../../utils";
 import { asyncFilter } from "../../utils/async";
 import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { banSearchSignature } from "./commands/BanSearchCmd";
 import { searchCmdSignature } from "./commands/SearchCmd";
 import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
@@ -122,12 +123,12 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
         return;
       }
 
       if (e instanceof InvalidRegexError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
         return;
       }
 
@@ -135,7 +136,7 @@ export async function displaySearch(
     }
 
     if (searchResult.totalResults === 0) {
-      sendErrorMessage(pluginData, msg.channel, "No results found");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No results found");
       return;
     }
 
@@ -266,12 +267,12 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
       return;
     }
 
     if (e instanceof InvalidRegexError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
       return;
     }
 
@@ -279,7 +280,7 @@ export async function archiveSearch(
   }
 
   if (results.totalResults === 0) {
-    sendErrorMessage(pluginData, msg.channel, "No results found");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No results found");
     return;
   }
 

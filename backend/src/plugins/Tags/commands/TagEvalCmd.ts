@@ -1,9 +1,9 @@
 import { MessageCreateOptions } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { logger } from "../../../logger";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { TemplateParseError } from "../../../templateFormatter";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
 
@@ -29,7 +29,7 @@ export const TagEvalCmd = tagsCmd({
       )) as MessageCreateOptions;
 
       if (!rendered.content && !rendered.embeds?.length) {
-        sendErrorMessage(pluginData, msg.channel, "Evaluation resulted in an empty text");
+        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Evaluation resulted in an empty text");
         return;
       }
 
@@ -37,7 +37,7 @@ export const TagEvalCmd = tagsCmd({
     } catch (e) {
       const errorMessage = e instanceof TemplateParseError ? e.message : "Internal error";
 
-      sendErrorMessage(pluginData, msg.channel, `Failed to render tag: ${errorMessage}`);
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to render tag: ${errorMessage}`);
 
       if (!(e instanceof TemplateParseError)) {
         logger.warn(`Internal error evaluating tag in ${pluginData.guild.id}: ${e}`);

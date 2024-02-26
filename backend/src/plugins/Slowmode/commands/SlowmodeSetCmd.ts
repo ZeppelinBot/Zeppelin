@@ -1,10 +1,10 @@
 import { escapeInlineCode, PermissionsBitField } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
+import { CommonPlugin } from "../../Common/CommonPlugin";
 import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { slowmodeCmd } from "../types";
 import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
@@ -40,7 +40,9 @@ export const SlowmodeSetCmd = slowmodeCmd({
     const channel = args.channel || msg.channel;
 
     if (!channel.isTextBased() || channel.isThread()) {
-      sendErrorMessage(pluginData, msg.channel, "Slowmode can only be set on non-thread text-based channels");
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(msg, "Slowmode can only be set on non-thread text-based channels");
       return;
     }
 
@@ -56,29 +58,26 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     const mode = (args.mode as TMode) || defaultMode;
     if (!validModes.includes(mode)) {
-      sendErrorMessage(pluginData, msg.channel, "--mode must be 'bot' or 'native'");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "--mode must be 'bot' or 'native'");
       return;
     }
 
     // Validate durations
     if (mode === "native" && args.time > MAX_NATIVE_SLOWMODE) {
-      sendErrorMessage(pluginData, msg.channel, "Native slowmode can only be set to 6h or less");
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Native slowmode can only be set to 6h or less");
       return;
     }
 
     if (mode === "bot" && args.time > MAX_BOT_SLOWMODE) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
-        `Sorry, bot managed slowmodes can be at most 100 years long. Maybe 99 would be enough?`,
-      );
+      pluginData
+        .getPlugin(CommonPlugin)
+        .sendErrorMessage(msg, `Sorry, bot managed slowmodes can be at most 100 years long. Maybe 99 would be enough?`);
       return;
     }
 
     if (mode === "bot" && args.time < MIN_BOT_SLOWMODE) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      pluginData.getPlugin(CommonPlugin).sendErrorMessage(
+        msg,
         asSingleLine(`
           Bot managed slowmode must be 15min or more.
           Use \`--mode native\` to use native slowmodes for short slowmodes instead.
@@ -96,11 +95,9 @@ export const SlowmodeSetCmd = slowmodeCmd({
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Unable to set native slowmode. ${missingPermissionError(missingPermissions)}`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `Unable to set native slowmode. ${missingPermissionError(missingPermissions)}`);
         return;
       }
     }
@@ -111,11 +108,9 @@ export const SlowmodeSetCmd = slowmodeCmd({
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
-          `Unable to set bot managed slowmode. ${missingPermissionError(missingPermissions)}`,
-        );
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `Unable to set bot managed slowmode. ${missingPermissionError(missingPermissions)}`);
         return;
       }
     }
@@ -134,7 +129,9 @@ export const SlowmodeSetCmd = slowmodeCmd({
       try {
         await channel.setRateLimitPerUser(rateLimitSeconds);
       } catch (e) {
-        sendErrorMessage(pluginData, msg.channel, `Failed to set native slowmode: ${escapeInlineCode(e.message)}`);
+        pluginData
+          .getPlugin(CommonPlugin)
+          .sendErrorMessage(msg, `Failed to set native slowmode: ${escapeInlineCode(e.message)}`);
         return;
       }
     } else {
@@ -153,10 +150,8 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     const humanizedSlowmodeTime = humanizeDuration(args.time);
     const slowmodeType = mode === "native" ? "native slowmode" : "bot-maintained slowmode";
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`,
-    );
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendSuccessMessage(msg, `Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`);
   },
 });
