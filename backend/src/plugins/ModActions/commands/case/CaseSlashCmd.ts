@@ -18,6 +18,7 @@ export const CaseSlashCmd = {
   ],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
     actualCaseCmd(pluginData, interaction, interaction.user.id, options["case-number"], options.show);
   },
 };

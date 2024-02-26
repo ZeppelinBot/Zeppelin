@@ -86,7 +86,13 @@ export async function sendContextResponse(
   if (isContextInteraction(context)) {
     const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
 
-    return (context.replied ? context.followUp(options) : context.reply(options)) as Promise<Message>;
+    return (
+      context.replied
+        ? context.followUp(options)
+        : context.deferred
+        ? context.editReply(options)
+        : context.reply(options)
+    ) as Promise<Message>;
   }
 
   if (typeof response !== "string" && "ephemeral" in response) {

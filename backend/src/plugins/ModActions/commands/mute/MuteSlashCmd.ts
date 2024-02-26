@@ -44,6 +44,7 @@ export const MuteSlashCmd = {
   signature: [slashOptions.user({ name: "user", description: "The user to mute", required: true }), ...opts],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
     const memberToMute = await resolveMember(pluginData.client, pluginData.guild, options.user.id);
 

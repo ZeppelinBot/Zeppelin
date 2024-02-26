@@ -42,6 +42,7 @@ export const WarnSlashCmd = {
   signature: [slashOptions.user({ name: "user", description: "The user to warn", required: true }), ...opts],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {

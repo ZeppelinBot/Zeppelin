@@ -30,6 +30,8 @@ export const CasesSlashCmd = {
   signature: [...opts],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
+
     return actualCasesCmd(
       pluginData,
       interaction,

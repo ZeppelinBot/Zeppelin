@@ -16,6 +16,8 @@ export const DeleteCaseSlashCmd = {
   ],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
+
     actualDeleteCaseCmd(
       pluginData,
       interaction,

@@ -21,6 +21,7 @@ export const NoteSlashCmd = {
   signature: [slashOptions.user({ name: "user", description: "The user to add a note to", required: true }), ...opts],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.note || options.note.trim() === "") && attachments.length < 1) {

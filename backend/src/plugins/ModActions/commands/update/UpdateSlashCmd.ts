@@ -21,6 +21,8 @@ export const UpdateSlashCmd = {
   signature: [...opts],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
+
     await updateCase(
       pluginData,
       interaction,

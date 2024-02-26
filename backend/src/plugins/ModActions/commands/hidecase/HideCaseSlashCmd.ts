@@ -12,6 +12,7 @@ export const HideCaseSlashCmd = {
   ],
 
   async run({ interaction, options, pluginData }) {
+    await interaction.deferReply({ ephemeral: true });
     actualHideCaseCmd(pluginData, interaction, options["case-number"].split(/[\s,]+/).map(Number));
   },
 };
