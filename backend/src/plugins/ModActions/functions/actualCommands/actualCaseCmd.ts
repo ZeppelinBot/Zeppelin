@@ -15,7 +15,7 @@ export async function actualCaseCmd(
   const theCase = await pluginData.state.cases.findByCaseNumber(caseNumber);
 
   if (!theCase) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Case not found");
+    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Case not found", undefined, undefined, show !== true);
     return;
   }
 

@@ -77,7 +77,7 @@ async function casesUserCmd(
   if (cases.length === 0) {
     await sendContextResponse(context, {
       content: `No cases found for **${userName}**${modId ? ` by ${modName}` : ""}.`,
-      ephemeral: true,
+      ephemeral: !show,
     });
 
     return;
@@ -88,7 +88,7 @@ async function casesUserCmd(
   if (!casesToDisplay.length) {
     await sendContextResponse(context, {
       content: `No normal cases found for **${userName}**. Use "-hidden" to show ${cases.length} hidden cases.`,
-      ephemeral: true,
+      ephemeral: !show,
     });
 
     return;
@@ -160,7 +160,10 @@ async function casesModCmd(
   const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters);
 
   if (totalCases === 0) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `No cases by **${modName}**`);
+    pluginData
+      .getPlugin(CommonPlugin)
+      .sendErrorMessage(context, `No cases by **${modName}**`, undefined, undefined, !show);
+
     return;
   }
 
