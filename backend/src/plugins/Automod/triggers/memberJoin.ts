@@ -1,17 +1,14 @@
-import * as t from "io-ts";
-import { convertDelayStringToMS, tDelayString } from "../../../utils";
+import z from "zod";
+import { convertDelayStringToMS, zDelayString } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
-export const MemberJoinTrigger = automodTrigger<unknown>()({
-  configType: t.type({
-    only_new: t.boolean,
-    new_threshold: tDelayString,
-  }),
+const configSchema = z.strictObject({
+  only_new: z.boolean().default(false),
+  new_threshold: zDelayString.default("1h"),
+});
 
-  defaultConfig: {
-    only_new: false,
-    new_threshold: "1h",
-  },
+export const MemberJoinTrigger = automodTrigger<unknown>()({
+  configSchema,
 
   async match({ context, triggerConfig }) {
     if (!context.joined || !context.member) {

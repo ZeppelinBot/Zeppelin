@@ -3,12 +3,11 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
 import { trimPluginDescription } from "../../utils";
-import { parseIoTsSchema } from "../../validatorUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
-import { ConfigSchema, StarboardPluginType, defaultStarboardOpts } from "./types";
+import { StarboardPluginType, zStarboardConfig } from "./types";
 import { onMessageDelete } from "./util/onMessageDelete";
 
 const defaultOptions: PluginOptions<StarboardPluginType> = {
@@ -120,19 +119,10 @@ export const StarboardPlugin = zeppelinGuildPlugin<StarboardPluginType>()({
                   enabled: true
       ~~~
     `),
-    configSchema: ConfigSchema,
+    configSchema: zStarboardConfig,
   },
 
-  configParser(input) {
-    const boards = (input as any).boards;
-    if (boards) {
-      for (const [name, opts] of Object.entries(boards)) {
-        boards[name] = Object.assign({}, defaultStarboardOpts, opts);
-      }
-    }
-
-    return parseIoTsSchema(ConfigSchema, input);
-  },
+  configParser: (input) => zStarboardConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

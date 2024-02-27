@@ -1,14 +1,12 @@
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { tNullable } from "../../utils";
+import z from "zod";
 
-export const ConfigSchema = t.type({
-  api_key: tNullable(t.string),
+export const zPhishermanConfig = z.strictObject({
+  api_key: z.string().max(255).nullable(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface PhishermanPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zPhishermanConfig>;
 
   state: {
     validApiKey: string | null;

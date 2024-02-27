@@ -1,18 +1,15 @@
-import * as t from "io-ts";
-import { makeIoTsConfigParser } from "../../pluginUtils";
+import z from "zod";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ArchiveChannelCmd } from "./commands/ArchiveChannelCmd";
 import { ChannelArchiverPluginType } from "./types";
-
-const ConfigSchema = t.type({});
 
 export const ChannelArchiverPlugin = zeppelinGuildPlugin<ChannelArchiverPluginType>()({
   name: "channel_archiver",
   showInDocs: false,
 
   dependencies: () => [TimeAndDatePlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => z.strictObject({}).parse(input),
 
   // prettier-ignore
   messageCommands: [

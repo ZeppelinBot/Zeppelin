@@ -1,6 +1,5 @@
-import * as t from "io-ts";
+import z from "zod";
 import { Configs } from "../../data/Configs";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { reloadChangedGuilds } from "./functions/reloadChangedGuilds";
 import { GuildConfigReloaderPluginType } from "./types";
@@ -9,7 +8,7 @@ export const GuildConfigReloaderPlugin = zeppelinGlobalPlugin<GuildConfigReloade
   name: "guild_config_reloader",
   showInDocs: false,
 
-  configParser: makeIoTsConfigParser(t.type({})),
+  configParser: (input) => z.strictObject({}).parse(input),
 
   async beforeLoad(pluginData) {
     const { state } = pluginData;

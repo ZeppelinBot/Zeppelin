@@ -1,14 +1,13 @@
 import { PluginOptions } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildReminders } from "../../data/GuildReminders";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
 import { postReminder } from "./functions/postReminder";
-import { ConfigSchema, RemindersPluginType } from "./types";
+import { RemindersPluginType, zRemindersConfig } from "./types";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {
@@ -29,11 +28,11 @@ export const RemindersPlugin = zeppelinGuildPlugin<RemindersPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Reminders",
-    configSchema: ConfigSchema,
+    configSchema: zRemindersConfig,
   },
 
   dependencies: () => [TimeAndDatePlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zRemindersConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

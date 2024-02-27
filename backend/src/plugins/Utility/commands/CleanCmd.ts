@@ -208,8 +208,9 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
     if (args.update) {
       const modActions = pluginData.getPlugin(ModActionsPlugin);
       const channelId = targetChannel.id !== msg.channel.id ? targetChannel.id : msg.channel.id;
-      const updateMessage = `Cleaned ${messagesToClean.length} ${messagesToClean.length === 1 ? "message" : "messages"
-        } in <#${channelId}>: ${cleanResult.archiveUrl}`;
+      const updateMessage = `Cleaned ${messagesToClean.length} ${
+        messagesToClean.length === 1 ? "message" : "messages"
+      } in <#${channelId}>: ${cleanResult.archiveUrl}`;
       if (typeof args.update === "number") {
         modActions.updateCase(msg, args.update, updateMessage);
       } else {

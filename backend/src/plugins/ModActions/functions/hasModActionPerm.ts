@@ -3,33 +3,33 @@ import { GuildPluginData } from "knub";
 import { ModActionsPluginType } from "../types";
 
 export async function hasNotePermission(
-    pluginData: GuildPluginData<ModActionsPluginType>,
-    member: GuildMember,
-    channelId: Snowflake,
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  member: GuildMember,
+  channelId: Snowflake,
 ) {
-    return (await pluginData.config.getMatchingConfig({ member, channelId })).can_note;
+  return (await pluginData.config.getMatchingConfig({ member, channelId })).can_note;
 }
 
 export async function hasWarnPermission(
-    pluginData: GuildPluginData<ModActionsPluginType>,
-    member: GuildMember,
-    channelId: Snowflake,
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  member: GuildMember,
+  channelId: Snowflake,
 ) {
-    return (await pluginData.config.getMatchingConfig({ member, channelId })).can_warn;
+  return (await pluginData.config.getMatchingConfig({ member, channelId })).can_warn;
 }
 
 export async function hasMutePermission(
-    pluginData: GuildPluginData<ModActionsPluginType>,
-    member: GuildMember,
-    channelId: Snowflake,
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  member: GuildMember,
+  channelId: Snowflake,
 ) {
-    return (await pluginData.config.getMatchingConfig({ member, channelId })).can_mute;
+  return (await pluginData.config.getMatchingConfig({ member, channelId })).can_mute;
 }
 
 export async function hasBanPermission(
-    pluginData: GuildPluginData<ModActionsPluginType>,
-    member: GuildMember,
-    channelId: Snowflake,
+  pluginData: GuildPluginData<ModActionsPluginType>,
+  member: GuildMember,
+  channelId: Snowflake,
 ) {
-    return (await pluginData.config.getMatchingConfig({ member, channelId })).can_ban;
+  return (await pluginData.config.getMatchingConfig({ member, channelId })).can_ban;
 }

@@ -1,4 +1,4 @@
-import { trimPluginDescription } from "src/utils";
+import { trimPluginDescription } from "../../utils";
 import { TemplateFunction } from "./types";
 
 export function generateTemplateMarkdown(definitions: TemplateFunction[]): string {

@@ -1,58 +1,112 @@
 import { ButtonStyle } from "discord.js";
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
+import z from "zod";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { tMessageContent, tNullable } from "../../utils";
+import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils";
+import { TooManyComponentsError } from "./functions/TooManyComponentsError";
+import { createButtonComponents } from "./functions/createButtonComponents";
 
-const RoleButtonOption = t.type({
-  role_id: t.string,
-  label: tNullable(t.string),
-  emoji: tNullable(t.string),
+const zRoleButtonOption = z.strictObject({
+  role_id: zSnowflake,
+  label: z.string().nullable().default(null),
+  emoji: z.string().nullable().default(null),
   // https://discord.js.org/#/docs/discord.js/v13/typedef/MessageButtonStyle
-  style: tNullable(
-    t.union([
-      t.literal(ButtonStyle.Primary),
-      t.literal(ButtonStyle.Secondary),
-      t.literal(ButtonStyle.Success),
-      t.literal(ButtonStyle.Danger),
+  style: z
+    .union([
+      z.literal(ButtonStyle.Primary),
+      z.literal(ButtonStyle.Secondary),
+      z.literal(ButtonStyle.Success),
+      z.literal(ButtonStyle.Danger),
 
       // The following are deprecated
-      t.literal("PRIMARY"),
-      t.literal("SECONDARY"),
-      t.literal("SUCCESS"),
-      t.literal("DANGER"),
-      // t.literal("LINK"), // Role buttons don't use link buttons, but adding this here so it's documented why it's not available
+      z.literal("PRIMARY"),
+      z.literal("SECONDARY"),
+      z.literal("SUCCESS"),
+      z.literal("DANGER"),
+      // z.literal("LINK"), // Role buttons don't use link buttons, but adding this here so it's documented why it's not available
+    ])
+    .nullable()
+    .default(null),
+  start_new_row: z.boolean().default(false),
+});
+export type TRoleButtonOption = z.infer<typeof zRoleButtonOption>;
+
+const zRoleButtonsConfigItem = z
+  .strictObject({
+    // Typed as "never" because you are not expected to supply this directly.
+    // The transform instead picks it up from the property key and the output type is a string.
+    name: z
+      .never()
+      .optional()
+      .transform((_, ctx) => {
+        const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
+        if (!ruleName) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Role buttons must have names",
+          });
+          return z.NEVER;
+        }
+        return ruleName;
+      }),
+    message: z.union([
+      z.strictObject({
+        channel_id: zSnowflake,
+        message_id: zSnowflake,
+      }),
+      z.strictObject({
+        channel_id: zSnowflake,
+        content: zMessageContent,
+      }),
     ]),
-  ),
-  start_new_row: tNullable(t.boolean),
-});
-export type TRoleButtonOption = t.TypeOf<typeof RoleButtonOption>;
+    options: z.array(zRoleButtonOption).max(25),
+    exclusive: z.boolean().default(false),
+  })
+  .refine(
+    (parsed) => {
+      try {
+        createButtonComponents(parsed);
+      } catch (err) {
+        if (err instanceof TooManyComponentsError) {
+          return false;
+        }
+        throw err;
+      }
+      return true;
+    },
+    {
+      message: "Too many options; can only have max 5 buttons per row on max 5 rows.",
+    },
+  );
+export type TRoleButtonsConfigItem = z.infer<typeof zRoleButtonsConfigItem>;
 
-const RoleButtonsConfigItem = t.type({
-  name: t.string,
-  message: t.union([
-    t.type({
-      channel_id: t.string,
-      message_id: t.string,
-    }),
-    t.type({
-      channel_id: t.string,
-      content: tMessageContent,
-    }),
-  ]),
-  options: t.array(RoleButtonOption),
-  exclusive: tNullable(t.boolean),
-});
-export type TRoleButtonsConfigItem = t.TypeOf<typeof RoleButtonsConfigItem>;
-
-export const ConfigSchema = t.type({
-  buttons: t.record(t.string, RoleButtonsConfigItem),
-  can_reset: t.boolean,
-});
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+export const zRoleButtonsConfig = z
+  .strictObject({
+    buttons: zBoundedRecord(z.record(zBoundedCharacters(1, 16), zRoleButtonsConfigItem), 0, 100),
+    can_reset: z.boolean(),
+  })
+  .refine(
+    (parsed) => {
+      const seenMessages = new Set();
+      for (const button of Object.values(parsed.buttons)) {
+        if (button.message) {
+          if ("message_id" in button.message) {
+            if (seenMessages.has(button.message.message_id)) {
+              return false;
+            }
+            seenMessages.add(button.message.message_id);
+          }
+        }
+      }
+      return true;
+    },
+    {
+      message: "Can't target the same message with two sets of role buttons",
+    },
+  );
 
 export interface RoleButtonsPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zRoleButtonsConfig>;
   state: {
     roleButtons: GuildRoleButtons;
   };

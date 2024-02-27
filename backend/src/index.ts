@@ -203,7 +203,7 @@ if (env.DEBUG) {
 }
 
 logger.info("Connecting to database");
-connect().then(async (connection) => {
+connect().then(async () => {
   const client = new Client({
     partials: [Partials.User, Partials.Channel, Partials.GuildMember, Partials.Message, Partials.Reaction],
 

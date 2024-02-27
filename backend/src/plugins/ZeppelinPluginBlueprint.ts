@@ -1,4 +1,3 @@
-import * as t from "io-ts";
 import {
   BasePluginType,
   globalPlugin,
@@ -8,6 +7,7 @@ import {
   GuildPluginBlueprint,
   GuildPluginData,
 } from "knub";
+import { ZodTypeAny } from "zod";
 import { TMarkdown } from "../types";
 
 /**
@@ -23,7 +23,7 @@ export interface ZeppelinGuildPluginBlueprint<TPluginData extends GuildPluginDat
     usageGuide?: TMarkdown;
     configurationGuide?: TMarkdown;
     legacy?: boolean | string;
-    configSchema?: t.Type<any>;
+    configSchema?: ZodTypeAny;
   };
 }
 

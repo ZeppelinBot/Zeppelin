@@ -1,12 +1,11 @@
 import { PluginOptions } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { CensorPluginType, ConfigSchema } from "./types";
+import { CensorPluginType, zCensorConfig } from "./types";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageUpdate } from "./util/onMessageUpdate";
 
@@ -54,11 +53,11 @@ export const CensorPlugin = zeppelinGuildPlugin<CensorPluginType>()({
       For more advanced filtering, check out the Automod plugin!
     `),
     legacy: true,
-    configSchema: ConfigSchema,
+    configSchema: zCensorConfig,
   },
 
   dependencies: () => [LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zCensorConfig.parse(input),
   defaultOptions,
 
   beforeLoad(pluginData) {

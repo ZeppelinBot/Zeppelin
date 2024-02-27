@@ -1,6 +1,6 @@
 import test from "ava";
-import * as ioTs from "io-ts";
-import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, tAllowedMentions } from "./utils";
+import z from "zod";
+import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, zAllowedMentions } from "./utils";
 import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions";
 
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
@@ -50,7 +50,7 @@ test("delay strings: reverse conversion (conservative)", (t) => {
 });
 
 test("tAllowedMentions matches Eris's AllowedMentions", (t) => {
-  type TAllowedMentions = ioTs.TypeOf<typeof tAllowedMentions>;
+  type TAllowedMentions = z.infer<typeof zAllowedMentions>;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const typeTest: AssertEquals<TAllowedMentions, ErisAllowedMentionFormat> = true;
   t.pass();

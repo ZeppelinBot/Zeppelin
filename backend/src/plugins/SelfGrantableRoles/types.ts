@@ -1,31 +1,30 @@
-import * as t from "io-ts";
 import { BasePluginType, CooldownManager, guildPluginMessageCommand } from "knub";
+import z from "zod";
+import { zBoundedCharacters, zBoundedRecord } from "../../utils";
 
-const RoleMap = t.record(t.string, t.array(t.string));
+const zRoleMap = z.record(
+  zBoundedCharacters(1, 100),
+  z
+    .array(zBoundedCharacters(1, 2000))
+    .max(100)
+    .transform((parsed) => parsed.map((v) => v.toLowerCase())),
+);
 
-const SelfGrantableRoleEntry = t.type({
-  roles: RoleMap,
-  can_use: t.boolean,
-  can_ignore_cooldown: t.boolean,
-  max_roles: t.number,
+const zSelfGrantableRoleEntry = z.strictObject({
+  roles: zBoundedRecord(zRoleMap, 0, 100),
+  can_use: z.boolean().default(false),
+  can_ignore_cooldown: z.boolean().default(false),
+  max_roles: z.number().default(0),
 });
-const PartialRoleEntry = t.partial(SelfGrantableRoleEntry.props);
-export type TSelfGrantableRoleEntry = t.TypeOf<typeof SelfGrantableRoleEntry>;
+export type TSelfGrantableRoleEntry = z.infer<typeof zSelfGrantableRoleEntry>;
 
-export const ConfigSchema = t.type({
-  entries: t.record(t.string, SelfGrantableRoleEntry),
-  mention_roles: t.boolean,
+export const zSelfGrantableRolesConfig = z.strictObject({
+  entries: zBoundedRecord(z.record(zBoundedCharacters(0, 255), zSelfGrantableRoleEntry), 0, 100),
+  mention_roles: z.boolean(),
 });
-type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
-
-export const defaultSelfGrantableRoleEntry: t.TypeOf<typeof PartialRoleEntry> = {
-  can_use: false,
-  can_ignore_cooldown: false,
-  max_roles: 0,
-};
 
 export interface SelfGrantableRolesPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zSelfGrantableRolesConfig>;
   state: {
     cooldowns: CooldownManager;
   };

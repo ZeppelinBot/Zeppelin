@@ -1,14 +1,13 @@
-import { configUtils, CooldownManager } from "knub";
+import { CooldownManager } from "knub";
+import { Queue } from "../../Queue";
 import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { Queue } from "../../Queue";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { MINUTES, SECONDS } from "../../utils";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
-import { parseIoTsSchema, StrictValidationError } from "../../validatorUtils";
 import { CountersPlugin } from "../Counters/CountersPlugin";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -17,13 +16,12 @@ import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { availableActions } from "./actions/availableActions";
 import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
 import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
 import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
-import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt";
 import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
+import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
 import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
 import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
 import {
@@ -35,8 +33,7 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { pluginInfo } from "./info";
-import { availableTriggers } from "./triggers/availableTriggers";
-import { AutomodPluginType, ConfigSchema } from "./types";
+import { AutomodPluginType, zAutomodConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -61,129 +58,6 @@ const defaultOptions = {
   ],
 };
 
-/**
- * Config preprocessor to set default values for triggers and perform extra validation
- * TODO: Separate input and output types
- */
-const configParser = (input: unknown) => {
-  const rules = (input as any).rules;
-  if (rules) {
-    // Loop through each rule
-    for (const [name, rule] of Object.entries(rules)) {
-      if (rule == null) {
-        delete rules[name];
-        continue;
-      }
-
-      rule["name"] = name;
-
-      // If the rule doesn't have an explicitly set "enabled" property, set it to true
-      if (rule["enabled"] == null) {
-        rule["enabled"] = true;
-      }
-
-      if (rule["allow_further_rules"] == null) {
-        rule["allow_further_rules"] = false;
-      }
-
-      if (rule["affects_bots"] == null) {
-        rule["affects_bots"] = false;
-      }
-
-      if (rule["affects_self"] == null) {
-        rule["affects_self"] = false;
-      }
-
-      // Loop through the rule's triggers
-      if (rule["triggers"]) {
-        for (const triggerObj of rule["triggers"]) {
-          for (const triggerName in triggerObj) {
-            if (!availableTriggers[triggerName]) {
-              throw new StrictValidationError([`Unknown trigger '${triggerName}' in rule '${rule["name"]}'`]);
-            }
-
-            const triggerBlueprint = availableTriggers[triggerName];
-
-            if (typeof triggerBlueprint.defaultConfig === "object" && triggerBlueprint.defaultConfig != null) {
-              triggerObj[triggerName] = configUtils.mergeConfig(
-                triggerBlueprint.defaultConfig,
-                triggerObj[triggerName] || {},
-              );
-            } else {
-              triggerObj[triggerName] = triggerObj[triggerName] || triggerBlueprint.defaultConfig;
-            }
-
-            if (triggerObj[triggerName].match_attachment_type) {
-              const white = triggerObj[triggerName].match_attachment_type.whitelist_enabled;
-              const black = triggerObj[triggerName].match_attachment_type.blacklist_enabled;
-
-              if (white && black) {
-                throw new StrictValidationError([
-                  `Cannot have both blacklist and whitelist enabled at rule <${rule["name"]}/match_attachment_type>`,
-                ]);
-              } else if (!white && !black) {
-                throw new StrictValidationError([
-                  `Must have either blacklist or whitelist enabled at rule <${rule["name"]}/match_attachment_type>`,
-                ]);
-              }
-            }
-
-            if (triggerObj[triggerName].match_mime_type) {
-              const white = triggerObj[triggerName].match_mime_type.whitelist_enabled;
-              const black = triggerObj[triggerName].match_mime_type.blacklist_enabled;
-
-              if (white && black) {
-                throw new StrictValidationError([
-                  `Cannot have both blacklist and whitelist enabled at rule <${rule["name"]}/match_mime_type>`,
-                ]);
-              } else if (!white && !black) {
-                throw new StrictValidationError([
-                  `Must have either blacklist or whitelist enabled at rule <${rule["name"]}/match_mime_type>`,
-                ]);
-              }
-            }
-          }
-        }
-      }
-
-      if (rule["actions"]) {
-        for (const actionName in rule["actions"]) {
-          if (!availableActions[actionName]) {
-            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule["name"]}'`]);
-          }
-
-          const actionBlueprint = availableActions[actionName];
-          const actionConfig = rule["actions"][actionName];
-
-          if (typeof actionConfig !== "object" || Array.isArray(actionConfig) || actionConfig == null) {
-            rule["actions"][actionName] = actionConfig;
-          } else {
-            rule["actions"][actionName] = configUtils.mergeConfig(actionBlueprint.defaultConfig, actionConfig);
-          }
-        }
-      }
-
-      // Enable logging of automod actions by default
-      if (rule["actions"]) {
-        for (const actionName in rule["actions"]) {
-          if (!availableActions[actionName]) {
-            throw new StrictValidationError([`Unknown action '${actionName}' in rule '${rule["name"]}'`]);
-          }
-        }
-
-        if (rule["actions"]["log"] == null) {
-          rule["actions"]["log"] = true;
-        }
-        if (rule["actions"]["clean"] && rule["actions"]["start_thread"]) {
-          throw new StrictValidationError([`Cannot have both clean and start_thread at rule '${rule["name"]}'`]);
-        }
-      }
-    }
-  }
-
-  return parseIoTsSchema(ConfigSchema, input);
-};
-
 export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   name: "automod",
   showInDocs: true,
@@ -201,7 +75,7 @@ export const AutomodPlugin = zeppelinGuildPlugin<AutomodPluginType>()({
   ],
 
   defaultOptions,
-  configParser,
+  configParser: (input) => zAutomodConfig.parse(input),
 
   customOverrideCriteriaFunctions: {
     antiraid_level: (pluginData, matchParams, value) => {

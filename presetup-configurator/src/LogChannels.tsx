@@ -67,8 +67,6 @@ const LOG_TYPES = {
   MESSAGE_DELETE_AUTO: "Message deleted (auto)",
   SET_ANTIRAID_USER: "Set antiraid (user)",
   SET_ANTIRAID_AUTO: "Set antiraid (auto)",
-  MASS_ASSIGN_ROLES: "Mass-assigned roles",
-  MASS_UNASSIGN_ROLES: "Mass-unassigned roles",
   MEMBER_NOTE: "Member noted",
   CASE_DELETE: "Case deleted",
   DM_FAILED: "Failed to DM member",

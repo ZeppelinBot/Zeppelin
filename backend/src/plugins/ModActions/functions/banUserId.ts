@@ -5,7 +5,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { LogType } from "../../../data/LogType";
 import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { logger } from "../../../logger";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
   DAYS,
   SECONDS,
@@ -54,30 +54,52 @@ export async function banUserId(
 
     if (contactMethods.length) {
       if (!banTime && config.ban_message) {
-        const banMessage = await renderTemplate(
-          config.ban_message,
-          new TemplateSafeValueContainer({
-            guildName: pluginData.guild.name,
-            reason,
-            moderator: banOptions.caseArgs?.modId
-              ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
-              : null,
-          }),
-        );
+        let banMessage: string;
+        try {
+          banMessage = await renderTemplate(
+            config.ban_message,
+            new TemplateSafeValueContainer({
+              guildName: pluginData.guild.name,
+              reason,
+              moderator: banOptions.caseArgs?.modId
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+                : null,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof TemplateParseError) {
+            return {
+              status: "failed",
+              error: `Invalid ban_message format: ${err.message}`,
+            };
+          }
+          throw err;
+        }
 
         notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else if (banTime && config.tempban_message) {
-        const banMessage = await renderTemplate(
-          config.tempban_message,
-          new TemplateSafeValueContainer({
-            guildName: pluginData.guild.name,
-            reason,
-            moderator: banOptions.caseArgs?.modId
-              ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
-              : null,
-            banTime: humanizeDuration(banTime),
-          }),
-        );
+        let banMessage: string;
+        try {
+          banMessage = await renderTemplate(
+            config.tempban_message,
+            new TemplateSafeValueContainer({
+              guildName: pluginData.guild.name,
+              reason,
+              moderator: banOptions.caseArgs?.modId
+                ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
+                : null,
+              banTime: humanizeDuration(banTime),
+            }),
+          );
+        } catch (err) {
+          if (err instanceof TemplateParseError) {
+            return {
+              status: "failed",
+              error: `Invalid tempban_message format: ${err.message}`,
+            };
+          }
+          throw err;
+        }
 
         notifyResult = await notifyUser(member.user, banMessage, contactMethods);
       } else {

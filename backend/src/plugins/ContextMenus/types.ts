@@ -1,17 +1,14 @@
-import { APIEmbed, Awaitable } from "discord.js";
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
-import { GuildCases } from "../../data/GuildCases";
+import { GuildCases } from "src/data/GuildCases";
+import z from "zod";
 
-export const ConfigSchema = t.type({
-  can_use: t.boolean,
-
-  can_open_mod_menu: t.boolean,
+export const zContextMenusConfig = z.strictObject({
+  can_use: z.boolean(),
+  can_open_mod_menu: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface ContextMenuPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zContextMenusConfig>;
   state: {
     cases: GuildCases;
   };

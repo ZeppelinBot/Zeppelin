@@ -1,17 +1,17 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildPersistedData } from "../../data/GuildPersistedData";
+import { zSnowflake } from "../../utils";
 
-export const ConfigSchema = t.type({
-  persisted_roles: t.array(t.string),
-  persist_nicknames: t.boolean,
-  persist_voice_mutes: t.boolean, // Deprecated, here to not break old configs
+export const zPersistConfig = z.strictObject({
+  persisted_roles: z.array(zSnowflake),
+  persist_nicknames: z.boolean(),
+  persist_voice_mutes: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface PersistPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zPersistConfig>;
 
   state: {
     persistedData: GuildPersistedData;

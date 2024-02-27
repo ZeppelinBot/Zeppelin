@@ -6,7 +6,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TypedTemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -31,7 +31,7 @@ import {
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
-import { ConfigSchema, FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "./types";
+import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel, zLogsConfig } from "./types";
 import { getLogMessage } from "./util/getLogMessage";
 import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
@@ -120,10 +120,10 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
     format: {
-      timestamp: FORMAT_NO_TIMESTAMP, // Legacy/deprecated, use timestamp_format below instead
+      timestamp: FORMAT_NO_TIMESTAMP,
       ...DefaultLogMessages,
     },
-    ping_user: true, // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
+    ping_user: true,
     allow_user_mentions: false,
     timestamp_format: "[<t:]X[>]",
     include_embed_timestamp: true,
@@ -133,7 +133,8 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
     {
       level: ">=50",
       config: {
-        ping_user: false, // Legacy/deprecated, read comment on global ping_user option
+        // Legacy/deprecated, read comment on global ping_user option
+        ping_user: false,
       },
     },
   ],
@@ -144,11 +145,11 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Logs",
-    configSchema: ConfigSchema,
+    configSchema: zLogsConfig,
   },
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zLogsConfig.parse(input),
   defaultOptions,
 
   events: [

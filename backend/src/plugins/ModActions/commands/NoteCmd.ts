@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { renderUserUsername, resolveUser } from "../../../utils";
+import { renderUsername, resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
@@ -29,7 +29,7 @@ export const NoteCmd = modActionsCmd({
       return;
     }
 
-    const userName = renderUserUsername(user);
+    const userName = renderUsername(user);
     const reason = formatReasonWithAttachments(args.note, [...msg.attachments.values()]);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);

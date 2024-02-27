@@ -1,12 +1,13 @@
-import * as t from "io-ts";
+import z from "zod";
 import { automodTrigger } from "../helpers";
 
 // tslint:disable-next-line:no-empty-interface
 interface NoteTriggerResultType {}
 
+const configSchema = z.strictObject({});
+
 export const NoteTrigger = automodTrigger<NoteTriggerResultType>()({
-  configType: t.type({}),
-  defaultConfig: {},
+  configSchema,
 
   async match({ context }) {
     if (context.modAction?.type !== "note") {

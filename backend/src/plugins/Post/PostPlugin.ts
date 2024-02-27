@@ -3,7 +3,6 @@ import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
@@ -14,7 +13,7 @@ import { PostEmbedCmd } from "./commands/PostEmbedCmd";
 import { ScheduledPostsDeleteCmd } from "./commands/ScheduledPostsDeleteCmd";
 import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
 import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
-import { ConfigSchema, PostPluginType } from "./types";
+import { PostPluginType, zPostConfig } from "./types";
 import { postScheduledPost } from "./util/postScheduledPost";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
@@ -36,11 +35,11 @@ export const PostPlugin = zeppelinGuildPlugin<PostPluginType>()({
   showInDocs: true,
   info: {
     prettyName: "Post",
-    configSchema: ConfigSchema,
+    configSchema: zPostConfig,
   },
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zPostConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

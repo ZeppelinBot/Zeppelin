@@ -13,7 +13,6 @@ import {
   trimLines,
   UnknownUser,
 } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { UtilityPluginType } from "../types";
 
 const MAX_ROLES_TO_DISPLAY = 15;
@@ -27,7 +26,6 @@ export async function getUserInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,
   userId: string,
   compact = false,
-  requestMemberId?: string,
 ): Promise<APIEmbed | null> {
   const user = await resolveUser(pluginData.client, userId);
   if (!user || user instanceof UnknownUser) {
@@ -40,13 +38,11 @@ export async function getUserInfoEmbed(
     fields: [],
   };
 
-  const timeAndDate = pluginData.getPlugin(TimeAndDatePlugin);
-
   embed.author = {
-    name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user.username, user.discriminator)}`,
+    name: `${user.bot ? "Bot" : "User"}:  ${renderUsername(user)}`,
   };
 
-  const avatarURL = user.displayAvatarURL();
+  const avatarURL = (member ?? user).displayAvatarURL();
   embed.author.icon_url = avatarURL;
 
   if (compact) {
@@ -72,9 +68,8 @@ export async function getUserInfoEmbed(
   }
 
   const userInfoLines = [`ID: \`${user.id}\``, `Username: **${user.username}**`];
-  if (user.discriminator !== "0") {
-    userInfoLines.push(`Discriminator: **${user.discriminator}**`);
-  }
+  if (user.discriminator !== "0") userInfoLines.push(`Discriminator: **${user.discriminator}**`);
+  if (user.globalName) userInfoLines.push(`Display Name: **${user.globalName}**`);
   userInfoLines.push(`Created: **<t:${Math.round(user.createdTimestamp / 1000)}:R>**`);
   userInfoLines.push(`Mention: <@!${user.id}>`);
 

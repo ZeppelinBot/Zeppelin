@@ -13,7 +13,7 @@ export const RoleInfoCmd = utilityCmd({
   },
 
   async run({ message, args, pluginData }) {
-    const embed = await getRoleInfoEmbed(pluginData, args.role, message.author.id);
+    const embed = await getRoleInfoEmbed(pluginData, args.role);
     message.channel.send({ embeds: [embed] });
   },
 });

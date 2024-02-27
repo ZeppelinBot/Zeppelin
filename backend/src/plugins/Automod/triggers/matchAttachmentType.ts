@@ -1,6 +1,6 @@
 import { escapeInlineCode, Snowflake } from "discord.js";
-import * as t from "io-ts";
 import { extname } from "path";
+import z from "zod";
 import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
@@ -9,20 +9,33 @@ interface MatchResultType {
   mode: "blacklist" | "whitelist";
 }
 
-export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
-  configType: t.type({
-    filetype_blacklist: t.array(t.string),
-    blacklist_enabled: t.boolean,
-    filetype_whitelist: t.array(t.string),
-    whitelist_enabled: t.boolean,
-  }),
+const configSchema = z
+  .strictObject({
+    filetype_blacklist: z.array(z.string().max(32)).max(255).default([]),
+    blacklist_enabled: z.boolean().default(false),
+    filetype_whitelist: z.array(z.string().max(32)).max(255).default([]),
+    whitelist_enabled: z.boolean().default(false),
+  })
+  .transform((parsed, ctx) => {
+    if (parsed.blacklist_enabled && parsed.whitelist_enabled) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cannot have both blacklist and whitelist enabled",
+      });
+      return z.NEVER;
+    }
+    if (!parsed.blacklist_enabled && !parsed.whitelist_enabled) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must have either blacklist or whitelist enabled",
+      });
+      return z.NEVER;
+    }
+    return parsed;
+  });
 
-  defaultConfig: {
-    filetype_blacklist: [],
-    blacklist_enabled: false,
-    filetype_whitelist: [],
-    whitelist_enabled: false,
-  },
+export const MatchAttachmentTypeTrigger = automodTrigger<MatchResultType>()({
+  configSchema,
 
   async match({ context, triggerConfig: trigger }) {
     if (!context.message) {

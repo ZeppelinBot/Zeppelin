@@ -1,16 +1,16 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
-import * as t from "io-ts";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import z from "zod";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import {
   convertDelayStringToMS,
   noop,
   renderRecursively,
-  tDelayString,
-  tMessageContent,
-  tNullable,
   unique,
   validateAndParseMessageContent,
   verboseChannelMention,
+  zBoundedCharacters,
+  zDelayString,
+  zMessageContent,
 } from "../../../utils";
 import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
@@ -20,16 +20,14 @@ import { automodAction } from "../helpers";
 import { AutomodContext } from "../types";
 
 export const ReplyAction = automodAction({
-  configType: t.union([
-    t.string,
-    t.type({
-      text: tMessageContent,
-      auto_delete: tNullable(t.union([tDelayString, t.number])),
-      inline: tNullable(t.boolean),
+  configSchema: z.union([
+    zBoundedCharacters(0, 4000),
+    z.strictObject({
+      text: zMessageContent,
+      auto_delete: z.union([zDelayString, z.number()]).nullable().default(null),
+      inline: z.boolean().default(false),
     }),
   ]),
-
-  defaultConfig: {},
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const contextsWithTextChannels = contexts
@@ -60,10 +58,21 @@ export const ReplyAction = automodAction({
           }),
         );
 
-      const formatted =
-        typeof actionConfig === "string"
-          ? await renderReplyText(actionConfig)
-          : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
+      let formatted: string | MessageCreateOptions;
+      try {
+        formatted =
+          typeof actionConfig === "string"
+            ? await renderReplyText(actionConfig)
+            : ((await renderRecursively(actionConfig.text, renderReplyText)) as MessageCreateOptions);
+      } catch (err) {
+        if (err instanceof TemplateParseError) {
+          pluginData.getPlugin(LogsPlugin).logBotAlert({
+            body: `Error in reply format of automod rule \`${ruleName}\`: ${err.message}`,
+          });
+          return;
+        }
+        throw err;
+      }
 
       if (formatted) {
         const channel = pluginData.guild.channels.cache.get(channelId as Snowflake) as GuildTextBasedChannel;

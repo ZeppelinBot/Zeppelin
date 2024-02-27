@@ -13,7 +13,6 @@ import {
   User,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { UnknownUser, renderUserUsername } from "src/utils";
 import { Case } from "../data/entities/Case";
 import {
   ISavedMessageAttachmentData,
@@ -27,6 +26,7 @@ import {
   TypedTemplateSafeValueContainer,
   ingestDataIntoTemplateSafeValueContainer,
 } from "../templateFormatter";
+import { UnknownUser, renderUsername } from "../utils";
 
 type InputProps<T> = Omit<
   {
@@ -49,9 +49,10 @@ export class TemplateSafeUser extends TemplateSafeValueContainer {
   id: Snowflake | string;
   username: string;
   discriminator: string;
+  globalName?: string;
   mention: string;
   tag: string;
-  avatarURL?: string;
+  avatarURL: string;
   bot?: boolean;
   createdAt?: number;
   renderedUsername: string;
@@ -91,7 +92,7 @@ export class TemplateSafeMember extends TemplateSafeUser {
   nick: string;
   roles: TemplateSafeRole[];
   joinedAt?: number;
-  // guildAvatarURL: string, Once DJS supports per-server avatars
+  guildAvatarURL: string;
   guildName: string;
 
   constructor(data: InputProps<TemplateSafeMember>) {
@@ -249,7 +250,7 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
       discriminator: "0000",
       mention: `<@${user.id}>`,
       tag: "Unknown#0000",
-      renderedUsername: renderUserUsername(user),
+      renderedUsername: renderUsername(user),
     });
   }
 
@@ -257,12 +258,13 @@ export function userToTemplateSafeUser(user: User | UnknownUser): TemplateSafeUs
     id: user.id,
     username: user.username,
     discriminator: user.discriminator,
+    globalName: user.globalName,
     mention: `<@${user.id}>`,
     tag: user.tag,
-    avatarURL: user.displayAvatarURL?.(),
+    avatarURL: user.displayAvatarURL(),
     bot: user.bot,
     createdAt: user.createdTimestamp,
-    renderedUsername: renderUserUsername(user),
+    renderedUsername: renderUsername(user),
   });
 }
 
@@ -285,6 +287,7 @@ export function memberToTemplateSafeMember(member: GuildMember | PartialGuildMem
     nick: member.nickname ?? "*None*",
     roles: [...member.roles.cache.mapValues((r) => roleToTemplateSafeRole(r)).values()],
     joinedAt: member.joinedTimestamp ?? undefined,
+    guildAvatarURL: member.displayAvatarURL(),
     guildName: member.guild.name,
   });
 }

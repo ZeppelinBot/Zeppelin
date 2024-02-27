@@ -1,11 +1,12 @@
 import { PluginOptions } from "knub";
+import z from "zod";
 import { Queue } from "../../Queue";
 import { Webhooks } from "../../data/Webhooks";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { mapToPublicFn } from "../../pluginUtils";
 import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { editMessage } from "./functions/editMessage";
 import { sendMessage } from "./functions/sendMessage";
-import { ConfigSchema, InternalPosterPluginType } from "./types";
+import { InternalPosterPluginType } from "./types";
 
 const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   config: {},
@@ -16,7 +17,7 @@ export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType
   name: "internal_poster",
   showInDocs: false,
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => z.strictObject({}).parse(input),
   defaultOptions,
 
   // prettier-ignore

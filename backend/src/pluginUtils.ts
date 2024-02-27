@@ -11,22 +11,12 @@ import {
   PermissionsBitField,
   TextBasedChannel,
 } from "discord.js";
-import * as t from "io-ts";
-import {
-  AnyPluginData,
-  CommandContext,
-  ConfigValidationError,
-  ExtendedMatchParams,
-  GuildPluginData,
-  PluginOverrideCriteria,
-  helpers,
-} from "knub";
+import { AnyPluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
 import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
-import { errorMessage, successMessage, tNullable } from "./utils";
+import { errorMessage, successMessage } from "./utils";
 import { Tail } from "./utils/typeUtils";
-import { StrictValidationError, parseIoTsSchema } from "./validatorUtils";
 
 const { getMemberLevel } = helpers;
 
@@ -58,46 +48,6 @@ export async function hasPermission(
 ) {
   const config = await pluginData.config.getMatchingConfig(matchParams);
   return helpers.hasPermission(config, permission);
-}
-
-const PluginOverrideCriteriaType: t.Type<PluginOverrideCriteria<unknown>> = t.recursion(
-  "PluginOverrideCriteriaType",
-  () =>
-    t.partial({
-      channel: tNullable(t.union([t.string, t.array(t.string)])),
-      category: tNullable(t.union([t.string, t.array(t.string)])),
-      level: tNullable(t.union([t.string, t.array(t.string)])),
-      user: tNullable(t.union([t.string, t.array(t.string)])),
-      role: tNullable(t.union([t.string, t.array(t.string)])),
-
-      all: tNullable(t.array(PluginOverrideCriteriaType)),
-      any: tNullable(t.array(PluginOverrideCriteriaType)),
-      not: tNullable(PluginOverrideCriteriaType),
-
-      extra: t.unknown,
-    }),
-);
-
-export function strictValidationErrorToConfigValidationError(err: StrictValidationError) {
-  return new ConfigValidationError(
-    err
-      .getErrors()
-      .map((e) => e.toString())
-      .join("\n"),
-  );
-}
-
-export function makeIoTsConfigParser<Schema extends t.Type<any>>(schema: Schema): (input: unknown) => t.TypeOf<Schema> {
-  return (input: unknown) => {
-    try {
-      return parseIoTsSchema(schema, input);
-    } catch (err) {
-      if (err instanceof StrictValidationError) {
-        throw strictValidationErrorToConfigValidationError(err);
-      }
-      throw err;
-    }
-  };
 }
 
 export async function sendSuccessMessage(

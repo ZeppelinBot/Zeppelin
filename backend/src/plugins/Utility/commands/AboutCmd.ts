@@ -100,8 +100,8 @@ export const AboutCmd = utilityCmd({
     }
 
     // Use the bot avatar as the embed image
-    if (pluginData.client.user!.avatarURL()) {
-      aboutEmbed.thumbnail = { url: pluginData.client.user!.avatarURL()! };
+    if (pluginData.client.user!.displayAvatarURL()) {
+      aboutEmbed.thumbnail = { url: pluginData.client.user!.displayAvatarURL()! };
     }
 
     msg.channel.send({ embeds: [aboutEmbed] });

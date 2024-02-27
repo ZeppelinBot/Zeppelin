@@ -3,9 +3,9 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
+import { UnknownUser, chunkArray, emptyEmbedValue, renderUsername, resolveMember, resolveUser } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
+import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { modActionsCmd } from "../types";
 
@@ -21,6 +21,8 @@ const opts = {
   unbans: ct.switchOption({ def: false, shortcut: "ub" }),
 };
 
+const casesPerPage = 5;
+
 export const CasesUserCmd = modActionsCmd({
   trigger: ["cases", "modlogs"],
   permission: "can_view",
@@ -35,8 +37,10 @@ export const CasesUserCmd = modActionsCmd({
   ],
 
   async run({ pluginData, message: msg, args }) {
-    const user = await resolveUser(pluginData.client, args.user);
-    if (!user.id) {
+    const user =
+      (await resolveMember(pluginData.client, pluginData.guild, args.user)) ||
+      (await resolveUser(pluginData.client, args.user));
+    if (user instanceof UnknownUser) {
       sendErrorMessage(pluginData, msg.channel, `User not found`);
       return;
     }
@@ -62,7 +66,7 @@ export const CasesUserCmd = modActionsCmd({
     const hiddenCases = cases.filter((c) => c.is_hidden);
 
     const userName =
-      user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUserUsername(user);
+      user instanceof UnknownUser && cases.length ? cases[cases.length - 1].user_name : renderUsername(user);
 
     if (cases.length === 0) {
       msg.channel.send(`No cases found for **${userName}**`);
@@ -90,49 +94,55 @@ export const CasesUserCmd = modActionsCmd({
       } else {
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
-        const lines = await asyncMap(casesToDisplay, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
+        const totalPages = Math.max(Math.ceil(cases.length / casesPerPage), 1);
         const prefix = getGuildPrefix(pluginData);
-        const linesPerChunk = 10;
-        const lineChunks = chunkArray(lines, linesPerChunk);
 
-        const footerField = {
-          name: emptyEmbedValue,
-          value: trimLines(`
-            Use \`${prefix}case <num>\` to see more information about an individual case
-          `),
-        };
+        createPaginatedMessage(
+          pluginData.client,
+          msg.channel,
+          totalPages,
+          async (page) => {
+            const chunkedCases = chunkArray(cases, casesPerPage)[page - 1];
+            const lines = await asyncMap(chunkedCases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
-        for (const [i, linesInChunk] of lineChunks.entries()) {
-          const isLastChunk = i === lineChunks.length - 1;
+            const isLastPage = page === totalPages;
+            const firstCaseNum = (page - 1) * casesPerPage + 1;
+            const lastCaseNum = isLastPage ? cases.length : page * casesPerPage;
+            const title =
+              totalPages === 1
+                ? `Cases for ${userName} (${lines.length} total)`
+                : `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${cases.length} for ${userName}`;
 
-          if (isLastChunk && !args.hidden && hiddenCases.length) {
-            if (hiddenCases.length === 1) {
-              linesInChunk.push(`*+${hiddenCases.length} hidden case, use "-hidden" to show it*`);
-            } else {
-              linesInChunk.push(`*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`);
-            }
-          }
+            const embed = {
+              author: {
+                name: title,
+                icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
+              },
+              description: lines.join("\n"),
+              fields: [
+                {
+                  name: emptyEmbedValue,
+                  value: `Use \`${prefix}case <num>\` to see more information about an individual case`,
+                },
+              ],
+            } satisfies APIEmbed;
 
-          const chunkStart = i * linesPerChunk + 1;
-          const chunkEnd = Math.min((i + 1) * linesPerChunk, lines.length);
+            if (isLastPage && !args.hidden && hiddenCases.length)
+              embed.fields.push({
+                name: emptyEmbedValue,
+                value:
+                  hiddenCases.length === 1
+                    ? `*+${hiddenCases.length} hidden case, use "-hidden" to show it*`
+                    : `*+${hiddenCases.length} hidden cases, use "-hidden" to show them*`,
+              });
 
-          const embed = {
-            author: {
-              name:
-                lineChunks.length === 1
-                  ? `Cases for ${userName} (${lines.length} total)`
-                  : `Cases ${chunkStart}–${chunkEnd} of ${lines.length} for ${userName}`,
-              icon_url: user instanceof User ? user.displayAvatarURL() : undefined,
-            },
-            fields: [
-              ...getChunkedEmbedFields(emptyEmbedValue, linesInChunk.join("\n")),
-              ...(isLastChunk ? [footerField] : []),
-            ],
-          } satisfies APIEmbed;
-
-          msg.channel.send({ embeds: [embed] });
-        }
+            return { embeds: [embed] };
+          },
+          {
+            limitToUserId: msg.author.id,
+          },
+        );
       }
     }
   },

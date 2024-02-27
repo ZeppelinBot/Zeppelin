@@ -5,7 +5,7 @@ import { LogType } from "./LogType";
 const guildInstances: Map<string, GuildLogs> = new Map();
 
 interface IIgnoredLog {
-  type: LogType;
+  type: keyof typeof LogType;
   ignoreId: any;
 }
 
@@ -27,7 +27,7 @@ export class GuildLogs extends events.EventEmitter {
     guildInstances.set(guildId, this);
   }
 
-  log(type: LogType, data: any, ignoreId?: string) {
+  log(type: keyof typeof LogType, data: any, ignoreId?: string) {
     if (ignoreId && this.isLogIgnored(type, ignoreId)) {
       this.clearIgnoredLog(type, ignoreId);
       return;
@@ -36,7 +36,7 @@ export class GuildLogs extends events.EventEmitter {
     this.emit("log", { type, data });
   }
 
-  ignoreLog(type: LogType, ignoreId: any, timeout?: number) {
+  ignoreLog(type: keyof typeof LogType, ignoreId: any, timeout?: number) {
     this.ignoredLogs.push({ type, ignoreId });
 
     // Clear after expiry (15sec by default)
@@ -45,11 +45,11 @@ export class GuildLogs extends events.EventEmitter {
     }, timeout || 1000 * 15);
   }
 
-  isLogIgnored(type: LogType, ignoreId: any) {
+  isLogIgnored(type: keyof typeof LogType, ignoreId: any) {
     return this.ignoredLogs.some((info) => type === info.type && ignoreId === info.ignoreId);
   }
 
-  clearIgnoredLog(type: LogType, ignoreId: any) {
+  clearIgnoredLog(type: keyof typeof LogType, ignoreId: any) {
     this.ignoredLogs.splice(
       this.ignoredLogs.findIndex((info) => type === info.type && ignoreId === info.ignoreId),
       1,
