@@ -20,12 +20,20 @@ export async function postReminder(pluginData: GuildPluginData<RemindersPluginTy
           allowedMentions: {
             users: [reminder.user_id as Snowflake],
           },
+          reply: {
+            messageReference: reminder.source_message_id,
+            failIfNotExists: false,
+          },
         });
       } else {
         await channel.send({
           content: disableLinkPreviews(`Reminder for <@!${reminder.user_id}>: ${reminder.body}`),
           allowedMentions: {
             users: [reminder.user_id as Snowflake],
+          },
+          reply: {
+            messageReference: reminder.source_message_id,
+            failIfNotExists: false,
           },
         });
       }

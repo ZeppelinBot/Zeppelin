@@ -41,7 +41,7 @@ export class GuildReminders extends BaseGuildRepository {
     });
   }
 
-  async add(userId: string, channelId: string, remindAt: string, body: string, created_at: string) {
+  async add(userId: string, channelId: string, remindAt: string, body: string, created_at: string, source_id?: string) {
     const result = await this.reminders.insert({
       guild_id: this.guildId,
       user_id: userId,
@@ -49,6 +49,7 @@ export class GuildReminders extends BaseGuildRepository {
       remind_at: remindAt,
       body,
       created_at,
+      source_message_id: source_id,
     });
 
     return (await this.find(result.identifiers[0].id))!;
