@@ -85,3 +85,5 @@ npm-audit.txt
 
 config-errors.txt
 /config-schema.json
+
+*.tsbuildinfo

@@ -1,19 +1,14 @@
 {
-  "compilerOptions": {
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "esnext",
-    "lib": ["es2023"],
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "alwaysStrict": true,
-    "noImplicitThis": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "useUnknownInCatchVariables": false
-  }
+  "files": [],
+  "references": [
+    {
+      "path": "./shared/tsconfig.json"
+    },
+    {
+      "path": "./backend/tsconfig.json"
+    },
+    {
+      "path": "./dashboard/tsconfig.json"
+    }
+  ]
 }

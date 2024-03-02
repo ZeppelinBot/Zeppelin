@@ -32,5 +32,10 @@
       "prettier --write",
       "git add"
     ]
-  }
+  },
+  "workspaces": [
+    "shared",
+    "backend",
+    "dashboard"
+  ]
 }

@@ -13,9 +13,12 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "paths": {
-      "@shared/*": ["../shared/src/*"]
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
     }
-  }
+  ]
 }

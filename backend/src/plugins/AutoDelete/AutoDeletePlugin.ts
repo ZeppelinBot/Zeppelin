@@ -24,7 +24,7 @@ export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
     description: "Allows Zeppelin to auto-delete messages from a channel after a delay",
     configurationGuide: "Maximum deletion delay is currently 5 minutes",
     configSchema: zAutoDeleteConfig,
-  },
+  } as any,
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
   configParser: (input) => zAutoDeleteConfig.parse(input),
