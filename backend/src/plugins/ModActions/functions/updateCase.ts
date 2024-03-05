@@ -13,7 +13,7 @@ export async function updateCase(
   pluginData: GuildPluginData<ModActionsPluginType>,
   context: Message | ChatInputCommandInteraction,
   author: User,
-  caseNumber?: number,
+  caseNumber?: number | null,
   note = "",
   attachments: Attachment[] = [],
 ) {

@@ -1,11 +1,12 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, convertDelayStringToMS } from "../../../../utils";
+import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualMuteCmd } from "../../functions/actualCommands/actualMuteCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -33,7 +34,7 @@ const opts = [
   }),
 ];
 
-export const ForceMuteSlashCmd = {
+export const ForceMuteSlashCmd = modActionsSlashCmd({
   name: "forcemute",
   configPermission: "can_mute",
   description: "Force-mute the specified user, even if they're not on the server",
@@ -53,7 +54,7 @@ export const ForceMuteSlashCmd = {
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     let ppId: string | undefined;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
@@ -68,7 +69,7 @@ export const ForceMuteSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
       ppId = interaction.user.id;
     }
 
@@ -94,8 +95,8 @@ export const ForceMuteSlashCmd = {
       mod,
       ppId,
       convertedTime,
-      options.reason,
+      options.reason ?? "",
       contactMethods,
     );
   },
-};
+});

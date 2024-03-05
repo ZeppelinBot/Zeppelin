@@ -1,11 +1,12 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod } from "../../../../utils";
+import { UserNotificationMethod, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualKickCmd } from "../../functions/actualCommands/actualKickCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -37,7 +38,7 @@ const opts = [
   }),
 ];
 
-export const KickSlashCmd = {
+export const KickSlashCmd = modActionsSlashCmd({
   name: "kick",
   configPermission: "can_kick",
   description: "Kick the specified member",
@@ -57,7 +58,7 @@ export const KickSlashCmd = {
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
       member: interaction.member,
@@ -71,7 +72,7 @@ export const KickSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
     }
 
     let contactMethods: UserNotificationMethod[] | undefined;
@@ -85,7 +86,7 @@ export const KickSlashCmd = {
     actualKickCmd(
       pluginData,
       interaction,
-      interaction.member,
+      interaction.member as GuildMember,
       options.user,
       options.reason || "",
       attachments,
@@ -94,4 +95,4 @@ export const KickSlashCmd = {
       options.clean,
     );
   },
-};
+});

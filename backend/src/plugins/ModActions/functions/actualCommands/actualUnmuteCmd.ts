@@ -16,7 +16,7 @@ export async function actualUnmuteCmd(
   mod: GuildMember,
   ppId?: string,
   time?: number,
-  reason?: string,
+  reason?: string | null,
 ) {
   if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
     return;

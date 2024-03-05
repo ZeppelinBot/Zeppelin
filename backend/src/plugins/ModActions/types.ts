@@ -1,6 +1,12 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { EventEmitter } from "events";
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, guildPluginSlashGroup } from "knub";
+import {
+  BasePluginType,
+  guildPluginEventListener,
+  guildPluginMessageCommand,
+  guildPluginSlashCommand,
+  guildPluginSlashGroup,
+} from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildCases } from "../../data/GuildCases";
@@ -152,4 +158,5 @@ export type ModActionType = "note" | "warn" | "mute" | "unmute" | "kick" | "ban"
 
 export const modActionsMsgCmd = guildPluginMessageCommand<ModActionsPluginType>();
 export const modActionsSlashGroup = guildPluginSlashGroup<ModActionsPluginType>();
+export const modActionsSlashCmd = guildPluginSlashCommand<ModActionsPluginType>();
 export const modActionsEvt = guildPluginEventListener<ModActionsPluginType>();

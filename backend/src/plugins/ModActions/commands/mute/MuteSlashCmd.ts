@@ -1,4 +1,4 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
@@ -8,6 +8,7 @@ import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualMuteCmd } from "../../functions/actualCommands/actualMuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -35,7 +36,7 @@ const opts = [
   }),
 ];
 
-export const MuteSlashCmd = {
+export const MuteSlashCmd = modActionsSlashCmd({
   name: "mute",
   configPermission: "can_mute",
   description: "Mute the specified member",
@@ -61,7 +62,7 @@ export const MuteSlashCmd = {
         const reply = await waitForButtonConfirm(
           interaction,
           { content: "User not found on the server, forcemute instead?" },
-          { confirmText: "Yes", cancelText: "No", restrictToId: interaction.member.id },
+          { confirmText: "Yes", cancelText: "No", restrictToId: interaction.user.id },
         );
 
         if (!reply) {
@@ -74,12 +75,12 @@ export const MuteSlashCmd = {
     }
 
     // Make sure we're allowed to mute this member
-    if (memberToMute && !canActOn(pluginData, interaction.member, memberToMute)) {
+    if (memberToMute && !canActOn(pluginData, interaction.member as GuildMember, memberToMute)) {
       pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot mute: insufficient permissions");
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     let ppId: string | undefined;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
@@ -94,7 +95,7 @@ export const MuteSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
       ppId = interaction.user.id;
     }
 
@@ -124,4 +125,4 @@ export const MuteSlashCmd = {
       contactMethods,
     );
   },
-};
+});

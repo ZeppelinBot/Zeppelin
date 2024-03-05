@@ -1,11 +1,12 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, convertDelayStringToMS } from "../../../../utils";
+import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualBanCmd } from "../../functions/actualCommands/actualBanCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -38,7 +39,7 @@ const opts = [
   }),
 ];
 
-export const BanSlashCmd = {
+export const BanSlashCmd = modActionsSlashCmd({
   name: "ban",
   configPermission: "can_ban",
   description: "Ban or Tempban the specified member",
@@ -58,7 +59,7 @@ export const BanSlashCmd = {
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
       member: interaction.member,
@@ -72,7 +73,7 @@ export const BanSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
     }
 
     let contactMethods: UserNotificationMethod[] | undefined;
@@ -96,9 +97,9 @@ export const BanSlashCmd = {
       convertedTime,
       options.reason || "",
       attachments,
-      interaction.member,
+      interaction.member as GuildMember,
       mod,
       contactMethods,
     );
   },
-};
+});

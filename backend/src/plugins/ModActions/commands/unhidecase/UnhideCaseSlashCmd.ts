@@ -1,7 +1,8 @@
 import { slashOptions } from "knub";
 import { actualUnhideCaseCmd } from "../../functions/actualCommands/actualUnhideCaseCmd";
+import { modActionsSlashCmd } from "../../types";
 
-export const UnhideCaseSlashCmd = {
+export const UnhideCaseSlashCmd = modActionsSlashCmd({
   name: "unhidecase",
   configPermission: "can_hidecase",
   description: "Un-hide the specified case",
@@ -13,6 +14,6 @@ export const UnhideCaseSlashCmd = {
 
   async run({ interaction, options, pluginData }) {
     await interaction.deferReply({ ephemeral: true });
-    actualUnhideCaseCmd(pluginData, interaction, options["case-number"].split(/[\s,]+/).map(Number));
+    actualUnhideCaseCmd(pluginData, interaction, options["case-number"].split(/\D+/).map(Number));
   },
-};
+});

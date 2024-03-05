@@ -1,9 +1,11 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
-import { convertDelayStringToMS } from "../../../../utils";
+import { convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualForceBanCmd } from "../../functions/actualCommands/actualForceBanCmd";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -15,7 +17,7 @@ const opts = [
   }),
 ];
 
-export const ForceBanSlashCmd = {
+export const ForceBanSlashCmd = modActionsSlashCmd({
   name: "forceban",
   configPermission: "can_ban",
   description: "Force-ban the specified user, even if they aren't on the server",
@@ -35,7 +37,7 @@ export const ForceBanSlashCmd = {
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
       member: interaction.member,
@@ -49,7 +51,7 @@ export const ForceBanSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
     }
 
     const convertedTime = options.time ? convertDelayStringToMS(options.time) : null;
@@ -58,6 +60,14 @@ export const ForceBanSlashCmd = {
       return;
     }
 
-    actualForceBanCmd(pluginData, interaction, interaction.user.id, options.user, options.reason, attachments, mod);
+    actualForceBanCmd(
+      pluginData,
+      interaction,
+      interaction.user.id,
+      options.user,
+      options.reason ?? "",
+      attachments,
+      mod,
+    );
   },
-};
+});

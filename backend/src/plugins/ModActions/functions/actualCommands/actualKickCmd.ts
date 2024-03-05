@@ -20,7 +20,7 @@ export async function actualKickCmd(
   attachments: Attachment[],
   mod: GuildMember,
   contactMethods?: UserNotificationMethod[],
-  clean?: boolean,
+  clean?: boolean | null,
 ) {
   if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {
     return;

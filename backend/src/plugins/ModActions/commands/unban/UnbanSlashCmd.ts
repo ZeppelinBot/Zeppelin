@@ -1,8 +1,11 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
+import { resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualUnbanCmd } from "../../functions/actualCommands/actualUnbanCmd";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -14,7 +17,7 @@ const opts = [
   }),
 ];
 
-export const UnbanSlashCmd = {
+export const UnbanSlashCmd = modActionsSlashCmd({
   name: "unban",
   configPermission: "can_unban",
   description: "Unban the specified member",
@@ -34,7 +37,7 @@ export const UnbanSlashCmd = {
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
       member: interaction.member,
@@ -48,9 +51,9 @@ export const UnbanSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
     }
 
-    actualUnbanCmd(pluginData, interaction, interaction.user.id, options.user, options.reason, attachments, mod);
+    actualUnbanCmd(pluginData, interaction, interaction.user.id, options.user, options.reason ?? "", attachments, mod);
   },
-};
+});

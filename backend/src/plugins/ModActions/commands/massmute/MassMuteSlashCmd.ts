@@ -1,7 +1,9 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualMassMuteCmd } from "../../functions/actualCommands/actualMassMuteCmd";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -12,7 +14,7 @@ const opts = [
   }),
 ];
 
-export const MassMuteSlashSlashCmd = {
+export const MassMuteSlashSlashCmd = modActionsSlashCmd({
   name: "massmute",
   configPermission: "can_massmute",
   description: "Mass-mute a list of user IDs",
@@ -39,10 +41,10 @@ export const MassMuteSlashSlashCmd = {
     actualMassMuteCmd(
       pluginData,
       interaction,
-      options["user-ids"].split(/[\s,\r\n]+/),
-      interaction.member,
+      options["user-ids"].split(/\D+/),
+      interaction.member as GuildMember,
       options.reason || "",
       attachments,
     );
   },
-};
+});

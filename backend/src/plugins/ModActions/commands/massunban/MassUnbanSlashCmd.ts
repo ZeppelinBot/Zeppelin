@@ -1,7 +1,9 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualMassUnbanCmd } from "../../functions/actualCommands/actualMassUnbanCmd";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -12,7 +14,7 @@ const opts = [
   }),
 ];
 
-export const MassUnbanSlashCmd = {
+export const MassUnbanSlashCmd = modActionsSlashCmd({
   name: "massunban",
   configPermission: "can_massunban",
   description: "Mass-unban a list of user IDs",
@@ -40,9 +42,9 @@ export const MassUnbanSlashCmd = {
       pluginData,
       interaction,
       options["user-ids"].split(/[\s,\r\n]+/),
-      interaction.member,
+      interaction.member as GuildMember,
       options.reason || "",
       attachments,
     );
   },
-};
+});

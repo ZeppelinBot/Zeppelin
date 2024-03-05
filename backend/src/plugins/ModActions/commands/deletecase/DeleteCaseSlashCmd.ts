@@ -1,9 +1,11 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { actualDeleteCaseCmd } from "../../functions/actualCommands/actualDeleteCaseCmd";
+import { modActionsSlashCmd } from "../../types";
 
 const opts = [slashOptions.boolean({ name: "force", description: "Whether or not to force delete", required: false })];
 
-export const DeleteCaseSlashCmd = {
+export const DeleteCaseSlashCmd = modActionsSlashCmd({
   name: "deletecase",
   configPermission: "can_deletecase",
   description: "Delete the specified case. This operation can *not* be reversed.",
@@ -21,9 +23,9 @@ export const DeleteCaseSlashCmd = {
     actualDeleteCaseCmd(
       pluginData,
       interaction,
-      interaction.member,
-      options["case-number"].split(/[\s,]+/),
+      interaction.member as GuildMember,
+      options["case-number"].split(/\D+/).map(Number),
       !!options.force,
     );
   },
-};
+});

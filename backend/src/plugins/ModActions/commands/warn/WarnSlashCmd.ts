@@ -1,4 +1,4 @@
-import { ChannelType } from "discord.js";
+import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, resolveMember } from "../../../../utils";
@@ -7,6 +7,7 @@ import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualWarnCmd } from "../../functions/actualCommands/actualWarnCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -33,7 +34,7 @@ const opts = [
   }),
 ];
 
-export const WarnSlashCmd = {
+export const WarnSlashCmd = modActionsSlashCmd({
   name: "warn",
   configPermission: "can_warn",
   description: "Send a warning to the specified user",
@@ -67,12 +68,12 @@ export const WarnSlashCmd = {
     }
 
     // Make sure we're allowed to warn this member
-    if (!canActOn(pluginData, interaction.member, memberToWarn)) {
+    if (!canActOn(pluginData, interaction.member as GuildMember, memberToWarn)) {
       await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot warn: insufficient permissions");
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
       member: interaction.member,
@@ -86,7 +87,7 @@ export const WarnSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
     }
 
     let contactMethods: UserNotificationMethod[] | undefined;
@@ -108,4 +109,4 @@ export const WarnSlashCmd = {
       contactMethods,
     );
   },
-};
+});

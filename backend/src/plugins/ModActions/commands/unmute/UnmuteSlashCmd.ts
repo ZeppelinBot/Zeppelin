@@ -1,3 +1,4 @@
+import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { convertDelayStringToMS, resolveMember } from "../../../../utils";
@@ -7,6 +8,7 @@ import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { actualUnmuteCmd } from "../../functions/actualCommands/actualUnmuteCmd";
 import { isBanned } from "../../functions/isBanned";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -19,7 +21,7 @@ const opts = [
   }),
 ];
 
-export const UnmuteSlashCmd = {
+export const UnmuteSlashCmd = modActionsSlashCmd({
   name: "unmute",
   configPermission: "can_mute",
   description: "Unmute the specified member",
@@ -79,12 +81,12 @@ export const UnmuteSlashCmd = {
     }
 
     // Make sure we're allowed to unmute this member
-    if (memberToUnmute && !canActOn(pluginData, interaction.member, memberToUnmute)) {
+    if (memberToUnmute && !canActOn(pluginData, interaction.member as GuildMember, memberToUnmute)) {
       pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot unmute: insufficient permissions");
       return;
     }
 
-    let mod = interaction.member;
+    let mod = interaction.member as GuildMember;
     let ppId: string | undefined;
     const canActAsOther = await hasPermission(pluginData, "can_act_as_other", {
       channel: interaction.channel,
@@ -99,7 +101,7 @@ export const UnmuteSlashCmd = {
         return;
       }
 
-      mod = options.mod;
+      mod = (await resolveMember(pluginData.client, pluginData.guild, options.mod.id))!;
       ppId = interaction.user.id;
     }
 
@@ -111,4 +113,4 @@ export const UnmuteSlashCmd = {
 
     actualUnmuteCmd(pluginData, interaction, options.user, attachments, mod, ppId, convertedTime, options.reason);
   },
-};
+});

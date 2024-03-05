@@ -1,7 +1,8 @@
 import { slashOptions } from "knub";
 import { actualHideCaseCmd } from "../../functions/actualCommands/actualHideCaseCmd";
+import { modActionsSlashCmd } from "../../types";
 
-export const HideCaseSlashCmd = {
+export const HideCaseSlashCmd = modActionsSlashCmd({
   name: "hidecase",
   configPermission: "can_hidecase",
   description: "Hide the specified case so it doesn't appear in !cases or !info",
@@ -13,6 +14,6 @@ export const HideCaseSlashCmd = {
 
   async run({ interaction, options, pluginData }) {
     await interaction.deferReply({ ephemeral: true });
-    actualHideCaseCmd(pluginData, interaction, options["case-number"].split(/[\s,]+/).map(Number));
+    actualHideCaseCmd(pluginData, interaction, options["case-number"].split(/\D+/).map(Number));
   },
-};
+});

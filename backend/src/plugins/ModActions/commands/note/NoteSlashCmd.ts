@@ -2,6 +2,7 @@ import { slashOptions } from "knub";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { actualNoteCmd } from "../../functions/actualCommands/actualNoteCmd";
+import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
 const opts = [
@@ -12,7 +13,7 @@ const opts = [
   }),
 ];
 
-export const NoteSlashCmd = {
+export const NoteSlashCmd = modActionsSlashCmd({
   name: "note",
   configPermission: "can_note",
   description: "Add a note to the specified user",
@@ -34,4 +35,4 @@ export const NoteSlashCmd = {
 
     actualNoteCmd(pluginData, interaction, interaction.user, attachments, options.user, options.note || "");
   },
-};
+});

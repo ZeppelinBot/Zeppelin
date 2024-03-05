@@ -29,7 +29,7 @@ export async function actualMuteCmd(
   mod: GuildMember,
   ppId?: string,
   time?: number,
-  reason?: string,
+  reason?: string | null,
   contactMethods?: UserNotificationMethod[],
 ) {
   if (await handleAttachmentLinkDetectionAndGetRestriction(pluginData, context, reason)) {

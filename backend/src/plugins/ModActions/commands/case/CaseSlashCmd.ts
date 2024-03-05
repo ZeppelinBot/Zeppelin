@@ -1,11 +1,12 @@
 import { slashOptions } from "knub";
 import { actualCaseCmd } from "../../functions/actualCommands/actualCaseCmd";
+import { modActionsSlashCmd } from "../../types";
 
 const opts = [
   slashOptions.boolean({ name: "show", description: "To make the result visible to everyone", required: false }),
 ];
 
-export const CaseSlashCmd = {
+export const CaseSlashCmd = modActionsSlashCmd({
   name: "case",
   configPermission: "can_view",
   description: "Show information about a specific case",
@@ -21,4 +22,4 @@ export const CaseSlashCmd = {
     await interaction.deferReply({ ephemeral: options.show !== true });
     actualCaseCmd(pluginData, interaction, interaction.user.id, options["case-number"], options.show);
   },
-};
+});
