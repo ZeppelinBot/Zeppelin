@@ -4,8 +4,6 @@ USER node
 COPY --chown=node:node . /zeppelin
 
 WORKDIR /zeppelin/dashboard
-RUN ls -lah
-RUN pwd
 RUN npm ci && npm run build
 
 FROM nginx
