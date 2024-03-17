@@ -1,6 +1,7 @@
 import moment from "moment-timezone";
 import path from "path";
 import { DataSource } from "typeorm";
+import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOptions.js";
 import { env } from "../env";
 import { backendDir } from "../paths";
 
@@ -9,13 +10,39 @@ moment.tz.setDefault("UTC");
 const entities = path.relative(process.cwd(), path.resolve(backendDir, "dist/backend/src/data/entities/*.js"));
 const migrations = path.relative(process.cwd(), path.resolve(backendDir, "dist/backend/src/migrations/*.js"));
 
+type DbOpts = Pick<MysqlConnectionOptions, "host" | "port" | "username" | "password" | "database">;
+let dbOpts: DbOpts;
+if (env.HOST_MODE === "development") {
+  dbOpts = {
+    host: "mysql",
+    port: 3306,
+    username: "zeppelin",
+    password: env.DEVELOPMENT_MYSQL_PASSWORD,
+    database: "zeppelin",
+  };
+} else if (env.HOST_MODE === "standalone") {
+  dbOpts = {
+    host: "mysql",
+    port: 3306,
+    username: "zeppelin",
+    password: env.STANDALONE_MYSQL_PASSWORD,
+    database: "zeppelin",
+  };
+} else if (env.HOST_MODE === "lightweight") {
+  dbOpts = {
+    host: env.LIGHTWEIGHT_DB_HOST,
+    port: env.LIGHTWEIGHT_DB_PORT,
+    username: env.LIGHTWEIGHT_DB_USER,
+    password: env.LIGHTWEIGHT_DB_PASSWORD,
+    database: env.LIGHTWEIGHT_DB_DATABASE,
+  };
+} else {
+  throw new Error(`Unknown host mode: ${env.HOST_MODE}`);
+}
+
 export const dataSource = new DataSource({
   type: "mysql",
-  host: env.DB_HOST,
-  port: env.DB_PORT,
-  username: env.DB_USER,
-  password: env.DB_PASSWORD,
-  database: env.DB_DATABASE,
+  ...dbOpts,
   charset: "utf8mb4",
   supportBigNumbers: true,
   bigNumberStrings: true,

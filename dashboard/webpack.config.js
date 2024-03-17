@@ -175,7 +175,7 @@ if (process.env.NODE_ENV === "production") {
     devServer: {
       ...(process.env.DEV_HOST ? { host: process.env.DEV_HOST } : undefined),
       historyApiFallback: true,
-      port: 1234,
+      port: 3002,
     },
   });
 }

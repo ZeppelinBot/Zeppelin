@@ -51,7 +51,7 @@ app.use((req, res, next) => {
   return notFound(res);
 });
 
-const port = env.API_PORT;
+const port = 3001;
 app.listen(port, "0.0.0.0", () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
 
 startBackgroundTasks();

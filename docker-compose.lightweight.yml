@@ -1,0 +1,60 @@
+version: '3'
+name: zeppelin-prod
+services:
+  migrate:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: docker/production/zeppelin/Dockerfile
+    environment:
+      HOST_MODE: lightweight
+    working_dir: /zeppelin
+    command: ["npm", "run", "migrate-prod"]
+
+  api:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: docker/production/zeppelin/Dockerfile
+    restart: on-failure
+    environment:
+      DEBUG: ${DEBUG-}
+      HOST_MODE: lightweight
+    ports:
+      - "${LIGHTWEIGHT_API_PORT}:3001"
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-api-prod"]
+
+  bot:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: docker/production/zeppelin/Dockerfile
+    restart: on-failure
+    environment:
+      DEBUG: ${DEBUG-}
+      HOST_MODE: lightweight
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-bot-prod"]
+  
+  dashboard:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: docker/production/zeppelin/Dockerfile
+    restart: on-failure
+    environment:
+      DEBUG: ${DEBUG-}
+      HOST_MODE: lightweight
+    ports:
+      - "${LIGHTWEIGHT_DASHBOARD_PORT}:3002"
+    working_dir: /zeppelin/dashboard
+    command: ["node", "serve.js"]

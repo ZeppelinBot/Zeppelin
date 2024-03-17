@@ -1,30 +1,25 @@
 version: '3'
 name: zeppelin-dev
 volumes:
-  vscode-remote: {}
-  vscode-server: {}
-  jetbrains-data: {}
+  home: {}
 services:
   nginx:
     build:
       context: ./docker/development/nginx
       args:
-        DOCKER_DEV_WEB_PORT: ${DOCKER_DEV_WEB_PORT:?Missing DOCKER_DEV_WEB_PORT}
-        API_PORT: ${API_PORT:?Missing API_PORT}
+        DEVELOPMENT_WEB_PORT: ${DEVELOPMENT_WEB_PORT:?Missing DEVELOPMENT_WEB_PORT}
     ports:
-      - "${DOCKER_DEV_WEB_PORT:?Missing DOCKER_DEV_WEB_PORT}:443"
-    volumes:
-      - ./:/zeppelin
+      - "${DEVELOPMENT_WEB_PORT:?Missing DEVELOPMENT_WEB_PORT}:443"
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${DOCKER_DEV_MYSQL_ROOT_PASSWORD?:Missing DOCKER_DEV_MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DEVELOPMENT_MYSQL_ROOT_PASSWORD?:Missing DEVELOPMENT_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: zeppelin
       MYSQL_USER: zeppelin
-      MYSQL_PASSWORD: ${DOCKER_DEV_MYSQL_PASSWORD?:Missing DOCKER_DEV_MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${DEVELOPMENT_MYSQL_PASSWORD?:Missing DEVELOPMENT_MYSQL_PASSWORD}
     ports:
-      - ${DOCKER_DEV_MYSQL_PORT:?Missing DOCKER_DEV_MYSQL_PORT}:3306
+      - ${DEVELOPMENT_MYSQL_PORT:?Missing DEVELOPMENT_MYSQL_PORT}:3306
     volumes:
       - ./docker/development/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
@@ -33,13 +28,10 @@ services:
     build:
       context: ./docker/development/devenv
       args:
-        DOCKER_DEV_SSH_PASSWORD: ${DOCKER_DEV_SSH_PASSWORD:?Missing DOCKER_DEV_SSH_PASSWORD}
-        DOCKER_DEV_UID: ${DOCKER_DEV_UID:-1000}
+        DEVELOPMENT_SSH_PASSWORD: ${DEVELOPMENT_SSH_PASSWORD:?Missing DEVELOPMENT_SSH_PASSWORD}
+        DEVELOPMENT_UID: ${DEVELOPMENT_UID:-1000}
     ports:
-      - "${DOCKER_DEV_SSH_PORT:?Missing DOCKER_DEV_SSH_PORT}:22"
+      - "${DEVELOPMENT_SSH_PORT:?Missing DEVELOPMENT_SSH_PORT}:22"
     volumes:
-      - ./:/home/ubuntu/zeppelin
-      - ~/.ssh:/home/ubuntu/.ssh
-      - vscode-remote:/home/ubuntu/.vscode-remote
-      - vscode-server:/home/ubuntu/.vscode-server
-      - jetbrains-data:/home/ubuntu/.cache/JetBrains
+      - home:/home/ubuntu
+      - ./:/workspace/zeppelin
