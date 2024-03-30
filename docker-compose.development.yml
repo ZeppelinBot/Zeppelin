@@ -2,6 +2,7 @@ version: '3'
 name: zeppelin-dev
 volumes:
   home: {}
+  mysql-data: {}
 services:
   nginx:
     build:
@@ -20,8 +21,11 @@ services:
       MYSQL_PASSWORD: ${DEVELOPMENT_MYSQL_PASSWORD?:Missing DEVELOPMENT_MYSQL_PASSWORD}
     ports:
       - ${DEVELOPMENT_MYSQL_PORT:?Missing DEVELOPMENT_MYSQL_PORT}:3306
+    # If you're upgrading from an older version, you can load your old database by switching the volumes below.
+    # Then, take a database dump from the old database, switch the volumes back, and load the dump into the new database.
     volumes:
-      - ./docker/development/data/mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+      # - ./docker/production/data/mysql:/var/lib/mysql
     command: --authentication-policy=mysql_native_password
 
   devenv:
