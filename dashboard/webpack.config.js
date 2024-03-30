@@ -153,6 +153,7 @@ let config = {
     new DotenvPlugin({
       path: path.resolve(process.cwd(), "../.env"),
     }),
+    new webpack.EnvironmentPlugin(["API_URL"]),
   ],
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".mjs", ".vue"],
@@ -160,8 +161,6 @@ let config = {
     roots: [path.resolve(__dirname, "src")],
   },
 };
-
-if (process.env.NODE_ENV === "web") config.plugins.push(new webpack.EnvironmentPlugin(["NODE_ENV", "API_URL"]));
 
 if (process.env.NODE_ENV === "production") {
   config = merge(config, {

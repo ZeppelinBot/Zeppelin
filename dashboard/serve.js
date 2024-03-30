@@ -17,3 +17,9 @@ fastify.listen({ port: 3002, host: '0.0.0.0' }, (err, address) => {
   }
   console.log(`Server listening on ${address}`);
 });
+
+process.on("SIGTERM", () => {
+  fastify.close().then(() => {
+    process.exit(0);
+  });
+});
