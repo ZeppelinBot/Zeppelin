@@ -173,7 +173,7 @@ if (process.env.NODE_ENV === "production") {
     mode: "development",
     devtool: "eval",
     devServer: {
-      ...(process.env.DEV_HOST ? { host: process.env.DEV_HOST } : undefined),
+      allowedHosts: "all",
       historyApiFallback: true,
       port: 3002,
     },

@@ -5,7 +5,7 @@
     <!-- Top bar -->
     <nav class="flex items-stretch pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl">
       <div class="flex-initial flex items-center">
-        <img class="flex-auto w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
+        <img class="flex-auto w-10 mr-5" :src="logoUrl" alt="" aria-hidden="true">
 
         <router-link to="/docs">
           <h1 class="flex-auto font-semibold">Zeppelin Documentation</h1>
@@ -50,10 +50,10 @@
 </template>
 
 <script lang="ts">
-  import Vue from "vue";
   import {mapState} from "vuex";
   import Menu from 'vue-material-design-icons/Menu.vue';
   import Title from "../Title.vue";
+  import logoUrl from "../../img/logo.png";
 
   type TMenuItem = {
     to: string;
@@ -131,7 +131,8 @@
 
     data() {
       return {
-        mobileMenuOpen: false
+        mobileMenuOpen: false,
+        logoUrl,
       };
     },
 
