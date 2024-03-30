@@ -17,7 +17,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # - ./docker/production/data/mysql:/var/lib/mysql
-    command: --authentication-policy=mysql_native_password
+    #command: --authentication-policy=mysql_native_password
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=\"${STANDALONE_MYSQL_ROOT_PASSWORD}\" --execute \"SHOW DATABASES;\""
       interval: 5s
@@ -37,23 +37,28 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    build:
+    build: &build
       context: .
+      args:
+        # Used at compile-time by dashboard
+        API_URL:
     environment:
       HOST_MODE: standalone
-    working_dir: /zeppelin
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
     command: ["npm", "run", "migrate-prod"]
 
   api:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
+    build: *build
     restart: on-failure
     environment:
       HOST_MODE: standalone
-      DEBUG: ${DEBUG-}
+    env_file:
+      - .env
     working_dir: /zeppelin/backend
     command: ["npm", "run", "start-api-prod"]
 
@@ -61,12 +66,12 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
+    build: *build
     restart: on-failure
     environment:
       HOST_MODE: standalone
-      DEBUG: ${DEBUG-}
+    env_file:
+      - .env
     working_dir: /zeppelin/backend
     command: ["npm", "run", "start-bot-prod"]
   
@@ -74,11 +79,11 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
+    build: *build
     restart: on-failure
     environment:
       HOST_MODE: standalone
-      DEBUG: ${DEBUG-}
+    env_file:
+      - .env
     working_dir: /zeppelin/dashboard
     command: ["node", "serve.js"]

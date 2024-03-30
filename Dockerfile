@@ -1,11 +1,25 @@
 FROM node:20
+
+RUN mkdir /zeppelin
+RUN chown node:node /zeppelin
+
 USER node
 
-COPY --chown=node:node . /zeppelin
+ARG API_URL
 
-# Install dependencies for all packages
+# Install dependencies before copying over any other files
+COPY --chown=node:node package.json package-lock.json /zeppelin
+RUN mkdir /zeppelin/backend
+COPY --chown=node:node backend/package.json /zeppelin/backend
+RUN mkdir /zeppelin/shared
+COPY --chown=node:node shared/package.json /zeppelin/shared
+RUN mkdir /zeppelin/dashboard
+COPY --chown=node:node dashboard/package.json /zeppelin/dashboard
+
 WORKDIR /zeppelin
-RUN npm ci
+RUN npm install
+
+COPY --chown=node:node . /zeppelin
 
 # Build backend
 WORKDIR /zeppelin/backend
@@ -17,4 +31,4 @@ RUN npm run build
 
 # Prune dev dependencies
 WORKDIR /zeppelin
-RUN npm prune --production
+RUN npm prune --omit=dev
