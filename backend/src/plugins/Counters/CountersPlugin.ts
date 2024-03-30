@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters";
 import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { MINUTES, convertDelayStringToMS, values } from "../../utils";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
@@ -62,20 +62,16 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
   // TODO: Separate input and output types
   configParser: (input) => zCountersConfig.parse(input),
 
-  public: {
-    counterExists: mapToPublicFn(counterExists),
-
-    // Change a counter's value by a relative amount, e.g. +5
-    changeCounterValue: mapToPublicFn(changeCounterValue),
-
-    // Set a counter's value to an absolute value
-    setCounterValue: mapToPublicFn(setCounterValue),
-
-    getPrettyNameForCounter: mapToPublicFn(getPrettyNameForCounter),
-    getPrettyNameForCounterTrigger: mapToPublicFn(getPrettyNameForCounterTrigger),
-
-    onCounterEvent: mapToPublicFn(onCounterEvent),
-    offCounterEvent: mapToPublicFn(offCounterEvent),
+  public(pluginData) {
+    return {
+      counterExists: makePublicFn(pluginData, counterExists),
+      changeCounterValue: makePublicFn(pluginData, changeCounterValue),
+      setCounterValue: makePublicFn(pluginData, setCounterValue),
+      getPrettyNameForCounter: makePublicFn(pluginData, getPrettyNameForCounter),
+      getPrettyNameForCounterTrigger: makePublicFn(pluginData, getPrettyNameForCounterTrigger),
+      onCounterEvent: makePublicFn(pluginData, onCounterEvent),
+      offCounterEvent: makePublicFn(pluginData, offCounterEvent),
+    };
   },
 
   // prettier-ignore

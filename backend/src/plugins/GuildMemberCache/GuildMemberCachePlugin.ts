@@ -1,7 +1,7 @@
 import { guildPlugin } from "knub";
 import z from "zod";
 import { GuildMemberCache } from "../../data/GuildMemberCache";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { SECONDS } from "../../utils";
 import { cancelDeletionOnMemberJoin } from "./events/cancelDeletionOnMemberJoin";
 import { removeMemberCacheOnMemberLeave } from "./events/removeMemberCacheOnMemberLeave";
@@ -28,8 +28,10 @@ export const GuildMemberCachePlugin = guildPlugin<GuildMemberCachePluginType>()(
     cancelDeletionOnMemberJoin,
   ],
 
-  public: {
-    getCachedMemberData: mapToPublicFn(getCachedMemberData),
+  public(pluginData) {
+    return {
+      getCachedMemberData: makePublicFn(pluginData, getCachedMemberData),
+    };
   },
 
   beforeLoad(pluginData) {

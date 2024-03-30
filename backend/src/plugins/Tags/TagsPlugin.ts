@@ -6,7 +6,7 @@ import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -71,9 +71,11 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
     onMessageDelete,
   ],
 
-  public: {
-    renderTagBody: mapToPublicFn(renderTagBody),
-    findTagByName: mapToPublicFn(findTagByName),
+  public(pluginData) {
+    return {
+      renderTagBody: makePublicFn(pluginData, renderTagBody),
+      findTagByName: makePublicFn(pluginData, findTagByName),
+    };
   },
 
   configParser: (input) => zTagsConfig.parse(input),

@@ -1,4 +1,4 @@
-import { GuildMember, Message, Snowflake } from "discord.js";
+import { Message } from "discord.js";
 import { EventEmitter } from "events";
 import { guildPlugin } from "knub";
 import { Queue } from "../../Queue";
@@ -7,7 +7,7 @@ import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn, mapToPublicFn } from "../../pluginUtils";
 import { MINUTES } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -47,7 +47,7 @@ import { offModActionsEvent } from "./functions/offModActionsEvent";
 import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
-import { BanOptions, KickOptions, ModActionsPluginType, WarnOptions, zModActionsConfig } from "./types";
+import { ModActionsPluginType, zModActionsConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -147,42 +147,18 @@ export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
     DeleteCaseCmd,
   ],
 
-  public: {
-    warnMember(pluginData) {
-      return (member: GuildMember, reason: string, warnOptions?: WarnOptions) => {
-        warnMember(pluginData, member, reason, warnOptions);
-      };
-    },
-
-    kickMember(pluginData) {
-      return (member: GuildMember, reason: string, kickOptions?: KickOptions) => {
-        kickMember(pluginData, member, reason, kickOptions);
-      };
-    },
-
-    banUserId(pluginData) {
-      return (userId: string, reason?: string, banOptions?: BanOptions, banTime?: number) => {
-        banUserId(pluginData, userId, reason, banOptions, banTime);
-      };
-    },
-
-    updateCase(pluginData) {
-      return (msg: Message, caseNumber: number | null, note: string) => {
-        updateCase(pluginData, msg, { caseNumber, note });
-      };
-    },
-
-    hasMutePermission(pluginData) {
-      return (member: GuildMember, channelId: Snowflake) => {
-        return hasMutePermission(pluginData, member, channelId);
-      };
-    },
-
-    on: mapToPublicFn(onModActionsEvent),
-    off: mapToPublicFn(offModActionsEvent),
-    getEventEmitter(pluginData) {
-      return () => pluginData.state.events;
-    },
+  public(pluginData) {
+    return {
+      warnMember: makePublicFn(pluginData, warnMember),
+      kickMember: makePublicFn(pluginData, kickMember),
+      banUserId: makePublicFn(pluginData, banUserId),
+      updateCase: (msg: Message, caseNumber: number | null, note: string) =>
+        updateCase(pluginData, msg, { caseNumber, note }),
+      hasMutePermission: makePublicFn(pluginData, hasMutePermission),
+      on: mapToPublicFn(onModActionsEvent),
+      off: mapToPublicFn(offModActionsEvent),
+      getEventEmitter: () => pluginData.state.events,
+    };
   },
 
   beforeLoad(pluginData) {

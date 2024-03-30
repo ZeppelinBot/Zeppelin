@@ -6,7 +6,7 @@ import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
@@ -84,21 +84,18 @@ export const MutesPlugin = guildPlugin<MutesPluginType>()({
     RegisterManualTimeoutsEvt,
   ],
 
-  public: {
-    muteUser: mapToPublicFn(muteUser),
-    unmuteUser: mapToPublicFn(unmuteUser),
-    hasMutedRole(pluginData) {
-      return (member: GuildMember) => {
+  public(pluginData) {
+    return {
+      muteUser: makePublicFn(pluginData, muteUser),
+      unmuteUser: makePublicFn(pluginData, unmuteUser),
+      hasMutedRole: (member: GuildMember) => {
         const muteRole = pluginData.config.get().mute_role;
         return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
-      };
-    },
-
-    on: mapToPublicFn(onMutesEvent),
-    off: mapToPublicFn(offMutesEvent),
-    getEventEmitter(pluginData) {
-      return () => pluginData.state.events;
-    },
+      },
+      on: makePublicFn(pluginData, onMutesEvent),
+      off: makePublicFn(pluginData, offMutesEvent),
+      getEventEmitter: () => pluginData.state.events,
+    };
   },
 
   beforeLoad(pluginData) {

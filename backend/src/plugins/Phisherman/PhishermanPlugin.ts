@@ -1,6 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { getDomainInfo } from "./functions/getDomainInfo";
 import { PhishermanPluginType, zPhishermanConfig } from "./types";
 
@@ -17,9 +17,10 @@ export const PhishermanPlugin = guildPlugin<PhishermanPluginType>()({
   configParser: (input) => zPhishermanConfig.parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  public: {
-    getDomainInfo: mapToPublicFn(getDomainInfo),
+  public(pluginData) {
+    return {
+      getDomainInfo: makePublicFn(pluginData, getDomainInfo),
+    };
   },
 
   async beforeLoad(pluginData) {

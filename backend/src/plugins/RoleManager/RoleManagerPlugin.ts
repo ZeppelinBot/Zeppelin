@@ -1,6 +1,6 @@
 import { guildPlugin } from "knub";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { addPriorityRole } from "./functions/addPriorityRole";
 import { addRole } from "./functions/addRole";
@@ -15,11 +15,13 @@ export const RoleManagerPlugin = guildPlugin<RoleManagerPluginType>()({
   dependencies: () => [LogsPlugin],
   configParser: (input) => zRoleManagerConfig.parse(input),
 
-  public: {
-    addRole: mapToPublicFn(addRole),
-    removeRole: mapToPublicFn(removeRole),
-    addPriorityRole: mapToPublicFn(addPriorityRole),
-    removePriorityRole: mapToPublicFn(removePriorityRole),
+  public(pluginData) {
+    return {
+      addRole: makePublicFn(pluginData, addRole),
+      removeRole: makePublicFn(pluginData, removeRole),
+      addPriorityRole: makePublicFn(pluginData, addPriorityRole),
+      removePriorityRole: makePublicFn(pluginData, removePriorityRole),
+    };
   },
 
   beforeLoad(pluginData) {

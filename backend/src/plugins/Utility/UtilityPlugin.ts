@@ -1,11 +1,11 @@
-import { GuildMember, Snowflake } from "discord.js";
+import { Snowflake } from "discord.js";
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { sendSuccessMessage } from "../../pluginUtils";
+import { makePublicFn, sendSuccessMessage } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
@@ -14,7 +14,7 @@ import { AboutCmd } from "./commands/AboutCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
-import { CleanArgs, CleanCmd, cleanCmd } from "./commands/CleanCmd";
+import { CleanCmd, cleanCmd } from "./commands/CleanCmd";
 import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
 import { HelpCmd } from "./commands/HelpCmd";
@@ -155,24 +155,12 @@ export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
     AutoJoinThreadSyncEvt,
   ],
 
-  public: {
-    clean(pluginData) {
-      return (args: CleanArgs, msg) => {
-        cleanCmd(pluginData, args, msg);
-      };
-    },
-
-    userInfo(pluginData) {
-      return (userId: Snowflake) => {
-        return getUserInfoEmbed(pluginData, userId, false);
-      };
-    },
-
-    hasPermission(pluginData) {
-      return (member: GuildMember, channelId: Snowflake, permission: string) => {
-        return hasPermission(pluginData, member, channelId, permission);
-      };
-    },
+  public(pluginData) {
+    return {
+      clean: makePublicFn(pluginData, cleanCmd),
+      userInfo: (userId: Snowflake) => getUserInfoEmbed(pluginData, userId, false),
+      hasPermission: makePublicFn(pluginData, hasPermission),
+    };
   },
 
   beforeLoad(pluginData) {

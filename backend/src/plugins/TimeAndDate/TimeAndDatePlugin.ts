@@ -1,6 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
 import { SetTimezoneCmd } from "./commands/SetTimezoneCmd";
 import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd";
@@ -42,12 +42,14 @@ export const TimeAndDatePlugin = guildPlugin<TimeAndDatePluginType>()({
     ViewTimezoneCmd,
   ],
 
-  public: {
-    getGuildTz: mapToPublicFn(getGuildTz),
-    inGuildTz: mapToPublicFn(inGuildTz),
-    getMemberTz: mapToPublicFn(getMemberTz),
-    inMemberTz: mapToPublicFn(inMemberTz),
-    getDateFormat: mapToPublicFn(getDateFormat),
+  public(pluginData) {
+    return {
+      getGuildTz: makePublicFn(pluginData, getGuildTz),
+      inGuildTz: makePublicFn(pluginData, inGuildTz),
+      getMemberTz: makePublicFn(pluginData, getMemberTz),
+      inMemberTz: makePublicFn(pluginData, inMemberTz),
+      getDateFormat: makePublicFn(pluginData, getDateFormat),
+    };
   },
 
   beforeLoad(pluginData) {

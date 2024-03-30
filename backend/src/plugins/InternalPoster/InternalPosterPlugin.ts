@@ -2,7 +2,7 @@ import { PluginOptions, guildPlugin } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { Webhooks } from "../../data/Webhooks";
-import { mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { editMessage } from "./functions/editMessage";
 import { sendMessage } from "./functions/sendMessage";
 import { InternalPosterPluginType } from "./types";
@@ -18,10 +18,11 @@ export const InternalPosterPlugin = guildPlugin<InternalPosterPluginType>()({
   configParser: (input) => z.strictObject({}).parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  public: {
-    sendMessage: mapToPublicFn(sendMessage),
-    editMessage: mapToPublicFn(editMessage),
+  public(pluginData) {
+    return {
+      sendMessage: makePublicFn(pluginData, sendMessage),
+      editMessage: makePublicFn(pluginData, editMessage),
+    };
   },
 
   async beforeLoad(pluginData) {
