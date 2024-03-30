@@ -1,5 +1,5 @@
 import { GuildMember, Snowflake } from "discord.js";
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
@@ -10,7 +10,6 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AboutCmd } from "./commands/AboutCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
@@ -112,13 +111,8 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
+export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
   name: "utility",
-  showInDocs: true,
-  info: {
-    prettyName: "Utility",
-    configSchema: zUtilityConfig,
-  },
 
   dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
   configParser: (input) => zUtilityConfig.parse(input),

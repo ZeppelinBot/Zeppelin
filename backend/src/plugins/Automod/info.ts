@@ -1,12 +1,12 @@
+import { ZeppelinPluginInfo } from "../../types";
 import { trimPluginDescription } from "../../utils";
-import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
-import { zAutomodConfig } from "./types";
 
-export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
+export const automodPluginInfo: ZeppelinPluginInfo = {
+  showInDocs: true,
   prettyName: "Automod",
   description: trimPluginDescription(`
       Allows specifying automated actions in response to triggers. Example use cases include word filtering and spam prevention.
-    `),
+  `),
   configurationGuide: trimPluginDescription(`
       The automod plugin is very customizable. For a full list of available triggers, actions, and their options, see Config schema at the bottom of this page.    
     
@@ -99,6 +99,5 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
                     Bad custom status on user <@!{user.id}>:
                     {matchSummary}
       ~~~
-    `),
-  configSchema: zAutomodConfig,
+  `),
 };

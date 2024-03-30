@@ -1,4 +1,4 @@
-import { CooldownManager, PluginOptions } from "knub";
+import { CooldownManager, PluginOptions, guildPlugin } from "knub";
 import DefaultLogMessages from "../../data/DefaultLogMessages.json";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -10,7 +10,6 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { TypedTemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
 import {
   LogsEmojiCreateEvt,
@@ -140,13 +139,8 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   ],
 };
 
-export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
+export const LogsPlugin = guildPlugin<LogsPluginType>()({
   name: "logs",
-  showInDocs: true,
-  info: {
-    prettyName: "Logs",
-    configSchema: zLogsConfig,
-  },
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
   configParser: (input) => zLogsConfig.parse(input),

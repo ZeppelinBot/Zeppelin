@@ -1,13 +1,12 @@
+import { guildPlugin } from "knub";
 import { CaseTypes } from "../../data/CaseTypes";
-import { Case } from "../../data/entities/Case";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
+import { Case } from "../../data/entities/Case";
 import { mapToPublicFn } from "../../pluginUtils";
-import { trimPluginDescription } from "../../utils";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { createCase } from "./functions/createCase";
 import { createCaseNote } from "./functions/createCaseNote";
 import { getCaseEmbed } from "./functions/getCaseEmbed";
@@ -34,16 +33,8 @@ const defaultOptions = {
   },
 };
 
-export const CasesPlugin = zeppelinGuildPlugin<CasesPluginType>()({
+export const CasesPlugin = guildPlugin<CasesPluginType>()({
   name: "cases",
-  showInDocs: true,
-  info: {
-    prettyName: "Cases",
-    description: trimPluginDescription(`
-      This plugin contains basic configuration for cases created by other plugins
-    `),
-    configSchema: zCasesConfig,
-  },
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getLogsPlugin()).LogsPlugin],
   configParser: (input) => zCasesConfig.parse(input),

@@ -7,8 +7,8 @@ import { backendDir } from "../paths";
 
 moment.tz.setDefault("UTC");
 
-const entities = path.relative(process.cwd(), path.resolve(backendDir, "dist/backend/src/data/entities/*.js"));
-const migrations = path.relative(process.cwd(), path.resolve(backendDir, "dist/backend/src/migrations/*.js"));
+const entities = path.relative(process.cwd(), path.resolve(backendDir, "dist/data/entities/*.js"));
+const migrations = path.relative(process.cwd(), path.resolve(backendDir, "dist/migrations/*.js"));
 
 type DbOpts = Pick<MysqlConnectionOptions, "host" | "port" | "username" | "password" | "database">;
 let dbOpts: DbOpts;

@@ -1,9 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ContextClickedEvt } from "./events/ContextClickedEvt";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types";
 import { loadAllCommands } from "./utils/loadAllCommands";
@@ -31,9 +30,8 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   ],
 };
 
-export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
+export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
-  showInDocs: false,
 
   dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),

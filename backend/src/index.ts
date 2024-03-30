@@ -445,7 +445,7 @@ connect().then(async () => {
       logger.info("Cleaning up before exit...");
       // Force exit after 10sec
       setTimeout(() => process.exit(code), 10 * SECONDS);
-      await bot.stop();
+      await bot.destroy();
       await dataSource.destroy();
       logger.info("Done! Exiting now.");
       process.exit(code);

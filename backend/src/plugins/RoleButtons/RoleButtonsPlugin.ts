@@ -1,17 +1,14 @@
+import { guildPlugin } from "knub";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { resetButtonsCmd } from "./commands/resetButtons";
 import { onButtonInteraction } from "./events/buttonInteraction";
 import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
-import { pluginInfo } from "./info";
 import { RoleButtonsPluginType, zRoleButtonsConfig } from "./types";
 
-export const RoleButtonsPlugin = zeppelinGuildPlugin<RoleButtonsPluginType>()({
+export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
-  info: pluginInfo,
-  showInDocs: true,
 
   defaultOptions: {
     config: {

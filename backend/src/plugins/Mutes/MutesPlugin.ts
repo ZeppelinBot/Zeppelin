@@ -1,5 +1,6 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
+import { guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
@@ -9,7 +10,6 @@ import { mapToPublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
@@ -61,13 +61,8 @@ const defaultOptions = {
   ],
 };
 
-export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
+export const MutesPlugin = guildPlugin<MutesPluginType>()({
   name: "mutes",
-  showInDocs: true,
-  info: {
-    prettyName: "Mutes",
-    configSchema: zMutesConfig,
-  },
 
   dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
   configParser: (input) => zMutesConfig.parse(input),

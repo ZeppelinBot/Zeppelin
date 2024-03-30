@@ -1,8 +1,7 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { NamesCmd } from "./commands/NamesCmd";
 import { NameHistoryPluginType, zNameHistoryConfig } from "./types";
 
@@ -20,9 +19,8 @@ const defaultOptions: PluginOptions<NameHistoryPluginType> = {
   ],
 };
 
-export const NameHistoryPlugin = zeppelinGuildPlugin<NameHistoryPluginType>()({
+export const NameHistoryPlugin = guildPlugin<NameHistoryPluginType>()({
   name: "name_history",
-  showInDocs: false,
 
   configParser: (input) => zNameHistoryConfig.parse(input),
   defaultOptions,

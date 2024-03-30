@@ -1,23 +1,20 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
 import { mapToPublicFn } from "../../pluginUtils";
-import { convertDelayStringToMS, trimPluginDescription } from "../../utils";
+import { convertDelayStringToMS } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
 import { TagDeleteCmd } from "./commands/TagDeleteCmd";
 import { TagEvalCmd } from "./commands/TagEvalCmd";
 import { TagListCmd } from "./commands/TagListCmd";
 import { TagSourceCmd } from "./commands/TagSourceCmd";
-import { generateTemplateMarkdown } from "./docs";
-import { TemplateFunctions } from "./templateFunctions";
 import { TagsPluginType, zTagsConfig } from "./types";
 import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
@@ -54,24 +51,8 @@ const defaultOptions: PluginOptions<TagsPluginType> = {
   ],
 };
 
-export const TagsPlugin = zeppelinGuildPlugin<TagsPluginType>()({
+export const TagsPlugin = guildPlugin<TagsPluginType>()({
   name: "tags",
-  showInDocs: true,
-  info: {
-    prettyName: "Tags",
-    description: "Tags are a way to store and reuse information.",
-    configurationGuide: trimPluginDescription(`
-      ### Template Functions
-      You can use template functions in your tags. These functions are called when the tag is rendered.
-      You can use these functions to render dynamic content, or to access information from the message and/or user calling the tag.
-      You use them by adding a \`{}\` on your tag.
-
-      Here are the functions you can use in your tags:
-
-      ${generateTemplateMarkdown(TemplateFunctions)}
-    `),
-    configSchema: zTagsConfig,
-  },
 
   dependencies: () => [LogsPlugin],
   defaultOptions,

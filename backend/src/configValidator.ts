@@ -1,12 +1,11 @@
-import { ConfigValidationError, PluginConfigManager } from "knub";
+import { ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
 import moment from "moment-timezone";
 import { ZodError } from "zod";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { ZeppelinGuildConfig, zZeppelinGuildConfig } from "./types";
 import { formatZodIssue } from "./utils/formatZodIssue";
 
-const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
+const pluginNameToPlugin = new Map<string, GuildPluginBlueprint<any, any>>();
 for (const plugin of guildPlugins) {
   pluginNameToPlugin.set(plugin.name, plugin);
 }

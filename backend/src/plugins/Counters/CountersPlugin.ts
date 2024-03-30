@@ -1,10 +1,9 @@
 import { EventEmitter } from "events";
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildCounters } from "../../data/GuildCounters";
 import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger";
 import { mapToPublicFn } from "../../pluginUtils";
 import { MINUTES, convertDelayStringToMS, values } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
 import { ResetAllCounterValuesCmd } from "./commands/ResetAllCounterValuesCmd";
@@ -56,16 +55,8 @@ const defaultOptions: PluginOptions<CountersPluginType> = {
  * A single trigger can only trigger once per user/channel/in general, depending on how specific the counter is (e.g. a per-user trigger can only trigger once per user).
  * After being triggered, a trigger is "reset" if the counter value no longer matches the trigger (e.g. drops to 100 or below in the above example). After this, that trigger can be triggered again.
  */
-export const CountersPlugin = zeppelinGuildPlugin<CountersPluginType>()({
+export const CountersPlugin = guildPlugin<CountersPluginType>()({
   name: "counters",
-  showInDocs: true,
-  info: {
-    prettyName: "Counters",
-    description:
-      "Keep track of per-user, per-channel, or global numbers and trigger specific actions based on this number",
-    configurationGuide: "See <a href='/docs/setup-guides/counters'>Counters setup guide</a>",
-    configSchema: zCountersConfig,
-  },
 
   defaultOptions,
   // TODO: Separate input and output types

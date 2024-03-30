@@ -1,8 +1,8 @@
+import { guildPlugin } from "knub";
 import z from "zod";
 import { GuildMemberCache } from "../../data/GuildMemberCache";
 import { mapToPublicFn } from "../../pluginUtils";
 import { SECONDS } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { cancelDeletionOnMemberJoin } from "./events/cancelDeletionOnMemberJoin";
 import { removeMemberCacheOnMemberLeave } from "./events/removeMemberCacheOnMemberLeave";
 import { updateMemberCacheOnMemberUpdate } from "./events/updateMemberCacheOnMemberUpdate";
@@ -14,9 +14,8 @@ import { GuildMemberCachePluginType } from "./types";
 
 const PENDING_SAVE_INTERVAL = 30 * SECONDS;
 
-export const GuildMemberCachePlugin = zeppelinGuildPlugin<GuildMemberCachePluginType>()({
+export const GuildMemberCachePlugin = guildPlugin<GuildMemberCachePluginType>()({
   name: "guild_member_cache",
-  showInDocs: false,
 
   configParser: (input) => z.strictObject({}).parse(input),
 

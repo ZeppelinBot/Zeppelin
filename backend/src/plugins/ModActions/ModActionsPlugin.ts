@@ -1,5 +1,6 @@
 import { GuildMember, Message, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
+import { guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
@@ -7,12 +8,11 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildTempbans } from "../../data/GuildTempbans";
 import { mapToPublicFn } from "../../pluginUtils";
-import { MINUTES, trimPluginDescription } from "../../utils";
+import { MINUTES } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AddCaseCmd } from "./commands/AddCaseCmd";
 import { BanCmd } from "./commands/BanCmd";
 import { CaseCmd } from "./commands/CaseCmd";
@@ -113,16 +113,8 @@ const defaultOptions = {
   ],
 };
 
-export const ModActionsPlugin = zeppelinGuildPlugin<ModActionsPluginType>()({
+export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
   name: "mod_actions",
-  showInDocs: true,
-  info: {
-    prettyName: "Mod actions",
-    description: trimPluginDescription(`
-      This plugin contains the 'typical' mod actions such as warning, muting, kicking, banning, etc.
-    `),
-    configSchema: zModActionsConfig,
-  },
 
   dependencies: () => [TimeAndDatePlugin, CasesPlugin, MutesPlugin, LogsPlugin],
   configParser: (input) => zModActionsConfig.parse(input),

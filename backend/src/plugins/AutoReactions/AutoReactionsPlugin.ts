@@ -1,9 +1,7 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
@@ -23,16 +21,8 @@ const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   ],
 };
 
-export const AutoReactionsPlugin = zeppelinGuildPlugin<AutoReactionsPluginType>()({
+export const AutoReactionsPlugin = guildPlugin<AutoReactionsPluginType>()({
   name: "auto_reactions",
-  showInDocs: true,
-  info: {
-    prettyName: "Auto-reactions",
-    description: trimPluginDescription(`
-      Allows setting up automatic reactions to all new messages on a channel
-    `),
-    configSchema: zAutoReactionsConfig,
-  },
 
   // prettier-ignore
   dependencies: () => [

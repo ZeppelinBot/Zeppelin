@@ -1,10 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildPersistedData } from "../../data/GuildPersistedData";
-import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LoadDataEvt } from "./events/LoadDataEvt";
 import { StoreDataEvt } from "./events/StoreDataEvt";
 import { PersistPluginType, zPersistConfig } from "./types";
@@ -17,17 +15,8 @@ const defaultOptions: PluginOptions<PersistPluginType> = {
   },
 };
 
-export const PersistPlugin = zeppelinGuildPlugin<PersistPluginType>()({
+export const PersistPlugin = guildPlugin<PersistPluginType>()({
   name: "persist",
-  showInDocs: true,
-  info: {
-    prettyName: "Persist",
-    description: trimPluginDescription(`
-      Re-apply roles or nicknames for users when they rejoin the server.
-      Mute roles are re-applied automatically, this plugin is not required for that.
-    `),
-    configSchema: zPersistConfig,
-  },
 
   dependencies: () => [LogsPlugin, RoleManagerPlugin],
   configParser: (input) => zPersistConfig.parse(input),
