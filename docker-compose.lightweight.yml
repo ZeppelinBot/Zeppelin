@@ -5,11 +5,15 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    build:
+    build: &build
       context: .
-      dockerfile: docker/production/zeppelin/Dockerfile
+      args:
+        # Used at compile-time by dashboard
+        API_URL:
     environment:
       HOST_MODE: lightweight
+    env_file:
+      - .env
     working_dir: /zeppelin
     command: ["npm", "run", "migrate-prod"]
 
@@ -17,13 +21,12 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
-      dockerfile: docker/production/zeppelin/Dockerfile
+    build: *build
     restart: on-failure
     environment:
-      DEBUG: ${DEBUG-}
       HOST_MODE: lightweight
+    env_file:
+      - .env
     ports:
       - "${LIGHTWEIGHT_API_PORT}:3001"
     working_dir: /zeppelin/backend
@@ -33,13 +36,12 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
-      dockerfile: docker/production/zeppelin/Dockerfile
+    build: *build
     restart: on-failure
     environment:
-      DEBUG: ${DEBUG-}
       HOST_MODE: lightweight
+    env_file:
+      - .env
     working_dir: /zeppelin/backend
     command: ["npm", "run", "start-bot-prod"]
   
@@ -47,13 +49,12 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    build:
-      context: .
-      dockerfile: docker/production/zeppelin/Dockerfile
+    build: *build
     restart: on-failure
     environment:
-      DEBUG: ${DEBUG-}
       HOST_MODE: lightweight
+    env_file:
+      - .env
     ports:
       - "${LIGHTWEIGHT_DASHBOARD_PORT}:3002"
     working_dir: /zeppelin/dashboard
