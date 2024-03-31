@@ -2,9 +2,6 @@ version: '3'
 name: zeppelin-prod
 services:
   migrate:
-    depends_on:
-      mysql:
-        condition: service_healthy
     build: &build
       context: .
       args:
