@@ -11,7 +11,7 @@ services:
       HOST_MODE: lightweight
     env_file:
       - .env
-    working_dir: /zeppelin
+    working_dir: /zeppelin/backend
     command: ["npm", "run", "migrate-prod"]
 
   api:
