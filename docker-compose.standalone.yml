@@ -1,5 +1,5 @@
 version: '3'
-name: zeppelin-prod
+name: zeppelin-standalone
 volumes:
   mysql-data:
 services:
