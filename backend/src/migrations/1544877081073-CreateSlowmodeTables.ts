@@ -10,11 +10,13 @@ export class CreateSlowmodeTables1544877081073 implements MigrationInterface {
             name: "guild_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "channel_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "slowmode_seconds",
@@ -25,7 +27,6 @@ export class CreateSlowmodeTables1544877081073 implements MigrationInterface {
         indices: [],
       }),
     );
-    await queryRunner.createPrimaryKey("slowmode_channels", ["guild_id", "channel_id"]);
 
     await queryRunner.createTable(
       new Table({
@@ -35,16 +36,19 @@ export class CreateSlowmodeTables1544877081073 implements MigrationInterface {
             name: "guild_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "channel_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "user_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "expires_at",
@@ -58,7 +62,6 @@ export class CreateSlowmodeTables1544877081073 implements MigrationInterface {
         ],
       }),
     );
-    await queryRunner.createPrimaryKey("slowmode_users", ["guild_id", "channel_id", "user_id"]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

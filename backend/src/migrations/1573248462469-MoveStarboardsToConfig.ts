@@ -2,7 +2,12 @@ import { MigrationInterface, QueryRunner, Table, TableColumn } from "typeorm";
 
 export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    // Create the new column for the channels id
+    // Edge case: Since we're dropping the primary key temporarily, we need to disable the sql_require_primary_key setting if it's enabled
+    // This is restored at the end of the migration
+    const sqlRequirePrimaryKey = (await queryRunner.query("SELECT @@sql_require_primary_key AS value"))[0].value;
+    await queryRunner.query("SET SESSION sql_require_primary_key=0");
+
+    // Create a new column for the channel's id
     const chanid_column = new TableColumn({
       name: "starboard_channel_id",
       type: "bigint",
@@ -33,9 +38,14 @@ export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
     await queryRunner.createPrimaryKey("starboard_messages", ["starboard_message_id"]);
     // Finally, drop the starboards channel as it is now obsolete
     await queryRunner.dropTable("starboards", true);
+
+    await queryRunner.query(`SET SESSION sql_require_primary_key=${sqlRequirePrimaryKey}`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
+    const sqlRequirePrimaryKey = (await queryRunner.query("SELECT @@sql_require_primary_key AS value"))[0].value;
+    await queryRunner.query("SET SESSION sql_require_primary_key=0");
+
     await queryRunner.dropColumn("starboard_messages", "starboard_channel_id");
     await queryRunner.dropColumn("starboard_messages", "guild_id");
 
@@ -99,5 +109,7 @@ export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
         ],
       }),
     );
+
+    await queryRunner.query(`SET SESSION sql_require_primary_key=${sqlRequirePrimaryKey}`);
   }
 }
