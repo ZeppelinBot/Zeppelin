@@ -97,10 +97,10 @@ function formatZodConfigSchema(schema: z.ZodTypeAny) {
   return "unknown";
 }
 
-export function initDocs(app: express.Express) {
+export function initDocs(router: express.Router) {
   const docsPluginNames = Object.keys(guildPluginInfo).filter((k) => guildPluginInfo[k].showInDocs);
 
-  app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
+  router.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
       docsPluginNames.map((pluginName) => {
         const info = guildPluginInfo[pluginName];
@@ -113,7 +113,7 @@ export function initDocs(app: express.Express) {
     );
   });
 
-  app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
+  router.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
     const name = req.params.pluginName;
     const baseInfo = guildPluginInfo[name];
     if (!baseInfo) {

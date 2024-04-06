@@ -10,6 +10,8 @@ import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
 
+const apiPathPrefix = env.HOST_MODE === "lightweight" ? env.LIGHTWEIGHT_API_PATH_PREFIX || "" : "/api";
+
 const app = express();
 
 app.use(
@@ -24,15 +26,19 @@ app.use(
 );
 app.use(multer().none());
 
+const rootRouter = express.Router();
+
 initAuth(app);
 initGuildsAPI(app);
 initArchives(app);
 initDocs(app);
 
 // Default route
-app.get("/", (req, res) => {
+rootRouter.get("/", (req, res) => {
   res.json({ status: "cookies", with: "milk" });
 });
+
+app.use(apiPathPrefix, rootRouter);
 
 // Error response
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

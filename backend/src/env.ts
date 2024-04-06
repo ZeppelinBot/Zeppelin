@@ -47,6 +47,8 @@ const envType = z.object({
   LIGHTWEIGHT_DB_PASSWORD: z.string().optional(),
   LIGHTWEIGHT_DB_DATABASE: z.string().optional(),
 
+  LIGHTWEIGHT_API_PATH_PREFIX: z.string().optional(),
+
   HOST_MODE: z.enum(["development", "standalone", "lightweight"]).optional().default("lightweight"),
   DEBUG: z
     .string()
