@@ -4,8 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "watch": "NODE_ENV=development HOST_MODE=development tsc-watch --onSuccess \"node start-dev.js\"",
-    "watch-yaml-parse-test": "NODE_ENV=development HOST_MODE=development tsc-watch --onSuccess \"node dist/yamlParseTest.js\"",
+    "watch": "NODE_ENV=development HOST_MODE=development tsc-watch --build --onSuccess \"node start-dev.js\"",
+    "watch-yaml-parse-test": "NODE_ENV=development HOST_MODE=development tsc-watch --build --onSuccess \"node dist/yamlParseTest.js\"",
     "build": "tsc --build",
     "start-bot-dev": "NODE_ENV=development HOST_MODE=development node --enable-source-maps --stack-trace-limit=30 --inspect=0.0.0.0:9229 dist/index.js",
     "start-bot-dev-debug": "NODE_ENV=development DEBUG=true clinic heapprofiler --collect-only --dest .clinic-bot -- node --enable-source-maps --stack-trace-limit=30 --inspect=0.0.0.0:9229 dist/index.js",
