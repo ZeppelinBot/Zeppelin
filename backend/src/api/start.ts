@@ -10,7 +10,7 @@ import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
 
-const apiPathPrefix = env.HOST_MODE === "lightweight" ? env.LIGHTWEIGHT_API_PATH_PREFIX || "" : "/api";
+const apiPathPrefix = env.NODE_ENV === "production" ? env.API_PATH_PREFIX ?? "" : "/api";
 
 const app = express();
 

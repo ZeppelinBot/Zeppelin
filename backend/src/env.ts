@@ -38,22 +38,22 @@ const envType = z.object({
 
   PHISHERMAN_API_KEY: z.string().optional(),
 
-  DEVELOPMENT_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in development
-  STANDALONE_MYSQL_PASSWORD: z.string().optional(), // Included here for the DB_PASSWORD default in production
+  DB_HOST: z.string().optional(),
+  DB_PORT: z.preprocess((v) => Number(v), z.number()).optional(),
+  DB_USER: z.string().optional(),
+  DB_PASSWORD: z.string().optional(),
+  DB_DATABASE: z.string().optional(),
 
-  LIGHTWEIGHT_DB_HOST: z.string().optional(),
-  LIGHTWEIGHT_DB_PORT: z.preprocess((v) => Number(v), z.number()).optional(),
-  LIGHTWEIGHT_DB_USER: z.string().optional(),
-  LIGHTWEIGHT_DB_PASSWORD: z.string().optional(),
-  LIGHTWEIGHT_DB_DATABASE: z.string().optional(),
+  DEVELOPMENT_MYSQL_PASSWORD: z.string().optional(),
 
-  LIGHTWEIGHT_API_PATH_PREFIX: z.string().optional(),
+  API_PATH_PREFIX: z.string().optional(),
 
-  HOST_MODE: z.enum(["development", "standalone", "lightweight"]).optional().default("lightweight"),
   DEBUG: z
     .string()
     .optional()
     .transform((str) => str === "true"),
+
+  NODE_ENV: z.string().default("development"),
 });
 
 let toValidate = { ...process.env };

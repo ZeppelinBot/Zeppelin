@@ -7,8 +7,14 @@ services:
       args:
         # Used at compile-time by dashboard
         API_URL:
-    environment:
-      HOST_MODE: lightweight
+    environment: &env
+      - NODE_ENV=production
+      - DB_HOST=${LIGHTWEIGHT_DB_HOST}
+      - DB_PORT=${LIGHTWEIGHT_DB_PORT}
+      - DB_USER=${LIGHTWEIGHT_DB_USER}
+      - DB_PASSWORD=${LIGHTWEIGHT_DB_PASSWORD}
+      - DB_DATABASE=${LIGHTWEIGHT_DB_DATABASE}
+      - API_PATH_PREFIX=${LIGHTWEIGHT_API_PATH_PREFIX}
     env_file:
       - .env
     working_dir: /zeppelin/backend
@@ -20,8 +26,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: lightweight
+    environment: *env
     env_file:
       - .env
     ports:
@@ -35,8 +40,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: lightweight
+    environment: *env
     env_file:
       - .env
     working_dir: /zeppelin/backend
@@ -48,8 +52,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: lightweight
+    environment: *env
     env_file:
       - .env
     ports:

@@ -42,8 +42,14 @@ services:
       args:
         # Used at compile-time by dashboard
         API_URL:
-    environment:
-      HOST_MODE: standalone
+    environment: &env
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=zeppelin
+      - DB_PASSWORD=${STANDALONE_MYSQL_PASSWORD}
+      - DB_DATABASE=zeppelin
+      - API_PATH_PREFIX=/api
     env_file:
       - .env
     working_dir: /zeppelin/backend
@@ -55,8 +61,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: standalone
+    environment: *env
     env_file:
       - .env
     working_dir: /zeppelin/backend
@@ -68,8 +73,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: standalone
+    environment: *env
     env_file:
       - .env
     working_dir: /zeppelin/backend
@@ -81,8 +85,7 @@ services:
         condition: service_completed_successfully
     build: *build
     restart: on-failure
-    environment:
-      HOST_MODE: standalone
+    environment: *env
     env_file:
       - .env
     working_dir: /zeppelin/dashboard
