@@ -16,7 +16,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^6.8.1",
     "cssnano": "^4.1.10",
-    "dotenv-webpack": "^8.0.1",
+    "dotenv": "^16.4.5",
     "file-loader": "^6.2.0",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.3",
