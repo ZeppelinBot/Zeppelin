@@ -11,12 +11,12 @@
     "start-bot-dev-debug": "NODE_ENV=development DEBUG=true clinic heapprofiler --collect-only --dest .clinic-bot -- node --enable-source-maps --stack-trace-limit=30 --inspect=0.0.0.0:9229 dist/index.js",
     "start-bot-prod": "cross-env NODE_ENV=production node --enable-source-maps --stack-trace-limit=30 dist/index.js",
     "start-bot-prod-debug": "NODE_ENV=production DEBUG=true clinic heapprofiler --collect-only --dest .clinic-bot -- node --enable-source-maps --stack-trace-limit=30 dist/index.js",
-    "watch-bot": "NODE_ENV=development HOST_MODE=development tsc-watch --onSuccess \"npm run start-bot-dev\"",
+    "watch-bot": "NODE_ENV=development HOST_MODE=development tsc-watch --build --onSuccess \"npm run start-bot-dev\"",
     "start-api-dev": "NODE_ENV=development HOST_MODE=development node --enable-source-maps --stack-trace-limit=30 --inspect=0.0.0.0:9239 dist/api/index.js",
     "start-api-dev-debug": "NODE_ENV=development DEBUG=true clinic heapprofiler --collect-only --dest .clinic-api -- node --enable-source-maps --stack-trace-limit=30 --inspect=0.0.0.0:9239 dist/api/index.js",
     "start-api-prod": "cross-env NODE_ENV=production node --enable-source-maps --stack-trace-limit=30 dist/api/index.js",
     "start-api-prod-debug": "NODE_ENV=production DEBUG=true clinic heapprofiler --collect-only --dest .clinic-api -- node --enable-source-maps --stack-trace-limit=30 dist/api/index.js",
-    "watch-api": "NODE_ENV=development HOST_MODE=development tsc-watch --onSuccess \"npm run start-api-dev\"",
+    "watch-api": "NODE_ENV=development HOST_MODE=development tsc-watch --build --onSuccess \"npm run start-api-dev\"",
     "typeorm": "node ../node_modules/typeorm/cli.js",
     "migrate": "npm run typeorm -- migration:run -d dist/data/dataSource.js",
     "migrate-prod": "cross-env NODE_ENV=production npm run migrate",
@@ -28,7 +28,7 @@
     "export-config-json-schema": "NODE_ENV=development HOST_MODE=development node --enable-source-maps dist/exportSchemas.js > ../config-schema.json",
     "test": "npm run build && npm run run-tests",
     "run-tests": "ava",
-    "test-watch": "tsc-watch --onSuccess \"npx ava\""
+    "test-watch": "tsc-watch --build --onSuccess \"npx ava\""
   },
   "dependencies": {
     "@silvia-odwyer/photon-node": "^0.3.1",
