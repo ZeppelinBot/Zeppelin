@@ -18,7 +18,7 @@ Zeppelin's production environment uses Docker. There are a few different ways to
 2. Make a copy of `.env.example` called `.env`
 3. Fill in the missing values in `.env` (including the "PRODUCTION - STANDALONE" section)
 
-**Note:** The dashboard and API are exposed with a self-signed certificate. It is recommended to set up a proxy with a proper certificate in front of them. A popular option for this is [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/).
+**Note:** The dashboard and API are served insecurely over HTTP. It is recommended to set up a proxy with a TLS certificate in front of them. A popular option for this is [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/).
 
 ### Running the bot
 `docker compose -f docker-compose.standalone.yml up -d`
@@ -68,4 +68,17 @@ If you're using an application platform such as Railway, you can simply point it
 For the start command, you can use the same commands as above: `npm run start-bot`, `npm run start-api`, `npm run start-dashboard`.
 Make sure to also run migrations when you update the bot.
 
-**Note:** You'll need to provide the necessary env variables. For example, `docker run --env-file .env zeppelin`
+### Environment variables
+You'll need to provide the necessary env variables in the manual setup. For example, `docker run -e NODE_ENV=production --env-file .env zeppelin`
+
+The following env variables can be used to set up the database credentials:
+* `DB_HOST`
+* `DB_PORT`
+* `DB_USER`
+* `DB_PASSWORD`
+* `DB_DATABASE`
+
+The following env variable can be used to configure the API path prefix:
+* `API_PATH_PREFIX`
+
+Remember to always set `NODE_ENV` to `production` for production setups.

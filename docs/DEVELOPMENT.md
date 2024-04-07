@@ -23,7 +23,7 @@ Below you can find instructions for setting up the environment and getting start
 4. Run `docker compose -f docker-compose.development.yml up` to start the development environment
 5. In VSCode: Install the `Remote - SSH` plugin
 6. In VSCode: Run `Remote-SSH: Connect to Host...`
-    * As the address, use `ubuntu@127.0.0.1:3002` (where `3002` matches `DEVELOPMENT_SSH_PORT` in `.env`)
+    * As the address, use `ubuntu@127.0.0.1:3022` (where `3022` matches `DEVELOPMENT_SSH_PORT` in `.env`)
     * Use the password specified in `.env` as `DEVELOPMENT_SSH_PASSWORD`
 7. In VSCode: Once connected, click `Open folder...` and select `/home/ubuntu/zeppelin`
 
@@ -35,7 +35,7 @@ Below you can find instructions for setting up the environment and getting start
 5. Choose `Connect via SSH` and create a new connection:
     * Username: `ubuntu`
     * Host: `127.0.0.1`
-    * Port: `3002` (matching the `DEVELOPMENT_SSH_PORT` value in `.env`)
+    * Port: `3022` (matching the `DEVELOPMENT_SSH_PORT` value in `.env`)
 6. Click `Check Connection and Continue` and enter the password specified in `.env` as `DEVELOPMENT_SSH_PASSWORD` when asked
 7. In the next pane:
     * IDE version: WebStorm, PHPStorm, or IntelliJ IDEA
@@ -49,12 +49,12 @@ Below you can find instructions for setting up the environment and getting start
 4. Run `docker compose -f docker-compose.development.yml up` to start the development environment
 5. Use the following credentials for connecting with your IDE:
     * Host: `127.0.0.1`
-    * Port: `3002` (matching the `DEVELOPMENT_SSH_PORT` value in `.env`)
+    * Port: `3022` (matching the `DEVELOPMENT_SSH_PORT` value in `.env`)
     * Username: `ubuntu`
     * Password: As specified in `.env` as `DEVELOPMENT_SSH_PASSWORD`
 
 ## Starting the project
-These commands are run inside the dev container. You should be able to open a terminal in your IDE after connecting.
+These commands are run inside the dev container. You should be able to open a terminal in your IDE after connecting to the dev environment.
 
 ### 1. Install dependencies
 
