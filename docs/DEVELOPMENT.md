@@ -13,8 +13,8 @@ Below you can find instructions for setting up the environment and getting start
 1. Install Docker
 2. Make a copy of `.env.example` called `.env`
 3. Fill in the missing values in `.env`
-4. In VSCode: Install the `Remote - Containers` plugin
-5. In VSCode: Run `Remote-Containers: Open Folder in Container...` and select the Zeppelin folder
+4. In VSCode: Install the `Dev Containers` plugin
+5. In VSCode: Run `Dev Containers: Open Folder in Container...` and select the Zeppelin folder
 
 ### Using VSCode remote SSH plugin
 1. Install Docker
