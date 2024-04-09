@@ -1,8 +1,8 @@
 import { Snowflake } from "discord.js";
 import z from "zod";
-import { renderUsername, zSnowflake } from "../../../utils";
-import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
-import { automodTrigger } from "../helpers";
+import { renderUsername, zSnowflake } from "../../../utils.js";
+import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges.js";
+import { automodTrigger } from "../helpers.js";
 
 interface RoleAddedMatchResult {
   matchedRoleId: string;

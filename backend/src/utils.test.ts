@@ -1,7 +1,7 @@
 import test from "ava";
 import z from "zod";
-import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, zAllowedMentions } from "./utils";
-import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions";
+import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, zAllowedMentions } from "./utils.js";
+import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions.js";
 
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
 

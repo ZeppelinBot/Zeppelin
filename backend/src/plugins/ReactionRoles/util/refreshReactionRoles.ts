@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { ReactionRolesPluginType } from "../types";
-import { applyReactionRoleReactionsToMessage } from "./applyReactionRoleReactionsToMessage";
+import { ReactionRolesPluginType } from "../types.js";
+import { applyReactionRoleReactionsToMessage } from "./applyReactionRoleReactionsToMessage.js";
 
 export async function refreshReactionRoles(
   pluginData: GuildPluginData<ReactionRolesPluginType>,

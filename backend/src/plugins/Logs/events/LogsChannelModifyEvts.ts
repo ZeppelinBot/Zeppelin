@@ -1,10 +1,10 @@
 import { TextChannel, VoiceChannel } from "discord.js";
-import { differenceToString, getScalarDifference } from "../../../utils";
-import { filterObject } from "../../../utils/filterObject";
-import { logChannelCreate } from "../logFunctions/logChannelCreate";
-import { logChannelDelete } from "../logFunctions/logChannelDelete";
-import { logChannelUpdate } from "../logFunctions/logChannelUpdate";
-import { logsEvt } from "../types";
+import { differenceToString, getScalarDifference } from "../../../utils.js";
+import { filterObject } from "../../../utils/filterObject.js";
+import { logChannelCreate } from "../logFunctions/logChannelCreate.js";
+import { logChannelDelete } from "../logFunctions/logChannelDelete.js";
+import { logChannelUpdate } from "../logFunctions/logChannelUpdate.js";
+import { logsEvt } from "../types.js";
 
 export const LogsChannelCreateEvt = logsEvt({
   event: "channelCreate",

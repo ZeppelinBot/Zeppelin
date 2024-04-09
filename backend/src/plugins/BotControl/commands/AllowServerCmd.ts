@@ -1,9 +1,9 @@
 import { ApiPermissions } from "@zeppelinbot/shared";
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DBDateFormat, isSnowflake } from "../../../utils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { DBDateFormat, isSnowflake } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 export const AllowServerCmd = botControlCmd({
   trigger: ["allow_server", "allowserver", "add_server", "addserver"],

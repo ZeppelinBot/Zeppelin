@@ -29,18 +29,18 @@ import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
 import humanizeDuration from "humanize-duration";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual.js";
 import { performance } from "perf_hooks";
-import tlds from "tlds";
+import tlds from "tlds" assert { type: "json" };
 import tmp from "tmp";
 import { URL } from "url";
 import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
-import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage";
-import { getProfiler } from "./profiler";
-import { SimpleCache } from "./SimpleCache";
-import { sendDM } from "./utils/sendDM";
-import { Brand } from "./utils/typeUtils";
-import { waitForButtonConfirm } from "./utils/waitForInteraction";
+import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
+import { getProfiler } from "./profiler.js";
+import { SimpleCache } from "./SimpleCache.js";
+import { sendDM } from "./utils/sendDM.js";
+import { Brand } from "./utils/typeUtils.js";
+import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
 
 const fsp = fs.promises;
 

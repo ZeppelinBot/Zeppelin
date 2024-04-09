@@ -1,7 +1,7 @@
 import { WebhookClient } from "discord.js";
 import { BasePluginType } from "knub";
-import { Queue } from "../../Queue";
-import { Webhooks } from "../../data/Webhooks";
+import { Queue } from "../../Queue.js";
+import { Webhooks } from "../../data/Webhooks.js";
 
 export interface InternalPosterPluginType extends BasePluginType {
   state: {

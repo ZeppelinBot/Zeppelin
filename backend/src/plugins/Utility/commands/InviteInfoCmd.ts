@@ -1,8 +1,8 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { parseInviteCodeInput } from "../../../utils";
-import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { parseInviteCodeInput } from "../../../utils.js";
+import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const InviteInfoCmd = utilityCmd({
   trigger: ["invite", "inviteinfo"],

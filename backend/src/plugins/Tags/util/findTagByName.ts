@@ -1,5 +1,5 @@
 import { ExtendedMatchParams, GuildPluginData } from "knub";
-import { TTag, TagsPluginType } from "../types";
+import { TTag, TagsPluginType } from "../types.js";
 
 export async function findTagByName(
   pluginData: GuildPluginData<TagsPluginType>,

@@ -1,7 +1,7 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
 import z from "zod";
-import { renderUsername } from "../../../utils";
-import { automodTrigger } from "../helpers";
+import { renderUsername } from "../../../utils.js";
+import { automodTrigger } from "../helpers.js";
 
 interface ThreadUnarchiveResult {
   matchedThreadId: Snowflake;

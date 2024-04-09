@@ -1,13 +1,13 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import { z } from "zod";
-import { RegExpRunner } from "../../RegExpRunner";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { LogType } from "../../data/LogType";
-import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils";
-import { MessageBuffer } from "../../utils/MessageBuffer";
+import { RegExpRunner } from "../../RegExpRunner.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { LogType } from "../../data/LogType.js";
+import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
+import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
   TemplateSafeCase,
   TemplateSafeChannel,
@@ -20,7 +20,7 @@ import {
   TemplateSafeUnknownMember,
   TemplateSafeUnknownUser,
   TemplateSafeUser,
-} from "../../utils/templateSafeObjects";
+} from "../../utils/templateSafeObjects.js";
 
 const DEFAULT_BATCH_TIME = 1000;
 const MIN_BATCH_TIME = 250;

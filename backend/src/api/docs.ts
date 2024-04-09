@@ -1,9 +1,9 @@
 import express from "express";
 import z from "zod";
-import { guildPlugins } from "../plugins/availablePlugins";
-import { guildPluginInfo } from "../plugins/pluginInfo";
-import { indentLines } from "../utils";
-import { notFound } from "./responses";
+import { guildPlugins } from "../plugins/availablePlugins.js";
+import { guildPluginInfo } from "../plugins/pluginInfo.js";
+import { indentLines } from "../utils.js";
+import { notFound } from "./responses.js";
 
 function isZodObject(schema: z.ZodTypeAny): schema is z.ZodObject<any> {
   return schema._def.typeName === "ZodObject";

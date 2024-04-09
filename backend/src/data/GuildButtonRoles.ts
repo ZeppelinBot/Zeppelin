@@ -1,6 +1,6 @@
 import { getRepository, Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { ButtonRole } from "./entities/ButtonRole";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { ButtonRole } from "./entities/ButtonRole.js";
 
 export class GuildButtonRoles extends BaseGuildRepository {
   private buttonRoles: Repository<ButtonRole>;

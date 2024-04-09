@@ -1,14 +1,14 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { performance } from "perf_hooks";
-import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler";
-import { availableActions } from "../actions/availableActions";
-import { CleanAction } from "../actions/clean";
-import { AutomodTriggerMatchResult } from "../helpers";
-import { availableTriggers } from "../triggers/availableTriggers";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { applyCooldown } from "./applyCooldown";
-import { checkCooldown } from "./checkCooldown";
+import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler.js";
+import { availableActions } from "../actions/availableActions.js";
+import { CleanAction } from "../actions/clean.js";
+import { AutomodTriggerMatchResult } from "../helpers.js";
+import { availableTriggers } from "../triggers/availableTriggers.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
+import { applyCooldown } from "./applyCooldown.js";
+import { checkCooldown } from "./checkCooldown.js";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;

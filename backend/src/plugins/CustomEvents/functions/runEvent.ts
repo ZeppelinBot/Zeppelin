@@ -1,16 +1,16 @@
 import { Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
-import { ActionError } from "../ActionError";
-import { addRoleAction } from "../actions/addRoleAction";
-import { createCaseAction } from "../actions/createCaseAction";
-import { makeRoleMentionableAction } from "../actions/makeRoleMentionableAction";
-import { makeRoleUnmentionableAction } from "../actions/makeRoleUnmentionableAction";
-import { messageAction } from "../actions/messageAction";
-import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction";
-import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { ActionError } from "../ActionError.js";
+import { addRoleAction } from "../actions/addRoleAction.js";
+import { createCaseAction } from "../actions/createCaseAction.js";
+import { makeRoleMentionableAction } from "../actions/makeRoleMentionableAction.js";
+import { makeRoleUnmentionableAction } from "../actions/makeRoleUnmentionableAction.js";
+import { messageAction } from "../actions/messageAction.js";
+import { moveToVoiceChannelAction } from "../actions/moveToVoiceChannelAction.js";
+import { setChannelPermissionOverridesAction } from "../actions/setChannelPermissionOverrides.js";
+import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export async function runEvent(
   pluginData: GuildPluginData<CustomEventsPluginType>,

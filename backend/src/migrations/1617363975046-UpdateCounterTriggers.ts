@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner, TableColumn, TableIndex } from "typeorm";
-import { TableForeignKey } from "typeorm/index";
+import { TableForeignKey } from "typeorm";
 
 export class UpdateCounterTriggers1617363975046 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

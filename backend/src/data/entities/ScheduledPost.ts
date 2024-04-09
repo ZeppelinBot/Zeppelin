@@ -1,6 +1,6 @@
 import { Attachment } from "discord.js";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { StrictMessageContent } from "../../utils";
+import { StrictMessageContent } from "../../utils.js";
 
 @Entity("scheduled_posts")
 export class ScheduledPost {

@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, MessageCreateOptions, PermissionsBitField, Snowflake, User } from "discord.js";
 import z from "zod";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
   convertDelayStringToMS,
   noop,
@@ -11,13 +11,13 @@ import {
   zBoundedCharacters,
   zDelayString,
   zMessageContent,
-} from "../../../utils";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
-import { AutomodContext } from "../types";
+} from "../../../utils.js";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
+import { AutomodContext } from "../types.js";
 
 export const ReplyAction = automodAction({
   configSchema: z.union([

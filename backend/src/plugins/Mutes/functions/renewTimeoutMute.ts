@@ -1,11 +1,11 @@
 import { PermissionFlagsBits } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes";
-import { Mute } from "../../../data/entities/Mute";
-import { DBDateFormat, noop, resolveMember } from "../../../utils";
+import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes.js";
+import { Mute } from "../../../data/entities/Mute.js";
+import { DBDateFormat, noop, resolveMember } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
-import { MutesPluginType } from "../types";
+import { MutesPluginType } from "../types.js";
 
 export async function renewTimeoutMute(pluginData: GuildPluginData<MutesPluginType>, mute: Mute) {
   const me =

@@ -1,11 +1,11 @@
 import { PermissionsBitField } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { readChannelPermissions } from "../../../utils/readChannelPermissions";
-import { autoReactionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils.js";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { readChannelPermissions } from "../../../utils/readChannelPermissions.js";
+import { autoReactionsCmd } from "../types.js";
 
 const requiredPermissions = readChannelPermissions | PermissionsBitField.Flags.AddReactions;
 

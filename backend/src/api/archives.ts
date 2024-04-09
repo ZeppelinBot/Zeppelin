@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import moment from "moment-timezone";
-import { GuildArchives } from "../data/GuildArchives";
-import { notFound } from "./responses";
+import { GuildArchives } from "../data/GuildArchives.js";
+import { notFound } from "./responses.js";
 
 export function initArchives(router: express.Router) {
   const archives = new GuildArchives(null);

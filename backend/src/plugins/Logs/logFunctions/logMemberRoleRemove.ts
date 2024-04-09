@@ -1,11 +1,11 @@
 import { GuildMember, Role, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { UnknownRole } from "../../../utils";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+import { LogType } from "../../../data/LogType.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { UnknownRole } from "../../../utils.js";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
 export interface LogMemberRoleRemoveData {
   mod: User | null;

@@ -1,12 +1,12 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { GuildReminders } from "../../data/GuildReminders";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { RemindCmd } from "./commands/RemindCmd";
-import { RemindersCmd } from "./commands/RemindersCmd";
-import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
-import { postReminder } from "./functions/postReminder";
-import { RemindersPluginType, zRemindersConfig } from "./types";
+import { onGuildEvent } from "../../data/GuildEvents.js";
+import { GuildReminders } from "../../data/GuildReminders.js";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
+import { RemindCmd } from "./commands/RemindCmd.js";
+import { RemindersCmd } from "./commands/RemindersCmd.js";
+import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd.js";
+import { postReminder } from "./functions/postReminder.js";
+import { RemindersPluginType, zRemindersConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {

@@ -2,12 +2,12 @@ import { ApiPermissions } from "@zeppelinbot/shared";
 import express, { Request, Response } from "express";
 import moment from "moment-timezone";
 import { z } from "zod";
-import { GuildCases } from "../../data/GuildCases";
-import { Case } from "../../data/entities/Case";
-import { MINUTES } from "../../utils";
-import { requireGuildPermission } from "../permissions";
-import { rateLimit } from "../rateLimits";
-import { clientError, ok } from "../responses";
+import { GuildCases } from "../../data/GuildCases.js";
+import { Case } from "../../data/entities/Case.js";
+import { MINUTES } from "../../utils.js";
+import { requireGuildPermission } from "../permissions.js";
+import { rateLimit } from "../rateLimits.js";
+import { clientError, ok } from "../responses.js";
 
 const caseHandlingModeSchema = z.union([
   z.literal("replace"),

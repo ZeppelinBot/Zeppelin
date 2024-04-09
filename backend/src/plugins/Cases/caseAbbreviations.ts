@@ -1,4 +1,4 @@
-import { CaseTypes } from "../../data/CaseTypes";
+import { CaseTypes } from "../../data/CaseTypes.js";
 
 export const caseAbbreviations = {
   [CaseTypes.Ban]: "BAN",

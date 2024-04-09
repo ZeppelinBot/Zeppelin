@@ -1,20 +1,20 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
 import { BasePluginType, CooldownManager } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { RegExpRunner } from "../../RegExpRunner";
-import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { SavedMessage } from "../../data/entities/SavedMessage";
-import { entries, zBoundedRecord, zDelayString } from "../../utils";
-import { CounterEvents } from "../Counters/types";
-import { ModActionType, ModActionsEvents } from "../ModActions/types";
-import { MutesEvents } from "../Mutes/types";
-import { availableActions } from "./actions/availableActions";
-import { RecentActionType } from "./constants";
-import { availableTriggers } from "./triggers/availableTriggers";
+import { Queue } from "../../Queue.js";
+import { RegExpRunner } from "../../RegExpRunner.js";
+import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { SavedMessage } from "../../data/entities/SavedMessage.js";
+import { entries, zBoundedRecord, zDelayString } from "../../utils.js";
+import { CounterEvents } from "../Counters/types.js";
+import { ModActionType, ModActionsEvents } from "../ModActions/types.js";
+import { MutesEvents } from "../Mutes/types.js";
+import { availableActions } from "./actions/availableActions.js";
+import { RecentActionType } from "./constants.js";
+import { availableTriggers } from "./triggers/availableTriggers.js";
 
 import Timeout = NodeJS.Timeout;
 

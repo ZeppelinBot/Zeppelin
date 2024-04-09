@@ -1,5 +1,5 @@
 import { Client, GuildPreview, Snowflake } from "discord.js";
-import { MINUTES, memoize } from "../../../utils";
+import { MINUTES, memoize } from "../../../utils.js";
 
 /**
  * Memoized getGuildPreview

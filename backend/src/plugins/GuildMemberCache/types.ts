@@ -1,5 +1,5 @@
 import { BasePluginType } from "knub";
-import { GuildMemberCache } from "../../data/GuildMemberCache";
+import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 
 export interface GuildMemberCachePluginType extends BasePluginType {
   state: {

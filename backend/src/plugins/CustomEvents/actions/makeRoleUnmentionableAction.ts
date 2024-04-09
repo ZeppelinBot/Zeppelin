@@ -1,10 +1,10 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import z from "zod";
-import { TemplateSafeValueContainer } from "../../../templateFormatter";
-import { zSnowflake } from "../../../utils";
-import { ActionError } from "../ActionError";
-import { CustomEventsPluginType, TCustomEvent } from "../types";
+import { TemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { zSnowflake } from "../../../utils.js";
+import { ActionError } from "../ActionError.js";
+import { CustomEventsPluginType, TCustomEvent } from "../types.js";
 
 export const zMakeRoleUnmentionableAction = z.strictObject({
   type: z.literal("make_role_unmentionable"),

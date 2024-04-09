@@ -1,5 +1,5 @@
-import { usernameSaverEvt } from "../types";
-import { updateUsername } from "../updateUsername";
+import { usernameSaverEvt } from "../types.js";
+import { updateUsername } from "../updateUsername.js";
 
 export const MessageCreateUpdateUsernameEvt = usernameSaverEvt({
   event: "messageCreate",

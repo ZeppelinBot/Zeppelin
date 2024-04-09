@@ -1,5 +1,5 @@
 import { BasePluginType } from "knub";
-import { Configs } from "../../data/Configs";
+import { Configs } from "../../data/Configs.js";
 import Timeout = NodeJS.Timeout;
 
 export interface GuildConfigReloaderPluginType extends BasePluginType {

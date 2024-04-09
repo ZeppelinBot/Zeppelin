@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { renderUsername } from "../../utils";
-import { UsernameSaverPluginType } from "./types";
+import { renderUsername } from "../../utils.js";
+import { UsernameSaverPluginType } from "./types.js";
 
 export async function updateUsername(pluginData: GuildPluginData<UsernameSaverPluginType>, user: User) {
   if (!user) return;

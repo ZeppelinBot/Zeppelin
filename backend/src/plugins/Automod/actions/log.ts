@@ -1,7 +1,7 @@
 import z from "zod";
-import { isTruthy, unique } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+import { isTruthy, unique } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 export const LogAction = automodAction({
   configSchema: z.boolean().default(true),

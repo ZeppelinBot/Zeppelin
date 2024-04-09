@@ -1,5 +1,5 @@
-import { TemplateParseError } from "../../templateFormatter";
-import { ActionError } from "./ActionError";
+import { TemplateParseError } from "../../templateFormatter.js";
+import { ActionError } from "./ActionError.js";
 
 export function catchTemplateError(fn: () => Promise<string>, errorText: string): Promise<string> {
   try {

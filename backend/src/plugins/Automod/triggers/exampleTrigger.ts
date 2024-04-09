@@ -1,5 +1,5 @@
 import z from "zod";
-import { automodTrigger } from "../helpers";
+import { automodTrigger } from "../helpers.js";
 
 interface ExampleMatchResultType {
   isBanana: boolean;

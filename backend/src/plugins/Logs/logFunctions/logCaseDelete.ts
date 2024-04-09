@@ -1,11 +1,11 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { Case } from "../../../data/entities/Case";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { caseToTemplateSafeCase, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+import { LogType } from "../../../data/LogType.js";
+import { Case } from "../../../data/entities/Case.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { caseToTemplateSafeCase, memberToTemplateSafeMember } from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
 export interface LogCaseDeleteData {
   mod: GuildMember;

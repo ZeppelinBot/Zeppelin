@@ -1,6 +1,6 @@
 import { GuildFeature } from "discord.js";
 import z from "zod";
-import { automodAction } from "../helpers";
+import { automodAction } from "../helpers.js";
 
 export const PauseInvitesAction = automodAction({
   configSchema: z.strictObject({

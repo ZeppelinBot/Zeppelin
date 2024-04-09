@@ -1,5 +1,5 @@
 import { GuildMember, GuildTextBasedChannel } from "discord.js";
-import { getMissingPermissions } from "./getMissingPermissions";
+import { getMissingPermissions } from "./getMissingPermissions.js";
 
 /**
  * @param requiredPermissions Bitmask of required permissions

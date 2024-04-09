@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { renderUsername, resolveUser } from "../../../utils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { renderUsername, resolveUser } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 export const ListDashboardUsersCmd = botControlCmd({
   trigger: ["list_dashboard_users"],

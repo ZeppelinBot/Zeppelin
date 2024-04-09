@@ -1,6 +1,6 @@
 import { GuildTextBasedChannel, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { MessageSaverPluginType } from "./types";
+import { MessageSaverPluginType } from "./types.js";
 
 export async function saveMessagesToDB(
   pluginData: GuildPluginData<MessageSaverPluginType>,

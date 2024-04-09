@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import z, { ZodTypeAny } from "zod";
-import { Awaitable } from "../../utils/typeUtils";
-import { AutomodContext, AutomodPluginType } from "./types";
+import { Awaitable } from "../../utils/typeUtils.js";
+import { AutomodContext, AutomodPluginType } from "./types.js";
 
 interface BaseAutomodTriggerMatchResult {
   extraContexts?: AutomodContext[];

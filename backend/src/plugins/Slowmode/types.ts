@@ -1,9 +1,9 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildSlowmodes } from "../../data/GuildSlowmodes";
-import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildSlowmodes } from "../../data/GuildSlowmodes.js";
+import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel.js";
 
 export const zSlowmodeConfig = z.strictObject({
   use_native_slowmode: z.boolean(),

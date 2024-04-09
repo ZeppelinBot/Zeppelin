@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { isDiscordAPIError } from "../../../utils";
-import { reactionRolesCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { isDiscordAPIError } from "../../../utils.js";
+import { reactionRolesCmd } from "../types.js";
 
 export const ClearReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles clear",

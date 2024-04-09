@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { ReactionRolesPluginType } from "../types";
-import { runAutoRefresh } from "./runAutoRefresh";
+import { ReactionRolesPluginType } from "../types.js";
+import { runAutoRefresh } from "./runAutoRefresh.js";
 
 export async function autoRefreshLoop(pluginData: GuildPluginData<ReactionRolesPluginType>, interval: number) {
   pluginData.state.autoRefreshTimeout = setTimeout(async () => {

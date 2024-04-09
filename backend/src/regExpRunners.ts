@@ -1,4 +1,4 @@
-import { RegExpRunner } from "./RegExpRunner";
+import { RegExpRunner } from "./RegExpRunner.js";
 
 interface RunnerInfo {
   users: number;
