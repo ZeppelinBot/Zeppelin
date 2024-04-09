@@ -1,1 +1,1 @@
-export * from "./apiPermissions";
+export * from "./apiPermissions.js";
