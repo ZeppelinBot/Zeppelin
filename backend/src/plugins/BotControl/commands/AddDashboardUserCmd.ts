@@ -1,4 +1,4 @@
-import { ApiPermissions } from "@zeppelinbot/shared";
+import { ApiPermissions } from "@zeppelinbot/shared/apiPermissions.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { renderUsername } from "../../../utils.js";
