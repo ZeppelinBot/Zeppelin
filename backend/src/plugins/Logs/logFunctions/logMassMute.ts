@@ -6,7 +6,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMassMuteData {
+export interface LogMassMuteData {
   mod: User;
   count: number;
 }

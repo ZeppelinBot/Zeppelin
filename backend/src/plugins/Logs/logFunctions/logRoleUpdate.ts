@@ -6,7 +6,7 @@ import { roleToTemplateSafeRole } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogRoleUpdateData {
+export interface LogRoleUpdateData {
   oldRole: Role;
   newRole: Role;
   differenceString: string;

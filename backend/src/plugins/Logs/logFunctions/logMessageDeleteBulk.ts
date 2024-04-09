@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMessageDeleteBulkData {
+export interface LogMessageDeleteBulkData {
   count: number;
   authorIds: string[];
   channel: GuildTextBasedChannel;

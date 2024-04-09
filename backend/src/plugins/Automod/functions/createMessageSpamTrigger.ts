@@ -9,7 +9,7 @@ import { findRecentSpam } from "./findRecentSpam";
 import { getMatchingMessageRecentActions } from "./getMatchingMessageRecentActions";
 import { getMessageSpamIdentifier } from "./getSpamIdentifier";
 
-interface TMessageSpamMatchResultType {
+export interface TMessageSpamMatchResultType {
   archiveId: string;
 }
 

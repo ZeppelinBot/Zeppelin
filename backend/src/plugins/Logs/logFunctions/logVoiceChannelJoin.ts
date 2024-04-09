@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogVoiceChannelJoinData {
+export interface LogVoiceChannelJoinData {
   member: GuildMember;
   channel: VoiceBasedChannel;
 }

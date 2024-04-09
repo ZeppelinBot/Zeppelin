@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel, memberToTemplateSafeMember } from "../../
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMessageSpamDetectedData {
+export interface LogMessageSpamDetectedData {
   member: GuildMember;
   channel: GuildTextBasedChannel;
   description: string;

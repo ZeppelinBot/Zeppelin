@@ -6,7 +6,7 @@ import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberWarnData {
+export interface LogMemberWarnData {
   mod: GuildMember;
   member: GuildMember;
   caseNumber: number;

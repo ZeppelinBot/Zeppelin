@@ -13,7 +13,7 @@ import {
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMessageEditData {
+export interface LogMessageEditData {
   user: User | UnknownUser;
   channel: GuildTextBasedChannel;
   before: SavedMessage;

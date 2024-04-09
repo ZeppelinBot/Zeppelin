@@ -4,7 +4,7 @@ import { createTypedTemplateSafeValueContainer } from "../../../templateFormatte
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogBotAlertData {
+export interface LogBotAlertData {
   body: string;
 }
 

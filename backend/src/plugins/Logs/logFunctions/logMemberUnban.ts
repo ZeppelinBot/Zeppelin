@@ -7,7 +7,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberUnbanData {
+export interface LogMemberUnbanData {
   mod: User | UnknownUser | null;
   userId: Snowflake;
   caseNumber: number;

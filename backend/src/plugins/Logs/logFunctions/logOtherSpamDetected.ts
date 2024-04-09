@@ -6,7 +6,7 @@ import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogOtherSpamDetectedData {
+export interface LogOtherSpamDetectedData {
   member: GuildMember;
   description: string;
   limit: number;

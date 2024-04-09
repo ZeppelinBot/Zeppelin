@@ -15,7 +15,7 @@ import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMessageDeleteData {
+export interface LogMessageDeleteData {
   user: User | UnknownUser;
   channel: GuildTextBasedChannel;
   message: SavedMessage;
@@ -31,10 +31,7 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
 
   // See comment on FORMAT_NO_TIMESTAMP in types.ts
   const config = pluginData.config.get();
-  const timestampFormat =
-    (config.format.timestamp !== FORMAT_NO_TIMESTAMP ? config.format.timestamp : null) ??
-    config.timestamp_format ??
-    undefined;
+  const timestampFormat = config.timestamp_format ?? undefined;
 
   return log(
     pluginData,

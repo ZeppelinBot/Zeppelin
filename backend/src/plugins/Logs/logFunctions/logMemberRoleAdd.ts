@@ -7,7 +7,7 @@ import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../uti
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberRoleAddData {
+export interface LogMemberRoleAddData {
   mod: User | null;
   member: GuildMember;
   roles: Array<Role | UnknownRole>;

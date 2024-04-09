@@ -118,10 +118,7 @@ function getCasesPlugin(): Promise<any> {
 const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
-    format: {
-      timestamp: FORMAT_NO_TIMESTAMP,
-      ...DefaultLogMessages,
-    },
+    format: DefaultLogMessages,
     ping_user: true,
     allow_user_mentions: false,
     timestamp_format: "[<t:]X[>]",

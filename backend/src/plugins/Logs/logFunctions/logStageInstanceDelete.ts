@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel, stageToTemplateSafeStage } from "../../..
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogStageInstanceDeleteData {
+export interface LogStageInstanceDeleteData {
   stageInstance: StageInstance;
   stageChannel: StageChannel;
 }

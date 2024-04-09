@@ -13,7 +13,7 @@ import {
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMessageDeleteAutoData {
+export interface LogMessageDeleteAutoData {
   message: SavedMessage;
   user: User | UnknownUser;
   channel: GuildBasedChannel;

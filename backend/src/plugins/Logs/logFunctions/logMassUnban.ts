@@ -6,7 +6,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMassUnbanData {
+export interface LogMassUnbanData {
   mod: User;
   count: number;
   reason: string;

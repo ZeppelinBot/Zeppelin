@@ -14,7 +14,7 @@ import {
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogCensorData {
+export interface LogCensorData {
   user: User | UnknownUser;
   channel: GuildTextBasedChannel;
   reason: string;

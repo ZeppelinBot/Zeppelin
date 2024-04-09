@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogThreadUpdateData {
+export interface LogThreadUpdateData {
   oldThread: AnyThreadChannel;
   newThread: AnyThreadChannel;
   differenceString: string;

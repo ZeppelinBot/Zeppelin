@@ -7,7 +7,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberTimedUnmuteData {
+export interface LogMemberTimedUnmuteData {
   mod: User;
   user: User | UnknownUser;
   time: string;

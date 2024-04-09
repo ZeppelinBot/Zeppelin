@@ -11,7 +11,7 @@ import {
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogVoiceChannelForceDisconnectData {
+export interface LogVoiceChannelForceDisconnectData {
   mod: User;
   member: GuildMember;
   oldChannel: VoiceBasedChannel;

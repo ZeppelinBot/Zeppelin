@@ -42,7 +42,7 @@ export enum RecentActionType {
   VoiceChannelMove,
 }
 
-interface IRecentAction<T> {
+export interface IRecentAction<T> {
   type: RecentActionType;
   userId: string;
   actionGroupId: string;

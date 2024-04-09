@@ -6,7 +6,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogCaseCreateData {
+export interface LogCaseCreateData {
   mod: User;
   userId: string;
   caseNum: number;

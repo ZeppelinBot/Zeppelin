@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel } from "../../../utils/templateSafeObjects
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogChannelUpdateData {
+export interface LogChannelUpdateData {
   oldChannel: GuildBasedChannel;
   newChannel: GuildBasedChannel;
   differenceString: string;

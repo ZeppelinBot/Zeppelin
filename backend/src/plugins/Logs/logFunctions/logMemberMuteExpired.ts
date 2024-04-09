@@ -11,7 +11,7 @@ import {
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberMuteExpiredData {
+export interface LogMemberMuteExpiredData {
   member: GuildMember | UnknownUser;
 }
 

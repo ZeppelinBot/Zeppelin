@@ -7,7 +7,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberKickData {
+export interface LogMemberKickData {
   mod: User | UnknownUser | null;
   user: User;
   caseNumber: number;

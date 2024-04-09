@@ -7,7 +7,7 @@ import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../u
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogPostedScheduledMessageData {
+export interface LogPostedScheduledMessageData {
   author: User;
   channel: GuildTextBasedChannel;
   messageId: string;

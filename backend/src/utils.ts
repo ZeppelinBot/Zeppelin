@@ -285,9 +285,9 @@ export type StrictMessageContent = {
   embeds?: APIEmbed[];
 };
 
-export const zMessageContent = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
-
 export type MessageContent = string | StrictMessageContent;
+export const zMessageContent = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]) as z.ZodType<MessageContent>;
+
 
 export function validateAndParseMessageContent(input: unknown): StrictMessageContent {
   if (input == null) {

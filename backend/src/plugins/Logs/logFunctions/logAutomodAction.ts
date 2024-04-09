@@ -6,7 +6,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogAutomodActionData {
+export interface LogAutomodActionData {
   rule: string;
   user?: User | null;
   users: User[];

@@ -6,7 +6,7 @@ import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberLeaveData {
+export interface LogMemberLeaveData {
   member: GuildMember | PartialGuildMember;
 }
 

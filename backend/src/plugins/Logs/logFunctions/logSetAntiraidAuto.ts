@@ -4,7 +4,7 @@ import { createTypedTemplateSafeValueContainer } from "../../../templateFormatte
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogSetAntiraidAutoData {
+export interface LogSetAntiraidAutoData {
   level: string;
 }
 

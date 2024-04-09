@@ -6,7 +6,7 @@ import { emojiToTemplateSafeEmoji } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogEmojiUpdateData {
+export interface LogEmojiUpdateData {
   oldEmoji: Emoji;
   newEmoji: Emoji;
   differenceString: string;

@@ -7,7 +7,7 @@ import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberTimedUnbanData {
+export interface LogMemberTimedUnbanData {
   mod: User | UnknownUser;
   userId: string;
   banTime: string;

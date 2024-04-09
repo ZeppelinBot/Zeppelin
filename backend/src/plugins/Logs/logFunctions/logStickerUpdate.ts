@@ -6,7 +6,7 @@ import { stickerToTemplateSafeSticker } from "../../../utils/templateSafeObjects
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogStickerUpdateData {
+export interface LogStickerUpdateData {
   oldSticker: Sticker;
   newSticker: Sticker;
   differenceString: string;

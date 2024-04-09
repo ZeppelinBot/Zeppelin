@@ -6,7 +6,7 @@ import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects";
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogMemberNickChangeData {
+export interface LogMemberNickChangeData {
   member: GuildMember;
   oldNick: string;
   newNick: string;

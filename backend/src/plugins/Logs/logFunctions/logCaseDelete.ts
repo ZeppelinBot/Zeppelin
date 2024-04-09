@@ -7,7 +7,7 @@ import { caseToTemplateSafeCase, memberToTemplateSafeMember } from "../../../uti
 import { LogsPluginType } from "../types";
 import { log } from "../util/log";
 
-interface LogCaseDeleteData {
+export interface LogCaseDeleteData {
   mod: GuildMember;
   case: Case;
 }
