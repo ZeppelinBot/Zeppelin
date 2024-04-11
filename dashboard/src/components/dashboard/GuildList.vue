@@ -30,7 +30,7 @@
 
 <script lang="ts">
   import { mapState } from "vuex";
-  import { ApiPermissions, hasPermission } from "@shared/apiPermissions";
+  import { ApiPermissions, hasPermission } from "@zeppelinbot/shared";
   import { AuthState, GuildState } from "../../store/types";
 
   export default {

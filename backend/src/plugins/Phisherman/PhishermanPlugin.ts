@@ -1,9 +1,7 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
-import { mapToPublicFn } from "../../pluginUtils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { makePublicFn } from "../../pluginUtils";
 import { getDomainInfo } from "./functions/getDomainInfo";
-import { pluginInfo } from "./info";
 import { PhishermanPluginType, zPhishermanConfig } from "./types";
 
 const defaultOptions: PluginOptions<PhishermanPluginType> = {
@@ -13,17 +11,16 @@ const defaultOptions: PluginOptions<PhishermanPluginType> = {
   overrides: [],
 };
 
-export const PhishermanPlugin = zeppelinGuildPlugin<PhishermanPluginType>()({
+export const PhishermanPlugin = guildPlugin<PhishermanPluginType>()({
   name: "phisherman",
-  showInDocs: true,
-  info: pluginInfo,
 
   configParser: (input) => zPhishermanConfig.parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  public: {
-    getDomainInfo: mapToPublicFn(getDomainInfo),
+  public(pluginData) {
+    return {
+      getDomainInfo: makePublicFn(pluginData, getDomainInfo),
+    };
   },
 
   async beforeLoad(pluginData) {

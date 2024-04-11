@@ -1,5 +1,5 @@
 import { BaseConfig, Knub } from "knub";
-import z from "zod";
+import z, { ZodTypeAny } from "zod";
 import { zSnowflake } from "./utils";
 
 export interface ZeppelinGuildConfig extends BaseConfig {
@@ -34,11 +34,13 @@ export type TZeppelinKnub = Knub;
 export type TMarkdown = string;
 
 export interface ZeppelinPluginInfo {
+  showInDocs: boolean;
   prettyName: string;
   description?: TMarkdown;
   usageGuide?: TMarkdown;
   configurationGuide?: TMarkdown;
   legacy?: boolean;
+  configSchema?: ZodTypeAny;
 }
 
 export interface CommandInfo {

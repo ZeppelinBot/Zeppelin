@@ -1,6 +1,7 @@
 import express from "express";
 import z from "zod";
 import { guildPlugins } from "../plugins/availablePlugins";
+import { guildPluginInfo } from "../plugins/pluginInfo";
 import { indentLines } from "../utils";
 import { notFound } from "./responses";
 
@@ -96,30 +97,31 @@ function formatZodConfigSchema(schema: z.ZodTypeAny) {
   return "unknown";
 }
 
-export function initDocs(app: express.Express) {
-  const docsPlugins = guildPlugins.filter((plugin) => plugin.showInDocs);
+export function initDocs(router: express.Router) {
+  const docsPluginNames = Object.keys(guildPluginInfo).filter((k) => guildPluginInfo[k].showInDocs);
 
-  app.get("/docs/plugins", (req: express.Request, res: express.Response) => {
+  router.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
-      docsPlugins.map((plugin) => {
-        const thinInfo = plugin.info ? { prettyName: plugin.info.prettyName, legacy: plugin.info.legacy ?? false } : {};
+      docsPluginNames.map((pluginName) => {
+        const info = guildPluginInfo[pluginName];
+        const thinInfo = info ? { prettyName: info.prettyName, legacy: info.legacy ?? false } : {};
         return {
-          name: plugin.name,
+          name: pluginName,
           info: thinInfo,
         };
       }),
     );
   });
 
-  app.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
-    // prettier-ignore
-    const plugin = docsPlugins.find(_plugin => _plugin.name === req.params.pluginName);
-    if (!plugin) {
+  router.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
+    const name = req.params.pluginName;
+    const baseInfo = guildPluginInfo[name];
+    if (!baseInfo) {
       return notFound(res);
     }
 
-    const name = plugin.name;
-    const info = { ...(plugin.info || {}) };
+    const plugin = guildPlugins.find((p) => p.name === name)!;
+    const info = { ...baseInfo };
     delete info.configSchema;
 
     const messageCommands = (plugin.messageCommands || []).map((cmd) => ({
@@ -132,7 +134,7 @@ export function initDocs(app: express.Express) {
     }));
 
     const defaultOptions = plugin.defaultOptions || {};
-    const configSchema = plugin.info?.configSchema && formatZodConfigSchema(plugin.info.configSchema);
+    const configSchema = info.configSchema && formatZodConfigSchema(info.configSchema);
 
     res.json({
       name,

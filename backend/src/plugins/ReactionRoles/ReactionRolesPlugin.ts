@@ -1,9 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
 import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
 import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
@@ -33,14 +32,8 @@ const defaultOptions: PluginOptions<ReactionRolesPluginType> = {
   ],
 };
 
-export const ReactionRolesPlugin = zeppelinGuildPlugin<ReactionRolesPluginType>()({
+export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
   name: "reaction_roles",
-  showInDocs: true,
-  info: {
-    prettyName: "Reaction roles",
-    legacy: "Consider using the [Role buttons](/docs/plugins/role_buttons) plugin instead.",
-    configSchema: zReactionRolesConfig,
-  },
 
   dependencies: () => [LogsPlugin],
   configParser: (input) => zReactionRolesConfig.parse(input),

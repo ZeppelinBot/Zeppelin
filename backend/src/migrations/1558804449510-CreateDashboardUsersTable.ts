@@ -9,10 +9,12 @@ export class CreateDashboardUsersTable1558804449510 implements MigrationInterfac
           {
             name: "guild_id",
             type: "bigint",
+            isPrimary: true,
           },
           {
             name: "user_id",
             type: "bigint",
+            isPrimary: true,
           },
           {
             name: "username",
@@ -28,7 +30,6 @@ export class CreateDashboardUsersTable1558804449510 implements MigrationInterfac
       }),
     );
 
-    await queryRunner.createPrimaryKey("dashboard_users", ["guild_id", "user_id"]);
     await queryRunner.createIndex(
       "dashboard_users",
       new TableIndex({

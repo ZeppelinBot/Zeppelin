@@ -1,12 +1,11 @@
+import { guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { UsernameHistory } from "../../data/UsernameHistory";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
 import { UsernameSaverPluginType, zUsernameSaverConfig } from "./types";
 
-export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>()({
+export const UsernameSaverPlugin = guildPlugin<UsernameSaverPluginType>()({
   name: "username_saver",
-  showInDocs: false,
 
   configParser: (input) => zUsernameSaverConfig.parse(input),
 

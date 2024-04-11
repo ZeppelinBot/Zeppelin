@@ -1,4 +1,4 @@
-import { ApiPermissions } from "@shared/apiPermissions";
+import { ApiPermissions } from "@zeppelinbot/shared";
 import { Repository } from "typeorm";
 import { ApiAuditLog } from "./ApiAuditLog";
 import { BaseRepository } from "./BaseRepository";

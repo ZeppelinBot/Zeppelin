@@ -11,7 +11,7 @@ import {
   PermissionsBitField,
   TextBasedChannel,
 } from "discord.js";
-import { AnyPluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
+import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
 import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
@@ -139,3 +139,16 @@ export function mapToPublicFn<T extends AnyFn>(inputFn: T) {
     };
   };
 }
+
+type FnWithPluginData<TPluginData> = (pluginData: TPluginData, ...args: any[]) => any;
+
+export function makePublicFn<TPluginData extends BasePluginData<any>, T extends FnWithPluginData<TPluginData>>(
+  pluginData: TPluginData,
+  fn: T,
+) {
+  return (...args: Tail<Parameters<T>>): ReturnType<T> => {
+    return fn(pluginData, ...args);
+  };
+}
+
+// ???

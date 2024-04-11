@@ -1,16 +1,8 @@
-import { PluginOptions } from "knub";
-import { GuildCases } from "src/data/GuildCases";
-import { CasesPlugin } from "../Cases/CasesPlugin";
+import { PluginOptions, guildPlugin } from "knub";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
-import { BanCmd } from "./commands/BanUserCtxCmd";
-import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd";
-import { MuteCmd } from "./commands/MuteUserCtxCmd";
-import { NoteCmd } from "./commands/NoteUserCtxCmd";
-import { WarnCmd } from "./commands/WarnUserCtxCmd";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
@@ -31,9 +23,8 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   ],
 };
 
-export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
+export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
-  showInDocs: true,
 
   dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),

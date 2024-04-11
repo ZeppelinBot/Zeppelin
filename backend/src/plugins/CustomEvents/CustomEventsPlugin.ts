@@ -1,5 +1,5 @@
 import { GuildChannel, GuildMember, User } from "discord.js";
-import { guildPluginMessageCommand, parseSignature } from "knub";
+import { guildPlugin, guildPluginMessageCommand, parseSignature } from "knub";
 import { TSignature } from "knub-command-manager";
 import { commandTypes } from "../../commandTypes";
 import { TemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
@@ -12,7 +12,6 @@ import {
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { runEvent } from "./functions/runEvent";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types";
 
@@ -22,9 +21,8 @@ const defaultOptions = {
   },
 };
 
-export const CustomEventsPlugin = zeppelinGuildPlugin<CustomEventsPluginType>()({
+export const CustomEventsPlugin = guildPlugin<CustomEventsPluginType>()({
   name: "custom_events",
-  showInDocs: false,
 
   dependencies: () => [LogsPlugin],
   configParser: (input) => zCustomEventsConfig.parse(input),

@@ -4,7 +4,7 @@
 
     <nav class="flex items-stretch flex-wrap pl-4 pr-2 py-1 border border-gray-700 rounded bg-gray-800 shadow-xl mb-8">
       <div class="flex-full md:flex-initial flex items-center">
-        <img class="w-10 mr-5" src="../../img/logo.png" alt="" aria-hidden="true">
+        <img class="w-10 mr-5" :src="logoUrl" alt="" aria-hidden="true">
 
         <router-link to="/dashboard">
           <h1 class="font-semibold">Zeppelin Dashboard</h1>
@@ -48,6 +48,7 @@
 
 <script>
   import Title from "../Title.vue";
+  import logoUrl from "../../img/logo.png";
 
   export default {
     components: {
@@ -58,6 +59,9 @@
         await this.$store.dispatch("auth/logout");
         window.location.pathname = '/';
       }
+    },
+    data() {
+      return { logoUrl };
     },
   };
 </script>
