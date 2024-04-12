@@ -173,7 +173,7 @@ export async function banUserId(
       mod,
       user,
       caseNumber: createdCase.case_number,
-      reason,
+      reason: reason ?? "",
       banTime: humanizeDuration(banTime),
     });
   } else {

@@ -12,7 +12,7 @@ import { UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
 export const zModActionsConfig = z.strictObject({
-  main_guild: tNullable(t.string),
+  main_guild: z.nullable(z.string()),
   dm_on_warn: z.boolean(),
   dm_on_kick: z.boolean(),
   dm_on_ban: z.boolean(),
@@ -24,7 +24,7 @@ export const zModActionsConfig = z.strictObject({
   kick_message: z.nullable(z.string()),
   ban_message: z.nullable(z.string()),
   tempban_message: z.nullable(z.string()),
-  default_ban_reason: tNullable(t.string),
+  default_ban_reason: z.nullable(z.string()),
   alert_on_rejoin: z.boolean(),
   alert_channel: z.nullable(z.string()),
   warn_notify_enabled: z.boolean(),

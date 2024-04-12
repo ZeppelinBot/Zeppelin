@@ -1,4 +1,10 @@
-import { ChannelType, GuildTextThreadCreateOptions, ThreadAutoArchiveDuration, ThreadChannel } from "discord.js";
+import {
+  ChannelType,
+  GuildTextThreadCreateOptions,
+  TextChannel,
+  ThreadAutoArchiveDuration,
+  ThreadChannel,
+} from "discord.js";
 import z from "zod";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { MINUTES, convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils";

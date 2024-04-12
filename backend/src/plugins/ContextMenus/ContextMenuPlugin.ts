@@ -1,23 +1,30 @@
 import { PluginOptions, guildPlugin } from "knub";
+import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
+import { ContextClickedEvt } from "./events/ContextClickedEvt";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types";
+import { loadAllCommands } from "./utils/loadAllCommands";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {
     can_use: false,
 
-    can_open_mod_menu: false,
+    user_muteindef: false,
+    user_mute1d: false,
+    user_mute1h: false,
+    user_info: false,
+
+    message_clean10: false,
+    message_clean25: false,
+    message_clean50: false,
   },
   overrides: [
     {
       level: ">=50",
       config: {
         can_use: true,
-
-        can_open_mod_menu: true,
       },
     },
   ],
@@ -26,15 +33,22 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
 export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
 
-  dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
+  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),
   defaultOptions,
 
-  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd],
+  // prettier-ignore
+  events: [
+    ContextClickedEvt,
+  ],
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.cases = GuildCases.getGuildInstance(guild.id);
+    state.contextMenuLinks = new GuildContextMenuLinks(guild.id);
+  },
+
+  afterLoad(pluginData) {
+    loadAllCommands(pluginData);
   },
 });
