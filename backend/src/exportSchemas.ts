@@ -1,13 +1,12 @@
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
-import { guildPlugins } from "./plugins/availablePlugins";
+import { guildPluginInfo } from "./plugins/pluginInfo";
 import { zZeppelinGuildConfig } from "./types";
 
-const pluginSchemaMap = guildPlugins.reduce((map, plugin) => {
-  if (!plugin.info) {
-    return map;
+const pluginSchemaMap = Object.entries(guildPluginInfo).reduce((map, [pluginName, pluginInfo]) => {
+  if (pluginInfo.configSchema) {
+    map[pluginName] = pluginInfo.configSchema;
   }
-  map[plugin.name] = plugin.info.configSchema;
   return map;
 }, {});
 

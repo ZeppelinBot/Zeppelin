@@ -164,7 +164,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Verify required Node.js version
-const REQUIRED_NODE_VERSION = "14.0.0";
+const REQUIRED_NODE_VERSION = "16.9.0";
 const requiredParts = REQUIRED_NODE_VERSION.split(".").map((v) => parseInt(v, 10));
 const actualVersionParts = process.versions.node.split(".").map((v) => parseInt(v, 10));
 for (const [i, part] of actualVersionParts.entries()) {
@@ -463,7 +463,7 @@ connect().then(async () => {
       logger.info("Cleaning up before exit...");
       // Force exit after 10sec
       setTimeout(() => process.exit(code), 10 * SECONDS);
-      await bot.stop();
+      await bot.destroy();
       await dataSource.destroy();
       logger.info("Done! Exiting now.");
       process.exit(code);

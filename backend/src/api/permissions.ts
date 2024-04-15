@@ -1,4 +1,4 @@
-import { ApiPermissions, hasPermission, permissionArrToSet } from "@shared/apiPermissions";
+import { ApiPermissions, hasPermission, permissionArrToSet } from "@zeppelinbot/shared";
 import { Request, Response } from "express";
 import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
 import { isStaff } from "../staff";

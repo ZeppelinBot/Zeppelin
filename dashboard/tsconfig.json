@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "esnext",
     "target": "es2018",
     "sourceMap": true,
@@ -13,9 +13,12 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "paths": {
-      "@shared/*": ["../shared/src/*"]
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "./ts-vue-shim.d.ts"],
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
     }
-  }
+  ]
 }

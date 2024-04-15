@@ -1,11 +1,9 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { trimPluginDescription } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SpamVoiceStateUpdateEvt } from "./events/SpamVoiceEvt";
 import { SpamPluginType, zSpamConfig } from "./types";
 import { clearOldRecentActions } from "./util/clearOldRecentActions";
@@ -42,18 +40,8 @@ const defaultOptions: PluginOptions<SpamPluginType> = {
   ],
 };
 
-export const SpamPlugin = zeppelinGuildPlugin<SpamPluginType>()({
+export const SpamPlugin = guildPlugin<SpamPluginType>()({
   name: "spam",
-  showInDocs: true,
-  info: {
-    prettyName: "Spam protection",
-    description: trimPluginDescription(`
-      Basic spam detection and auto-muting.
-      For more advanced spam filtering, check out the Automod plugin!
-    `),
-    legacy: true,
-    configSchema: zSpamConfig,
-  },
 
   dependencies: () => [LogsPlugin],
   configParser: (input) => zSpamConfig.parse(input),

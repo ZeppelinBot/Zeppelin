@@ -1,7 +1,7 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-ARG DOCKER_DEV_UID
-ARG DOCKER_DEV_SSH_PASSWORD
+ARG DEVELOPMENT_UID
+ARG DEVELOPMENT_SSH_PASSWORD
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
@@ -15,15 +15,11 @@ RUN add-apt-repository ppa:git-core/ppa && apt-get update && apt-get install -y 
 # Set up SSH access
 RUN apt-get install -y openssh-server iptables
 RUN mkdir /var/run/sshd
-RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u $DOCKER_DEV_UID ubuntu
-RUN echo "ubuntu:${DOCKER_DEV_SSH_PASSWORD}" | chpasswd
+RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo -u $DEVELOPMENT_UID ubuntu
+RUN echo "ubuntu:${DEVELOPMENT_SSH_PASSWORD}" | chpasswd
 
-# Set up proper permissions for volumes
-RUN mkdir -p /home/ubuntu/zeppelin /home/ubuntu/.vscode-remote /home/ubuntu/.vscode-server /home/ubuntu/.cache/JetBrains
-RUN chown -R ubuntu /home/ubuntu
-
-# Install Node.js 18 and packages needed to build native packages
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+# Install Node.js 20 and packages needed to build native packages
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs gcc g++ make python3
 
 CMD ["/usr/sbin/sshd", "-D", "-e"]

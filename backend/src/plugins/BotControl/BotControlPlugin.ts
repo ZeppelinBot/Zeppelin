@@ -1,10 +1,10 @@
 import { Snowflake, TextChannel } from "discord.js";
+import { globalPlugin } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
 import { CommonPlugin } from "../Common/CommonPlugin";
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
@@ -35,7 +35,7 @@ const defaultOptions = {
   },
 };
 
-export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
+export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
   name: "bot_control",
   configParser: (input) => zBotControlConfig.parse(input),
   defaultOptions,

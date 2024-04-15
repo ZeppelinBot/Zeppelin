@@ -1,4 +1,4 @@
-import { ApiPermissions } from "@shared/apiPermissions";
+import { ApiPermissions } from "@zeppelinbot/shared";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
 import { renderUsername } from "../../../utils";

@@ -61,11 +61,13 @@ export class CreateStarboardTable1544887946307 implements MigrationInterface {
             name: "starboard_id",
             type: "int",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "message_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "starboard_message_id",
@@ -75,7 +77,6 @@ export class CreateStarboardTable1544887946307 implements MigrationInterface {
         ],
       }),
     );
-    await queryRunner.createPrimaryKey("starboard_messages", ["starboard_id", "message_id"]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

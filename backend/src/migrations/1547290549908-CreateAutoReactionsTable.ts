@@ -10,11 +10,13 @@ export class CreateAutoReactionsTable1547290549908 implements MigrationInterface
             name: "guild_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "channel_id",
             type: "bigint",
             unsigned: true,
+            isPrimary: true,
           },
           {
             name: "reactions",
@@ -23,7 +25,6 @@ export class CreateAutoReactionsTable1547290549908 implements MigrationInterface
         ],
       }),
     );
-    await queryRunner.createPrimaryKey("auto_reactions", ["guild_id", "channel_id"]);
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {

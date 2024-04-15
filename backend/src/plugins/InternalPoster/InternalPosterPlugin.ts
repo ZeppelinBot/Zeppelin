@@ -1,9 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { Webhooks } from "../../data/Webhooks";
-import { mapToPublicFn } from "../../pluginUtils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
+import { makePublicFn } from "../../pluginUtils";
 import { editMessage } from "./functions/editMessage";
 import { sendMessage } from "./functions/sendMessage";
 import { InternalPosterPluginType } from "./types";
@@ -13,17 +12,17 @@ const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   overrides: [],
 };
 
-export const InternalPosterPlugin = zeppelinGuildPlugin<InternalPosterPluginType>()({
+export const InternalPosterPlugin = guildPlugin<InternalPosterPluginType>()({
   name: "internal_poster",
-  showInDocs: false,
 
   configParser: (input) => z.strictObject({}).parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  public: {
-    sendMessage: mapToPublicFn(sendMessage),
-    editMessage: mapToPublicFn(editMessage),
+  public(pluginData) {
+    return {
+      sendMessage: makePublicFn(pluginData, sendMessage),
+      editMessage: makePublicFn(pluginData, editMessage),
+    };
   },
 
   async beforeLoad(pluginData) {

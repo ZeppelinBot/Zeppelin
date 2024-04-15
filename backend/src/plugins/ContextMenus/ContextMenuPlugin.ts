@@ -1,12 +1,10 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildCases } from "../../data/GuildCases";
-import { trimPluginDescription } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { BanCmd } from "./commands/BanUserCtxCmd";
 import { CleanCmd } from "./commands/CleanMessageCtxCmd";
 import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd";
@@ -33,16 +31,8 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   ],
 };
 
-export const ContextMenuPlugin = zeppelinGuildPlugin<ContextMenuPluginType>()({
+export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
-  showInDocs: true,
-  info: {
-    prettyName: "Context Menus",
-    description: trimPluginDescription(`
-      This plugin provides command shortcuts via context menus
-    `),
-    configSchema: zContextMenusConfig,
-  },
 
   dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),

@@ -1,8 +1,6 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
-import { trimPluginDescription } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { FollowCmd } from "./commands/FollowCmd";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
 import { WhereCmd } from "./commands/WhereCmd";
@@ -28,18 +26,8 @@ const defaultOptions: PluginOptions<LocateUserPluginType> = {
   ],
 };
 
-export const LocateUserPlugin = zeppelinGuildPlugin<LocateUserPluginType>()({
+export const LocateUserPlugin = guildPlugin<LocateUserPluginType>()({
   name: "locate_user",
-  showInDocs: true,
-  info: {
-    prettyName: "Locate user",
-    description: trimPluginDescription(`
-      This plugin allows users with access to the commands the following:
-      * Instantly receive an invite to the voice channel of a user
-      * Be notified as soon as a user switches or joins a voice channel
-    `),
-    configSchema: zLocateUserConfig,
-  },
 
   configParser: (input) => zLocateUserConfig.parse(input),
   defaultOptions,

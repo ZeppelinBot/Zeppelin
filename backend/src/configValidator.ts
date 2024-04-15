@@ -1,11 +1,10 @@
-import { BaseConfig, ConfigValidationError, PluginConfigManager } from "knub";
+import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
 import { ZodError } from "zod";
-import { ZeppelinPlugin } from "./plugins/ZeppelinPlugin";
 import { guildPlugins } from "./plugins/availablePlugins";
 import { zZeppelinGuildConfig } from "./types";
 import { formatZodIssue } from "./utils/formatZodIssue";
 
-const pluginNameToPlugin = new Map<string, ZeppelinPlugin>();
+const pluginNameToPlugin = new Map<string, GuildPluginBlueprint<any, any>>();
 for (const plugin of guildPlugins) {
   pluginNameToPlugin.set(plugin.name, plugin);
 }

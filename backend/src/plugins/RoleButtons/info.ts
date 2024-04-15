@@ -1,8 +1,9 @@
+import { ZeppelinPluginInfo } from "../../types";
 import { trimPluginDescription } from "../../utils";
-import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
 import { zRoleButtonsConfig } from "./types";
 
-export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
+export const roleButtonsPluginInfo: ZeppelinPluginInfo = {
+  showInDocs: true,
   prettyName: "Role buttons",
   description: trimPluginDescription(`
     Allow users to pick roles by clicking on buttons

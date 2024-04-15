@@ -1,0 +1,90 @@
+version: '3'
+name: zeppelin-prod
+volumes:
+  mysql-data:
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${STANDALONE_MYSQL_ROOT_PASSWORD?:Missing STANDALONE_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: zeppelin
+      MYSQL_USER: zeppelin
+      MYSQL_PASSWORD: ${STANDALONE_MYSQL_PASSWORD?:Missing STANDALONE_MYSQL_PASSWORD}
+    ports:
+      - 127.0.0.1:${STANDALONE_MYSQL_PORT:?Missing STANDALONE_MYSQL_PORT}:3306
+    # If you're upgrading from an older version, you can load your old database by switching the volumes below.
+    # Then, take a database dump from the old database, switch the volumes back, and load the dump into the new database.
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # - ./docker/production/data/mysql:/var/lib/mysql
+    #command: --authentication-policy=mysql_native_password
+    healthcheck:
+      test: "/usr/bin/mysql --host=127.0.0.1 --user=root --password=\"${STANDALONE_MYSQL_ROOT_PASSWORD}\" --execute \"SHOW DATABASES;\""
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/production/nginx/Dockerfile
+    ports:
+      - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:80"
+
+  migrate:
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build: &build
+      context: .
+      args:
+        # Used at compile-time by dashboard
+        API_URL:
+    environment: &env
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=zeppelin
+      - DB_PASSWORD=${STANDALONE_MYSQL_PASSWORD}
+      - DB_DATABASE=zeppelin
+      - API_PATH_PREFIX=/api
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "migrate-prod"]
+
+  api:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build: *build
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-api-prod"]
+
+  bot:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build: *build
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/backend
+    command: ["npm", "run", "start-bot-prod"]
+  
+  dashboard:
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    build: *build
+    restart: on-failure
+    environment: *env
+    env_file:
+      - .env
+    working_dir: /zeppelin/dashboard
+    command: ["node", "serve.js"]

@@ -23,11 +23,11 @@ See https://zeppelin.gg/ for more details.
 For information on how to use the bot, see https://zeppelin.gg/docs
 
 ## Development
-See [DEVELOPMENT.md](./DEVELOPMENT.md) for instructions on running the development environment.
+See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for instructions on running the development environment.
 
-Once you have the environment up and running, see [MANAGEMENT.md](./MANAGEMENT.md) for how to manage your bot.
+Once you have the environment up and running, see [docs/MANAGEMENT.md](docs/MANAGEMENT.md) for how to manage your bot.
 
 ## Production
-See [PRODUCTION.md](./PRODUCTION.md) for instructions on how to run the bot in production.
+See [docs/PRODUCTION.md](docs/PRODUCTION.md) for instructions on how to run the bot in production.
 
-Once you have the environment up and running, see [MANAGEMENT.md](./MANAGEMENT.md) for how to manage your bot.
+Once you have the environment up and running, see [docs/MANAGEMENT.md](docs/MANAGEMENT.md) for how to manage your bot.

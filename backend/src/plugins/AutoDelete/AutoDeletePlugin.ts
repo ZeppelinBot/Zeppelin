@@ -1,9 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AutoDeletePluginType, zAutoDeleteConfig } from "./types";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
@@ -16,15 +15,8 @@ const defaultOptions: PluginOptions<AutoDeletePluginType> = {
   },
 };
 
-export const AutoDeletePlugin = zeppelinGuildPlugin<AutoDeletePluginType>()({
+export const AutoDeletePlugin = guildPlugin<AutoDeletePluginType>()({
   name: "auto_delete",
-  showInDocs: true,
-  info: {
-    prettyName: "Auto-delete",
-    description: "Allows Zeppelin to auto-delete messages from a channel after a delay",
-    configurationGuide: "Maximum deletion delay is currently 5 minutes",
-    configSchema: zAutoDeleteConfig,
-  },
 
   dependencies: () => [TimeAndDatePlugin, LogsPlugin],
   configParser: (input) => zAutoDeleteConfig.parse(input),
