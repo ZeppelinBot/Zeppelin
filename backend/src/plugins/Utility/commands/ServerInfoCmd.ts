@@ -17,7 +17,7 @@ export const ServerInfoCmd = utilityCmd({
     const serverId = args.serverId || pluginData.guild.id;
     const serverInfoEmbed = await getServerInfoEmbed(pluginData, serverId);
     if (!serverInfoEmbed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Could not find information for that server");
+      void pluginData.state.common.sendErrorMessage(message, "Could not find information for that server");
       return;
     }
 

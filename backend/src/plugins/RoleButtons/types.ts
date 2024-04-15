@@ -1,10 +1,11 @@
 import { ButtonStyle } from "discord.js";
-import { BasePluginType } from "knub";
+import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
 import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError";
 import { createButtonComponents } from "./functions/createButtonComponents";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const zRoleButtonOption = z.strictObject({
   role_id: zSnowflake,
@@ -109,5 +110,6 @@ export interface RoleButtonsPluginType extends BasePluginType {
   config: z.infer<typeof zRoleButtonsConfig>;
   state: {
     roleButtons: GuildRoleButtons;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

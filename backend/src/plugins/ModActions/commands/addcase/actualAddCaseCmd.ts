@@ -5,11 +5,10 @@ import { Case } from "../../../../data/entities/Case";
 import { canActOn } from "../../../../pluginUtils";
 import { UnknownUser, renderUsername, resolveMember } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 
 export async function actualAddCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -28,9 +27,10 @@ export async function actualAddCaseCmd(
   // If the user exists as a guild member, make sure we can act on them first
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
   if (member && !canActOn(pluginData, author, member)) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(context, "Cannot add case on this user: insufficient permissions");
+    pluginData.state.common.sendErrorMessage(
+      context,
+      "Cannot add case on this user: insufficient permissions"
+    );
     return;
   }
 
@@ -47,11 +47,12 @@ export async function actualAddCaseCmd(
   });
 
   if (user) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(context, `Case #${theCase.case_number} created for **${renderUsername(user)}**`);
+    pluginData.state.common.sendSuccessMessage(
+      context,
+      `Case #${theCase.case_number} created for **${renderUsername(user)}**`
+    );
   } else {
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Case #${theCase.case_number} created`);
+    pluginData.state.common.sendSuccessMessage(context, `Case #${theCase.case_number} created`);
   }
 
   // Log the action

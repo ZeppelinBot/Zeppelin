@@ -1,8 +1,7 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualMassMuteCmd } from "../../functions/actualCommands/actualMassMuteCmd";
+import { actualMassMuteCmd } from "./actualMassMuteCmd";
 import { modActionsMsgCmd } from "../../types";
 
 export const MassMuteMsgCmd = modActionsMsgCmd({
@@ -25,7 +24,7 @@ export const MassMuteMsgCmd = modActionsMsgCmd({
       !muteReasonReceived.content ||
       muteReasonReceived.content.toLowerCase().trim() === "cancel"
     ) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cancelled");
+      pluginData.state.common.sendErrorMessage(msg, "Cancelled");
       return;
     }
 

@@ -7,6 +7,7 @@ import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
 import { StarboardPluginType, zStarboardConfig } from "./types";
 import { onMessageDelete } from "./util/onMessageDelete";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<StarboardPluginType> = {
   config: {
@@ -48,6 +49,10 @@ export const StarboardPlugin = guildPlugin<StarboardPluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.starboardMessages = GuildStarboardMessages.getGuildInstance(guild.id);
     state.starboardReactions = GuildStarboardReactions.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

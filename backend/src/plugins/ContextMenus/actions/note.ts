@@ -8,8 +8,8 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { canActOn } from "src/pluginUtils";
-import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
+import { canActOn } from "../../../pluginUtils";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { logger } from "../../../logger";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
@@ -34,25 +34,21 @@ async function noteAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasNotePermission(executingMember, interaction.channelId))) {
-    await interactionToReply
-      .editReply({
-        content: "Cannot note: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
+    await interactionToReply.editReply({
+      content: "Cannot note: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interactionToReply
-      .editReply({
-        content: "Cannot note: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
+    await interactionToReply.editReply({
+      content: "Cannot note: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
@@ -72,13 +68,11 @@ async function noteAction(
   });
 
   const userName = renderUserUsername(targetMember.user);
-  await interactionToReply
-    .editReply({
-      content: `Note added on **${userName}** (Case #${createdCase.case_number})`,
-      embeds: [],
-      components: [],
-    })
-    .catch((err) => logger.error(`Note interaction reply failed: ${err}`));
+  await interactionToReply.editReply({
+    content: `Note added on **${userName}** (Case #${createdCase.case_number})`,
+    embeds: [],
+    components: [],
+  });
 }
 
 export async function launchNoteActionModal(
@@ -99,14 +93,11 @@ export async function launchNoteActionModal(
       if (interaction.isButton()) {
         await submitted.deferUpdate().catch((err) => logger.error(`Note interaction defer failed: ${err}`));
       } else if (interaction.isContextMenuCommand()) {
-        await submitted
-          .deferReply({ ephemeral: true })
-          .catch((err) => logger.error(`Note interaction defer failed: ${err}`));
+        await submitted.deferReply({ ephemeral: true });
       }
 
       const reason = submitted.fields.getTextInputValue("reason");
 
       await noteAction(pluginData, reason, target, interaction, submitted);
-    })
-    .catch((err) => logger.error(`Note modal interaction failed: ${err}`));
+    });
 }

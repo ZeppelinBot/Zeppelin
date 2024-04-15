@@ -72,6 +72,7 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { AttachmentLinkReactionType, ModActionsPluginType, modActionsSlashGroup, zModActionsConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {
@@ -94,7 +95,6 @@ const defaultOptions = {
       "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
     ban_delete_message_days: 1,
     attachment_link_reaction: "warn" as AttachmentLinkReactionType,
-    attachment_storing_channel: null,
 
     can_note: false,
     can_warn: false,
@@ -234,6 +234,10 @@ export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
     state.massbanQueue = new Queue(15 * MINUTES);
 
     state.events = new EventEmitter();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

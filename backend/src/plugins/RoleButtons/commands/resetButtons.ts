@@ -16,14 +16,12 @@ export const resetButtonsCmd = guildPluginMessageCommand<RoleButtonsPluginType>(
   async run({ pluginData, args, message }) {
     const config = pluginData.config.get();
     if (!config.buttons[args.name]) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(message, `Can't find role buttons with the name "${args.name}"`);
+      void pluginData.state.common.sendErrorMessage(message, `Can't find role buttons with the name "${args.name}"`);
       return;
     }
 
     await pluginData.state.roleButtons.deleteRoleButtonItem(args.name);
     await applyAllRoleButtons(pluginData);
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(message, "Done!");
+    void pluginData.state.common.sendSuccessMessage(message, "Done!");
   },
 });

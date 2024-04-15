@@ -6,6 +6,7 @@ import { resetButtonsCmd } from "./commands/resetButtons";
 import { onButtonInteraction } from "./events/buttonInteraction";
 import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { RoleButtonsPluginType, zRoleButtonsConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",
@@ -35,6 +36,10 @@ export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
 
   beforeLoad(pluginData) {
     pluginData.state.roleButtons = GuildRoleButtons.getGuildInstance(pluginData.guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

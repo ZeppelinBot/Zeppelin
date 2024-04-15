@@ -2,8 +2,7 @@ import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualMuteCmd } from "../../functions/actualCommands/actualMuteCmd";
+import { actualMuteCmd } from "./actualMuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
@@ -38,7 +37,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -48,9 +47,10 @@ export const MuteMsgCmd = modActionsMsgCmd({
       const _isBanned = await isBanned(pluginData, user.id);
       const prefix = pluginData.fullConfig.prefix;
       if (_isBanned) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(msg, `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`);
+        pluginData.state.common.sendErrorMessage(
+          msg,
+          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`
+        );
         return;
       } else {
         // Ask the mod if we should upgrade to a forcemute as the user is not on the server
@@ -61,7 +61,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
         );
 
         if (!reply) {
-          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "User not on server, mute cancelled by moderator");
+          pluginData.state.common.sendErrorMessage(msg, "User not on server, mute cancelled by moderator");
           return;
         }
       }
@@ -69,7 +69,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to mute this member
     if (memberToMute && !canActOn(pluginData, msg.member, memberToMute)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot mute: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(msg, "Cannot mute: insufficient permissions");
       return;
     }
 
@@ -79,7 +79,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
 
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
+        pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -91,7 +91,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
+      pluginData.state.common.sendErrorMessage(msg, e.message);
       return;
     }
 

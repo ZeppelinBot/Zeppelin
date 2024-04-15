@@ -1,4 +1,4 @@
-import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand } from "knub";
+import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";

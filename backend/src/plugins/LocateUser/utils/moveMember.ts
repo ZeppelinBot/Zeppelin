@@ -16,14 +16,10 @@ export async function moveMember(
         channel: target.voice.channelId,
       });
     } catch {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
+      void pluginData.state.common.sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
       return;
     }
   } else {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
+    void pluginData.state.common.sendErrorMessage(errorChannel, "Failed to move you. Are you in a voice channel?");
   }
 }

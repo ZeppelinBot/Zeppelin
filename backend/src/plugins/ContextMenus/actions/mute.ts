@@ -39,25 +39,21 @@ async function muteAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasMutePermission(executingMember, interaction.channelId))) {
-    await interactionToReply
-      .editReply({
-        content: "Cannot mute: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+    await interactionToReply.editReply({
+      content: "Cannot mute: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interactionToReply
-      .editReply({
-        content: "Cannot mute: insufficient permissions",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+    await interactionToReply.editReply({
+      content: "Cannot mute: insufficient permissions",
+      embeds: [],
+      components: [],
+    });
     return;
   }
 
@@ -78,17 +74,13 @@ async function muteAction(
       await updateAction(pluginData, executingMember, result.case!, evidence);
     }
 
-    await interactionToReply
-      .editReply({ content: muteMessage, embeds: [], components: [] })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+    await interactionToReply.editReply({ content: muteMessage, embeds: [], components: [] });
   } catch (e) {
-    await interactionToReply
-      .editReply({
-        content: "Plugin error, please check your BOT_ALERTs",
-        embeds: [],
-        components: [],
-      })
-      .catch((err) => logger.error(`Mute interaction reply failed: ${err}`));
+    await interactionToReply.editReply({
+      content: "Plugin error, please check your BOT_ALERTs",
+      embeds: [],
+      components: [],
+    });
 
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
       pluginData.getPlugin(LogsPlugin).logBotAlert({
@@ -134,9 +126,7 @@ export async function launchMuteActionModal(
       if (interaction.isButton()) {
         await submitted.deferUpdate().catch((err) => logger.error(`Mute interaction defer failed: ${err}`));
       } else if (interaction.isContextMenuCommand()) {
-        await submitted
-          .deferReply({ ephemeral: true })
-          .catch((err) => logger.error(`Mute interaction defer failed: ${err}`));
+        await submitted.deferReply({ ephemeral: true });
       }
 
       const duration = submitted.fields.getTextInputValue("duration");
@@ -144,6 +134,5 @@ export async function launchMuteActionModal(
       const evidence = submitted.fields.getTextInputValue("evidence");
 
       await muteAction(pluginData, duration, reason, evidence, target, interaction, submitted);
-    })
-    .catch((err) => logger.error(`Mute modal interaction failed: ${err}`));
+    });
 }

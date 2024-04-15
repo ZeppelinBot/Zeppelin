@@ -17,7 +17,7 @@ export const ScheduledPostsShowCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Scheduled post not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Scheduled post not found");
       return;
     }
 

@@ -51,7 +51,7 @@ export const JumboCmd = utilityCmd({
     let file: AttachmentBuilder | undefined;
 
     if (!isEmoji(args.emoji)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid emoji");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid emoji");
       return;
     }
 
@@ -87,7 +87,7 @@ export const JumboCmd = utilityCmd({
         }
       }
       if (!image) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Error occurred while jumboing default emoji");
+        void pluginData.state.common.sendErrorMessage(msg, "Error occurred while jumboing default emoji");
         return;
       }
 

@@ -19,6 +19,7 @@ import { offCounterEvent } from "./functions/offCounterEvent";
 import { onCounterEvent } from "./functions/onCounterEvent";
 import { setCounterValue } from "./functions/setCounterValue";
 import { CountersPluginType, zCountersConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 
@@ -125,6 +126,10 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
 
     // Mark old/unused triggers to be deleted later
     await state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

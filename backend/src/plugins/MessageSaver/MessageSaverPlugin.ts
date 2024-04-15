@@ -4,6 +4,7 @@ import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
 import { MessageSaverPluginType, zMessageSaverConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {
@@ -42,5 +43,9 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

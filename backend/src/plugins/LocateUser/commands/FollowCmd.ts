@@ -27,9 +27,7 @@ export const FollowCmd = locateUserCmd({
     const active = args.active || false;
 
     if (time < 30 * SECONDS) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, "Sorry, but the minimum duration for an alert is 30 seconds!");
+      void pluginData.state.common.sendErrorMessage(msg, "Sorry, but the minimum duration for an alert is 30 seconds!");
       return;
     }
 
@@ -48,18 +46,14 @@ export const FollowCmd = locateUserCmd({
     }
 
     if (active) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      void pluginData.state.common.sendSuccessMessage(
           msg,
           `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
             time,
           )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
         );
     } else {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      void pluginData.state.common.sendSuccessMessage(
           msg,
           `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
             time,

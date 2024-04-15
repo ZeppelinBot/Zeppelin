@@ -15,7 +15,7 @@ export const CountersListCmd = guildPluginMessageCommand<CountersPluginType>()({
 
     const countersToShow = Array.from(Object.values(config.counters)).filter((c) => c.can_view !== false);
     if (!countersToShow.length) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "No counters are configured for this server");
+      void pluginData.state.common.sendErrorMessage(message, "No counters are configured for this server");
       return;
     }
 

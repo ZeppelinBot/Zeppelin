@@ -11,6 +11,7 @@ import { getMemberTz } from "./functions/getMemberTz";
 import { inGuildTz } from "./functions/inGuildTz";
 import { inMemberTz } from "./functions/inMemberTz";
 import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {
@@ -56,5 +57,9 @@ export const TimeAndDatePlugin = guildPlugin<TimeAndDatePluginType>()({
     const { state, guild } = pluginData;
 
     state.memberTimezones = GuildMemberTimezones.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

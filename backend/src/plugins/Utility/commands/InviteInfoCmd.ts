@@ -18,7 +18,7 @@ export const InviteInfoCmd = utilityCmd({
     const inviteCode = parseInviteCodeInput(args.inviteCode);
     const embed = await getInviteInfoEmbed(pluginData, inviteCode);
     if (!embed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Unknown invite");
+      void pluginData.state.common.sendErrorMessage(message, "Unknown invite");
       return;
     }
 

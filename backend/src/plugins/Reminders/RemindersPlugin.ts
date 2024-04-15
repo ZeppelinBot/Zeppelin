@@ -7,6 +7,7 @@ import { RemindersCmd } from "./commands/RemindersCmd";
 import { RemindersDeleteCmd } from "./commands/RemindersDeleteCmd";
 import { postReminder } from "./functions/postReminder";
 import { RemindersPluginType, zRemindersConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<RemindersPluginType> = {
   config: {
@@ -42,6 +43,10 @@ export const RemindersPlugin = guildPlugin<RemindersPluginType>()({
     state.reminders = GuildReminders.getGuildInstance(guild.id);
     state.tries = new Map();
     state.unloaded = false;
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

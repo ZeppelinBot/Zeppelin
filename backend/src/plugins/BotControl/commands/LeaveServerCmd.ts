@@ -17,7 +17,7 @@ export const LeaveServerCmd = botControlCmd({
 
   async run({ pluginData, message: msg, args }) {
     if (!pluginData.client.guilds.cache.has(args.guildId as Snowflake)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "I am not in that guild");
+      void msg.channel.send("I am not in that guild");
       return;
     }
 
@@ -27,10 +27,10 @@ export const LeaveServerCmd = botControlCmd({
     try {
       await pluginData.client.guilds.cache.get(args.guildId as Snowflake)?.leave();
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to leave guild: ${e.message}`);
+      void msg.channel.send(`Failed to leave guild: ${e.message}`);
       return;
     }
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Left guild **${guildName}**`);
+    void msg.channel.send(`Left guild **${guildName}**`);
   },
 });

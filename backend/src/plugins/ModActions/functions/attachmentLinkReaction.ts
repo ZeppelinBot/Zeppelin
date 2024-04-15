@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, Message, TextBasedChannel } from "discord.js";
 import { AnyPluginData, GuildPluginData } from "knub";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../types";
 
 export function shouldReactToAttachmentLink(pluginData: GuildPluginData<ModActionsPluginType>) {
@@ -22,16 +21,14 @@ export function sendAttachmentLinkDetectionErrorMessage(
   context: TextBasedChannel | Message | ChatInputCommandInteraction,
   restricted = false,
 ) {
-  const emoji = pluginData.getPlugin(CommonPlugin).getErrorEmoji();
+  const emoji = pluginData.state.common.getErrorEmoji();
 
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendErrorMessage(
-      context,
-      "You manually added a Discord attachment link to the reason. This link will only work for a limited time.\n" +
-        "You should instead **re-upload** the attachment with the command, in the same message.\n\n" +
-        (restricted ? `${emoji} **Command canceled.** ${emoji}` : "").trim(),
-    );
+  pluginData.state.common.sendErrorMessage(
+    context,
+    "You manually added a Discord attachment link to the reason. This link will only work for a limited time.\n" +
+      "You should instead **re-upload** the attachment with the command, in the same message.\n\n" +
+      (restricted ? `${emoji} **Command canceled.** ${emoji}` : "").trim(),
+  );
 }
 
 export async function handleAttachmentLinkDetectionAndGetRestriction(

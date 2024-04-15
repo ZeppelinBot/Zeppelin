@@ -14,12 +14,12 @@ export const DisableAutoReactionsCmd = autoReactionsCmd({
   async run({ message: msg, args, pluginData }) {
     const autoReaction = await pluginData.state.autoReactions.getForChannel(args.channelId);
     if (!autoReaction) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Auto-reactions aren't enabled in <#${args.channelId}>`);
+      void pluginData.state.common.sendErrorMessage(msg, `Auto-reactions aren't enabled in <#${args.channelId}>`);
       return;
     }
 
     await pluginData.state.autoReactions.removeFromChannel(args.channelId);
     pluginData.state.cache.delete(args.channelId);
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Auto-reactions disabled in <#${args.channelId}>`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Auto-reactions disabled in <#${args.channelId}>`);
   },
 });

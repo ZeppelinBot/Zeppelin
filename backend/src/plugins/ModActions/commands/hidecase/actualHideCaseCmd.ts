@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 export async function actualHideCaseCmd(
@@ -21,7 +20,7 @@ export async function actualHideCaseCmd(
   }
 
   if (failed.length === caseNumbers.length) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "None of the cases were found!");
+    pluginData.state.common.sendErrorMessage(context, "None of the cases were found!");
     return;
   }
   const failedAddendum =
@@ -30,9 +29,7 @@ export async function actualHideCaseCmd(
       : "";
 
   const amt = caseNumbers.length - failed.length;
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(
+  pluginData.state.common.sendSuccessMessage(
       context,
       `${amt} case${amt === 1 ? " is" : "s are"} now hidden! Use \`unhidecase\` to unhide them.${failedAddendum}`,
     );

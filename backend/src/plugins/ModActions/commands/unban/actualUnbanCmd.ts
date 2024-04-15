@@ -5,12 +5,11 @@ import { LogType } from "../../../../data/LogType";
 import { clearExpiringTempban } from "../../../../data/loops/expiringTempbansLoop";
 import { UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { ignoreEvent } from "../ignoreEvent";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ignoreEvent } from "../../functions/ignoreEvent";
 
 export async function actualUnbanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -32,9 +31,10 @@ export async function actualUnbanCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
     await pluginData.guild.bans.remove(user.id as Snowflake, formattedReason ?? undefined);
   } catch {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(context, "Failed to unban member; are you sure they're banned?");
+    pluginData.state.common.sendErrorMessage(
+      context,
+      "Failed to unban member; are you sure they're banned?"
+    );
     return;
   }
 
@@ -56,7 +56,7 @@ export async function actualUnbanCmd(
   }
 
   // Confirm the action
-  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Member unbanned (Case #${createdCase.case_number})`);
+  pluginData.state.common.sendSuccessMessage(context, `Member unbanned (Case #${createdCase.case_number})`);
 
   // Log the action
   pluginData.getPlugin(LogsPlugin).logMemberUnban({

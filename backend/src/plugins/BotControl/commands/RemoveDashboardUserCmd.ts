@@ -19,7 +19,7 @@ export const RemoveDashboardUserCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Server is not using Zeppelin");
+      void msg.channel.send("Server is not using Zeppelin");
       return;
     }
 
@@ -37,11 +37,8 @@ export const RemoveDashboardUserCmd = botControlCmd({
 
     const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`)`);
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(
-        msg,
-        `The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`,
-      );
+    msg.channel.send(
+      `The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`,
+    );
   },
 });

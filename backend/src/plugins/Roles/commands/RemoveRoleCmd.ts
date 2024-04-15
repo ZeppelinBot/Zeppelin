@@ -19,21 +19,19 @@ export const RemoveRoleCmd = rolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member, true)) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, "Cannot remove roles from this user: insufficient permissions");
+      void pluginData.state.common.sendErrorMessage(msg, "Cannot remove roles from this user: insufficient permissions");
       return;
     }
 
     const roleId = await resolveRoleId(pluginData.client, pluginData.guild.id, args.role);
     if (!roleId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid role id");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid role id");
       return;
     }
 
     const config = await pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You cannot remove that role");
+      void pluginData.state.common.sendErrorMessage(msg, "You cannot remove that role");
       return;
     }
 
@@ -43,12 +41,12 @@ export const RemoveRoleCmd = rolesCmd({
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You cannot remove that role");
+      void pluginData.state.common.sendErrorMessage(msg, "You cannot remove that role");
       return;
     }
 
     if (!args.member.roles.cache.has(roleId)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Member doesn't have that role");
+      void pluginData.state.common.sendErrorMessage(msg, "Member doesn't have that role");
       return;
     }
 
@@ -59,8 +57,6 @@ export const RemoveRoleCmd = rolesCmd({
       roles: [role],
     });
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, `Removed role **${role.name}** from ${verboseUserMention(args.member.user)}!`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Removed role **${role.name}** from ${verboseUserMention(args.member.user)}!`);
   },
 });

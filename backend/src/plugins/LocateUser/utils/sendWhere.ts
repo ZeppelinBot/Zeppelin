@@ -22,7 +22,7 @@ export async function sendWhere(
     try {
       invite = await createOrReuseInvite(voice);
     } catch {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(channel, "Cannot create an invite to that channel!");
+      void pluginData.state.common.sendErrorMessage(channel, "Cannot create an invite to that channel!");
       return;
     }
     channel.send({

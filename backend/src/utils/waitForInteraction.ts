@@ -34,13 +34,11 @@ export async function waitForButtonConfirm(
         .setCustomId(`cancelButton:${idMod}:${uuidv4()}`),
     ]);
     const sendMethod = () => {
-      return contextIsInteraction
-        ? context.replied
-          ? context.editReply.bind(context)
-          : context.reply.bind(context)
-        : "send" in context
-        ? context.send.bind(context)
-        : context.channel.send.bind(context.channel);
+      if (contextIsInteraction) {
+        return context.replied ? context.editReply.bind(context) : context.reply.bind(context);
+      } else {
+        return "send" in context ? context.send.bind(context) : context.channel.send.bind(context.channel);
+      }
     };
     const extraParameters = contextIsInteraction ? { fetchReply: true, ephemeral: true } : {};
     const message = (await sendMethod()({ ...toPost, components: [row], ...extraParameters })) as Message;

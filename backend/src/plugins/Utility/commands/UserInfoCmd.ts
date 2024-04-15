@@ -19,7 +19,7 @@ export const UserInfoCmd = utilityCmd({
     const userId = args.user?.id || message.author.id;
     const embed = await getUserInfoEmbed(pluginData, userId, args.compact);
     if (!embed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "User not found");
+      void pluginData.state.common.sendErrorMessage(message, "User not found");
       return;
     }
 

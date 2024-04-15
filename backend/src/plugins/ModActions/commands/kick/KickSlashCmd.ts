@@ -3,8 +3,7 @@ import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualKickCmd } from "../../functions/actualCommands/actualKickCmd";
+import { actualKickCmd } from "./actualKickCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
@@ -51,9 +50,13 @@ export const KickSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
+      pluginData.state.common.sendErrorMessage(
+        interaction,
+        "Text or attachment required",
+        undefined,
+        undefined,
+        true
+      );
 
       return;
     }
@@ -66,9 +69,10 @@ export const KickSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
+        pluginData.state.common.sendErrorMessage(
+          interaction,
+          "You don't have permission to act as another moderator"
+        );
         return;
       }
 
@@ -79,7 +83,7 @@ export const KickSlashCmd = modActionsSlashCmd({
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
+      pluginData.state.common.sendErrorMessage(interaction, e.message);
       return;
     }
 

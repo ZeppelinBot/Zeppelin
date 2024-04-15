@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { actualCasesCmd } from "../../functions/actualCommands/actualCasesCmd";
+import { actualCasesCmd } from "./actualCasesCmd";
 import { modActionsMsgCmd } from "../../types";
 
 const opts = {

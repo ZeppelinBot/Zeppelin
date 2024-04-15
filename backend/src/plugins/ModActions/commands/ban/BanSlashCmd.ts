@@ -3,8 +3,7 @@ import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualBanCmd } from "../../functions/actualCommands/actualBanCmd";
+import { actualBanCmd } from "./actualBanCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
@@ -52,9 +51,13 @@ export const BanSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
+      pluginData.state.common.sendErrorMessage(
+        interaction,
+        "Text or attachment required",
+        undefined,
+        undefined,
+        true
+      );
 
       return;
     }
@@ -67,9 +70,10 @@ export const BanSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
+        pluginData.state.common.sendErrorMessage(
+          interaction,
+          "You don't have permission to act as another moderator"
+        );
         return;
       }
 
@@ -80,13 +84,13 @@ export const BanSlashCmd = modActionsSlashCmd({
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
+      pluginData.state.common.sendErrorMessage(interaction, e.message);
       return;
     }
 
     const convertedTime = options.time ? convertDelayStringToMS(options.time) : null;
     if (options.time && !convertedTime) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
+      pluginData.state.common.sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
       return;
     }
 

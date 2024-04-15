@@ -61,15 +61,11 @@ export async function launchCleanActionModal(
   await interaction
     .awaitModalSubmit({ time: MODAL_TIMEOUT, filter: (i) => i.customId == modalId })
     .then(async (submitted) => {
-      await submitted
-        .deferReply({ ephemeral: true })
-        .catch((err) => logger.error(`Clean interaction defer failed: ${err}`));
+      await submitted.deferReply({ ephemeral: true });
 
       const amount = submitted.fields.getTextInputValue("amount");
       if (isNaN(Number(amount))) {
-        interaction
-          .editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] })
-          .catch((err) => logger.error(`Clean interaction reply failed: ${err}`));
+        interaction.editReply({ content: `Error: Amount '${amount}' is invalid`, embeds: [], components: [] });
         return;
       }
 
@@ -81,6 +77,5 @@ export async function launchCleanActionModal(
         interaction.channelId,
         submitted,
       );
-    })
-    .catch((err) => logger.error(`Clean modal interaction failed: ${err}`));
+    });
 }

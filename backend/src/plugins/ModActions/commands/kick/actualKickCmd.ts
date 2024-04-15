@@ -3,13 +3,12 @@ import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType";
 import { canActOn } from "../../../../pluginUtils";
 import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { ignoreEvent } from "../ignoreEvent";
-import { isBanned } from "../isBanned";
-import { kickMember } from "../kickMember";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ignoreEvent } from "../../functions/ignoreEvent";
+import { isBanned } from "../../functions/isBanned";
+import { kickMember } from "../../functions/kickMember";
 
 export async function actualKickCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -31,9 +30,9 @@ export async function actualKickCmd(
   if (!memberToKick) {
     const banned = await isBanned(pluginData, user.id);
     if (banned) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `User is banned`);
+      pluginData.state.common.sendErrorMessage(context, `User is banned`);
     } else {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `User not found on the server`);
+      pluginData.state.common.sendErrorMessage(context, `User not found on the server`);
     }
 
     return;
@@ -41,7 +40,7 @@ export async function actualKickCmd(
 
   // Make sure we're allowed to kick this member
   if (!canActOn(pluginData, author, memberToKick)) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Cannot kick: insufficient permissions");
+    pluginData.state.common.sendErrorMessage(context, "Cannot kick: insufficient permissions");
     return;
   }
 
@@ -63,7 +62,7 @@ export async function actualKickCmd(
     try {
       await memberToKick.ban({ deleteMessageSeconds: (1 * DAYS) / SECONDS, reason: "kick -clean" });
     } catch {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Failed to ban the user to clean messages (-clean)");
+      pluginData.state.common.sendErrorMessage(context, "Failed to ban the user to clean messages (-clean)");
     }
 
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, memberToKick.id);
@@ -72,14 +71,14 @@ export async function actualKickCmd(
     try {
       await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(context, "Failed to unban the user after banning them (-clean)");
+      pluginData.state.common.sendErrorMessage(
+        context,
+        "Failed to unban the user after banning them (-clean)");
     }
   }
 
   if (kickResult.status === "failed") {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Failed to kick user`);
+    pluginData.state.common.sendErrorMessage(context, `Failed to kick user`);
     return;
   }
 
@@ -87,5 +86,5 @@ export async function actualKickCmd(
   let response = `Kicked **${renderUsername(memberToKick.user)}** (Case #${kickResult.case.case_number})`;
 
   if (kickResult.notifyResult.text) response += ` (${kickResult.notifyResult.text})`;
-  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);
+  pluginData.state.common.sendSuccessMessage(context, response);
 }

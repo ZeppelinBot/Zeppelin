@@ -15,7 +15,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
   async run({ message: msg, args, pluginData }) {
     const existingReactionRoles = pluginData.state.reactionRoles.getForMessage(args.message.messageId);
     if (!existingReactionRoles) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Message doesn't have reaction roles on it");
+      void pluginData.state.common.sendErrorMessage(msg, "Message doesn't have reaction roles on it");
       return;
     }
 
@@ -26,7 +26,7 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
       targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     } catch (err) {
       if (isDiscordAPIError(err) && err.code === 50001) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Missing access to the specified message");
+        void pluginData.state.common.sendErrorMessage(msg, "Missing access to the specified message");
         return;
       }
 
@@ -35,6 +35,6 @@ export const ClearReactionRolesCmd = reactionRolesCmd({
 
     await targetMessage.reactions.removeAll();
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Reaction roles cleared");
+    void pluginData.state.common.sendSuccessMessage(msg, "Reaction roles cleared");
   },
 });

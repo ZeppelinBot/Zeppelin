@@ -1,8 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualUnmuteCmd } from "../../functions/actualCommands/actualUnmuteCmd";
+import { actualUnmuteCmd } from "../unmute/actualUnmuteCmd";
 import { modActionsMsgCmd } from "../../types";
 
 const opts = {
@@ -33,13 +32,13 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
 
     // Check if they're muted in the first place
     if (!(await pluginData.state.mutes.isMuted(user.id))) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: member is not muted");
+      pluginData.state.common.sendErrorMessage(msg, "Cannot unmute: member is not muted");
       return;
     }
 
@@ -48,7 +47,7 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to unmute this member
     if (memberToUnmute && !canActOn(pluginData, msg.member, memberToUnmute)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot unmute: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(msg, "Cannot unmute: insufficient permissions");
       return;
     }
 
@@ -58,7 +57,7 @@ export const ForceUnmuteMsgCmd = modActionsMsgCmd({
 
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
+        pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 

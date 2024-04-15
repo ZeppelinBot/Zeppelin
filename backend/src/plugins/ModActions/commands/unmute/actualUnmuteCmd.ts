@@ -2,11 +2,10 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } f
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -35,14 +34,14 @@ export async function actualUnmuteCmd(
   });
 
   if (!result) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "User is not muted!");
+    pluginData.state.common.sendErrorMessage(context, "User is not muted!");
     return;
   }
 
   // Confirm the action to the moderator
   if (time) {
     const timeUntilUnmute = time && humanizeDuration(time);
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
+    pluginData.state.common.sendSuccessMessage(
       context,
       asSingleLine(`
         Unmuting **${renderUsername(user)}**
@@ -50,7 +49,7 @@ export async function actualUnmuteCmd(
       `),
     );
   } else {
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(
+    pluginData.state.common.sendSuccessMessage(
       context,
       asSingleLine(`
         Unmuted **${renderUsername(user)}**

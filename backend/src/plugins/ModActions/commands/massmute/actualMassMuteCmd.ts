@@ -3,12 +3,11 @@ import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType";
 import { logger } from "../../../../logger";
 import { canActOn, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 
 export async function actualMassMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -20,7 +19,7 @@ export async function actualMassMuteCmd(
 ) {
   // Limit to 100 users at once (arbitrary?)
   if (userIds.length > 100) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Can only massmute max 100 users at once`);
+    pluginData.state.common.sendErrorMessage(context, `Can only massmute max 100 users at once`);
     return;
   }
 
@@ -35,9 +34,10 @@ export async function actualMassMuteCmd(
   for (const userId of userIds) {
     const member = pluginData.guild.members.cache.get(userId as Snowflake);
     if (member && !canActOn(pluginData, author, member)) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(context, "Cannot massmute one or more users: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(
+        context,
+        "Cannot massmute one or more users: insufficient permissions"
+      );
       return;
     }
   }
@@ -77,7 +77,7 @@ export async function actualMassMuteCmd(
   const successfulMuteCount = userIds.length - failedMutes.length;
   if (successfulMuteCount === 0) {
     // All mutes failed
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "All mutes failed. Make sure the IDs are valid.");
+    pluginData.state.common.sendErrorMessage(context, "All mutes failed. Make sure the IDs are valid.");
   } else {
     // Success on all or some mutes
     pluginData.getPlugin(LogsPlugin).logMassMute({
@@ -86,14 +86,12 @@ export async function actualMassMuteCmd(
     });
 
     if (failedMutes.length) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      pluginData.state.common.sendSuccessMessage(
           context,
           `Muted ${successfulMuteCount} users, ${failedMutes.length} failed: ${failedMutes.join(" ")}`,
         );
     } else {
-      pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Muted ${successfulMuteCount} users successfully`);
+      pluginData.state.common.sendSuccessMessage(context, `Muted ${successfulMuteCount} users successfully`);
     }
   }
 }

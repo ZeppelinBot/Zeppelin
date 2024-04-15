@@ -3,8 +3,7 @@ import { slashOptions } from "knub";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualWarnCmd } from "../../functions/actualCommands/actualWarnCmd";
+import { actualWarnCmd } from "./actualWarnCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
@@ -47,9 +46,13 @@ export const WarnSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      await pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
+      await pluginData.state.common.sendErrorMessage(
+        interaction,
+        "Text or attachment required",
+        undefined,
+        undefined,
+        true
+      );
 
       return;
     }
@@ -59,9 +62,9 @@ export const WarnSlashCmd = modActionsSlashCmd({
     if (!memberToWarn) {
       const _isBanned = await isBanned(pluginData, options.user.id);
       if (_isBanned) {
-        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User is banned`);
+        await pluginData.state.common.sendErrorMessage(interaction, `User is banned`);
       } else {
-        await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `User not found on the server`);
+        await pluginData.state.common.sendErrorMessage(interaction, `User not found on the server`);
       }
 
       return;
@@ -69,7 +72,7 @@ export const WarnSlashCmd = modActionsSlashCmd({
 
     // Make sure we're allowed to warn this member
     if (!canActOn(pluginData, interaction.member as GuildMember, memberToWarn)) {
-      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot warn: insufficient permissions");
+      await pluginData.state.common.sendErrorMessage(interaction, "Cannot warn: insufficient permissions");
       return;
     }
 
@@ -81,9 +84,10 @@ export const WarnSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        await pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
+        await pluginData.state.common.sendErrorMessage(
+          interaction,
+          "You don't have permission to act as another moderator"
+        );
         return;
       }
 
@@ -94,7 +98,7 @@ export const WarnSlashCmd = modActionsSlashCmd({
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
+      await pluginData.state.common.sendErrorMessage(interaction, e.message);
       return;
     }
 

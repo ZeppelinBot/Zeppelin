@@ -19,7 +19,7 @@ export const DisallowServerCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const existing = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!existing) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "That server is not allowed in the first place!");
+      void msg.channel.send("That server is not allowed in the first place!");
       return;
     }
 
@@ -28,6 +28,6 @@ export const DisallowServerCmd = botControlCmd({
       .get(args.guildId as Snowflake)
       ?.leave()
       .catch(noop);
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Server removed!");
+    void msg.channel.send("Server removed!");
   },
 });

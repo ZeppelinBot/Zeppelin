@@ -17,12 +17,12 @@ export const ScheduledPostsDeleteCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Scheduled post not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Scheduled post not found");
       return;
     }
 
     clearUpcomingScheduledPost(post);
     await pluginData.state.scheduledPosts.delete(post.id);
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Scheduled post deleted!");
+    void pluginData.state.common.sendSuccessMessage(msg, "Scheduled post deleted!");
   },
 });

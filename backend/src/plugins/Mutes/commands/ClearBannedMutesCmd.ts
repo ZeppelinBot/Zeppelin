@@ -25,6 +25,6 @@ export const ClearBannedMutesCmd = mutesCmd({
       }
     }
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Cleared ${cleared} mutes from banned users!`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Cleared ${cleared} mutes from banned users!`);
   },
 });

@@ -6,6 +6,7 @@ import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
 import { AutoReactionsPluginType, zAutoReactionsConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -50,4 +51,8 @@ export const AutoReactionsPlugin = guildPlugin<AutoReactionsPluginType>()({
     state.autoReactions = GuildAutoReactions.getGuildInstance(guild.id);
     state.cache = new Map();
   },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+  }
 });

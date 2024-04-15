@@ -13,7 +13,7 @@ export const ListFollowCmd = locateUserCmd({
   async run({ message: msg, pluginData }) {
     const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.member.id);
     if (alerts.length === 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You have no active alerts!");
+      void pluginData.state.common.sendErrorMessage(msg, "You have no active alerts!");
       return;
     }
 
@@ -46,7 +46,7 @@ export const DeleteFollowCmd = locateUserCmd({
     alerts.sort(sorter("expires_at"));
 
     if (args.num > alerts.length || args.num <= 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown alert!");
+      void pluginData.state.common.sendErrorMessage(msg, "Unknown alert!");
       return;
     }
 
@@ -54,6 +54,6 @@ export const DeleteFollowCmd = locateUserCmd({
     clearExpiringVCAlert(toDelete);
     await pluginData.state.alerts.delete(toDelete.id);
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Alert deleted");
+    void pluginData.state.common.sendSuccessMessage(msg, "Alert deleted");
   },
 });

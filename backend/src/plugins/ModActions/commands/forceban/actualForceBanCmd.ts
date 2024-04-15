@@ -4,12 +4,11 @@ import { CaseTypes } from "../../../../data/CaseTypes";
 import { LogType } from "../../../../data/LogType";
 import { DAYS, MINUTES, UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { ignoreEvent } from "../ignoreEvent";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ignoreEvent } from "../../functions/ignoreEvent";
 
 export async function actualForceBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -37,7 +36,7 @@ export async function actualForceBanCmd(
       reason: formattedReasonWithAttachments ?? undefined,
     });
   } catch {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Failed to forceban member");
+    pluginData.state.common.sendErrorMessage(context, "Failed to forceban member");
     return;
   }
 
@@ -52,9 +51,7 @@ export async function actualForceBanCmd(
   });
 
   // Confirm the action
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(context, `Member forcebanned (Case #${createdCase.case_number})`);
+  pluginData.state.common.sendSuccessMessage(context, `Member forcebanned (Case #${createdCase.case_number})`);
 
   // Log the action
   pluginData.getPlugin(LogsPlugin).logMemberForceban({

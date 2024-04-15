@@ -29,7 +29,7 @@ export const TagEvalCmd = tagsCmd({
       )) as MessageCreateOptions;
 
       if (!rendered.content && !rendered.embeds?.length) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Evaluation resulted in an empty text");
+        void pluginData.state.common.sendErrorMessage(msg, "Evaluation resulted in an empty text");
         return;
       }
 
@@ -37,7 +37,7 @@ export const TagEvalCmd = tagsCmd({
     } catch (e) {
       const errorMessage = e instanceof TemplateParseError ? e.message : "Internal error";
 
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to render tag: ${errorMessage}`);
+      void pluginData.state.common.sendErrorMessage(msg, `Failed to render tag: ${errorMessage}`);
 
       if (!(e instanceof TemplateParseError)) {
         logger.warn(`Internal error evaluating tag in ${pluginData.guild.id}: ${e}`);

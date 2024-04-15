@@ -1,6 +1,5 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 export async function actualUnhideCaseCmd(
@@ -21,7 +20,7 @@ export async function actualUnhideCaseCmd(
   }
 
   if (failed.length === caseNumbers.length) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "None of the cases were found!");
+    pluginData.state.common.sendErrorMessage(context, "None of the cases were found!");
     return;
   }
 
@@ -31,7 +30,8 @@ export async function actualUnhideCaseCmd(
       : "";
 
   const amt = caseNumbers.length - failed.length;
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(context, `${amt} case${amt === 1 ? " is" : "s are"} no longer hidden!${failedAddendum}`);
+  pluginData.state.common.sendSuccessMessage(
+    context,
+    `${amt} case${amt === 1 ? " is" : "s are"} no longer hidden!${failedAddendum}`
+  );
 }

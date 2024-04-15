@@ -9,8 +9,8 @@ import {
 } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { canActOn } from "src/pluginUtils";
-import { ModActionsPlugin } from "src/plugins/ModActions/ModActionsPlugin";
+import { canActOn } from "../../../pluginUtils";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { logger } from "../../../logger";
 import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
@@ -36,17 +36,13 @@ async function banAction(
 
   const modactions = pluginData.getPlugin(ModActionsPlugin);
   if (!userCfg.can_use || !(await modactions.hasBanPermission(executingMember, interaction.channelId))) {
-    await interactionToReply
-      .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
-      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
+    await interactionToReply.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
   const targetMember = await pluginData.guild.members.fetch(target);
   if (!canActOn(pluginData, executingMember, targetMember)) {
-    await interactionToReply
-      .editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] })
-      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
+    await interactionToReply.editReply({ content: "Cannot ban: insufficient permissions", embeds: [], components: [] });
     return;
   }
 
@@ -57,9 +53,7 @@ async function banAction(
   const durationMs = duration ? convertDelayStringToMS(duration)! : undefined;
   const result = await modactions.banUserId(target, reason, reason, { caseArgs }, durationMs);
   if (result.status === "failed") {
-    await interactionToReply
-      .editReply({ content: "Error: Failed to ban user", embeds: [], components: [] })
-      .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
+    await interactionToReply.editReply({ content: "Error: Failed to ban user", embeds: [], components: [] });
     return;
   }
 
@@ -73,9 +67,7 @@ async function banAction(
     await updateAction(pluginData, executingMember, result.case, evidence);
   }
 
-  await interactionToReply
-    .editReply({ content: banMessage, embeds: [], components: [] })
-    .catch((err) => logger.error(`Ban interaction reply failed: ${err}`));
+  await interactionToReply.editReply({ content: banMessage, embeds: [], components: [] });
 }
 
 export async function launchBanActionModal(
@@ -112,9 +104,7 @@ export async function launchBanActionModal(
       if (interaction.isButton()) {
         await submitted.deferUpdate().catch((err) => logger.error(`Ban interaction defer failed: ${err}`));
       } else if (interaction.isContextMenuCommand()) {
-        await submitted
-          .deferReply({ ephemeral: true })
-          .catch((err) => logger.error(`Ban interaction defer failed: ${err}`));
+        await submitted.deferReply({ ephemeral: true });
       }
 
       const duration = submitted.fields.getTextInputValue("duration");
@@ -122,6 +112,5 @@ export async function launchBanActionModal(
       const evidence = submitted.fields.getTextInputValue("evidence");
 
       await banAction(pluginData, duration, reason, evidence, target, interaction, submitted);
-    })
-    .catch((err) => logger.error(`Ban modal interaction failed: ${err}`));
+    });
 }

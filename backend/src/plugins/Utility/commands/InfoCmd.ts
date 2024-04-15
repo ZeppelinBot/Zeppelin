@@ -146,11 +146,9 @@ export const InfoCmd = utilityCmd({
     }
 
     // 10. No can do
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(
-        message,
-        "Could not find anything with that value or you are lacking permission for the snowflake type",
-      );
+    void pluginData.state.common.sendErrorMessage(
+      message,
+      "Could not find anything with that value or you are lacking permission for the snowflake type",
+    );
   },
 });

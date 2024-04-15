@@ -7,6 +7,7 @@ import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
 import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
 import { RolesPluginType, zRolesConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {
@@ -49,5 +50,9 @@ export const RolesPlugin = guildPlugin<RolesPluginType>()({
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

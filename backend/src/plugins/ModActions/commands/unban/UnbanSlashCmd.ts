@@ -3,8 +3,7 @@ import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
 import { resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualUnbanCmd } from "../../functions/actualCommands/actualUnbanCmd";
+import { actualUnbanCmd } from "./actualUnbanCmd";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
 
@@ -30,9 +29,13 @@ export const UnbanSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
+      pluginData.state.common.sendErrorMessage(
+        interaction,
+        "Text or attachment required",
+        undefined,
+        undefined,
+        true
+      );
 
       return;
     }
@@ -45,9 +48,10 @@ export const UnbanSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
+        pluginData.state.common.sendErrorMessage(
+          interaction,
+          "You don't have permission to act as another moderator"
+        );
         return;
       }
 

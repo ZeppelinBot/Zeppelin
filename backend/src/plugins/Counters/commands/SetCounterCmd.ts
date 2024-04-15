@@ -45,22 +45,22 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
     const counter = config.counters[args.counterName];
     const counterId = pluginData.state.counterIds[args.counterName];
     if (!counter || !counterId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, `Unknown counter: ${args.counterName}`);
+      void pluginData.state.common.sendErrorMessage(message, `Unknown counter: ${args.counterName}`);
       return;
     }
 
     if (counter.can_edit === false) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, `Missing permissions to edit this counter's value`);
+      void pluginData.state.common.sendErrorMessage(message, `Missing permissions to edit this counter's value`);
       return;
     }
 
     if (args.channel && !counter.per_channel) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, `This counter is not per-channel`);
+      void pluginData.state.common.sendErrorMessage(message, `This counter is not per-channel`);
       return;
     }
 
     if (args.user && !counter.per_user) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, `This counter is not per-user`);
+      void pluginData.state.common.sendErrorMessage(message, `This counter is not per-user`);
       return;
     }
 
@@ -69,13 +69,13 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
       message.channel.send(`Which channel's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Cancelling");
         return;
       }
 
       const potentialChannel = pluginData.guild.channels.resolve(reply.content as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof TextChannel)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Channel is not a text channel, cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Channel is not a text channel, cancelling");
         return;
       }
 
@@ -87,13 +87,13 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
       message.channel.send(`Which user's counter value would you like to change?`);
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Cancelling");
         return;
       }
 
       const potentialUser = await resolveUser(pluginData.client, reply.content);
       if (!potentialUser || potentialUser instanceof UnknownUser) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Unknown user, cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Unknown user, cancelling");
         return;
       }
 
@@ -105,13 +105,13 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
       message.channel.send("What would you like to set the counter's value to?");
       const reply = await waitForReply(pluginData.client, message.channel, message.author.id);
       if (!reply || !reply.content) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Cancelling");
         return;
       }
 
       const potentialValue = parseInt(reply.content, 10);
       if (Number.isNaN(potentialValue)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Not a number, cancelling");
+        void pluginData.state.common.sendErrorMessage(message, "Not a number, cancelling");
         return;
       }
 
@@ -119,7 +119,7 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
     }
 
     if (value < 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Cannot set counter value below 0");
+      void pluginData.state.common.sendErrorMessage(message, "Cannot set counter value below 0");
       return;
     }
 

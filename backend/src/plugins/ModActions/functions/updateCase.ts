@@ -3,7 +3,6 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "./attachmentLinkReaction";
@@ -25,12 +24,12 @@ export async function updateCase(
   }
 
   if (!theCase) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Case not found");
+    pluginData.state.common.sendErrorMessage(context, "Case not found");
     return;
   }
 
   if (note.length === 0 && attachments.length === 0) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Text or attachment required");
+    pluginData.state.common.sendErrorMessage(context, "Text or attachment required");
     return;
   }
 
@@ -54,5 +53,5 @@ export async function updateCase(
     note: formattedNote,
   });
 
-  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, `Case \`#${theCase.case_number}\` updated`);
+  pluginData.state.common.sendSuccessMessage(context, `Case \`#${theCase.case_number}\` updated`);
 }

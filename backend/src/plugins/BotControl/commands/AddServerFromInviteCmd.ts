@@ -18,21 +18,19 @@ export const AddServerFromInviteCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const invite = await resolveInvite(pluginData.client, args.inviteCode, true);
     if (!invite || !isGuildInvite(invite)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Could not resolve invite"); // :D
+      void msg.channel.send("Could not resolve invite"); // :D
       return;
     }
 
     const existing = await pluginData.state.allowedGuilds.find(invite.guild.id);
     if (existing) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Server is already allowed!");
+      void msg.channel.send("Server is already allowed!");
       return;
     }
 
     const { result, explanation } = await isEligible(pluginData, args.user, invite);
     if (!result) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, `Could not add server because it's not eligible: ${explanation}`);
+      msg.channel.send(`Could not add server because it's not eligible: ${explanation}`);
       return;
     }
 
@@ -53,8 +51,6 @@ export const AddServerFromInviteCmd = botControlCmd({
       );
     }
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, "Server was eligible and is now allowed to use Zeppelin!");
+    msg.channel.send("Server was eligible and is now allowed to use Zeppelin!");
   },
 });

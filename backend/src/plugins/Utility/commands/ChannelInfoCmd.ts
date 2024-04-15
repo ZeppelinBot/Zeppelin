@@ -16,7 +16,7 @@ export const ChannelInfoCmd = utilityCmd({
   async run({ message, args, pluginData }) {
     const embed = await getChannelInfoEmbed(pluginData, args.channel);
     if (!embed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Unknown channel");
+      void pluginData.state.common.sendErrorMessage(message, "Unknown channel");
       return;
     }
 

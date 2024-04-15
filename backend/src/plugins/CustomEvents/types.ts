@@ -1,4 +1,4 @@
-import { BasePluginType } from "knub";
+import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils";
 import { zAddRoleAction } from "./actions/addRoleAction";
@@ -8,6 +8,7 @@ import { zMakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAct
 import { zMessageAction } from "./actions/messageAction";
 import { zMoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
 import { zSetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const zCommandTrigger = z.strictObject({
   type: z.literal("command"),
@@ -43,5 +44,6 @@ export interface CustomEventsPluginType extends BasePluginType {
   config: z.infer<typeof zCustomEventsConfig>;
   state: {
     clearTriggers: () => void;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

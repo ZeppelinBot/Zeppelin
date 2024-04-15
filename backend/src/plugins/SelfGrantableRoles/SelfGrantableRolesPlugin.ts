@@ -3,6 +3,7 @@ import { RoleAddCmd } from "./commands/RoleAddCmd";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd";
 import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
 import { SelfGrantableRolesPluginType, zSelfGrantableRolesConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   config: {
@@ -26,5 +27,9 @@ export const SelfGrantableRolesPlugin = guildPlugin<SelfGrantableRolesPluginType
 
   beforeLoad(pluginData) {
     pluginData.state.cooldowns = new CooldownManager();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

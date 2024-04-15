@@ -1,8 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualMuteCmd } from "../../functions/actualCommands/actualMuteCmd";
+import { actualMuteCmd } from "../mute/actualMuteCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
 
@@ -36,7 +35,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -44,7 +43,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
 
     // Make sure we're allowed to mute this user
     if (memberToMute && !canActOn(pluginData, msg.member, memberToMute)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot mute: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(msg, "Cannot mute: insufficient permissions");
       return;
     }
 
@@ -54,7 +53,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
 
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
+        pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -66,7 +65,7 @@ export const ForceMuteMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args);
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
+      pluginData.state.common.sendErrorMessage(msg, e.message);
       return;
     }
 

@@ -9,6 +9,7 @@ import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { LocateUserPluginType, zLocateUserConfig } from "./types";
 import { clearExpiredAlert } from "./utils/clearExpiredAlert";
 import { fillActiveAlertsList } from "./utils/fillAlertsList";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {
@@ -51,6 +52,10 @@ export const LocateUserPlugin = guildPlugin<LocateUserPluginType>()({
 
     state.alerts = GuildVCAlerts.getGuildInstance(guild.id);
     state.usersWithAlerts = [];
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

@@ -15,7 +15,7 @@ export const ReloadGlobalPluginsCmd = botControlCmd({
 
     const guildId = "guild" in message.channel ? message.channel.guild.id : null;
     if (!guildId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "This command can only be used in a server");
+      void message.channel.send("This command can only be used in a server");
       return;
     }
 

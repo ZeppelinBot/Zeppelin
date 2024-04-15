@@ -21,7 +21,7 @@ export const NamesCmd = nameHistoryCmd({
     const usernames = await pluginData.state.usernameHistory.getByUserId(args.userId);
 
     if (nicknames.length === 0 && usernames.length === 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No name history found");
+      void pluginData.state.common.sendErrorMessage(msg, "No name history found");
       return;
     }
 

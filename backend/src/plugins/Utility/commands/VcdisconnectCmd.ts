@@ -18,12 +18,12 @@ export const VcdisconnectCmd = utilityCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cannot move: insufficient permissions");
+      void pluginData.state.common.sendErrorMessage(msg, "Cannot move: insufficient permissions");
       return;
     }
 
     if (!args.member.voice?.channelId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Member is not in a voice channel");
+      void pluginData.state.common.sendErrorMessage(msg, "Member is not in a voice channel");
       return;
     }
     const channel = pluginData.guild.channels.cache.get(args.member.voice.channelId) as VoiceChannel;
@@ -31,7 +31,7 @@ export const VcdisconnectCmd = utilityCmd({
     try {
       await args.member.voice.disconnect();
     } catch {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Failed to disconnect member");
+      void pluginData.state.common.sendErrorMessage(msg, "Failed to disconnect member");
       return;
     }
 
@@ -41,8 +41,9 @@ export const VcdisconnectCmd = utilityCmd({
       oldChannel: channel,
     });
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, `**${renderUsername(args.member)}** disconnected from **${channel.name}**`);
+    pluginData.state.common.sendSuccessMessage(
+      msg,
+      `**${renderUsername(args.member)}** disconnected from **${channel.name}**`
+    );
   },
 });

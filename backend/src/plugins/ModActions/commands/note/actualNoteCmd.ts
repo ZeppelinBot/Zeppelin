@@ -3,11 +3,10 @@ import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { UnknownUser, renderUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 
 export async function actualNoteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -39,9 +38,7 @@ export async function actualNoteCmd(
     reason,
   });
 
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(
+  pluginData.state.common.sendSuccessMessage(
       context,
       `Note added on **${userName}** (Case #${createdCase.case_number})`,
       undefined,

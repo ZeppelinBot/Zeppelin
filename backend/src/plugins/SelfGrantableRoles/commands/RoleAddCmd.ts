@@ -39,11 +39,9 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       }, new Map());
 
     if (!rolesToAdd.size) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`, {
-          users: [msg.author.id],
-        });
+      void pluginData.state.common.sendErrorMessage(msg, `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`, {
+        users: [msg.author.id],
+      });
       lock.unlock();
       return;
     }
@@ -83,11 +81,9 @@ export const RoleAddCmd = selfGrantableRolesCmd({
         roles: Array.from(newRoleIds) as Snowflake[],
       });
     } catch {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, `<@!${msg.author.id}> Got an error while trying to grant you the roles`, {
-          users: [msg.author.id],
-        });
+      void pluginData.state.common.sendErrorMessage(msg, `<@!${msg.author.id}> Got an error while trying to grant you the roles`, {
+        users: [msg.author.id],
+      });
       return;
     }
 
@@ -118,7 +114,7 @@ export const RoleAddCmd = selfGrantableRolesCmd({
       messageParts.push("couldn't recognize some of the roles");
     }
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `<@!${msg.author.id}> ${messageParts.join("; ")}`, {
+    void pluginData.state.common.sendSuccessMessage(msg, `<@!${msg.author.id}> ${messageParts.join("; ")}`, {
       users: [msg.author.id],
     });
 

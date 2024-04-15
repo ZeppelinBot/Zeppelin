@@ -9,6 +9,7 @@ import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { MessageDeletedEvt } from "./events/MessageDeletedEvt";
 import { ReactionRolesPluginType, zReactionRolesConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 
@@ -61,6 +62,10 @@ export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
     state.roleChangeQueue = new Queue();
     state.pendingRoleChanges = new Map();
     state.pendingRefreshes = new Set();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

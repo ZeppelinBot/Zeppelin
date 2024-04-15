@@ -32,6 +32,6 @@ export const NicknameResetCmd = utilityCmd({
       return;
     }
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `The nickname of <@!${args.member.id}> has been reset`);
+    void pluginData.state.common.sendSuccessMessage(msg, `The nickname of <@!${args.member.id}> has been reset`);
   },
 });

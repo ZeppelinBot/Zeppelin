@@ -4,6 +4,7 @@ import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
 import { NamesCmd } from "./commands/NamesCmd";
 import { NameHistoryPluginType, zNameHistoryConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<NameHistoryPluginType> = {
   config: {
@@ -43,5 +44,9 @@ export const NameHistoryPlugin = guildPlugin<NameHistoryPluginType>()({
     state.nicknameHistory = GuildNicknameHistory.getGuildInstance(guild.id);
     state.usernameHistory = new UsernameHistory();
     state.updateQueue = new Queue();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

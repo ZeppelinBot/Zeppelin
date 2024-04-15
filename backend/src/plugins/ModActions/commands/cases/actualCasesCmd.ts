@@ -18,7 +18,6 @@ import { asyncMap } from "../../../../utils/async";
 import { createPaginatedMessage } from "../../../../utils/createPaginatedMessage";
 import { getGuildPrefix } from "../../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
 
 const casesPerPage = 5;
@@ -160,9 +159,13 @@ async function casesModCmd(
   const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters);
 
   if (totalCases === 0) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(context, `No cases by **${modName}**`, undefined, undefined, !show);
+    pluginData.state.common.sendErrorMessage(
+      context,
+      `No cases by **${modName}**`,
+      undefined,
+      undefined,
+      !show
+    );
 
     return;
   }

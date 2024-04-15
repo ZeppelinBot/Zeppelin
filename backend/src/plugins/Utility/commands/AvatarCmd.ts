@@ -24,7 +24,7 @@ export const AvatarCmd = utilityCmd({
       };
       msg.channel.send({ embeds: [embed] });
     } else {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid user ID");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid user ID");
     }
   },
 });

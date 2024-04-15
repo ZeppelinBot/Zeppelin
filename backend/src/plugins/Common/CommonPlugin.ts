@@ -1,4 +1,5 @@
 import {
+  Attachment,
   ChatInputCommandInteraction,
   Message,
   MessageCreateOptions,
@@ -7,11 +8,10 @@ import {
   TextBasedChannel,
   User,
 } from "discord.js";
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { logger } from "../../logger";
 import { isContextInteraction, sendContextResponse } from "../../pluginUtils";
 import { errorMessage, successMessage } from "../../utils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji";
 import { CommonPluginType, zCommonConfig } from "./types";
 
@@ -19,30 +19,21 @@ const defaultOptions: PluginOptions<CommonPluginType> = {
   config: {
     success_emoji: "✅",
     error_emoji: "❌",
+    attachment_storing_channel: null,
   },
 };
 
-export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
+export const CommonPlugin = guildPlugin<CommonPluginType>()({
   name: "common",
-  showInDocs: false,
-  info: {
-    prettyName: "Common",
-  },
-
   dependencies: () => [],
   configParser: (input) => zCommonConfig.parse(input),
   defaultOptions,
-  public: {
-    getSuccessEmoji(pluginData) {
-      return () => getSuccessEmoji(pluginData);
-    },
+  public(pluginData) {
+    return {
+      getSuccessEmoji,
+      getErrorEmoji,
 
-    getErrorEmoji(pluginData) {
-      return () => getErrorEmoji(pluginData);
-    },
-
-    sendSuccessMessage(pluginData) {
-      return async (
+      sendSuccessMessage: async (
         context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
         body: string,
         allowedMentions?: MessageMentionOptions,
@@ -89,11 +80,9 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
 
           return undefined;
         }) as Promise<Message>;
-      };
-    },
+      },
 
-    sendErrorMessage(pluginData) {
-      return async (
+      sendErrorMessage: async (
         context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
         body: string,
         allowedMentions?: MessageMentionOptions,
@@ -140,7 +129,25 @@ export const CommonPlugin = zeppelinGuildPlugin<CommonPluginType>()({
 
           return undefined;
         }) as Promise<Message>;
-      };
-    },
+      },
+
+      storeAttachmentsAsMessage: async (attachments: Attachment[], backupChannel?: TextBasedChannel | null) => {
+        const attachmentChannelId = pluginData.config.get().attachment_storing_channel;
+        const channel = attachmentChannelId
+          ? (pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? backupChannel
+          : backupChannel;
+
+        if (!channel) {
+          throw new Error(
+            'Cannot store attachments: no attachment storing channel configured, and no backup channel passed'
+          );
+        }
+
+        return channel!.send({
+          content: `Storing ${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
+          files: attachments.map((a) => a.url),
+        });
+      },
+    }
   },
 });

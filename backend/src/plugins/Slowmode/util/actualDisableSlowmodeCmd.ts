@@ -11,16 +11,14 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const hasNativeSlowmode = args.channel.rateLimitPerUser;
 
   if (!botSlowmode && hasNativeSlowmode === 0) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Channel is not on slowmode!");
+    void pluginData.state.common.sendErrorMessage(msg, "Channel is not on slowmode!");
     return;
   }
 
   const me = pluginData.guild.members.cache.get(pluginData.client.user!.id);
   const missingPermissions = getMissingChannelPermissions(me, args.channel, BOT_SLOWMODE_DISABLE_PERMISSIONS);
   if (missingPermissions) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(msg, `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`);
+    void pluginData.state.common.sendErrorMessage(msg, `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`);
     return;
   }
 
@@ -39,14 +37,12 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   }
 
   if (failedUsers.length) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(
-        msg,
-        `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
-      );
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Slowmode disabled! Failed to clear slowmode from the following users:\n\n<@!${failedUsers.join(">\n<@!")}>`,
+    );
   } else {
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Slowmode disabled!");
+    void pluginData.state.common.sendSuccessMessage(msg, "Slowmode disabled!");
     initMsg.delete().catch(noop);
   }
 }

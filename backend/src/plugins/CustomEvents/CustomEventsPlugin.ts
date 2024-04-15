@@ -14,6 +14,7 @@ import {
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { runEvent } from "./functions/runEvent";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {
@@ -27,6 +28,10 @@ export const CustomEventsPlugin = guildPlugin<CustomEventsPluginType>()({
   dependencies: () => [LogsPlugin],
   configParser: (input) => zCustomEventsConfig.parse(input),
   defaultOptions,
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+  },
 
   afterLoad(pluginData) {
     const config = pluginData.config.get();

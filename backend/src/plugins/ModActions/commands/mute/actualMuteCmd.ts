@@ -10,12 +10,11 @@ import {
   isDiscordAPIError,
   renderUsername,
 } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { MuteResult } from "../../../Mutes/types";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 
 /**
  * The actual function run by both !mute and !forcemute.
@@ -57,11 +56,12 @@ export async function actualMuteCmd(
     });
   } catch (e) {
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(context, "Could not mute the user: no mute role set in config");
+      pluginData.state.common.sendErrorMessage(
+        context,
+        "Could not mute the user: no mute role set in config"
+      );
     } else if (isDiscordAPIError(e) && e.code === 10007) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Could not mute the user: unknown member");
+      pluginData.state.common.sendErrorMessage(context, "Could not mute the user: unknown member");
     } else {
       logger.error(`Failed to mute user ${user.id}: ${e.stack}`);
       if (user.id == null) {
@@ -69,7 +69,7 @@ export async function actualMuteCmd(
         // tslint:disable-next-line:no-console
         console.trace("[DEBUG] Null user.id for mute");
       }
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Could not mute the user");
+      pluginData.state.common.sendErrorMessage(context, "Could not mute the user");
     }
 
     return;
@@ -104,5 +104,5 @@ export async function actualMuteCmd(
   }
 
   if (muteResult.notifyResult.text) response += ` (${muteResult.notifyResult.text})`;
-  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);
+  pluginData.state.common.sendSuccessMessage(context, response);
 }

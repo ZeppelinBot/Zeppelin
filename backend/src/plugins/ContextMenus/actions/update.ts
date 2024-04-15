@@ -2,8 +2,8 @@ import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
 import { Case } from "../../../data/entities/Case";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
+import { CasesPlugin } from "../../Cases/CasesPlugin";
+import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { ContextMenuPluginType } from "../types";
 
 export async function updateAction(
@@ -19,7 +19,7 @@ export async function updateAction(
     body: value,
   });
 
-  pluginData.getPlugin(LogsPlugin).logCaseUpdate({
+  void pluginData.getPlugin(LogsPlugin).logCaseUpdate({
     mod: executingMember.user,
     caseNumber: theCase.case_number,
     caseType: CaseTypes[theCase.type],

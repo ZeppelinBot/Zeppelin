@@ -6,12 +6,11 @@ import { humanizeDurationShort } from "../../../../humanizeDurationShort";
 import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { ignoreEvent } from "../ignoreEvent";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ignoreEvent } from "../../functions/ignoreEvent";
 
 export async function actualMassBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -23,7 +22,7 @@ export async function actualMassBanCmd(
 ) {
   // Limit to 100 users at once (arbitrary?)
   if (userIds.length > 100) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Can only massban max 100 users at once`);
+    pluginData.state.common.sendErrorMessage(context, `Can only massban max 100 users at once`);
     return;
   }
 
@@ -38,9 +37,9 @@ export async function actualMassBanCmd(
   for (const userId of userIds) {
     const member = pluginData.guild.members.cache.get(userId as Snowflake); // TODO: Get members on demand?
     if (member && !canActOn(pluginData, author, member)) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(context, "Cannot massban one or more users: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(
+        context,
+        "Cannot massban one or more users: insufficient permissions");
       return;
     }
   }
@@ -146,7 +145,7 @@ export async function actualMassBanCmd(
     const successfulBanCount = userIds.length - failedBans.length;
     if (successfulBanCount === 0) {
       // All bans failed - don't create a log entry and notify the user
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "All bans failed. Make sure the IDs are valid.");
+      pluginData.state.common.sendErrorMessage(context, "All bans failed. Make sure the IDs are valid.");
     } else {
       // Some or all bans were successful. Create a log entry for the mass ban and notify the user.
       pluginData.getPlugin(LogsPlugin).logMassBan({
@@ -156,18 +155,17 @@ export async function actualMassBanCmd(
       });
 
       if (failedBans.length) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendSuccessMessage(
-            context,
-            `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${
-              failedBans.length
-            } failed: ${failedBans.join(" ")}`,
-          );
+        pluginData.state.common.sendSuccessMessage(
+          context,
+          `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${
+            failedBans.length
+          } failed: ${failedBans.join(" ")}`,
+        );
       } else {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendSuccessMessage(context, `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`);
+        pluginData.state.common.sendSuccessMessage(
+          context,
+          `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`
+        );
       }
     }
   });

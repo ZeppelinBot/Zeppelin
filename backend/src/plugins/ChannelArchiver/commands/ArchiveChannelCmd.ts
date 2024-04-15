@@ -38,7 +38,7 @@ export const ArchiveChannelCmd = channelArchiverCmd({
           "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
       });
       if (!confirmed) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Canceled");
+        void pluginData.state.common.sendErrorMessage(msg, "Canceled");
         return;
       }
     }

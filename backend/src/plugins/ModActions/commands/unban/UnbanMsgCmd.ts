@@ -1,8 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { hasPermission } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualUnbanCmd } from "../../functions/actualCommands/actualUnbanCmd";
+import { actualUnbanCmd } from "./actualUnbanCmd";
 import { modActionsMsgCmd } from "../../types";
 
 const opts = {
@@ -26,7 +25,7 @@ export const UnbanMsgCmd = modActionsMsgCmd({
   async run({ pluginData, message: msg, args }) {
     const user = await resolveUser(pluginData.client, args.user);
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -34,7 +33,7 @@ export const UnbanMsgCmd = modActionsMsgCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg, channelId: msg.channel.id }))) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
+        pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 

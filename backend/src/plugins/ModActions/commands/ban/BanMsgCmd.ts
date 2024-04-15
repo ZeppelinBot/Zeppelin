@@ -1,8 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, resolveUser } from "../../../../utils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualBanCmd } from "../../functions/actualCommands/actualBanCmd";
+import { actualBanCmd } from "./actualBanCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
 
@@ -38,7 +37,7 @@ export const BanMsgCmd = modActionsMsgCmd({
     const user = await resolveUser(pluginData.client, args.user);
 
     if (!user.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `User not found`);
+      pluginData.state.common.sendErrorMessage(msg, `User not found`);
       return;
     }
 
@@ -46,7 +45,7 @@ export const BanMsgCmd = modActionsMsgCmd({
     let mod = msg.member;
     if (args.mod) {
       if (!(await hasPermission(pluginData, "can_act_as_other", { message: msg }))) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You don't have permission to use -mod");
+        pluginData.state.common.sendErrorMessage(msg, "You don't have permission to use -mod");
         return;
       }
 
@@ -57,7 +56,7 @@ export const BanMsgCmd = modActionsMsgCmd({
     try {
       contactMethods = readContactMethodsFromArgs(args) ?? undefined;
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, e.message);
+      pluginData.state.common.sendErrorMessage(msg, e.message);
       return;
     }
 

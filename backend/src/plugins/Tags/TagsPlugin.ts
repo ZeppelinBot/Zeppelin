@@ -20,6 +20,7 @@ import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {
@@ -89,6 +90,10 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
     state.logs = new GuildLogs(guild.id);
 
     state.tagFunctions = {};
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

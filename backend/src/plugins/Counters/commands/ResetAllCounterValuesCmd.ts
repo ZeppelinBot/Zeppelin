@@ -18,14 +18,12 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     const counter = config.counters[args.counterName];
     const counterId = pluginData.state.counterIds[args.counterName];
     if (!counter || !counterId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, `Unknown counter: ${args.counterName}`);
+      void pluginData.state.common.sendErrorMessage(message, `Unknown counter: ${args.counterName}`);
       return;
     }
 
     if (counter.can_reset_all === false) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(message, `Missing permissions to reset all of this counter's values`);
+      void pluginData.state.common.sendErrorMessage(message, `Missing permissions to reset all of this counter's values`);
       return;
     }
 
@@ -38,7 +36,7 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
       `),
     });
     if (!confirmed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Cancelled");
+      void pluginData.state.common.sendErrorMessage(message, "Cancelled");
       return;
     }
 
@@ -49,9 +47,7 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     await resetAllCounterValues(pluginData, args.counterName);
 
     loadingMessage?.delete().catch(noop);
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(message, `All counter values for **${counterName}** have been reset`);
+    void pluginData.state.common.sendSuccessMessage(message, `All counter values for **${counterName}** have been reset`);
 
     pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);
   },

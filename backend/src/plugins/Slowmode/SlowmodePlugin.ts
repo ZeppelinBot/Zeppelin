@@ -12,6 +12,7 @@ import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
 import { SlowmodePluginType, zSlowmodeConfig } from "./types";
 import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
 import { onMessageCreate } from "./util/onMessageCreate";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 
@@ -61,6 +62,10 @@ export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
     state.channelSlowmodeCache = new Map();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

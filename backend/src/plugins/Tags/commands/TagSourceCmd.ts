@@ -18,18 +18,18 @@ export const TagSourceCmd = tagsCmd({
     if (args.delete) {
       const actualTag = await pluginData.state.tags.find(args.tag);
       if (!actualTag) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No tag with that name");
+        void pluginData.state.common.sendErrorMessage(msg, "No tag with that name");
         return;
       }
 
       await pluginData.state.tags.delete(args.tag);
-      pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Tag deleted!");
+      void pluginData.state.common.sendSuccessMessage(msg, "Tag deleted!");
       return;
     }
 
     const tag = await pluginData.state.tags.find(args.tag);
     if (!tag) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No tag with that name");
+      void pluginData.state.common.sendErrorMessage(msg, "No tag with that name");
       return;
     }
 

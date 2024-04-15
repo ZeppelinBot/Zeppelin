@@ -5,13 +5,12 @@ import { LogType } from "../../../../data/LogType";
 import { isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
 import { MINUTES, noop } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { ignoreEvent } from "../ignoreEvent";
-import { isBanned } from "../isBanned";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ignoreEvent } from "../../functions/ignoreEvent";
+import { isBanned } from "../../functions/isBanned";
 
 export async function actualMassUnbanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -23,7 +22,7 @@ export async function actualMassUnbanCmd(
 ) {
   // Limit to 100 users at once (arbitrary?)
   if (userIds.length > 100) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Can only mass-unban max 100 users at once`);
+    pluginData.state.common.sendErrorMessage(context, `Can only mass-unban max 100 users at once`);
     return;
   }
 
@@ -76,9 +75,10 @@ export async function actualMassUnbanCmd(
   const successfulUnbanCount = userIds.length - failedUnbans.length;
   if (successfulUnbanCount === 0) {
     // All unbans failed - don't create a log entry and notify the user
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(context, "All unbans failed. Make sure the IDs are valid and banned.");
+    pluginData.state.common.sendErrorMessage(
+      context,
+      "All unbans failed. Make sure the IDs are valid and banned."
+    );
   } else {
     // Some or all unbans were successful. Create a log entry for the mass unban and notify the user.
     pluginData.getPlugin(LogsPlugin).logMassUnban({
@@ -105,16 +105,12 @@ export async function actualMassUnbanCmd(
         });
       }
 
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      pluginData.state.common.sendSuccessMessage(
           context,
           `Unbanned ${successfulUnbanCount} users, ${failedUnbans.length} failed:\n${failedMsg}`,
         );
     } else {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(context, `Unbanned ${successfulUnbanCount} users successfully`);
+      pluginData.state.common.sendSuccessMessage(context, `Unbanned ${successfulUnbanCount} users successfully`);
     }
   }
 }

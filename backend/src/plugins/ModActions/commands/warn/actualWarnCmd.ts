@@ -4,11 +4,10 @@ import { CaseTypes } from "../../../../data/CaseTypes";
 import { UserNotificationMethod, renderUsername } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { warnMember } from "../warnMember";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { warnMember } from "../../functions/warnMember";
 
 export async function actualWarnCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -37,7 +36,7 @@ export async function actualWarnCmd(
       { confirmText: "Yes", cancelText: "No", restrictToId: authorId },
     );
     if (!reply) {
-      await pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "Warn cancelled by moderator");
+      await pluginData.state.common.sendErrorMessage(context, "Warn cancelled by moderator");
       return;
     }
   }
@@ -55,16 +54,14 @@ export async function actualWarnCmd(
   if (warnResult.status === "failed") {
     const failReason = warnResult.error ? `: ${warnResult.error}` : "";
 
-    await pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Failed to warn user${failReason}`);
+    await pluginData.state.common.sendErrorMessage(context, `Failed to warn user${failReason}`);
 
     return;
   }
 
   const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
-  await pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(
+  await pluginData.state.common.sendSuccessMessage(
       context,
       `Warned **${renderUsername(memberToWarn.user)}** (Case #${warnResult.case.case_number})${messageResultText}`,
     );

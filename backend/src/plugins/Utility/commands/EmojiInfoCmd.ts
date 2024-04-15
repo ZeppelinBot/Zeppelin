@@ -17,13 +17,13 @@ export const EmojiInfoCmd = utilityCmd({
   async run({ message, args, pluginData }) {
     const emojiId = getCustomEmojiId(args.emoji);
     if (!emojiId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Emoji not found");
+      void pluginData.state.common.sendErrorMessage(message, "Emoji not found");
       return;
     }
 
     const embed = await getEmojiInfoEmbed(pluginData, emojiId);
     if (!embed) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(message, "Emoji not found");
+      void pluginData.state.common.sendErrorMessage(message, "Emoji not found");
       return;
     }
 

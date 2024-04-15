@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { actualCasesCmd } from "../../functions/actualCommands/actualCasesCmd";
+import { actualCasesCmd } from "./actualCasesCmd";
 import { modActionsSlashCmd } from "../../types";
 
 const opts = [

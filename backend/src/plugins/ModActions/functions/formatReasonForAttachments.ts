@@ -1,4 +1,4 @@
-import { Attachment, ChatInputCommandInteraction, Message, TextBasedChannel } from "discord.js";
+import { Attachment, ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
 import { isContextMessage } from "../../../pluginUtils";
 import { ModActionsPluginType } from "../types";
@@ -19,17 +19,9 @@ export async function formatReasonWithMessageLinkForAttachments(
     return reason;
   }
 
-  const attachmentChannelId = pluginData.config.get().attachment_storing_channel;
-  const channel = attachmentChannelId
-    ? (pluginData.guild.channels.cache.get(attachmentChannelId) as TextBasedChannel) ?? context.channel
-    : context.channel;
+  const attachmentsMessage = await pluginData.state.common.storeAttachmentsAsMessage(attachments, context.channel);
 
-  const message = await channel!.send({
-    content: `Storing ${attachments.length} attachment${attachments.length === 1 ? "" : "s"}`,
-    files: attachments.map((a) => a.url),
-  });
-
-  return ((reason || "") + " " + message.url).trim();
+  return ((reason || "") + " " + attachmentsMessage.url).trim();
 }
 
 export function formatReasonWithAttachments(reason: string, attachments: Attachment[]) {

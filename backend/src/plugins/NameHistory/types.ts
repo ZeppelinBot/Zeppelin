@@ -1,8 +1,9 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const zNameHistoryConfig = z.strictObject({
   can_view: z.boolean(),
@@ -14,6 +15,7 @@ export interface NameHistoryPluginType extends BasePluginType {
     nicknameHistory: GuildNicknameHistory;
     usernameHistory: UsernameHistory;
     updateQueue: Queue;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

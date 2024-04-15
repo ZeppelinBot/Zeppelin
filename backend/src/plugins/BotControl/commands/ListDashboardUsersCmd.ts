@@ -14,7 +14,7 @@ export const ListDashboardUsersCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Server is not using Zeppelin");
+      void msg.channel.send("Server is not using Zeppelin");
       return;
     }
 
@@ -30,12 +30,9 @@ export const ListDashboardUsersCmd = botControlCmd({
         `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`): ${permission.permissions.join(", ")}`,
     );
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(
-        msg,
-        `The following users have dashboard access for **${guild.name}**:\n\n${userNameList.join("\n")}`,
-        {},
-      );
+    msg.channel.send({
+      content: `The following users have dashboard access for **${guild.name}**:\n\n${userNameList.join("\n")}`,
+      allowedMentions: {},
+    });
   },
 });

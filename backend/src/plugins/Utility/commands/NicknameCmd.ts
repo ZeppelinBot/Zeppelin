@@ -46,11 +46,9 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(
-        msg,
-        `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
-      );
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
+    );
   },
 });

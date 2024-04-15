@@ -18,14 +18,12 @@ export const SaveMessagesToDBCmd = messageSaverCmd({
     const { savedCount, failed } = await saveMessagesToDB(pluginData, args.channel, args.ids.trim().split(" "));
 
     if (failed.length) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      void pluginData.state.common.sendSuccessMessage(
           msg,
           `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}`,
         );
     } else {
-      pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, `Saved ${savedCount} messages!`);
+      void pluginData.state.common.sendSuccessMessage(msg, `Saved ${savedCount} messages!`);
     }
   },
 });

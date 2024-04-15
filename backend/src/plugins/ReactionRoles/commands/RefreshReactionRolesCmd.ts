@@ -13,12 +13,12 @@ export const RefreshReactionRolesCmd = reactionRolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (pluginData.state.pendingRefreshes.has(`${args.message.channel.id}-${args.message.messageId}`)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Another refresh in progress");
+      void pluginData.state.common.sendErrorMessage(msg, "Another refresh in progress");
       return;
     }
 
     await refreshReactionRoles(pluginData, args.message.channel.id, args.message.messageId);
 
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Reaction roles refreshed");
+    void pluginData.state.common.sendSuccessMessage(msg, "Reaction roles refreshed");
   },
 });

@@ -30,14 +30,14 @@ export const EditEmbedCmd = postCmd({
       if (colorRgb) {
         color = rgbToInt(colorRgb);
       } else {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid color specified");
+        void pluginData.state.common.sendErrorMessage(msg, "Invalid color specified");
         return;
       }
     }
 
     const targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     if (!targetMessage) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(msg, "Unknown message");
       return;
     }
 
@@ -51,12 +51,12 @@ export const EditEmbedCmd = postCmd({
         try {
           parsed = JSON.parse(content);
         } catch (e) {
-          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Syntax error in embed JSON: ${e.message}`);
+          void pluginData.state.common.sendErrorMessage(msg, `Syntax error in embed JSON: ${e.message}`);
           return;
         }
 
         if (!isValidEmbed(parsed)) {
-          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Embed is not valid");
+          void pluginData.state.common.sendErrorMessage(msg, "Embed is not valid");
           return;
         }
 
@@ -69,7 +69,7 @@ export const EditEmbedCmd = postCmd({
     args.message.channel.messages.edit(targetMessage.id, {
       embeds: [embed],
     });
-    await pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, "Embed edited");
+    await pluginData.state.common.sendSuccessMessage(msg, "Embed edited");
 
     if (args.content) {
       const prefix = pluginData.fullConfig.prefix || "!";

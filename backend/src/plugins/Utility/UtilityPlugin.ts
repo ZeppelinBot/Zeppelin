@@ -193,11 +193,15 @@ export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
     }
   },
 
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+  },
+
   afterLoad(pluginData) {
     const { guild } = pluginData;
 
     if (activeReloads.has(guild.id)) {
-      pluginData.getPlugin(CommonPlugin).sendSuccessMessage(activeReloads.get(guild.id)!, "Reloaded!");
+      pluginData.state.common.sendSuccessMessage(activeReloads.get(guild.id)!, "Reloaded!");
       activeReloads.delete(guild.id);
     }
   },

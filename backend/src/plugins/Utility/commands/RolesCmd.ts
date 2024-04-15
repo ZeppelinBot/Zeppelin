@@ -62,7 +62,7 @@ export const RolesCmd = utilityCmd({
     } else if (sort === "name") {
       roles.sort(sorter((r) => r.name.toLowerCase(), sortDir));
     } else {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown sorting method");
+      void pluginData.state.common.sendErrorMessage(msg, "Unknown sorting method");
       return;
     }
 

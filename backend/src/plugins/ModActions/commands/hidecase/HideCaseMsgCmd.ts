@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { actualHideCaseCmd } from "../../functions/actualCommands/actualHideCaseCmd";
+import { actualHideCaseCmd } from "./actualHideCaseCmd";
 import { modActionsMsgCmd } from "../../types";
 
 export const HideCaseMsgCmd = modActionsMsgCmd({

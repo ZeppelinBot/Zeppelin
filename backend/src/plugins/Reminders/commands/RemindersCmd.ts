@@ -12,7 +12,7 @@ export const RemindersCmd = remindersCmd({
   async run({ message: msg, pluginData }) {
     const reminders = await pluginData.state.reminders.getRemindersByUserId(msg.author.id);
     if (reminders.length === 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No reminders");
+      void pluginData.state.common.sendErrorMessage(msg, "No reminders");
       return;
     }
 

@@ -24,6 +24,7 @@ import { onMutesEvent } from "./functions/onMutesEvent";
 import { renewTimeoutMute } from "./functions/renewTimeoutMute";
 import { unmuteUser } from "./functions/unmuteUser";
 import { MutesPluginType, zMutesConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {
@@ -107,6 +108,10 @@ export const MutesPlugin = guildPlugin<MutesPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.events = new EventEmitter();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

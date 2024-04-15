@@ -17,13 +17,13 @@ export const SourceCmd = utilityCmd({
 
   async run({ message: cmdMessage, args, pluginData }) {
     if (!canReadChannel(args.message.channel, cmdMessage.member)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(cmdMessage, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(cmdMessage, "Unknown message");
       return;
     }
 
     const message = await args.message.channel.messages.fetch(args.message.messageId);
     if (!message) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(cmdMessage, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(cmdMessage, "Unknown message");
       return;
     }
 

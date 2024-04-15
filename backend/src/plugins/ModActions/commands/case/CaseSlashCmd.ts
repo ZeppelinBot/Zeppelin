@@ -1,5 +1,5 @@
 import { slashOptions } from "knub";
-import { actualCaseCmd } from "../../functions/actualCommands/actualCaseCmd";
+import { actualCaseCmd } from "./actualCaseCmd";
 import { modActionsSlashCmd } from "../../types";
 
 const opts = [

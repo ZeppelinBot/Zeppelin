@@ -1,8 +1,9 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const zReactionRolesConfig = z.strictObject({
   auto_refresh_interval: z.number(),
@@ -37,6 +38,8 @@ export interface ReactionRolesPluginType extends BasePluginType {
     pendingRefreshes: Set<string>;
 
     autoRefreshTimeout: NodeJS.Timeout;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

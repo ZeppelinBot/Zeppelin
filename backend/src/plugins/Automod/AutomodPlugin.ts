@@ -32,6 +32,7 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { AutomodPluginType, zAutomodConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {
@@ -115,6 +116,10 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.cachedAntiraidLevel = await state.antiraidLevels.get();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

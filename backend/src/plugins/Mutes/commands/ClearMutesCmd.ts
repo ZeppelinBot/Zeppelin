@@ -23,15 +23,11 @@ export const ClearMutesCmd = mutesCmd({
     }
 
     if (failed.length !== args.userIds.length) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(msg, `**${args.userIds.length - failed.length} active mute(s) cleared**`);
+      void pluginData.state.common.sendSuccessMessage(msg, `**${args.userIds.length - failed.length} active mute(s) cleared**`);
     }
 
     if (failed.length) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(
+      void pluginData.state.common.sendErrorMessage(
           msg,
           `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${failed.join(" ")}`,
         );

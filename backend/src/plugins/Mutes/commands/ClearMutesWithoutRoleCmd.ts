@@ -26,8 +26,6 @@ export const ClearMutesWithoutRoleCmd = mutesCmd({
       }
     }
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, `Cleared ${cleared} mutes from members that don't have the mute role`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Cleared ${cleared} mutes from members that don't have the mute role`);
   },
 });

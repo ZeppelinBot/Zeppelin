@@ -1,5 +1,5 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
-import { BasePluginType, CooldownManager } from "knub";
+import { BasePluginType, CooldownManager, pluginUtils } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";
 import { RegExpRunner } from "../../RegExpRunner";
@@ -17,6 +17,7 @@ import { RecentActionType } from "./constants";
 import { availableTriggers } from "./triggers/availableTriggers";
 
 import Timeout = NodeJS.Timeout;
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export type ZTriggersMapHelper = {
   [TriggerName in keyof typeof availableTriggers]: (typeof availableTriggers)[TriggerName]["configSchema"];
@@ -139,6 +140,8 @@ export interface AutomodPluginType extends BasePluginType {
 
     modActionsListeners: Map<keyof ModActionsEvents, any>;
     mutesListeners: Map<keyof MutesEvents, any>;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

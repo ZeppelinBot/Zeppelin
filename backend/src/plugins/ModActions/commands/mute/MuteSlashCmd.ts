@@ -4,8 +4,7 @@ import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualMuteCmd } from "../../functions/actualCommands/actualMuteCmd";
+import { actualMuteCmd } from "./actualMuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
@@ -53,9 +52,10 @@ export const MuteSlashCmd = modActionsSlashCmd({
       const _isBanned = await isBanned(pluginData, options.user.id);
       const prefix = pluginData.fullConfig.prefix;
       if (_isBanned) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`);
+        pluginData.state.common.sendErrorMessage(
+          interaction,
+          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`
+        );
         return;
       } else {
         // Ask the mod if we should upgrade to a forcemute as the user is not on the server
@@ -66,9 +66,10 @@ export const MuteSlashCmd = modActionsSlashCmd({
         );
 
         if (!reply) {
-          pluginData
-            .getPlugin(CommonPlugin)
-            .sendErrorMessage(interaction, "User not on server, mute cancelled by moderator");
+          pluginData.state.common.sendErrorMessage(
+            interaction,
+            "User not on server, mute cancelled by moderator"
+          );
           return;
         }
       }
@@ -76,7 +77,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
 
     // Make sure we're allowed to mute this member
     if (memberToMute && !canActOn(pluginData, interaction.member as GuildMember, memberToMute)) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, "Cannot mute: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(interaction, "Cannot mute: insufficient permissions");
       return;
     }
 
@@ -89,9 +90,10 @@ export const MuteSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(interaction, "You don't have permission to act as another moderator");
+        pluginData.state.common.sendErrorMessage(
+          interaction,
+          "You don't have permission to act as another moderator"
+        );
         return;
       }
 
@@ -101,7 +103,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
 
     const convertedTime = options.time ? convertDelayStringToMS(options.time) ?? undefined : undefined;
     if (options.time && !convertedTime) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
+      pluginData.state.common.sendErrorMessage(interaction, `Could not convert ${options.time} to a delay`);
       return;
     }
 
@@ -109,7 +111,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
     try {
       contactMethods = readContactMethodsFromArgs(options) ?? undefined;
     } catch (e) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(interaction, e.message);
+      pluginData.state.common.sendErrorMessage(interaction, e.message);
       return;
     }
 

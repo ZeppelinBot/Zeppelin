@@ -14,6 +14,7 @@ import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
 import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
 import { PostPluginType, zPostConfig } from "./types";
 import { postScheduledPost } from "./util/postScheduledPost";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
   config: {
@@ -53,6 +54,10 @@ export const PostPlugin = guildPlugin<PostPluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.scheduledPosts = GuildScheduledPosts.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

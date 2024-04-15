@@ -4,7 +4,6 @@ import { Case } from "../../../../data/entities/Case";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
 import { SECONDS, renderUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../../TimeAndDate/TimeAndDatePlugin";
 import { ModActionsPluginType } from "../../types";
@@ -31,7 +30,7 @@ export async function actualDeleteCaseCmd(
   }
 
   if (failed.length === caseNumbers.length) {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "None of the cases were found!");
+    pluginData.state.common.sendErrorMessage(context, "None of the cases were found!");
     return;
   }
 
@@ -83,13 +82,15 @@ export async function actualDeleteCaseCmd(
       : "";
   const amt = validCases.length - cancelled;
   if (amt === 0) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(context, "All deletions were cancelled, no cases were deleted.");
+    pluginData.state.common.sendErrorMessage(
+      context,
+      "All deletions were cancelled, no cases were deleted."
+    );
     return;
   }
 
-  pluginData
-    .getPlugin(CommonPlugin)
-    .sendSuccessMessage(context, `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`);
+  pluginData.state.common.sendSuccessMessage(
+    context,
+    `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`
+  );
 }

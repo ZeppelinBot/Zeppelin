@@ -24,7 +24,7 @@ export const VcmoveCmd = utilityCmd({
       // Snowflake -> resolve channel directly
       const potentialChannel = pluginData.guild.channels.cache.get(args.channel as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown or non-voice channel");
+        void pluginData.state.common.sendErrorMessage(msg, "Unknown or non-voice channel");
         return;
       }
 
@@ -34,7 +34,7 @@ export const VcmoveCmd = utilityCmd({
       const channelId = args.channel.match(channelMentionRegex)![1];
       const potentialChannel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown or non-voice channel");
+        void pluginData.state.common.sendErrorMessage(msg, "Unknown or non-voice channel");
         return;
       }
 
@@ -46,7 +46,7 @@ export const VcmoveCmd = utilityCmd({
       );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No matching voice channels");
+        void pluginData.state.common.sendErrorMessage(msg, "No matching voice channels");
         return;
       }
 
@@ -54,12 +54,12 @@ export const VcmoveCmd = utilityCmd({
     }
 
     if (!args.member.voice?.channelId) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Member is not in a voice channel");
+      void pluginData.state.common.sendErrorMessage(msg, "Member is not in a voice channel");
       return;
     }
 
     if (args.member.voice.channelId === channel.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Member is already on that channel!");
+      void pluginData.state.common.sendErrorMessage(msg, "Member is already on that channel!");
       return;
     }
 
@@ -70,7 +70,7 @@ export const VcmoveCmd = utilityCmd({
         channel: channel.id,
       });
     } catch {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Failed to move member");
+      void pluginData.state.common.sendErrorMessage(msg, "Failed to move member");
       return;
     }
 
@@ -81,9 +81,7 @@ export const VcmoveCmd = utilityCmd({
       newChannel: channel,
     });
 
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendSuccessMessage(msg, `**${renderUsername(args.member)}** moved to **${channel.name}**`);
+    void pluginData.state.common.sendSuccessMessage(msg, `**${renderUsername(args.member)}** moved to **${channel.name}**`);
   },
 });
 
@@ -105,7 +103,7 @@ export const VcmoveAllCmd = utilityCmd({
       // Snowflake -> resolve channel directly
       const potentialChannel = pluginData.guild.channels.cache.get(args.channel as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown or non-voice channel");
+        void pluginData.state.common.sendErrorMessage(msg, "Unknown or non-voice channel");
         return;
       }
 
@@ -115,7 +113,7 @@ export const VcmoveAllCmd = utilityCmd({
       const channelId = args.channel.match(channelMentionRegex)![1];
       const potentialChannel = pluginData.guild.channels.cache.get(channelId as Snowflake);
       if (!potentialChannel || !(potentialChannel instanceof VoiceChannel)) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown or non-voice channel");
+        void pluginData.state.common.sendErrorMessage(msg, "Unknown or non-voice channel");
         return;
       }
 
@@ -127,7 +125,7 @@ export const VcmoveAllCmd = utilityCmd({
       );
       const closestMatch = simpleClosestStringMatch(args.channel, voiceChannels, (ch) => ch.name);
       if (!closestMatch) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "No matching voice channels");
+        void pluginData.state.common.sendErrorMessage(msg, "No matching voice channels");
         return;
       }
 
@@ -135,12 +133,12 @@ export const VcmoveAllCmd = utilityCmd({
     }
 
     if (args.oldChannel.members.size === 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Voice channel is empty");
+      void pluginData.state.common.sendErrorMessage(msg, "Voice channel is empty");
       return;
     }
 
     if (args.oldChannel.id === channel.id) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cant move from and to the same channel!");
+      void pluginData.state.common.sendErrorMessage(msg, "Cant move from and to the same channel!");
       return;
     }
 
@@ -153,12 +151,10 @@ export const VcmoveAllCmd = utilityCmd({
 
       // Check for permissions but allow self-moves
       if (currMember.id !== msg.member.id && !canActOn(pluginData, msg.member, currMember)) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(
-            msg,
-            `Failed to move ${renderUsername(currMember)} (${currMember.id}): You cannot act on this member`,
-          );
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Failed to move ${renderUsername(currMember)} (${currMember.id}): You cannot act on this member`,
+        );
         errAmt++;
         continue;
       }
@@ -169,12 +165,10 @@ export const VcmoveAllCmd = utilityCmd({
         });
       } catch {
         if (msg.member.id === currMember.id) {
-          pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Unknown error when trying to move members");
+          void pluginData.state.common.sendErrorMessage(msg, "Unknown error when trying to move members");
           return;
         }
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(msg, `Failed to move ${renderUsername(currMember)} (${currMember.id})`);
+        void pluginData.state.common.sendErrorMessage(msg, `Failed to move ${renderUsername(currMember)} (${currMember.id})`);
         errAmt++;
         continue;
       }
@@ -188,14 +182,12 @@ export const VcmoveAllCmd = utilityCmd({
     }
 
     if (moveAmt !== errAmt) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
-          msg,
-          `${moveAmt - errAmt} members from **${args.oldChannel.name}** moved to **${channel.name}**`,
-        );
+      void pluginData.state.common.sendSuccessMessage(
+        msg,
+        `${moveAmt - errAmt} members from **${args.oldChannel.name}** moved to **${channel.name}**`,
+      );
     } else {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, `Failed to move any members.`);
+      void pluginData.state.common.sendErrorMessage(msg, `Failed to move any members.`);
     }
   },
 });

@@ -1,8 +1,7 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
-import { actualMassUnbanCmd } from "../../functions/actualCommands/actualMassUnbanCmd";
+import { actualMassUnbanCmd } from "./actualMassUnbanCmd";
 import { modActionsMsgCmd } from "../../types";
 
 export const MassUnbanMsgCmd = modActionsMsgCmd({
@@ -21,7 +20,7 @@ export const MassUnbanMsgCmd = modActionsMsgCmd({
     sendContextResponse(msg, "Unban reason? `cancel` to cancel");
     const unbanReasonReply = await waitForReply(pluginData.client, await getContextChannel(msg), msg.author.id);
     if (!unbanReasonReply || !unbanReasonReply.content || unbanReasonReply.content.toLowerCase().trim() === "cancel") {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Cancelled");
+      pluginData.state.common.sendErrorMessage(msg, "Cancelled");
       return;
     }
 

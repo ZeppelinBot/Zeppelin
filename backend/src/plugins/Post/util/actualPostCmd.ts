@@ -40,15 +40,11 @@ export async function actualPostCmd(
 
   if (opts.repeat) {
     if (opts.repeat < MIN_REPEAT_TIME) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(msg, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
       return;
     }
     if (opts.repeat > MAX_REPEAT_TIME) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(msg, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(msg, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
       return;
     }
   }
@@ -59,7 +55,7 @@ export async function actualPostCmd(
     // Schedule the post to be posted later
     postAt = await parseScheduleTime(pluginData, msg.author.id, opts.schedule);
     if (!postAt) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid schedule time");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid schedule time");
       return;
     }
   } else if (opts.repeat) {
@@ -76,41 +72,35 @@ export async function actualPostCmd(
 
     // Invalid time
     if (!repeatUntil) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Invalid time specified for -repeat-until");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid time specified for -repeat-until");
       return;
     }
     if (repeatUntil.isBefore(moment.utc())) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "You can't set -repeat-until in the past");
+      void pluginData.state.common.sendErrorMessage(msg, "You can't set -repeat-until in the past");
       return;
     }
     if (repeatUntil.isAfter(MAX_REPEAT_UNTIL)) {
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendErrorMessage(
-          msg,
-          "Unfortunately, -repeat-until can only be at most 100 years into the future. Maybe 99 years would be enough?",
-        );
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        "Unfortunately, -repeat-until can only be at most 100 years into the future. Maybe 99 years would be enough?",
+      );
       return;
     }
   } else if (opts["repeat-times"]) {
     repeatTimes = opts["repeat-times"];
     if (repeatTimes <= 0) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "-repeat-times must be 1 or more");
+      void pluginData.state.common.sendErrorMessage(msg, "-repeat-times must be 1 or more");
       return;
     }
   }
 
   if (repeatUntil && repeatTimes) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(msg, "You can only use one of -repeat-until or -repeat-times at once");
+    void pluginData.state.common.sendErrorMessage(msg, "You can only use one of -repeat-until or -repeat-times at once");
     return;
   }
 
   if (opts.repeat && !repeatUntil && !repeatTimes) {
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(msg, "You must specify -repeat-until or -repeat-times for repeated messages");
+    void pluginData.state.common.sendErrorMessage(msg, "You must specify -repeat-until or -repeat-times for repeated messages");
     return;
   }
 
@@ -125,7 +115,7 @@ export async function actualPostCmd(
   // Save schedule/repeat information in DB
   if (postAt) {
     if (postAt < moment.utc()) {
-      pluginData.getPlugin(CommonPlugin).sendErrorMessage(msg, "Post can't be scheduled to be posted in the past");
+      void pluginData.state.common.sendErrorMessage(msg, "Post can't be scheduled to be posted in the past");
       return;
     }
 
@@ -201,6 +191,6 @@ export async function actualPostCmd(
   }
 
   if (targetChannel.id !== msg.channel.id || opts.schedule || opts.repeat) {
-    pluginData.getPlugin(CommonPlugin).sendSuccessMessage(msg, successMessage);
+    void pluginData.state.common.sendSuccessMessage(msg, successMessage);
   }
 }

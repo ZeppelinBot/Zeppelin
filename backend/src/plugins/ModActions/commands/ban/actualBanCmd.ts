@@ -9,13 +9,12 @@ import { UnknownUser, UserNotificationMethod, renderUsername, resolveMember } fr
 import { banLock } from "../../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { CommonPlugin } from "../../../Common/CommonPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { ModActionsPluginType } from "../../types";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../attachmentLinkReaction";
-import { banUserId } from "../banUserId";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../formatReasonForAttachments";
-import { isBanned } from "../isBanned";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { banUserId } from "../../functions/banUserId";
+import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { isBanned } from "../../functions/isBanned";
 
 export async function actualBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -54,7 +53,7 @@ export async function actualBanCmd(
       );
 
       if (!reply) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, "User not on server, ban cancelled by moderator");
+        pluginData.state.common.sendErrorMessage(context, "User not on server, ban cancelled by moderator");
         lock.unlock();
         return;
       } else {
@@ -63,7 +62,7 @@ export async function actualBanCmd(
     } else {
       // Abort if trying to ban user indefinitely if they are already banned indefinitely
       if (!existingTempban && !time) {
-        pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `User is already banned indefinitely.`);
+        pluginData.state.common.sendErrorMessage(context, `User is already banned indefinitely.`);
         return;
       }
 
@@ -75,9 +74,10 @@ export async function actualBanCmd(
       );
 
       if (!reply) {
-        pluginData
-          .getPlugin(CommonPlugin)
-          .sendErrorMessage(context, "User already banned, update cancelled by moderator");
+        pluginData.state.common.sendErrorMessage(
+          context,
+          "User already banned, update cancelled by moderator"
+        );
         lock.unlock();
         return;
       }
@@ -122,9 +122,7 @@ export async function actualBanCmd(
         });
       }
 
-      pluginData
-        .getPlugin(CommonPlugin)
-        .sendSuccessMessage(
+      pluginData.state.common.sendSuccessMessage(
           context,
           `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
         );
@@ -137,11 +135,9 @@ export async function actualBanCmd(
   if (!forceban && !canActOn(pluginData, author, memberToBan!)) {
     const ourLevel = getMemberLevel(pluginData, author);
     const targetLevel = getMemberLevel(pluginData, memberToBan!);
-    pluginData
-      .getPlugin(CommonPlugin)
-      .sendErrorMessage(
-        context,
-        `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
+    pluginData.state.common.sendErrorMessage(
+      context,
+      `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
       );
     lock.unlock();
     return;
@@ -170,7 +166,7 @@ export async function actualBanCmd(
   );
 
   if (banResult.status === "failed") {
-    pluginData.getPlugin(CommonPlugin).sendErrorMessage(context, `Failed to ban member: ${banResult.error}`);
+    pluginData.state.common.sendErrorMessage(context, `Failed to ban member: ${banResult.error}`);
     lock.unlock();
     return;
   }
@@ -190,5 +186,5 @@ export async function actualBanCmd(
   }
 
   lock.unlock();
-  pluginData.getPlugin(CommonPlugin).sendSuccessMessage(context, response);
+  pluginData.state.common.sendSuccessMessage(context, response);
 }
