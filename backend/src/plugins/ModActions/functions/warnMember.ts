@@ -1,7 +1,7 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes";
-import { TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
 import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils";
 import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
@@ -20,16 +20,27 @@ export async function warnMember(
 
   let notifyResult: UserNotificationResult;
   if (config.warn_message) {
-    const warnMessage = await renderTemplate(
-      config.warn_message,
-      new TemplateSafeValueContainer({
-        guildName: pluginData.guild.name,
-        reason,
-        moderator: warnOptions.caseArgs?.modId
-          ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
-          : null,
-      }),
-    );
+    let warnMessage: string;
+    try {
+      warnMessage = await renderTemplate(
+        config.warn_message,
+        new TemplateSafeValueContainer({
+          guildName: pluginData.guild.name,
+          reason,
+          moderator: warnOptions.caseArgs?.modId
+            ? userToTemplateSafeUser(await resolveUser(pluginData.client, warnOptions.caseArgs.modId))
+            : null,
+        }),
+      );
+    } catch (err) {
+      if (err instanceof TemplateParseError) {
+        return {
+          status: "failed",
+          error: `Invalid warn_message format: ${err.message}`,
+        };
+      }
+      throw err;
+    }
     const contactMethods = warnOptions?.contactMethods
       ? warnOptions.contactMethods
       : getDefaultContactMethods(pluginData, "warn");

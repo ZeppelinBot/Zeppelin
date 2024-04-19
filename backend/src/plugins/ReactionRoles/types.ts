@@ -1,17 +1,15 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { Queue } from "../../Queue";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { tNullable } from "../../utils";
 
-export const ConfigSchema = t.type({
-  auto_refresh_interval: t.number,
-  remove_user_reactions: t.boolean,
-  can_manage: t.boolean,
-  button_groups: tNullable(t.unknown),
+export const zReactionRolesConfig = z.strictObject({
+  auto_refresh_interval: z.number(),
+  remove_user_reactions: z.boolean(),
+  can_manage: z.boolean(),
+  button_groups: z.nullable(z.unknown()),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export type RoleChangeMode = "+" | "-";
 
@@ -24,12 +22,11 @@ export type PendingMemberRoleChanges = {
   }>;
 };
 
-const ReactionRolePair = t.union([t.tuple([t.string, t.string, t.string]), t.tuple([t.string, t.string])]);
-export type TReactionRolePair = t.TypeOf<typeof ReactionRolePair>;
-type ReactionRolePair = [string, string, string?];
+const zReactionRolePair = z.union([z.tuple([z.string(), z.string(), z.string()]), z.tuple([z.string(), z.string()])]);
+export type TReactionRolePair = z.infer<typeof zReactionRolePair>;
 
 export interface ReactionRolesPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zReactionRolesConfig>;
   state: {
     reactionRoles: GuildReactionRoles;
     savedMessages: GuildSavedMessages;

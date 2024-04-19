@@ -1,9 +1,9 @@
-import * as t from "io-ts";
+import z from "zod";
 import { allowTimeout } from "../../../RegExpRunner";
+import { zRegex } from "../../../utils";
 import { mergeRegexes } from "../../../utils/mergeRegexes";
 import { normalizeText } from "../../../utils/normalizeText";
 import { stripMarkdown } from "../../../utils/stripMarkdown";
-import { TRegex } from "../../../validatorUtils";
 import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
 import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
 import { automodTrigger } from "../helpers";
@@ -13,33 +13,23 @@ interface MatchResultType {
   type: MatchableTextType;
 }
 
+const configSchema = z.strictObject({
+  patterns: z.array(zRegex(z.string().max(2000))).max(512),
+  case_sensitive: z.boolean().default(false),
+  normalize: z.boolean().default(false),
+  strip_markdown: z.boolean().default(false),
+  match_messages: z.boolean().default(true),
+  match_embeds: z.boolean().default(false),
+  match_visible_names: z.boolean().default(false),
+  match_usernames: z.boolean().default(false),
+  match_nicknames: z.boolean().default(false),
+  match_custom_status: z.boolean().default(false),
+});
+
 const regexCache = new WeakMap<any, RegExp[]>();
 
 export const MatchRegexTrigger = automodTrigger<MatchResultType>()({
-  configType: t.type({
-    patterns: t.array(TRegex),
-    case_sensitive: t.boolean,
-    normalize: t.boolean,
-    strip_markdown: t.boolean,
-    match_messages: t.boolean,
-    match_embeds: t.boolean,
-    match_visible_names: t.boolean,
-    match_usernames: t.boolean,
-    match_nicknames: t.boolean,
-    match_custom_status: t.boolean,
-  }),
-
-  defaultConfig: {
-    case_sensitive: false,
-    normalize: false,
-    strip_markdown: false,
-    match_messages: true,
-    match_embeds: false,
-    match_visible_names: false,
-    match_usernames: false,
-    match_nicknames: false,
-    match_custom_status: false,
-  },
+  configSchema,
 
   async match({ pluginData, context, triggerConfig: trigger }) {
     if (!context.message) {

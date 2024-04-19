@@ -1,8 +1,10 @@
 {
-  "name": "@zeppelin/shared",
+  "name": "@zeppelinbot/shared",
   "version": "0.0.1",
   "description": "",
   "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "ava"
   },

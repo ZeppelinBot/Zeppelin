@@ -1,14 +1,21 @@
 const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const DotenvPlugin = require("dotenv-webpack");
 const { merge } = require("webpack-merge");
 const webpack = require("webpack");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 
 const targetDir = path.normalize(path.join(__dirname, "dist"));
 
 if (!process.env.NODE_ENV) {
   console.error("Please set NODE_ENV");
+  process.exit(1);
+}
+
+if (!process.env.API_URL) {
+  console.error("API_URL missing from environment variables");
   process.exit(1);
 }
 
@@ -150,9 +157,7 @@ let config = {
         js: ["./src/main.ts"],
       },
     }),
-    new DotenvPlugin({
-      path: path.resolve(process.cwd(), "../.env"),
-    }),
+    new webpack.EnvironmentPlugin(["API_URL"]),
   ],
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".mjs", ".vue"],
@@ -160,8 +165,6 @@ let config = {
     roots: [path.resolve(__dirname, "src")],
   },
 };
-
-if (process.env.NODE_ENV === "web") config.plugins.push(new webpack.EnvironmentPlugin(["NODE_ENV", "API_URL"]));
 
 if (process.env.NODE_ENV === "production") {
   config = merge(config, {
@@ -173,9 +176,9 @@ if (process.env.NODE_ENV === "production") {
     mode: "development",
     devtool: "eval",
     devServer: {
-      ...(process.env.DEV_HOST ? { host: process.env.DEV_HOST } : undefined),
+      allowedHosts: "all",
       historyApiFallback: true,
-      port: 1234,
+      port: 3002,
     },
   });
 }

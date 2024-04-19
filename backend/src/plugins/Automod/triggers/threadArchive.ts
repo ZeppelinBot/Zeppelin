@@ -1,6 +1,6 @@
 import { User, escapeBold, type Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { tNullable } from "../../../utils";
+import z from "zod";
+import { renderUsername } from "../../../utils";
 import { automodTrigger } from "../helpers";
 
 interface ThreadArchiveResult {
@@ -11,12 +11,12 @@ interface ThreadArchiveResult {
   matchedThreadOwner: User | undefined;
 }
 
-export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
-  configType: t.type({
-    locked: tNullable(t.boolean),
-  }),
+const configSchema = z.strictObject({
+  locked: z.boolean().optional(),
+});
 
-  defaultConfig: {},
+export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
+  configSchema,
 
   async match({ context, triggerConfig }) {
     if (!context.threadChange?.archived) {
@@ -48,7 +48,7 @@ export const ThreadArchiveTrigger = automodTrigger<ThreadArchiveResult>()({
     const parentName = matchResult.extra.matchedThreadParentName;
     const base = `Thread **#${threadName}** (\`${threadId}\`) has been archived in the **#${parentName}** (\`${parentId}\`) channel`;
     if (threadOwner) {
-      return `${base} by **${escapeBold(threadOwner.tag)}** (\`${threadOwner.id}\`)`;
+      return `${base} by **${escapeBold(renderUsername(threadOwner))}** (\`${threadOwner.id}\`)`;
     }
     return base;
   },

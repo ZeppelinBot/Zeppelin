@@ -1,5 +1,4 @@
 import { PersistedData } from "../../../data/entities/PersistedData";
-import { GuildMemberCachePlugin } from "../../GuildMemberCache/GuildMemberCachePlugin";
 import { persistEvt } from "../types";
 
 export const StoreDataEvt = persistEvt({
@@ -9,8 +8,11 @@ export const StoreDataEvt = persistEvt({
     const config = await pluginData.config.getForUser(member.user);
     const persistData: Partial<PersistedData> = {};
 
+    // FIXME: New caching thing, or fix deadlocks with this plugin
     if (member.partial) {
+      return;
       // Djs hasn't cached member data => use db cache
+      /*
       const data = await pluginData.getPlugin(GuildMemberCachePlugin).getCachedMemberData(member.id);
       if (!data) {
         return;
@@ -22,7 +24,7 @@ export const StoreDataEvt = persistEvt({
       }
       if (config.persist_nicknames && data.nickname) {
         persistData.nickname = data.nickname;
-      }
+      }*/
     } else {
       // Djs has cached member data => use that
       const memberRoles = Array.from(member.roles.cache.keys());

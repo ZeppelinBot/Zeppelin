@@ -1,10 +1,10 @@
 import { Guild, Snowflake } from "discord.js";
 import moment from "moment-timezone";
-import { isDefaultSticker } from "src/utils/isDefaultSticker";
 import { Repository } from "typeorm";
 import { TemplateSafeValueContainer, renderTemplate } from "../templateFormatter";
 import { renderUsername, trimLines } from "../utils";
 import { decrypt, encrypt } from "../utils/crypt";
+import { isDefaultSticker } from "../utils/isDefaultSticker";
 import { channelToTemplateSafeChannel, guildToTemplateSafeGuild } from "../utils/templateSafeObjects";
 import { BaseGuildRepository } from "./BaseGuildRepository";
 import { dataSource } from "./dataSource";

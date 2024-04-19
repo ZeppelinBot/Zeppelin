@@ -11,6 +11,7 @@ export enum ERRORS {
   MUTE_ROLE_ABOVE_ZEP,
   USER_ABOVE_ZEP,
   USER_NOT_MODERATABLE,
+  TEMPLATE_PARSE_ERROR,
 }
 
 export const RECOVERABLE_PLUGIN_ERROR_MESSAGES = {
@@ -24,6 +25,7 @@ export const RECOVERABLE_PLUGIN_ERROR_MESSAGES = {
   [ERRORS.MUTE_ROLE_ABOVE_ZEP]: "Specified mute role is above Zeppelin in the role hierarchy",
   [ERRORS.USER_ABOVE_ZEP]: "Cannot mute user, specified user is above Zeppelin in the role hierarchy",
   [ERRORS.USER_NOT_MODERATABLE]: "Cannot mute user, specified user is not moderatable",
+  [ERRORS.TEMPLATE_PARSE_ERROR]: "Template parse error",
 };
 
 export class RecoverablePluginError extends Error {

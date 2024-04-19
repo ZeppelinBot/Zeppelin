@@ -10,6 +10,8 @@ import { initGuildsAPI } from "./guilds/index";
 import { clientError, error, notFound } from "./responses";
 import { startBackgroundTasks } from "./tasks";
 
+const apiPathPrefix = env.API_PATH_PREFIX || (env.NODE_ENV === "development" ? "/api" : "");
+
 const app = express();
 
 app.use(
@@ -24,15 +26,19 @@ app.use(
 );
 app.use(multer().none());
 
+const rootRouter = express.Router();
+
 initAuth(app);
 initGuildsAPI(app);
 initArchives(app);
 initDocs(app);
 
 // Default route
-app.get("/", (req, res) => {
+rootRouter.get("/", (req, res) => {
   res.json({ status: "cookies", with: "milk" });
 });
+
+app.use(apiPathPrefix, rootRouter);
 
 // Error response
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,7 +57,7 @@ app.use((req, res, next) => {
   return notFound(res);
 });
 
-const port = env.API_PORT;
+const port = 3001;
 app.listen(port, "0.0.0.0", () => console.log(`API server listening on port ${port}`)); // tslint:disable-line
 
 startBackgroundTasks();

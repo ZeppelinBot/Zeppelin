@@ -1,4 +1,4 @@
-import { CooldownManager, PluginOptions } from "knub";
+import { CooldownManager, PluginOptions, guildPlugin } from "knub";
 import DefaultLogMessages from "../../data/DefaultLogMessages.json";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -6,11 +6,10 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { LogType } from "../../data/LogType";
 import { logger } from "../../logger";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { TypedTemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
+import { createTypedTemplateSafeValueContainer } from "../../templateFormatter";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { LogsChannelCreateEvt, LogsChannelDeleteEvt, LogsChannelUpdateEvt } from "./events/LogsChannelModifyEvts";
 import {
   LogsEmojiCreateEvt,
@@ -31,7 +30,7 @@ import {
 import { LogsThreadCreateEvt, LogsThreadDeleteEvt, LogsThreadUpdateEvt } from "./events/LogsThreadModifyEvts";
 import { LogsGuildMemberUpdateEvt } from "./events/LogsUserUpdateEvts";
 import { LogsVoiceStateUpdateEvt } from "./events/LogsVoiceChannelEvts";
-import { ConfigSchema, FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "./types";
+import { FORMAT_NO_TIMESTAMP, LogsPluginType, zLogsConfig } from "./types";
 import { getLogMessage } from "./util/getLogMessage";
 import { log } from "./util/log";
 import { onMessageDelete } from "./util/onMessageDelete";
@@ -120,10 +119,10 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
   config: {
     channels: {},
     format: {
-      timestamp: FORMAT_NO_TIMESTAMP, // Legacy/deprecated, use timestamp_format below instead
+      timestamp: FORMAT_NO_TIMESTAMP,
       ...DefaultLogMessages,
     },
-    ping_user: true, // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
+    ping_user: true,
     allow_user_mentions: false,
     timestamp_format: "[<t:]X[>]",
     include_embed_timestamp: true,
@@ -133,22 +132,18 @@ const defaultOptions: PluginOptions<LogsPluginType> = {
     {
       level: ">=50",
       config: {
-        ping_user: false, // Legacy/deprecated, read comment on global ping_user option
+        // Legacy/deprecated, read comment on global ping_user option
+        ping_user: false,
       },
     },
   ],
 };
 
-export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
+export const LogsPlugin = guildPlugin<LogsPluginType>()({
   name: "logs",
-  showInDocs: true,
-  info: {
-    prettyName: "Logs",
-    configSchema: ConfigSchema,
-  },
 
   dependencies: async () => [TimeAndDatePlugin, InternalPosterPlugin, (await getCasesPlugin()).CasesPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zLogsConfig.parse(input),
   defaultOptions,
 
   events: [
@@ -177,86 +172,79 @@ export const LogsPlugin = zeppelinGuildPlugin<LogsPluginType>()({
     LogsGuildMemberRoleChangeEvt,
   ],
 
-  public: {
-    getLogMessage: (pluginData) => {
-      return <TLogType extends keyof ILogTypeData>(
-        type: TLogType,
-        data: TypedTemplateSafeValueContainer<ILogTypeData[TLogType]>,
-        opts?: Pick<TLogChannel, "format" | "timestamp_format" | "include_embed_timestamp">,
-      ) => {
-        return getLogMessage(pluginData, type, data, opts);
-      };
-    },
-
-    logAutomodAction: mapToPublicFn(logAutomodAction),
-    logBotAlert: mapToPublicFn(logBotAlert),
-    logCaseCreate: mapToPublicFn(logCaseCreate),
-    logCaseDelete: mapToPublicFn(logCaseDelete),
-    logCaseUpdate: mapToPublicFn(logCaseUpdate),
-    logCensor: mapToPublicFn(logCensor),
-    logChannelCreate: mapToPublicFn(logChannelCreate),
-    logChannelDelete: mapToPublicFn(logChannelDelete),
-    logChannelUpdate: mapToPublicFn(logChannelUpdate),
-    logClean: mapToPublicFn(logClean),
-    logEmojiCreate: mapToPublicFn(logEmojiCreate),
-    logEmojiDelete: mapToPublicFn(logEmojiDelete),
-    logEmojiUpdate: mapToPublicFn(logEmojiUpdate),
-    logMassBan: mapToPublicFn(logMassBan),
-    logMassMute: mapToPublicFn(logMassMute),
-    logMassUnban: mapToPublicFn(logMassUnban),
-    logMemberBan: mapToPublicFn(logMemberBan),
-    logMemberForceban: mapToPublicFn(logMemberForceban),
-    logMemberJoin: mapToPublicFn(logMemberJoin),
-    logMemberJoinWithPriorRecords: mapToPublicFn(logMemberJoinWithPriorRecords),
-    logMemberKick: mapToPublicFn(logMemberKick),
-    logMemberLeave: mapToPublicFn(logMemberLeave),
-    logMemberMute: mapToPublicFn(logMemberMute),
-    logMemberMuteExpired: mapToPublicFn(logMemberMuteExpired),
-    logMemberMuteRejoin: mapToPublicFn(logMemberMuteRejoin),
-    logMemberNickChange: mapToPublicFn(logMemberNickChange),
-    logMemberNote: mapToPublicFn(logMemberNote),
-    logMemberRestore: mapToPublicFn(logMemberRestore),
-    logMemberRoleAdd: mapToPublicFn(logMemberRoleAdd),
-    logMemberRoleChanges: mapToPublicFn(logMemberRoleChanges),
-    logMemberRoleRemove: mapToPublicFn(logMemberRoleRemove),
-    logMemberTimedBan: mapToPublicFn(logMemberTimedBan),
-    logMemberTimedMute: mapToPublicFn(logMemberTimedMute),
-    logMemberTimedUnban: mapToPublicFn(logMemberTimedUnban),
-    logMemberTimedUnmute: mapToPublicFn(logMemberTimedUnmute),
-    logMemberUnban: mapToPublicFn(logMemberUnban),
-    logMemberUnmute: mapToPublicFn(logMemberUnmute),
-    logMemberWarn: mapToPublicFn(logMemberWarn),
-    logMessageDelete: mapToPublicFn(logMessageDelete),
-    logMessageDeleteAuto: mapToPublicFn(logMessageDeleteAuto),
-    logMessageDeleteBare: mapToPublicFn(logMessageDeleteBare),
-    logMessageDeleteBulk: mapToPublicFn(logMessageDeleteBulk),
-    logMessageEdit: mapToPublicFn(logMessageEdit),
-    logMessageSpamDetected: mapToPublicFn(logMessageSpamDetected),
-    logOtherSpamDetected: mapToPublicFn(logOtherSpamDetected),
-    logPostedScheduledMessage: mapToPublicFn(logPostedScheduledMessage),
-    logRepeatedMessage: mapToPublicFn(logRepeatedMessage),
-    logRoleCreate: mapToPublicFn(logRoleCreate),
-    logRoleDelete: mapToPublicFn(logRoleDelete),
-    logRoleUpdate: mapToPublicFn(logRoleUpdate),
-    logScheduledMessage: mapToPublicFn(logScheduledMessage),
-    logScheduledRepeatedMessage: mapToPublicFn(logScheduledRepeatedMessage),
-    logSetAntiraidAuto: mapToPublicFn(logSetAntiraidAuto),
-    logSetAntiraidUser: mapToPublicFn(logSetAntiraidUser),
-    logStageInstanceCreate: mapToPublicFn(logStageInstanceCreate),
-    logStageInstanceDelete: mapToPublicFn(logStageInstanceDelete),
-    logStageInstanceUpdate: mapToPublicFn(logStageInstanceUpdate),
-    logStickerCreate: mapToPublicFn(logStickerCreate),
-    logStickerDelete: mapToPublicFn(logStickerDelete),
-    logStickerUpdate: mapToPublicFn(logStickerUpdate),
-    logThreadCreate: mapToPublicFn(logThreadCreate),
-    logThreadDelete: mapToPublicFn(logThreadDelete),
-    logThreadUpdate: mapToPublicFn(logThreadUpdate),
-    logVoiceChannelForceDisconnect: mapToPublicFn(logVoiceChannelForceDisconnect),
-    logVoiceChannelForceMove: mapToPublicFn(logVoiceChannelForceMove),
-    logVoiceChannelJoin: mapToPublicFn(logVoiceChannelJoin),
-    logVoiceChannelLeave: mapToPublicFn(logVoiceChannelLeave),
-    logVoiceChannelMove: mapToPublicFn(logVoiceChannelMove),
-    logDmFailed: mapToPublicFn(logDmFailed),
+  public(pluginData) {
+    return {
+      getLogMessage: makePublicFn(pluginData, getLogMessage),
+      logAutomodAction: makePublicFn(pluginData, logAutomodAction),
+      logBotAlert: makePublicFn(pluginData, logBotAlert),
+      logCaseCreate: makePublicFn(pluginData, logCaseCreate),
+      logCaseDelete: makePublicFn(pluginData, logCaseDelete),
+      logCaseUpdate: makePublicFn(pluginData, logCaseUpdate),
+      logCensor: makePublicFn(pluginData, logCensor),
+      logChannelCreate: makePublicFn(pluginData, logChannelCreate),
+      logChannelDelete: makePublicFn(pluginData, logChannelDelete),
+      logChannelUpdate: makePublicFn(pluginData, logChannelUpdate),
+      logClean: makePublicFn(pluginData, logClean),
+      logEmojiCreate: makePublicFn(pluginData, logEmojiCreate),
+      logEmojiDelete: makePublicFn(pluginData, logEmojiDelete),
+      logEmojiUpdate: makePublicFn(pluginData, logEmojiUpdate),
+      logMassBan: makePublicFn(pluginData, logMassBan),
+      logMassMute: makePublicFn(pluginData, logMassMute),
+      logMassUnban: makePublicFn(pluginData, logMassUnban),
+      logMemberBan: makePublicFn(pluginData, logMemberBan),
+      logMemberForceban: makePublicFn(pluginData, logMemberForceban),
+      logMemberJoin: makePublicFn(pluginData, logMemberJoin),
+      logMemberJoinWithPriorRecords: makePublicFn(pluginData, logMemberJoinWithPriorRecords),
+      logMemberKick: makePublicFn(pluginData, logMemberKick),
+      logMemberLeave: makePublicFn(pluginData, logMemberLeave),
+      logMemberMute: makePublicFn(pluginData, logMemberMute),
+      logMemberMuteExpired: makePublicFn(pluginData, logMemberMuteExpired),
+      logMemberMuteRejoin: makePublicFn(pluginData, logMemberMuteRejoin),
+      logMemberNickChange: makePublicFn(pluginData, logMemberNickChange),
+      logMemberNote: makePublicFn(pluginData, logMemberNote),
+      logMemberRestore: makePublicFn(pluginData, logMemberRestore),
+      logMemberRoleAdd: makePublicFn(pluginData, logMemberRoleAdd),
+      logMemberRoleChanges: makePublicFn(pluginData, logMemberRoleChanges),
+      logMemberRoleRemove: makePublicFn(pluginData, logMemberRoleRemove),
+      logMemberTimedBan: makePublicFn(pluginData, logMemberTimedBan),
+      logMemberTimedMute: makePublicFn(pluginData, logMemberTimedMute),
+      logMemberTimedUnban: makePublicFn(pluginData, logMemberTimedUnban),
+      logMemberTimedUnmute: makePublicFn(pluginData, logMemberTimedUnmute),
+      logMemberUnban: makePublicFn(pluginData, logMemberUnban),
+      logMemberUnmute: makePublicFn(pluginData, logMemberUnmute),
+      logMemberWarn: makePublicFn(pluginData, logMemberWarn),
+      logMessageDelete: makePublicFn(pluginData, logMessageDelete),
+      logMessageDeleteAuto: makePublicFn(pluginData, logMessageDeleteAuto),
+      logMessageDeleteBare: makePublicFn(pluginData, logMessageDeleteBare),
+      logMessageDeleteBulk: makePublicFn(pluginData, logMessageDeleteBulk),
+      logMessageEdit: makePublicFn(pluginData, logMessageEdit),
+      logMessageSpamDetected: makePublicFn(pluginData, logMessageSpamDetected),
+      logOtherSpamDetected: makePublicFn(pluginData, logOtherSpamDetected),
+      logPostedScheduledMessage: makePublicFn(pluginData, logPostedScheduledMessage),
+      logRepeatedMessage: makePublicFn(pluginData, logRepeatedMessage),
+      logRoleCreate: makePublicFn(pluginData, logRoleCreate),
+      logRoleDelete: makePublicFn(pluginData, logRoleDelete),
+      logRoleUpdate: makePublicFn(pluginData, logRoleUpdate),
+      logScheduledMessage: makePublicFn(pluginData, logScheduledMessage),
+      logScheduledRepeatedMessage: makePublicFn(pluginData, logScheduledRepeatedMessage),
+      logSetAntiraidAuto: makePublicFn(pluginData, logSetAntiraidAuto),
+      logSetAntiraidUser: makePublicFn(pluginData, logSetAntiraidUser),
+      logStageInstanceCreate: makePublicFn(pluginData, logStageInstanceCreate),
+      logStageInstanceDelete: makePublicFn(pluginData, logStageInstanceDelete),
+      logStageInstanceUpdate: makePublicFn(pluginData, logStageInstanceUpdate),
+      logStickerCreate: makePublicFn(pluginData, logStickerCreate),
+      logStickerDelete: makePublicFn(pluginData, logStickerDelete),
+      logStickerUpdate: makePublicFn(pluginData, logStickerUpdate),
+      logThreadCreate: makePublicFn(pluginData, logThreadCreate),
+      logThreadDelete: makePublicFn(pluginData, logThreadDelete),
+      logThreadUpdate: makePublicFn(pluginData, logThreadUpdate),
+      logVoiceChannelForceDisconnect: makePublicFn(pluginData, logVoiceChannelForceDisconnect),
+      logVoiceChannelForceMove: makePublicFn(pluginData, logVoiceChannelForceMove),
+      logVoiceChannelJoin: makePublicFn(pluginData, logVoiceChannelJoin),
+      logVoiceChannelLeave: makePublicFn(pluginData, logVoiceChannelLeave),
+      logVoiceChannelMove: makePublicFn(pluginData, logVoiceChannelMove),
+      logDmFailed: makePublicFn(pluginData, logDmFailed),
+    };
   },
 
   beforeLoad(pluginData) {

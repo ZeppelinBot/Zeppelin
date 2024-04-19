@@ -1,10 +1,8 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles";
-import { makeIoTsConfigParser } from "../../pluginUtils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd";
 import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd";
-import { ConfigSchema, PingableRolesPluginType } from "./types";
+import { PingableRolesPluginType, zPingableRolesConfig } from "./types";
 
 const defaultOptions: PluginOptions<PingableRolesPluginType> = {
   config: {
@@ -20,15 +18,10 @@ const defaultOptions: PluginOptions<PingableRolesPluginType> = {
   ],
 };
 
-export const PingableRolesPlugin = zeppelinGuildPlugin<PingableRolesPluginType>()({
+export const PingableRolesPlugin = guildPlugin<PingableRolesPluginType>()({
   name: "pingable_roles",
-  showInDocs: true,
-  info: {
-    prettyName: "Pingable roles",
-    configSchema: ConfigSchema,
-  },
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zPingableRolesConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

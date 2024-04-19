@@ -4,7 +4,7 @@ import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
 import { logger } from "../../../logger";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { UnknownUser, asSingleLine, isDiscordAPIError, renderUserUsername } from "../../../utils";
+import { UnknownUser, asSingleLine, isDiscordAPIError, renderUsername } from "../../../utils";
 import { MutesPlugin } from "../../Mutes/MutesPlugin";
 import { MuteResult } from "../../Mutes/types";
 import { ModActionsPluginType } from "../types";
@@ -90,24 +90,24 @@ export async function actualMuteUserCmd(
   if (args.time) {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${renderUserUsername(user)}**'s
+        Updated **${renderUsername(user)}**'s
         mute to ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${renderUserUsername(user)}**
+        Muted **${renderUsername(user)}**
         for ${timeUntilUnmute} (Case #${muteResult.case.case_number})
       `);
     }
   } else {
     if (muteResult.updatedExistingMute) {
       response = asSingleLine(`
-        Updated **${renderUserUsername(user)}**'s
+        Updated **${renderUsername(user)}**'s
         mute to indefinite (Case #${muteResult.case.case_number})
       `);
     } else {
       response = asSingleLine(`
-        Muted **${renderUserUsername(user)}**
+        Muted **${renderUsername(user)}**
         indefinitely (Case #${muteResult.case.case_number})
       `);
     }

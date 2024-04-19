@@ -12,7 +12,8 @@ import { CounterValue } from "./entities/CounterValue";
 const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
 const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;
 
-const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
+export const MIN_COUNTER_VALUE = 0;
+export const MAX_COUNTER_VALUE = 2147483647; // 2^31-1, for MySQL INT
 
 const decayQueue = new Queue();
 
@@ -115,7 +116,9 @@ export class GuildCounters extends BaseGuildRepository {
     userId = userId || "0";
 
     const rawUpdate =
-      change >= 0 ? `value = LEAST(value + ${change}, ${MAX_COUNTER_VALUE})` : `value = GREATEST(value ${change}, 0)`;
+      change >= 0
+        ? `value = LEAST(value + ${change}, ${MAX_COUNTER_VALUE})`
+        : `value = GREATEST(value ${change}, ${MIN_COUNTER_VALUE})`;
 
     await this.counterValues.query(
       `
@@ -173,7 +176,7 @@ export class GuildCounters extends BaseGuildRepository {
 
       const rawUpdate =
         decayAmountToApply >= 0
-          ? `GREATEST(value - ${decayAmountToApply}, 0)`
+          ? `GREATEST(value - ${decayAmountToApply}, ${MIN_COUNTER_VALUE})`
           : `LEAST(value + ${Math.abs(decayAmountToApply)}, ${MAX_COUNTER_VALUE})`;
 
       // Using an UPDATE with ORDER BY in an attempt to avoid deadlocks from simultaneous decays

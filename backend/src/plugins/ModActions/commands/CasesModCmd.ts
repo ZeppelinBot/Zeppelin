@@ -1,10 +1,9 @@
-import { APIEmbed, User } from "discord.js";
+import { APIEmbed } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { sendErrorMessage } from "../../../pluginUtils";
-import { emptyEmbedValue, resolveUser, trimLines } from "../../../utils";
+import { UnknownUser, emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils";
 import { asyncMap } from "../../../utils/async";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { modActionsCmd } from "../types";
@@ -28,8 +27,10 @@ export const CasesModCmd = modActionsCmd({
 
   async run({ pluginData, message: msg, args }) {
     const modId = args.mod || msg.author.id;
-    const mod = await resolveUser(pluginData.client, modId);
-    const modName = mod instanceof User ? mod.tag : modId;
+    const mod =
+      (await resolveMember(pluginData.client, pluginData.guild, modId)) ||
+      (await resolveUser(pluginData.client, modId));
+    const modName = mod instanceof UnknownUser ? modId : renderUsername(mod);
 
     const casesPlugin = pluginData.getPlugin(CasesPlugin);
     const totalCases = await casesPlugin.getTotalCasesByMod(modId);
@@ -50,17 +51,18 @@ export const CasesModCmd = modActionsCmd({
         const cases = await casesPlugin.getRecentCasesByMod(modId, casesPerPage, (page - 1) * casesPerPage);
         const lines = await asyncMap(cases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
+        const isLastPage = page === totalPages;
         const firstCaseNum = (page - 1) * casesPerPage + 1;
-        const lastCaseNum = page * casesPerPage;
+        const lastCaseNum = isLastPage ? totalCases : page * casesPerPage;
         const title = `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${totalCases} by ${modName}`;
 
         const embed = {
           author: {
             name: title,
-            icon_url: mod instanceof User ? mod.displayAvatarURL() : undefined,
+            icon_url: mod instanceof UnknownUser ? undefined : mod.displayAvatarURL(),
           },
+          description: lines.join("\n"),
           fields: [
-            ...getChunkedEmbedFields(emptyEmbedValue, lines.join("\n")),
             {
               name: emptyEmbedValue,
               value: trimLines(`

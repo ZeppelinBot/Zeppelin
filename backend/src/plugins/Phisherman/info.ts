@@ -1,8 +1,8 @@
+import { ZeppelinPluginInfo } from "../../types";
 import { trimPluginDescription } from "../../utils";
-import { ZeppelinGuildPluginBlueprint } from "../ZeppelinPluginBlueprint";
-import { ConfigSchema } from "./types";
+import { zPhishermanConfig } from "./types";
 
-export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
+export const phishermanPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Phisherman",
   description: trimPluginDescription(`
     Match scam/phishing links using the Phisherman API. See https://phisherman.gg/ for more details!
@@ -39,5 +39,6 @@ export const pluginInfo: ZeppelinGuildPluginBlueprint["info"] = {
               clean: true
     ~~~
   `),
-  configSchema: ConfigSchema,
+  configSchema: zPhishermanConfig,
+  showInDocs: true,
 };

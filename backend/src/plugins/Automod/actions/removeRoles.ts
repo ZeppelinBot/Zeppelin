@@ -1,6 +1,6 @@
 import { PermissionFlagsBits, Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { nonNullish, unique } from "../../../utils";
+import z from "zod";
+import { nonNullish, unique, zSnowflake } from "../../../utils";
 import { canAssignRole } from "../../../utils/canAssignRole";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
@@ -12,9 +12,7 @@ import { automodAction } from "../helpers";
 const p = PermissionFlagsBits;
 
 export const RemoveRolesAction = automodAction({
-  configType: t.array(t.string),
-
-  defaultConfig: [],
+  configSchema: z.array(zSnowflake).default([]),
 
   async apply({ pluginData, contexts, actionConfig, ruleName }) {
     const members = unique(contexts.map((c) => c.member).filter(nonNullish));

@@ -1,16 +1,13 @@
-import * as t from "io-ts";
+import { guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { UsernameHistory } from "../../data/UsernameHistory";
-import { makeIoTsConfigParser } from "../../pluginUtils";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
-import { UsernameSaverPluginType } from "./types";
+import { UsernameSaverPluginType, zUsernameSaverConfig } from "./types";
 
-export const UsernameSaverPlugin = zeppelinGuildPlugin<UsernameSaverPluginType>()({
+export const UsernameSaverPlugin = guildPlugin<UsernameSaverPluginType>()({
   name: "username_saver",
-  showInDocs: false,
 
-  configParser: makeIoTsConfigParser(t.type({})),
+  configParser: (input) => zUsernameSaverConfig.parse(input),
 
   // prettier-ignore
   events: [

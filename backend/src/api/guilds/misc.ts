@@ -1,4 +1,4 @@
-import { ApiPermissions } from "@shared/apiPermissions";
+import { ApiPermissions } from "@zeppelinbot/shared";
 import express, { Request, Response } from "express";
 import { YAMLException } from "js-yaml";
 import moment from "moment-timezone";

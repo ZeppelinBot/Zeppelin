@@ -1,15 +1,15 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { EventEmitter } from "events";
+import { guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
-import { makeIoTsConfigParser, mapToPublicFn } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
 import { ClearMutesCmd } from "./commands/ClearMutesCmd";
 import { ClearMutesWithoutRoleCmd } from "./commands/ClearMutesWithoutRoleCmd";
@@ -23,7 +23,7 @@ import { offMutesEvent } from "./functions/offMutesEvent";
 import { onMutesEvent } from "./functions/onMutesEvent";
 import { renewTimeoutMute } from "./functions/renewTimeoutMute";
 import { unmuteUser } from "./functions/unmuteUser";
-import { ConfigSchema, MutesPluginType } from "./types";
+import { MutesPluginType, zMutesConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -61,16 +61,11 @@ const defaultOptions = {
   ],
 };
 
-export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
+export const MutesPlugin = guildPlugin<MutesPluginType>()({
   name: "mutes",
-  showInDocs: true,
-  info: {
-    prettyName: "Mutes",
-    configSchema: ConfigSchema,
-  },
 
   dependencies: () => [CasesPlugin, LogsPlugin, RoleManagerPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zMutesConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore
@@ -89,21 +84,18 @@ export const MutesPlugin = zeppelinGuildPlugin<MutesPluginType>()({
     RegisterManualTimeoutsEvt,
   ],
 
-  public: {
-    muteUser: mapToPublicFn(muteUser),
-    unmuteUser: mapToPublicFn(unmuteUser),
-    hasMutedRole(pluginData) {
-      return (member: GuildMember) => {
+  public(pluginData) {
+    return {
+      muteUser: makePublicFn(pluginData, muteUser),
+      unmuteUser: makePublicFn(pluginData, unmuteUser),
+      hasMutedRole: (member: GuildMember) => {
         const muteRole = pluginData.config.get().mute_role;
         return muteRole ? member.roles.cache.has(muteRole as Snowflake) : false;
-      };
-    },
-
-    on: mapToPublicFn(onMutesEvent),
-    off: mapToPublicFn(offMutesEvent),
-    getEventEmitter(pluginData) {
-      return () => pluginData.state.events;
-    },
+      },
+      on: makePublicFn(pluginData, onMutesEvent),
+      off: makePublicFn(pluginData, offMutesEvent),
+      getEventEmitter: () => pluginData.state.events,
+    };
   },
 
   beforeLoad(pluginData) {

@@ -1,17 +1,14 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "es2022",
-    "lib": ["es2022"],
-    "baseUrl": "src",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "outDir": "./dist"
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    
+    "composite": true,
+    "declaration": true
   },
   "include": ["src/**/*.ts"]
 }

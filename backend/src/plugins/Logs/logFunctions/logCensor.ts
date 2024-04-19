@@ -1,11 +1,11 @@
 import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import { deactivateMentions, disableCodeBlocks } from "knub/helpers";
-import { resolveChannelIds } from "src/utils/resolveChannelIds";
 import { LogType } from "../../../data/LogType";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
 import { UnknownUser } from "../../../utils";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,

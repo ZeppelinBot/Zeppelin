@@ -1,21 +1,20 @@
-import { GuildMember, Snowflake } from "discord.js";
-import { PluginOptions } from "knub";
+import { Snowflake } from "discord.js";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { makeIoTsConfigParser, sendSuccessMessage } from "../../pluginUtils";
+import { makePublicFn, sendSuccessMessage } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { AboutCmd } from "./commands/AboutCmd";
 import { AvatarCmd } from "./commands/AvatarCmd";
 import { BanSearchCmd } from "./commands/BanSearchCmd";
 import { ChannelInfoCmd } from "./commands/ChannelInfoCmd";
-import { CleanArgs, CleanCmd, cleanCmd } from "./commands/CleanCmd";
+import { CleanCmd, cleanCmd } from "./commands/CleanCmd";
 import { ContextCmd } from "./commands/ContextCmd";
 import { EmojiInfoCmd } from "./commands/EmojiInfoCmd";
 import { HelpCmd } from "./commands/HelpCmd";
@@ -42,7 +41,7 @@ import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
 import { hasPermission } from "./functions/hasPermission";
 import { activeReloads } from "./guildReloads";
 import { refreshMembersIfNeeded } from "./refreshMembers";
-import { ConfigSchema, UtilityPluginType } from "./types";
+import { UtilityPluginType, zUtilityConfig } from "./types";
 
 const defaultOptions: PluginOptions<UtilityPluginType> = {
   config: {
@@ -112,16 +111,11 @@ const defaultOptions: PluginOptions<UtilityPluginType> = {
   ],
 };
 
-export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
+export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
   name: "utility",
-  showInDocs: true,
-  info: {
-    prettyName: "Utility",
-    configSchema: ConfigSchema,
-  },
 
   dependencies: () => [TimeAndDatePlugin, ModActionsPlugin, LogsPlugin],
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zUtilityConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore
@@ -161,24 +155,12 @@ export const UtilityPlugin = zeppelinGuildPlugin<UtilityPluginType>()({
     AutoJoinThreadSyncEvt,
   ],
 
-  public: {
-    clean(pluginData) {
-      return (args: CleanArgs, msg) => {
-        cleanCmd(pluginData, args, msg);
-      };
-    },
-
-    userInfo(pluginData) {
-      return (userId: Snowflake, requestMemberId?: Snowflake) => {
-        return getUserInfoEmbed(pluginData, userId, false, requestMemberId);
-      };
-    },
-
-    hasPermission(pluginData) {
-      return (member: GuildMember, channelId: Snowflake, permission: string) => {
-        return hasPermission(pluginData, member, channelId, permission);
-      };
-    },
+  public(pluginData) {
+    return {
+      clean: makePublicFn(pluginData, cleanCmd),
+      userInfo: (userId: Snowflake) => getUserInfoEmbed(pluginData, userId, false),
+      hasPermission: makePublicFn(pluginData, hasPermission),
+    };
   },
 
   beforeLoad(pluginData) {

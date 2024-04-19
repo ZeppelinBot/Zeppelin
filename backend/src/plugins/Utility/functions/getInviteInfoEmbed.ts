@@ -85,7 +85,7 @@ export async function getInviteInfoEmbed(
       embed.fields.push({
         name: preEmbedPadding + "Invite creator",
         value: trimLines(`
-          Name: **${renderUsername(invite.inviter.username, invite.inviter.discriminator)}**
+          Name: **${renderUsername(invite.inviter)}**
           ID: \`${invite.inviter.id}\`
           Mention: <@!${invite.inviter.id}>
         `),

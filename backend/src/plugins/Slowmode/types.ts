@@ -1,20 +1,19 @@
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
 import { SlowmodeChannel } from "../../data/entities/SlowmodeChannel";
 
-export const ConfigSchema = t.type({
-  use_native_slowmode: t.boolean,
+export const zSlowmodeConfig = z.strictObject({
+  use_native_slowmode: z.boolean(),
 
-  can_manage: t.boolean,
-  is_affected: t.boolean,
+  can_manage: z.boolean(),
+  is_affected: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface SlowmodePluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zSlowmodeConfig>;
   state: {
     slowmodes: GuildSlowmodes;
     savedMessages: GuildSavedMessages;

@@ -1,11 +1,44 @@
-.git
-.github
-.idea
-.devcontainer
+**/.git
+**/.github
+**/.idea
+**/.devcontainer
 
 /docker/development/data
 /docker/production/data
 
-node_modules
-/backend/dist
-/dashboard/dist
+**/node_modules
+**/dist
+
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/.clinic
+**/.clinic-bot
+**/.clinic-api
+
+# dotenv environment variables file
+**/*.env
+**/.env
+
+# windows folder options
+**/desktop.ini
+
+# PHPStorm
+**/.idea
+
+# Misc
+**/npm-ls.txt
+**/npm-audit.txt
+**/.cache
+
+# Debug files
+**/*.debug.ts
+**/*.debug.js
+
+**/.vscode
+
+config-errors.txt
+/config-schema.json
+
+**/*.tsbuildinfo

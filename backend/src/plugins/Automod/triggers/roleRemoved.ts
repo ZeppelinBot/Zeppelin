@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { renderUserUsername } from "../../../utils";
+import z from "zod";
+import { renderUsername, zSnowflake } from "../../../utils";
 import { consumeIgnoredRoleChange } from "../functions/ignoredRoleChanges";
 import { automodTrigger } from "../helpers";
 
@@ -8,10 +8,10 @@ interface RoleAddedMatchResult {
   matchedRoleId: string;
 }
 
-export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
-  configType: t.union([t.string, t.array(t.string)]),
+const configSchema = z.union([zSnowflake, z.array(zSnowflake).max(255)]).default([]);
 
-  defaultConfig: "",
+export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
+  configSchema,
 
   async match({ triggerConfig, context, pluginData }) {
     if (!context.member || !context.rolesChanged || context.rolesChanged.removed!.length === 0) {
@@ -38,7 +38,7 @@ export const RoleRemovedTrigger = automodTrigger<RoleAddedMatchResult>()({
     const role = pluginData.guild.roles.cache.get(matchResult.extra.matchedRoleId as Snowflake);
     const roleName = role?.name || "Unknown";
     const member = contexts[0].member!;
-    const memberName = `**${renderUserUsername(member.user)}** (\`${member.id}\`)`;
+    const memberName = `**${renderUsername(member)}** (\`${member.id}\`)`;
     return `Role ${roleName} (\`${matchResult.extra.matchedRoleId}\`) was removed from ${memberName}`;
   },
 });

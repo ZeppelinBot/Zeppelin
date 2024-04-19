@@ -1,10 +1,10 @@
 import { Snowflake, TextChannel } from "discord.js";
+import { globalPlugin } from "knub";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
 import { Configs } from "../../data/Configs";
 import { GuildArchives } from "../../data/GuildArchives";
-import { makeIoTsConfigParser, sendSuccessMessage } from "../../pluginUtils";
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
+import { sendSuccessMessage } from "../../pluginUtils";
 import { getActiveReload, resetActiveReload } from "./activeReload";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd";
@@ -22,7 +22,7 @@ import { ReloadServerCmd } from "./commands/ReloadServerCmd";
 import { RemoveDashboardUserCmd } from "./commands/RemoveDashboardUserCmd";
 import { RestPerformanceCmd } from "./commands/RestPerformanceCmd";
 import { ServersCmd } from "./commands/ServersCmd";
-import { BotControlPluginType, ConfigSchema } from "./types";
+import { BotControlPluginType, zBotControlConfig } from "./types";
 
 const defaultOptions = {
   config: {
@@ -35,9 +35,9 @@ const defaultOptions = {
   },
 };
 
-export const BotControlPlugin = zeppelinGlobalPlugin<BotControlPluginType>()({
+export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
   name: "bot_control",
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zBotControlConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

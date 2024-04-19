@@ -1,12 +1,11 @@
-import * as t from "io-ts";
 import { BasePluginType } from "knub";
+import z from "zod";
 import { GuildRoleQueue } from "../../data/GuildRoleQueue";
 
-export const ConfigSchema = t.type({});
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
+export const zRoleManagerConfig = z.strictObject({});
 
 export interface RoleManagerPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zRoleManagerConfig>;
   state: {
     roleQueue: GuildRoleQueue;
     roleAssignmentLoopRunning: boolean;

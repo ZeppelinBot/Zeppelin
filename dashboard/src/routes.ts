@@ -51,7 +51,7 @@ export const router = new VueRouter({
         },
         {
           path: "setup-guides/moderation",
-          component: () => import("./components/docs/WorkInProgress.vue"),
+          component: () => import("./components/docs/Moderation.vue"),
         },
         {
           path: "setup-guides/counters",

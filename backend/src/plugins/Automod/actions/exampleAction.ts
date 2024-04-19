@@ -1,12 +1,11 @@
-import * as t from "io-ts";
+import z from "zod";
+import { zBoundedCharacters } from "../../../utils";
 import { automodAction } from "../helpers";
 
 export const ExampleAction = automodAction({
-  configType: t.type({
-    someValue: t.string,
+  configSchema: z.strictObject({
+    someValue: zBoundedCharacters(0, 1000),
   }),
-
-  defaultConfig: {},
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async apply({ pluginData, contexts, actionConfig }) {

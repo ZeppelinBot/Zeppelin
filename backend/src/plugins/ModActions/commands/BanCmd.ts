@@ -5,7 +5,7 @@ import { CaseTypes } from "../../../data/CaseTypes";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { renderUserUsername, resolveMember, resolveUser } from "../../../utils";
+import { renderUsername, resolveMember, resolveUser } from "../../../utils";
 import { banLock } from "../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
@@ -207,7 +207,7 @@ export const BanCmd = modActionsCmd({
     // Confirm the action to the moderator
     let response = "";
     if (!forceban) {
-      response = `Banned **${renderUserUsername(user)}** ${forTime}(Case #${banResult.case.case_number})`;
+      response = `Banned **${renderUsername(user)}** ${forTime}(Case #${banResult.case.case_number})`;
       if (banResult.notifyResult.text) response += ` (${banResult.notifyResult.text})`;
     } else {
       response = `Member forcebanned ${forTime}(Case #${banResult.case.case_number})`;

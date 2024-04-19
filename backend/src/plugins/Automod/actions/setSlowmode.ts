@@ -1,18 +1,14 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
-import * as t from "io-ts";
-import { convertDelayStringToMS, isDiscordAPIError, tDelayString, tNullable } from "../../../utils";
+import z from "zod";
+import { convertDelayStringToMS, isDiscordAPIError, zDelayString, zSnowflake } from "../../../utils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { automodAction } from "../helpers";
 
 export const SetSlowmodeAction = automodAction({
-  configType: t.type({
-    channels: tNullable(t.array(t.string)),
-    duration: tNullable(tDelayString),
+  configSchema: z.strictObject({
+    channels: z.array(zSnowflake),
+    duration: zDelayString.nullable().default("10s"),
   }),
-
-  defaultConfig: {
-    duration: "10s",
-  },
 
   async apply({ pluginData, actionConfig, contexts }) {
     const slowmodeMs = Math.max(actionConfig.duration ? convertDelayStringToMS(actionConfig.duration)! : 0, 0);

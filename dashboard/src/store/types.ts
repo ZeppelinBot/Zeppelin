@@ -1,4 +1,4 @@
-import { ApiPermissions } from "@shared/apiPermissions";
+import { ApiPermissions } from "@zeppelinbot/shared";
 
 export enum LoadStatus {
   None = 1,

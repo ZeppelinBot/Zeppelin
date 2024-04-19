@@ -1,28 +1,16 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "esnext",
-    "lib": ["es2023"],
-    "baseUrl": ".",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "outDir": "./dist",
-    "paths": {
-      "@shared/*": ["../shared/src/*"]
-    },
-    "sourceMap": true,
-    "alwaysStrict": true,
-    "noImplicitThis": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "useUnknownInCatchVariables": false,
-    "allowJs": true
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.json"],
+  "references": [
+    {
+      "path": "../shared/tsconfig.json"
+    }
+  ]
 }

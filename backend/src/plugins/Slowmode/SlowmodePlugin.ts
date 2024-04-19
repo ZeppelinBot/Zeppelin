@@ -1,17 +1,15 @@
-import { PluginOptions } from "knub";
+import { PluginOptions, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
-import { makeIoTsConfigParser } from "../../pluginUtils";
 import { SECONDS } from "../../utils";
 import { LogsPlugin } from "../Logs/LogsPlugin";
-import { zeppelinGuildPlugin } from "../ZeppelinPluginBlueprint";
 import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
 import { SlowmodeGetCmd } from "./commands/SlowmodeGetCmd";
 import { SlowmodeListCmd } from "./commands/SlowmodeListCmd";
 import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
-import { ConfigSchema, SlowmodePluginType } from "./types";
+import { SlowmodePluginType, zSlowmodeConfig } from "./types";
 import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
 import { onMessageCreate } from "./util/onMessageCreate";
 
@@ -36,20 +34,15 @@ const defaultOptions: PluginOptions<SlowmodePluginType> = {
   ],
 };
 
-export const SlowmodePlugin = zeppelinGuildPlugin<SlowmodePluginType>()({
+export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
   name: "slowmode",
-  showInDocs: true,
-  info: {
-    prettyName: "Slowmode",
-    configSchema: ConfigSchema,
-  },
 
   // prettier-ignore
   dependencies: () => [
     LogsPlugin,
   ],
 
-  configParser: makeIoTsConfigParser(ConfigSchema),
+  configParser: (input) => zSlowmodeConfig.parse(input),
   defaultOptions,
 
   // prettier-ignore

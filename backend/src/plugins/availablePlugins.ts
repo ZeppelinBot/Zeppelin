@@ -1,3 +1,4 @@
+import { GlobalPluginBlueprint, GuildPluginBlueprint } from "knub";
 import { AutoDeletePlugin } from "./AutoDelete/AutoDeletePlugin";
 import { AutoReactionsPlugin } from "./AutoReactions/AutoReactionsPlugin";
 import { AutomodPlugin } from "./Automod/AutomodPlugin";
@@ -12,7 +13,6 @@ import { CustomEventsPlugin } from "./CustomEvents/CustomEventsPlugin";
 import { GuildAccessMonitorPlugin } from "./GuildAccessMonitor/GuildAccessMonitorPlugin";
 import { GuildConfigReloaderPlugin } from "./GuildConfigReloader/GuildConfigReloaderPlugin";
 import { GuildInfoSaverPlugin } from "./GuildInfoSaver/GuildInfoSaverPlugin";
-import { GuildMemberCachePlugin } from "./GuildMemberCache/GuildMemberCachePlugin";
 import { InternalPosterPlugin } from "./InternalPoster/InternalPosterPlugin";
 import { LocateUserPlugin } from "./LocateUser/LocateUserPlugin";
 import { LogsPlugin } from "./Logs/LogsPlugin";
@@ -38,10 +38,9 @@ import { TimeAndDatePlugin } from "./TimeAndDate/TimeAndDatePlugin";
 import { UsernameSaverPlugin } from "./UsernameSaver/UsernameSaverPlugin";
 import { UtilityPlugin } from "./Utility/UtilityPlugin";
 import { WelcomeMessagePlugin } from "./WelcomeMessage/WelcomeMessagePlugin";
-import { ZeppelinGlobalPluginBlueprint, ZeppelinGuildPluginBlueprint } from "./ZeppelinPluginBlueprint";
 
 // prettier-ignore
-export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+export const guildPlugins: Array<GuildPluginBlueprint<any, any>> = [
   AutoDeletePlugin,
   AutoReactionsPlugin,
   GuildInfoSaverPlugin,
@@ -54,7 +53,7 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
   PostPlugin,
   ReactionRolesPlugin,
   MessageSaverPlugin,
-  GuildMemberCachePlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   ModActionsPlugin,
   NameHistoryPlugin,
   RemindersPlugin,
@@ -82,18 +81,18 @@ export const guildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
 ];
 
 // prettier-ignore
-export const globalPlugins: Array<ZeppelinGlobalPluginBlueprint<any>> = [
+export const globalPlugins: Array<GlobalPluginBlueprint<any, any>> = [
   GuildConfigReloaderPlugin,
   BotControlPlugin,
   GuildAccessMonitorPlugin,
 ];
 
 // prettier-ignore
-export const baseGuildPlugins: Array<ZeppelinGuildPluginBlueprint<any>> = [
+export const baseGuildPlugins: Array<GuildPluginBlueprint<any, any>> = [
   GuildInfoSaverPlugin,
   MessageSaverPlugin,
   NameHistoryPlugin,
-  GuildMemberCachePlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   CasesPlugin,
   MutesPlugin,
   TimeAndDatePlugin,

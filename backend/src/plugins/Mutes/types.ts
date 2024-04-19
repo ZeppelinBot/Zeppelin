@@ -1,36 +1,35 @@
 import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
-import * as t from "io-ts";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import z from "zod";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { Case } from "../../data/entities/Case";
 import { Mute } from "../../data/entities/Mute";
-import { UserNotificationMethod, UserNotificationResult, tNullable } from "../../utils";
+import { UserNotificationMethod, UserNotificationResult, zSnowflake } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
-export const ConfigSchema = t.type({
-  mute_role: tNullable(t.string),
-  move_to_voice_channel: tNullable(t.string),
-  kick_from_voice_channel: t.boolean,
+export const zMutesConfig = z.strictObject({
+  mute_role: zSnowflake.nullable(),
+  move_to_voice_channel: zSnowflake.nullable(),
+  kick_from_voice_channel: z.boolean(),
 
-  dm_on_mute: t.boolean,
-  dm_on_update: t.boolean,
-  message_on_mute: t.boolean,
-  message_on_update: t.boolean,
-  message_channel: tNullable(t.string),
-  mute_message: tNullable(t.string),
-  timed_mute_message: tNullable(t.string),
-  update_mute_message: tNullable(t.string),
-  remove_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
-  restore_roles_on_mute: t.union([t.boolean, t.array(t.string)]),
+  dm_on_mute: z.boolean(),
+  dm_on_update: z.boolean(),
+  message_on_mute: z.boolean(),
+  message_on_update: z.boolean(),
+  message_channel: z.string().nullable(),
+  mute_message: z.string().nullable(),
+  timed_mute_message: z.string().nullable(),
+  update_mute_message: z.string().nullable(),
+  remove_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
+  restore_roles_on_mute: z.union([z.boolean(), z.array(zSnowflake)]).default(false),
 
-  can_view_list: t.boolean,
-  can_cleanup: t.boolean,
+  can_view_list: z.boolean(),
+  can_cleanup: z.boolean(),
 });
-export type TConfigSchema = t.TypeOf<typeof ConfigSchema>;
 
 export interface MutesEvents {
   mute: (userId: string, reason?: string, isAutomodAction?: boolean) => void;
@@ -43,7 +42,7 @@ export interface MutesEventEmitter extends EventEmitter {
 }
 
 export interface MutesPluginType extends BasePluginType {
-  config: TConfigSchema;
+  config: z.infer<typeof zMutesConfig>;
   state: {
     mutes: GuildMutes;
     cases: GuildCases;

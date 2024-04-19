@@ -1,11 +1,9 @@
 import { Guild } from "discord.js";
-import * as t from "io-ts";
-import { BasePluginType, GlobalPluginData, globalPluginEventListener } from "knub";
+import { BasePluginType, GlobalPluginData, globalPlugin, globalPluginEventListener } from "knub";
+import z from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds";
 import { Configs } from "../../data/Configs";
 import { env } from "../../env";
-import { makeIoTsConfigParser } from "../../pluginUtils";
-import { zeppelinGlobalPlugin } from "../ZeppelinPluginBlueprint";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   state: {
@@ -24,9 +22,9 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
 /**
  * Global plugin to monitor if Zeppelin is invited to a non-whitelisted server, and leave it
  */
-export const GuildAccessMonitorPlugin = zeppelinGlobalPlugin<GuildAccessMonitorPluginType>()({
+export const GuildAccessMonitorPlugin = globalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configParser: makeIoTsConfigParser(t.type({})),
+  configParser: (input) => z.strictObject({}).parse(input),
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({

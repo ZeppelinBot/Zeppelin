@@ -7,7 +7,8 @@ import { CleanAction } from "../actions/clean";
 import { AutomodTriggerMatchResult } from "../helpers";
 import { availableTriggers } from "../triggers/availableTriggers";
 import { AutomodContext, AutomodPluginType } from "../types";
-import { checkAndUpdateCooldown } from "./checkAndUpdateCooldown";
+import { applyCooldown } from "./applyCooldown";
+import { checkCooldown } from "./checkCooldown";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
@@ -46,7 +47,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     }
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
-    if (rule.cooldown && checkAndUpdateCooldown(pluginData, rule, context)) {
+    if (rule.cooldown && checkCooldown(pluginData, rule, context)) {
       continue;
     }
 
@@ -84,6 +85,8 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         }
 
         if (matchResult) {
+          if (rule.cooldown) applyCooldown(pluginData, rule, context);
+
           contexts = [context, ...(matchResult.extraContexts || [])];
 
           for (const _context of contexts) {

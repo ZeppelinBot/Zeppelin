@@ -32,7 +32,9 @@ export function logMessageDelete(pluginData: GuildPluginData<LogsPluginType>, da
   // See comment on FORMAT_NO_TIMESTAMP in types.ts
   const config = pluginData.config.get();
   const timestampFormat =
-    (config.format.timestamp !== FORMAT_NO_TIMESTAMP ? config.format.timestamp : null) ?? config.timestamp_format;
+    (config.format.timestamp !== FORMAT_NO_TIMESTAMP ? config.format.timestamp : null) ??
+    config.timestamp_format ??
+    undefined;
 
   return log(
     pluginData,

@@ -1,10 +1,9 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { erisAllowedMentionsToDjsMentionOptions } from "src/utils/erisAllowedMentionsToDjsMentionOptions";
 import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { convertDelayStringToMS, resolveMember, tStrictMessageContent } from "../../../utils";
+import { convertDelayStringToMS, resolveMember, zStrictMessageContent } from "../../../utils";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
 import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { validate } from "../../../validatorUtils";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TagsPluginType } from "../types";
 import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
@@ -85,10 +84,10 @@ export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType
     pluginData.cooldowns.setCooldown(cd[0], cd[1]);
   }
 
-  const validationError = await validate(tStrictMessageContent, tagResult.renderedContent);
-  if (validationError) {
+  const validated = zStrictMessageContent.safeParse(tagResult.renderedContent);
+  if (!validated.success) {
     pluginData.getPlugin(LogsPlugin).logBotAlert({
-      body: `Rendering tag ${tagResult.tagName} resulted in an invalid message: ${validationError.message}`,
+      body: `Rendering tag ${tagResult.tagName} resulted in an invalid message: ${validated.error.message}`,
     });
     return;
   }

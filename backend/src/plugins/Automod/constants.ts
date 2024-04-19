@@ -1,3 +1,4 @@
+import z from "zod";
 import { MINUTES, SECONDS } from "../../utils";
 
 export const RECENT_SPAM_EXPIRY_TIME = 10 * SECONDS;
@@ -18,3 +19,5 @@ export enum RecentActionType {
   MemberLeave,
   ThreadCreate,
 }
+
+export const zNotify = z.union([z.literal("dm"), z.literal("channel")]);

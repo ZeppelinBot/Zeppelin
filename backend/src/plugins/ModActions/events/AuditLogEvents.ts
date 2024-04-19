@@ -42,7 +42,9 @@ export const AuditLogEvents = modActionsEvt({
             caseId: existingCaseId,
             modId: auditLogEntry.executor?.id || "0",
             body: auditLogEntry.reason || "",
-            noteDetails: [`Timeout set to expire on <t:${moment.utc(muteChange.new as string).valueOf()}>`],
+            noteDetails: [
+              `Timeout set to expire on <t:${Math.ceil(moment.utc(muteChange.new as string).valueOf() / 1_000)}>`,
+            ],
           });
         } else {
           await casesPlugin.createCase({
