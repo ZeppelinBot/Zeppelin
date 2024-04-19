@@ -25,9 +25,9 @@ export const zModActionsConfig = z.strictObject({
   tempban_message: z.nullable(z.string()),
   default_reasons: z.nullable(
     z.object({
-      mute: z.string(),
-      kick: z.string(),
-      ban: z.string(),
+      mute: z.string().max(512).nullable(),
+      kick: z.string().max(512).nullable(),
+      ban: z.string().max(512).nullable(),
     }),
   ),
   alert_on_rejoin: z.boolean(),
