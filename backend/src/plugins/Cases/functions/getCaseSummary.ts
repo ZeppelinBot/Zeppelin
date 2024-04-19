@@ -8,9 +8,9 @@ import { caseAbbreviations } from "../caseAbbreviations";
 import { CasesPluginType } from "../types";
 import { getCaseIcon } from "./getCaseIcon";
 
-const CASE_SUMMARY_REASON_MAX_LENGTH = 300;
+const CASE_SUMMARY_REASON_MAX_LENGTH = 682;
 const INCLUDE_MORE_NOTES_THRESHOLD = 20;
-const UPDATE_STR = "**[Update]**";
+const UPDATE_STR = "\n**[Update]**";
 
 export async function getCaseSummary(
   pluginData: GuildPluginData<CasesPluginType>,
@@ -31,7 +31,7 @@ export async function getCaseSummary(
 
   for (let i = 1; i < theCase.notes.length; i++) {
     if (reason.length >= CASE_SUMMARY_REASON_MAX_LENGTH - UPDATE_STR.length - INCLUDE_MORE_NOTES_THRESHOLD) break;
-    reason += ` ${UPDATE_STR} ${theCase.notes[i].body}`;
+    reason += ` ${UPDATE_STR} ${theCase.notes[i].body}\n`;
     leftoverNotes--;
   }
 
@@ -67,7 +67,7 @@ export async function getCaseSummary(
   let caseType = (caseAbbreviations[theCase.type] || String(theCase.type)).toUpperCase();
   caseType = (caseType + "    ").slice(0, 4);
 
-  let line = `${icon} **\`${caseType}\`** \`[${prettyTimestamp}]\` ${caseTitle} **Mod:** ${theCase.mod_name}\n${reason}`;
+  let line = `${icon} **\`${caseType}\`** \`[${prettyTimestamp}]\` ${caseTitle} **Moderator:** ${theCase.mod_name}\n${reason}`;
   if (leftoverNotes > 1) {
     line += ` *(+${leftoverNotes} ${leftoverNotes === 1 ? "note" : "notes"})*`;
   }

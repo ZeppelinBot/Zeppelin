@@ -74,6 +74,9 @@ export class GuildCases extends BaseGuildRepository {
       where: {
         user_id: userId,
       },
+      order: {
+        created_at: "DESC",
+      },
     });
   }
 
