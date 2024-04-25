@@ -24,6 +24,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         id: In(ids),
       },
     });
@@ -33,6 +34,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         id,
       },
     });
@@ -42,6 +44,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         case_number: caseNumber,
       },
     });
@@ -51,6 +54,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         mod_id: modId,
       },
       order: {
@@ -63,6 +67,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.findOne({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         audit_log_id: auditLogId,
       },
     });
@@ -72,6 +77,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         user_id: userId,
       },
       order: {
@@ -84,6 +90,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         user_id: userId,
       },
       skip,
@@ -97,6 +104,7 @@ export class GuildCases extends BaseGuildRepository {
   async getTotalCasesByModId(modId: string): Promise<number> {
     return this.cases.count({
       where: {
+        guild_id: this.guildId,
         mod_id: modId,
         is_hidden: false,
       },
@@ -107,6 +115,7 @@ export class GuildCases extends BaseGuildRepository {
     return this.cases.find({
       relations: this.getRelations(),
       where: {
+        guild_id: this.guildId,
         mod_id: modId,
         is_hidden: false,
       },
@@ -152,6 +161,7 @@ export class GuildCases extends BaseGuildRepository {
       const lastCaseNumberRow = await this.cases
         .createQueryBuilder()
         .select(["MAX(case_number) AS last_case_number"])
+        .where("guild_id = :guildId", { guildId: this.guildId })
         .getRawOne();
       const lastCaseNumber = lastCaseNumberRow?.last_case_number || 0;
 
