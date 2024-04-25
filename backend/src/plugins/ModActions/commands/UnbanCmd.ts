@@ -47,19 +47,12 @@ export const UnbanCmd = modActionsCmd({
       mod = args.mod;
     }
 
-    const config = pluginData.config.get();
-    const guild = pluginData.client.guilds.cache.get(config.main_guild as Snowflake);
-    if (!guild) {
-      sendErrorMessage(pluginData, msg.channel, "Main guild not found!");
-      return;
-    }
-
     pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, user.id);
     const reason = formatReasonWithAttachments(args.reason, [...msg.attachments.values()]);
 
     try {
       ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
-      await guild.bans.remove(user.id as Snowflake, reason ?? undefined);
+      await pluginData.guild.bans.remove(user.id as Snowflake, reason ?? undefined);
     } catch {
       sendErrorMessage(pluginData, msg.channel, "Failed to unban member; are you sure they're banned?");
       return;

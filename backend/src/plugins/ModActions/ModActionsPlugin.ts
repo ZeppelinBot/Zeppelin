@@ -51,7 +51,6 @@ import { ModActionsPluginType, zModActionsConfig } from "./types";
 
 const defaultOptions = {
   config: {
-    main_guild: null,
     dm_on_warn: true,
     dm_on_kick: false,
     dm_on_ban: false,

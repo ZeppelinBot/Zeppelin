@@ -12,7 +12,6 @@ import { UserNotificationMethod, UserNotificationResult } from "../../utils";
 import { CaseArgs } from "../Cases/types";
 
 export const zModActionsConfig = z.strictObject({
-  main_guild: z.nullable(z.string()),
   dm_on_warn: z.boolean(),
   dm_on_kick: z.boolean(),
   dm_on_ban: z.boolean(),
