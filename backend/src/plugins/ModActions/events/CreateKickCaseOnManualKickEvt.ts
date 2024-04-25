@@ -40,7 +40,7 @@ export const CreateKickCaseOnManualKickEvt = modActionsEvt({
 
         const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
-        if (pluginData.guild.id === config.main_guild && config.create_cases_for_manual_actions) {
+        if (config.create_cases_for_manual_actions) {
           const casesPlugin = pluginData.getPlugin(CasesPlugin);
           createdCase = await casesPlugin.createCase({
             userId: member.id,

@@ -41,7 +41,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt({
 
       const config = mod instanceof UnknownUser ? pluginData.config.get() : await pluginData.config.getForUser(mod);
 
-      if (pluginData.guild.id === config.main_guild && config.create_cases_for_manual_actions) {
+      if (config.create_cases_for_manual_actions) {
         createdCase = await casesPlugin.createCase({
           userId: user.id,
           modId,
@@ -52,7 +52,7 @@ export const CreateUnbanCaseOnManualUnbanEvt = modActionsEvt({
       }
     } else {
       const config = pluginData.config.get();
-      if (pluginData.guild.id === config.main_guild && config.create_cases_for_manual_actions) {
+      if (config.create_cases_for_manual_actions) {
         createdCase = await casesPlugin.createCase({
           userId: user.id,
           modId: "0",
