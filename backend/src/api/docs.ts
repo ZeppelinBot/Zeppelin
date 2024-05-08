@@ -122,7 +122,6 @@ export function initDocs(router: express.Router) {
 
     const plugin = guildPlugins.find((p) => p.name === name)!;
     const info = { ...baseInfo };
-    delete info.configSchema;
 
     const messageCommands = (plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
@@ -135,6 +134,7 @@ export function initDocs(router: express.Router) {
 
     const defaultOptions = plugin.defaultOptions || {};
     const configSchema = info.configSchema && formatZodConfigSchema(info.configSchema);
+    delete info.configSchema;
 
     res.json({
       name,
