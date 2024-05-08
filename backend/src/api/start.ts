@@ -28,17 +28,17 @@ app.use(multer().none());
 
 const rootRouter = express.Router();
 
-initAuth(app);
-initGuildsAPI(app);
-initArchives(app);
-initDocs(app);
-
 // Default route
 rootRouter.get("/", (req, res) => {
   res.json({ status: "cookies", with: "milk" });
 });
 
 app.use(apiPathPrefix, rootRouter);
+
+initAuth(rootRouter);
+initGuildsAPI(rootRouter);
+initArchives(rootRouter);
+initDocs(rootRouter);
 
 // Error response
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
