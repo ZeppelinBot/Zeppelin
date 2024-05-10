@@ -1,5 +1,6 @@
 import { ZeppelinPluginInfo } from "../../types";
 import { trimPluginDescription } from "../../utils";
+import { zCompanionChannelsConfig } from "./types";
 
 export const companionChannelsPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,
@@ -9,4 +10,5 @@ export const companionChannelsPluginInfo: ZeppelinPluginInfo = {
     Once set up, any time a user joins one of the specified voice channels,
     they'll get channel permissions applied to them for the text channels.
   `),
+  configSchema: zCompanionChannelsConfig,
 };

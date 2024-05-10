@@ -1,5 +1,6 @@
 import { ZeppelinPluginInfo } from "../../types";
 import { trimPluginDescription } from "../../utils";
+import { zAutomodConfig } from "./types";
 
 export const automodPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,
@@ -100,4 +101,5 @@ export const automodPluginInfo: ZeppelinPluginInfo = {
                     {matchSummary}
       ~~~
   `),
+  configSchema: zAutomodConfig,
 };
