@@ -10,7 +10,6 @@ import { resolveUser } from "../../../utils";
 import { CasesPlugin } from "../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
 import { ignoreEvent } from "./ignoreEvent";
 import { isBanned } from "./isBanned";
 
@@ -21,11 +20,9 @@ export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginT
   }
 
   pluginData.state.serverLogs.ignoreLog(LogType.MEMBER_UNBAN, tempban.user_id);
-  const reason = formatReasonWithAttachments(
-    `Tempban timed out.
-    Tempbanned at: \`${tempban.created_at} UTC\``,
-    [],
-  );
+  const reason = `Tempban timed out.
+    Tempbanned at: \`${tempban.created_at} UTC\``;
+
   try {
     ignoreEvent(pluginData, IgnoredEventType.Unban, tempban.user_id);
     await pluginData.guild.bans.remove(tempban.user_id as Snowflake, reason ?? undefined);

@@ -57,6 +57,7 @@ export const MuteAction = automodAction({
           userId,
           duration,
           reason,
+          reason,
           { contactMethods, caseArgs, isAutomodAction: true },
           rolesToRemove,
           rolesToRestore,

@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { postCmd } from "../types";
 import { formatContent } from "../util/formatContent";
 
@@ -15,18 +14,18 @@ export const EditCmd = postCmd({
   async run({ message: msg, args, pluginData }) {
     const targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     if (!targetMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(msg, "Unknown message");
       return;
     }
 
     if (targetMessage.author.id !== pluginData.client.user!.id) {
-      sendErrorMessage(pluginData, msg.channel, "Message wasn't posted by me");
+      void pluginData.state.common.sendErrorMessage(msg, "Message wasn't posted by me");
       return;
     }
 
     targetMessage.channel.messages.edit(targetMessage.id, {
       content: formatContent(args.content),
     });
-    sendSuccessMessage(pluginData, msg.channel, "Message edited");
+    void pluginData.state.common.sendSuccessMessage(msg, "Message edited");
   },
 });

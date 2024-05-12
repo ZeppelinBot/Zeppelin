@@ -13,7 +13,7 @@ import escapeStringRegexp from "escape-string-regexp";
 import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
-import { getBaseUrl, sendErrorMessage } from "../../pluginUtils";
+import { getBaseUrl } from "../../pluginUtils";
 import {
   InvalidRegexError,
   MINUTES,
@@ -122,12 +122,12 @@ export async function displaySearch(
       }
     } catch (e) {
       if (e instanceof SearchError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        void pluginData.state.common.sendErrorMessage(msg, e.message);
         return;
       }
 
       if (e instanceof InvalidRegexError) {
-        sendErrorMessage(pluginData, msg.channel, e.message);
+        void pluginData.state.common.sendErrorMessage(msg, e.message);
         return;
       }
 
@@ -135,7 +135,7 @@ export async function displaySearch(
     }
 
     if (searchResult.totalResults === 0) {
-      sendErrorMessage(pluginData, msg.channel, "No results found");
+      void pluginData.state.common.sendErrorMessage(msg, "No results found");
       return;
     }
 
@@ -266,12 +266,12 @@ export async function archiveSearch(
     }
   } catch (e) {
     if (e instanceof SearchError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      void pluginData.state.common.sendErrorMessage(msg, e.message);
       return;
     }
 
     if (e instanceof InvalidRegexError) {
-      sendErrorMessage(pluginData, msg.channel, e.message);
+      void pluginData.state.common.sendErrorMessage(msg, e.message);
       return;
     }
 
@@ -279,7 +279,7 @@ export async function archiveSearch(
   }
 
   if (results.totalResults === 0) {
-    sendErrorMessage(pluginData, msg.channel, "No results found");
+    void pluginData.state.common.sendErrorMessage(msg, "No results found");
     return;
   }
 

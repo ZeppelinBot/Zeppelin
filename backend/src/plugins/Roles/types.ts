@@ -1,6 +1,7 @@
-import { BasePluginType, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { GuildLogs } from "../../data/GuildLogs";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const zRolesConfig = z.strictObject({
   can_assign: z.boolean(),
@@ -12,6 +13,7 @@ export interface RolesPluginType extends BasePluginType {
   config: z.infer<typeof zRolesConfig>;
   state: {
     logs: GuildLogs;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildReminders } from "../../data/GuildReminders";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { RemindCmd } from "./commands/RemindCmd";
 import { RemindersCmd } from "./commands/RemindersCmd";
@@ -42,6 +43,10 @@ export const RemindersPlugin = guildPlugin<RemindersPluginType>()({
     state.reminders = GuildReminders.getGuildInstance(guild.id);
     state.tries = new Map();
     state.unloaded = false;
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

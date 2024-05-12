@@ -1,6 +1,7 @@
 import {
   APIEmbed,
   ChannelType,
+  ChatInputCommandInteraction,
   Client,
   DiscordAPIError,
   EmbedData,
@@ -1303,11 +1304,11 @@ export async function resolveStickerId(bot: Client, id: Snowflake): Promise<Stic
 }
 
 export async function confirm(
-  channel: GuildTextBasedChannel,
+  context: Message | User | ChatInputCommandInteraction,
   userId: string,
   content: MessageCreateOptions,
 ): Promise<boolean> {
-  return waitForButtonConfirm(channel, content, { restrictToId: userId });
+  return waitForButtonConfirm(context, content, { restrictToId: userId });
 }
 
 export function messageSummary(msg: SavedMessage) {

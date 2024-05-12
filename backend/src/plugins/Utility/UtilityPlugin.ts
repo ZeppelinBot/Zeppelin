@@ -5,8 +5,9 @@ import { GuildCases } from "../../data/GuildCases";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { Supporters } from "../../data/Supporters";
-import { makePublicFn, sendSuccessMessage } from "../../pluginUtils";
+import { makePublicFn } from "../../pluginUtils";
 import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -192,11 +193,15 @@ export const UtilityPlugin = guildPlugin<UtilityPluginType>()({
     }
   },
 
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+  },
+
   afterLoad(pluginData) {
     const { guild } = pluginData;
 
     if (activeReloads.has(guild.id)) {
-      sendSuccessMessage(pluginData, activeReloads.get(guild.id)!, "Reloaded!");
+      pluginData.state.common.sendSuccessMessage(activeReloads.get(guild.id)!, "Reloaded!");
       activeReloads.delete(guild.id);
     }
   },

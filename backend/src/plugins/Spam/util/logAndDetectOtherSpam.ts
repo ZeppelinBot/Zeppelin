@@ -40,10 +40,13 @@ export async function logAndDetectOtherSpam(
           (spamConfig.mute_time && convertDelayStringToMS(spamConfig.mute_time.toString())) ?? 120 * 1000;
 
         try {
+          const reason = "Automatic spam detection";
+
           await mutesPlugin.muteUser(
             member.id,
             muteTime,
-            "Automatic spam detection",
+            reason,
+            reason,
             {
               caseArgs: {
                 modId: pluginData.client.user!.id,

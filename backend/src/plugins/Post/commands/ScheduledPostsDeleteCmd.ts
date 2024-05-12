@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { clearUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { sorter } from "../../../utils";
 import { postCmd } from "../types";
 
@@ -17,12 +16,12 @@ export const ScheduledPostsDeleteCmd = postCmd({
     scheduledPosts.sort(sorter("post_at"));
     const post = scheduledPosts[args.num - 1];
     if (!post) {
-      sendErrorMessage(pluginData, msg.channel, "Scheduled post not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Scheduled post not found");
       return;
     }
 
     clearUpcomingScheduledPost(post);
     await pluginData.state.scheduledPosts.delete(post.id);
-    sendSuccessMessage(pluginData, msg.channel, "Scheduled post deleted!");
+    void pluginData.state.common.sendSuccessMessage(msg, "Scheduled post deleted!");
   },
 });

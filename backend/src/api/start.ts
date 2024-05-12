@@ -28,10 +28,10 @@ app.use(multer().none());
 
 const rootRouter = express.Router();
 
-initAuth(app);
-initGuildsAPI(app);
-initArchives(app);
-initDocs(app);
+initAuth(rootRouter);
+initGuildsAPI(rootRouter);
+initArchives(rootRouter);
+initDocs(rootRouter);
 
 // Default route
 rootRouter.get("/", (req, res) => {

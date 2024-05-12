@@ -1,6 +1,7 @@
-import { BasePluginType, CooldownManager, guildPluginMessageCommand } from "knub";
+import { BasePluginType, CooldownManager, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 const zRoleMap = z.record(
   zBoundedCharacters(1, 100),
@@ -27,6 +28,7 @@ export interface SelfGrantableRolesPluginType extends BasePluginType {
   config: z.infer<typeof zSelfGrantableRolesConfig>;
   state: {
     cooldowns: CooldownManager;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

@@ -1,8 +1,7 @@
-import { ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
-import moment from "moment-timezone";
+import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
 import { ZodError } from "zod";
 import { guildPlugins } from "./plugins/availablePlugins";
-import { ZeppelinGuildConfig, zZeppelinGuildConfig } from "./types";
+import { zZeppelinGuildConfig } from "./types";
 import { formatZodIssue } from "./utils/formatZodIssue";
 
 const pluginNameToPlugin = new Map<string, GuildPluginBlueprint<any, any>>();
@@ -16,14 +15,7 @@ export async function validateGuildConfig(config: any): Promise<string | null> {
     return validationResult.error.issues.map(formatZodIssue).join("\n");
   }
 
-  const guildConfig = config as ZeppelinGuildConfig;
-
-  if (guildConfig.timezone) {
-    const validTimezones = moment.tz.names();
-    if (!validTimezones.includes(guildConfig.timezone)) {
-      return `Invalid timezone: ${guildConfig.timezone}`;
-    }
-  }
+  const guildConfig = config as BaseConfig;
 
   if (guildConfig.plugins) {
     for (const [pluginName, pluginOptions] of Object.entries(guildConfig.plugins)) {

@@ -8,6 +8,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { makePublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
@@ -107,6 +108,10 @@ export const MutesPlugin = guildPlugin<MutesPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.events = new EventEmitter();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

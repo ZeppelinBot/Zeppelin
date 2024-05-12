@@ -3,18 +3,18 @@
  */
 
 import {
+  ChatInputCommandInteraction,
   GuildMember,
+  InteractionReplyOptions,
   Message,
   MessageCreateOptions,
-  MessageMentionOptions,
   PermissionsBitField,
   TextBasedChannel,
+  User,
 } from "discord.js";
 import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
-import { logger } from "./logger";
 import { isStaff } from "./staff";
 import { TZeppelinKnub } from "./types";
-import { errorMessage, successMessage } from "./utils";
 import { Tail } from "./utils/typeUtils";
 
 const { getMemberLevel } = helpers;
@@ -49,46 +49,57 @@ export async function hasPermission(
   return helpers.hasPermission(config, permission);
 }
 
-export async function sendSuccessMessage(
-  pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.success_emoji || undefined;
-  const formattedBody = successMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
-
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send success message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
-    });
+export function isContextInteraction(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+): context is ChatInputCommandInteraction {
+  return "commandId" in context && !!context.commandId;
 }
 
-export async function sendErrorMessage(
-  pluginData: AnyPluginData<any>,
-  channel: TextBasedChannel,
-  body: string,
-  allowedMentions?: MessageMentionOptions,
-): Promise<Message | undefined> {
-  const emoji = pluginData.fullConfig.error_emoji || undefined;
-  const formattedBody = errorMessage(body, emoji);
-  const content: MessageCreateOptions = allowedMentions
-    ? { content: formattedBody, allowedMentions }
-    : { content: formattedBody };
+export function isContextMessage(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+): context is Message {
+  return "content" in context || "embeds" in context;
+}
 
-  return channel
-    .send({ ...content }) // Force line break
-    .catch((err) => {
-      const channelInfo = "guild" in channel ? `${channel.id} (${channel.guild.id})` : channel.id;
-      logger.warn(`Failed to send error message to ${channelInfo}): ${err.code} ${err.message}`);
-      return undefined;
-    });
+export async function getContextChannel(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+): Promise<TextBasedChannel> {
+  if (isContextInteraction(context)) {
+    // context is ChatInputCommandInteraction
+    return context.channel!;
+  } else if ("username" in context) {
+    // context is User
+    return await (context as User).createDM();
+  } else if ("send" in context) {
+    // context is TextBaseChannel
+    return context as TextBasedChannel;
+  } else {
+    // context is Message
+    return context.channel;
+  }
+}
+
+export async function sendContextResponse(
+  context: TextBasedChannel | Message | User | ChatInputCommandInteraction,
+  response: string | Omit<MessageCreateOptions, "flags"> | InteractionReplyOptions,
+): Promise<Message> {
+  if (isContextInteraction(context)) {
+    const options = { ...(typeof response === "string" ? { content: response } : response), fetchReply: true };
+
+    return (
+      context.replied
+        ? context.followUp(options)
+        : context.deferred
+        ? context.editReply(options)
+        : context.reply(options)
+    ) as Promise<Message>;
+  }
+
+  if (typeof response !== "string" && "ephemeral" in response) {
+    delete response.ephemeral;
+  }
+
+  return (await getContextChannel(context)).send(response as string | Omit<MessageCreateOptions, "flags">);
 }
 
 export function getBaseUrl(pluginData: AnyPluginData<any>) {

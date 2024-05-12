@@ -1,5 +1,6 @@
 import { guildPlugin } from "knub";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { resetButtonsCmd } from "./commands/resetButtons";
@@ -35,6 +36,10 @@ export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
 
   beforeLoad(pluginData) {
     pluginData.state.roleButtons = GuildRoleButtons.getGuildInstance(pluginData.guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

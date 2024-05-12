@@ -1,12 +1,13 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
-import { zEmbedInput } from "../../utils";
+import { zBoundedCharacters, zStrictMessageContent } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
-export const zTag = z.union([z.string(), zEmbedInput]);
+export const zTag = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 export type TTag = z.infer<typeof zTag>;
 
 export const zTagCategory = z
@@ -59,6 +60,7 @@ export interface TagsPluginType extends BasePluginType {
     tags: GuildTags;
     savedMessages: GuildSavedMessages;
     logs: GuildLogs;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
 
     onMessageCreateFn;
 

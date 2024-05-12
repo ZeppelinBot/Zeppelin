@@ -6,6 +6,7 @@ import { BotControlPlugin } from "./BotControl/BotControlPlugin";
 import { CasesPlugin } from "./Cases/CasesPlugin";
 import { CensorPlugin } from "./Censor/CensorPlugin";
 import { ChannelArchiverPlugin } from "./ChannelArchiver/ChannelArchiverPlugin";
+import { CommonPlugin } from "./Common/CommonPlugin";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin";
 import { ContextMenuPlugin } from "./ContextMenus/ContextMenuPlugin";
 import { CountersPlugin } from "./Counters/CountersPlugin";
@@ -53,8 +54,8 @@ export const guildPlugins: Array<GuildPluginBlueprint<any, any>> = [
   PostPlugin,
   ReactionRolesPlugin,
   MessageSaverPlugin,
-  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   ModActionsPlugin,
+  // GuildMemberCachePlugin, // FIXME: New caching thing, or fix deadlocks with this plugin
   NameHistoryPlugin,
   RemindersPlugin,
   RolesPlugin,
@@ -78,6 +79,7 @@ export const guildPlugins: Array<GuildPluginBlueprint<any, any>> = [
   InternalPosterPlugin,
   RoleManagerPlugin,
   RoleButtonsPlugin,
+  CommonPlugin,
 ];
 
 // prettier-ignore
@@ -96,5 +98,6 @@ export const baseGuildPlugins: Array<GuildPluginBlueprint<any, any>> = [
   CasesPlugin,
   MutesPlugin,
   TimeAndDatePlugin,
+  CommonPlugin,
   // TODO: Replace these with proper dependencies
 ];

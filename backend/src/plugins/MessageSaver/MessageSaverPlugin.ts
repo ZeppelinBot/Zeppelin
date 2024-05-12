@@ -1,5 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
@@ -42,5 +43,9 @@ export const MessageSaverPlugin = guildPlugin<MessageSaverPluginType>()({
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

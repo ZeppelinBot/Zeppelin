@@ -1,30 +1,31 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
+import { GuildCases } from "../../data/GuildCases";
+import { CasesPlugin } from "../Cases/CasesPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { ContextClickedEvt } from "./events/ContextClickedEvt";
+import { BanCmd } from "./commands/BanUserCtxCmd";
+import { CleanCmd } from "./commands/CleanMessageCtxCmd";
+import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd";
+import { MuteCmd } from "./commands/MuteUserCtxCmd";
+import { NoteCmd } from "./commands/NoteUserCtxCmd";
+import { WarnCmd } from "./commands/WarnUserCtxCmd";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types";
-import { loadAllCommands } from "./utils/loadAllCommands";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {
     can_use: false,
 
-    user_muteindef: false,
-    user_mute1d: false,
-    user_mute1h: false,
-    user_info: false,
-
-    message_clean10: false,
-    message_clean25: false,
-    message_clean50: false,
+    can_open_mod_menu: false,
   },
   overrides: [
     {
       level: ">=50",
       config: {
         can_use: true,
+
+        can_open_mod_menu: true,
       },
     },
   ],
@@ -33,22 +34,15 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
 export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
 
-  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
+  dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  events: [
-    ContextClickedEvt,
-  ],
+  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd, CleanCmd],
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.contextMenuLinks = new GuildContextMenuLinks(guild.id);
-  },
-
-  afterLoad(pluginData) {
-    loadAllCommands(pluginData);
+    state.cases = GuildCases.getGuildInstance(guild.id);
   },
 });

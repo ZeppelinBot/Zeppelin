@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { GuildArchives } from "../../data/GuildArchives";
 import { GuildCases } from "../../data/GuildCases";
@@ -10,6 +10,7 @@ import { Case } from "../../data/entities/Case";
 import { Mute } from "../../data/entities/Mute";
 import { UserNotificationMethod, UserNotificationResult, zSnowflake } from "../../utils";
 import { CaseArgs } from "../Cases/types";
+import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const zMutesConfig = z.strictObject({
   mute_role: zSnowflake.nullable(),
@@ -53,6 +54,8 @@ export interface MutesPluginType extends BasePluginType {
     unregisterTimeoutMuteToRenewListener: () => void;
 
     events: MutesEventEmitter;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

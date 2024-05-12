@@ -2,6 +2,7 @@ import { PluginOptions, guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
@@ -48,6 +49,10 @@ export const StarboardPlugin = guildPlugin<StarboardPluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.starboardMessages = GuildStarboardMessages.getGuildInstance(guild.id);
     state.starboardReactions = GuildStarboardReactions.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

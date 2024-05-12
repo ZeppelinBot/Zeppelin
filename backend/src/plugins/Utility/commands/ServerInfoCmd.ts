@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
 import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
 import { utilityCmd } from "../types";
 
@@ -17,7 +16,7 @@ export const ServerInfoCmd = utilityCmd({
     const serverId = args.serverId || pluginData.guild.id;
     const serverInfoEmbed = await getServerInfoEmbed(pluginData, serverId);
     if (!serverInfoEmbed) {
-      sendErrorMessage(pluginData, message.channel, "Could not find information for that server");
+      void pluginData.state.common.sendErrorMessage(message, "Could not find information for that server");
       return;
     }
 

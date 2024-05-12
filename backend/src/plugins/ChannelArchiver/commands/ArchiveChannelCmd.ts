@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isOwner, sendErrorMessage } from "../../../pluginUtils";
+import { isOwner } from "../../../pluginUtils";
 import { SECONDS, confirm, noop, renderUsername } from "../../../utils";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { rehostAttachment } from "../rehostAttachment";
@@ -32,12 +32,12 @@ export const ArchiveChannelCmd = channelArchiverCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!args["attachment-channel"]) {
-      const confirmed = await confirm(msg.channel, msg.author.id, {
+      const confirmed = await confirm(msg, msg.author.id, {
         content:
           "No `-attachment-channel` specified. Continue? Attachments will not be available in the log if their message is deleted.",
       });
       if (!confirmed) {
-        sendErrorMessage(pluginData, msg.channel, "Canceled");
+        void pluginData.state.common.sendErrorMessage(msg, "Canceled");
         return;
       }
     }

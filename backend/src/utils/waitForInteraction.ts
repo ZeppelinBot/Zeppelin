@@ -2,22 +2,26 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  GuildTextBasedChannel,
+  ChatInputCommandInteraction,
+  Message,
   MessageActionRowComponentBuilder,
   MessageComponentInteraction,
   MessageCreateOptions,
+  User,
 } from "discord.js";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
+import { isContextInteraction } from "../pluginUtils";
 import { noop } from "../utils";
 
 export async function waitForButtonConfirm(
-  channel: GuildTextBasedChannel,
-  toPost: MessageCreateOptions,
+  context: Message | User | ChatInputCommandInteraction,
+  toPost: Omit<MessageCreateOptions, "flags">,
   options?: WaitForOptions,
 ): Promise<boolean> {
   return new Promise(async (resolve) => {
-    const idMod = `${channel.guild.id}-${moment.utc().valueOf()}`;
+    const contextIsInteraction = isContextInteraction(context);
+    const idMod = `${context.id}-${moment.utc().valueOf()}`;
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents([
       new ButtonBuilder()
         .setStyle(ButtonStyle.Success)
@@ -29,7 +33,15 @@ export async function waitForButtonConfirm(
         .setLabel(options?.cancelText || "Cancel")
         .setCustomId(`cancelButton:${idMod}:${uuidv4()}`),
     ]);
-    const message = await channel.send({ ...toPost, components: [row] });
+    const sendMethod = () => {
+      if (contextIsInteraction) {
+        return context.replied ? context.editReply.bind(context) : context.reply.bind(context);
+      } else {
+        return "send" in context ? context.send.bind(context) : context.channel.send.bind(context.channel);
+      }
+    };
+    const extraParameters = contextIsInteraction ? { fetchReply: true, ephemeral: true } : {};
+    const message = (await sendMethod()({ ...toPost, components: [row], ...extraParameters })) as Message;
 
     const collector = message.createMessageComponentCollector({ time: 10000 });
 
@@ -41,16 +53,16 @@ export async function waitForButtonConfirm(
           .catch((err) => console.trace(err.message));
       } else {
         if (interaction.customId.startsWith(`confirmButton:${idMod}:`)) {
-          message.delete();
+          if (!contextIsInteraction) message.delete();
           resolve(true);
         } else if (interaction.customId.startsWith(`cancelButton:${idMod}:`)) {
-          message.delete();
+          if (!contextIsInteraction) message.delete();
           resolve(false);
         }
       }
     });
     collector.on("end", () => {
-      if (message.deletable) message.delete().catch(noop);
+      if (!contextIsInteraction && message.deletable) message.delete().catch(noop);
       resolve(false);
     });
   });

@@ -1,7 +1,6 @@
 import { ApiPermissions } from "@zeppelinbot/shared";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
 import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils";
 import { isEligible } from "../functions/isEligible";
 import { botControlCmd } from "../types";
@@ -18,19 +17,19 @@ export const AddServerFromInviteCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const invite = await resolveInvite(pluginData.client, args.inviteCode, true);
     if (!invite || !isGuildInvite(invite)) {
-      sendErrorMessage(pluginData, msg.channel, "Could not resolve invite"); // :D
+      void msg.channel.send("Could not resolve invite"); // :D
       return;
     }
 
     const existing = await pluginData.state.allowedGuilds.find(invite.guild.id);
     if (existing) {
-      sendErrorMessage(pluginData, msg.channel, "Server is already allowed!");
+      void msg.channel.send("Server is already allowed!");
       return;
     }
 
     const { result, explanation } = await isEligible(pluginData, args.user, invite);
     if (!result) {
-      sendErrorMessage(pluginData, msg.channel, `Could not add server because it's not eligible: ${explanation}`);
+      msg.channel.send(`Could not add server because it's not eligible: ${explanation}`);
       return;
     }
 
@@ -51,6 +50,6 @@ export const AddServerFromInviteCmd = botControlCmd({
       );
     }
 
-    sendSuccessMessage(pluginData, msg.channel, "Server was eligible and is now allowed to use Zeppelin!");
+    msg.channel.send("Server was eligible and is now allowed to use Zeppelin!");
   },
 });
