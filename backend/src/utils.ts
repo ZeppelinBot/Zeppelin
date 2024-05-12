@@ -1327,7 +1327,14 @@ export function messageSummary(msg: SavedMessage) {
   }
 
   if (msg.data.poll) {
-    result += "Poll: ```" + escapeCodeBlock(JSON.stringify(msg.data.poll)) + "```";
+    const poll = msg.data.poll;
+    result +=
+      "Poll: ```" +
+      escapeCodeBlock(
+        `Question: ${poll.question.text}
+        Answers: ${poll.answers.map((answer) => answer.text).join(" | ")}`,
+      ) +
+      "```";
   }
 
   return result;
