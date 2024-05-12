@@ -1332,7 +1332,7 @@ export function messageSummary(msg: SavedMessage) {
       "Poll: ```" +
       escapeCodeBlock(
         `Question: ${poll.question.text}
-        Answers: ${poll.answers.map((answer) => answer.text).join(" | ")}`,
+        Answers: ${poll.answers.map((answer) => `"${answer.text}"`).join(" | ")}`,
       ) +
       "```";
   }
