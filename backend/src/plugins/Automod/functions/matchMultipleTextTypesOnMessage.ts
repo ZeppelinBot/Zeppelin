@@ -15,14 +15,7 @@ type TextTriggerWithMultipleMatchTypes = {
   match_polls: boolean;
 };
 
-export type MatchableTextType =
-  | "message"
-  | "embed"
-  | "visiblename"
-  | "username"
-  | "nickname"
-  | "customstatus"
-  | "polls";
+export type MatchableTextType = "message" | "embed" | "visiblename" | "username" | "nickname" | "customstatus" | "poll";
 
 type YieldedContent = [MatchableTextType, string];
 
@@ -69,6 +62,6 @@ export async function* matchMultipleTextTypesOnMessage(
   }
 
   if (trigger.match_polls && msg.data.poll) {
-    yield ["polls", JSON.stringify(msg.data.poll)];
+    yield ["poll", JSON.stringify(msg.data.poll)];
   }
 }

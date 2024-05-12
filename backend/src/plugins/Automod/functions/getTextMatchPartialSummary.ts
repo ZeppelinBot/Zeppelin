@@ -30,5 +30,10 @@ export function getTextMatchPartialSummary(
     return `visible name: ${visibleName}`;
   } else if (type === "customstatus") {
     return `custom status: ${context.member!.presence?.activities.find((a) => a.type === ActivityType.Custom)?.name}`;
+  } else if (type == "poll") {
+    const message = context.message!;
+    const channel = pluginData.guild.channels.cache.get(message.channel_id as Snowflake);
+    const channelMention = channel ? verboseChannelMention(channel) : `\`#${message.channel_id}\``;
+    return `poll in ${channelMention}:\n${messageSummary(message)}`;
   }
 }

@@ -65,13 +65,13 @@ export interface ISavedMessageStickerData {
 }
 
 export interface ISavedMessagePollData {
+  question: {
+    text: string;
+  };
   answers: {
     id: number;
     text: string | null;
   }[];
-  question: {
-    text: string;
-  };
 }
 
 export interface ISavedMessageData {
