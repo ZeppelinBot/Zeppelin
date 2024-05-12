@@ -66,8 +66,6 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
         str = normalizeText(str);
       }
 
-      console.log([type, str]);
-
       for (const regex of regexes) {
         if (regex.test(str)) {
           return {
