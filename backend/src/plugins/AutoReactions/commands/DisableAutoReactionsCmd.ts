@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { autoReactionsCmd } from "../types";
 
 export const DisableAutoReactionsCmd = autoReactionsCmd({

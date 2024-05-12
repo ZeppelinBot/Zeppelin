@@ -1,7 +1,6 @@
 import { guildPluginMessageCommand } from "knub";
 import { trimMultilineString, ucfirst } from "../../../utils";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { CountersPluginType } from "../types";
 
 export const CountersListCmd = guildPluginMessageCommand<CountersPluginType>()({

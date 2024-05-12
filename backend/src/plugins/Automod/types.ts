@@ -9,6 +9,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { SavedMessage } from "../../data/entities/SavedMessage";
 import { entries, zBoundedRecord, zDelayString } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { CounterEvents } from "../Counters/types";
 import { ModActionType, ModActionsEvents } from "../ModActions/types";
 import { MutesEvents } from "../Mutes/types";
@@ -17,7 +18,6 @@ import { RecentActionType } from "./constants";
 import { availableTriggers } from "./triggers/availableTriggers";
 
 import Timeout = NodeJS.Timeout;
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 export type ZTriggersMapHelper = {
   [TriggerName in keyof typeof availableTriggers]: (typeof availableTriggers)[TriggerName]["configSchema"];

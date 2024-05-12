@@ -4,11 +4,11 @@ import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { actualMuteCmd } from "./actualMuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
+import { actualMuteCmd } from "./actualMuteCmd";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the mute", required: false }),
@@ -54,7 +54,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
       if (_isBanned) {
         pluginData.state.common.sendErrorMessage(
           interaction,
-          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`
+          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
         );
         return;
       } else {
@@ -66,10 +66,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
         );
 
         if (!reply) {
-          pluginData.state.common.sendErrorMessage(
-            interaction,
-            "User not on server, mute cancelled by moderator"
-          );
+          pluginData.state.common.sendErrorMessage(interaction, "User not on server, mute cancelled by moderator");
           return;
         }
       }
@@ -90,10 +87,7 @@ export const MuteSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData.state.common.sendErrorMessage(
-          interaction,
-          "You don't have permission to act as another moderator"
-        );
+        pluginData.state.common.sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 

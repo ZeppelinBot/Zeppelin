@@ -1,8 +1,8 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { actualMassMuteCmd } from "./actualMassMuteCmd";
 import { modActionsMsgCmd } from "../../types";
+import { actualMassMuteCmd } from "./actualMassMuteCmd";
 
 export const MassMuteMsgCmd = modActionsMsgCmd({
   trigger: "massmute",

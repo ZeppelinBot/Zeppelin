@@ -1,7 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { clearUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop";
 import { sorter } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { remindersCmd } from "../types";
 
 export const RemindersDeleteCmd = remindersCmd({

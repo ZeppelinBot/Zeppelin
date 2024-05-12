@@ -5,10 +5,10 @@ import { convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { actualUnmuteCmd } from "./actualUnmuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
+import { actualUnmuteCmd } from "./actualUnmuteCmd";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the unmute", required: false }),
@@ -33,13 +33,7 @@ export const UnmuteSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData.state.common.sendErrorMessage(
-        interaction,
-        "Text or attachment required",
-        undefined,
-        undefined,
-        true
-      );
+      pluginData.state.common.sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
 
       return;
     }
@@ -64,7 +58,7 @@ export const UnmuteSlashCmd = modActionsSlashCmd({
       if (banned) {
         pluginData.state.common.sendErrorMessage(
           interaction,
-          `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`
+          `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`,
         );
         return;
       } else {
@@ -76,10 +70,7 @@ export const UnmuteSlashCmd = modActionsSlashCmd({
         );
 
         if (!reply) {
-          pluginData.state.common.sendErrorMessage(
-            interaction,
-            "User not on server, unmute cancelled by moderator"
-          );
+          pluginData.state.common.sendErrorMessage(interaction, "User not on server, unmute cancelled by moderator");
           return;
         }
       }
@@ -100,10 +91,7 @@ export const UnmuteSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData.state.common.sendErrorMessage(
-          interaction,
-          "You don't have permission to act as another moderator"
-        );
+        pluginData.state.common.sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 

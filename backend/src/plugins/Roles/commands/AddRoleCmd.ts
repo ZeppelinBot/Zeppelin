@@ -2,7 +2,6 @@ import { GuildChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { resolveRoleId, verboseUserMention } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
@@ -58,6 +57,9 @@ export const AddRoleCmd = rolesCmd({
       roles: [role],
     });
 
-    void pluginData.state.common.sendSuccessMessage(msg, `Added role **${role.name}** to ${verboseUserMention(args.member.user)}!`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Added role **${role.name}** to ${verboseUserMention(args.member.user)}!`,
+    );
   },
 });

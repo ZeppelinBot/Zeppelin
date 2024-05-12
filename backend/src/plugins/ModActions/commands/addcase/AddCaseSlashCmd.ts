@@ -4,9 +4,9 @@ import { CaseTypes } from "../../../../data/CaseTypes";
 import { hasPermission } from "../../../../pluginUtils";
 import { resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { actualAddCaseCmd } from "./actualAddCaseCmd";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
+import { actualAddCaseCmd } from "./actualAddCaseCmd";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),
@@ -48,10 +48,7 @@ export const AddCaseSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData.state.common.sendErrorMessage(
-          interaction,
-          "You don't have permission to act as another moderator"
-        );
+        pluginData.state.common.sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 

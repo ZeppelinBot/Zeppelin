@@ -159,13 +159,7 @@ async function casesModCmd(
   const totalCases = await casesPlugin.getTotalCasesByMod(modId ?? author.id, casesFilters);
 
   if (totalCases === 0) {
-    pluginData.state.common.sendErrorMessage(
-      context,
-      `No cases by **${modName}**`,
-      undefined,
-      undefined,
-      !show
-    );
+    pluginData.state.common.sendErrorMessage(context, `No cases by **${modName}**`, undefined, undefined, !show);
 
     return;
   }

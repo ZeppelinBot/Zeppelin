@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { mutesCmd } from "../types";
 
 export const ClearBannedMutesCmd = mutesCmd({

@@ -1,6 +1,6 @@
 import { slashOptions } from "knub";
-import { actualHideCaseCmd } from "./actualHideCaseCmd";
 import { modActionsSlashCmd } from "../../types";
+import { actualHideCaseCmd } from "./actualHideCaseCmd";
 
 export const HideCaseSlashCmd = modActionsSlashCmd({
   name: "hidecase",

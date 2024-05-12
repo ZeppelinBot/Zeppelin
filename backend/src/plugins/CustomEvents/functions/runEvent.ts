@@ -1,7 +1,6 @@
 import { Message } from "discord.js";
 import { GuildPluginData } from "knub";
 import { TemplateSafeValueContainer } from "../../../templateFormatter";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { ActionError } from "../ActionError";
 import { addRoleAction } from "../actions/addRoleAction";
 import { createCaseAction } from "../actions/createCaseAction";

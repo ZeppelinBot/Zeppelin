@@ -9,11 +9,11 @@ import {
 } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { canActOn } from "../../../pluginUtils";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { logger } from "../../../logger";
+import { canActOn } from "../../../pluginUtils";
 import { convertDelayStringToMS, renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
 import { updateAction } from "./update";

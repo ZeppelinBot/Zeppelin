@@ -2,7 +2,6 @@ import { VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { utilityCmd } from "../types";
 
@@ -43,7 +42,7 @@ export const VcdisconnectCmd = utilityCmd({
 
     pluginData.state.common.sendSuccessMessage(
       msg,
-      `**${renderUsername(args.member)}** disconnected from **${channel.name}**`
+      `**${renderUsername(args.member)}** disconnected from **${channel.name}**`,
     );
   },
 });

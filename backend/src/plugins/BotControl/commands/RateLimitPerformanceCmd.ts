@@ -2,7 +2,6 @@ import moment from "moment-timezone";
 import { GuildArchives } from "../../../data/GuildArchives";
 import { getBaseUrl } from "../../../pluginUtils";
 import { getRateLimitStats } from "../../../rateLimitStats";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const RateLimitPerformanceCmd = botControlCmd({

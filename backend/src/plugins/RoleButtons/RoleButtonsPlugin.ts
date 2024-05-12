@@ -1,12 +1,12 @@
 import { guildPlugin } from "knub";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { resetButtonsCmd } from "./commands/resetButtons";
 import { onButtonInteraction } from "./events/buttonInteraction";
 import { applyAllRoleButtons } from "./functions/applyAllRoleButtons";
 import { RoleButtonsPluginType, zRoleButtonsConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 export const RoleButtonsPlugin = guildPlugin<RoleButtonsPluginType>()({
   name: "role_buttons",

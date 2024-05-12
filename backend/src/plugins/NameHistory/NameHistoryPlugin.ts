@@ -2,9 +2,9 @@ import { PluginOptions, guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
 import { UsernameHistory } from "../../data/UsernameHistory";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { NamesCmd } from "./commands/NamesCmd";
 import { NameHistoryPluginType, zNameHistoryConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<NameHistoryPluginType> = {
   config: {

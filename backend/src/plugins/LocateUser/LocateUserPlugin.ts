@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { FollowCmd } from "./commands/FollowCmd";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
 import { WhereCmd } from "./commands/WhereCmd";
@@ -9,7 +10,6 @@ import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
 import { LocateUserPluginType, zLocateUserConfig } from "./types";
 import { clearExpiredAlert } from "./utils/clearExpiredAlert";
 import { fillActiveAlertsList } from "./utils/fillAlertsList";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {

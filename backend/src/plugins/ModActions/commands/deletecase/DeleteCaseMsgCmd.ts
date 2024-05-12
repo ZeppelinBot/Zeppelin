@@ -1,7 +1,7 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { trimLines } from "../../../../utils";
-import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd";
 import { modActionsMsgCmd } from "../../types";
+import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd";
 
 export const DeleteCaseMsgCmd = modActionsMsgCmd({
   trigger: ["delete_case", "deletecase"],

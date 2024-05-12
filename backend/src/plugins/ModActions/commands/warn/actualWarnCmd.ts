@@ -4,10 +4,13 @@ import { CaseTypes } from "../../../../data/CaseTypes";
 import { UserNotificationMethod, renderUsername } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
 import { warnMember } from "../../functions/warnMember";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualWarnCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -62,7 +65,7 @@ export async function actualWarnCmd(
   const messageResultText = warnResult.notifyResult.text ? ` (${warnResult.notifyResult.text})` : "";
 
   await pluginData.state.common.sendSuccessMessage(
-      context,
-      `Warned **${renderUsername(memberToWarn.user)}** (Case #${warnResult.case.case_number})${messageResultText}`,
-    );
+    context,
+    `Warned **${renderUsername(memberToWarn.user)}** (Case #${warnResult.case.case_number})${messageResultText}`,
+  );
 }

@@ -82,15 +82,12 @@ export async function actualDeleteCaseCmd(
       : "";
   const amt = validCases.length - cancelled;
   if (amt === 0) {
-    pluginData.state.common.sendErrorMessage(
-      context,
-      "All deletions were cancelled, no cases were deleted."
-    );
+    pluginData.state.common.sendErrorMessage(context, "All deletions were cancelled, no cases were deleted.");
     return;
   }
 
   pluginData.state.common.sendSuccessMessage(
     context,
-    `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`
+    `${amt} case${amt === 1 ? " was" : "s were"} deleted!${failedAddendum}`,
   );
 }

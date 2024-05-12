@@ -3,7 +3,6 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop";
 import { convertDelayStringToMS, messageLink } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { remindersCmd } from "../types";
 
@@ -67,6 +66,9 @@ export const RemindCmd = remindersCmd({
       pluginData.getPlugin(TimeAndDatePlugin).getDateFormat("pretty_datetime"),
     );
 
-    void pluginData.state.common.sendSuccessMessage(msg, `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `I will remind you in **${timeUntilReminder}** at **${prettyReminderTime}**`,
+    );
   },
 });

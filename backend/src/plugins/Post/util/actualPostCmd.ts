@@ -4,7 +4,6 @@ import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 import { DBDateFormat, MINUTES, StrictMessageContent, errorMessage, renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { PostPluginType } from "../types";
@@ -40,11 +39,17 @@ export async function actualPostCmd(
 
   if (opts.repeat) {
     if (opts.repeat < MIN_REPEAT_TIME) {
-      void pluginData.state.common.sendErrorMessage(msg, `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Minimum time for -repeat is ${humanizeDuration(MIN_REPEAT_TIME)}`,
+      );
       return;
     }
     if (opts.repeat > MAX_REPEAT_TIME) {
-      void pluginData.state.common.sendErrorMessage(msg, `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Max time for -repeat is ${humanizeDuration(MAX_REPEAT_TIME)}`,
+      );
       return;
     }
   }
@@ -95,12 +100,18 @@ export async function actualPostCmd(
   }
 
   if (repeatUntil && repeatTimes) {
-    void pluginData.state.common.sendErrorMessage(msg, "You can only use one of -repeat-until or -repeat-times at once");
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      "You can only use one of -repeat-until or -repeat-times at once",
+    );
     return;
   }
 
   if (opts.repeat && !repeatUntil && !repeatTimes) {
-    void pluginData.state.common.sendErrorMessage(msg, "You must specify -repeat-until or -repeat-times for repeated messages");
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      "You must specify -repeat-until or -repeat-times for repeated messages",
+    );
     return;
   }
 

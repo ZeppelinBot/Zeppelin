@@ -2,7 +2,6 @@ import { escapeBold } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { errorMessage } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const NicknameCmd = utilityCmd({

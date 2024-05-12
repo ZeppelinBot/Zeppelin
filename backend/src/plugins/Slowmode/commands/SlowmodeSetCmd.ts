@@ -4,7 +4,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
 import { slowmodeCmd } from "../types";
 import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
@@ -67,7 +66,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
     }
 
     if (mode === "bot" && args.time > MAX_BOT_SLOWMODE) {
-      void pluginData.state.common.sendErrorMessage(msg, `Sorry, bot managed slowmodes can be at most 100 years long. Maybe 99 would be enough?`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Sorry, bot managed slowmodes can be at most 100 years long. Maybe 99 would be enough?`,
+      );
       return;
     }
 
@@ -91,7 +93,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
         NATIVE_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
-        void pluginData.state.common.sendErrorMessage(msg, `Unable to set native slowmode. ${missingPermissionError(missingPermissions)}`);
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Unable to set native slowmode. ${missingPermissionError(missingPermissions)}`,
+        );
         return;
       }
     }
@@ -102,7 +107,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
         BOT_SLOWMODE_PERMISSIONS,
       );
       if (missingPermissions) {
-        void pluginData.state.common.sendErrorMessage(msg, `Unable to set bot managed slowmode. ${missingPermissionError(missingPermissions)}`);
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Unable to set bot managed slowmode. ${missingPermissionError(missingPermissions)}`,
+        );
         return;
       }
     }
@@ -121,7 +129,10 @@ export const SlowmodeSetCmd = slowmodeCmd({
       try {
         await channel.setRateLimitPerUser(rateLimitSeconds);
       } catch (e) {
-        void pluginData.state.common.sendErrorMessage(msg, `Failed to set native slowmode: ${escapeInlineCode(e.message)}`);
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Failed to set native slowmode: ${escapeInlineCode(e.message)}`,
+        );
         return;
       }
     } else {
@@ -140,6 +151,9 @@ export const SlowmodeSetCmd = slowmodeCmd({
 
     const humanizedSlowmodeTime = humanizeDuration(args.time);
     const slowmodeType = mode === "native" ? "native slowmode" : "bot-maintained slowmode";
-    void pluginData.state.common.sendSuccessMessage(msg, `Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Set ${humanizedSlowmodeTime} slowmode for <#${channel.id}> (${slowmodeType})`,
+    );
   },
 });

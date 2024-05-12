@@ -1,7 +1,6 @@
 import { Role } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { chunkArray, sorter, trimLines } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { refreshMembersIfNeeded } from "../refreshMembers";
 import { utilityCmd } from "../types";
 

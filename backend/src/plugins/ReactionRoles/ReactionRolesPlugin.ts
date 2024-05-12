@@ -2,6 +2,7 @@ import { PluginOptions, guildPlugin } from "knub";
 import { Queue } from "../../Queue";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd";
 import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd";
@@ -9,7 +10,6 @@ import { RefreshReactionRolesCmd } from "./commands/RefreshReactionRolesCmd";
 import { AddReactionRoleEvt } from "./events/AddReactionRoleEvt";
 import { MessageDeletedEvt } from "./events/MessageDeletedEvt";
 import { ReactionRolesPluginType, zReactionRolesConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const MIN_AUTO_REFRESH = 1000 * 60 * 15; // 15min minimum, let's not abuse the API
 

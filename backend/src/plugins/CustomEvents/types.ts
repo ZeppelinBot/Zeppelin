@@ -1,6 +1,7 @@
 import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { zAddRoleAction } from "./actions/addRoleAction";
 import { zCreateCaseAction } from "./actions/createCaseAction";
 import { zMakeRoleMentionableAction } from "./actions/makeRoleMentionableAction";
@@ -8,7 +9,6 @@ import { zMakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAct
 import { zMessageAction } from "./actions/messageAction";
 import { zMoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
 import { zSetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const zCommandTrigger = z.strictObject({
   type: z.literal("command"),

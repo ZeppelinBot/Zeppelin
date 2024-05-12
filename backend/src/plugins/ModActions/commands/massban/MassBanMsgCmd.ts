@@ -1,8 +1,8 @@
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { actualMassBanCmd } from "./actualMassBanCmd";
 import { modActionsMsgCmd } from "../../types";
+import { actualMassBanCmd } from "./actualMassBanCmd";
 
 export const MassBanMsgCmd = modActionsMsgCmd({
   trigger: "massban",

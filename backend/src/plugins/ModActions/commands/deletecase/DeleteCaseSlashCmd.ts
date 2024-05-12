@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd";
 import { modActionsSlashCmd } from "../../types";
+import { actualDeleteCaseCmd } from "./actualDeleteCaseCmd";
 
 const opts = [slashOptions.boolean({ name: "force", description: "Whether or not to force delete", required: false })];
 

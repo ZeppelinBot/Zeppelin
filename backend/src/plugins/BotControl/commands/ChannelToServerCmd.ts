@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const ChannelToServerCmd = botControlCmd({

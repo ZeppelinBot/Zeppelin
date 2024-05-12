@@ -5,9 +5,12 @@ import { logger } from "../../../../logger";
 import { canActOn, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualMassMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -34,10 +37,7 @@ export async function actualMassMuteCmd(
   for (const userId of userIds) {
     const member = pluginData.guild.members.cache.get(userId as Snowflake);
     if (member && !canActOn(pluginData, author, member)) {
-      pluginData.state.common.sendErrorMessage(
-        context,
-        "Cannot massmute one or more users: insufficient permissions"
-      );
+      pluginData.state.common.sendErrorMessage(context, "Cannot massmute one or more users: insufficient permissions");
       return;
     }
   }
@@ -87,9 +87,9 @@ export async function actualMassMuteCmd(
 
     if (failedMutes.length) {
       pluginData.state.common.sendSuccessMessage(
-          context,
-          `Muted ${successfulMuteCount} users, ${failedMutes.length} failed: ${failedMutes.join(" ")}`,
-        );
+        context,
+        `Muted ${successfulMuteCount} users, ${failedMutes.length} failed: ${failedMutes.join(" ")}`,
+      );
     } else {
       pluginData.state.common.sendSuccessMessage(context, `Muted ${successfulMuteCount} users successfully`);
     }

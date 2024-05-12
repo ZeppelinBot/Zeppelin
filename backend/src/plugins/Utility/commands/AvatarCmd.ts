@@ -1,7 +1,6 @@
 import { APIEmbed, ImageFormat } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { UnknownUser, renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const AvatarCmd = utilityCmd({

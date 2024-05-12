@@ -3,7 +3,6 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isOwner } from "../../../pluginUtils";
 import { SECONDS, confirm, noop, renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { rehostAttachment } from "../rehostAttachment";
 import { channelArchiverCmd } from "../types";

@@ -2,7 +2,6 @@ import { GuildChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { resolveRoleId, verboseUserMention } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
@@ -19,7 +18,10 @@ export const RemoveRoleCmd = rolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canActOn(pluginData, msg.member, args.member, true)) {
-      void pluginData.state.common.sendErrorMessage(msg, "Cannot remove roles from this user: insufficient permissions");
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        "Cannot remove roles from this user: insufficient permissions",
+      );
       return;
     }
 
@@ -57,6 +59,9 @@ export const RemoveRoleCmd = rolesCmd({
       roles: [role],
     });
 
-    void pluginData.state.common.sendSuccessMessage(msg, `Removed role **${role.name}** from ${verboseUserMention(args.member.user)}!`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Removed role **${role.name}** from ${verboseUserMention(args.member.user)}!`,
+    );
   },
 });

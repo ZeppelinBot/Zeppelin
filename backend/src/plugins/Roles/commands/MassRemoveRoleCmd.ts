@@ -2,7 +2,6 @@ import { GuildMember } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { resolveMember, resolveRoleId, successMessage } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
 import { rolesCmd } from "../types";
@@ -29,7 +28,10 @@ export const MassRemoveRoleCmd = rolesCmd({
 
     for (const member of members) {
       if (!canActOn(pluginData, msg.member, member, true)) {
-        void pluginData.state.common.sendErrorMessage(msg, "Cannot add roles to 1 or more specified members: insufficient permissions");
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          "Cannot add roles to 1 or more specified members: insufficient permissions",
+        );
         return;
       }
     }

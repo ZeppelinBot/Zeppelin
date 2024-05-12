@@ -1,7 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, Invite, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getInviteLink } from "knub/helpers";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LocateUserPluginType } from "../types";
 import { createOrReuseInvite } from "./createOrReuseInvite";
 

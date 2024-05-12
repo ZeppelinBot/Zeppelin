@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { pingableRolesCmd } from "../types";
 
 export const PingableRoleEnableCmd = pingableRolesCmd({
@@ -17,13 +16,19 @@ export const PingableRoleEnableCmd = pingableRolesCmd({
       args.role.id,
     );
     if (existingPingableRole) {
-      void pluginData.state.common.sendErrorMessage(msg, `**${args.role.name}** is already set as pingable in <#${args.channelId}>`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `**${args.role.name}** is already set as pingable in <#${args.channelId}>`,
+      );
       return;
     }
 
     await pluginData.state.pingableRoles.add(args.channelId, args.role.id);
     pluginData.state.cache.delete(args.channelId);
 
-    void pluginData.state.common.sendSuccessMessage(msg, `**${args.role.name}** has been set as pingable in <#${args.channelId}>`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `**${args.role.name}** has been set as pingable in <#${args.channelId}>`,
+    );
   },
 });

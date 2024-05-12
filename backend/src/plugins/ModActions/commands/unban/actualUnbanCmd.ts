@@ -6,10 +6,10 @@ import { clearExpiringTempban } from "../../../../data/loops/expiringTempbansLoo
 import { UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
 import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
 import { ignoreEvent } from "../../functions/ignoreEvent";
+import { IgnoredEventType, ModActionsPluginType } from "../../types";
 
 export async function actualUnbanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -31,10 +31,7 @@ export async function actualUnbanCmd(
     ignoreEvent(pluginData, IgnoredEventType.Unban, user.id);
     await pluginData.guild.bans.remove(user.id as Snowflake, formattedReason ?? undefined);
   } catch {
-    pluginData.state.common.sendErrorMessage(
-      context,
-      "Failed to unban member; are you sure they're banned?"
-    );
+    pluginData.state.common.sendErrorMessage(context, "Failed to unban member; are you sure they're banned?");
     return;
   }
 

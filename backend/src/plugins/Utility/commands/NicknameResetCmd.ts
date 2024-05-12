@@ -1,7 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { errorMessage } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const NicknameResetCmd = utilityCmd({

@@ -1,7 +1,6 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { memberRolesLock } from "../../../utils/lockNameHelpers";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { selfGrantableRolesCmd } from "../types";
 import { findMatchingRoles } from "../util/findMatchingRoles";
 import { getApplyingEntries } from "../util/getApplyingEntries";
@@ -53,19 +52,31 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
             { users: [msg.author.id] },
           );
         } else {
-          void pluginData.state.common.sendSuccessMessage(msg, `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`, {
-            users: [msg.author.id],
-          });
+          void pluginData.state.common.sendSuccessMessage(
+            msg,
+            `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`,
+            {
+              users: [msg.author.id],
+            },
+          );
         }
       } catch {
-        void pluginData.state.common.sendSuccessMessage(msg, `<@!${msg.author.id}> Got an error while trying to remove the roles`, {
-          users: [msg.author.id],
-        });
+        void pluginData.state.common.sendSuccessMessage(
+          msg,
+          `<@!${msg.author.id}> Got an error while trying to remove the roles`,
+          {
+            users: [msg.author.id],
+          },
+        );
       }
     } else {
-      void pluginData.state.common.sendErrorMessage(msg, `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`, {
-        users: [msg.author.id],
-      });
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`,
+        {
+          users: [msg.author.id],
+        },
+      );
     }
 
     lock.unlock();

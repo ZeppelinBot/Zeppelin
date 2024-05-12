@@ -6,9 +6,9 @@ import { canActOn } from "../../../../pluginUtils";
 import { UnknownUser, renderUsername, resolveMember } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
 import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualAddCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -27,10 +27,7 @@ export async function actualAddCaseCmd(
   // If the user exists as a guild member, make sure we can act on them first
   const member = await resolveMember(pluginData.client, pluginData.guild, user.id);
   if (member && !canActOn(pluginData, author, member)) {
-    pluginData.state.common.sendErrorMessage(
-      context,
-      "Cannot add case on this user: insufficient permissions"
-    );
+    pluginData.state.common.sendErrorMessage(context, "Cannot add case on this user: insufficient permissions");
     return;
   }
 
@@ -49,7 +46,7 @@ export async function actualAddCaseCmd(
   if (user) {
     pluginData.state.common.sendSuccessMessage(
       context,
-      `Case #${theCase.case_number} created for **${renderUsername(user)}**`
+      `Case #${theCase.case_number} created for **${renderUsername(user)}**`,
     );
   } else {
     pluginData.state.common.sendSuccessMessage(context, `Case #${theCase.case_number} created`);

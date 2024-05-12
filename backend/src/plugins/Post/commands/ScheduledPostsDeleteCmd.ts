@@ -1,7 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { clearUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
 import { sorter } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { postCmd } from "../types";
 
 export const ScheduledPostsDeleteCmd = postCmd({

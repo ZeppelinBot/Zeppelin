@@ -2,7 +2,6 @@ import { ApiPermissions } from "@zeppelinbot/shared";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
 import { renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const AddDashboardUserCmd = botControlCmd({

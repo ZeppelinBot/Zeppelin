@@ -1,6 +1,5 @@
 import { Snowflake } from "discord.js";
 import { resolveMember } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { mutesCmd } from "../types";
 
 export const ClearMutesWithoutRoleCmd = mutesCmd({
@@ -26,6 +25,9 @@ export const ClearMutesWithoutRoleCmd = mutesCmd({
       }
     }
 
-    void pluginData.state.common.sendSuccessMessage(msg, `Cleared ${cleared} mutes from members that don't have the mute role`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Cleared ${cleared} mutes from members that don't have the mute role`,
+    );
   },
 });

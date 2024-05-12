@@ -5,10 +5,13 @@ import { LogType } from "../../../../data/LogType";
 import { DAYS, MINUTES, UnknownUser } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
 import { ignoreEvent } from "../../functions/ignoreEvent";
+import { IgnoredEventType, ModActionsPluginType } from "../../types";
 
 export async function actualForceBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

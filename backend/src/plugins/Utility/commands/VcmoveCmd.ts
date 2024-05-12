@@ -2,7 +2,6 @@ import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canActOn } from "../../../pluginUtils";
 import { channelMentionRegex, isSnowflake, renderUsername, simpleClosestStringMatch } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { utilityCmd } from "../types";
 
@@ -81,7 +80,10 @@ export const VcmoveCmd = utilityCmd({
       newChannel: channel,
     });
 
-    void pluginData.state.common.sendSuccessMessage(msg, `**${renderUsername(args.member)}** moved to **${channel.name}**`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `**${renderUsername(args.member)}** moved to **${channel.name}**`,
+    );
   },
 });
 
@@ -168,7 +170,10 @@ export const VcmoveAllCmd = utilityCmd({
           void pluginData.state.common.sendErrorMessage(msg, "Unknown error when trying to move members");
           return;
         }
-        void pluginData.state.common.sendErrorMessage(msg, `Failed to move ${renderUsername(currMember)} (${currMember.id})`);
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `Failed to move ${renderUsername(currMember)} (${currMember.id})`,
+        );
         errAmt++;
         continue;
       }

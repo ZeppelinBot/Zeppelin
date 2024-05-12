@@ -1,6 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { actualHideCaseCmd } from "../hidecase/actualHideCaseCmd";
 import { modActionsMsgCmd } from "../../types";
+import { actualHideCaseCmd } from "../hidecase/actualHideCaseCmd";
 
 export const UnhideCaseMsgCmd = modActionsMsgCmd({
   trigger: ["unhide", "unhidecase", "unhide_case"],

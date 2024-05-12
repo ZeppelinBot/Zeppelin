@@ -3,9 +3,9 @@ import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
 import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

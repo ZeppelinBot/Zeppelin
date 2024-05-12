@@ -4,7 +4,6 @@ import fs from "fs";
 import twemoji from "twemoji";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { downloadFile, isEmoji, SECONDS } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 const fsp = fs.promises;

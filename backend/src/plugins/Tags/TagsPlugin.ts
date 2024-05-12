@@ -8,6 +8,7 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildTags } from "../../data/GuildTags";
 import { makePublicFn } from "../../pluginUtils";
 import { convertDelayStringToMS } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
 import { TagCreateCmd } from "./commands/TagCreateCmd";
@@ -20,7 +21,6 @@ import { findTagByName } from "./util/findTagByName";
 import { onMessageCreate } from "./util/onMessageCreate";
 import { onMessageDelete } from "./util/onMessageDelete";
 import { renderTagBody } from "./util/renderTagBody";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<TagsPluginType> = {
   config: {

@@ -3,6 +3,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes";
 import { SECONDS } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd";
@@ -12,7 +13,6 @@ import { SlowmodeSetCmd } from "./commands/SlowmodeSetCmd";
 import { SlowmodePluginType, zSlowmodeConfig } from "./types";
 import { clearExpiredSlowmodes } from "./util/clearExpiredSlowmodes";
 import { onMessageCreate } from "./util/onMessageCreate";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const BOT_SLOWMODE_CLEAR_INTERVAL = 60 * SECONDS;
 

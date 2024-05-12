@@ -1,9 +1,9 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
-import { actualForceBanCmd } from "./actualForceBanCmd";
 import { isBanned } from "../../functions/isBanned";
 import { modActionsMsgCmd } from "../../types";
+import { actualForceBanCmd } from "./actualForceBanCmd";
 
 const opts = {
   mod: ct.member({ option: true }),

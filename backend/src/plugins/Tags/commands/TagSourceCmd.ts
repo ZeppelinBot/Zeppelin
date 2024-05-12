@@ -1,7 +1,6 @@
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getBaseUrl } from "../../../pluginUtils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { tagsCmd } from "../types";
 
 export const TagSourceCmd = tagsCmd({

@@ -1,11 +1,12 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { EventEmitter } from "events";
 import {
-  BasePluginType, pluginUtils,
+  BasePluginType,
   guildPluginEventListener,
   guildPluginMessageCommand,
   guildPluginSlashCommand,
-  guildPluginSlashGroup
+  guildPluginSlashGroup,
+  pluginUtils,
 } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue";

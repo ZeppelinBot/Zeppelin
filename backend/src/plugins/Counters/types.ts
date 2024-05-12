@@ -9,8 +9,8 @@ import {
   parseCounterConditionString,
 } from "../../data/entities/CounterTrigger";
 import { zBoundedCharacters, zBoundedRecord, zDelayString } from "../../utils";
-import Timeout = NodeJS.Timeout;
 import { CommonPlugin } from "../Common/CommonPlugin";
+import Timeout = NodeJS.Timeout;
 
 const MAX_COUNTERS = 5;
 const MAX_TRIGGERS_PER_COUNTER = 5;

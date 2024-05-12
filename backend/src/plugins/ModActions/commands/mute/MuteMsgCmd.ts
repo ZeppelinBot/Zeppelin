@@ -2,10 +2,10 @@ import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { actualMuteCmd } from "./actualMuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
+import { actualMuteCmd } from "./actualMuteCmd";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -49,7 +49,7 @@ export const MuteMsgCmd = modActionsMsgCmd({
       if (_isBanned) {
         pluginData.state.common.sendErrorMessage(
           msg,
-          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`
+          `User is banned. Use \`${prefix}forcemute\` if you want to mute them anyway.`,
         );
         return;
       } else {

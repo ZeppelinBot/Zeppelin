@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { renderUsername, resolveUser } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const ListDashboardUsersCmd = botControlCmd({

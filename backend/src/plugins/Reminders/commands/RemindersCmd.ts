@@ -1,7 +1,6 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
 import { remindersCmd } from "../types";
 

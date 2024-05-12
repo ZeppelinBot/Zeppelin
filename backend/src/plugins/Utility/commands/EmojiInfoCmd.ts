@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getCustomEmojiId } from "../functions/getCustomEmojiId";
 import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
 import { utilityCmd } from "../types";

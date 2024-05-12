@@ -1,6 +1,5 @@
 import { guildPluginMessageCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { applyAllRoleButtons } from "../functions/applyAllRoleButtons";
 import { RoleButtonsPluginType } from "../types";
 

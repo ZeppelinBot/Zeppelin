@@ -4,9 +4,9 @@ import { CaseTypes } from "../../../../data/CaseTypes";
 import { UnknownUser, renderUsername } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
 import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualNoteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -39,12 +39,12 @@ export async function actualNoteCmd(
   });
 
   pluginData.state.common.sendSuccessMessage(
-      context,
-      `Note added on **${userName}** (Case #${createdCase.case_number})`,
-      undefined,
-      undefined,
-      true,
-    );
+    context,
+    `Note added on **${userName}** (Case #${createdCase.case_number})`,
+    undefined,
+    undefined,
+    true,
+  );
 
   pluginData.state.events.emit("note", user.id, reason);
 }

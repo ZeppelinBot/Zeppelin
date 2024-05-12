@@ -4,6 +4,7 @@ import { GuildCounters } from "../../data/GuildCounters";
 import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger";
 import { makePublicFn } from "../../pluginUtils";
 import { MINUTES, convertDelayStringToMS, values } from "../../utils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { AddCounterCmd } from "./commands/AddCounterCmd";
 import { CountersListCmd } from "./commands/CountersListCmd";
 import { ResetAllCounterValuesCmd } from "./commands/ResetAllCounterValuesCmd";
@@ -19,7 +20,6 @@ import { offCounterEvent } from "./functions/offCounterEvent";
 import { onCounterEvent } from "./functions/onCounterEvent";
 import { setCounterValue } from "./functions/setCounterValue";
 import { CountersPluginType, zCountersConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const DECAY_APPLY_INTERVAL = 5 * MINUTES;
 

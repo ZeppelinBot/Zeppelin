@@ -1,7 +1,6 @@
 import { Message } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isDiscordAPIError } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { reactionRolesCmd } from "../types";
 
 export const ClearReactionRolesCmd = reactionRolesCmd({

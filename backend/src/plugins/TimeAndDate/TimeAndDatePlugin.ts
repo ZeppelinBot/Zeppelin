@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
 import { makePublicFn } from "../../pluginUtils";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
 import { SetTimezoneCmd } from "./commands/SetTimezoneCmd";
 import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd";
@@ -11,7 +12,6 @@ import { getMemberTz } from "./functions/getMemberTz";
 import { inGuildTz } from "./functions/inGuildTz";
 import { inMemberTz } from "./functions/inMemberTz";
 import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {

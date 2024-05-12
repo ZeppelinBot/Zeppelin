@@ -8,6 +8,7 @@ import { GuildLogs } from "../../data/GuildLogs";
 import { GuildMutes } from "../../data/GuildMutes";
 import { makePublicFn } from "../../pluginUtils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { ClearBannedMutesCmd } from "./commands/ClearBannedMutesCmd";
@@ -24,7 +25,6 @@ import { onMutesEvent } from "./functions/onMutesEvent";
 import { renewTimeoutMute } from "./functions/renewTimeoutMute";
 import { unmuteUser } from "./functions/unmuteUser";
 import { MutesPluginType, zMutesConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {

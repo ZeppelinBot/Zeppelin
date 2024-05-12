@@ -139,7 +139,7 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
 
         if (!channel) {
           throw new Error(
-            'Cannot store attachments: no attachment storing channel configured, and no backup channel passed'
+            "Cannot store attachments: no attachment storing channel configured, and no backup channel passed",
           );
         }
 
@@ -148,6 +148,6 @@ export const CommonPlugin = guildPlugin<CommonPluginType>()({
           files: attachments.map((a) => a.url),
         });
       },
-    }
+    };
   },
 });

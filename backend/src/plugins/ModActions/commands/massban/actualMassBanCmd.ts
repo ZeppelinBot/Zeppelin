@@ -7,10 +7,13 @@ import { canActOn, getContextChannel, isContextInteraction, sendContextResponse 
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
 import { ignoreEvent } from "../../functions/ignoreEvent";
+import { IgnoredEventType, ModActionsPluginType } from "../../types";
 
 export async function actualMassBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -37,9 +40,7 @@ export async function actualMassBanCmd(
   for (const userId of userIds) {
     const member = pluginData.guild.members.cache.get(userId as Snowflake); // TODO: Get members on demand?
     if (member && !canActOn(pluginData, author, member)) {
-      pluginData.state.common.sendErrorMessage(
-        context,
-        "Cannot massban one or more users: insufficient permissions");
+      pluginData.state.common.sendErrorMessage(context, "Cannot massban one or more users: insufficient permissions");
       return;
     }
   }
@@ -157,14 +158,14 @@ export async function actualMassBanCmd(
       if (failedBans.length) {
         pluginData.state.common.sendSuccessMessage(
           context,
-          `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${
-            failedBans.length
-          } failed: ${failedBans.join(" ")}`,
+          `Banned ${successfulBanCount} users in ${formattedTimeTaken}, ${failedBans.length} failed: ${failedBans.join(
+            " ",
+          )}`,
         );
       } else {
         pluginData.state.common.sendSuccessMessage(
           context,
-          `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`
+          `Banned ${successfulBanCount} users successfully in ${formattedTimeTaken}`,
         );
       }
     }

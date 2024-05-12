@@ -3,10 +3,10 @@ import { slashOptions } from "knub";
 import { hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { actualBanCmd } from "./actualBanCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
+import { actualBanCmd } from "./actualBanCmd";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the ban", required: false }),
@@ -51,13 +51,7 @@ export const BanSlashCmd = modActionsSlashCmd({
     const attachments = retrieveMultipleOptions(NUMBER_ATTACHMENTS_CASE_CREATION, options, "attachment");
 
     if ((!options.reason || options.reason.trim() === "") && attachments.length < 1) {
-      pluginData.state.common.sendErrorMessage(
-        interaction,
-        "Text or attachment required",
-        undefined,
-        undefined,
-        true
-      );
+      pluginData.state.common.sendErrorMessage(interaction, "Text or attachment required", undefined, undefined, true);
 
       return;
     }
@@ -70,10 +64,7 @@ export const BanSlashCmd = modActionsSlashCmd({
 
     if (options.mod) {
       if (!canActAsOther) {
-        pluginData.state.common.sendErrorMessage(
-          interaction,
-          "You don't have permission to act as another moderator"
-        );
+        pluginData.state.common.sendErrorMessage(interaction, "You don't have permission to act as another moderator");
         return;
       }
 

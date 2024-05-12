@@ -11,10 +11,10 @@ import {
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { runEvent } from "./functions/runEvent";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {

@@ -3,12 +3,15 @@ import { GuildPluginData } from "knub";
 import { LogType } from "../../../../data/LogType";
 import { canActOn } from "../../../../pluginUtils";
 import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
 import { ignoreEvent } from "../../functions/ignoreEvent";
 import { isBanned } from "../../functions/isBanned";
 import { kickMember } from "../../functions/kickMember";
+import { IgnoredEventType, ModActionsPluginType } from "../../types";
 
 export async function actualKickCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -71,9 +74,7 @@ export async function actualKickCmd(
     try {
       await pluginData.guild.bans.remove(memberToKick.id, "kick -clean");
     } catch {
-      pluginData.state.common.sendErrorMessage(
-        context,
-        "Failed to unban the user after banning them (-clean)");
+      pluginData.state.common.sendErrorMessage(context, "Failed to unban the user after banning them (-clean)");
     }
   }
 

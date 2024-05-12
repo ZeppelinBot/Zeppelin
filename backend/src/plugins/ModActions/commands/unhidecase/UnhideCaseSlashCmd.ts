@@ -1,6 +1,6 @@
 import { slashOptions } from "knub";
-import { actualUnhideCaseCmd } from "./actualUnhideCaseCmd";
 import { modActionsSlashCmd } from "../../types";
+import { actualUnhideCaseCmd } from "./actualUnhideCaseCmd";
 
 export const UnhideCaseSlashCmd = modActionsSlashCmd({
   name: "unhidecase",

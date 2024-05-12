@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { parseInviteCodeInput } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getInviteInfoEmbed } from "../functions/getInviteInfoEmbed";
 import { utilityCmd } from "../types";
 

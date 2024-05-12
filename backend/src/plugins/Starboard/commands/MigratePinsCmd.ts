@@ -1,6 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { starboardCmd } from "../types";
 import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
 
@@ -43,6 +42,9 @@ export const MigratePinsCmd = starboardCmd({
       await saveMessageToStarboard(pluginData, pin, starboard);
     }
 
-    void pluginData.state.common.sendSuccessMessage(msg, `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Pins migrated from <#${args.pinChannel.id}> to <#${starboardChannel.id}>!`,
+    );
   },
 });

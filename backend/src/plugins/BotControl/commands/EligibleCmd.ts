@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isGuildInvite, resolveInvite } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { isEligible } from "../functions/isEligible";
 import { botControlCmd } from "../types";
 

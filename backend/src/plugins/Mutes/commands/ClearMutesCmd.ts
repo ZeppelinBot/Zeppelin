@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { mutesCmd } from "../types";
 
 export const ClearMutesCmd = mutesCmd({
@@ -23,14 +22,17 @@ export const ClearMutesCmd = mutesCmd({
     }
 
     if (failed.length !== args.userIds.length) {
-      void pluginData.state.common.sendSuccessMessage(msg, `**${args.userIds.length - failed.length} active mute(s) cleared**`);
+      void pluginData.state.common.sendSuccessMessage(
+        msg,
+        `**${args.userIds.length - failed.length} active mute(s) cleared**`,
+      );
     }
 
     if (failed.length) {
       void pluginData.state.common.sendErrorMessage(
-          msg,
-          `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${failed.join(" ")}`,
-        );
+        msg,
+        `**${failed.length}/${args.userIds.length} IDs failed**, they are not muted: ${failed.join(" ")}`,
+      );
     }
   },
 });

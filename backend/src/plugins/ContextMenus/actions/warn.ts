@@ -8,11 +8,11 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { canActOn } from "../../../pluginUtils";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { logger } from "../../../logger";
+import { canActOn } from "../../../pluginUtils";
 import { renderUserUsername } from "../../../utils";
 import { CaseArgs } from "../../Cases/types";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
 import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
 import { ContextMenuPluginType, ModMenuActionType } from "../types";
 import { updateAction } from "./update";

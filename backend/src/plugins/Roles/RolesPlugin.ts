@@ -1,5 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
 import { AddRoleCmd } from "./commands/AddRoleCmd";
@@ -7,7 +8,6 @@ import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
 import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
 import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
 import { RolesPluginType, zRolesConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {

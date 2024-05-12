@@ -12,9 +12,12 @@ import {
 } from "../../../../utils";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
 import { MuteResult } from "../../../Mutes/types";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
+import { ModActionsPluginType } from "../../types";
 
 /**
  * The actual function run by both !mute and !forcemute.
@@ -56,10 +59,7 @@ export async function actualMuteCmd(
     });
   } catch (e) {
     if (e instanceof RecoverablePluginError && e.code === ERRORS.NO_MUTE_ROLE_IN_CONFIG) {
-      pluginData.state.common.sendErrorMessage(
-        context,
-        "Could not mute the user: no mute role set in config"
-      );
+      pluginData.state.common.sendErrorMessage(context, "Could not mute the user: no mute role set in config");
     } else if (isDiscordAPIError(e) && e.code === 10007) {
       pluginData.state.common.sendErrorMessage(context, "Could not mute the user: unknown member");
     } else {

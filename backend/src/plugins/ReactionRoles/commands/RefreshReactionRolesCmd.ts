@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { reactionRolesCmd } from "../types";
 import { refreshReactionRoles } from "../util/refreshReactionRoles";
 

@@ -8,6 +8,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
 import { MINUTES, SECONDS } from "../../utils";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { CountersPlugin } from "../Counters/CountersPlugin";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
@@ -32,7 +33,6 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { clearOldRecentActions } from "./functions/clearOldRecentActions";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
 import { AutomodPluginType, zAutomodConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {

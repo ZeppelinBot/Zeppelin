@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { tagsCmd } from "../types";
 
 export const TagDeleteCmd = tagsCmd({

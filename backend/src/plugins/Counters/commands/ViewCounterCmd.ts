@@ -3,7 +3,6 @@ import { guildPluginMessageCommand } from "knub";
 import { waitForReply } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { resolveUser, UnknownUser } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { CountersPluginType } from "../types";
 
 export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({

@@ -2,7 +2,6 @@ import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { messageLink } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const ContextCmd = utilityCmd({

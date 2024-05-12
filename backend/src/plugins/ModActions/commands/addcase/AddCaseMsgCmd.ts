@@ -2,8 +2,8 @@ import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { CaseTypes } from "../../../../data/CaseTypes";
 import { hasPermission } from "../../../../pluginUtils";
 import { resolveUser } from "../../../../utils";
-import { actualAddCaseCmd } from "./actualAddCaseCmd";
 import { modActionsMsgCmd } from "../../types";
+import { actualAddCaseCmd } from "./actualAddCaseCmd";
 
 const opts = {
   mod: ct.member({ option: true }),

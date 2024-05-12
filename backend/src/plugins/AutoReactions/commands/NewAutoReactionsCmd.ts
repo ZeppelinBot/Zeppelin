@@ -4,7 +4,6 @@ import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
 import { readChannelPermissions } from "../../../utils/readChannelPermissions";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { autoReactionsCmd } from "../types";
 
 const requiredPermissions = readChannelPermissions | PermissionsBitField.Flags.AddReactions;
@@ -44,7 +43,10 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
       if (customEmojiMatch) {
         // Custom emoji
         if (!canUseEmoji(pluginData.client, customEmojiMatch[2])) {
-          pluginData.state.common.sendErrorMessage(msg, "I can only use regular emojis and custom emojis from this server");
+          pluginData.state.common.sendErrorMessage(
+            msg,
+            "I can only use regular emojis and custom emojis from this server",
+          );
           return;
         }
 

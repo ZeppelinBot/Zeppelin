@@ -3,7 +3,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isValidEmbed, trimLines } from "../../../utils";
 import { parseColor } from "../../../utils/parseColor";
 import { rgbToInt } from "../../../utils/rgbToInt";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { postCmd } from "../types";
 import { actualPostCmd } from "../util/actualPostCmd";
 import { formatContent } from "../util/formatContent";

@@ -2,12 +2,12 @@ import { PluginOptions, guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { MigratePinsCmd } from "./commands/MigratePinsCmd";
 import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
 import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
 import { StarboardPluginType, zStarboardConfig } from "./types";
 import { onMessageDelete } from "./util/onMessageDelete";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<StarboardPluginType> = {
   config: {

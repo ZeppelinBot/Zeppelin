@@ -2,7 +2,6 @@ import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
 import { canReadChannel } from "../../../utils/canReadChannel";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { TReactionRolePair, reactionRolesCmd } from "../types";
 import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
 
@@ -34,7 +33,10 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canReadChannel(args.message.channel, msg.member)) {
-      void pluginData.state.common.sendErrorMessage(msg, "You can't add reaction roles to channels you can't see yourself");
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        "You can't add reaction roles to channels you can't see yourself",
+      );
       return;
     }
 
@@ -71,7 +73,10 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     // Verify the specified emojis and roles are valid and usable
     for (const pair of emojiRolePairs) {
       if (pair[0] === CLEAR_ROLES_EMOJI) {
-        void pluginData.state.common.sendErrorMessage(msg, `The emoji for clearing roles (${CLEAR_ROLES_EMOJI}) is reserved and cannot be used`);
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          `The emoji for clearing roles (${CLEAR_ROLES_EMOJI}) is reserved and cannot be used`,
+        );
         return;
       }
 
@@ -81,7 +86,10 @@ export const InitReactionRolesCmd = reactionRolesCmd({
       }
 
       if (!canUseEmoji(pluginData.client, pair[0])) {
-        void pluginData.state.common.sendErrorMessage(msg, "I can only use regular emojis and custom emojis from servers I'm on");
+        void pluginData.state.common.sendErrorMessage(
+          msg,
+          "I can only use regular emojis and custom emojis from servers I'm on",
+        );
         return;
       }
 

@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { saveMessagesToDB } from "../saveMessagesToDB";
 import { messageSaverCmd } from "../types";
 
@@ -20,9 +19,9 @@ export const SavePinsToDBCmd = messageSaverCmd({
 
     if (failed.length) {
       void pluginData.state.common.sendSuccessMessage(
-          msg,
-          `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}`,
-        );
+        msg,
+        `Saved ${savedCount} messages. The following messages could not be saved: ${failed.join(", ")}`,
+      );
     } else {
       void pluginData.state.common.sendSuccessMessage(msg, `Saved ${savedCount} messages!`);
     }

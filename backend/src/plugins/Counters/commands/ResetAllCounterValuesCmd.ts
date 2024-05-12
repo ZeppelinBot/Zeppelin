@@ -1,7 +1,6 @@
 import { guildPluginMessageCommand } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { confirm, noop, trimMultilineString } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { resetAllCounterValues } from "../functions/resetAllCounterValues";
 import { CountersPluginType } from "../types";
 
@@ -23,7 +22,10 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     }
 
     if (counter.can_reset_all === false) {
-      void pluginData.state.common.sendErrorMessage(message, `Missing permissions to reset all of this counter's values`);
+      void pluginData.state.common.sendErrorMessage(
+        message,
+        `Missing permissions to reset all of this counter's values`,
+      );
       return;
     }
 
@@ -47,7 +49,10 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     await resetAllCounterValues(pluginData, args.counterName);
 
     loadingMessage?.delete().catch(noop);
-    void pluginData.state.common.sendSuccessMessage(message, `All counter values for **${counterName}** have been reset`);
+    void pluginData.state.common.sendSuccessMessage(
+      message,
+      `All counter values for **${counterName}** have been reset`,
+    );
 
     pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);
   },

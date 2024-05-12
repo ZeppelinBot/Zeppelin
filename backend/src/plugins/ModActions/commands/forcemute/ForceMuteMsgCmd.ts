@@ -1,9 +1,9 @@
 import { commandTypeHelpers as ct } from "../../../../commandTypes";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
-import { actualMuteCmd } from "../mute/actualMuteCmd";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsMsgCmd } from "../../types";
+import { actualMuteCmd } from "../mute/actualMuteCmd";
 
 const opts = {
   mod: ct.member({ option: true }),

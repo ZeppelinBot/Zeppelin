@@ -10,11 +10,14 @@ import { banLock } from "../../../../utils/lockNameHelpers";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { CasesPlugin } from "../../../Cases/CasesPlugin";
 import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { ModActionsPluginType } from "../../types";
 import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
 import { banUserId } from "../../functions/banUserId";
-import { formatReasonWithAttachments, formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
+import {
+  formatReasonWithAttachments,
+  formatReasonWithMessageLinkForAttachments,
+} from "../../functions/formatReasonForAttachments";
 import { isBanned } from "../../functions/isBanned";
+import { ModActionsPluginType } from "../../types";
 
 export async function actualBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,
@@ -74,10 +77,7 @@ export async function actualBanCmd(
       );
 
       if (!reply) {
-        pluginData.state.common.sendErrorMessage(
-          context,
-          "User already banned, update cancelled by moderator"
-        );
+        pluginData.state.common.sendErrorMessage(context, "User already banned, update cancelled by moderator");
         lock.unlock();
         return;
       }
@@ -123,9 +123,9 @@ export async function actualBanCmd(
       }
 
       pluginData.state.common.sendSuccessMessage(
-          context,
-          `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
-        );
+        context,
+        `Ban updated to ${time ? "expire in " + humanizeDuration(time) + " from now" : "indefinite"}`,
+      );
       lock.unlock();
       return;
     }
@@ -138,7 +138,7 @@ export async function actualBanCmd(
     pluginData.state.common.sendErrorMessage(
       context,
       `Cannot ban: target permission level is equal or higher to yours, ${targetLevel} >= ${ourLevel}`,
-      );
+    );
     lock.unlock();
     return;
   }

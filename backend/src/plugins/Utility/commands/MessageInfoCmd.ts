@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { canReadChannel } from "../../../utils/canReadChannel";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
 import { utilityCmd } from "../types";
 

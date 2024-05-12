@@ -1,7 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop";
 import { createChunkedMessage, sorter } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { locateUserCmd } from "../types";
 
 export const ListFollowCmd = locateUserCmd({

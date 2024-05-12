@@ -2,7 +2,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { AllowedGuild } from "../../../data/entities/AllowedGuild";
 import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment";
 import { renderUsername, resolveUser } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const ListDashboardPermsCmd = botControlCmd({

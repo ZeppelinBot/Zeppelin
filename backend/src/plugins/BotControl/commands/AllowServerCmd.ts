@@ -3,7 +3,6 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
 import { DBDateFormat, isSnowflake } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const AllowServerCmd = botControlCmd({

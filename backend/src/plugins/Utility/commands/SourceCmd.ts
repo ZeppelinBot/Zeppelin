@@ -2,7 +2,6 @@ import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { getBaseUrl } from "../../../pluginUtils";
 import { canReadChannel } from "../../../utils/canReadChannel";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { utilityCmd } from "../types";
 
 export const SourceCmd = utilityCmd({

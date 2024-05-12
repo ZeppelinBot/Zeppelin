@@ -5,7 +5,6 @@ import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistor
 import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory";
 import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
 import { DAYS, renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { nameHistoryCmd } from "../types";
 
 export const NamesCmd = nameHistoryCmd({

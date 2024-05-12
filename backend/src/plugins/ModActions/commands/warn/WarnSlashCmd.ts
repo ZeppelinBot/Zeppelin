@@ -3,11 +3,11 @@ import { slashOptions } from "knub";
 import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { UserNotificationMethod, resolveMember } from "../../../../utils";
 import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { actualWarnCmd } from "./actualWarnCmd";
 import { isBanned } from "../../functions/isBanned";
 import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
 import { modActionsSlashCmd } from "../../types";
 import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
+import { actualWarnCmd } from "./actualWarnCmd";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),
@@ -51,7 +51,7 @@ export const WarnSlashCmd = modActionsSlashCmd({
         "Text or attachment required",
         undefined,
         undefined,
-        true
+        true,
       );
 
       return;
@@ -86,7 +86,7 @@ export const WarnSlashCmd = modActionsSlashCmd({
       if (!canActAsOther) {
         await pluginData.state.common.sendErrorMessage(
           interaction,
-          "You don't have permission to act as another moderator"
+          "You don't have permission to act as another moderator",
         );
         return;
       }

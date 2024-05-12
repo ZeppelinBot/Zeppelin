@@ -30,7 +30,7 @@ export async function actualHideCaseCmd(
 
   const amt = caseNumbers.length - failed.length;
   pluginData.state.common.sendSuccessMessage(
-      context,
-      `${amt} case${amt === 1 ? " is" : "s are"} now hidden! Use \`unhidecase\` to unhide them.${failedAddendum}`,
-    );
+    context,
+    `${amt} case${amt === 1 ? " is" : "s are"} now hidden! Use \`unhidecase\` to unhide them.${failedAddendum}`,
+  );
 }

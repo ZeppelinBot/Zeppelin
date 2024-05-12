@@ -3,7 +3,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { logger } from "../../../logger";
 import { TemplateParseError } from "../../../templateFormatter";
 import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { tagsCmd } from "../types";
 import { renderTagBody } from "../util/renderTagBody";
 

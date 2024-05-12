@@ -2,7 +2,6 @@ import { Message } from "discord.js";
 import { noop } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions";
 import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel";
 
@@ -18,7 +17,10 @@ export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const me = pluginData.guild.members.cache.get(pluginData.client.user!.id);
   const missingPermissions = getMissingChannelPermissions(me, args.channel, BOT_SLOWMODE_DISABLE_PERMISSIONS);
   if (missingPermissions) {
-    void pluginData.state.common.sendErrorMessage(msg, `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`);
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      `Unable to disable slowmode. ${missingPermissionError(missingPermissions)}`,
+    );
     return;
   }
 

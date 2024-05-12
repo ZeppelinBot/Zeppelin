@@ -8,7 +8,6 @@ import { humanizeDurationShort } from "../../../humanizeDurationShort";
 import { getBaseUrl } from "../../../pluginUtils";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
 import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { LogsPlugin } from "../../Logs/LogsPlugin";
 import { UtilityPluginType, utilityCmd } from "../types";
 
@@ -94,7 +93,12 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
 
   const targetChannel = args.channel ? pluginData.guild.channels.cache.get(args.channel as Snowflake) : msg.channel;
   if (!targetChannel?.isTextBased()) {
-    void pluginData.state.common.sendErrorMessage(msg, `Invalid channel specified`, undefined, args["response-interaction"]);
+    void pluginData.state.common.sendErrorMessage(
+      msg,
+      `Invalid channel specified`,
+      undefined,
+      args["response-interaction"],
+    );
     return;
   }
 
@@ -217,10 +221,20 @@ export async function cleanCmd(pluginData: GuildPluginData<UtilityPluginType>, a
       }
     }
 
-    responseMsg = await pluginData.state.common.sendSuccessMessage(msg, responseText, undefined, args["response-interaction"]);
+    responseMsg = await pluginData.state.common.sendSuccessMessage(
+      msg,
+      responseText,
+      undefined,
+      args["response-interaction"],
+    );
   } else {
     const responseText = `Found no messages to clean${note ? ` (${note})` : ""}!`;
-    responseMsg = await pluginData.state.common.sendErrorMessage(msg, responseText, undefined, args["response-interaction"]);
+    responseMsg = await pluginData.state.common.sendErrorMessage(
+      msg,
+      responseText,
+      undefined,
+      args["response-interaction"],
+    );
   }
 
   cleaningMessage?.delete();

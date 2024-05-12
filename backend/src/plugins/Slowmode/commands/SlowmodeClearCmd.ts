@@ -3,7 +3,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { asSingleLine, renderUsername } from "../../../utils";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
 import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
 import { slowmodeCmd } from "../types";
 import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
@@ -29,7 +28,10 @@ export const SlowmodeClearCmd = slowmodeCmd({
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     const missingPermissions = getMissingChannelPermissions(me, args.channel, BOT_SLOWMODE_CLEAR_PERMISSIONS);
     if (missingPermissions) {
-      void pluginData.state.common.sendErrorMessage(msg, `Unable to clear slowmode. ${missingPermissionError(missingPermissions)}`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `Unable to clear slowmode. ${missingPermissionError(missingPermissions)}`,
+      );
       return;
     }
 
@@ -57,6 +59,9 @@ export const SlowmodeClearCmd = slowmodeCmd({
       return;
     }
 
-    void pluginData.state.common.sendSuccessMessage(msg, `Slowmode cleared from **${renderUsername(args.user)}** in <#${args.channel.id}>`);
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
+      `Slowmode cleared from **${renderUsername(args.user)}** in <#${args.channel.id}>`,
+    );
   },
 });

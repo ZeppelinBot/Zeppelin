@@ -1,7 +1,6 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { isStaffPreFilter } from "../../../pluginUtils";
 import { renderUsername } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { botControlCmd } from "../types";
 
 export const RemoveDashboardUserCmd = botControlCmd({
@@ -37,8 +36,6 @@ export const RemoveDashboardUserCmd = botControlCmd({
 
     const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`)`);
 
-    msg.channel.send(
-      `The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`,
-    );
+    msg.channel.send(`The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`);
   },
 });

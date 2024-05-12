@@ -10,6 +10,7 @@ import { GuildTempbans } from "../../data/GuildTempbans";
 import { makePublicFn, mapToPublicFn } from "../../pluginUtils";
 import { MINUTES } from "../../utils";
 import { CasesPlugin } from "../Cases/CasesPlugin";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { MutesPlugin } from "../Mutes/MutesPlugin";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
@@ -72,7 +73,6 @@ import { onModActionsEvent } from "./functions/onModActionsEvent";
 import { updateCase } from "./functions/updateCase";
 import { warnMember } from "./functions/warnMember";
 import { AttachmentLinkReactionType, ModActionsPluginType, modActionsSlashGroup, zModActionsConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions = {
   config: {

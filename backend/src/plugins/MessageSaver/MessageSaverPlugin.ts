@@ -1,10 +1,10 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
 import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
 import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
 import { MessageSaverPluginType, zMessageSaverConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {

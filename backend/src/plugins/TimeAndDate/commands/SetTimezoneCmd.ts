@@ -2,7 +2,6 @@ import { escapeInlineCode } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { trimLines } from "../../../utils";
 import { parseFuzzyTimezone } from "../../../utils/parseFuzzyTimezone";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { timeAndDateCmd } from "../types";
 
 export const SetTimezoneCmd = timeAndDateCmd({

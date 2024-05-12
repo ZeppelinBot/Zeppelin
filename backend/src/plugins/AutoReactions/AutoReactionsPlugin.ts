@@ -1,12 +1,12 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { CommonPlugin } from "../Common/CommonPlugin";
 import { LogsPlugin } from "../Logs/LogsPlugin";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd";
 import { AddReactionsEvt } from "./events/AddReactionsEvt";
 import { AutoReactionsPluginType, zAutoReactionsConfig } from "./types";
-import { CommonPlugin } from "../Common/CommonPlugin";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {
@@ -54,5 +54,5 @@ export const AutoReactionsPlugin = guildPlugin<AutoReactionsPluginType>()({
 
   beforeStart(pluginData) {
     pluginData.state.common = pluginData.getPlugin(CommonPlugin);
-  }
+  },
 });

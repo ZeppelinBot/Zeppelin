@@ -2,7 +2,6 @@ import { ApiPermissions } from "@zeppelinbot/shared";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { isEligible } from "../functions/isEligible";
 import { botControlCmd } from "../types";
 

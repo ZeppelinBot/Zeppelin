@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes";
 import { TemplateParseError, parseTemplate } from "../../../templateFormatter";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { tagsCmd } from "../types";
 
 export const TagCreateCmd = tagsCmd({

@@ -1,5 +1,4 @@
 import { isStaffPreFilter } from "../../../pluginUtils";
-import { CommonPlugin } from "../../Common/CommonPlugin";
 import { getActiveReload, setActiveReload } from "../activeReload";
 import { botControlCmd } from "../types";
 

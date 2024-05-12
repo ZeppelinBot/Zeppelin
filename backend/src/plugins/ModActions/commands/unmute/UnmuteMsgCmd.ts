@@ -3,9 +3,9 @@ import { canActOn, hasPermission } from "../../../../pluginUtils";
 import { resolveMember, resolveUser } from "../../../../utils";
 import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
 import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { actualUnmuteCmd } from "./actualUnmuteCmd";
 import { isBanned } from "../../functions/isBanned";
 import { modActionsMsgCmd } from "../../types";
+import { actualUnmuteCmd } from "./actualUnmuteCmd";
 
 const opts = {
   mod: ct.member({ option: true }),
@@ -59,7 +59,7 @@ export const UnmuteMsgCmd = modActionsMsgCmd({
       if (banned) {
         pluginData.state.common.sendErrorMessage(
           msg,
-          `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`
+          `User is banned. Use \`${prefix}forceunmute\` to unmute them anyway.`,
         );
         return;
       } else {
