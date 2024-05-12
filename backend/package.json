@@ -37,7 +37,7 @@
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "deep-diff": "^1.0.2",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.15.2",
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "escape-string-regexp": "^1.0.5",

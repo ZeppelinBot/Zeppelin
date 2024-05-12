@@ -64,6 +64,16 @@ export interface ISavedMessageStickerData {
   type: StickerType | null;
 }
 
+export interface ISavedMessagePollData {
+  answers: {
+    id: number;
+    text: string | null;
+  }[];
+  question: {
+    text: string;
+  };
+}
+
 export interface ISavedMessageData {
   attachments?: ISavedMessageAttachmentData[];
   author: {
@@ -73,6 +83,7 @@ export interface ISavedMessageData {
   content: string;
   embeds?: ISavedMessageEmbedData[];
   stickers?: ISavedMessageStickerData[];
+  poll?: ISavedMessagePollData;
   timestamp: number;
 }
 

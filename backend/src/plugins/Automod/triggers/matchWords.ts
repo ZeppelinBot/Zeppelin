@@ -27,6 +27,7 @@ const configSchema = z.strictObject({
   match_usernames: z.boolean().default(false),
   match_nicknames: z.boolean().default(false),
   match_custom_status: z.boolean().default(false),
+  match_polls: z.boolean().default(false),
 });
 
 export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
@@ -64,6 +65,8 @@ export const MatchWordsTrigger = automodTrigger<MatchResultType>()({
       if (trigger.normalize) {
         str = normalizeText(str);
       }
+
+      console.log([type, str]);
 
       for (const regex of regexes) {
         if (regex.test(str)) {
