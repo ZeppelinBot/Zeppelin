@@ -8,6 +8,7 @@ import { log } from "../util/log";
 
 interface LogAutomodActionData {
   rule: string;
+  prettyName: string | undefined;
   user?: User | null;
   users: User[];
   actionsTaken: string;
@@ -20,6 +21,7 @@ export function logAutomodAction(pluginData: GuildPluginData<LogsPluginType>, da
     LogType.AUTOMOD_ACTION,
     createTypedTemplateSafeValueContainer({
       rule: data.rule,
+      prettyName: data.prettyName,
       user: data.user ? userToTemplateSafeUser(data.user) : null,
       users: data.users.map((user) => userToTemplateSafeUser(user)),
       actionsTaken: data.actionsTaken,

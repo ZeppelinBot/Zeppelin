@@ -59,6 +59,7 @@ type AutomodActionApplyFn<TConfigType> = (meta: {
   contexts: AutomodContext[];
   actionConfig: TConfigType;
   matchResult: AutomodTriggerMatchResult;
+  prettyName: string | undefined;
 }) => Awaitable<void>;
 
 export interface AutomodActionBlueprint<TConfigSchema extends ZodTypeAny> {

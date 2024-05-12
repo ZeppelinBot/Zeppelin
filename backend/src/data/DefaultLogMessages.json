@@ -86,7 +86,7 @@
   "BOT_ALERT": "{timestamp} ⚠ **BOT ALERT:** {tmplEval(body)}",
   "DM_FAILED": "{timestamp} \uD83D\uDEA7 Failed to send DM ({source}) to {userMention(user)}",
 
-  "AUTOMOD_ACTION": "{timestamp} \uD83E\uDD16 Automod rule **{rule}** triggered by {userMention(users)}\n{matchSummary}\nActions taken: **{actionsTaken}**",
+  "AUTOMOD_ACTION": "{timestamp} \uD83E\uDD16 Automod rule **{if(not(prettyName), rule, prettyName)}** triggered by {userMention(users)}\n{matchSummary}\nActions taken: **{actionsTaken}**",
   "SET_ANTIRAID_USER": "{timestamp} ⚔ {userMention(user)} set anti-raid to **{level}**",
   "SET_ANTIRAID_AUTO": "{timestamp} ⚔ Anti-raid automatically set to **{level}**"
 }
