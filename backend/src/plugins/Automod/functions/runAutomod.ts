@@ -35,6 +35,8 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   });
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
+    const prettyName = rule.pretty_name;
+
     if (rule.enabled === false) continue;
     if (
       !rule.affects_bots &&
@@ -100,6 +102,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
               contexts,
               actionConfig: true,
               matchResult,
+              prettyName,
             });
             return;
           }
@@ -113,7 +116,9 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
               triggerConfig,
             })) ?? "";
 
-          matchResult.fullSummary = `Triggered automod rule **${ruleName}**\n${matchResult.summary}`.trim();
+          matchResult.fullSummary = `Triggered automod rule **${prettyName ?? ruleName}**\n${
+            matchResult.summary
+          }`.trim();
         }
 
         if (profilingEnabled()) {
@@ -147,6 +152,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
           contexts,
           actionConfig,
           matchResult,
+          prettyName,
         });
 
         if (profilingEnabled()) {

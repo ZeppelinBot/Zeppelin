@@ -34,7 +34,7 @@ const configSchema = z.object({
 export const AlertAction = automodAction({
   configSchema,
 
-  async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
+  async apply({ pluginData, contexts, actionConfig, ruleName, matchResult, prettyName }) {
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
@@ -55,6 +55,7 @@ export const AlertAction = automodAction({
           users: safeUsers,
           actionsTaken,
           matchSummary: matchResult.summary ?? "",
+          prettyName,
         }),
       );
 
@@ -69,6 +70,7 @@ export const AlertAction = automodAction({
             text,
             actionsTaken,
             matchSummary: matchResult.summary,
+            prettyName,
             messageLink: theMessageLink,
             logMessage: validateAndParseMessageContent(logMessage)?.content,
           }),
