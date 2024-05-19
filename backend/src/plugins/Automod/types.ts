@@ -61,6 +61,7 @@ const zRule = z.strictObject({
       }
       return ruleName;
     }),
+  pretty_name: z.string().optional(),
   presets: z.array(z.string().max(100)).max(25).default([]),
   affects_bots: z.boolean().default(false),
   affects_self: z.boolean().default(false),
