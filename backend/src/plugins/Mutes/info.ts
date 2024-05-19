@@ -3,6 +3,6 @@ import { zMutesConfig } from "./types.js";
 
 export const mutesPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Mutes",
-  showInDocs: true,
+  type: "stable",
   configSchema: zMutesConfig,
 };

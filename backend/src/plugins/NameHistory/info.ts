@@ -3,6 +3,6 @@ import { zNameHistoryConfig } from "./types.js";
 
 export const nameHistoryPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Name history",
-  showInDocs: false,
+  type: "internal",
   configSchema: zNameHistoryConfig,
 };

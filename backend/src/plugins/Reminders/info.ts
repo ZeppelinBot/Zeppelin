@@ -4,5 +4,5 @@ import { zRemindersConfig } from "./types.js";
 export const remindersPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Reminders",
   configSchema: zRemindersConfig,
-  showInDocs: true,
+  type: "stable",
 };

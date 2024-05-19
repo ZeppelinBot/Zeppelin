@@ -3,6 +3,6 @@ import { zGuildConfigReloaderPlugin } from "./types.js";
 
 export const guildConfigReloaderPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Guild config reloader",
-  showInDocs: false,
+  type: "internal",
   configSchema: zGuildConfigReloaderPlugin,
 };

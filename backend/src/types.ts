@@ -33,14 +33,15 @@ export type TZeppelinKnub = Knub;
  */
 export type TMarkdown = string;
 
+export type ZeppelinPluginType = "stable" | "legacy" | "internal";
+
 export interface ZeppelinPluginInfo {
-  showInDocs: boolean;
+  type: ZeppelinPluginType;
   prettyName: string;
   configSchema: ZodTypeAny;
   description?: TMarkdown;
   usageGuide?: TMarkdown;
   configurationGuide?: TMarkdown;
-  legacy?: boolean;
 }
 
 export interface CommandInfo {

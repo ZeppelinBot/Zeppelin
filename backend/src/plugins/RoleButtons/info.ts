@@ -3,7 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zRoleButtonsConfig } from "./types.js";
 
 export const roleButtonsPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Role buttons",
   description: trimPluginDescription(`
     Allow users to pick roles by clicking on buttons

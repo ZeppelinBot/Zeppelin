@@ -3,8 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zCensorConfig } from "./types.js";
 
 export const censorPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
-  legacy: true,
+  type: "legacy",
   prettyName: "Censor",
   configSchema: zCensorConfig,
   description: trimPluginDescription(`

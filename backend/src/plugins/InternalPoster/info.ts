@@ -3,6 +3,6 @@ import { zInternalPosterConfig } from "./types.js";
 
 export const internalPosterPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Internal poster",
-  showInDocs: false,
+  type: "internal",
   configSchema: zInternalPosterConfig,
 };

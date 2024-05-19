@@ -3,7 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zCompanionChannelsConfig } from "./types.js";
 
 export const companionChannelsPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Companion channels",
   configSchema: zCompanionChannelsConfig,
   description: trimPluginDescription(`

@@ -4,7 +4,7 @@ import { TemplateFunctions } from "./templateFunctions.js";
 import { TemplateFunction, zTagsConfig } from "./types.js";
 
 export const tagsPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Tags",
   description: "Tags are a way to store and reuse information.",
   configurationGuide: trimPluginDescription(`

@@ -4,5 +4,5 @@ import { zLogsConfig } from "./types.js";
 export const logsPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Logs",
   configSchema: zLogsConfig,
-  showInDocs: true,
+  type: "stable",
 };

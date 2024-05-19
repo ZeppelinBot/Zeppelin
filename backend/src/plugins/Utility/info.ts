@@ -2,7 +2,7 @@ import { ZeppelinPluginInfo } from "../../types.js";
 import { zUtilityConfig } from "./types.js";
 
 export const utilityPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Utility",
   configSchema: zUtilityConfig,
 };

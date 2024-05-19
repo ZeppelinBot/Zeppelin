@@ -4,7 +4,6 @@ import { zReactionRolesConfig } from "./types.js";
 export const reactionRolesPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Reaction roles",
   description: "Consider using the [Role buttons](https://zeppelin.gg/docs/plugins/role_buttons) plugin instead.",
-  legacy: true,
+  type: "legacy",
   configSchema: zReactionRolesConfig,
-  showInDocs: true,
 };

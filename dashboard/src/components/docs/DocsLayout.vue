@@ -156,14 +156,14 @@
           ...menu,
           {
             label: 'Plugins',
-            items: this.plugins.filter(plugin => !plugin.info.legacy).map(plugin => ({
+            items: this.plugins.filter(plugin => plugin.info.type === "stable").map(plugin => ({
               label: plugin.info.prettyName || plugin.name,
               to: `/docs/plugins/${plugin.name}`,
             })),
           },
           {
             label: "Legacy Plugins",
-            items: this.plugins.filter(plugin => plugin.info.legacy).map(plugin => ({
+            items: this.plugins.filter(plugin => plugin.info.type === "legacy").map(plugin => ({
               label: plugin.info.prettyName || plugin.name,
               to: `/docs/plugins/${plugin.name}`,
             })),

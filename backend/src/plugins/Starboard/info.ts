@@ -3,7 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zStarboardConfig } from "./types.js";
 
 export const starboardPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Starboard",
   description: trimPluginDescription(`
     This plugin allows you to set up starboards on your server. Starboards are like user voted pins where messages with enough reactions get immortalized on a "starboard" channel.

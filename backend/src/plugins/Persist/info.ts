@@ -9,5 +9,5 @@ export const persistPluginInfo: ZeppelinPluginInfo = {
     Mute roles are re-applied automatically, this plugin is not required for that.
   `),
   configSchema: zPersistConfig,
-  showInDocs: true,
+  type: "stable",
 };

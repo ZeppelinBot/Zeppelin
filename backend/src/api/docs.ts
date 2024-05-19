@@ -98,13 +98,13 @@ function formatZodConfigSchema(schema: z.ZodTypeAny) {
 }
 
 export function initDocs(router: express.Router) {
-  const docsPluginNames = Object.keys(guildPluginInfo).filter((k) => guildPluginInfo[k].showInDocs);
+  const docsPluginNames = Object.keys(guildPluginInfo).filter((k) => guildPluginInfo[k].type === "stable" || guildPluginInfo[k].type === "legacy");
 
   router.get("/docs/plugins", (req: express.Request, res: express.Response) => {
     res.json(
       docsPluginNames.map((pluginName) => {
-        const info = guildPluginInfo[pluginName];
-        const thinInfo = info ? { prettyName: info.prettyName, legacy: info.legacy ?? false } : {};
+        const info = guildPluginInfo[pluginName]!;
+        const thinInfo = { prettyName: info.prettyName, type: info.type };
         return {
           name: pluginName,
           info: thinInfo,

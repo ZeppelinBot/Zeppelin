@@ -3,6 +3,6 @@ import { zGuildInfoSaverConfig } from "./types.js";
 
 export const guildInfoSaverPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Guild info saver",
-  showInDocs: false,
+  type: "internal",
   configSchema: zGuildInfoSaverConfig,
 };

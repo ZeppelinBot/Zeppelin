@@ -3,7 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zCasesConfig } from "./types.js";
 
 export const casesPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Cases",
   configSchema: zCasesConfig,
   description: trimPluginDescription(`

@@ -3,7 +3,7 @@ import { trimPluginDescription } from "../../utils.js";
 import { zAutomodConfig } from "./types.js";
 
 export const automodPluginInfo: ZeppelinPluginInfo = {
-  showInDocs: true,
+  type: "stable",
   prettyName: "Automod",
   configSchema: zAutomodConfig,
   description: trimPluginDescription(`

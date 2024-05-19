@@ -4,6 +4,7 @@ import { zPhishermanConfig } from "./types.js";
 
 export const phishermanPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Phisherman",
+  type: "stable",
   description: trimPluginDescription(`
     Match scam/phishing links using the Phisherman API. See https://phisherman.gg/ for more details!
   `),
@@ -40,5 +41,4 @@ export const phishermanPluginInfo: ZeppelinPluginInfo = {
     ~~~
   `),
   configSchema: zPhishermanConfig,
-  showInDocs: true,
 };
