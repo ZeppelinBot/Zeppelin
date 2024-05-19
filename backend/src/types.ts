@@ -36,11 +36,11 @@ export type TMarkdown = string;
 export interface ZeppelinPluginInfo {
   showInDocs: boolean;
   prettyName: string;
+  configSchema: ZodTypeAny;
   description?: TMarkdown;
   usageGuide?: TMarkdown;
   configurationGuide?: TMarkdown;
   legacy?: boolean;
-  configSchema?: ZodTypeAny;
 }
 
 export interface CommandInfo {
