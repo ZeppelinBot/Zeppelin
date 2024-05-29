@@ -95,7 +95,7 @@ export const CasesUserCmd = modActionsCmd({
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
-        const totalPages = Math.max(Math.ceil(cases.length / casesPerPage), 1);
+        const totalPages = Math.max(Math.ceil(casesToDisplay.length / casesPerPage), 1);
         const prefix = getGuildPrefix(pluginData);
 
         createPaginatedMessage(
@@ -103,7 +103,7 @@ export const CasesUserCmd = modActionsCmd({
           msg.channel,
           totalPages,
           async (page) => {
-            const chunkedCases = chunkArray(cases, casesPerPage)[page - 1];
+            const chunkedCases = chunkArray(casesToDisplay, casesPerPage)[page - 1];
             const lines = await asyncMap(chunkedCases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
             const isLastPage = page === totalPages;
