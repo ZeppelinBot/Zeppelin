@@ -575,10 +575,10 @@ export function isNotNull<T>(value: T): value is Exclude<T, null | undefined> {
 // discord.gg/<code>
 // discord.com/friend-invite/<code>
 const quickInviteDetection =
-  /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9-]+)|discord\.gg\/(?:\S+\/)?([a-z0-9-]+)/gi;
+  /discord(?:app)?\.com\/(?:friend-)?invite\/([a-z0-9-]{8})|discord\.gg\/(?:\S+\/)?([a-z0-9-]{8})/gi;
 
 const isInviteHostRegex = /(?:^|\.)(?:discord.gg|discord.com|discordapp.com)$/i;
-const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9-]+)$/i;
+const longInvitePathRegex = /^\/(?:friend-)?invite\/([a-z0-9-]{8})$/i;
 
 export function getInviteCodesInString(str: string): string[] {
   const inviteCodes: string[] = [];
@@ -605,7 +605,7 @@ export function getInviteCodesInString(str: string): string[] {
       // discord.gg/[anything/]<code>
       if (url.hostname === "discord.gg") {
         const parts = url.pathname.split("/").filter(Boolean);
-        return parts[parts.length - 1];
+        return parts[parts.length - 1].substring(0, 8);
       }
 
       // discord.com/invite/<code>[/anything]

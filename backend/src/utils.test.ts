@@ -1,6 +1,6 @@
 import test from "ava";
 import z from "zod";
-import { convertDelayStringToMS, convertMSToDelayString, getUrlsInString, zAllowedMentions } from "./utils.js";
+import { convertDelayStringToMS, convertMSToDelayString, getInviteCodesInString, getUrlsInString, zAllowedMentions } from "./utils.js";
 import { ErisAllowedMentionFormat } from "./utils/erisAllowedMentionsToDjsMentionOptions.js";
 
 type AssertEquals<TActual, TExpected> = TActual extends TExpected ? true : false;
@@ -55,3 +55,8 @@ test("tAllowedMentions matches Eris's AllowedMentions", (t) => {
   const typeTest: AssertEquals<TAllowedMentions, ErisAllowedMentionFormat> = true;
   t.pass();
 });
+
+test("getInviteCodesInString() : Try to get all real invite codes in a string", (t) => {
+  const codes = getInviteCodesInString("My first link is https://discord.gg/jyfP8grUe (wrong) and the second is https://discord.gg/jyfP8grU (real)");
+  t.is(codes.join(" "), "jyfP8grU");
+})
