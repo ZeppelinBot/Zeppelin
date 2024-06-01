@@ -1,10 +1,10 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
 import z from "zod";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildMutes } from "../../data/GuildMutes";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { zSnowflake } from "../../utils";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildMutes } from "../../data/GuildMutes.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { zSnowflake } from "../../utils.js";
 
 const zBaseSingleSpamConfig = z.strictObject({
   interval: z.number(),
@@ -42,7 +42,7 @@ export enum RecentActionType {
   VoiceChannelMove,
 }
 
-interface IRecentAction<T> {
+export interface IRecentAction<T> {
   type: RecentActionType;
   userId: string;
   actionGroupId: string;

@@ -3,10 +3,10 @@ import moment from "moment-timezone";
 import { Repository } from "typeorm";
 // tslint:disable-next-line:no-submodule-imports
 import { v4 as uuidv4 } from "uuid";
-import { DAYS, DBDateFormat } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { ApiLogin } from "./entities/ApiLogin";
+import { DAYS, DBDateFormat } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { ApiLogin } from "./entities/ApiLogin.js";
 
 const LOGIN_EXPIRY_TIME = 1 * DAYS;
 

@@ -1,14 +1,12 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
-import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { resolveMember, resolveUser } from "../../../utils";
-import { banLock } from "../../../utils/lockNameHelpers";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { banUserId } from "../functions/banUserId";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { isBanned } from "../functions/isBanned";
-import { BanResult, IgnoredEventType, modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { resolveMember, resolveUser } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { ignoreEvent } from "../functions/ignoreEvent.js";
+import { isBanned } from "../functions/isBanned.js";
+import { IgnoredEventType, modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.member({ option: true }),

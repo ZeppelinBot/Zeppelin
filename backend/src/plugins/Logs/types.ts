@@ -1,13 +1,13 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import { z } from "zod";
-import { RegExpRunner } from "../../RegExpRunner";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { LogType } from "../../data/LogType";
-import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils";
-import { MessageBuffer } from "../../utils/MessageBuffer";
+import { RegExpRunner } from "../../RegExpRunner.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { LogType } from "../../data/LogType.js";
+import { keys, zBoundedCharacters, zMessageContent, zRegex, zSnowflake } from "../../utils.js";
+import { MessageBuffer } from "../../utils/MessageBuffer.js";
 import {
   TemplateSafeCase,
   TemplateSafeChannel,
@@ -20,22 +20,15 @@ import {
   TemplateSafeUnknownMember,
   TemplateSafeUnknownUser,
   TemplateSafeUser,
-} from "../../utils/templateSafeObjects";
+} from "../../utils/templateSafeObjects.js";
 
 const DEFAULT_BATCH_TIME = 1000;
 const MIN_BATCH_TIME = 250;
 const MAX_BATCH_TIME = 5000;
 
-type ZLogFormatsHelper = {
-  -readonly [K in keyof typeof LogType]: typeof zMessageContent;
-};
-export const zLogFormats = z.strictObject(
-  keys(LogType).reduce((map, logType) => {
-    map[logType] = zMessageContent;
-    return map;
-  }, {} as ZLogFormatsHelper),
-);
-export type TLogFormats = z.infer<typeof zLogFormats>;
+// A bit of a workaround so we can pass LogType keys to z.enum()
+const logTypes = Object.keys(LogType) as [keyof typeof LogType, ...Array<keyof typeof LogType>];
+const zLogFormats = z.record(z.enum(logTypes), zMessageContent);
 
 const zLogChannel = z.strictObject({
   include: z.array(zBoundedCharacters(1, 255)).default([]),
@@ -49,7 +42,7 @@ const zLogChannel = z.strictObject({
   excluded_threads: z.array(zSnowflake).nullable().default(null),
   exclude_bots: z.boolean().default(false),
   excluded_roles: z.array(zSnowflake).nullable().default(null),
-  format: zLogFormats.partial().default({}),
+  format: zLogFormats.default({}),
   timestamp_format: z.string().nullable().default(null),
   include_embed_timestamp: z.boolean().nullable().default(null),
 });
@@ -60,12 +53,7 @@ export type TLogChannelMap = z.infer<typeof zLogChannelMap>;
 
 export const zLogsConfig = z.strictObject({
   channels: zLogChannelMap,
-  format: zLogFormats.merge(
-    z.strictObject({
-      // Legacy/deprecated, use timestamp_format below instead
-      timestamp: zBoundedCharacters(0, 64).nullable(),
-    }),
-  ),
+  format: zLogFormats,
   // Legacy/deprecated, if below is false mentions wont actually ping. In case you really want the old behavior, set below to true
   ping_user: z.boolean(),
   allow_user_mentions: z.boolean(),

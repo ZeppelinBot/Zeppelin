@@ -6,11 +6,11 @@ import {
   ThreadChannel,
 } from "discord.js";
 import z from "zod";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { MINUTES, convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils";
-import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
+import { MINUTES, convertDelayStringToMS, noop, zBoundedCharacters, zDelayString } from "../../../utils.js";
+import { savedMessageToTemplateSafeSavedMessage, userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 const validThreadAutoArchiveDurations: ThreadAutoArchiveDuration[] = [
   ThreadAutoArchiveDuration.OneHour,

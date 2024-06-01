@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { TimeAndDatePluginType } from "../types";
-import { getMemberTz } from "./getMemberTz";
+import { TimeAndDatePluginType } from "../types.js";
+import { getMemberTz } from "./getMemberTz.js";
 
 export async function inMemberTz(
   pluginData: GuildPluginData<TimeAndDatePluginType>,

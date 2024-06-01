@@ -1,5 +1,5 @@
 import { GuildMember, Message, User } from "discord.js";
-import { SavedMessage } from "../data/entities/SavedMessage";
+import { SavedMessage } from "../data/entities/SavedMessage.js";
 
 export function allStarboardsLock() {
   return `starboards`;

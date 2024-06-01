@@ -1,6 +1,6 @@
 import z from "zod";
-import { convertDelayStringToMS, zDelayString } from "../../../utils";
-import { automodTrigger } from "../helpers";
+import { convertDelayStringToMS, zDelayString } from "../../../utils.js";
+import { automodTrigger } from "../helpers.js";
 
 const configSchema = z.strictObject({
   only_new: z.boolean().default(false),

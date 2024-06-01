@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { StarboardReaction } from "./entities/StarboardReaction";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { StarboardReaction } from "./entities/StarboardReaction.js";
 
 export class GuildStarboardReactions extends BaseGuildRepository {
   private allStarboardReactions: Repository<StarboardReaction>;

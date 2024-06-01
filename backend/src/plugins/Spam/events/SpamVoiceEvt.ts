@@ -1,5 +1,5 @@
-import { RecentActionType, spamEvt } from "../types";
-import { logAndDetectOtherSpam } from "../util/logAndDetectOtherSpam";
+import { RecentActionType, spamEvt } from "../types.js";
+import { logAndDetectOtherSpam } from "../util/logAndDetectOtherSpam.js";
 
 export const SpamVoiceStateUpdateEvt = spamEvt({
   event: "voiceStateUpdate",

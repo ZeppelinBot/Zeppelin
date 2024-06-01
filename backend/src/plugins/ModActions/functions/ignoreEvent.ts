@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { SECONDS } from "../../../utils";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { clearIgnoredEvents } from "./clearIgnoredEvents";
+import { SECONDS } from "../../../utils.js";
+import { IgnoredEventType, ModActionsPluginType } from "../types.js";
+import { clearIgnoredEvents } from "./clearIgnoredEvents.js";
 
 const DEFAULT_TIMEOUT = 15 * SECONDS;
 

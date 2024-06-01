@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { VCAlert } from "./entities/VCAlert";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { VCAlert } from "./entities/VCAlert.js";
 
 export class GuildVCAlerts extends BaseGuildRepository {
   private allAlerts: Repository<VCAlert>;

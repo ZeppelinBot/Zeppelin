@@ -1,19 +1,19 @@
 import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/helpers";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
-import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { renderUsername, resolveMember, resolveUser } from "../../../utils";
-import { banLock } from "../../../utils/lockNameHelpers";
-import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { banUserId } from "../functions/banUserId";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { isBanned } from "../functions/isBanned";
-import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop.js";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import { banLock } from "../../../utils/lockNameHelpers.js";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { banUserId } from "../functions/banUserId.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { isBanned } from "../functions/isBanned.js";
+import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs.js";
+import { modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.member({ option: true }),

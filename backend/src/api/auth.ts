@@ -1,15 +1,15 @@
 import express, { Request, Response } from "express";
 import https from "https";
-import pick from "lodash.pick";
+import pick from "lodash/pick.js";
 import passport from "passport";
 import { Strategy as CustomStrategy } from "passport-custom";
 import OAuth2Strategy from "passport-oauth2";
-import { ApiLogins } from "../data/ApiLogins";
-import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments";
-import { ApiUserInfo } from "../data/ApiUserInfo";
-import { ApiUserInfoData } from "../data/entities/ApiUserInfo";
-import { env } from "../env";
-import { ok } from "./responses";
+import { ApiLogins } from "../data/ApiLogins.js";
+import { ApiPermissionAssignments } from "../data/ApiPermissionAssignments.js";
+import { ApiUserInfo } from "../data/ApiUserInfo.js";
+import { ApiUserInfoData } from "../data/entities/ApiUserInfo.js";
+import { env } from "../env.js";
+import { ok } from "./responses.js";
 
 interface IPassportApiUser {
   apiKey: string;

@@ -1,11 +1,11 @@
 import { PluginOptions, guildPlugin } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { Webhooks } from "../../data/Webhooks";
-import { makePublicFn } from "../../pluginUtils";
-import { editMessage } from "./functions/editMessage";
-import { sendMessage } from "./functions/sendMessage";
-import { InternalPosterPluginType } from "./types";
+import { Queue } from "../../Queue.js";
+import { Webhooks } from "../../data/Webhooks.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { editMessage } from "./functions/editMessage.js";
+import { sendMessage } from "./functions/sendMessage.js";
+import { InternalPosterPluginType } from "./types.js";
 
 const defaultOptions: PluginOptions<InternalPosterPluginType> = {
   config: {},

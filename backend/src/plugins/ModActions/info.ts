@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zModActionsConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zModActionsConfig } from "./types.js";
 
 export const modActionsPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Mod actions",

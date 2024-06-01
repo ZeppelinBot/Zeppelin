@@ -1,9 +1,9 @@
 import express from "express";
 import z from "zod";
-import { guildPlugins } from "../plugins/availablePlugins";
-import { guildPluginInfo } from "../plugins/pluginInfo";
-import { indentLines } from "../utils";
-import { notFound } from "./responses";
+import { guildPlugins } from "../plugins/availablePlugins.js";
+import { guildPluginInfo } from "../plugins/pluginInfo.js";
+import { indentLines } from "../utils.js";
+import { notFound } from "./responses.js";
 
 function isZodObject(schema: z.ZodTypeAny): schema is z.ZodObject<any> {
   return schema._def.typeName === "ZodObject";
@@ -121,8 +121,8 @@ export function initDocs(router: express.Router) {
     }
 
     const plugin = guildPlugins.find((p) => p.name === name)!;
-    const info = { ...baseInfo };
-    delete info.configSchema;
+    const { configSchema, ...info } = baseInfo;
+    const formattedConfigSchema = formatZodConfigSchema(configSchema);
 
     const messageCommands = (plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
@@ -134,12 +134,11 @@ export function initDocs(router: express.Router) {
     }));
 
     const defaultOptions = plugin.defaultOptions || {};
-    const configSchema = info.configSchema && formatZodConfigSchema(info.configSchema);
 
     res.json({
       name,
       info,
-      configSchema,
+      configSchema: formattedConfigSchema,
       defaultOptions,
       messageCommands,
     });

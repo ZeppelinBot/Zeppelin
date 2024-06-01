@@ -1,13 +1,13 @@
 import { APIEmbed, User } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUsername, resolveMember, resolveUser } from "../../../utils";
-import { asyncMap } from "../../../utils/async";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { UnknownUser, chunkArray, emptyEmbedValue, renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import { asyncMap } from "../../../utils/async.js";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { modActionsCmd } from "../types";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
+import { modActionsCmd } from "../types.js";
 
 const opts = {
   expand: ct.bool({ option: true, isSwitch: true, shortcut: "e" }),

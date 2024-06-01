@@ -1,5 +1,5 @@
-import { allStarboardsLock } from "../../../utils/lockNameHelpers";
-import { starboardEvt } from "../types";
+import { allStarboardsLock } from "../../../utils/lockNameHelpers.js";
+import { starboardEvt } from "../types.js";
 
 export const StarboardReactionRemoveEvt = starboardEvt({
   event: "messageReactionRemove",

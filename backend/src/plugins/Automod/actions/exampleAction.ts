@@ -1,6 +1,6 @@
 import z from "zod";
-import { zBoundedCharacters } from "../../../utils";
-import { automodAction } from "../helpers";
+import { zBoundedCharacters } from "../../../utils.js";
+import { automodAction } from "../helpers.js";
 
 export const ExampleAction = automodAction({
   configSchema: z.strictObject({

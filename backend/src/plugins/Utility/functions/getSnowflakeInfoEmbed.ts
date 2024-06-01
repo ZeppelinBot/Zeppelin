@@ -1,6 +1,6 @@
 import { APIEmbed } from "discord.js";
-import { EmbedWith, preEmbedPadding } from "../../../utils";
-import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
+import { EmbedWith, preEmbedPadding } from "../../../utils.js";
+import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp.js";
 
 const SNOWFLAKE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/742020790471491668/snowflake.png";
 

@@ -1,6 +1,6 @@
 import z from "zod";
-import { parseColor } from "./parseColor";
-import { rgbToInt } from "./rgbToInt";
+import { parseColor } from "./parseColor.js";
+import { rgbToInt } from "./rgbToInt.js";
 
 export const zColor = z.string().transform((val, ctx) => {
   const parsedColor = parseColor(val);

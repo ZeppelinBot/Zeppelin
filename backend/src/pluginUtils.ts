@@ -12,11 +12,11 @@ import {
   TextBasedChannel,
 } from "discord.js";
 import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
-import { logger } from "./logger";
-import { isStaff } from "./staff";
-import { TZeppelinKnub } from "./types";
-import { errorMessage, successMessage } from "./utils";
-import { Tail } from "./utils/typeUtils";
+import { logger } from "./logger.js";
+import { isStaff } from "./staff.js";
+import { TZeppelinKnub } from "./types.js";
+import { errorMessage, successMessage } from "./utils.js";
+import { Tail } from "./utils/typeUtils.js";
 
 const { getMemberLevel } = helpers;
 

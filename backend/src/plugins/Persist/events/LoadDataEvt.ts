@@ -1,14 +1,14 @@
 import { GuildMember, PermissionFlagsBits } from "discord.js";
 import { GuildPluginData } from "knub";
-import intersection from "lodash.intersection";
-import { PersistedData } from "../../../data/entities/PersistedData";
-import { SECONDS } from "../../../utils";
-import { canAssignRole } from "../../../utils/canAssignRole";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
-import { PersistPluginType, persistEvt } from "../types";
+import intersection from "lodash/intersection.js";
+import { PersistedData } from "../../../data/entities/PersistedData.js";
+import { SECONDS } from "../../../utils.js";
+import { canAssignRole } from "../../../utils/canAssignRole.js";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
+import { PersistPluginType, persistEvt } from "../types.js";
 
 const p = PermissionFlagsBits;
 

@@ -1,6 +1,6 @@
 // KEEP THIS AS FIRST IMPORT
 // See comment in module for details
-import "./threadsSignalFix";
+import "./threadsSignalFix.js";
 
 import {
   Client,
@@ -17,37 +17,37 @@ import { Knub, PluginError, PluginLoadError, PluginNotLoadedError } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
 import process from "process";
-import { DiscordJSError } from "./DiscordJSError";
-import { RecoverablePluginError } from "./RecoverablePluginError";
-import { SimpleError } from "./SimpleError";
-import { AllowedGuilds } from "./data/AllowedGuilds";
-import { Configs } from "./data/Configs";
-import { GuildLogs } from "./data/GuildLogs";
-import { LogType } from "./data/LogType";
-import { hasPhishermanMasterAPIKey } from "./data/Phisherman";
-import { dataSource } from "./data/dataSource";
-import { connect } from "./data/db";
-import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop";
-import { runExpiredMemberCacheDeletionLoop } from "./data/loops/expiredMemberCacheDeletionLoop";
-import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop";
-import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop";
-import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop";
-import { runMemberCacheDeletionLoop } from "./data/loops/memberCacheDeletionLoop";
-import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops";
-import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop";
-import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop";
-import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop";
-import { consumeQueryStats } from "./data/queryLogger";
-import { env } from "./env";
-import { logger } from "./logger";
-import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins";
-import { setProfiler } from "./profiler";
-import { logRateLimit } from "./rateLimitStats";
-import { startUptimeCounter } from "./uptime";
-import { MINUTES, SECONDS, errorMessage, isDiscordAPIError, isDiscordHTTPError, sleep, successMessage } from "./utils";
-import { DecayingCounter } from "./utils/DecayingCounter";
-import { enableProfiling } from "./utils/easyProfiler";
-import { loadYamlSafely } from "./utils/loadYamlSafely";
+import { DiscordJSError } from "./DiscordJSError.js";
+import { RecoverablePluginError } from "./RecoverablePluginError.js";
+import { SimpleError } from "./SimpleError.js";
+import { AllowedGuilds } from "./data/AllowedGuilds.js";
+import { Configs } from "./data/Configs.js";
+import { GuildLogs } from "./data/GuildLogs.js";
+import { LogType } from "./data/LogType.js";
+import { hasPhishermanMasterAPIKey } from "./data/Phisherman.js";
+import { dataSource } from "./data/dataSource.js";
+import { connect } from "./data/db.js";
+import { runExpiredArchiveDeletionLoop } from "./data/loops/expiredArchiveDeletionLoop.js";
+import { runExpiredMemberCacheDeletionLoop } from "./data/loops/expiredMemberCacheDeletionLoop.js";
+import { runExpiringMutesLoop } from "./data/loops/expiringMutesLoop.js";
+import { runExpiringTempbansLoop } from "./data/loops/expiringTempbansLoop.js";
+import { runExpiringVCAlertsLoop } from "./data/loops/expiringVCAlertsLoop.js";
+import { runMemberCacheDeletionLoop } from "./data/loops/memberCacheDeletionLoop.js";
+import { runPhishermanCacheCleanupLoop, runPhishermanReportingLoop } from "./data/loops/phishermanLoops.js";
+import { runSavedMessageCleanupLoop } from "./data/loops/savedMessageCleanupLoop.js";
+import { runUpcomingRemindersLoop } from "./data/loops/upcomingRemindersLoop.js";
+import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPostsLoop.js";
+import { consumeQueryStats } from "./data/queryLogger.js";
+import { env } from "./env.js";
+import { logger } from "./logger.js";
+import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins.js";
+import { setProfiler } from "./profiler.js";
+import { logRateLimit } from "./rateLimitStats.js";
+import { startUptimeCounter } from "./uptime.js";
+import { MINUTES, SECONDS, errorMessage, isDiscordAPIError, isDiscordHTTPError, sleep, successMessage } from "./utils.js";
+import { DecayingCounter } from "./utils/DecayingCounter.js";
+import { enableProfiling } from "./utils/easyProfiler.js";
+import { loadYamlSafely } from "./utils/loadYamlSafely.js";
 
 // Error handling
 let recentPluginErrors = 0;

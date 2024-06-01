@@ -1,4 +1,4 @@
-import { AdvancedConsoleLogger } from "typeorm/logger/AdvancedConsoleLogger";
+import { AdvancedConsoleLogger } from "typeorm";
 
 let groupedQueryStats: Map<string, number> = new Map();
 

@@ -1,14 +1,13 @@
 import { escapeCodeBlock, MessageCreateOptions, MessageEditOptions } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { Case } from "../../../data/entities/Case";
-import { chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { CasesPluginType } from "../types";
-import { getCaseColor } from "./getCaseColor";
-import { getCaseIcon } from "./getCaseIcon";
-import { resolveCaseId } from "./resolveCaseId";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { Case } from "../../../data/entities/Case.js";
+import { chunkMessageLines, emptyEmbedValue, messageLink } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { CasesPluginType } from "../types.js";
+import { getCaseColor } from "./getCaseColor.js";
+import { resolveCaseId } from "./resolveCaseId.js";
 
 export async function getCaseEmbed(
   pluginData: GuildPluginData<CasesPluginType>,

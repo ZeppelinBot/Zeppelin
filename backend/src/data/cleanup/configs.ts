@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { In } from "typeorm";
-import { DBDateFormat } from "../../utils";
-import { dataSource } from "../dataSource";
-import { Config } from "../entities/Config";
+import { DBDateFormat } from "../../utils.js";
+import { dataSource } from "../dataSource.js";
+import { Config } from "../entities/Config.js";
 
 const CLEAN_PER_LOOP = 50;
 

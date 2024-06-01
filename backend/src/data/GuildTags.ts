@@ -1,8 +1,8 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { Tag } from "./entities/Tag";
-import { TagResponse } from "./entities/TagResponse";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Tag } from "./entities/Tag.js";
+import { TagResponse } from "./entities/TagResponse.js";
 
 export class GuildTags extends BaseGuildRepository {
   private tags: Repository<Tag>;

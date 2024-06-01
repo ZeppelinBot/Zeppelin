@@ -1,6 +1,6 @@
-import { zBoundedCharacters } from "../../../utils";
-import { setAntiraidLevel } from "../functions/setAntiraidLevel";
-import { automodAction } from "../helpers";
+import { zBoundedCharacters } from "../../../utils.js";
+import { setAntiraidLevel } from "../functions/setAntiraidLevel.js";
+import { automodAction } from "../helpers.js";
 
 export const SetAntiraidLevelAction = automodAction({
   configSchema: zBoundedCharacters(0, 100).nullable(),

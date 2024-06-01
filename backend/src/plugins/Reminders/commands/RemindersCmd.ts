@@ -1,9 +1,9 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { remindersCmd } from "../types";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { remindersCmd } from "../types.js";
 
 export const RemindersCmd = remindersCmd({
   trigger: "reminders",

@@ -1,14 +1,14 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { GuildVCAlerts } from "../../data/GuildVCAlerts";
-import { FollowCmd } from "./commands/FollowCmd";
-import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd";
-import { WhereCmd } from "./commands/WhereCmd";
-import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt";
-import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts";
-import { LocateUserPluginType, zLocateUserConfig } from "./types";
-import { clearExpiredAlert } from "./utils/clearExpiredAlert";
-import { fillActiveAlertsList } from "./utils/fillAlertsList";
+import { onGuildEvent } from "../../data/GuildEvents.js";
+import { GuildVCAlerts } from "../../data/GuildVCAlerts.js";
+import { FollowCmd } from "./commands/FollowCmd.js";
+import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd.js";
+import { WhereCmd } from "./commands/WhereCmd.js";
+import { GuildBanRemoveAlertsEvt } from "./events/BanRemoveAlertsEvt.js";
+import { VoiceStateUpdateAlertEvt } from "./events/SendAlertsEvts.js";
+import { LocateUserPluginType, zLocateUserConfig } from "./types.js";
+import { clearExpiredAlert } from "./utils/clearExpiredAlert.js";
+import { fillActiveAlertsList } from "./utils/fillAlertsList.js";
 
 const defaultOptions: PluginOptions<LocateUserPluginType> = {
   config: {

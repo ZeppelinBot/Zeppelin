@@ -1,9 +1,9 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { SlowmodeChannel } from "./entities/SlowmodeChannel";
-import { SlowmodeUser } from "./entities/SlowmodeUser";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { SlowmodeChannel } from "./entities/SlowmodeChannel.js";
+import { SlowmodeUser } from "./entities/SlowmodeUser.js";
 
 export class GuildSlowmodes extends BaseGuildRepository {
   private slowmodeChannels: Repository<SlowmodeChannel>;

@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
-import { TableColumn } from "typeorm/index";
+import { TableColumn } from "typeorm";
 
 export class AddLogMessageIdToCases1597015567215 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

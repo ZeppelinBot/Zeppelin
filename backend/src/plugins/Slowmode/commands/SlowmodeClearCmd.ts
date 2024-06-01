@@ -1,9 +1,9 @@
 import { ChannelType, escapeInlineCode } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, renderUsername } from "../../../utils";
-import { slowmodeCmd } from "../types";
-import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { asSingleLine, renderUsername } from "../../../utils.js";
+import { slowmodeCmd } from "../types.js";
+import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId.js";
 
 export const SlowmodeClearCmd = slowmodeCmd({
   trigger: ["slowmode clear", "slowmode c"],

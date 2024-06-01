@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { noop } from "../../../utils";
-import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { noop } from "../../../utils.js";
+import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel.js";
 
 export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const botSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(args.channel.id);

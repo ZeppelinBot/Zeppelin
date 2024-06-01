@@ -1,4 +1,4 @@
-import { reactionRolesEvt } from "../types";
+import { reactionRolesEvt } from "../types.js";
 
 export const MessageDeletedEvt = reactionRolesEvt({
   event: "messageDelete",

@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { postCmd } from "../types";
-import { actualPostCmd } from "../util/actualPostCmd";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { postCmd } from "../types.js";
+import { actualPostCmd } from "../util/actualPostCmd.js";
 
 export const PostCmd = postCmd({
   trigger: "post",

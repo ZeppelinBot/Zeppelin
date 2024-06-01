@@ -1,6 +1,6 @@
-import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils";
-import { getActiveReload, setActiveReload } from "../activeReload";
-import { botControlCmd } from "../types";
+import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils.js";
+import { getActiveReload, setActiveReload } from "../activeReload.js";
+import { botControlCmd } from "../types.js";
 
 export const ReloadGlobalPluginsCmd = botControlCmd({
   trigger: "bot_reload_global_plugins",
