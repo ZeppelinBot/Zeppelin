@@ -1,12 +1,12 @@
 import { helpers } from "knub";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { SECONDS, renderUsername, trimLines } from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { Case } from "../../../data/entities/Case.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { SECONDS, renderUsername, trimLines } from "../../../utils.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { modActionsCmd } from "../types.js";
 
 export const DeleteCaseCmd = modActionsCmd({
   trigger: ["delete_case", "deletecase"],

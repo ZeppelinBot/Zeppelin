@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
+import { IgnoredEventType, ModActionsPluginType } from "../types.js";
 
 export function clearIgnoredEvents(
   pluginData: GuildPluginData<ModActionsPluginType>,

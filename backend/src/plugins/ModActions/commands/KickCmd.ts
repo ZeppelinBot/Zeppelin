@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { actualKickMemberCmd } from "../functions/actualKickMemberCmd.js";
+import { modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.member({ option: true }),

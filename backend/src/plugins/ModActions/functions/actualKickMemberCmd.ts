@@ -1,15 +1,15 @@
 import { GuildMember, GuildTextBasedChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { hasPermission } from "knub/helpers";
-import { LogType } from "../../../data/LogType";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { DAYS, SECONDS, errorMessage, renderUsername, resolveMember, resolveUser } from "../../../utils";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { ignoreEvent } from "./ignoreEvent";
-import { isBanned } from "./isBanned";
-import { kickMember } from "./kickMember";
-import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs";
+import { LogType } from "../../../data/LogType.js";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { DAYS, SECONDS, errorMessage, renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import { IgnoredEventType, ModActionsPluginType } from "../types.js";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments.js";
+import { ignoreEvent } from "./ignoreEvent.js";
+import { isBanned } from "./isBanned.js";
+import { kickMember } from "./kickMember.js";
+import { readContactMethodsFromArgs } from "./readContactMethodsFromArgs.js";
 
 export async function actualKickMemberCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

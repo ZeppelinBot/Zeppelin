@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getRoleInfoEmbed } from "../functions/getRoleInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const RoleInfoCmd = utilityCmd({
   trigger: ["roleinfo"],

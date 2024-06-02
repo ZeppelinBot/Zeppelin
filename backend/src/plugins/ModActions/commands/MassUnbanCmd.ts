@@ -1,15 +1,15 @@
 import { Snowflake } from "discord.js";
 import { waitForReply } from "knub/helpers";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { isBanned } from "../functions/isBanned";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { ignoreEvent } from "../functions/ignoreEvent.js";
+import { isBanned } from "../functions/isBanned.js";
+import { IgnoredEventType, modActionsCmd } from "../types.js";
 
 export const MassunbanCmd = modActionsCmd({
   trigger: "massunban",

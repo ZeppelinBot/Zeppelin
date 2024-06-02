@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isStaffPreFilter, sendErrorMessage } from "../../../pluginUtils.js";
+import { botControlCmd } from "../types.js";
 
 export const ChannelToServerCmd = botControlCmd({
   trigger: ["channel_to_server", "channel2server"],

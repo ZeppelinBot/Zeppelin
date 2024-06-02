@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
 import { guildPluginEventListener } from "knub";
-import { SECONDS } from "../../../utils";
-import { parseCustomId } from "../../../utils/parseCustomId";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
-import { getAllRolesInButtons } from "../functions/getAllRolesInButtons";
-import { RoleButtonsPluginType, TRoleButtonOption } from "../types";
+import { SECONDS } from "../../../utils.js";
+import { parseCustomId } from "../../../utils/parseCustomId.js";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
+import { getAllRolesInButtons } from "../functions/getAllRolesInButtons.js";
+import { RoleButtonsPluginType, TRoleButtonOption } from "../types.js";
 
 const ROLE_BUTTON_CD = 5 * SECONDS;
 

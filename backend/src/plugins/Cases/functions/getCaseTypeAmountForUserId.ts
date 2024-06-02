@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPluginType } from "../types";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { CasesPluginType } from "../types.js";
 
 export async function getCaseTypeAmountForUserId(
   pluginData: GuildPluginData<CasesPluginType>,

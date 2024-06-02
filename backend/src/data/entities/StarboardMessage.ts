@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
-import { SavedMessage } from "./SavedMessage";
+import { SavedMessage } from "./SavedMessage.js";
 
 @Entity("starboard_messages")
 export class StarboardMessage {

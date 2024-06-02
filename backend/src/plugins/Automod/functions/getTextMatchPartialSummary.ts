@@ -1,8 +1,8 @@
 import { ActivityType, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { messageSummary, verboseChannelMention } from "../../../utils";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { MatchableTextType } from "./matchMultipleTextTypesOnMessage";
+import { messageSummary, verboseChannelMention } from "../../../utils.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
+import { MatchableTextType } from "./matchMultipleTextTypesOnMessage.js";
 
 export function getTextMatchPartialSummary(
   pluginData: GuildPluginData<AutomodPluginType>,

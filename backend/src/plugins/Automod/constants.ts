@@ -1,5 +1,5 @@
 import z from "zod";
-import { MINUTES, SECONDS } from "../../utils";
+import { MINUTES, SECONDS } from "../../utils.js";
 
 export const RECENT_SPAM_EXPIRY_TIME = 10 * SECONDS;
 export const RECENT_ACTION_EXPIRY_TIME = 5 * MINUTES;

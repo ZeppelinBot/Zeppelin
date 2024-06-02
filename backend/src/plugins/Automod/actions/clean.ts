@@ -1,8 +1,8 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import z from "zod";
-import { LogType } from "../../../data/LogType";
-import { noop } from "../../../utils";
-import { automodAction } from "../helpers";
+import { LogType } from "../../../data/LogType.js";
+import { noop } from "../../../utils.js";
+import { automodAction } from "../helpers.js";
 
 export const CleanAction = automodAction({
   configSchema: z.boolean().default(false),

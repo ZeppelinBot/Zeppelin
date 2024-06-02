@@ -1,8 +1,8 @@
 import { CooldownManager, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt";
-import { CompanionChannelsPluginType, zCompanionChannelsConfig } from "./types";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt.js";
+import { CompanionChannelsPluginType, zCompanionChannelsConfig } from "./types.js";
 
 const defaultOptions = {
   config: {

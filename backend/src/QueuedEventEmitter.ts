@@ -1,4 +1,4 @@
-import { Queue } from "./Queue";
+import { Queue } from "./Queue.js";
 
 type Listener = (...args: any[]) => void;
 

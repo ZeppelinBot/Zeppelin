@@ -1,8 +1,8 @@
 import z from "zod";
-import { zBoundedCharacters } from "../../../utils";
-import { CountersPlugin } from "../../Counters/CountersPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+import { zBoundedCharacters } from "../../../utils.js";
+import { CountersPlugin } from "../../Counters/CountersPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 const configSchema = z.object({
   counter: zBoundedCharacters(0, 100),

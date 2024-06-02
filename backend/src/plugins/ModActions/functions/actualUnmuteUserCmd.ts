@@ -1,11 +1,11 @@
 import { GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { UnknownUser, asSingleLine, renderUsername } from "../../../utils";
-import { ModActionsPluginType } from "../types";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin.js";
+import { UnknownUser, asSingleLine, renderUsername } from "../../../utils.js";
+import { ModActionsPluginType } from "../types.js";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments.js";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

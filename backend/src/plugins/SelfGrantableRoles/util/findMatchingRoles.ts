@@ -1,4 +1,4 @@
-import { TSelfGrantableRoleEntry } from "../types";
+import { TSelfGrantableRoleEntry } from "../types.js";
 
 export function findMatchingRoles(roleNames: string[], entries: TSelfGrantableRoleEntry[]): string[] {
   const aliasToRoleId = entries.reduce((map, entry) => {

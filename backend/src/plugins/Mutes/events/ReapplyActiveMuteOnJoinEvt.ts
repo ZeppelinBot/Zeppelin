@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
-import { MuteTypes } from "../../../data/MuteTypes";
+import { MuteTypes } from "../../../data/MuteTypes.js";
 import { noop } from "../../../utils.js";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
-import { getTimeoutExpiryTime } from "../functions/getTimeoutExpiryTime";
-import { mutesEvt } from "../types";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
+import { getTimeoutExpiryTime } from "../functions/getTimeoutExpiryTime.js";
+import { mutesEvt } from "../types.js";
 
 /**
  * Reapply active mutes on join
