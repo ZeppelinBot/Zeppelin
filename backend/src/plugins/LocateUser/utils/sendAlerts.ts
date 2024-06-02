@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { resolveMember } from "../../../utils";
-import { LocateUserPluginType } from "../types";
-import { moveMember } from "./moveMember";
-import { sendWhere } from "./sendWhere";
+import { resolveMember } from "../../../utils.js";
+import { LocateUserPluginType } from "../types.js";
+import { moveMember } from "./moveMember.js";
+import { sendWhere } from "./sendWhere.js";
 
 export async function sendAlerts(pluginData: GuildPluginData<LocateUserPluginType>, userId: string) {
   const triggeredAlerts = await pluginData.state.alerts.getAlertsByUserId(userId);

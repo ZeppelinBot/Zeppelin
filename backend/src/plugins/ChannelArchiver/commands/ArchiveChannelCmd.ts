@@ -1,11 +1,11 @@
 import { Snowflake } from "discord.js";
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isOwner, sendErrorMessage } from "../../../pluginUtils";
-import { SECONDS, confirm, noop, renderUsername } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { rehostAttachment } from "../rehostAttachment";
-import { channelArchiverCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isOwner, sendErrorMessage } from "../../../pluginUtils.js";
+import { SECONDS, confirm, noop, renderUsername } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { rehostAttachment } from "../rehostAttachment.js";
+import { channelArchiverCmd } from "../types.js";
 
 const MAX_ARCHIVED_MESSAGES = 5000;
 const MAX_MESSAGES_PER_FETCH = 100;

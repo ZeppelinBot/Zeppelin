@@ -1,9 +1,9 @@
 import { AuditLogChange, AuditLogEvent } from "discord.js";
 import moment from "moment-timezone";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { resolveUser } from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { modActionsEvt } from "../types";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { resolveUser } from "../../../utils.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { modActionsEvt } from "../types.js";
 
 export const AuditLogEvents = modActionsEvt({
   event: "guildAuditLogEntryCreate",

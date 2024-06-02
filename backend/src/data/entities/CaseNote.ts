@@ -1,5 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Case } from "./Case";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Case } from "./Case.js";
 
 @Entity("case_notes")
 export class CaseNote {
@@ -17,5 +17,5 @@ export class CaseNote {
 
   @ManyToOne(() => Case, (theCase) => theCase.notes)
   @JoinColumn({ name: "case_id" })
-  case: Case;
+  case: Relation<Case>;
 }

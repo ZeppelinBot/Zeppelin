@@ -1,15 +1,15 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { AddMuteParams } from "../../../data/GuildMutes";
-import { MuteTypes } from "../../../data/MuteTypes";
-import { Case } from "../../../data/entities/Case";
-import { Mute } from "../../../data/entities/Mute";
-import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop";
-import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { AddMuteParams } from "../../../data/GuildMutes.js";
+import { MuteTypes } from "../../../data/MuteTypes.js";
+import { Case } from "../../../data/entities/Case.js";
+import { Mute } from "../../../data/entities/Mute.js";
+import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop.js";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin.js";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
   UserNotificationMethod,
   UserNotificationResult,
@@ -18,14 +18,14 @@ import {
   resolveMember,
   resolveUser,
   ucfirst,
-} from "../../../utils";
-import { muteLock } from "../../../utils/lockNameHelpers";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
-import { MuteOptions, MutesPluginType } from "../types";
-import { getDefaultMuteType } from "./getDefaultMuteType";
-import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime";
+} from "../../../utils.js";
+import { muteLock } from "../../../utils/lockNameHelpers.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
+import { MuteOptions, MutesPluginType } from "../types.js";
+import { getDefaultMuteType } from "./getDefaultMuteType.js";
+import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime.js";
 
 /**
  * TODO: Clean up this function

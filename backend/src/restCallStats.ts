@@ -1,4 +1,4 @@
-import { sorter } from "./utils";
+import { sorter } from "./utils.js";
 
 Error.stackTraceLimit = Infinity;
 

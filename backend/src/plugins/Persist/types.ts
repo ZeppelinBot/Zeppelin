@@ -1,8 +1,8 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildPersistedData } from "../../data/GuildPersistedData";
-import { zSnowflake } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildPersistedData } from "../../data/GuildPersistedData.js";
+import { zSnowflake } from "../../utils.js";
 
 export const zPersistConfig = z.strictObject({
   persisted_roles: z.array(zSnowflake),

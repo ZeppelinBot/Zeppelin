@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { trimPluginDescription } from "../../../utils";
-import { actualKickMemberCmd } from "../functions/actualKickMemberCmd";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { trimPluginDescription } from "../../../utils.js";
+import { actualKickMemberCmd } from "../functions/actualKickMemberCmd.js";
+import { modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.member({ option: true }),

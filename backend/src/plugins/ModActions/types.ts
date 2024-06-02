@@ -2,14 +2,14 @@ import { GuildTextBasedChannel } from "discord.js";
 import { EventEmitter } from "events";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildMutes } from "../../data/GuildMutes";
-import { GuildTempbans } from "../../data/GuildTempbans";
-import { Case } from "../../data/entities/Case";
-import { UserNotificationMethod, UserNotificationResult } from "../../utils";
-import { CaseArgs } from "../Cases/types";
+import { Queue } from "../../Queue.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildMutes } from "../../data/GuildMutes.js";
+import { GuildTempbans } from "../../data/GuildTempbans.js";
+import { Case } from "../../data/entities/Case.js";
+import { UserNotificationMethod, UserNotificationResult } from "../../utils.js";
+import { CaseArgs } from "../Cases/types.js";
 
 export const zModActionsConfig = z.strictObject({
   dm_on_warn: z.boolean(),

@@ -1,9 +1,9 @@
 import { ChannelType, Snowflake, VoiceChannel } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { channelMentionRegex, isSnowflake, renderUsername, simpleClosestStringMatch } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { channelMentionRegex, isSnowflake, renderUsername, simpleClosestStringMatch } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { utilityCmd } from "../types.js";
 
 export const VcmoveCmd = utilityCmd({
   trigger: "vcmove",

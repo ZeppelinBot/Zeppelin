@@ -1,20 +1,22 @@
-import { ApiPermissions } from "@zeppelinbot/shared";
+import { ApiPermissions } from "@zeppelinbot/shared/apiPermissions.js";
 import express, { Request, Response } from "express";
-import { YAMLException } from "js-yaml";
+import jsYaml from "js-yaml";
 import moment from "moment-timezone";
-import { Queue } from "../Queue";
-import { validateGuildConfig } from "../configValidator";
-import { AllowedGuilds } from "../data/AllowedGuilds";
-import { ApiAuditLog } from "../data/ApiAuditLog";
-import { ApiPermissionAssignments, ApiPermissionTypes } from "../data/ApiPermissionAssignments";
-import { Configs } from "../data/Configs";
-import { AuditLogEventTypes } from "../data/apiAuditLogTypes";
-import { isSnowflake } from "../utils";
-import { loadYamlSafely } from "../utils/loadYamlSafely";
-import { ObjectAliasError } from "../utils/validateNoObjectAliases";
-import { apiTokenAuthHandlers } from "./auth";
-import { hasGuildPermission, requireGuildPermission } from "./permissions";
-import { clientError, ok, serverError, unauthorized } from "./responses";
+import { Queue } from "../Queue.js";
+import { validateGuildConfig } from "../configValidator.js";
+import { AllowedGuilds } from "../data/AllowedGuilds.js";
+import { ApiAuditLog } from "../data/ApiAuditLog.js";
+import { ApiPermissionAssignments, ApiPermissionTypes } from "../data/ApiPermissionAssignments.js";
+import { Configs } from "../data/Configs.js";
+import { AuditLogEventTypes } from "../data/apiAuditLogTypes.js";
+import { isSnowflake } from "../utils.js";
+import { loadYamlSafely } from "../utils/loadYamlSafely.js";
+import { ObjectAliasError } from "../utils/validateNoObjectAliases.js";
+import { apiTokenAuthHandlers } from "./auth.js";
+import { hasGuildPermission, requireGuildPermission } from "./permissions.js";
+import { clientError, ok, serverError, unauthorized } from "./responses.js";
+
+const YAMLException = jsYaml.YAMLException;
 
 const apiPermissionAssignments = new ApiPermissionAssignments();
 const auditLog = new ApiAuditLog();

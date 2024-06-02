@@ -1,10 +1,10 @@
 import { BasePluginType, globalPluginEventListener, globalPluginMessageCommand } from "knub";
 import z from "zod";
-import { AllowedGuilds } from "../../data/AllowedGuilds";
-import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments";
-import { Configs } from "../../data/Configs";
-import { GuildArchives } from "../../data/GuildArchives";
-import { zBoundedCharacters } from "../../utils";
+import { AllowedGuilds } from "../../data/AllowedGuilds.js";
+import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
+import { Configs } from "../../data/Configs.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { zBoundedCharacters } from "../../utils.js";
 
 export const zBotControlConfig = z.strictObject({
   can_use: z.boolean(),

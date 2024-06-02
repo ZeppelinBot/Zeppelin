@@ -1,6 +1,6 @@
-import { cleanAction } from "../actions/clean";
-import { muteAction } from "../actions/mute";
-import { userInfoAction } from "../actions/userInfo";
+import { cleanAction } from "../actions/clean.js";
+import { muteAction } from "../actions/mute.js";
+import { userInfoAction } from "../actions/userInfo.js";
 
 export const hardcodedContext: Record<string, string> = {
   user_muteindef: "Mute Indefinitely",

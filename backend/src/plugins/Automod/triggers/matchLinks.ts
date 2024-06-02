@@ -1,14 +1,14 @@
 import { escapeInlineCode } from "discord.js";
 import z from "zod";
-import { allowTimeout } from "../../../RegExpRunner";
-import { phishermanDomainIsSafe } from "../../../data/Phisherman";
-import { getUrlsInString, zRegex } from "../../../utils";
-import { mergeRegexes } from "../../../utils/mergeRegexes";
-import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex";
-import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { automodTrigger } from "../helpers";
+import { allowTimeout } from "../../../RegExpRunner.js";
+import { phishermanDomainIsSafe } from "../../../data/Phisherman.js";
+import { getUrlsInString, zRegex } from "../../../utils.js";
+import { mergeRegexes } from "../../../utils/mergeRegexes.js";
+import { mergeWordsIntoRegex } from "../../../utils/mergeWordsIntoRegex.js";
+import { PhishermanPlugin } from "../../Phisherman/PhishermanPlugin.js";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
+import { automodTrigger } from "../helpers.js";
 
 interface MatchResultType {
   type: MatchableTextType;

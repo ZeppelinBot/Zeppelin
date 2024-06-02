@@ -1,7 +1,7 @@
-import { pingableRolesEvt } from "../types";
-import { disablePingableRoles } from "../utils/disablePingableRoles";
-import { enablePingableRoles } from "../utils/enablePingableRoles";
-import { getPingableRolesForChannel } from "../utils/getPingableRolesForChannel";
+import { pingableRolesEvt } from "../types.js";
+import { disablePingableRoles } from "../utils/disablePingableRoles.js";
+import { enablePingableRoles } from "../utils/enablePingableRoles.js";
+import { getPingableRolesForChannel } from "../utils/getPingableRolesForChannel.js";
 
 const TIMEOUT = 10 * 1000;
 

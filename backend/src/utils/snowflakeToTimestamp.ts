@@ -1,4 +1,4 @@
-import { isValidSnowflake } from "../utils";
+import { isValidSnowflake } from "../utils.js";
 
 /**
  * @return Unix timestamp in milliseconds

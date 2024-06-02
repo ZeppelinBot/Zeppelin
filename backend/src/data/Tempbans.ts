@@ -1,9 +1,9 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DBDateFormat } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { Tempban } from "./entities/Tempban";
+import { DBDateFormat } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Tempban } from "./entities/Tempban.js";
 
 export class Tempbans extends BaseRepository {
   private tempbans: Repository<Tempban>;

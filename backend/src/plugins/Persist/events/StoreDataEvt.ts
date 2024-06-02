@@ -1,5 +1,5 @@
-import { PersistedData } from "../../../data/entities/PersistedData";
-import { persistEvt } from "../types";
+import { PersistedData } from "../../../data/entities/PersistedData.js";
+import { persistEvt } from "../types.js";
 
 export const StoreDataEvt = persistEvt({
   event: "guildMemberRemove",

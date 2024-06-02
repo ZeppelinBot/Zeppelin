@@ -1,12 +1,12 @@
 import { APIEmbed } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { isValidEmbed, trimLines } from "../../../utils";
-import { parseColor } from "../../../utils/parseColor";
-import { rgbToInt } from "../../../utils/rgbToInt";
-import { postCmd } from "../types";
-import { actualPostCmd } from "../util/actualPostCmd";
-import { formatContent } from "../util/formatContent";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { isValidEmbed, trimLines } from "../../../utils.js";
+import { parseColor } from "../../../utils/parseColor.js";
+import { rgbToInt } from "../../../utils/rgbToInt.js";
+import { postCmd } from "../types.js";
+import { actualPostCmd } from "../util/actualPostCmd.js";
+import { formatContent } from "../util/formatContent.js";
 
 export const PostEmbedCmd = postCmd({
   trigger: "post_embed",

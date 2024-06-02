@@ -1,9 +1,9 @@
 import { guildPluginMessageCommand } from "knub";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { confirm, noop, trimMultilineString } from "../../../utils";
-import { resetAllCounterValues } from "../functions/resetAllCounterValues";
-import { CountersPluginType } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { confirm, noop, trimMultilineString } from "../../../utils.js";
+import { resetAllCounterValues } from "../functions/resetAllCounterValues.js";
+import { CountersPluginType } from "../types.js";
 
 export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters reset_all"],

@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils";
-import { RecentActionType } from "../constants";
-import { AutomodContext, AutomodPluginType } from "../types";
+import { getEmojiInString, getRoleMentions, getUrlsInString, getUserMentions } from "../../../utils.js";
+import { RecentActionType } from "../constants.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
 
 export function addRecentActionsFromMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const message = context.message!;

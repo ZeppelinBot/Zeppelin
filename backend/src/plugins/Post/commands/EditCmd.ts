@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { postCmd } from "../types";
-import { formatContent } from "../util/formatContent";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { postCmd } from "../types.js";
+import { formatContent } from "../util/formatContent.js";
 
 export const EditCmd = postCmd({
   trigger: "edit",

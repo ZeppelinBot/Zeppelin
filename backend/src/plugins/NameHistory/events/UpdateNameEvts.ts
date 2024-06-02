@@ -1,5 +1,5 @@
-import { nameHistoryEvt } from "../types";
-import { updateNickname } from "../updateNickname";
+import { nameHistoryEvt } from "../types.js";
+import { updateNickname } from "../updateNickname.js";
 
 export const ChannelJoinEvt = nameHistoryEvt({
   event: "voiceStateUpdate",

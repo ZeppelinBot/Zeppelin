@@ -1,7 +1,7 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
-import { PingableRole } from "../../data/entities/PingableRole";
+import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
+import { PingableRole } from "../../data/entities/PingableRole.js";
 
 export const zPingableRolesConfig = z.strictObject({
   can_manage: z.boolean(),

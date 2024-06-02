@@ -1,11 +1,11 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { getBaseUrl } from "../../../pluginUtils";
-import { logMessageDeleteBulk } from "../logFunctions/logMessageDeleteBulk";
-import { LogsPluginType } from "../types";
-import { isLogIgnored } from "./isLogIgnored";
+import { LogType } from "../../../data/LogType.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { getBaseUrl } from "../../../pluginUtils.js";
+import { logMessageDeleteBulk } from "../logFunctions/logMessageDeleteBulk.js";
+import { LogsPluginType } from "../types.js";
+import { isLogIgnored } from "./isLogIgnored.js";
 
 export async function onMessageDeleteBulk(pluginData: GuildPluginData<LogsPluginType>, savedMessages: SavedMessage[]) {
   if (isLogIgnored(pluginData, LogType.MESSAGE_DELETE, savedMessages[0].id)) {

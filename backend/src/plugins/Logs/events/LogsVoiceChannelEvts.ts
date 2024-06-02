@@ -1,7 +1,7 @@
-import { logVoiceChannelJoin } from "../logFunctions/logVoiceChannelJoin";
-import { logVoiceChannelLeave } from "../logFunctions/logVoiceChannelLeave";
-import { logVoiceChannelMove } from "../logFunctions/logVoiceChannelMove";
-import { logsEvt } from "../types";
+import { logVoiceChannelJoin } from "../logFunctions/logVoiceChannelJoin.js";
+import { logVoiceChannelLeave } from "../logFunctions/logVoiceChannelLeave.js";
+import { logVoiceChannelMove } from "../logFunctions/logVoiceChannelMove.js";
+import { logsEvt } from "../types.js";
 
 export const LogsVoiceStateUpdateEvt = logsEvt({
   event: "voiceStateUpdate",

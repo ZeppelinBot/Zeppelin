@@ -1,14 +1,14 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { createChunkedMessage, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { sendDM } from "../../../utils/sendDM";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
+import { createChunkedMessage, verboseChannelMention, verboseUserMention } from "../../../utils.js";
+import { sendDM } from "../../../utils/sendDM.js";
 import {
   guildToTemplateSafeGuild,
   memberToTemplateSafeMember,
   userToTemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { welcomeMessageEvt } from "../types";
+} from "../../../utils/templateSafeObjects.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { welcomeMessageEvt } from "../types.js";
 
 export const SendWelcomeMessageEvt = welcomeMessageEvt({
   event: "guildMemberAdd",

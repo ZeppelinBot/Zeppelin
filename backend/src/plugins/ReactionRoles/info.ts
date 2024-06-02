@@ -1,5 +1,5 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { zReactionRolesConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { zReactionRolesConfig } from "./types.js";
 
 export const reactionRolesPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Reaction roles",

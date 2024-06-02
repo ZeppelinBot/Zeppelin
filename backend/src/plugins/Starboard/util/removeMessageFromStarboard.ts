@@ -1,8 +1,8 @@
 import { ChannelType } from "discord.js";
 import { GuildPluginData } from "knub";
-import { StarboardMessage } from "../../../data/entities/StarboardMessage";
-import { noop } from "../../../utils";
-import { StarboardPluginType } from "../types";
+import { StarboardMessage } from "../../../data/entities/StarboardMessage.js";
+import { noop } from "../../../utils.js";
+import { StarboardPluginType } from "../types.js";
 
 export async function removeMessageFromStarboard(
   pluginData: GuildPluginData<StarboardPluginType>,

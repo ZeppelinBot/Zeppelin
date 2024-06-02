@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { In } from "typeorm";
-import { DAYS, DBDateFormat, MINUTES, SECONDS, sleep } from "../../utils";
-import { dataSource } from "../dataSource";
-import { SavedMessage } from "../entities/SavedMessage";
+import { DAYS, DBDateFormat, MINUTES, SECONDS, sleep } from "../../utils.js";
+import { dataSource } from "../dataSource.js";
+import { SavedMessage } from "../entities/SavedMessage.js";
 
 /**
  * How long message edits, deletions, etc. will include the original message content.

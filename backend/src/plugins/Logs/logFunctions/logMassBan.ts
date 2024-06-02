@@ -1,12 +1,12 @@
 import { User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+import { LogType } from "../../../data/LogType.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
-interface LogMassBanData {
+export interface LogMassBanData {
   mod: User;
   count: number;
   reason: string;

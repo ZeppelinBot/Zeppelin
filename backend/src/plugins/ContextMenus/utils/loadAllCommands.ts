@@ -1,8 +1,8 @@
 import { ApplicationCommandData, ApplicationCommandType } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin";
-import { ContextMenuPluginType } from "../types";
-import { hardcodedContext } from "./hardcodedContextOptions";
+import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin.js";
+import { ContextMenuPluginType } from "../types.js";
+import { hardcodedContext } from "./hardcodedContextOptions.js";
 
 export async function loadAllCommands(pluginData: GuildPluginData<ContextMenuPluginType>) {
   const comms = await pluginData.client.application!.commands;

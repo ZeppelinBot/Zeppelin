@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
 import { GlobalPluginData } from "knub";
-import { SECONDS } from "../../../utils";
-import { GuildConfigReloaderPluginType } from "../types";
+import { SECONDS } from "../../../utils.js";
+import { GuildConfigReloaderPluginType } from "../types.js";
 
 const CHECK_INTERVAL = 1 * SECONDS;
 

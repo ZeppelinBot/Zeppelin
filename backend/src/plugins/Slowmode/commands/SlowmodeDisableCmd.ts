@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { slowmodeCmd } from "../types";
-import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { slowmodeCmd } from "../types.js";
+import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd.js";
 
 export const SlowmodeDisableCmd = slowmodeCmd({
   trigger: ["slowmode disable", "slowmode d"],

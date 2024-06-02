@@ -1,10 +1,10 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
-import { UnknownUser, isDiscordAPIError, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { SlowmodePluginType } from "../types";
+import { LogType } from "../../../data/LogType.js";
+import { logger } from "../../../logger.js";
+import { UnknownUser, isDiscordAPIError, verboseChannelMention, verboseUserMention } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { SlowmodePluginType } from "../types.js";
 
 export async function applyBotSlowmodeToUserId(
   pluginData: GuildPluginData<SlowmodePluginType>,

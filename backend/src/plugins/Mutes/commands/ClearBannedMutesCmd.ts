@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { sendSuccessMessage } from "../../../pluginUtils";
-import { mutesCmd } from "../types";
+import { sendSuccessMessage } from "../../../pluginUtils.js";
+import { mutesCmd } from "../types.js";
 
 export const ClearBannedMutesCmd = mutesCmd({
   trigger: "clear_banned_mutes",

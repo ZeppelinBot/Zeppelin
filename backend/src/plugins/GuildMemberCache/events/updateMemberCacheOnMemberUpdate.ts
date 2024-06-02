@@ -1,6 +1,6 @@
 import { guildPluginEventListener } from "knub";
-import { updateMemberCacheForMember } from "../functions/updateMemberCacheForMember";
-import { GuildMemberCachePluginType } from "../types";
+import { updateMemberCacheForMember } from "../functions/updateMemberCacheForMember.js";
+import { GuildMemberCachePluginType } from "../types.js";
 
 export const updateMemberCacheOnMemberUpdate = guildPluginEventListener<GuildMemberCachePluginType>()({
   event: "guildMemberUpdate",
