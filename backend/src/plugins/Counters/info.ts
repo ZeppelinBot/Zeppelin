@@ -1,5 +1,5 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { zCountersConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { zCountersConfig } from "./types.js";
 
 export const countersPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Counters",

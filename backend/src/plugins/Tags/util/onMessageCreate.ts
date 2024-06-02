@@ -1,12 +1,12 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { convertDelayStringToMS, resolveMember, zStrictMessageContent } from "../../../utils";
-import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { TagsPluginType } from "../types";
-import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { convertDelayStringToMS, resolveMember, zStrictMessageContent } from "../../../utils.js";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions.js";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { TagsPluginType } from "../types.js";
+import { matchAndRenderTagFromString } from "./matchAndRenderTagFromString.js";
 
 export async function onMessageCreate(pluginData: GuildPluginData<TagsPluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;

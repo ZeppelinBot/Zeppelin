@@ -11,9 +11,9 @@ import {
   renderUsername,
   resolveInvite,
   trimLines,
-} from "../../../utils";
-import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp";
-import { UtilityPluginType } from "../types";
+} from "../../../utils.js";
+import { snowflakeToTimestamp } from "../../../utils/snowflakeToTimestamp.js";
+import { UtilityPluginType } from "../types.js";
 
 export async function getInviteInfoEmbed(
   pluginData: GuildPluginData<UtilityPluginType>,

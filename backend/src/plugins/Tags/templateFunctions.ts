@@ -1,4 +1,4 @@
-import { TemplateFunction } from "./types";
+import { TemplateFunction } from "./types.js";
 
 // TODO: Generate this dynamically, lmao
 export const TemplateFunctions: TemplateFunction[] = [

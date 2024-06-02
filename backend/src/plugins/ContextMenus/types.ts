@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
 import z from "zod";
-import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
+import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks.js";
 
 export const zContextMenusConfig = z.strictObject({
   can_use: z.boolean(),

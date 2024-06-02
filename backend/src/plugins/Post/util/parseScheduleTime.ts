@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
 import moment, { Moment } from "moment-timezone";
-import { convertDelayStringToMS } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
+import { convertDelayStringToMS } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 
 // TODO: Extract out of the Post plugin, use everywhere with a date input
 export async function parseScheduleTime(

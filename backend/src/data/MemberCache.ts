@@ -1,9 +1,9 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DAYS } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { MemberCacheItem } from "./entities/MemberCacheItem";
+import { DAYS } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { MemberCacheItem } from "./entities/MemberCacheItem.js";
 
 const STALE_PERIOD = 90 * DAYS;
 

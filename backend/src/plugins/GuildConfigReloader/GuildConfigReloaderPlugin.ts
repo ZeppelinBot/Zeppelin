@@ -1,8 +1,8 @@
 import { globalPlugin } from "knub";
 import z from "zod";
-import { Configs } from "../../data/Configs";
-import { reloadChangedGuilds } from "./functions/reloadChangedGuilds";
-import { GuildConfigReloaderPluginType } from "./types";
+import { Configs } from "../../data/Configs.js";
+import { reloadChangedGuilds } from "./functions/reloadChangedGuilds.js";
+import { GuildConfigReloaderPluginType } from "./types.js";
 
 export const GuildConfigReloaderPlugin = globalPlugin<GuildConfigReloaderPluginType>()({
   name: "guild_config_reloader",

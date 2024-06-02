@@ -1,19 +1,19 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { onGuildEvent } from "../../data/GuildEvents";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { EditCmd } from "./commands/EditCmd";
-import { EditEmbedCmd } from "./commands/EditEmbedCmd";
-import { PostCmd } from "./commands/PostCmd";
-import { PostEmbedCmd } from "./commands/PostEmbedCmd";
-import { ScheduledPostsDeleteCmd } from "./commands/ScheduledPostsDeleteCmd";
-import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd";
-import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd";
-import { PostPluginType, zPostConfig } from "./types";
-import { postScheduledPost } from "./util/postScheduledPost";
+import { onGuildEvent } from "../../data/GuildEvents.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildScheduledPosts } from "../../data/GuildScheduledPosts.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
+import { EditCmd } from "./commands/EditCmd.js";
+import { EditEmbedCmd } from "./commands/EditEmbedCmd.js";
+import { PostCmd } from "./commands/PostCmd.js";
+import { PostEmbedCmd } from "./commands/PostEmbedCmd.js";
+import { ScheduledPostsDeleteCmd } from "./commands/ScheduledPostsDeleteCmd.js";
+import { ScheduledPostsListCmd } from "./commands/ScheduledPostsListCmd.js";
+import { ScheduledPostsShowCmd } from "./commands/ScheduledPostsShowCmd.js";
+import { PostPluginType, zPostConfig } from "./types.js";
+import { postScheduledPost } from "./util/postScheduledPost.js";
 
 const defaultOptions: PluginOptions<PostPluginType> = {
   config: {

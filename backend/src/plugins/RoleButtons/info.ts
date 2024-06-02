@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zRoleButtonsConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zRoleButtonsConfig } from "./types.js";
 
 export const roleButtonsPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

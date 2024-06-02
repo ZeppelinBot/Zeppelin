@@ -1,5 +1,5 @@
-import { logMemberNickChange } from "../logFunctions/logMemberNickChange";
-import { logsEvt } from "../types";
+import { logMemberNickChange } from "../logFunctions/logMemberNickChange.js";
+import { logsEvt } from "../types.js";
 
 export const LogsGuildMemberUpdateEvt = logsEvt({
   event: "guildMemberUpdate",

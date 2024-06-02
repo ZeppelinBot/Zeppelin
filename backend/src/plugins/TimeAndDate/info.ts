@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zTimeAndDateConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zTimeAndDateConfig } from "./types.js";
 
 export const timeAndDatePluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

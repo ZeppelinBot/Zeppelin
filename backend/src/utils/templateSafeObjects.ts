@@ -13,20 +13,20 @@ import {
   User,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { Case } from "../data/entities/Case";
+import { Case } from "../data/entities/Case.js";
 import {
   ISavedMessageAttachmentData,
   ISavedMessageData,
   ISavedMessageEmbedData,
   ISavedMessageStickerData,
   SavedMessage,
-} from "../data/entities/SavedMessage";
+} from "../data/entities/SavedMessage.js";
 import {
   TemplateSafeValueContainer,
   TypedTemplateSafeValueContainer,
   ingestDataIntoTemplateSafeValueContainer,
-} from "../templateFormatter";
-import { UnknownUser, renderUsername } from "../utils";
+} from "../templateFormatter.js";
+import { UnknownUser, renderUsername } from "../utils.js";
 
 type InputProps<T> = Omit<
   {

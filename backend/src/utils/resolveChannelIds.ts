@@ -1,7 +1,7 @@
 import { CategoryChannel, Channel } from "discord.js";
-import { isDmChannel } from "./isDmChannel";
-import { isGuildChannel } from "./isGuildChannel";
-import { isThreadChannel } from "./isThreadChannel";
+import { isDmChannel } from "./isDmChannel.js";
+import { isGuildChannel } from "./isGuildChannel.js";
+import { isThreadChannel } from "./isThreadChannel.js";
 
 type ResolvedChannelIds = {
   category: string | null;

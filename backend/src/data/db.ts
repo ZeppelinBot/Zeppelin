@@ -1,5 +1,5 @@
-import { SimpleError } from "../SimpleError";
-import { dataSource } from "./dataSource";
+import { SimpleError } from "../SimpleError.js";
+import { dataSource } from "./dataSource.js";
 
 let connectionPromise: Promise<void>;
 

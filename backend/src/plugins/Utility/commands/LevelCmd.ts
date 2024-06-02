@@ -1,7 +1,7 @@
 import { helpers } from "knub";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { renderUsername } from "../../../utils";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { renderUsername } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
 
 const { getMemberLevel } = helpers;
 

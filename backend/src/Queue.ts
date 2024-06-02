@@ -1,4 +1,4 @@
-import { SECONDS } from "./utils";
+import { SECONDS } from "./utils.js";
 
 type InternalQueueFn = () => Promise<void>;
 type AnyFn = (...args: any[]) => any;

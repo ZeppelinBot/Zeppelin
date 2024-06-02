@@ -1,9 +1,9 @@
 import { Role } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { chunkArray, sorter, trimLines } from "../../../utils";
-import { refreshMembersIfNeeded } from "../refreshMembers";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { chunkArray, sorter, trimLines } from "../../../utils.js";
+import { refreshMembersIfNeeded } from "../refreshMembers.js";
+import { utilityCmd } from "../types.js";
 
 export const RolesCmd = utilityCmd({
   trigger: "roles",

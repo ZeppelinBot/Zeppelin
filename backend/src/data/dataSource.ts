@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import path from "path";
 import { DataSource } from "typeorm";
-import { env } from "../env";
-import { backendDir } from "../paths";
+import { env } from "../env.js";
+import { backendDir } from "../paths.js";
 
 moment.tz.setDefault("UTC");
 

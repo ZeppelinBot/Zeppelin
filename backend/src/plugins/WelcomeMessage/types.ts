@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
+import { GuildLogs } from "../../data/GuildLogs.js";
 
 export const zWelcomeMessageConfig = z.strictObject({
   send_dm: z.boolean(),

@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildVCAlerts } from "../../data/GuildVCAlerts";
+import { GuildVCAlerts } from "../../data/GuildVCAlerts.js";
 
 export const zLocateUserConfig = z.strictObject({
   can_where: z.boolean(),

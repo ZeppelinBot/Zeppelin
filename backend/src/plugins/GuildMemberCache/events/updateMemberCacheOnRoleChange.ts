@@ -1,7 +1,7 @@
 import { AuditLogEvent } from "discord.js";
 import { guildPluginEventListener } from "knub";
-import { updateMemberCacheForMember } from "../functions/updateMemberCacheForMember";
-import { GuildMemberCachePluginType } from "../types";
+import { updateMemberCacheForMember } from "../functions/updateMemberCacheForMember.js";
+import { GuildMemberCachePluginType } from "../types.js";
 
 export const updateMemberCacheOnRoleChange = guildPluginEventListener<GuildMemberCachePluginType>()({
   event: "guildAuditLogEntryCreate",

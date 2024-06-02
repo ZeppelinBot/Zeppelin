@@ -1,4 +1,4 @@
-import { mutesEvt } from "../types";
+import { mutesEvt } from "../types.js";
 
 /**
  * Clear active mute from the member if the member is banned

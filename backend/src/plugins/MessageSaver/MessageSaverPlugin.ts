@@ -1,9 +1,14 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB";
-import { SavePinsToDBCmd } from "./commands/SavePinsToDB";
-import { MessageCreateEvt, MessageDeleteBulkEvt, MessageDeleteEvt, MessageUpdateEvt } from "./events/SaveMessagesEvts";
-import { MessageSaverPluginType, zMessageSaverConfig } from "./types";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { SaveMessagesToDBCmd } from "./commands/SaveMessagesToDB.js";
+import { SavePinsToDBCmd } from "./commands/SavePinsToDB.js";
+import {
+  MessageCreateEvt,
+  MessageDeleteBulkEvt,
+  MessageDeleteEvt,
+  MessageUpdateEvt,
+} from "./events/SaveMessagesEvts.js";
+import { MessageSaverPluginType, zMessageSaverConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<MessageSaverPluginType> = {
   config: {

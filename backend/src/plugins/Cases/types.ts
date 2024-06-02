@@ -1,12 +1,12 @@
 import { BasePluginType } from "knub";
 import { U } from "ts-toolbelt";
 import z from "zod";
-import { CaseNameToType, CaseTypes } from "../../data/CaseTypes";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { keys, zBoundedCharacters, zDelayString, zSnowflake } from "../../utils";
-import { zColor } from "../../utils/zColor";
+import { CaseNameToType, CaseTypes } from "../../data/CaseTypes.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { keys, zBoundedCharacters, zDelayString, zSnowflake } from "../../utils.js";
+import { zColor } from "../../utils/zColor.js";
 
 const caseKeys = keys(CaseNameToType) as U.ListOf<keyof typeof CaseNameToType>;
 

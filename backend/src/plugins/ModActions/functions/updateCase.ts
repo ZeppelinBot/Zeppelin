@@ -1,10 +1,10 @@
 import { Message } from "discord.js";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { Case } from "../../../data/entities/Case";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { Case } from "../../../data/entities/Case.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments.js";
 
 export async function updateCase(pluginData, msg: Message, args) {
   let theCase: Case | undefined;

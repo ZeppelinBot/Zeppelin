@@ -1,4 +1,4 @@
-import { env } from "./env";
+import { env } from "./env.js";
 
 /**
  * Zeppelin staff have full access to the dashboard

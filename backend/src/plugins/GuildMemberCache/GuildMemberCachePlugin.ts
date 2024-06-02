@@ -1,16 +1,16 @@
 import { guildPlugin } from "knub";
 import z from "zod";
-import { GuildMemberCache } from "../../data/GuildMemberCache";
-import { makePublicFn } from "../../pluginUtils";
-import { SECONDS } from "../../utils";
-import { cancelDeletionOnMemberJoin } from "./events/cancelDeletionOnMemberJoin";
-import { removeMemberCacheOnMemberLeave } from "./events/removeMemberCacheOnMemberLeave";
-import { updateMemberCacheOnMemberUpdate } from "./events/updateMemberCacheOnMemberUpdate";
-import { updateMemberCacheOnMessage } from "./events/updateMemberCacheOnMessage";
-import { updateMemberCacheOnRoleChange } from "./events/updateMemberCacheOnRoleChange";
-import { updateMemberCacheOnVoiceStateUpdate } from "./events/updateMemberCacheOnVoiceStateUpdate";
-import { getCachedMemberData } from "./functions/getCachedMemberData";
-import { GuildMemberCachePluginType } from "./types";
+import { GuildMemberCache } from "../../data/GuildMemberCache.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { SECONDS } from "../../utils.js";
+import { cancelDeletionOnMemberJoin } from "./events/cancelDeletionOnMemberJoin.js";
+import { removeMemberCacheOnMemberLeave } from "./events/removeMemberCacheOnMemberLeave.js";
+import { updateMemberCacheOnMemberUpdate } from "./events/updateMemberCacheOnMemberUpdate.js";
+import { updateMemberCacheOnMessage } from "./events/updateMemberCacheOnMessage.js";
+import { updateMemberCacheOnRoleChange } from "./events/updateMemberCacheOnRoleChange.js";
+import { updateMemberCacheOnVoiceStateUpdate } from "./events/updateMemberCacheOnVoiceStateUpdate.js";
+import { getCachedMemberData } from "./functions/getCachedMemberData.js";
+import { GuildMemberCachePluginType } from "./types.js";
 
 const PENDING_SAVE_INTERVAL = 30 * SECONDS;
 

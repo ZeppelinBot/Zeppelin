@@ -1,12 +1,12 @@
 import { Snowflake } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
-import { selfGrantableRolesCmd } from "../types";
-import { findMatchingRoles } from "../util/findMatchingRoles";
-import { getApplyingEntries } from "../util/getApplyingEntries";
-import { normalizeRoleNames } from "../util/normalizeRoleNames";
-import { splitRoleNames } from "../util/splitRoleNames";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { memberRolesLock } from "../../../utils/lockNameHelpers.js";
+import { selfGrantableRolesCmd } from "../types.js";
+import { findMatchingRoles } from "../util/findMatchingRoles.js";
+import { getApplyingEntries } from "../util/getApplyingEntries.js";
+import { normalizeRoleNames } from "../util/normalizeRoleNames.js";
+import { splitRoleNames } from "../util/splitRoleNames.js";
 
 export const RoleRemoveCmd = selfGrantableRolesCmd({
   trigger: "role remove",

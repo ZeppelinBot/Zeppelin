@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { AntiraidLevel } from "./entities/AntiraidLevel";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { AntiraidLevel } from "./entities/AntiraidLevel.js";
 
 export class GuildAntiraidLevels extends BaseGuildRepository {
   protected antiraidLevels: Repository<AntiraidLevel>;

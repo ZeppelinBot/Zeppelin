@@ -1,10 +1,10 @@
 import z from "zod";
-import { convertDelayStringToMS, zDelayString } from "../../../utils";
-import { RecentActionType } from "../constants";
-import { findRecentSpam } from "../functions/findRecentSpam";
-import { getMatchingRecentActions } from "../functions/getMatchingRecentActions";
-import { sumRecentActionCounts } from "../functions/sumRecentActionCounts";
-import { automodTrigger } from "../helpers";
+import { convertDelayStringToMS, zDelayString } from "../../../utils.js";
+import { RecentActionType } from "../constants.js";
+import { findRecentSpam } from "../functions/findRecentSpam.js";
+import { getMatchingRecentActions } from "../functions/getMatchingRecentActions.js";
+import { sumRecentActionCounts } from "../functions/sumRecentActionCounts.js";
+import { automodTrigger } from "../helpers.js";
 
 const configSchema = z.strictObject({
   amount: z.number().int(),

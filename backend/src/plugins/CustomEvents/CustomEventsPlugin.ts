@@ -1,19 +1,19 @@
 import { GuildChannel, GuildMember, User } from "discord.js";
 import { guildPlugin, guildPluginMessageCommand, parseSignature } from "knub";
 import { TSignature } from "knub-command-manager";
-import { commandTypes } from "../../commandTypes";
-import { TemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter";
-import { UnknownUser } from "../../utils";
-import { isScalar } from "../../utils/isScalar";
+import { commandTypes } from "../../commandTypes.js";
+import { TemplateSafeValueContainer, createTypedTemplateSafeValueContainer } from "../../templateFormatter.js";
+import { UnknownUser } from "../../utils.js";
+import { isScalar } from "../../utils/isScalar.js";
 import {
   channelToTemplateSafeChannel,
   memberToTemplateSafeMember,
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
-} from "../../utils/templateSafeObjects";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { runEvent } from "./functions/runEvent";
-import { CustomEventsPluginType, zCustomEventsConfig } from "./types";
+} from "../../utils/templateSafeObjects.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { runEvent } from "./functions/runEvent.js";
+import { CustomEventsPluginType, zCustomEventsConfig } from "./types.js";
 
 const defaultOptions = {
   config: {

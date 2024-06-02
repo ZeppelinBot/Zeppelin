@@ -1,12 +1,12 @@
 import { ChannelType, escapeInlineCode } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, renderUsername } from "../../../utils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions";
-import { slowmodeCmd } from "../types";
-import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { asSingleLine, renderUsername } from "../../../utils.js";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { BOT_SLOWMODE_CLEAR_PERMISSIONS } from "../requiredPermissions.js";
+import { slowmodeCmd } from "../types.js";
+import { clearBotSlowmodeFromUserId } from "../util/clearBotSlowmodeFromUserId.js";
 
 export const SlowmodeClearCmd = slowmodeCmd({
   trigger: ["slowmode clear", "slowmode c"],

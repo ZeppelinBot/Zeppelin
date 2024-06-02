@@ -1,6 +1,6 @@
 import { Guild, GuildMember, PermissionsBitField, Role, Snowflake } from "discord.js";
-import { getMissingPermissions } from "./getMissingPermissions";
-import { hasDiscordPermissions } from "./hasDiscordPermissions";
+import { getMissingPermissions } from "./getMissingPermissions.js";
+import { hasDiscordPermissions } from "./hasDiscordPermissions.js";
 
 export function canAssignRole(guild: Guild, member: GuildMember, roleId: string) {
   if (getMissingPermissions(member.permissions, PermissionsBitField.Flags.ManageRoles)) {

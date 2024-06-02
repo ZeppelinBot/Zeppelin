@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { CounterEventEmitter, CountersPluginType } from "../types";
+import { CounterEventEmitter, CountersPluginType } from "../types.js";
 
 export function offCounterEvent(
   pluginData: GuildPluginData<CountersPluginType>,

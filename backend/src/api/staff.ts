@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-import { isStaff } from "../staff";
-import { apiTokenAuthHandlers } from "./auth";
+import { isStaff } from "../staff.js";
+import { apiTokenAuthHandlers } from "./auth.js";
 
 export function initStaff(app: express.Express) {
   const staffRouter = express.Router();

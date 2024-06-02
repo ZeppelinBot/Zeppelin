@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getTopRestCallStats } from "../../../restCallStats";
-import { createChunkedMessage } from "../../../utils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getTopRestCallStats } from "../../../restCallStats.js";
+import { createChunkedMessage } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 const leadingPathRegex = /(?<=\().+\/backend\//g;
 

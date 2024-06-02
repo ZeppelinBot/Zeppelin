@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { CaseTypes, CaseTypeToName } from "../../../data/CaseTypes";
-import { caseIcons } from "../caseIcons";
-import { CasesPluginType } from "../types";
+import { CaseTypes, CaseTypeToName } from "../../../data/CaseTypes.js";
+import { caseIcons } from "../caseIcons.js";
+import { CasesPluginType } from "../types.js";
 
 export function getCaseIcon(pluginData: GuildPluginData<CasesPluginType>, caseType: CaseTypes) {
   return pluginData.config.get().case_icons?.[CaseTypeToName[caseType]] ?? caseIcons[caseType];

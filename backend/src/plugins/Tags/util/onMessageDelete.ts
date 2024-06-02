@@ -1,5 +1,5 @@
 import { guildPluginEventListener } from "knub";
-import { noop } from "../../../utils";
+import { noop } from "../../../utils.js";
 
 export const onMessageDelete = guildPluginEventListener({
   event: "messageDelete",

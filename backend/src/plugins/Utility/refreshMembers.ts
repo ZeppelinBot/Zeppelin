@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import { HOURS, noop } from "../../utils";
+import { HOURS, noop } from "../../utils.js";
 
 const MEMBER_REFRESH_FREQUENCY = 1 * HOURS; // How often to do a full member refresh when using commands that need it
 const memberRefreshLog = new Map<string, { time: number; promise: Promise<void> }>();

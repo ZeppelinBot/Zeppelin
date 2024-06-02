@@ -1,6 +1,6 @@
-import { asSingleLine, trimLines } from "../../../utils";
-import { selfGrantableRolesCmd } from "../types";
-import { getApplyingEntries } from "../util/getApplyingEntries";
+import { asSingleLine, trimLines } from "../../../utils.js";
+import { selfGrantableRolesCmd } from "../types.js";
+import { getApplyingEntries } from "../util/getApplyingEntries.js";
 
 export const RoleHelpCmd = selfGrantableRolesCmd({
   trigger: ["role help", "role"],

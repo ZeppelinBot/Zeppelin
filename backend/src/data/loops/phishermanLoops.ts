@@ -1,11 +1,11 @@
 // tslint:disable:no-console
 
-import { MINUTES } from "../../utils";
+import { MINUTES } from "../../utils.js";
 import {
   deleteStalePhishermanCacheEntries,
   deleteStalePhishermanKeyCacheEntries,
   reportTrackedDomainsToPhisherman,
-} from "../Phisherman";
+} from "../Phisherman.js";
 
 const CACHE_CLEANUP_LOOP_INTERVAL = 15 * MINUTES;
 const REPORT_LOOP_INTERVAL = 15 * MINUTES;

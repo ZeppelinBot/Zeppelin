@@ -1,9 +1,9 @@
 import { escapeInlineCode } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { trimLines } from "../../../utils";
-import { parseFuzzyTimezone } from "../../../utils/parseFuzzyTimezone";
-import { timeAndDateCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { trimLines } from "../../../utils.js";
+import { parseFuzzyTimezone } from "../../../utils/parseFuzzyTimezone.js";
+import { timeAndDateCmd } from "../types.js";
 
 export const SetTimezoneCmd = timeAndDateCmd({
   trigger: "timezone",

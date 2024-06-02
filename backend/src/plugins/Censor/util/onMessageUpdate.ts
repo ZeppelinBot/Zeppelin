@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { messageLock } from "../../../utils/lockNameHelpers";
-import { CensorPluginType } from "../types";
-import { applyFiltersToMsg } from "./applyFiltersToMsg";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { messageLock } from "../../../utils/lockNameHelpers.js";
+import { CensorPluginType } from "../types.js";
+import { applyFiltersToMsg } from "./applyFiltersToMsg.js";
 
 export async function onMessageUpdate(pluginData: GuildPluginData<CensorPluginType>, savedMessage: SavedMessage) {
   if (savedMessage.is_bot) return;

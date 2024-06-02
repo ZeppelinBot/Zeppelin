@@ -1,12 +1,12 @@
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { performance } from "perf_hooks";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { profilingEnabled } from "../../../utils/easyProfiler";
-import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage";
-import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage";
-import { runAutomod } from "../functions/runAutomod";
-import { AutomodContext, AutomodPluginType } from "../types";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { profilingEnabled } from "../../../utils/easyProfiler.js";
+import { addRecentActionsFromMessage } from "../functions/addRecentActionsFromMessage.js";
+import { clearRecentActionsForMessage } from "../functions/clearRecentActionsForMessage.js";
+import { runAutomod } from "../functions/runAutomod.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
 
 export async function runAutomodOnMessage(
   pluginData: GuildPluginData<AutomodPluginType>,

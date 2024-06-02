@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ReactionRole } from "../../../data/entities/ReactionRole";
-import { isDiscordAPIError, sleep } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ReactionRolesPluginType } from "../types";
+import { ReactionRole } from "../../../data/entities/ReactionRole.js";
+import { isDiscordAPIError, sleep } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ReactionRolesPluginType } from "../types.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 

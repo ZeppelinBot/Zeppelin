@@ -1,9 +1,9 @@
 import { BasePluginType } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { SavedMessage } from "../../data/entities/SavedMessage";
-import { MINUTES, zDelayString } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { SavedMessage } from "../../data/entities/SavedMessage.js";
+import { MINUTES, zDelayString } from "../../utils.js";
 import Timeout = NodeJS.Timeout;
 
 export const MAX_DELAY = 5 * MINUTES;

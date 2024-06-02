@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { logger } from "../../../logger";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { RoleManagerPluginType } from "../types";
+import { logger } from "../../../logger.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { RoleManagerPluginType } from "../types.js";
 
 const ROLE_ASSIGNMENTS_PER_BATCH = 10;
 

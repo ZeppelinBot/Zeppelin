@@ -1,5 +1,5 @@
 import test from "ava";
-import { ApiPermissions, hasPermission } from "./apiPermissions";
+import { ApiPermissions, hasPermission } from "./apiPermissions.js";
 
 test("Directly granted permissions match", (t) => {
   t.is(hasPermission(new Set([ApiPermissions.ManageAccess]), ApiPermissions.ManageAccess), true);

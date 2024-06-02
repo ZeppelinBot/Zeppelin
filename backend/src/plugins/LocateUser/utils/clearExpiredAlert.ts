@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { VCAlert } from "../../../data/entities/VCAlert";
-import { LocateUserPluginType } from "../types";
-import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts";
+import { VCAlert } from "../../../data/entities/VCAlert.js";
+import { LocateUserPluginType } from "../types.js";
+import { removeUserIdFromActiveAlerts } from "./removeUserIdFromActiveAlerts.js";
 
 export async function clearExpiredAlert(pluginData: GuildPluginData<LocateUserPluginType>, alert: VCAlert) {
   await pluginData.state.alerts.delete(alert.id);

@@ -1,19 +1,19 @@
 import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { AddMuteParams } from "../../../data/GuildMutes";
-import { MuteTypes } from "../../../data/MuteTypes";
-import { Mute } from "../../../data/entities/Mute";
-import { noop, resolveMember, resolveUser } from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { CaseArgs } from "../../Cases/types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { MutesPluginType, UnmuteResult } from "../types";
-import { clearMute } from "./clearMute";
-import { getDefaultMuteType } from "./getDefaultMuteType";
-import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime";
-import { memberHasMutedRole } from "./memberHasMutedRole";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { AddMuteParams } from "../../../data/GuildMutes.js";
+import { MuteTypes } from "../../../data/MuteTypes.js";
+import { Mute } from "../../../data/entities/Mute.js";
+import { noop, resolveMember, resolveUser } from "../../../utils.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { CaseArgs } from "../../Cases/types.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { MutesPluginType, UnmuteResult } from "../types.js";
+import { clearMute } from "./clearMute.js";
+import { getDefaultMuteType } from "./getDefaultMuteType.js";
+import { getTimeoutExpiryTime } from "./getTimeoutExpiryTime.js";
+import { memberHasMutedRole } from "./memberHasMutedRole.js";
 
 export async function unmuteUser(
   pluginData: GuildPluginData<MutesPluginType>,

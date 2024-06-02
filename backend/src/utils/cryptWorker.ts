@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { expose } from "threads";
+import { expose } from "threads/worker";
 
 const ALGORITHM = "aes-256-gcm";
 

@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zPhishermanConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zPhishermanConfig } from "./types.js";
 
 export const phishermanPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Phisherman",

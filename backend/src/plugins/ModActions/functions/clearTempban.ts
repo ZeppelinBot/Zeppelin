@@ -2,17 +2,17 @@ import { Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { Tempban } from "../../../data/entities/Tempban";
-import { logger } from "../../../logger";
-import { resolveUser } from "../../../utils";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { IgnoredEventType, ModActionsPluginType } from "../types";
-import { formatReasonWithAttachments } from "./formatReasonWithAttachments";
-import { ignoreEvent } from "./ignoreEvent";
-import { isBanned } from "./isBanned";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { Tempban } from "../../../data/entities/Tempban.js";
+import { logger } from "../../../logger.js";
+import { resolveUser } from "../../../utils.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { IgnoredEventType, ModActionsPluginType } from "../types.js";
+import { formatReasonWithAttachments } from "./formatReasonWithAttachments.js";
+import { ignoreEvent } from "./ignoreEvent.js";
+import { isBanned } from "./isBanned.js";
 
 export async function clearTempban(pluginData: GuildPluginData<ModActionsPluginType>, tempban: Tempban) {
   if (!(await isBanned(pluginData, tempban.user_id))) {

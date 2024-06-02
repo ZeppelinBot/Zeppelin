@@ -1,14 +1,14 @@
 import { GuildChannel, Message } from "discord.js";
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { QueuedEventEmitter } from "../QueuedEventEmitter";
-import { noop } from "../utils";
-import { asyncMap } from "../utils/async";
-import { decryptJson, encryptJson } from "../utils/cryptHelpers";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { buildEntity } from "./buildEntity";
-import { dataSource } from "./dataSource";
-import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage";
+import { QueuedEventEmitter } from "../QueuedEventEmitter.js";
+import { noop } from "../utils.js";
+import { asyncMap } from "../utils/async.js";
+import { decryptJson, encryptJson } from "../utils/cryptHelpers.js";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { buildEntity } from "./buildEntity.js";
+import { dataSource } from "./dataSource.js";
+import { ISavedMessageData, SavedMessage } from "./entities/SavedMessage.js";
 
 export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
   private messages: Repository<SavedMessage>;

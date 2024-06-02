@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { StatValue } from "./entities/StatValue";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { StatValue } from "./entities/StatValue.js";
 
 export class GuildStats extends BaseGuildRepository {
   private stats: Repository<StatValue>;

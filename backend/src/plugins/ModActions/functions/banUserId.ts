@@ -1,11 +1,11 @@
 import { DiscordAPIError, Snowflake } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
-import { logger } from "../../../logger";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop.js";
+import { logger } from "../../../logger.js";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {
   DAYS,
   SECONDS,
@@ -15,13 +15,13 @@ import {
   resolveMember,
   resolveUser,
   ucfirst,
-} from "../../../utils";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types";
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import { ignoreEvent } from "./ignoreEvent";
+} from "../../../utils.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { BanOptions, BanResult, IgnoredEventType, ModActionsPluginType } from "../types.js";
+import { getDefaultContactMethods } from "./getDefaultContactMethods.js";
+import { ignoreEvent } from "./ignoreEvent.js";
 
 /**
  * Ban the specified user id, whether or not they're actually on the server at the time. Generates a case.

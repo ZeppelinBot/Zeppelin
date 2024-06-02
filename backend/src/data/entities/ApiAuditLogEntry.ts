@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { AuditLogEventData, AuditLogEventType } from "../apiAuditLogTypes";
+import { AuditLogEventData, AuditLogEventType } from "../apiAuditLogTypes.js";
 
 @Entity("api_audit_log")
 export class ApiAuditLogEntry<TEventType extends AuditLogEventType> {

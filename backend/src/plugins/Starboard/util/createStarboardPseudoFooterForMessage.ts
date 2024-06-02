@@ -1,6 +1,6 @@
 import { EmbedField, Message } from "discord.js";
-import { EMPTY_CHAR, messageLink } from "../../../utils";
-import { TStarboardOpts } from "../types";
+import { EMPTY_CHAR, messageLink } from "../../../utils.js";
+import { TStarboardOpts } from "../types.js";
 
 export function createStarboardPseudoFooterForMessage(
   starboard: TStarboardOpts,

@@ -1,7 +1,7 @@
 import { BasePluginType, CooldownManager, guildPluginEventListener } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
-import { zBoundedCharacters, zSnowflake } from "../../utils";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { zBoundedCharacters, zSnowflake } from "../../utils.js";
 
 export const zCompanionChannelOpts = z.strictObject({
   voice_channel_ids: z.array(zSnowflake),

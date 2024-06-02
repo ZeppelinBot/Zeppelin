@@ -1,15 +1,15 @@
 import { Snowflake } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { clearExpiringTempban } from "../../../data/loops/expiringTempbansLoop";
-import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { resolveUser } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { clearExpiringTempban } from "../../../data/loops/expiringTempbansLoop.js";
+import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { resolveUser } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { ignoreEvent } from "../functions/ignoreEvent.js";
+import { IgnoredEventType, modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.member({ option: true }),

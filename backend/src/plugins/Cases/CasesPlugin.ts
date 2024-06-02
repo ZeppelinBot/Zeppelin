@@ -1,19 +1,19 @@
 import { guildPlugin } from "knub";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { makePublicFn } from "../../pluginUtils";
-import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { createCase } from "./functions/createCase";
-import { createCaseNote } from "./functions/createCaseNote";
-import { getCaseEmbed } from "./functions/getCaseEmbed";
-import { getCaseSummary } from "./functions/getCaseSummary";
-import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId";
-import { getRecentCasesByMod } from "./functions/getRecentCasesByMod";
-import { getTotalCasesByMod } from "./functions/getTotalCasesByMod";
-import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel";
-import { CasesPluginType, zCasesConfig } from "./types";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin.js";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
+import { createCase } from "./functions/createCase.js";
+import { createCaseNote } from "./functions/createCaseNote.js";
+import { getCaseEmbed } from "./functions/getCaseEmbed.js";
+import { getCaseSummary } from "./functions/getCaseSummary.js";
+import { getCaseTypeAmountForUserId } from "./functions/getCaseTypeAmountForUserId.js";
+import { getRecentCasesByMod } from "./functions/getRecentCasesByMod.js";
+import { getTotalCasesByMod } from "./functions/getTotalCasesByMod.js";
+import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel.js";
+import { CasesPluginType, zCasesConfig } from "./types.js";
 
 // The `any` cast here is to prevent TypeScript from locking up from the circular dependency
 function getLogsPlugin(): Promise<any> {

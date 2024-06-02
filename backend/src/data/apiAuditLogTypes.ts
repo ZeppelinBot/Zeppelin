@@ -1,4 +1,4 @@
-import { ApiPermissionTypes } from "./ApiPermissionAssignments";
+import { ApiPermissionTypes } from "./ApiPermissionAssignments.js";
 
 export const AuditLogEventTypes = {
   ADD_API_PERMISSION: "ADD_API_PERMISSION" as const,

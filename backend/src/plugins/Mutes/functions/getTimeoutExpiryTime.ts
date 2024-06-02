@@ -1,4 +1,4 @@
-import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes";
+import { MAX_TIMEOUT_DURATION } from "../../../data/Mutes.js";
 
 /**
  * Since timeouts have a limited duration (max 28d) but we support mutes longer than that,

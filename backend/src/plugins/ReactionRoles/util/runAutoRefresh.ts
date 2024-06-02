@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { ReactionRolesPluginType } from "../types";
-import { refreshReactionRoles } from "./refreshReactionRoles";
+import { ReactionRolesPluginType } from "../types.js";
+import { refreshReactionRoles } from "./refreshReactionRoles.js";
 
 export async function runAutoRefresh(pluginData: GuildPluginData<ReactionRolesPluginType>) {
   // Refresh reaction roles on all reaction role messages

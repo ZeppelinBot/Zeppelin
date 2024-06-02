@@ -1,14 +1,14 @@
 import { EventEmitter } from "events";
 import { BasePluginType } from "knub";
 import z from "zod";
-import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters";
+import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters.js";
 import {
   CounterTrigger,
   buildCounterConditionString,
   getReverseCounterComparisonOp,
   parseCounterConditionString,
-} from "../../data/entities/CounterTrigger";
-import { zBoundedCharacters, zBoundedRecord, zDelayString } from "../../utils";
+} from "../../data/entities/CounterTrigger.js";
+import { zBoundedCharacters, zBoundedRecord, zDelayString } from "../../utils.js";
 import Timeout = NodeJS.Timeout;
 
 const MAX_COUNTERS = 5;

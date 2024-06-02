@@ -1,10 +1,10 @@
 import { AuditLogEvent } from "discord.js";
-import { LogType } from "../../../data/LogType";
-import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry";
-import { logMemberBan } from "../logFunctions/logMemberBan";
-import { logMemberUnban } from "../logFunctions/logMemberUnban";
-import { logsEvt } from "../types";
-import { isLogIgnored } from "../util/isLogIgnored";
+import { LogType } from "../../../data/LogType.js";
+import { findMatchingAuditLogEntry } from "../../../utils/findMatchingAuditLogEntry.js";
+import { logMemberBan } from "../logFunctions/logMemberBan.js";
+import { logMemberUnban } from "../logFunctions/logMemberUnban.js";
+import { logsEvt } from "../types.js";
+import { isLogIgnored } from "../util/isLogIgnored.js";
 
 export const LogsGuildBanAddEvt = logsEvt({
   event: "guildBanAdd",

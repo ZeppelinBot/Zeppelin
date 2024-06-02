@@ -1,7 +1,7 @@
 import z from "zod";
-import { nonNullish, unique, zBoundedCharacters } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+import { nonNullish, unique, zBoundedCharacters } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 export const ChangeNicknameAction = automodAction({
   configSchema: z.union([

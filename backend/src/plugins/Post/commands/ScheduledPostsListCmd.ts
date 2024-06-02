@@ -1,9 +1,9 @@
 import { escapeCodeBlock } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import { createChunkedMessage, DBDateFormat, deactivateMentions, sorter, trimLines } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { postCmd } from "../types";
+import { createChunkedMessage, DBDateFormat, deactivateMentions, sorter, trimLines } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { postCmd } from "../types.js";
 
 const SCHEDULED_POST_PREVIEW_TEXT_LENGTH = 50;
 

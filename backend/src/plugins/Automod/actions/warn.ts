@@ -1,10 +1,10 @@
 import z from "zod";
-import { asyncMap, nonNullish, resolveMember, unique, zBoundedCharacters, zSnowflake } from "../../../utils";
-import { CaseArgs } from "../../Cases/types";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { zNotify } from "../constants";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { automodAction } from "../helpers";
+import { asyncMap, nonNullish, resolveMember, unique, zBoundedCharacters, zSnowflake } from "../../../utils.js";
+import { CaseArgs } from "../../Cases/types.js";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
+import { zNotify } from "../constants.js";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods.js";
+import { automodAction } from "../helpers.js";
 
 export const WarnAction = automodAction({
   configSchema: z.strictObject({

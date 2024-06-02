@@ -1,15 +1,15 @@
 import { PermissionsBitField, PermissionsString } from "discord.js";
 import { U } from "ts-toolbelt";
 import z from "zod";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
+import { isValidSnowflake, keys, noop, zBoundedCharacters } from "../../../utils.js";
 import {
   guildToTemplateSafeGuild,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+} from "../../../utils/templateSafeObjects.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 type LegacyPermMap = Record<string, keyof (typeof PermissionsBitField)["Flags"]>;
 const legacyPermMap = {

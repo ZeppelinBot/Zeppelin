@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
-import { TStarboardOpts } from "../types";
-import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage";
+import { TStarboardOpts } from "../types.js";
+import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage.js";
 import Timeout = NodeJS.Timeout;
 
 const DEBOUNCE_DELAY = 1000;

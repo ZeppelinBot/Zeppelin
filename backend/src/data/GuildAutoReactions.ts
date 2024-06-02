@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { AutoReaction } from "./entities/AutoReaction";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { AutoReaction } from "./entities/AutoReaction.js";
 
 export class GuildAutoReactions extends BaseGuildRepository {
   private autoReactions: Repository<AutoReaction>;

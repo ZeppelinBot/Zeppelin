@@ -1,9 +1,9 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DBDateFormat } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { VCAlert } from "./entities/VCAlert";
+import { DBDateFormat } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { VCAlert } from "./entities/VCAlert.js";
 
 export class VCAlerts extends BaseRepository {
   private allAlerts: Repository<VCAlert>;

@@ -1,8 +1,8 @@
 import z from "zod";
-import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, zSnowflake } from "../../../utils";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { automodTrigger } from "../helpers";
+import { getInviteCodesInString, GuildInvite, isGuildInvite, resolveInvite, zSnowflake } from "../../../utils.js";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
+import { automodTrigger } from "../helpers.js";
 
 interface MatchResultType {
   type: MatchableTextType;

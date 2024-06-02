@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { ExtendedMatchParams, GuildPluginData } from "knub";
-import { StrictMessageContent } from "../../../utils";
-import { TTagCategory, TagsPluginType } from "../types";
-import { renderTagFromString } from "./renderTagFromString";
+import { StrictMessageContent } from "../../../utils.js";
+import { TTagCategory, TagsPluginType } from "../types.js";
+import { renderTagFromString } from "./renderTagFromString.js";
 
 interface BaseResult {
   renderedContent: StrictMessageContent;

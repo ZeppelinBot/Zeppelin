@@ -1,5 +1,5 @@
 import type { PermissionFlagsBits } from "discord.js";
-import { EMPTY_CHAR } from "../utils";
+import { EMPTY_CHAR } from "../utils.js";
 
 export const PERMISSION_NAMES = {
   AddReactions: "Add Reactions",

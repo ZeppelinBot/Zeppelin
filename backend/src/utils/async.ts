@@ -1,4 +1,4 @@
-import { Awaitable } from "./typeUtils";
+import { Awaitable } from "./typeUtils.js";
 
 export async function asyncReduce<T, V>(
   arr: T[],

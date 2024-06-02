@@ -1,9 +1,9 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
-import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
-import { zBoundedRecord, zSnowflake } from "../../utils";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
+import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";
+import { zBoundedRecord, zSnowflake } from "../../utils.js";
 
 const zStarboardOpts = z.strictObject({
   channel_id: zSnowflake,

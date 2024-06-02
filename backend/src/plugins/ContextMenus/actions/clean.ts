@@ -1,9 +1,9 @@
 import { ContextMenuCommandInteraction, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ContextMenuPluginType } from "../types";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ContextMenuPluginType } from "../types.js";
 
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

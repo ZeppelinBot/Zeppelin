@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { CounterTrigger } from "../../../data/entities/CounterTrigger";
-import { CountersPluginType } from "../types";
-import { emitCounterEvent } from "./emitCounterEvent";
+import { CounterTrigger } from "../../../data/entities/CounterTrigger.js";
+import { CountersPluginType } from "../types.js";
+import { emitCounterEvent } from "./emitCounterEvent.js";
 
 export async function checkReverseCounterTrigger(
   pluginData: GuildPluginData<CountersPluginType>,

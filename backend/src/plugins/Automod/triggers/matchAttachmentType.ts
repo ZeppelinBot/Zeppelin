@@ -1,8 +1,8 @@
 import { escapeInlineCode, Snowflake } from "discord.js";
 import { extname } from "path";
 import z from "zod";
-import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils";
-import { automodTrigger } from "../helpers";
+import { asSingleLine, messageSummary, verboseChannelMention } from "../../../utils.js";
+import { automodTrigger } from "../helpers.js";
 
 interface MatchResultType {
   matchedType: string;

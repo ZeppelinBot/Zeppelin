@@ -1,6 +1,6 @@
 import { StageChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
+import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types.js";
 
 const defaultCompanionChannelOpts: Partial<TCompanionChannelOpts> = {
   enabled: true,

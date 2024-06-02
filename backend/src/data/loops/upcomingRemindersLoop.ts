@@ -1,10 +1,10 @@
 // tslint:disable:no-console
 
 import moment from "moment-timezone";
-import { lazyMemoize, MINUTES } from "../../utils";
-import { Reminder } from "../entities/Reminder";
-import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents";
-import { Reminders } from "../Reminders";
+import { lazyMemoize, MINUTES } from "../../utils.js";
+import { Reminder } from "../entities/Reminder.js";
+import { emitGuildEvent, hasGuildEventListener } from "../GuildEvents.js";
+import { Reminders } from "../Reminders.js";
 import Timeout = NodeJS.Timeout;
 
 const LOOP_INTERVAL = 15 * MINUTES;

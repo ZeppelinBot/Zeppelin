@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
 import { Brackets, Repository } from "typeorm";
-import { DBDateFormat } from "../utils";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { MuteTypes } from "./MuteTypes";
-import { dataSource } from "./dataSource";
-import { Mute } from "./entities/Mute";
+import { DBDateFormat } from "../utils.js";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { MuteTypes } from "./MuteTypes.js";
+import { dataSource } from "./dataSource.js";
+import { Mute } from "./entities/Mute.js";
 
 export type AddMuteParams = {
   userId: Mute["user_id"];

@@ -1,5 +1,5 @@
 import test from "ava";
-import { ObjectAliasError, validateNoObjectAliases } from "./validateNoObjectAliases";
+import { ObjectAliasError, validateNoObjectAliases } from "./validateNoObjectAliases.js";
 
 test("validateNoObjectAliases() disallows object aliases at top level", (t) => {
   const obj: any = {

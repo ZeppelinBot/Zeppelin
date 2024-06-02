@@ -1,4 +1,4 @@
-import { BaseRepository } from "./BaseRepository";
+import { BaseRepository } from "./BaseRepository.js";
 
 export class BaseGuildRepository<TEntity = unknown> extends BaseRepository<TEntity> {
   private static guildInstances: Map<string, any>;

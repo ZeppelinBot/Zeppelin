@@ -1,13 +1,13 @@
 import { Snowflake } from "discord.js";
 import { waitForReply } from "knub/helpers";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { logger } from "../../../logger.js";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { modActionsCmd } from "../types.js";
 
 export const MassmuteCmd = modActionsCmd({
   trigger: "massmute",

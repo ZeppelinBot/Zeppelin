@@ -1,9 +1,9 @@
 import { APIRole, AuditLogChange, AuditLogEvent } from "discord.js";
 import { guildPluginEventListener } from "knub";
-import { resolveRole } from "../../../utils";
-import { logMemberRoleAdd } from "../logFunctions/logMemberRoleAdd";
-import { logMemberRoleRemove } from "../logFunctions/logMemberRoleRemove";
-import { LogsPluginType } from "../types";
+import { resolveRole } from "../../../utils.js";
+import { logMemberRoleAdd } from "../logFunctions/logMemberRoleAdd.js";
+import { logMemberRoleRemove } from "../logFunctions/logMemberRoleRemove.js";
+import { LogsPluginType } from "../types.js";
 
 type RoleAddChange = AuditLogChange & {
   key: "$add";

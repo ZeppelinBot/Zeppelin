@@ -1,8 +1,8 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { GuildReactionRoles } from "../../data/GuildReactionRoles";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
+import { Queue } from "../../Queue.js";
+import { GuildReactionRoles } from "../../data/GuildReactionRoles.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 
 export const zReactionRolesConfig = z.strictObject({
   auto_refresh_interval: z.number(),

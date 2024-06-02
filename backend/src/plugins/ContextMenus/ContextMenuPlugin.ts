@@ -1,11 +1,11 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { MutesPlugin } from "../Mutes/MutesPlugin";
-import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { ContextClickedEvt } from "./events/ContextClickedEvt";
-import { ContextMenuPluginType, zContextMenusConfig } from "./types";
-import { loadAllCommands } from "./utils/loadAllCommands";
+import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { MutesPlugin } from "../Mutes/MutesPlugin.js";
+import { UtilityPlugin } from "../Utility/UtilityPlugin.js";
+import { ContextClickedEvt } from "./events/ContextClickedEvt.js";
+import { ContextMenuPluginType, zContextMenusConfig } from "./types.js";
+import { loadAllCommands } from "./utils/loadAllCommands.js";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {

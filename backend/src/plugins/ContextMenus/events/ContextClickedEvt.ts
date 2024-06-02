@@ -1,5 +1,5 @@
-import { contextMenuEvt } from "../types";
-import { routeContextAction } from "../utils/contextRouter";
+import { contextMenuEvt } from "../types.js";
+import { routeContextAction } from "../utils/contextRouter.js";
 
 export const ContextClickedEvt = contextMenuEvt({
   event: "interactionCreate",

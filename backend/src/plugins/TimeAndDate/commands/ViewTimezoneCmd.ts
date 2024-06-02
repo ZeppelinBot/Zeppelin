@@ -1,5 +1,5 @@
-import { getGuildTz } from "../functions/getGuildTz";
-import { timeAndDateCmd } from "../types";
+import { getGuildTz } from "../functions/getGuildTz.js";
+import { timeAndDateCmd } from "../types.js";
 
 export const ViewTimezoneCmd = timeAndDateCmd({
   trigger: "timezone",

@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { In } from "typeorm";
-import { DAYS, DBDateFormat } from "../../utils";
-import { dataSource } from "../dataSource";
-import { UsernameHistoryEntry } from "../entities/UsernameHistoryEntry";
+import { DAYS, DBDateFormat } from "../../utils.js";
+import { dataSource } from "../dataSource.js";
+import { UsernameHistoryEntry } from "../entities/UsernameHistoryEntry.js";
 
 export const USERNAME_RETENTION_PERIOD = 30 * DAYS;
 const CLEAN_PER_LOOP = 500;

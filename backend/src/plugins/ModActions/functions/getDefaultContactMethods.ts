@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { UserNotificationMethod } from "../../../utils";
-import { ModActionsPluginType } from "../types";
+import { UserNotificationMethod } from "../../../utils.js";
+import { ModActionsPluginType } from "../types.js";
 
 export function getDefaultContactMethods(
   pluginData: GuildPluginData<ModActionsPluginType>,

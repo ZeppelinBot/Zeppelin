@@ -1,6 +1,6 @@
 import type { Knub } from "knub";
 import { performance } from "perf_hooks";
-import { noop, SECONDS } from "../utils";
+import { noop, SECONDS } from "../utils.js";
 
 type Profiler = Knub["profiler"];
 

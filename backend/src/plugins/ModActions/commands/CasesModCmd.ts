@@ -1,12 +1,12 @@
 import { APIEmbed } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { UnknownUser, emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils";
-import { asyncMap } from "../../../utils/async";
-import { createPaginatedMessage } from "../../../utils/createPaginatedMessage";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { UnknownUser, emptyEmbedValue, renderUsername, resolveMember, resolveUser, trimLines } from "../../../utils.js";
+import { asyncMap } from "../../../utils/async.js";
+import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { modActionsCmd } from "../types.js";
 
 const opts = {
   mod: ct.userId({ option: true }),

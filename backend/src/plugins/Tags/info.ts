@@ -1,7 +1,7 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { TemplateFunctions } from "./templateFunctions";
-import { TemplateFunction, zTagsConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { TemplateFunctions } from "./templateFunctions.js";
+import { TemplateFunction, zTagsConfig } from "./types.js";
 
 export const tagsPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

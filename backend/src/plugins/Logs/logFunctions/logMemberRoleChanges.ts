@@ -1,13 +1,13 @@
 import { GuildMember, Role, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { UnknownUser } from "../../../utils";
-import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+import { LogType } from "../../../data/LogType.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { UnknownUser } from "../../../utils.js";
+import { memberToTemplateSafeMember, userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
-interface LogMemberRoleChangesData {
+export interface LogMemberRoleChangesData {
   mod: User | UnknownUser | null;
   member: GuildMember;
   addedRoles: Role[];

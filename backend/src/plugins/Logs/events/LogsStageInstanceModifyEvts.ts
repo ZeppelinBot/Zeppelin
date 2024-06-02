@@ -1,10 +1,10 @@
 import { StageChannel, StageInstance } from "discord.js";
-import { differenceToString, getScalarDifference } from "../../../utils";
-import { filterObject } from "../../../utils/filterObject";
-import { logStageInstanceCreate } from "../logFunctions/logStageInstanceCreate";
-import { logStageInstanceDelete } from "../logFunctions/logStageInstanceDelete";
-import { logStageInstanceUpdate } from "../logFunctions/logStageInstanceUpdate";
-import { logsEvt } from "../types";
+import { differenceToString, getScalarDifference } from "../../../utils.js";
+import { filterObject } from "../../../utils/filterObject.js";
+import { logStageInstanceCreate } from "../logFunctions/logStageInstanceCreate.js";
+import { logStageInstanceDelete } from "../logFunctions/logStageInstanceDelete.js";
+import { logStageInstanceUpdate } from "../logFunctions/logStageInstanceUpdate.js";
+import { logsEvt } from "../types.js";
 
 export const LogsStageInstanceCreateEvt = logsEvt({
   event: "stageInstanceCreate",

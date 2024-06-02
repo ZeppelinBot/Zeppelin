@@ -1,10 +1,10 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { resolveUser } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { CensorPluginType } from "../types";
+import { LogType } from "../../../data/LogType.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { resolveUser } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { CensorPluginType } from "../types.js";
 
 export async function censorMessage(
   pluginData: GuildPluginData<CensorPluginType>,

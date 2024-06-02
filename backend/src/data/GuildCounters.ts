@@ -1,13 +1,13 @@
 import moment from "moment-timezone";
 import { FindOptionsWhere, In, IsNull, Not, Repository } from "typeorm";
-import { Queue } from "../Queue";
-import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { Counter } from "./entities/Counter";
-import { CounterTrigger, TriggerComparisonOp, isValidCounterComparisonOp } from "./entities/CounterTrigger";
-import { CounterTriggerState } from "./entities/CounterTriggerState";
-import { CounterValue } from "./entities/CounterValue";
+import { Queue } from "../Queue.js";
+import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils.js";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Counter } from "./entities/Counter.js";
+import { CounterTrigger, TriggerComparisonOp, isValidCounterComparisonOp } from "./entities/CounterTrigger.js";
+import { CounterTriggerState } from "./entities/CounterTriggerState.js";
+import { CounterValue } from "./entities/CounterValue.js";
 
 const DELETE_UNUSED_COUNTERS_AFTER = 1 * DAYS;
 const DELETE_UNUSED_COUNTER_TRIGGERS_AFTER = 1 * DAYS;

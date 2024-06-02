@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { logger } from "../../../logger";
-import { renderUsername, resolveMember } from "../../../utils";
-import { memberRolesLock } from "../../../utils/lockNameHelpers";
-import { PendingMemberRoleChanges, ReactionRolesPluginType, RoleChangeMode } from "../types";
+import { logger } from "../../../logger.js";
+import { renderUsername, resolveMember } from "../../../utils.js";
+import { memberRolesLock } from "../../../utils/lockNameHelpers.js";
+import { PendingMemberRoleChanges, ReactionRolesPluginType, RoleChangeMode } from "../types.js";
 
 const ROLE_CHANGE_BATCH_DEBOUNCE_TIME = 1500;
 

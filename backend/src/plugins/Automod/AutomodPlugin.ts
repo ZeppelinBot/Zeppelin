@@ -1,37 +1,37 @@
 import { CooldownManager, guildPlugin } from "knub";
-import { Queue } from "../../Queue";
-import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { MINUTES, SECONDS } from "../../utils";
-import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap";
-import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap";
-import { CountersPlugin } from "../Counters/CountersPlugin";
-import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
-import { MutesPlugin } from "../Mutes/MutesPlugin";
-import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin";
-import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { AntiraidClearCmd } from "./commands/AntiraidClearCmd";
-import { SetAntiraidCmd } from "./commands/SetAntiraidCmd";
-import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd";
-import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt";
-import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate";
-import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger";
-import { runAutomodOnMessage } from "./events/runAutomodOnMessage";
-import { runAutomodOnModAction } from "./events/runAutomodOnModAction";
+import { Queue } from "../../Queue.js";
+import { GuildAntiraidLevels } from "../../data/GuildAntiraidLevels.js";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";
+import { MINUTES, SECONDS } from "../../utils.js";
+import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap.js";
+import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap.js";
+import { CountersPlugin } from "../Counters/CountersPlugin.js";
+import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin.js";
+import { MutesPlugin } from "../Mutes/MutesPlugin.js";
+import { PhishermanPlugin } from "../Phisherman/PhishermanPlugin.js";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
+import { AntiraidClearCmd } from "./commands/AntiraidClearCmd.js";
+import { SetAntiraidCmd } from "./commands/SetAntiraidCmd.js";
+import { ViewAntiraidCmd } from "./commands/ViewAntiraidCmd.js";
+import { RunAutomodOnJoinEvt, RunAutomodOnLeaveEvt } from "./events/RunAutomodOnJoinLeaveEvt.js";
+import { RunAutomodOnMemberUpdate } from "./events/RunAutomodOnMemberUpdate.js";
+import { runAutomodOnCounterTrigger } from "./events/runAutomodOnCounterTrigger.js";
+import { runAutomodOnMessage } from "./events/runAutomodOnMessage.js";
+import { runAutomodOnModAction } from "./events/runAutomodOnModAction.js";
 import {
   RunAutomodOnThreadCreate,
   RunAutomodOnThreadDelete,
   RunAutomodOnThreadUpdate,
-} from "./events/runAutomodOnThreadEvents";
-import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges";
-import { clearOldRecentActions } from "./functions/clearOldRecentActions";
-import { clearOldRecentSpam } from "./functions/clearOldRecentSpam";
-import { AutomodPluginType, zAutomodConfig } from "./types";
+} from "./events/runAutomodOnThreadEvents.js";
+import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChanges.js";
+import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
+import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
+import { AutomodPluginType, zAutomodConfig } from "./types.js";
 
 const defaultOptions = {
   config: {

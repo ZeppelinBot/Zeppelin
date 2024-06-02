@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { GuildMemberCachePluginType } from "../types";
+import { GuildMemberCachePluginType } from "../types.js";
 
 export async function updateMemberCacheForMember(
   pluginData: GuildPluginData<GuildMemberCachePluginType>,

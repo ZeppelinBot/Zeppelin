@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zLocateUserConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zLocateUserConfig } from "./types.js";
 
 export const locateUserPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Locate user",

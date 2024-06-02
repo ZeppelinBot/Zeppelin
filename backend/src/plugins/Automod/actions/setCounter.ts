@@ -1,9 +1,9 @@
 import z from "zod";
-import { MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../../data/GuildCounters";
-import { zBoundedCharacters } from "../../../utils";
-import { CountersPlugin } from "../../Counters/CountersPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+import { MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../../data/GuildCounters.js";
+import { zBoundedCharacters } from "../../../utils.js";
+import { CountersPlugin } from "../../Counters/CountersPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 export const SetCounterAction = automodAction({
   configSchema: z.strictObject({

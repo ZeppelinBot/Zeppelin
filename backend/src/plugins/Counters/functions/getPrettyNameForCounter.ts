@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { CountersPluginType } from "../types";
+import { CountersPluginType } from "../types.js";
 
 export function getPrettyNameForCounter(pluginData: GuildPluginData<CountersPluginType>, counterName: string) {
   const config = pluginData.config.get();

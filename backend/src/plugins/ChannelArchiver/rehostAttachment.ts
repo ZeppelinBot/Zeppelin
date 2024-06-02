@@ -1,6 +1,6 @@
 import { Attachment, GuildTextBasedChannel, MessageCreateOptions } from "discord.js";
 import fs from "fs";
-import { downloadFile } from "../../utils";
+import { downloadFile } from "../../utils.js";
 const fsp = fs.promises;
 
 const MAX_ATTACHMENT_REHOST_SIZE = 1024 * 1024 * 8;

@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { locateUserEvt } from "../types";
-import { sendAlerts } from "../utils/sendAlerts";
+import { locateUserEvt } from "../types.js";
+import { sendAlerts } from "../utils/sendAlerts.js";
 
 export const VoiceStateUpdateAlertEvt = locateUserEvt({
   event: "voiceStateUpdate",

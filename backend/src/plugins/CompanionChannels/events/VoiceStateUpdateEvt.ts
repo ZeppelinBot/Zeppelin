@@ -1,5 +1,5 @@
-import { handleCompanionPermissions } from "../functions/handleCompanionPermissions";
-import { companionChannelsEvt } from "../types";
+import { handleCompanionPermissions } from "../functions/handleCompanionPermissions.js";
+import { companionChannelsEvt } from "../types.js";
 
 export const VoiceStateUpdateEvt = companionChannelsEvt({
   event: "voiceStateUpdate",

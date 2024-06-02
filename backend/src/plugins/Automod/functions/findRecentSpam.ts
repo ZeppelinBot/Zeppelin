@@ -1,7 +1,7 @@
 import { GuildPluginData } from "knub";
-import { startProfiling } from "../../../utils/easyProfiler";
-import { RecentActionType } from "../constants";
-import { AutomodPluginType } from "../types";
+import { startProfiling } from "../../../utils/easyProfiler.js";
+import { RecentActionType } from "../constants.js";
+import { AutomodPluginType } from "../types.js";
 
 export function findRecentSpam(
   pluginData: GuildPluginData<AutomodPluginType>,

@@ -1,8 +1,8 @@
 import { APIEmbed, Message, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { StarboardPluginType, TStarboardOpts } from "../types";
-import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage";
-import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage";
+import { StarboardPluginType, TStarboardOpts } from "../types.js";
+import { createStarboardEmbedFromMessage } from "./createStarboardEmbedFromMessage.js";
+import { createStarboardPseudoFooterForMessage } from "./createStarboardPseudoFooterForMessage.js";
 
 export async function saveMessageToStarboard(
   pluginData: GuildPluginData<StarboardPluginType>,

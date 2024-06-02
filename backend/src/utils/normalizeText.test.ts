@@ -1,5 +1,5 @@
 import test from "ava";
-import { normalizeText } from "./normalizeText";
+import { normalizeText } from "./normalizeText.js";
 
 test("Replaces special characters", (t) => {
   const from = "𝗧:regional_indicator_e:ᔕ7 𝗧:regional_indicator_e:ᔕ7 𝗧:regional_indicator_e:ᔕ7";

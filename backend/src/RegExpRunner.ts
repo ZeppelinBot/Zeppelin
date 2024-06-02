@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { CooldownManager } from "knub";
 import { RegExpWorker, TimeoutError } from "regexp-worker";
-import { MINUTES, SECONDS } from "./utils";
+import { MINUTES, SECONDS } from "./utils.js";
 import Timeout = NodeJS.Timeout;
 
 const isTimeoutError = (a): a is TimeoutError => {

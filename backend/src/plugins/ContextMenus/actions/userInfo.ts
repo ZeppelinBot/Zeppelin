@@ -1,7 +1,7 @@
 import { ContextMenuCommandInteraction } from "discord.js";
 import { GuildPluginData } from "knub";
-import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
-import { ContextMenuPluginType } from "../types";
+import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin.js";
+import { ContextMenuPluginType } from "../types.js";
 
 export async function userInfoAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

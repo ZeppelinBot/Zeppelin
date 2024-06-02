@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { TimeAndDatePluginType } from "../types";
-import { getGuildTz } from "./getGuildTz";
+import { TimeAndDatePluginType } from "../types.js";
+import { getGuildTz } from "./getGuildTz.js";
 
 export async function getMemberTz(pluginData: GuildPluginData<TimeAndDatePluginType>, memberId: string) {
   const memberTz = await pluginData.state.memberTimezones.get(memberId);

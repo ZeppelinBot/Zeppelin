@@ -1,5 +1,5 @@
 import { AuditLogEvent, Guild, GuildAuditLogsEntry } from "discord.js";
-import { SECONDS, sleep } from "../utils";
+import { SECONDS, sleep } from "../utils.js";
 
 const BATCH_DEBOUNCE_TIME = 2 * SECONDS;
 const BATCH_FETCH_COUNT_INCREMENT = 10;

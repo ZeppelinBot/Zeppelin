@@ -1,9 +1,9 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DBDateFormat } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { ScheduledPost } from "./entities/ScheduledPost";
+import { DBDateFormat } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { ScheduledPost } from "./entities/ScheduledPost.js";
 
 export class ScheduledPosts extends BaseRepository {
   private scheduledPosts: Repository<ScheduledPost>;

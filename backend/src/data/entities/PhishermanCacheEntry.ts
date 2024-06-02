@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { PhishermanDomainInfo } from "../types/phisherman";
+import { PhishermanDomainInfo } from "../types/phisherman.js";
 
 @Entity("phisherman_cache")
 export class PhishermanCacheEntry {

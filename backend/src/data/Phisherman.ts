@@ -1,12 +1,12 @@
 import crypto from "crypto";
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { env } from "../env";
-import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils";
-import { dataSource } from "./dataSource";
-import { PhishermanCacheEntry } from "./entities/PhishermanCacheEntry";
-import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry";
-import { PhishermanDomainInfo, PhishermanUnknownDomain } from "./types/phisherman";
+import { env } from "../env.js";
+import { DAYS, DBDateFormat, HOURS, MINUTES } from "../utils.js";
+import { dataSource } from "./dataSource.js";
+import { PhishermanCacheEntry } from "./entities/PhishermanCacheEntry.js";
+import { PhishermanKeyCacheEntry } from "./entities/PhishermanKeyCacheEntry.js";
+import { PhishermanDomainInfo, PhishermanUnknownDomain } from "./types/phisherman.js";
 
 const API_URL = "https://api.phisherman.gg";
 const MASTER_API_KEY = env.PHISHERMAN_API_KEY;

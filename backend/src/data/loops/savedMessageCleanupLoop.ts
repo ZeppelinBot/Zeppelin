@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 
-import { MINUTES } from "../../utils";
-import { cleanupMessages } from "../cleanup/messages";
+import { MINUTES } from "../../utils.js";
+import { cleanupMessages } from "../cleanup/messages.js";
 
 const LOOP_INTERVAL = 5 * MINUTES;
 

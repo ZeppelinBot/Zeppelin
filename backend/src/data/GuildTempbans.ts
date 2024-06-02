@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { Tempban } from "./entities/Tempban";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Tempban } from "./entities/Tempban.js";
 
 export class GuildTempbans extends BaseGuildRepository {
   private tempbans: Repository<Tempban>;

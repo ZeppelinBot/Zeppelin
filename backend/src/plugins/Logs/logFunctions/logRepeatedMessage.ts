@@ -1,13 +1,13 @@
 import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { resolveChannelIds } from "../../../utils/resolveChannelIds";
-import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+import { LogType } from "../../../data/LogType.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds.js";
+import { channelToTemplateSafeChannel, userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
-interface LogRepeatedMessageData {
+export interface LogRepeatedMessageData {
   author: User;
   channel: GuildTextBasedChannel;
   datetime: string;

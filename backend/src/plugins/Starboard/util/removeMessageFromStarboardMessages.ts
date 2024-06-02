@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { StarboardPluginType } from "../types";
+import { StarboardPluginType } from "../types.js";
 
 export async function removeMessageFromStarboardMessages(
   pluginData: GuildPluginData<StarboardPluginType>,

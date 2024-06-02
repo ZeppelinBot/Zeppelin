@@ -1,14 +1,14 @@
 import { escapeInlineCode, PermissionsBitField } from "discord.js";
 import humanizeDuration from "humanize-duration";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
-import { slowmodeCmd } from "../types";
-import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd";
-import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils.js";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { BOT_SLOWMODE_PERMISSIONS, NATIVE_SLOWMODE_PERMISSIONS } from "../requiredPermissions.js";
+import { slowmodeCmd } from "../types.js";
+import { actualDisableSlowmodeCmd } from "../util/actualDisableSlowmodeCmd.js";
+import { disableBotSlowmodeForChannel } from "../util/disableBotSlowmodeForChannel.js";
 
 const MAX_NATIVE_SLOWMODE = 6 * HOURS; // 6 hours
 const MAX_BOT_SLOWMODE = DAYS * 365 * 100; // 100 years

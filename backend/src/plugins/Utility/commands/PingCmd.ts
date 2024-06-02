@@ -1,7 +1,7 @@
 import { Message } from "discord.js";
 import { performance } from "perf_hooks";
-import { noop, trimLines } from "../../../utils";
-import { utilityCmd } from "../types";
+import { noop, trimLines } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
 
 export const PingCmd = utilityCmd({
   trigger: ["ping", "pong"],

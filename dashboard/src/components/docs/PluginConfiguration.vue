@@ -54,7 +54,7 @@
                 - channel: "109672661671505920"
                   config:
                     can_kick: false
-                # Don't allow kicking on any trhead
+                # Don't allow kicking on any thread
                 - is_thread: true
                   config:
                     can_kick: false

@@ -1,6 +1,6 @@
 import { GuildChannel, Message } from "discord.js";
 import path from "path";
-import { EMPTY_CHAR, EmbedWith, renderUsername } from "../../../utils";
+import { EMPTY_CHAR, EmbedWith, renderUsername } from "../../../utils.js";
 
 const imageAttachmentExtensions = ["jpeg", "jpg", "png", "gif", "webp"];
 const audioAttachmentExtensions = ["wav", "mp3", "m4a"];

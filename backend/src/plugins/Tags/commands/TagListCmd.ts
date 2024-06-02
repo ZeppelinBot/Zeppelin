@@ -1,7 +1,7 @@
 import escapeStringRegexp from "escape-string-regexp";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { createChunkedMessage } from "../../../utils";
-import { tagsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { createChunkedMessage } from "../../../utils.js";
+import { tagsCmd } from "../types.js";
 
 export const TagListCmd = tagsCmd({
   trigger: ["tag list", "tags", "taglist"],

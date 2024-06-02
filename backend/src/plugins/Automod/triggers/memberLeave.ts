@@ -1,5 +1,5 @@
 import z from "zod";
-import { automodTrigger } from "../helpers";
+import { automodTrigger } from "../helpers.js";
 
 const configSchema = z.strictObject({});
 

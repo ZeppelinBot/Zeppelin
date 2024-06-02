@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
-import { dataSource } from "./dataSource";
-import { SavedMessage } from "./entities/SavedMessage";
+import { dataSource } from "./dataSource.js";
+import { SavedMessage } from "./entities/SavedMessage.js";
 
 let repository: Repository<SavedMessage>;
 

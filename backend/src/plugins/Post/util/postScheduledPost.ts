@@ -1,13 +1,13 @@
 import { Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { ScheduledPost } from "../../../data/entities/ScheduledPost";
-import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop";
-import { logger } from "../../../logger";
-import { DBDateFormat, verboseChannelMention, verboseUserMention } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { PostPluginType } from "../types";
-import { postMessage } from "./postMessage";
+import { ScheduledPost } from "../../../data/entities/ScheduledPost.js";
+import { registerUpcomingScheduledPost } from "../../../data/loops/upcomingScheduledPostsLoop.js";
+import { logger } from "../../../logger.js";
+import { DBDateFormat, verboseChannelMention, verboseUserMention } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { PostPluginType } from "../types.js";
+import { postMessage } from "./postMessage.js";
 
 export async function postScheduledPost(pluginData: GuildPluginData<PostPluginType>, post: ScheduledPost) {
   // First, update the scheduled post or delete it from the database *before* we try posting it.

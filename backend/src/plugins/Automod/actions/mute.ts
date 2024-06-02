@@ -1,5 +1,5 @@
 import z from "zod";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import {
   convertDelayStringToMS,
   nonNullish,
@@ -7,13 +7,13 @@ import {
   zBoundedCharacters,
   zDelayString,
   zSnowflake,
-} from "../../../utils";
-import { CaseArgs } from "../../Cases/types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
-import { zNotify } from "../constants";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { automodAction } from "../helpers";
+} from "../../../utils.js";
+import { CaseArgs } from "../../Cases/types.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { MutesPlugin } from "../../Mutes/MutesPlugin.js";
+import { zNotify } from "../constants.js";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods.js";
+import { automodAction } from "../helpers.js";
 
 export const MuteAction = automodAction({
   configSchema: z.strictObject({

@@ -11,10 +11,10 @@ import {
   resolveInvite,
   resolveUser,
   trimLines,
-} from "../../../utils";
-import { idToTimestamp } from "../../../utils/idToTimestamp";
-import { UtilityPluginType } from "../types";
-import { getGuildPreview } from "./getGuildPreview";
+} from "../../../utils.js";
+import { idToTimestamp } from "../../../utils/idToTimestamp.js";
+import { UtilityPluginType } from "../types.js";
+import { getGuildPreview } from "./getGuildPreview.js";
 
 const prettifyFeature = (feature: string): string =>
   `\`${feature

@@ -1,5 +1,5 @@
-import { logMemberLeave } from "../logFunctions/logMemberLeave";
-import { logsEvt } from "../types";
+import { logMemberLeave } from "../logFunctions/logMemberLeave.js";
+import { logsEvt } from "../types.js";
 
 export const LogsGuildMemberRemoveEvt = logsEvt({
   event: "guildMemberRemove",

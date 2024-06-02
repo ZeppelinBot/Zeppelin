@@ -7,11 +7,11 @@ import {
   Snowflake,
 } from "discord.js";
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { getBaseUrl } from "../../../pluginUtils";
-import { DBDateFormat, MINUTES, renderUsername, resolveMember } from "../../../utils";
-import { IMuteWithDetails, mutesCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { getBaseUrl } from "../../../pluginUtils.js";
+import { DBDateFormat, MINUTES, renderUsername, resolveMember } from "../../../utils.js";
+import { IMuteWithDetails, mutesCmd } from "../types.js";
 
 export const MutesCmd = mutesCmd({
   trigger: "mutes",

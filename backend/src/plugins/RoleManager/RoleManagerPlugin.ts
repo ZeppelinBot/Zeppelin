@@ -1,13 +1,13 @@
 import { guildPlugin } from "knub";
-import { GuildRoleQueue } from "../../data/GuildRoleQueue";
-import { makePublicFn } from "../../pluginUtils";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { addPriorityRole } from "./functions/addPriorityRole";
-import { addRole } from "./functions/addRole";
-import { removePriorityRole } from "./functions/removePriorityRole";
-import { removeRole } from "./functions/removeRole";
-import { runRoleAssignmentLoop } from "./functions/runRoleAssignmentLoop";
-import { RoleManagerPluginType, zRoleManagerConfig } from "./types";
+import { GuildRoleQueue } from "../../data/GuildRoleQueue.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { addPriorityRole } from "./functions/addPriorityRole.js";
+import { addRole } from "./functions/addRole.js";
+import { removePriorityRole } from "./functions/removePriorityRole.js";
+import { removeRole } from "./functions/removeRole.js";
+import { runRoleAssignmentLoop } from "./functions/runRoleAssignmentLoop.js";
+import { RoleManagerPluginType, zRoleManagerConfig } from "./types.js";
 
 export const RoleManagerPlugin = guildPlugin<RoleManagerPluginType>()({
   name: "role_manager",

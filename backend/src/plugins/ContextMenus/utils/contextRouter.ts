@@ -1,7 +1,7 @@
 import { ContextMenuCommandInteraction } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ContextMenuPluginType } from "../types";
-import { hardcodedActions } from "./hardcodedContextOptions";
+import { ContextMenuPluginType } from "../types.js";
+import { hardcodedActions } from "./hardcodedContextOptions.js";
 
 export async function routeContextAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

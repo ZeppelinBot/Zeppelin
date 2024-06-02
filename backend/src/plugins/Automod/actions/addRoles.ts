@@ -1,13 +1,13 @@
 import { PermissionFlagsBits, Snowflake } from "discord.js";
 import z from "zod";
-import { nonNullish, unique, zSnowflake } from "../../../utils";
-import { canAssignRole } from "../../../utils/canAssignRole";
-import { getMissingPermissions } from "../../../utils/getMissingPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin";
-import { ignoreRoleChange } from "../functions/ignoredRoleChanges";
-import { automodAction } from "../helpers";
+import { nonNullish, unique, zSnowflake } from "../../../utils.js";
+import { canAssignRole } from "../../../utils/canAssignRole.js";
+import { getMissingPermissions } from "../../../utils/getMissingPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
+import { ignoreRoleChange } from "../functions/ignoredRoleChanges.js";
+import { automodAction } from "../helpers.js";
 
 const p = PermissionFlagsBits;
 

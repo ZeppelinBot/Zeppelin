@@ -1,8 +1,8 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt";
-import { WelcomeMessagePluginType, zWelcomeMessageConfig } from "./types";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { SendWelcomeMessageEvt } from "./events/SendWelcomeMessageEvt.js";
+import { WelcomeMessagePluginType, zWelcomeMessageConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<WelcomeMessagePluginType> = {
   config: {

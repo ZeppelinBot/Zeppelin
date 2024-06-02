@@ -1,6 +1,6 @@
 import { APIEmbed } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
+import { CaseTypes } from "../../../data/CaseTypes.js";
 import {
   EmbedWith,
   messageLink,
@@ -12,8 +12,8 @@ import {
   trimEmptyLines,
   trimLines,
   UnknownUser,
-} from "../../../utils";
-import { UtilityPluginType } from "../types";
+} from "../../../utils.js";
+import { UtilityPluginType } from "../types.js";
 
 const MAX_ROLES_TO_DISPLAY = 15;
 

@@ -6,12 +6,12 @@ import {
   zBoundedCharacters,
   zDelayString,
   zSnowflake,
-} from "../../../utils";
-import { CaseArgs } from "../../Cases/types";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { zNotify } from "../constants";
-import { resolveActionContactMethods } from "../functions/resolveActionContactMethods";
-import { automodAction } from "../helpers";
+} from "../../../utils.js";
+import { CaseArgs } from "../../Cases/types.js";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
+import { zNotify } from "../constants.js";
+import { resolveActionContactMethods } from "../functions/resolveActionContactMethods.js";
+import { automodAction } from "../helpers.js";
 
 const configSchema = z.strictObject({
   reason: zBoundedCharacters(0, 4000).nullable().default(null),

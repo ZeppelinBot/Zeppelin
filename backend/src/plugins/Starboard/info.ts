@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zStarboardConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zStarboardConfig } from "./types.js";
 
 export const starboardPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

@@ -1,8 +1,8 @@
 import { guildPluginMessageCommand } from "knub";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { trimMultilineString, ucfirst } from "../../../utils";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { CountersPluginType } from "../types";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { trimMultilineString, ucfirst } from "../../../utils.js";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
+import { CountersPluginType } from "../types.js";
 
 export const CountersListCmd = guildPluginMessageCommand<CountersPluginType>()({
   trigger: ["counters list", "counter list", "counters"],

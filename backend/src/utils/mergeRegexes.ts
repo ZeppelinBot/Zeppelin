@@ -1,4 +1,4 @@
-import { categorize } from "./categorize";
+import { categorize } from "./categorize.js";
 
 const hasBackreference = /(?:^|[^\\]|[\\]{2})\\\d+/;
 

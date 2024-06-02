@@ -9,8 +9,8 @@ import {
   TextBasedChannel,
   User,
 } from "discord.js";
-import { MINUTES, noop } from "../utils";
-import { Awaitable } from "./typeUtils";
+import { MINUTES, noop } from "../utils.js";
+import { Awaitable } from "./typeUtils.js";
 import Timeout = NodeJS.Timeout;
 
 export type LoadPageFn = (page: number) => Awaitable<MessageCreateOptions & MessageEditOptions>;

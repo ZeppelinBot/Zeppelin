@@ -1,9 +1,9 @@
 import { BasePluginType } from "knub";
 import z from "zod";
-import { RegExpRunner } from "../../RegExpRunner";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { zBoundedCharacters, zRegex, zSnowflake } from "../../utils";
+import { RegExpRunner } from "../../RegExpRunner.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { zBoundedCharacters, zRegex, zSnowflake } from "../../utils.js";
 
 export const zCensorConfig = z.strictObject({
   filter_zalgo: z.boolean(),

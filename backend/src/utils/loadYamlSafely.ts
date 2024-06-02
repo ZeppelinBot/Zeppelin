@@ -1,5 +1,5 @@
 import yaml from "js-yaml";
-import { validateNoObjectAliases } from "./validateNoObjectAliases";
+import { validateNoObjectAliases } from "./validateNoObjectAliases.js";
 
 /**
  * Loads a YAML file safely while removing object anchors/aliases (including arrays)

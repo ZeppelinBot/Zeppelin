@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
+import { GuildLogs } from "../../data/GuildLogs.js";
 
 export const zRolesConfig = z.strictObject({
   can_assign: z.boolean(),

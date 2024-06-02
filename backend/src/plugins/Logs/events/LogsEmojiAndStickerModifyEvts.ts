@@ -1,13 +1,13 @@
 import { GuildEmoji, Sticker } from "discord.js";
-import { differenceToString, getScalarDifference } from "../../../utils";
-import { filterObject } from "../../../utils/filterObject";
-import { logEmojiCreate } from "../logFunctions/logEmojiCreate";
-import { logEmojiDelete } from "../logFunctions/logEmojiDelete";
-import { logEmojiUpdate } from "../logFunctions/logEmojiUpdate";
-import { logStickerCreate } from "../logFunctions/logStickerCreate";
-import { logStickerDelete } from "../logFunctions/logStickerDelete";
-import { logStickerUpdate } from "../logFunctions/logStickerUpdate";
-import { logsEvt } from "../types";
+import { differenceToString, getScalarDifference } from "../../../utils.js";
+import { filterObject } from "../../../utils/filterObject.js";
+import { logEmojiCreate } from "../logFunctions/logEmojiCreate.js";
+import { logEmojiDelete } from "../logFunctions/logEmojiDelete.js";
+import { logEmojiUpdate } from "../logFunctions/logEmojiUpdate.js";
+import { logStickerCreate } from "../logFunctions/logStickerCreate.js";
+import { logStickerDelete } from "../logFunctions/logStickerDelete.js";
+import { logStickerUpdate } from "../logFunctions/logStickerUpdate.js";
+import { logsEvt } from "../types.js";
 
 export const LogsEmojiCreateEvt = logsEvt({
   event: "emojiCreate",

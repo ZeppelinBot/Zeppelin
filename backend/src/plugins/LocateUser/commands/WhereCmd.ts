@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { locateUserCmd } from "../types";
-import { sendWhere } from "../utils/sendWhere";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { locateUserCmd } from "../types.js";
+import { sendWhere } from "../utils/sendWhere.js";
 
 export const WhereCmd = locateUserCmd({
   trigger: ["where", "w"],

@@ -2,7 +2,7 @@ import path from "path";
 import pkgUp from "pkg-up";
 
 const backendPackageJson = pkgUp.sync({
-  cwd: __dirname,
+  cwd: import.meta.dirname,
 }) as string;
 
 export const backendDir = path.dirname(backendPackageJson);

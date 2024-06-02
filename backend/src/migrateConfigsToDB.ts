@@ -1,8 +1,8 @@
 // tslint:disable:no-console
 import * as _fs from "fs";
 import path from "path";
-import { Configs } from "./data/Configs";
-import { connect } from "./data/db";
+import { Configs } from "./data/Configs.js";
+import { connect } from "./data/db.js";
 
 const fs = _fs.promises;
 
@@ -17,7 +17,7 @@ connect().then(async () => {
   const configs = new Configs();
 
   console.log("Loading config files");
-  const configDir = path.join(__dirname, "..", "config");
+  const configDir = path.join(import.meta.dirname, "..", "config");
   const configFiles = await fs.readdir(configDir);
 
   console.log("Looping through config files");

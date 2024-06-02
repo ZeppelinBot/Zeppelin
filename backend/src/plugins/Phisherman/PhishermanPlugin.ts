@@ -1,8 +1,8 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman";
-import { makePublicFn } from "../../pluginUtils";
-import { getDomainInfo } from "./functions/getDomainInfo";
-import { PhishermanPluginType, zPhishermanConfig } from "./types";
+import { hasPhishermanMasterAPIKey, phishermanApiKeyIsValid } from "../../data/Phisherman.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { getDomainInfo } from "./functions/getDomainInfo.js";
+import { PhishermanPluginType, zPhishermanConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<PhishermanPluginType> = {
   config: {

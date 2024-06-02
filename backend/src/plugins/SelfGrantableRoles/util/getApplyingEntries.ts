@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { SelfGrantableRolesPluginType, TSelfGrantableRoleEntry } from "../types";
+import { SelfGrantableRolesPluginType, TSelfGrantableRoleEntry } from "../types.js";
 
 export async function getApplyingEntries(
   pluginData: GuildPluginData<SelfGrantableRolesPluginType>,

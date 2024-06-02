@@ -1,7 +1,7 @@
 // tslint:disable:no-console
 
-import { lazyMemoize, MINUTES } from "../../utils";
-import { MemberCache } from "../MemberCache";
+import { lazyMemoize, MINUTES } from "../../utils.js";
+import { MemberCache } from "../MemberCache.js";
 
 const LOOP_INTERVAL = 5 * MINUTES;
 const getMemberCacheRepository = lazyMemoize(() => new MemberCache());

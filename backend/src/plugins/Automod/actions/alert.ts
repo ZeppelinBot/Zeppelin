@@ -1,12 +1,12 @@
 import { Snowflake } from "discord.js";
 import z from "zod";
-import { LogType } from "../../../data/LogType";
+import { LogType } from "../../../data/LogType.js";
 import {
   createTypedTemplateSafeValueContainer,
   renderTemplate,
   TemplateParseError,
   TemplateSafeValueContainer,
-} from "../../../templateFormatter";
+} from "../../../templateFormatter.js";
 import {
   chunkMessageLines,
   isTruthy,
@@ -17,13 +17,13 @@ import {
   zBoundedCharacters,
   zNullishToUndefined,
   zSnowflake,
-} from "../../../utils";
-import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions";
-import { messageIsEmpty } from "../../../utils/messageIsEmpty";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { automodAction } from "../helpers";
+} from "../../../utils.js";
+import { erisAllowedMentionsToDjsMentionOptions } from "../../../utils/erisAllowedMentionsToDjsMentionOptions.js";
+import { messageIsEmpty } from "../../../utils/messageIsEmpty.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { InternalPosterPlugin } from "../../InternalPoster/InternalPosterPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { automodAction } from "../helpers.js";
 
 const configSchema = z.object({
   channel: zSnowflake,
@@ -34,7 +34,7 @@ const configSchema = z.object({
 export const AlertAction = automodAction({
   configSchema,
 
-  async apply({ pluginData, contexts, actionConfig, ruleName, matchResult }) {
+  async apply({ pluginData, contexts, actionConfig, ruleName, matchResult, prettyName }) {
     const channel = pluginData.guild.channels.cache.get(actionConfig.channel as Snowflake);
     const logs = pluginData.getPlugin(LogsPlugin);
 
@@ -55,6 +55,7 @@ export const AlertAction = automodAction({
           users: safeUsers,
           actionsTaken,
           matchSummary: matchResult.summary ?? "",
+          prettyName,
         }),
       );
 
@@ -69,6 +70,7 @@ export const AlertAction = automodAction({
             text,
             actionsTaken,
             matchSummary: matchResult.summary,
+            prettyName,
             messageLink: theMessageLink,
             logMessage: validateAndParseMessageContent(logMessage)?.content,
           }),

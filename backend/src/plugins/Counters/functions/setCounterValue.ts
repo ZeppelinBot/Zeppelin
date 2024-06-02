@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { counterIdLock } from "../../../utils/lockNameHelpers";
-import { CountersPluginType } from "../types";
-import { checkCounterTrigger } from "./checkCounterTrigger";
-import { checkReverseCounterTrigger } from "./checkReverseCounterTrigger";
+import { counterIdLock } from "../../../utils/lockNameHelpers.js";
+import { CountersPluginType } from "../types.js";
+import { checkCounterTrigger } from "./checkCounterTrigger.js";
+import { checkReverseCounterTrigger } from "./checkReverseCounterTrigger.js";
 
 export async function setCounterValue(
   pluginData: GuildPluginData<CountersPluginType>,

@@ -1,8 +1,8 @@
 import { APIEmbed, PermissionFlagsBits, Role } from "discord.js";
 import { GuildPluginData } from "knub";
-import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils";
+import { EmbedWith, preEmbedPadding, trimLines } from "../../../utils.js";
 import { PERMISSION_NAMES } from "../../../utils/permissionNames.js";
-import { UtilityPluginType } from "../types";
+import { UtilityPluginType } from "../types.js";
 
 const MENTION_ICON = "https://cdn.discordapp.com/attachments/705009450855039042/839284872152481792/mention.png";
 

@@ -1,8 +1,8 @@
 import { BasePluginType, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildScheduledPosts } from "../../data/GuildScheduledPosts";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildScheduledPosts } from "../../data/GuildScheduledPosts.js";
 
 export const zPostConfig = z.strictObject({
   can_post: z.boolean(),

@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { PersistedData } from "./entities/PersistedData";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { PersistedData } from "./entities/PersistedData.js";
 
 export class GuildPersistedData extends BaseGuildRepository {
   private persistedData: Repository<PersistedData>;

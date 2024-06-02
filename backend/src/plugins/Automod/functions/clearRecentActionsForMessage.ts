@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { startProfiling } from "../../../utils/easyProfiler";
-import { AutomodContext, AutomodPluginType } from "../types";
+import { startProfiling } from "../../../utils/easyProfiler.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
 
 export function clearRecentActionsForMessage(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const stopProfiling = startProfiling(

@@ -1,8 +1,8 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { sorter } from "../../../utils";
-import { postCmd } from "../types";
-import { postMessage } from "../util/postMessage";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { sorter } from "../../../utils.js";
+import { postCmd } from "../types.js";
+import { postMessage } from "../util/postMessage.js";
 
 export const ScheduledPostsShowCmd = postCmd({
   trigger: ["scheduled_posts", "scheduled_posts show"],

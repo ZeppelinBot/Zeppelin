@@ -1,8 +1,8 @@
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { StarboardPluginType } from "../types";
-import { removeMessageFromStarboard } from "./removeMessageFromStarboard";
-import { removeMessageFromStarboardMessages } from "./removeMessageFromStarboardMessages";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { StarboardPluginType } from "../types.js";
+import { removeMessageFromStarboard } from "./removeMessageFromStarboard.js";
+import { removeMessageFromStarboardMessages } from "./removeMessageFromStarboardMessages.js";
 
 export async function onMessageDelete(pluginData: GuildPluginData<StarboardPluginType>, msg: SavedMessage) {
   // Deleted source message

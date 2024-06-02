@@ -1,5 +1,5 @@
 import { guildPluginEventListener } from "knub";
-import { GuildMemberCachePluginType } from "../types";
+import { GuildMemberCachePluginType } from "../types.js";
 
 export const removeMemberCacheOnMemberLeave = guildPluginEventListener<GuildMemberCachePluginType>()({
   event: "guildMemberRemove",

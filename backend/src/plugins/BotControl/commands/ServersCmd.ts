@@ -1,8 +1,8 @@
 import escapeStringRegexp from "escape-string-regexp";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter } from "../../../pluginUtils";
-import { createChunkedMessage, getUser, renderUsername, sorter } from "../../../utils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
+import { createChunkedMessage, getUser, renderUsername, sorter } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 export const ServersCmd = botControlCmd({
   trigger: ["servers", "guilds"],

@@ -1,9 +1,9 @@
 import { PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SECONDS, isDiscordAPIError, isDiscordHTTPError, sleep } from "../../../utils";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ModActionsPluginType } from "../types";
+import { SECONDS, isDiscordAPIError, isDiscordHTTPError, sleep } from "../../../utils.js";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ModActionsPluginType } from "../types.js";
 
 export async function isBanned(
   pluginData: GuildPluginData<ModActionsPluginType>,

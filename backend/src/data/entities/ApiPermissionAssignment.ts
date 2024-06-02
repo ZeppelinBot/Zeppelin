@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ApiPermissionTypes } from "../ApiPermissionAssignments";
-import { ApiUserInfo } from "./ApiUserInfo";
+import { ApiPermissionTypes } from "../ApiPermissionAssignments.js";
+import { ApiUserInfo } from "./ApiUserInfo.js";
 
 @Entity("api_permissions")
 export class ApiPermissionAssignment {

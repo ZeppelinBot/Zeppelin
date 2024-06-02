@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zPersistConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zPersistConfig } from "./types.js";
 
 export const persistPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Persist",

@@ -1,14 +1,14 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { errorMessage, renderUsername, resolveMember, resolveUser } from "../../../utils";
-import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { isBanned } from "../functions/isBanned";
-import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs";
-import { warnMember } from "../functions/warnMember";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { errorMessage, renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { isBanned } from "../functions/isBanned.js";
+import { readContactMethodsFromArgs } from "../functions/readContactMethodsFromArgs.js";
+import { warnMember } from "../functions/warnMember.js";
+import { modActionsCmd } from "../types.js";
 
 export const WarnCmd = modActionsCmd({
   trigger: "warn",

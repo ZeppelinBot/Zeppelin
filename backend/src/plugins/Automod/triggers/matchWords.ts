@@ -1,10 +1,10 @@
 import escapeStringRegexp from "escape-string-regexp";
 import z from "zod";
-import { normalizeText } from "../../../utils/normalizeText";
-import { stripMarkdown } from "../../../utils/stripMarkdown";
-import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary";
-import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage";
-import { automodTrigger } from "../helpers";
+import { normalizeText } from "../../../utils/normalizeText.js";
+import { stripMarkdown } from "../../../utils/stripMarkdown.js";
+import { getTextMatchPartialSummary } from "../functions/getTextMatchPartialSummary.js";
+import { MatchableTextType, matchMultipleTextTypesOnMessage } from "../functions/matchMultipleTextTypesOnMessage.js";
+import { automodTrigger } from "../helpers.js";
 
 interface MatchResultType {
   word: string;

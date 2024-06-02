@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { StarboardMessage } from "./entities/StarboardMessage";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { StarboardMessage } from "./entities/StarboardMessage.js";
 
 export class GuildStarboardMessages extends BaseGuildRepository {
   private allStarboardMessages: Repository<StarboardMessage>;

@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import { noop } from "../utils";
+import { noop } from "../utils.js";
 
 export async function waitForButtonConfirm(
   channel: GuildTextBasedChannel,

@@ -1,9 +1,9 @@
 import { Message, Snowflake, TextChannel } from "discord.js";
-import { noop, resolveMember } from "../../../utils";
-import { allStarboardsLock } from "../../../utils/lockNameHelpers";
-import { starboardEvt } from "../types";
-import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
-import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount";
+import { noop, resolveMember } from "../../../utils.js";
+import { allStarboardsLock } from "../../../utils/lockNameHelpers.js";
+import { starboardEvt } from "../types.js";
+import { saveMessageToStarboard } from "../util/saveMessageToStarboard.js";
+import { updateStarboardMessageStarCount } from "../util/updateStarboardMessageStarCount.js";
 
 export const StarboardReactionAddEvt = starboardEvt({
   event: "messageReactionAdd",

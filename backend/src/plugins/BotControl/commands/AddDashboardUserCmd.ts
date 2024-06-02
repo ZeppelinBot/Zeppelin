@@ -1,8 +1,8 @@
-import { ApiPermissions } from "@zeppelinbot/shared";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { renderUsername } from "../../../utils";
-import { botControlCmd } from "../types";
+import { ApiPermissions } from "@zeppelinbot/shared/apiPermissions.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { renderUsername } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 export const AddDashboardUserCmd = botControlCmd({
   trigger: ["add_dashboard_user"],

@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { GuildPluginData } from "knub";
-import { RoleButtonsPluginType } from "../types";
-import { applyRoleButtons } from "./applyRoleButtons";
+import { RoleButtonsPluginType } from "../types.js";
+import { applyRoleButtons } from "./applyRoleButtons.js";
 
 export async function applyAllRoleButtons(pluginData: GuildPluginData<RoleButtonsPluginType>) {
   const savedRoleButtons = await pluginData.state.roleButtons.getSavedRoleButtons();
