@@ -44,7 +44,15 @@ import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availab
 import { setProfiler } from "./profiler.js";
 import { logRateLimit } from "./rateLimitStats.js";
 import { startUptimeCounter } from "./uptime.js";
-import { MINUTES, SECONDS, errorMessage, isDiscordAPIError, isDiscordHTTPError, sleep, successMessage } from "./utils.js";
+import {
+  MINUTES,
+  SECONDS,
+  errorMessage,
+  isDiscordAPIError,
+  isDiscordHTTPError,
+  sleep,
+  successMessage,
+} from "./utils.js";
 import { DecayingCounter } from "./utils/DecayingCounter.js";
 import { enableProfiling } from "./utils/easyProfiler.js";
 import { loadYamlSafely } from "./utils/loadYamlSafely.js";
