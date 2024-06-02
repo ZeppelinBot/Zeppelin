@@ -1,6 +1,6 @@
 import { BasePluginType } from "knub";
-import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 import { z } from "zod";
+import { GuildMemberCache } from "../../data/GuildMemberCache.js";
 
 export const zGuildMemberCacheConfig = z.strictObject({});
 

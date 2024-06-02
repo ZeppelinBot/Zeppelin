@@ -12,7 +12,7 @@ import {
   userToTemplateSafeUser,
 } from "../../../utils/templateSafeObjects.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
-import { FORMAT_NO_TIMESTAMP, LogsPluginType } from "../types.js";
+import { LogsPluginType } from "../types.js";
 import { log } from "../util/log.js";
 
 export interface LogMessageDeleteData {

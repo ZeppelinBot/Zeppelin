@@ -1,5 +1,4 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
-import { Table } from "typeorm";
+import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
 export class CreateMemberTimezonesTable1597109357201 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
