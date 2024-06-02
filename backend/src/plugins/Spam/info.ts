@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zSpamConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zSpamConfig } from "./types.js";
 
 export const spamPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

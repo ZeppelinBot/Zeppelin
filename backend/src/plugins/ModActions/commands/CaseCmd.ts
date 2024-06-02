@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { sendErrorMessage } from "../../../pluginUtils";
-import { modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { sendErrorMessage } from "../../../pluginUtils.js";
+import { modActionsCmd } from "../types.js";
 
 export const CaseCmd = modActionsCmd({
   trigger: "case",

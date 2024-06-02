@@ -1,4 +1,4 @@
-import { decrypt, encrypt } from "./crypt";
+import { decrypt, encrypt } from "./crypt.js";
 
 export async function encryptJson(obj: any): Promise<string> {
   const serialized = JSON.stringify(obj);

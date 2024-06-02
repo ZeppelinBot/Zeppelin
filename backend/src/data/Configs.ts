@@ -1,10 +1,10 @@
 import { Repository } from "typeorm";
-import { isAPI } from "../globals";
-import { HOURS, SECONDS } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { cleanupConfigs } from "./cleanup/configs";
-import { dataSource } from "./dataSource";
-import { Config } from "./entities/Config";
+import { isAPI } from "../globals.js";
+import { HOURS, SECONDS } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { cleanupConfigs } from "./cleanup/configs.js";
+import { dataSource } from "./dataSource.js";
+import { Config } from "./entities/Config.js";
 
 const CLEANUP_INTERVAL = 1 * HOURS;
 

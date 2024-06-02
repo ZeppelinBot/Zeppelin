@@ -2,13 +2,13 @@ import cors from "cors";
 import express from "express";
 import multer from "multer";
 import { TokenError } from "passport-oauth2";
-import { env } from "../env";
-import { initArchives } from "./archives";
-import { initAuth } from "./auth";
-import { initDocs } from "./docs";
-import { initGuildsAPI } from "./guilds/index";
-import { clientError, error, notFound } from "./responses";
-import { startBackgroundTasks } from "./tasks";
+import { env } from "../env.js";
+import { initArchives } from "./archives.js";
+import { initAuth } from "./auth.js";
+import { initDocs } from "./docs.js";
+import { initGuildsAPI } from "./guilds/index.js";
+import { clientError, error, notFound } from "./responses.js";
+import { startBackgroundTasks } from "./tasks.js";
 
 const apiPathPrefix = env.API_PATH_PREFIX || (env.NODE_ENV === "development" ? "/api" : "");
 

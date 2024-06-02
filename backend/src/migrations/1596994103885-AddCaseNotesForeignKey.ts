@@ -1,5 +1,4 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
-import { TableForeignKey } from "typeorm/index";
+import { MigrationInterface, QueryRunner, TableForeignKey } from "typeorm";
 
 export class AddCaseNotesForeignKey1596994103885 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

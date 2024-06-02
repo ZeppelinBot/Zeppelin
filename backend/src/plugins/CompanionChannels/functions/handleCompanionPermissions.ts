@@ -1,11 +1,11 @@
 import { PermissionsBitField, Snowflake, StageChannel, TextChannel, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { MINUTES, isDiscordAPIError } from "../../../utils";
-import { filterObject } from "../../../utils/filterObject";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types";
-import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId";
+import { LogType } from "../../../data/LogType.js";
+import { MINUTES, isDiscordAPIError } from "../../../utils.js";
+import { filterObject } from "../../../utils/filterObject.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { CompanionChannelsPluginType, TCompanionChannelOpts } from "../types.js";
+import { getCompanionChannelOptsForVoiceChannelId } from "./getCompanionChannelOptsForVoiceChannelId.js";
 
 const ERROR_COOLDOWN_KEY = "errorCooldown";
 const ERROR_COOLDOWN = 5 * MINUTES;

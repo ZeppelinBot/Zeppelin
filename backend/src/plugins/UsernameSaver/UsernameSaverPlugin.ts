@@ -1,8 +1,8 @@
 import { guildPlugin } from "knub";
-import { Queue } from "../../Queue";
-import { UsernameHistory } from "../../data/UsernameHistory";
-import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts";
-import { UsernameSaverPluginType, zUsernameSaverConfig } from "./types";
+import { Queue } from "../../Queue.js";
+import { UsernameHistory } from "../../data/UsernameHistory.js";
+import { MessageCreateUpdateUsernameEvt, VoiceChannelJoinUpdateUsernameEvt } from "./events/UpdateUsernameEvts.js";
+import { UsernameSaverPluginType, zUsernameSaverConfig } from "./types.js";
 
 export const UsernameSaverPlugin = guildPlugin<UsernameSaverPluginType>()({
   name: "username_saver",

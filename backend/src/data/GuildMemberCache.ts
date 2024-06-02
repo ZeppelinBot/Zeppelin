@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { Blocker } from "../Blocker";
-import { DBDateFormat, MINUTES } from "../utils";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { MemberCacheItem } from "./entities/MemberCacheItem";
+import { Blocker } from "../Blocker.js";
+import { DBDateFormat, MINUTES } from "../utils.js";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { MemberCacheItem } from "./entities/MemberCacheItem.js";
 
 const SAVE_PENDING_BLOCKER_KEY = "save-pending" as const;
 

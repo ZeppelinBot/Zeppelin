@@ -1,10 +1,10 @@
 import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import cloneDeep from "lodash.clonedeep";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { resolveUser } from "../../../utils";
-import { logMessageEdit } from "../logFunctions/logMessageEdit";
-import { LogsPluginType } from "../types";
+import cloneDeep from "lodash/cloneDeep.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { resolveUser } from "../../../utils.js";
+import { logMessageEdit } from "../logFunctions/logMessageEdit.js";
+import { LogsPluginType } from "../types.js";
 
 export async function onMessageUpdate(
   pluginData: GuildPluginData<LogsPluginType>,

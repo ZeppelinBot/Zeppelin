@@ -1,6 +1,6 @@
 import { BasePluginType } from "knub";
 import z from "zod";
-import { GuildRoleQueue } from "../../data/GuildRoleQueue";
+import { GuildRoleQueue } from "../../data/GuildRoleQueue.js";
 
 export const zRoleManagerConfig = z.strictObject({});
 

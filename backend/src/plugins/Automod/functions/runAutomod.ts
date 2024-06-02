@@ -1,14 +1,14 @@
 import { GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import { performance } from "perf_hooks";
-import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler";
-import { availableActions } from "../actions/availableActions";
-import { CleanAction } from "../actions/clean";
-import { AutomodTriggerMatchResult } from "../helpers";
-import { availableTriggers } from "../triggers/availableTriggers";
-import { AutomodContext, AutomodPluginType } from "../types";
-import { applyCooldown } from "./applyCooldown";
-import { checkCooldown } from "./checkCooldown";
+import { calculateBlocking, profilingEnabled } from "../../../utils/easyProfiler.js";
+import { availableActions } from "../actions/availableActions.js";
+import { CleanAction } from "../actions/clean.js";
+import { AutomodTriggerMatchResult } from "../helpers.js";
+import { availableTriggers } from "../triggers/availableTriggers.js";
+import { AutomodContext, AutomodPluginType } from "../types.js";
+import { applyCooldown } from "./applyCooldown.js";
+import { checkCooldown } from "./checkCooldown.js";
 
 export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>, context: AutomodContext) {
   const userId = context.user?.id || context.member?.id || context.message?.user_id;
@@ -35,6 +35,8 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
   });
 
   for (const [ruleName, rule] of Object.entries(config.rules)) {
+    const prettyName = rule.pretty_name;
+
     if (rule.enabled === false) continue;
     if (
       !rule.affects_bots &&
@@ -100,6 +102,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
               contexts,
               actionConfig: true,
               matchResult,
+              prettyName,
             });
             return;
           }
@@ -113,7 +116,9 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
               triggerConfig,
             })) ?? "";
 
-          matchResult.fullSummary = `Triggered automod rule **${ruleName}**\n${matchResult.summary}`.trim();
+          matchResult.fullSummary = `Triggered automod rule **${prettyName ?? ruleName}**\n${
+            matchResult.summary
+          }`.trim();
         }
 
         if (profilingEnabled()) {
@@ -147,6 +152,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
           contexts,
           actionConfig,
           matchResult,
+          prettyName,
         });
 
         if (profilingEnabled()) {

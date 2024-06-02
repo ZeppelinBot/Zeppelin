@@ -1,17 +1,17 @@
 import { Snowflake } from "discord.js";
 import { waitForReply } from "knub/helpers";
 import { performance } from "perf_hooks";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { DAYS, MINUTES, SECONDS, noop } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments";
-import { ignoreEvent } from "../functions/ignoreEvent";
-import { IgnoredEventType, modActionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { DAYS, MINUTES, SECONDS, noop } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { formatReasonWithAttachments } from "../functions/formatReasonWithAttachments.js";
+import { ignoreEvent } from "../functions/ignoreEvent.js";
+import { IgnoredEventType, modActionsCmd } from "../types.js";
 
 export const MassbanCmd = modActionsCmd({
   trigger: "massban",

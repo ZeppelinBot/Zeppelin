@@ -8,8 +8,8 @@ import {
   renderUsername,
   trimEmptyLines,
   trimLines,
-} from "../../../utils";
-import { UtilityPluginType } from "../types";
+} from "../../../utils.js";
+import { UtilityPluginType } from "../types.js";
 
 const MESSAGE_ICON = "https://cdn.discordapp.com/attachments/740650744830623756/740685652152025088/message.png";
 

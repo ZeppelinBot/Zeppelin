@@ -1,6 +1,6 @@
 import { BaseConfig, Knub } from "knub";
 import z, { ZodTypeAny } from "zod";
-import { zSnowflake } from "./utils";
+import { zSnowflake } from "./utils.js";
 
 export interface ZeppelinGuildConfig extends BaseConfig {
   success_emoji?: string;
@@ -36,11 +36,11 @@ export type TMarkdown = string;
 export interface ZeppelinPluginInfo {
   showInDocs: boolean;
   prettyName: string;
+  configSchema: ZodTypeAny;
   description?: TMarkdown;
   usageGuide?: TMarkdown;
   configurationGuide?: TMarkdown;
   legacy?: boolean;
-  configSchema?: ZodTypeAny;
 }
 
 export interface CommandInfo {

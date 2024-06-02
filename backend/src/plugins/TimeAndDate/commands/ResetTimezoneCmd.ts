@@ -1,6 +1,6 @@
-import { sendSuccessMessage } from "../../../pluginUtils";
-import { getGuildTz } from "../functions/getGuildTz";
-import { timeAndDateCmd } from "../types";
+import { sendSuccessMessage } from "../../../pluginUtils.js";
+import { getGuildTz } from "../functions/getGuildTz.js";
+import { timeAndDateCmd } from "../types.js";
 
 export const ResetTimezoneCmd = timeAndDateCmd({
   trigger: "timezone reset",

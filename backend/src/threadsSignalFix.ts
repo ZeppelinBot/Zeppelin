@@ -6,7 +6,7 @@
  * - This is imported as early as possible to avoid removing our own signal handlers
  */
 import "threads";
-import { env } from "./env";
+import { env } from "./env.js";
 if (!env.DEBUG) {
   process.removeAllListeners("SIGINT");
   process.removeAllListeners("SIGTERM");

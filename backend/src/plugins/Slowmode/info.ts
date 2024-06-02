@@ -1,5 +1,5 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { zSlowmodeConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { zSlowmodeConfig } from "./types.js";
 
 export const slowmodePluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

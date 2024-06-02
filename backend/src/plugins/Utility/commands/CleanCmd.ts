@@ -1,15 +1,15 @@
 import { Message, Snowflake, TextChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { allowTimeout } from "../../../RegExpRunner";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { LogType } from "../../../data/LogType";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { humanizeDurationShort } from "../../../humanizeDurationShort";
-import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils";
-import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin";
-import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { UtilityPluginType, utilityCmd } from "../types";
+import { allowTimeout } from "../../../RegExpRunner.js";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin.js";
+import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { UtilityPluginType, utilityCmd } from "../types.js";
 
 const MAX_CLEAN_COUNT = 300;
 const MAX_CLEAN_TIME = 1 * DAYS;

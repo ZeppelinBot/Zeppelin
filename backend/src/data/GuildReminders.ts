@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { Reminder } from "./entities/Reminder";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Reminder } from "./entities/Reminder.js";
 
 export class GuildReminders extends BaseGuildRepository {
   private reminders: Repository<Reminder>;
