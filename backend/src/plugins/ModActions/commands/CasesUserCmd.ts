@@ -3,7 +3,14 @@ import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { sendErrorMessage } from "../../../pluginUtils.js";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import {
+  UnknownUser,
+  chunkArray,
+  emptyEmbedValue,
+  renderUsername,
+  resolveMember,
+  resolveUser,
+} from "../../../utils.js";
 import { asyncMap } from "../../../utils/async.js";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
