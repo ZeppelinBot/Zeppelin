@@ -122,7 +122,7 @@ export class GuildSavedMessages extends BaseGuildRepository<SavedMessage> {
     if (msg.poll) {
       data.poll = {
         question: msg.poll.question,
-        answers: Array.from(msg.poll.answers.values()).map((answer) => ({
+        answers: msg.poll.answers.map((answer) => ({
           id: answer.id,
           text: answer.text,
         })),
