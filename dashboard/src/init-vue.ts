@@ -10,8 +10,8 @@ import "highlight.js/styles/base16/ocean.css";
 import { router } from "./routes";
 import { RootStore } from "./store";
 
-import "./directives/trim-indents";
 import "./directives/highlightjs";
+import "./directives/trim-indents";
 
 import App from "./components/App.vue";
 
