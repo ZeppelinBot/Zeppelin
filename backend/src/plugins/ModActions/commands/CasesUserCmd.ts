@@ -108,11 +108,11 @@ export const CasesUserCmd = modActionsCmd({
 
             const isLastPage = page === totalPages;
             const firstCaseNum = (page - 1) * casesPerPage + 1;
-            const lastCaseNum = isLastPage ? cases.length : page * casesPerPage;
+            const lastCaseNum = isLastPage ? casesToDisplay.length : page * casesPerPage;
             const title =
               totalPages === 1
                 ? `Cases for ${userName} (${lines.length} total)`
-                : `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${cases.length} for ${userName}`;
+                : `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${casesToDisplay.length} for ${userName}`;
 
             const embed = {
               author: {
