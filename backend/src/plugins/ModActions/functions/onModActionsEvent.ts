@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { ModActionsEvents, ModActionsPluginType } from "../types";
+import { ModActionsEvents, ModActionsPluginType } from "../types.js";
 
 export function onModActionsEvent<TEvent extends keyof ModActionsEvents>(
   pluginData: GuildPluginData<ModActionsPluginType>,

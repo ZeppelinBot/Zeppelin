@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { ScheduledPost } from "./entities/ScheduledPost";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { ScheduledPost } from "./entities/ScheduledPost.js";
 
 export class GuildScheduledPosts extends BaseGuildRepository {
   private scheduledPosts: Repository<ScheduledPost>;

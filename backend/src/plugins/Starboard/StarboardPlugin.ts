@@ -1,12 +1,12 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildStarboardMessages } from "../../data/GuildStarboardMessages";
-import { GuildStarboardReactions } from "../../data/GuildStarboardReactions";
-import { MigratePinsCmd } from "./commands/MigratePinsCmd";
-import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt";
-import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts";
-import { StarboardPluginType, zStarboardConfig } from "./types";
-import { onMessageDelete } from "./util/onMessageDelete";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
+import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";
+import { MigratePinsCmd } from "./commands/MigratePinsCmd.js";
+import { StarboardReactionAddEvt } from "./events/StarboardReactionAddEvt.js";
+import { StarboardReactionRemoveAllEvt, StarboardReactionRemoveEvt } from "./events/StarboardReactionRemoveEvts.js";
+import { StarboardPluginType, zStarboardConfig } from "./types.js";
+import { onMessageDelete } from "./util/onMessageDelete.js";
 
 const defaultOptions: PluginOptions<StarboardPluginType> = {
   config: {

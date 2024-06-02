@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { PingableRole } from "./entities/PingableRole";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { PingableRole } from "./entities/PingableRole.js";
 
 export class GuildPingableRoles extends BaseGuildRepository {
   private pingableRoles: Repository<PingableRole>;

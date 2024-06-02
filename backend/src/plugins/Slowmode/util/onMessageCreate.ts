@@ -1,16 +1,16 @@
 import { ChannelType, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel";
-import { hasPermission } from "../../../pluginUtils";
-import { resolveMember } from "../../../utils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { messageLock } from "../../../utils/lockNameHelpers";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions";
-import { SlowmodePluginType } from "../types";
-import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { SlowmodeChannel } from "../../../data/entities/SlowmodeChannel.js";
+import { hasPermission } from "../../../pluginUtils.js";
+import { resolveMember } from "../../../utils.js";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
+import { messageLock } from "../../../utils/lockNameHelpers.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { BOT_SLOWMODE_PERMISSIONS } from "../requiredPermissions.js";
+import { SlowmodePluginType } from "../types.js";
+import { applyBotSlowmodeToUserId } from "./applyBotSlowmodeToUserId.js";
 
 export async function onMessageCreate(pluginData: GuildPluginData<SlowmodePluginType>, msg: SavedMessage) {
   if (msg.is_bot) return;

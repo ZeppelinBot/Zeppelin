@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { archiveSearch, displaySearch, SearchType } from "../search";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { archiveSearch, displaySearch, SearchType } from "../search.js";
+import { utilityCmd } from "../types.js";
 
 // Separate from BanSearchCmd to avoid a circular reference from ./search.ts
 export const banSearchSignature = {

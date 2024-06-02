@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { LogsPluginType } from "../types";
+import { LogType } from "../../../data/LogType.js";
+import { LogsPluginType } from "../types.js";
 
 export function isLogIgnored(
   pluginData: GuildPluginData<LogsPluginType>,

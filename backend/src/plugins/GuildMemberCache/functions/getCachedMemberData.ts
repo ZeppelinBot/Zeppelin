@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { MemberCacheItem } from "../../../data/entities/MemberCacheItem";
-import { GuildMemberCachePluginType } from "../types";
+import { MemberCacheItem } from "../../../data/entities/MemberCacheItem.js";
+import { GuildMemberCachePluginType } from "../types.js";
 
 export function getCachedMemberData(
   pluginData: GuildPluginData<GuildMemberCachePluginType>,

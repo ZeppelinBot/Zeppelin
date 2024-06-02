@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { RECENT_NICKNAME_CHANGE_EXPIRY_TIME } from "../constants";
-import { AutomodPluginType } from "../types";
+import { RECENT_NICKNAME_CHANGE_EXPIRY_TIME } from "../constants.js";
+import { AutomodPluginType } from "../types.js";
 
 export function clearOldRecentNicknameChanges(pluginData: GuildPluginData<AutomodPluginType>) {
   const now = Date.now();

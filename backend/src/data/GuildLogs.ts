@@ -1,5 +1,5 @@
 import * as events from "events";
-import { LogType } from "./LogType";
+import { LogType } from "./LogType.js";
 
 // Use the same instance for the same guild, even if a new instance is created
 const guildInstances: Map<string, GuildLogs> = new Map();

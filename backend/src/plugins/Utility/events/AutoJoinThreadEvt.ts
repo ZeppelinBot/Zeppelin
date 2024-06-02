@@ -1,4 +1,4 @@
-import { utilityEvt } from "../types";
+import { utilityEvt } from "../types.js";
 
 export const AutoJoinThreadEvt = utilityEvt({
   event: "threadCreate",

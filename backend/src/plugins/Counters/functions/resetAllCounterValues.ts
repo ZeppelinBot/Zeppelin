@@ -1,6 +1,6 @@
 import { GuildPluginData } from "knub";
-import { counterIdLock } from "../../../utils/lockNameHelpers";
-import { CountersPluginType } from "../types";
+import { counterIdLock } from "../../../utils/lockNameHelpers.js";
+import { CountersPluginType } from "../types.js";
 
 export async function resetAllCounterValues(pluginData: GuildPluginData<CountersPluginType>, counterName: string) {
   const config = pluginData.config.get();

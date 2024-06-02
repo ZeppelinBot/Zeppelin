@@ -1,5 +1,5 @@
-import { memberHasMutedRole } from "../functions/memberHasMutedRole";
-import { mutesEvt } from "../types";
+import { memberHasMutedRole } from "../functions/memberHasMutedRole.js";
+import { mutesEvt } from "../types.js";
 
 /**
  * Clear active mute if the mute role is removed manually

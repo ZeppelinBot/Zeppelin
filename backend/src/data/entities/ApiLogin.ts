@@ -1,5 +1,5 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ApiUserInfo } from "./ApiUserInfo";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, Relation } from "typeorm";
+import { ApiUserInfo } from "./ApiUserInfo.js";
 
 @Entity("api_logins")
 export class ApiLogin {
@@ -21,5 +21,5 @@ export class ApiLogin {
 
   @ManyToOne(() => ApiUserInfo, (userInfo) => userInfo.logins)
   @JoinColumn({ name: "user_id" })
-  userInfo: ApiUserInfo;
+  userInfo: Relation<ApiUserInfo>;
 }

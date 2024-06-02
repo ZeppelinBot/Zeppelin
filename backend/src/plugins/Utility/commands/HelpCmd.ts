@@ -1,8 +1,8 @@
 import { LoadedGuildPlugin, PluginCommandDefinition } from "knub";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { createChunkedMessage } from "../../../utils";
-import { utilityCmd } from "../types";
-import { env } from "../../../env"
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { createChunkedMessage } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
+import { env } from "../../../env";
 
 export const HelpCmd = utilityCmd({
   trigger: "help",

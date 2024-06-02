@@ -1,6 +1,6 @@
 import { BasePluginType, guildPluginMessageCommand } from "knub";
 import z from "zod";
-import { GuildReminders } from "../../data/GuildReminders";
+import { GuildReminders } from "../../data/GuildReminders.js";
 
 export const zRemindersConfig = z.strictObject({
   can_use: z.boolean(),
