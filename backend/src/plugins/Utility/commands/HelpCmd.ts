@@ -3,7 +3,6 @@ import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { env } from "../../../env.js";
 import { createChunkedMessage } from "../../../utils.js";
 import { utilityCmd } from "../types.js";
-import { env } from "../../../env.js";
 
 export const HelpCmd = utilityCmd({
   trigger: "help",
