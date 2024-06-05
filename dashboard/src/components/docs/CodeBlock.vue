@@ -1,5 +1,5 @@
 <template>
-  <pre class="codeblock" v-highlightjs><code :class="codeLang" v-trim-indents="trim"><slot></slot></code></pre>
+  <pre class="codeblock"><code :class="codeLang" v-trim-indents="trim" v-highlightjs><slot></slot></code></pre>
 </template>
 
 <script>

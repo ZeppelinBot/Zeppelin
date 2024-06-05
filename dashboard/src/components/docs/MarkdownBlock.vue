@@ -18,7 +18,7 @@
             elem.parentNode.classList.add('codeblock');
           }
 
-          hljs.highlightBlock(elem);
+          hljs.highlightElement(elem);
         });
       }
     },
