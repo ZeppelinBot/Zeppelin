@@ -62,6 +62,11 @@ const defaultOptions = {
     kick_message: "You have been kicked from the {guildName} server. Reason given: {reason}",
     ban_message: "You have been banned from the {guildName} server. Reason given: {reason}",
     tempban_message: "You have been banned from the {guildName} server for {banTime}. Reason given: {reason}",
+    default_reasons: {
+      mute: "No reason specified",
+      kick: "No reason specified",
+      ban: "No reason specified",
+    },
     alert_on_rejoin: false,
     alert_channel: null,
     warn_notify_enabled: false,

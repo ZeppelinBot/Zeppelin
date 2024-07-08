@@ -67,7 +67,10 @@ export async function actualKickMemberCmd(
     return;
   }
 
-  const reason = formatReasonWithAttachments(args.reason, msg.attachments);
+  const config = pluginData.config.get();
+  const reason = args.reason
+    ? formatReasonWithAttachments(args.reason, msg.attachments)
+    : config.default_reasons?.kick || "No reason specified";
 
   const kickResult = await kickMember(pluginData, memberToKick, reason, {
     contactMethods,
