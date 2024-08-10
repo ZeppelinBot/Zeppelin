@@ -4,6 +4,9 @@
   "description": "",
   "private": true,
   "type": "module",
+  "exports": {
+    "./*": "./dist/*"
+  },
   "scripts": {
     "watch": "tsc-watch --build --onSuccess \"node start-dev.js\"",
     "watch-yaml-parse-test": "tsc-watch --build --onSuccess \"node dist/yamlParseTest.js\"",
