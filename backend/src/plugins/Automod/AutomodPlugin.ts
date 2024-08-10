@@ -32,6 +32,7 @@ import { clearOldRecentNicknameChanges } from "./functions/clearOldNicknameChang
 import { clearOldRecentActions } from "./functions/clearOldRecentActions.js";
 import { clearOldRecentSpam } from "./functions/clearOldRecentSpam.js";
 import { AutomodPluginType, zAutomodConfig } from "./types.js";
+import { automodPluginDocs } from "./docs.js";
 
 const defaultOptions = {
   config: {

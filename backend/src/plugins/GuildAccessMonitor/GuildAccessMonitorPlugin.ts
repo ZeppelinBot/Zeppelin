@@ -4,6 +4,7 @@ import z from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { Configs } from "../../data/Configs.js";
 import { env } from "../../env.js";
+import { zGuildAccessMonitorConfig } from "./types.js";
 
 interface GuildAccessMonitorPluginType extends BasePluginType {
   state: {
@@ -24,7 +25,7 @@ async function checkGuild(pluginData: GlobalPluginData<GuildAccessMonitorPluginT
  */
 export const GuildAccessMonitorPlugin = globalPlugin<GuildAccessMonitorPluginType>()({
   name: "guild_access_monitor",
-  configParser: (input) => z.strictObject({}).parse(input),
+  configParser: (input) => zGuildAccessMonitorConfig.parse(input),
 
   events: [
     globalPluginEventListener<GuildAccessMonitorPluginType>()({

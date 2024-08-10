@@ -1,9 +1,9 @@
 import express from "express";
 import z from "zod";
-import { guildPlugins } from "../plugins/availablePlugins.js";
-import { guildPluginInfo } from "../plugins/pluginInfo.js";
 import { indentLines } from "../utils.js";
 import { notFound } from "./responses.js";
+import { availableGuildPlugins } from "../plugins/availablePlugins.js";
+import { ZeppelinGuildPluginInfo } from "../types.js";
 
 function isZodObject(schema: z.ZodTypeAny): schema is z.ZodObject<any> {
   return schema._def.typeName === "ZodObject";
@@ -97,34 +97,34 @@ function formatZodConfigSchema(schema: z.ZodTypeAny) {
   return "unknown";
 }
 
+const availableGuildPluginsByName = availableGuildPlugins.reduce<Record<string, ZeppelinGuildPluginInfo>>((map, obj) => {
+  map[obj.plugin.name] = obj;
+  return map;
+}, {});
+
 export function initDocs(router: express.Router) {
-  const docsPluginNames = Object.keys(guildPluginInfo).filter((k) => guildPluginInfo[k].type === "stable" || guildPluginInfo[k].type === "legacy");
+  const docsPlugins = availableGuildPlugins.filter(obj => obj.docs.type !== "internal");
 
   router.get("/docs/plugins", (req: express.Request, res: express.Response) => {
-    res.json(
-      docsPluginNames.map((pluginName) => {
-        const info = guildPluginInfo[pluginName]!;
-        const thinInfo = { prettyName: info.prettyName, type: info.type };
-        return {
-          name: pluginName,
-          info: thinInfo,
-        };
-      }),
-    );
+    res.json(docsPlugins.map(obj => ({
+      name: obj.plugin.name,
+      info: {
+        prettyName: obj.docs.prettyName,
+        type: obj.docs.type,
+      },
+    })));
   });
 
   router.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {
-    const name = req.params.pluginName;
-    const baseInfo = guildPluginInfo[name];
-    if (!baseInfo) {
+    const pluginInfo = availableGuildPluginsByName[req.params.pluginName];
+    if (!pluginInfo) {
       return notFound(res);
     }
 
-    const plugin = guildPlugins.find((p) => p.name === name)!;
-    const { configSchema, ...info } = baseInfo;
+    const { configSchema, ...info } = pluginInfo.docs;
     const formattedConfigSchema = formatZodConfigSchema(configSchema);
 
-    const messageCommands = (plugin.messageCommands || []).map((cmd) => ({
+    const messageCommands = (pluginInfo.plugin.messageCommands || []).map((cmd) => ({
       trigger: cmd.trigger,
       permission: cmd.permission,
       signature: cmd.signature,
@@ -133,10 +133,10 @@ export function initDocs(router: express.Router) {
       config: cmd.config,
     }));
 
-    const defaultOptions = plugin.defaultOptions || {};
+    const defaultOptions = pluginInfo.plugin.defaultOptions || {};
 
     res.json({
-      name,
+      name: pluginInfo.plugin.name,
       info,
       configSchema: formattedConfigSchema,
       defaultOptions,

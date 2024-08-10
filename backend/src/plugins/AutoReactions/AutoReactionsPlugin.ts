@@ -6,6 +6,7 @@ import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd.js";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd.js";
 import { AddReactionsEvt } from "./events/AddReactionsEvt.js";
 import { AutoReactionsPluginType, zAutoReactionsConfig } from "./types.js";
+import { autoReactionsPluginDocs } from "./docs.js";
 
 const defaultOptions: PluginOptions<AutoReactionsPluginType> = {
   config: {

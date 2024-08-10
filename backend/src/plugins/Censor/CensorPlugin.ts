@@ -6,6 +6,7 @@ import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { CensorPluginType, zCensorConfig } from "./types.js";
 import { onMessageCreate } from "./util/onMessageCreate.js";
 import { onMessageUpdate } from "./util/onMessageUpdate.js";
+import { censorPluginDocs } from "./docs.js";
 
 const defaultOptions: PluginOptions<CensorPluginType> = {
   config: {

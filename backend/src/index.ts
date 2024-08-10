@@ -40,7 +40,7 @@ import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPos
 import { consumeQueryStats } from "./data/queryLogger.js";
 import { env } from "./env.js";
 import { logger } from "./logger.js";
-import { baseGuildPlugins, globalPlugins, guildPlugins } from "./plugins/availablePlugins.js";
+import { availableGuildPlugins, availableGlobalPlugins } from "./plugins/availablePlugins.js";
 import { setProfiler } from "./profiler.js";
 import { logRateLimit } from "./rateLimitStats.js";
 import { startUptimeCounter } from "./uptime.js";
@@ -245,6 +245,7 @@ connect().then(async () => {
     ],
   });
   // FIXME: TS doesn't see Client as a child of EventEmitter for some reason
+  // If you're here because of an error from TS 5.5.2, see https://github.com/discordjs/discord.js/issues/10358
   (client as unknown as EventEmitter).setMaxListeners(200);
 
   const safe429DecayInterval = 5 * SECONDS;
@@ -274,8 +275,8 @@ connect().then(async () => {
   const guildConfigs = new Configs();
 
   const bot = new Knub(client, {
-    guildPlugins,
-    globalPlugins,
+    guildPlugins: availableGuildPlugins.map(obj => obj.plugin),
+    globalPlugins: availableGlobalPlugins.map(obj => obj.plugin),
 
     options: {
       canLoadGuild(guildId): Promise<boolean> {
@@ -284,7 +285,7 @@ connect().then(async () => {
 
       /**
        * Plugins are enabled if they...
-       * - are base plugins, i.e. always enabled, or
+       * - are marked to be autoloaded, or
        * - are explicitly enabled in the guild config
        * Dependencies are also automatically loaded by Knub.
        */
@@ -294,10 +295,10 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const basePluginNames = baseGuildPlugins.map((p) => p.name);
+        const autoloadPluginNames = availableGuildPlugins.filter(obj => obj.autoload).map(obj => obj.plugin.name);
 
         return Array.from(plugins.keys()).filter((pluginName) => {
-          if (basePluginNames.includes(pluginName)) return true;
+          if (autoloadPluginNames.includes(pluginName)) return true;
           return configuredPlugins[pluginName] && (configuredPlugins[pluginName] as any).enabled !== false;
         });
       },
