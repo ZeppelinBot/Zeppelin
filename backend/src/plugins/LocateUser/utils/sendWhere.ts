@@ -1,7 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, Invite, VoiceChannel } from "discord.js";
 import { GuildPluginData } from "knub";
 import { getInviteLink } from "knub/helpers";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { LocateUserPluginType } from "../types.js";
 import { createOrReuseInvite } from "./createOrReuseInvite.js";
 
@@ -22,7 +21,7 @@ export async function sendWhere(
     try {
       invite = await createOrReuseInvite(voice);
     } catch {
-      sendErrorMessage(pluginData, channel, "Cannot create an invite to that channel!");
+      void pluginData.state.common.sendErrorMessage(channel, "Cannot create an invite to that channel!");
       return;
     }
     channel.send({

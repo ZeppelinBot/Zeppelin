@@ -1,6 +1,5 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { TReactionRolePair, reactionRolesCmd } from "../types.js";
@@ -34,7 +33,10 @@ export const InitReactionRolesCmd = reactionRolesCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (!canReadChannel(args.message.channel, msg.member)) {
-      sendErrorMessage(pluginData, msg.channel, "You can't add reaction roles to channels you can't see yourself");
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        "You can't add reaction roles to channels you can't see yourself",
+      );
       return;
     }
 
@@ -43,7 +45,7 @@ export const InitReactionRolesCmd = reactionRolesCmd({
       targetMessage = await args.message.channel.messages.fetch(args.message.messageId);
     } catch (e) {
       if (isDiscordAPIError(e)) {
-        sendErrorMessage(pluginData, msg.channel, `Error ${e.code} while getting message: ${e.message}`);
+        void pluginData.state.common.sendErrorMessage(msg, `Error ${e.code} while getting message: ${e.message}`);
         return;
       }
 
@@ -71,30 +73,28 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     // Verify the specified emojis and roles are valid and usable
     for (const pair of emojiRolePairs) {
       if (pair[0] === CLEAR_ROLES_EMOJI) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
+        void pluginData.state.common.sendErrorMessage(
+          msg,
           `The emoji for clearing roles (${CLEAR_ROLES_EMOJI}) is reserved and cannot be used`,
         );
         return;
       }
 
       if (!isValidEmoji(pair[0])) {
-        sendErrorMessage(pluginData, msg.channel, `Invalid emoji: ${pair[0]}`);
+        void pluginData.state.common.sendErrorMessage(msg, `Invalid emoji: ${pair[0]}`);
         return;
       }
 
       if (!canUseEmoji(pluginData.client, pair[0])) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
+        void pluginData.state.common.sendErrorMessage(
+          msg,
           "I can only use regular emojis and custom emojis from servers I'm on",
         );
         return;
       }
 
       if (!pluginData.guild.roles.cache.has(pair[1] as Snowflake)) {
-        sendErrorMessage(pluginData, msg.channel, `Unknown role ${pair[1]}`);
+        void pluginData.state.common.sendErrorMessage(msg, `Unknown role ${pair[1]}`);
         return;
       }
     }
@@ -125,9 +125,9 @@ export const InitReactionRolesCmd = reactionRolesCmd({
     );
 
     if (errors?.length) {
-      sendErrorMessage(pluginData, msg.channel, `Errors while adding reaction roles:\n${errors.join("\n")}`);
+      void pluginData.state.common.sendErrorMessage(msg, `Errors while adding reaction roles:\n${errors.join("\n")}`);
     } else {
-      sendSuccessMessage(pluginData, msg.channel, "Reaction roles added");
+      void pluginData.state.common.sendSuccessMessage(msg, "Reaction roles added");
     }
 
     (await progressMessage).delete().catch(noop);

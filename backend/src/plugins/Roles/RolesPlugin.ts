@@ -1,5 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildLogs } from "../../data/GuildLogs.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
 import { AddRoleCmd } from "./commands/AddRoleCmd.js";
@@ -49,5 +50,9 @@ export const RolesPlugin = guildPlugin<RolesPluginType>()({
     const { state, guild } = pluginData;
 
     state.logs = new GuildLogs(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

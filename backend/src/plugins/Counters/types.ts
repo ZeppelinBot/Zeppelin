@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { BasePluginType } from "knub";
+import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { GuildCounters, MAX_COUNTER_VALUE, MIN_COUNTER_VALUE } from "../../data/GuildCounters.js";
 import {
@@ -9,6 +9,7 @@ import {
   parseCounterConditionString,
 } from "../../data/entities/CounterTrigger.js";
 import { zBoundedCharacters, zBoundedRecord, zDelayString } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import Timeout = NodeJS.Timeout;
 
 const MAX_COUNTERS = 5;
@@ -132,5 +133,6 @@ export interface CountersPluginType extends BasePluginType {
     decayTimers: Timeout[];
     events: CounterEventEmitter;
     counterTriggersByCounterId: Map<number, CounterTrigger[]>;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

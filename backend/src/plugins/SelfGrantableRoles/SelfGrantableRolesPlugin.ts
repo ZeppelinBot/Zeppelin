@@ -1,4 +1,5 @@
 import { CooldownManager, PluginOptions, guildPlugin } from "knub";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { RoleAddCmd } from "./commands/RoleAddCmd.js";
 import { RoleHelpCmd } from "./commands/RoleHelpCmd.js";
 import { RoleRemoveCmd } from "./commands/RoleRemoveCmd.js";
@@ -26,5 +27,9 @@ export const SelfGrantableRolesPlugin = guildPlugin<SelfGrantableRolesPluginType
 
   beforeLoad(pluginData) {
     pluginData.state.cooldowns = new CooldownManager();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { isStaffPreFilter, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
 import { renderUsername } from "../../../utils.js";
 import { botControlCmd } from "../types.js";
 
@@ -18,7 +18,7 @@ export const RemoveDashboardUserCmd = botControlCmd({
   async run({ pluginData, message: msg, args }) {
     const guild = await pluginData.state.allowedGuilds.find(args.guildId);
     if (!guild) {
-      sendErrorMessage(pluginData, msg.channel, "Server is not using Zeppelin");
+      void msg.channel.send("Server is not using Zeppelin");
       return;
     }
 
@@ -35,10 +35,7 @@ export const RemoveDashboardUserCmd = botControlCmd({
     }
 
     const userNameList = args.users.map((user) => `<@!${user.id}> (**${renderUsername(user)}**, \`${user.id}\`)`);
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
-      `The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`,
-    );
+
+    msg.channel.send(`The following users were removed from the dashboard for **${guild.name}**:\n\n${userNameList}`);
   },
 });

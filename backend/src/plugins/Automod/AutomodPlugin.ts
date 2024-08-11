@@ -8,6 +8,7 @@ import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";
 import { MINUTES, SECONDS } from "../../utils.js";
 import { registerEventListenersFromMap } from "../../utils/registerEventListenersFromMap.js";
 import { unregisterEventListenersFromMap } from "../../utils/unregisterEventListenersFromMap.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { CountersPlugin } from "../Counters/CountersPlugin.js";
 import { InternalPosterPlugin } from "../InternalPoster/InternalPosterPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
@@ -115,6 +116,10 @@ export const AutomodPlugin = guildPlugin<AutomodPluginType>()({
     state.archives = GuildArchives.getGuildInstance(guild.id);
 
     state.cachedAntiraidLevel = await state.antiraidLevels.get();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

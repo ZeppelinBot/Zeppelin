@@ -1,8 +1,9 @@
 import { ButtonStyle } from "discord.js";
-import { BasePluginType } from "knub";
+import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { GuildRoleButtons } from "../../data/GuildRoleButtons.js";
 import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { TooManyComponentsError } from "./functions/TooManyComponentsError.js";
 import { createButtonComponents } from "./functions/createButtonComponents.js";
 
@@ -109,5 +110,6 @@ export interface RoleButtonsPluginType extends BasePluginType {
   config: z.infer<typeof zRoleButtonsConfig>;
   state: {
     roleButtons: GuildRoleButtons;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

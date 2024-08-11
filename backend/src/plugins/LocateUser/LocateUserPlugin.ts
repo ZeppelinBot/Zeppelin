@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { onGuildEvent } from "../../data/GuildEvents.js";
 import { GuildVCAlerts } from "../../data/GuildVCAlerts.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { FollowCmd } from "./commands/FollowCmd.js";
 import { DeleteFollowCmd, ListFollowCmd } from "./commands/ListFollowCmd.js";
 import { WhereCmd } from "./commands/WhereCmd.js";
@@ -51,6 +52,10 @@ export const LocateUserPlugin = guildPlugin<LocateUserPluginType>()({
 
     state.alerts = GuildVCAlerts.getGuildInstance(guild.id);
     state.usersWithAlerts = [];
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

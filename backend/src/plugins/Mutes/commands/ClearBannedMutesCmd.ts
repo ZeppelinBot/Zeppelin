@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import { sendSuccessMessage } from "../../../pluginUtils.js";
 import { mutesCmd } from "../types.js";
 
 export const ClearBannedMutesCmd = mutesCmd({
@@ -25,6 +24,6 @@ export const ClearBannedMutesCmd = mutesCmd({
       }
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `Cleared ${cleared} mutes from banned users!`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Cleared ${cleared} mutes from banned users!`);
   },
 });

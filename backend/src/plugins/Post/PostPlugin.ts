@@ -3,6 +3,7 @@ import { onGuildEvent } from "../../data/GuildEvents.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildScheduledPosts } from "../../data/GuildScheduledPosts.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
 import { EditCmd } from "./commands/EditCmd.js";
@@ -53,6 +54,10 @@ export const PostPlugin = guildPlugin<PostPluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.scheduledPosts = GuildScheduledPosts.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

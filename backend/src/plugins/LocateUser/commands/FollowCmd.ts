@@ -2,7 +2,6 @@ import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { MINUTES, SECONDS } from "../../../utils.js";
 import { locateUserCmd } from "../types.js";
 
@@ -27,7 +26,7 @@ export const FollowCmd = locateUserCmd({
     const active = args.active || false;
 
     if (time < 30 * SECONDS) {
-      sendErrorMessage(pluginData, msg.channel, "Sorry, but the minimum duration for an alert is 30 seconds!");
+      void pluginData.state.common.sendErrorMessage(msg, "Sorry, but the minimum duration for an alert is 30 seconds!");
       return;
     }
 
@@ -46,17 +45,15 @@ export const FollowCmd = locateUserCmd({
     }
 
     if (active) {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendSuccessMessage(
+        msg,
         `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(
           time,
         )} i will notify and move you.\nPlease make sure to be in a voice channel, otherwise i cannot move you!`,
       );
     } else {
-      sendSuccessMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendSuccessMessage(
+        msg,
         `Every time <@${args.member.id}> joins or switches VC in the next ${humanizeDuration(time)} i will notify you`,
       );
     }

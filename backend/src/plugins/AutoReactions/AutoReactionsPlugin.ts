@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildAutoReactions } from "../../data/GuildAutoReactions.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { DisableAutoReactionsCmd } from "./commands/DisableAutoReactionsCmd.js";
 import { NewAutoReactionsCmd } from "./commands/NewAutoReactionsCmd.js";
@@ -49,5 +50,9 @@ export const AutoReactionsPlugin = guildPlugin<AutoReactionsPluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.autoReactions = GuildAutoReactions.getGuildInstance(guild.id);
     state.cache = new Map();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

@@ -1,6 +1,5 @@
 import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
 import { remindersCmd } from "../types.js";
@@ -12,7 +11,7 @@ export const RemindersCmd = remindersCmd({
   async run({ message: msg, pluginData }) {
     const reminders = await pluginData.state.reminders.getRemindersByUserId(msg.author.id);
     if (reminders.length === 0) {
-      sendErrorMessage(pluginData, msg.channel, "No reminders");
+      void pluginData.state.common.sendErrorMessage(msg, "No reminders");
       return;
     }
 

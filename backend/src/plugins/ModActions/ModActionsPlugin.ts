@@ -10,44 +10,69 @@ import { GuildTempbans } from "../../data/GuildTempbans.js";
 import { makePublicFn, mapToPublicFn } from "../../pluginUtils.js";
 import { MINUTES } from "../../utils.js";
 import { CasesPlugin } from "../Cases/CasesPlugin.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { MutesPlugin } from "../Mutes/MutesPlugin.js";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
-import { AddCaseCmd } from "./commands/AddCaseCmd.js";
-import { BanCmd } from "./commands/BanCmd.js";
-import { CaseCmd } from "./commands/CaseCmd.js";
-import { CasesModCmd } from "./commands/CasesModCmd.js";
-import { CasesUserCmd } from "./commands/CasesUserCmd.js";
-import { DeleteCaseCmd } from "./commands/DeleteCaseCmd.js";
-import { ForcebanCmd } from "./commands/ForcebanCmd.js";
-import { ForcemuteCmd } from "./commands/ForcemuteCmd.js";
-import { ForceUnmuteCmd } from "./commands/ForceunmuteCmd.js";
-import { HideCaseCmd } from "./commands/HideCaseCmd.js";
-import { KickCmd } from "./commands/KickCmd.js";
-import { MassbanCmd } from "./commands/MassBanCmd.js";
-import { MassunbanCmd } from "./commands/MassUnbanCmd.js";
-import { MassmuteCmd } from "./commands/MassmuteCmd.js";
-import { MuteCmd } from "./commands/MuteCmd.js";
-import { NoteCmd } from "./commands/NoteCmd.js";
-import { SoftbanCmd } from "./commands/SoftbanCommand.js";
-import { UnbanCmd } from "./commands/UnbanCmd.js";
-import { UnhideCaseCmd } from "./commands/UnhideCaseCmd.js";
-import { UnmuteCmd } from "./commands/UnmuteCmd.js";
-import { UpdateCmd } from "./commands/UpdateCmd.js";
-import { WarnCmd } from "./commands/WarnCmd.js";
+import { AddCaseMsgCmd } from "./commands/addcase/AddCaseMsgCmd.js";
+import { AddCaseSlashCmd } from "./commands/addcase/AddCaseSlashCmd.js";
+import { BanMsgCmd } from "./commands/ban/BanMsgCmd.js";
+import { BanSlashCmd } from "./commands/ban/BanSlashCmd.js";
+import { CaseMsgCmd } from "./commands/case/CaseMsgCmd.js";
+import { CaseSlashCmd } from "./commands/case/CaseSlashCmd.js";
+import { CasesModMsgCmd } from "./commands/cases/CasesModMsgCmd.js";
+import { CasesSlashCmd } from "./commands/cases/CasesSlashCmd.js";
+import { CasesUserMsgCmd } from "./commands/cases/CasesUserMsgCmd.js";
+import { DeleteCaseMsgCmd } from "./commands/deletecase/DeleteCaseMsgCmd.js";
+import { DeleteCaseSlashCmd } from "./commands/deletecase/DeleteCaseSlashCmd.js";
+import { ForceBanMsgCmd } from "./commands/forceban/ForceBanMsgCmd.js";
+import { ForceBanSlashCmd } from "./commands/forceban/ForceBanSlashCmd.js";
+import { ForceMuteMsgCmd } from "./commands/forcemute/ForceMuteMsgCmd.js";
+import { ForceMuteSlashCmd } from "./commands/forcemute/ForceMuteSlashCmd.js";
+import { ForceUnmuteMsgCmd } from "./commands/forceunmute/ForceUnmuteMsgCmd.js";
+import { ForceUnmuteSlashCmd } from "./commands/forceunmute/ForceUnmuteSlashCmd.js";
+import { HideCaseMsgCmd } from "./commands/hidecase/HideCaseMsgCmd.js";
+import { HideCaseSlashCmd } from "./commands/hidecase/HideCaseSlashCmd.js";
+import { KickMsgCmd } from "./commands/kick/KickMsgCmd.js";
+import { KickSlashCmd } from "./commands/kick/KickSlashCmd.js";
+import { MassBanMsgCmd } from "./commands/massban/MassBanMsgCmd.js";
+import { MassBanSlashCmd } from "./commands/massban/MassBanSlashCmd.js";
+import { MassMuteMsgCmd } from "./commands/massmute/MassMuteMsgCmd.js";
+import { MassMuteSlashSlashCmd } from "./commands/massmute/MassMuteSlashCmd.js";
+import { MassUnbanMsgCmd } from "./commands/massunban/MassUnbanMsgCmd.js";
+import { MassUnbanSlashCmd } from "./commands/massunban/MassUnbanSlashCmd.js";
+import { MuteMsgCmd } from "./commands/mute/MuteMsgCmd.js";
+import { MuteSlashCmd } from "./commands/mute/MuteSlashCmd.js";
+import { NoteMsgCmd } from "./commands/note/NoteMsgCmd.js";
+import { NoteSlashCmd } from "./commands/note/NoteSlashCmd.js";
+import { UnbanMsgCmd } from "./commands/unban/UnbanMsgCmd.js";
+import { UnbanSlashCmd } from "./commands/unban/UnbanSlashCmd.js";
+import { UnhideCaseMsgCmd } from "./commands/unhidecase/UnhideCaseMsgCmd.js";
+import { UnhideCaseSlashCmd } from "./commands/unhidecase/UnhideCaseSlashCmd.js";
+import { UnmuteMsgCmd } from "./commands/unmute/UnmuteMsgCmd.js";
+import { UnmuteSlashCmd } from "./commands/unmute/UnmuteSlashCmd.js";
+import { UpdateMsgCmd } from "./commands/update/UpdateMsgCmd.js";
+import { UpdateSlashCmd } from "./commands/update/UpdateSlashCmd.js";
+import { WarnMsgCmd } from "./commands/warn/WarnMsgCmd.js";
+import { WarnSlashCmd } from "./commands/warn/WarnSlashCmd.js";
 import { AuditLogEvents } from "./events/AuditLogEvents.js";
 import { CreateBanCaseOnManualBanEvt } from "./events/CreateBanCaseOnManualBanEvt.js";
 import { CreateUnbanCaseOnManualUnbanEvt } from "./events/CreateUnbanCaseOnManualUnbanEvt.js";
 import { PostAlertOnMemberJoinEvt } from "./events/PostAlertOnMemberJoinEvt.js";
 import { banUserId } from "./functions/banUserId.js";
 import { clearTempban } from "./functions/clearTempban.js";
-import { hasMutePermission } from "./functions/hasMutePerm.js";
+import {
+  hasBanPermission,
+  hasMutePermission,
+  hasNotePermission,
+  hasWarnPermission,
+} from "./functions/hasModActionPerm.js";
 import { kickMember } from "./functions/kickMember.js";
 import { offModActionsEvent } from "./functions/offModActionsEvent.js";
 import { onModActionsEvent } from "./functions/onModActionsEvent.js";
 import { updateCase } from "./functions/updateCase.js";
 import { warnMember } from "./functions/warnMember.js";
-import { ModActionsPluginType, zModActionsConfig } from "./types.js";
+import { AttachmentLinkReactionType, ModActionsPluginType, modActionsSlashGroup, zModActionsConfig } from "./types.js";
 
 const defaultOptions = {
   config: {
@@ -69,6 +94,7 @@ const defaultOptions = {
     warn_notify_message:
       "The user already has **{priorWarnings}** warnings!\n Please check their prior cases and assess whether or not to warn anyways.\n Proceed with the warning?",
     ban_delete_message_days: 1,
+    attachment_link_reaction: "warn" as AttachmentLinkReactionType,
 
     can_note: false,
     can_warn: false,
@@ -122,29 +148,58 @@ export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
 
   events: [CreateBanCaseOnManualBanEvt, CreateUnbanCaseOnManualUnbanEvt, PostAlertOnMemberJoinEvt, AuditLogEvents],
 
+  slashCommands: [
+    modActionsSlashGroup({
+      name: "mod",
+      description: "Moderation actions",
+      defaultMemberPermissions: "0",
+      subcommands: [
+        AddCaseSlashCmd,
+        BanSlashCmd,
+        CaseSlashCmd,
+        CasesSlashCmd,
+        DeleteCaseSlashCmd,
+        ForceBanSlashCmd,
+        ForceMuteSlashCmd,
+        ForceUnmuteSlashCmd,
+        HideCaseSlashCmd,
+        KickSlashCmd,
+        MassBanSlashCmd,
+        MassMuteSlashSlashCmd,
+        MassUnbanSlashCmd,
+        MuteSlashCmd,
+        NoteSlashCmd,
+        UnbanSlashCmd,
+        UnhideCaseSlashCmd,
+        UnmuteSlashCmd,
+        UpdateSlashCmd,
+        WarnSlashCmd,
+      ],
+    }),
+  ],
+
   messageCommands: [
-    UpdateCmd,
-    NoteCmd,
-    WarnCmd,
-    MuteCmd,
-    ForcemuteCmd,
-    UnmuteCmd,
-    ForceUnmuteCmd,
-    KickCmd,
-    SoftbanCmd,
-    BanCmd,
-    UnbanCmd,
-    ForcebanCmd,
-    MassbanCmd,
-    MassmuteCmd,
-    MassunbanCmd,
-    AddCaseCmd,
-    CaseCmd,
-    CasesUserCmd,
-    CasesModCmd,
-    HideCaseCmd,
-    UnhideCaseCmd,
-    DeleteCaseCmd,
+    UpdateMsgCmd,
+    NoteMsgCmd,
+    WarnMsgCmd,
+    MuteMsgCmd,
+    ForceMuteMsgCmd,
+    UnmuteMsgCmd,
+    ForceUnmuteMsgCmd,
+    KickMsgCmd,
+    BanMsgCmd,
+    UnbanMsgCmd,
+    ForceBanMsgCmd,
+    MassBanMsgCmd,
+    MassMuteMsgCmd,
+    MassUnbanMsgCmd,
+    AddCaseMsgCmd,
+    CaseMsgCmd,
+    CasesUserMsgCmd,
+    CasesModMsgCmd,
+    HideCaseMsgCmd,
+    UnhideCaseMsgCmd,
+    DeleteCaseMsgCmd,
   ],
 
   public(pluginData) {
@@ -153,8 +208,11 @@ export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
       kickMember: makePublicFn(pluginData, kickMember),
       banUserId: makePublicFn(pluginData, banUserId),
       updateCase: (msg: Message, caseNumber: number | null, note: string) =>
-        updateCase(pluginData, msg, { caseNumber, note }),
+        updateCase(pluginData, msg, msg.author, caseNumber ?? undefined, note, [...msg.attachments.values()]),
+      hasNotePermission: makePublicFn(pluginData, hasNotePermission),
+      hasWarnPermission: makePublicFn(pluginData, hasWarnPermission),
       hasMutePermission: makePublicFn(pluginData, hasMutePermission),
+      hasBanPermission: makePublicFn(pluginData, hasBanPermission),
       on: mapToPublicFn(onModActionsEvent),
       off: mapToPublicFn(offModActionsEvent),
       getEventEmitter: () => pluginData.state.events,
@@ -176,6 +234,10 @@ export const ModActionsPlugin = guildPlugin<ModActionsPluginType>()({
     state.massbanQueue = new Queue(15 * MINUTES);
 
     state.events = new EventEmitter();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

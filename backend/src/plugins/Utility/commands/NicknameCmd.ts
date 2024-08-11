@@ -1,6 +1,6 @@
 import { escapeBold } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn, sendSuccessMessage } from "../../../pluginUtils.js";
+import { canActOn } from "../../../pluginUtils.js";
 import { errorMessage } from "../../../utils.js";
 import { utilityCmd } from "../types.js";
 
@@ -45,9 +45,8 @@ export const NicknameCmd = utilityCmd({
       return;
     }
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
       `Changed nickname of <@!${args.member.id}> from **${oldNickname}** to **${args.nickname}**`,
     );
   },

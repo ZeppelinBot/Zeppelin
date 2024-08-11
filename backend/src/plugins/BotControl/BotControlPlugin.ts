@@ -4,7 +4,6 @@ import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { ApiPermissionAssignments } from "../../data/ApiPermissionAssignments.js";
 import { Configs } from "../../data/Configs.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
-import { sendSuccessMessage } from "../../pluginUtils.js";
 import { getActiveReload, resetActiveReload } from "./activeReload.js";
 import { AddDashboardUserCmd } from "./commands/AddDashboardUserCmd.js";
 import { AddServerFromInviteCmd } from "./commands/AddServerFromInviteCmd.js";
@@ -77,7 +76,7 @@ export const BotControlPlugin = globalPlugin<BotControlPluginType>()({
       if (guild) {
         const channel = guild.channels.cache.get(channelId as Snowflake);
         if (channel instanceof TextChannel) {
-          sendSuccessMessage(pluginData, channel, "Global plugins reloaded!");
+          void channel.send("Global plugins reloaded!");
         }
       }
     }

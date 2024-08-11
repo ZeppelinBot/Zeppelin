@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed.js";
 import { utilityCmd } from "../types.js";
@@ -16,13 +15,13 @@ export const MessageInfoCmd = utilityCmd({
 
   async run({ message, args, pluginData }) {
     if (!canReadChannel(args.message.channel, message.member)) {
-      sendErrorMessage(pluginData, message.channel, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(message, "Unknown message");
       return;
     }
 
     const embed = await getMessageInfoEmbed(pluginData, args.message.channel.id, args.message.messageId);
     if (!embed) {
-      sendErrorMessage(pluginData, message.channel, "Unknown message");
+      void pluginData.state.common.sendErrorMessage(message, "Unknown message");
       return;
     }
 

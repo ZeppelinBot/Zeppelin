@@ -1,6 +1,6 @@
 import { GuildMember, PermissionFlagsBits } from "discord.js";
 import { GuildPluginData } from "knub";
-import intersection from "lodash/intersection.js";
+import intersection from "lodash.intersection";
 import { PersistedData } from "../../../data/entities/PersistedData.js";
 import { SECONDS } from "../../../utils.js";
 import { canAssignRole } from "../../../utils/canAssignRole.js";

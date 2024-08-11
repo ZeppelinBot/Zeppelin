@@ -1,6 +1,5 @@
 import { Snowflake, TextChannel } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { messageLink } from "../../../utils.js";
 import { canReadChannel } from "../../../utils/canReadChannel.js";
 import { utilityCmd } from "../types.js";
@@ -23,7 +22,7 @@ export const ContextCmd = utilityCmd({
 
   async run({ message: msg, args, pluginData }) {
     if (args.channel && !(args.channel instanceof TextChannel)) {
-      sendErrorMessage(pluginData, msg.channel, "Channel must be a text channel");
+      void pluginData.state.common.sendErrorMessage(msg, "Channel must be a text channel");
       return;
     }
 
@@ -31,7 +30,7 @@ export const ContextCmd = utilityCmd({
     const messageId = args.messageId ?? args.message.messageId;
 
     if (!canReadChannel(channel, msg.member)) {
-      sendErrorMessage(pluginData, msg.channel, "Message context not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Message context not found");
       return;
     }
 
@@ -42,7 +41,7 @@ export const ContextCmd = utilityCmd({
       })
     )[0];
     if (!previousMessage) {
-      sendErrorMessage(pluginData, msg.channel, "Message context not found");
+      void pluginData.state.common.sendErrorMessage(msg, "Message context not found");
       return;
     }
 

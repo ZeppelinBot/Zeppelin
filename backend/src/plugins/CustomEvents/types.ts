@@ -1,6 +1,7 @@
-import { BasePluginType } from "knub";
+import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
 import { zBoundedCharacters, zBoundedRecord } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { zAddRoleAction } from "./actions/addRoleAction.js";
 import { zCreateCaseAction } from "./actions/createCaseAction.js";
 import { zMakeRoleMentionableAction } from "./actions/makeRoleMentionableAction.js";
@@ -43,5 +44,6 @@ export interface CustomEventsPluginType extends BasePluginType {
   config: z.infer<typeof zCustomEventsConfig>;
   state: {
     clearTriggers: () => void;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }

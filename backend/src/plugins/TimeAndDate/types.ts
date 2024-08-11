@@ -1,9 +1,10 @@
-import { BasePluginType, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
 import { U } from "ts-toolbelt";
 import z from "zod";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { keys } from "../../utils.js";
 import { zValidTimezone } from "../../utils/zValidTimezone.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { defaultDateFormats } from "./defaultDateFormats.js";
 
 const zDateFormatKeys = z.enum(keys(defaultDateFormats) as U.ListOf<keyof typeof defaultDateFormats>);
@@ -18,6 +19,7 @@ export interface TimeAndDatePluginType extends BasePluginType {
   config: z.infer<typeof zTimeAndDateConfig>;
   state: {
     memberTimezones: GuildMemberTimezones;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

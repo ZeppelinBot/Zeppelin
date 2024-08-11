@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage } from "../../../pluginUtils.js";
 import { getCustomEmojiId } from "../functions/getCustomEmojiId.js";
 import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed.js";
 import { utilityCmd } from "../types.js";
@@ -17,13 +16,13 @@ export const EmojiInfoCmd = utilityCmd({
   async run({ message, args, pluginData }) {
     const emojiId = getCustomEmojiId(args.emoji);
     if (!emojiId) {
-      sendErrorMessage(pluginData, message.channel, "Emoji not found");
+      void pluginData.state.common.sendErrorMessage(message, "Emoji not found");
       return;
     }
 
     const embed = await getEmojiInfoEmbed(pluginData, emojiId);
     if (!embed) {
-      sendErrorMessage(pluginData, message.channel, "Emoji not found");
+      void pluginData.state.common.sendErrorMessage(message, "Emoji not found");
       return;
     }
 

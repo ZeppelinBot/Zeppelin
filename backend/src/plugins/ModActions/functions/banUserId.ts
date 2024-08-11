@@ -30,6 +30,7 @@ export async function banUserId(
   pluginData: GuildPluginData<ModActionsPluginType>,
   userId: string,
   reason?: string,
+  reasonWithAttachments?: string,
   banOptions: BanOptions = {},
   banTime?: number,
 ): Promise<BanResult> {
@@ -45,7 +46,7 @@ export async function banUserId(
   // Attempt to message the user *before* banning them, as doing it after may not be possible
   const member = await resolveMember(pluginData.client, pluginData.guild, userId);
   let notifyResult: UserNotificationResult = { method: null, success: true };
-  if (reason && member) {
+  if (reasonWithAttachments && member) {
     const contactMethods = banOptions?.contactMethods
       ? banOptions.contactMethods
       : getDefaultContactMethods(pluginData, "ban");
@@ -58,7 +59,7 @@ export async function banUserId(
             config.ban_message,
             new TemplateSafeValueContainer({
               guildName: pluginData.guild.name,
-              reason,
+              reason: reasonWithAttachments,
               moderator: banOptions.caseArgs?.modId
                 ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
                 : null,
@@ -82,7 +83,7 @@ export async function banUserId(
             config.tempban_message,
             new TemplateSafeValueContainer({
               guildName: pluginData.guild.name,
-              reason,
+              reason: reasonWithAttachments,
               moderator: banOptions.caseArgs?.modId
                 ? userToTemplateSafeUser(await resolveUser(pluginData.client, banOptions.caseArgs.modId))
                 : null,

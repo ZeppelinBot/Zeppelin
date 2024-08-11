@@ -1,6 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { clearExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { createChunkedMessage, sorter } from "../../../utils.js";
 import { locateUserCmd } from "../types.js";
 
@@ -13,7 +12,7 @@ export const ListFollowCmd = locateUserCmd({
   async run({ message: msg, pluginData }) {
     const alerts = await pluginData.state.alerts.getAlertsByRequestorId(msg.member.id);
     if (alerts.length === 0) {
-      sendErrorMessage(pluginData, msg.channel, "You have no active alerts!");
+      void pluginData.state.common.sendErrorMessage(msg, "You have no active alerts!");
       return;
     }
 
@@ -46,7 +45,7 @@ export const DeleteFollowCmd = locateUserCmd({
     alerts.sort(sorter("expires_at"));
 
     if (args.num > alerts.length || args.num <= 0) {
-      sendErrorMessage(pluginData, msg.channel, "Unknown alert!");
+      void pluginData.state.common.sendErrorMessage(msg, "Unknown alert!");
       return;
     }
 
@@ -54,6 +53,6 @@ export const DeleteFollowCmd = locateUserCmd({
     clearExpiringVCAlert(toDelete);
     await pluginData.state.alerts.delete(toDelete.id);
 
-    sendSuccessMessage(pluginData, msg.channel, "Alert deleted");
+    void pluginData.state.common.sendSuccessMessage(msg, "Alert deleted");
   },
 });

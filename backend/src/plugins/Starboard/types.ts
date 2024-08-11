@@ -1,9 +1,10 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildStarboardMessages } from "../../data/GuildStarboardMessages.js";
 import { GuildStarboardReactions } from "../../data/GuildStarboardReactions.js";
 import { zBoundedRecord, zSnowflake } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 const zStarboardOpts = z.strictObject({
   channel_id: zSnowflake,
@@ -29,6 +30,7 @@ export interface StarboardPluginType extends BasePluginType {
     savedMessages: GuildSavedMessages;
     starboardMessages: GuildStarboardMessages;
     starboardReactions: GuildStarboardReactions;
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
 
     onMessageDeleteFn;
   };

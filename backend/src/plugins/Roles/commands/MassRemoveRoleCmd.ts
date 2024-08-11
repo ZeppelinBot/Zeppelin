@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn, sendErrorMessage } from "../../../pluginUtils.js";
+import { canActOn } from "../../../pluginUtils.js";
 import { resolveMember, resolveRoleId, successMessage } from "../../../utils.js";
 import { LogsPlugin } from "../../Logs/LogsPlugin.js";
 import { RoleManagerPlugin } from "../../RoleManager/RoleManagerPlugin.js";
@@ -28,9 +28,8 @@ export const MassRemoveRoleCmd = rolesCmd({
 
     for (const member of members) {
       if (!canActOn(pluginData, msg.member, member, true)) {
-        sendErrorMessage(
-          pluginData,
-          msg.channel,
+        void pluginData.state.common.sendErrorMessage(
+          msg,
           "Cannot add roles to 1 or more specified members: insufficient permissions",
         );
         return;
@@ -39,13 +38,13 @@ export const MassRemoveRoleCmd = rolesCmd({
 
     const roleId = await resolveRoleId(pluginData.client, pluginData.guild.id, args.role);
     if (!roleId) {
-      sendErrorMessage(pluginData, msg.channel, "Invalid role id");
+      void pluginData.state.common.sendErrorMessage(msg, "Invalid role id");
       return;
     }
 
     const config = await pluginData.config.getForMessage(msg);
     if (!config.assignable_roles.includes(roleId)) {
-      sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      void pluginData.state.common.sendErrorMessage(msg, "You cannot remove that role");
       return;
     }
 
@@ -54,7 +53,7 @@ export const MassRemoveRoleCmd = rolesCmd({
       pluginData.getPlugin(LogsPlugin).logBotAlert({
         body: `Unknown role configured for 'roles' plugin: ${roleId}`,
       });
-      sendErrorMessage(pluginData, msg.channel, "You cannot remove that role");
+      void pluginData.state.common.sendErrorMessage(msg, "You cannot remove that role");
       return;
     }
 

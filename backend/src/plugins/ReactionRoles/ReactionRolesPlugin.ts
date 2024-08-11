@@ -2,6 +2,7 @@ import { PluginOptions, guildPlugin } from "knub";
 import { Queue } from "../../Queue.js";
 import { GuildReactionRoles } from "../../data/GuildReactionRoles.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { ClearReactionRolesCmd } from "./commands/ClearReactionRolesCmd.js";
 import { InitReactionRolesCmd } from "./commands/InitReactionRolesCmd.js";
@@ -61,6 +62,10 @@ export const ReactionRolesPlugin = guildPlugin<ReactionRolesPluginType>()({
     state.roleChangeQueue = new Queue();
     state.pendingRoleChanges = new Map();
     state.pendingRefreshes = new Set();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

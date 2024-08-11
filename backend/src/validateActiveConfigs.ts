@@ -1,11 +1,9 @@
-import jsYaml from "js-yaml";
+import { YAMLException } from "js-yaml";
 import { validateGuildConfig } from "./configValidator.js";
 import { Configs } from "./data/Configs.js";
 import { connect, disconnect } from "./data/db.js";
 import { loadYamlSafely } from "./utils/loadYamlSafely.js";
 import { ObjectAliasError } from "./utils/validateNoObjectAliases.js";
-
-const YAMLException = jsYaml.YAMLException;
 
 function writeError(key: string, error: string) {
   const indented = error

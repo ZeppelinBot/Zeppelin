@@ -1,5 +1,6 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd.js";
 import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd.js";
 import { PingableRolesPluginType, zPingableRolesConfig } from "./types.js";
@@ -43,5 +44,9 @@ export const PingableRolesPlugin = guildPlugin<PingableRolesPluginType>()({
     state.pingableRoles = GuildPingableRoles.getGuildInstance(guild.id);
     state.cache = new Map();
     state.timeouts = new Map();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

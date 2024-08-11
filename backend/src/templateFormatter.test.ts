@@ -1,10 +1,5 @@
 import test from "ava";
-import {
-  parseTemplate,
-  renderParsedTemplate,
-  renderTemplate,
-  TemplateSafeValueContainer,
-} from "./templateFormatter.js";
+import { parseTemplate, renderParsedTemplate, renderTemplate, TemplateSafeValueContainer } from "./templateFormatter.js";
 
 test("Parses plain string templates correctly", (t) => {
   const result = parseTemplate("foo bar baz");

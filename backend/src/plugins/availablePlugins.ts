@@ -11,6 +11,8 @@ import { CasesPlugin } from "./Cases/CasesPlugin.js";
 import { casesPluginDocs } from "./Cases/docs.js";
 import { CensorPlugin } from "./Censor/CensorPlugin.js";
 import { censorPluginDocs } from "./Censor/docs.js";
+import { CommonPlugin } from "./Common/CommonPlugin.js";
+import { commonPluginDocs } from "./Common/docs.js";
 import { CompanionChannelsPlugin } from "./CompanionChannels/CompanionChannelsPlugin.js";
 import { companionChannelsPluginDocs } from "./CompanionChannels/docs.js";
 import { ContextMenuPlugin } from "./ContextMenus/ContextMenuPlugin.js";
@@ -228,6 +230,11 @@ export const availableGuildPlugins: ZeppelinGuildPluginInfo[] = [
   {
     plugin: WelcomeMessagePlugin,
     docs: welcomeMessagePluginDocs,
+  },
+  {
+    plugin: CommonPlugin,
+    docs: commonPluginDocs,
+    autoload: true,
   },
 ];
 

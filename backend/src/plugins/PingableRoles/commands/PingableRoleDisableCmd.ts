@@ -1,5 +1,4 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { pingableRolesCmd } from "../types.js";
 
 export const PingableRoleDisableCmd = pingableRolesCmd({
@@ -14,16 +13,18 @@ export const PingableRoleDisableCmd = pingableRolesCmd({
   async run({ message: msg, args, pluginData }) {
     const pingableRole = await pluginData.state.pingableRoles.getByChannelAndRoleId(args.channelId, args.role.id);
     if (!pingableRole) {
-      sendErrorMessage(pluginData, msg.channel, `**${args.role.name}** is not set as pingable in <#${args.channelId}>`);
+      void pluginData.state.common.sendErrorMessage(
+        msg,
+        `**${args.role.name}** is not set as pingable in <#${args.channelId}>`,
+      );
       return;
     }
 
     await pluginData.state.pingableRoles.delete(args.channelId, args.role.id);
     pluginData.state.cache.delete(args.channelId);
 
-    sendSuccessMessage(
-      pluginData,
-      msg.channel,
+    void pluginData.state.common.sendSuccessMessage(
+      msg,
       `**${args.role.name}** is no longer set as pingable in <#${args.channelId}>`,
     );
   },

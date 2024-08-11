@@ -1,5 +1,5 @@
 import { GuildMember, GuildTextBasedChannel, PartialGuildMember, ThreadChannel, User } from "discord.js";
-import { BasePluginType, CooldownManager } from "knub";
+import { BasePluginType, CooldownManager, pluginUtils } from "knub";
 import z from "zod";
 import { Queue } from "../../Queue.js";
 import { RegExpRunner } from "../../RegExpRunner.js";
@@ -9,6 +9,7 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { SavedMessage } from "../../data/entities/SavedMessage.js";
 import { entries, zBoundedRecord, zDelayString } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { CounterEvents } from "../Counters/types.js";
 import { ModActionType, ModActionsEvents } from "../ModActions/types.js";
 import { MutesEvents } from "../Mutes/types.js";
@@ -140,6 +141,8 @@ export interface AutomodPluginType extends BasePluginType {
 
     modActionsListeners: Map<keyof ModActionsEvents, any>;
     mutesListeners: Map<keyof MutesEvents, any>;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

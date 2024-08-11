@@ -1,6 +1,5 @@
 import { Snowflake } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { memberRolesLock } from "../../../utils/lockNameHelpers.js";
 import { selfGrantableRolesCmd } from "../types.js";
 import { findMatchingRoles } from "../util/findMatchingRoles.js";
@@ -46,35 +45,37 @@ export const RoleRemoveCmd = selfGrantableRolesCmd({
         const removedRolesWord = rolesToRemove.length === 1 ? "role" : "roles";
 
         if (rolesToRemove.length !== roleNames.length) {
-          sendSuccessMessage(
-            pluginData,
-            msg.channel,
+          void pluginData.state.common.sendSuccessMessage(
+            msg,
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord};` +
               ` couldn't recognize the other roles you mentioned`,
             { users: [msg.author.id] },
           );
         } else {
-          sendSuccessMessage(
-            pluginData,
-            msg.channel,
+          void pluginData.state.common.sendSuccessMessage(
+            msg,
             `<@!${msg.author.id}> Removed ${removedRolesStr.join(", ")} ${removedRolesWord}`,
-            { users: [msg.author.id] },
+            {
+              users: [msg.author.id],
+            },
           );
         }
       } catch {
-        sendSuccessMessage(
-          pluginData,
-          msg.channel,
+        void pluginData.state.common.sendSuccessMessage(
+          msg,
           `<@!${msg.author.id}> Got an error while trying to remove the roles`,
-          { users: [msg.author.id] },
+          {
+            users: [msg.author.id],
+          },
         );
       }
     } else {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      void pluginData.state.common.sendErrorMessage(
+        msg,
         `<@!${msg.author.id}> Unknown ${args.roleNames.length === 1 ? "role" : "roles"}`,
-        { users: [msg.author.id] },
+        {
+          users: [msg.author.id],
+        },
       );
     }
 

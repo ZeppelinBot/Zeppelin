@@ -8,6 +8,7 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildTags } from "../../data/GuildTags.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { convertDelayStringToMS } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
 import { TagCreateCmd } from "./commands/TagCreateCmd.js";
@@ -89,6 +90,10 @@ export const TagsPlugin = guildPlugin<TagsPluginType>()({
     state.logs = new GuildLogs(guild.id);
 
     state.tagFunctions = {};
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

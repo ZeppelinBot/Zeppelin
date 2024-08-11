@@ -1,6 +1,7 @@
 import { PluginOptions, guildPlugin } from "knub";
 import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
 import { makePublicFn } from "../../pluginUtils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd.js";
 import { SetTimezoneCmd } from "./commands/SetTimezoneCmd.js";
 import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd.js";
@@ -56,5 +57,9 @@ export const TimeAndDatePlugin = guildPlugin<TimeAndDatePluginType>()({
     const { state, guild } = pluginData;
 
     state.memberTimezones = GuildMemberTimezones.getGuildInstance(guild.id);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 });

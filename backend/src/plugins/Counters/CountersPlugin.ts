@@ -4,6 +4,7 @@ import { GuildCounters } from "../../data/GuildCounters.js";
 import { CounterTrigger, parseCounterConditionString } from "../../data/entities/CounterTrigger.js";
 import { makePublicFn } from "../../pluginUtils.js";
 import { MINUTES, convertDelayStringToMS, values } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { AddCounterCmd } from "./commands/AddCounterCmd.js";
 import { CountersListCmd } from "./commands/CountersListCmd.js";
 import { ResetAllCounterValuesCmd } from "./commands/ResetAllCounterValuesCmd.js";
@@ -125,6 +126,10 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
 
     // Mark old/unused triggers to be deleted later
     await state.counters.markUnusedTriggersToBeDeleted(activeTriggerIds);
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   async afterLoad(pluginData) {

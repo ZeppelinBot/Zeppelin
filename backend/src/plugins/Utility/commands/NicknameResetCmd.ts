@@ -1,5 +1,5 @@
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { canActOn, sendSuccessMessage } from "../../../pluginUtils.js";
+import { canActOn } from "../../../pluginUtils.js";
 import { errorMessage } from "../../../utils.js";
 import { utilityCmd } from "../types.js";
 
@@ -31,6 +31,6 @@ export const NicknameResetCmd = utilityCmd({
       return;
     }
 
-    sendSuccessMessage(pluginData, msg.channel, `The nickname of <@!${args.member.id}> has been reset`);
+    void pluginData.state.common.sendSuccessMessage(msg, `The nickname of <@!${args.member.id}> has been reset`);
   },
 });

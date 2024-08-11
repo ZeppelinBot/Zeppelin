@@ -1,4 +1,4 @@
-import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand } from "knub";
+import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
 import { RegExpRunner } from "../../RegExpRunner.js";
 import { GuildArchives } from "../../data/GuildArchives.js";
@@ -6,6 +6,7 @@ import { GuildCases } from "../../data/GuildCases.js";
 import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { Supporters } from "../../data/Supporters.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zUtilityConfig = z.strictObject({
   can_roles: z.boolean(),
@@ -48,6 +49,8 @@ export interface UtilityPluginType extends BasePluginType {
     regexRunner: RegExpRunner;
 
     lastReload: number;
+
+    common: pluginUtils.PluginPublicInterface<typeof CommonPlugin>;
   };
 }
 

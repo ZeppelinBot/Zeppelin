@@ -3,6 +3,7 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildSlowmodes } from "../../data/GuildSlowmodes.js";
 import { SECONDS } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { SlowmodeClearCmd } from "./commands/SlowmodeClearCmd.js";
 import { SlowmodeDisableCmd } from "./commands/SlowmodeDisableCmd.js";
@@ -61,6 +62,10 @@ export const SlowmodePlugin = guildPlugin<SlowmodePluginType>()({
     state.savedMessages = GuildSavedMessages.getGuildInstance(guild.id);
     state.logs = new GuildLogs(guild.id);
     state.channelSlowmodeCache = new Map();
+  },
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
   },
 
   afterLoad(pluginData) {

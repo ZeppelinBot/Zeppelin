@@ -1,30 +1,31 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildContextMenuLinks } from "../../data/GuildContextMenuLinks.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { CasesPlugin } from "../Cases/CasesPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin.js";
 import { MutesPlugin } from "../Mutes/MutesPlugin.js";
 import { UtilityPlugin } from "../Utility/UtilityPlugin.js";
-import { ContextClickedEvt } from "./events/ContextClickedEvt.js";
+import { BanCmd } from "./commands/BanUserCtxCmd.js";
+import { CleanCmd } from "./commands/CleanMessageCtxCmd.js";
+import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd.js";
+import { MuteCmd } from "./commands/MuteUserCtxCmd.js";
+import { NoteCmd } from "./commands/NoteUserCtxCmd.js";
+import { WarnCmd } from "./commands/WarnUserCtxCmd.js";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types.js";
-import { loadAllCommands } from "./utils/loadAllCommands.js";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {
     can_use: false,
 
-    user_muteindef: false,
-    user_mute1d: false,
-    user_mute1h: false,
-    user_info: false,
-
-    message_clean10: false,
-    message_clean25: false,
-    message_clean50: false,
+    can_open_mod_menu: false,
   },
   overrides: [
     {
       level: ">=50",
       config: {
         can_use: true,
+
+        can_open_mod_menu: true,
       },
     },
   ],
@@ -33,22 +34,15 @@ const defaultOptions: PluginOptions<ContextMenuPluginType> = {
 export const ContextMenuPlugin = guildPlugin<ContextMenuPluginType>()({
   name: "context_menu",
 
-  dependencies: () => [MutesPlugin, LogsPlugin, UtilityPlugin],
+  dependencies: () => [CasesPlugin, MutesPlugin, ModActionsPlugin, LogsPlugin, UtilityPlugin],
   configParser: (input) => zContextMenusConfig.parse(input),
   defaultOptions,
 
-  // prettier-ignore
-  events: [
-    ContextClickedEvt,
-  ],
+  contextMenuCommands: [ModMenuCmd, NoteCmd, WarnCmd, MuteCmd, BanCmd, CleanCmd],
 
   beforeLoad(pluginData) {
     const { state, guild } = pluginData;
 
-    state.contextMenuLinks = new GuildContextMenuLinks(guild.id);
-  },
-
-  afterLoad(pluginData) {
-    loadAllCommands(pluginData);
+    state.cases = GuildCases.getGuildInstance(guild.id);
   },
 });

@@ -1,6 +1,5 @@
 import { PermissionsBitField } from "discord.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { canUseEmoji, customEmojiRegex, isEmoji } from "../../../utils.js";
 import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
 import { missingPermissionError } from "../../../utils/missingPermissionError.js";
@@ -25,9 +24,8 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
     const me = pluginData.guild.members.cache.get(pluginData.client.user!.id)!;
     const missingPermissions = getMissingChannelPermissions(me, args.channel, requiredPermissions);
     if (missingPermissions) {
-      sendErrorMessage(
-        pluginData,
-        msg.channel,
+      pluginData.state.common.sendErrorMessage(
+        msg,
         `Cannot set auto-reactions for that channel. ${missingPermissionError(missingPermissions)}`,
       );
       return;
@@ -35,7 +33,7 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
 
     for (const reaction of args.reactions) {
       if (!isEmoji(reaction)) {
-        sendErrorMessage(pluginData, msg.channel, "One or more of the specified reactions were invalid!");
+        void pluginData.state.common.sendErrorMessage(msg, "One or more of the specified reactions were invalid!");
         return;
       }
 
@@ -45,7 +43,10 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
       if (customEmojiMatch) {
         // Custom emoji
         if (!canUseEmoji(pluginData.client, customEmojiMatch[2])) {
-          sendErrorMessage(pluginData, msg.channel, "I can only use regular emojis and custom emojis from this server");
+          pluginData.state.common.sendErrorMessage(
+            msg,
+            "I can only use regular emojis and custom emojis from this server",
+          );
           return;
         }
 
@@ -60,6 +61,6 @@ export const NewAutoReactionsCmd = autoReactionsCmd({
 
     await pluginData.state.autoReactions.set(args.channel.id, finalReactions);
     pluginData.state.cache.delete(args.channel.id);
-    sendSuccessMessage(pluginData, msg.channel, `Auto-reactions set for <#${args.channel.id}>`);
+    void pluginData.state.common.sendSuccessMessage(msg, `Auto-reactions set for <#${args.channel.id}>`);
   },
 });

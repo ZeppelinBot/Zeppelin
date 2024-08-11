@@ -11,6 +11,7 @@ import {
   messageToTemplateSafeMessage,
   userToTemplateSafeUser,
 } from "../../utils/templateSafeObjects.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { runEvent } from "./functions/runEvent.js";
 import { CustomEventsPluginType, zCustomEventsConfig } from "./types.js";
@@ -27,6 +28,10 @@ export const CustomEventsPlugin = guildPlugin<CustomEventsPluginType>()({
   dependencies: () => [LogsPlugin],
   configParser: (input) => zCustomEventsConfig.parse(input),
   defaultOptions,
+
+  beforeStart(pluginData) {
+    pluginData.state.common = pluginData.getPlugin(CommonPlugin);
+  },
 
   afterLoad(pluginData) {
     const config = pluginData.config.get();

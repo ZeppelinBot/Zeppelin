@@ -1,6 +1,5 @@
 import { LoadedGuildPlugin, PluginCommandDefinition } from "knub";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
-import { env } from "../../../env.js";
 import { createChunkedMessage } from "../../../utils.js";
 import { utilityCmd } from "../types.js";
 

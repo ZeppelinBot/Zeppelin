@@ -47,6 +47,7 @@ export const BanAction = automodAction({
       await modActions.banUserId(
         userId,
         reason,
+        reason,
         {
           contactMethods,
           caseArgs,
