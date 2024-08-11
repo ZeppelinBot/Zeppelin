@@ -6,7 +6,6 @@ import { UtilityPlugin } from "../Utility/UtilityPlugin.js";
 import { ContextClickedEvt } from "./events/ContextClickedEvt.js";
 import { ContextMenuPluginType, zContextMenusConfig } from "./types.js";
 import { loadAllCommands } from "./utils/loadAllCommands.js";
-import { contextMenuPluginDocs } from "./docs.js";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {

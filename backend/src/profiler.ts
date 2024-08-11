@@ -3,7 +3,7 @@ import type { Knub } from "knub";
 type Profiler = Knub["profiler"];
 let profiler: Profiler | null = null;
 
-export function getProfiler(): Profiler|null {
+export function getProfiler(): Profiler | null {
   return profiler;
 }
 

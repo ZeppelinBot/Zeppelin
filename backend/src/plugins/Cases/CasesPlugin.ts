@@ -14,7 +14,6 @@ import { getRecentCasesByMod } from "./functions/getRecentCasesByMod.js";
 import { getTotalCasesByMod } from "./functions/getTotalCasesByMod.js";
 import { postCaseToCaseLogChannel } from "./functions/postToCaseLogChannel.js";
 import { CasesPluginType, zCasesConfig } from "./types.js";
-import { casesPluginDocs } from "./docs.js";
 
 // The `any` cast here is to prevent TypeScript from locking up from the circular dependency
 function getLogsPlugin(): Promise<any> {

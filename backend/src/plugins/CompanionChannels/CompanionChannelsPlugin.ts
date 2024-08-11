@@ -3,7 +3,6 @@ import { GuildLogs } from "../../data/GuildLogs.js";
 import { LogsPlugin } from "../Logs/LogsPlugin.js";
 import { VoiceStateUpdateEvt } from "./events/VoiceStateUpdateEvt.js";
 import { CompanionChannelsPluginType, zCompanionChannelsConfig } from "./types.js";
-import { companionChannelsPluginDocs } from "./docs.js";
 
 const defaultOptions = {
   config: {

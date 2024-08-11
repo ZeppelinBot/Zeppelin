@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { ZeppelinPluginDocs } from "../../types.js";
 import { trimPluginDescription } from "../../utils.js";
 import { zGuildAccessMonitorConfig } from "./types.js";

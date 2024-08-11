@@ -1,9 +1,9 @@
 import express from "express";
 import z from "zod";
-import { indentLines } from "../utils.js";
-import { notFound } from "./responses.js";
 import { availableGuildPlugins } from "../plugins/availablePlugins.js";
 import { ZeppelinGuildPluginInfo } from "../types.js";
+import { indentLines } from "../utils.js";
+import { notFound } from "./responses.js";
 
 function isZodObject(schema: z.ZodTypeAny): schema is z.ZodObject<any> {
   return schema._def.typeName === "ZodObject";
@@ -97,22 +97,27 @@ function formatZodConfigSchema(schema: z.ZodTypeAny) {
   return "unknown";
 }
 
-const availableGuildPluginsByName = availableGuildPlugins.reduce<Record<string, ZeppelinGuildPluginInfo>>((map, obj) => {
-  map[obj.plugin.name] = obj;
-  return map;
-}, {});
+const availableGuildPluginsByName = availableGuildPlugins.reduce<Record<string, ZeppelinGuildPluginInfo>>(
+  (map, obj) => {
+    map[obj.plugin.name] = obj;
+    return map;
+  },
+  {},
+);
 
 export function initDocs(router: express.Router) {
-  const docsPlugins = availableGuildPlugins.filter(obj => obj.docs.type !== "internal");
+  const docsPlugins = availableGuildPlugins.filter((obj) => obj.docs.type !== "internal");
 
   router.get("/docs/plugins", (req: express.Request, res: express.Response) => {
-    res.json(docsPlugins.map(obj => ({
-      name: obj.plugin.name,
-      info: {
-        prettyName: obj.docs.prettyName,
-        type: obj.docs.type,
-      },
-    })));
+    res.json(
+      docsPlugins.map((obj) => ({
+        name: obj.plugin.name,
+        info: {
+          prettyName: obj.docs.prettyName,
+          type: obj.docs.type,
+        },
+      })),
+    );
   });
 
   router.get("/docs/plugins/:pluginName", (req: express.Request, res: express.Response) => {

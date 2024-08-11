@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { zZeppelinGuildConfig } from "./types.js";
 import { availableGuildPlugins } from "./plugins/availablePlugins.js";
+import { zZeppelinGuildConfig } from "./types.js";
 
 const pluginSchemaMap = availableGuildPlugins.reduce((map, pluginInfo) => {
   map[pluginInfo.plugin.name] = pluginInfo.docs.configSchema;

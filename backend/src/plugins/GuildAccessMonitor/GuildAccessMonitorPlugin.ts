@@ -1,6 +1,5 @@
 import { Guild } from "discord.js";
 import { BasePluginType, GlobalPluginData, globalPlugin, globalPluginEventListener } from "knub";
-import z from "zod";
 import { AllowedGuilds } from "../../data/AllowedGuilds.js";
 import { Configs } from "../../data/Configs.js";
 import { env } from "../../env.js";

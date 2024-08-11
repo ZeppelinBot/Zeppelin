@@ -40,7 +40,7 @@ import { runUpcomingScheduledPostsLoop } from "./data/loops/upcomingScheduledPos
 import { consumeQueryStats } from "./data/queryLogger.js";
 import { env } from "./env.js";
 import { logger } from "./logger.js";
-import { availableGuildPlugins, availableGlobalPlugins } from "./plugins/availablePlugins.js";
+import { availableGlobalPlugins, availableGuildPlugins } from "./plugins/availablePlugins.js";
 import { setProfiler } from "./profiler.js";
 import { logRateLimit } from "./rateLimitStats.js";
 import { startUptimeCounter } from "./uptime.js";
@@ -283,8 +283,8 @@ connect().then(async () => {
   const guildConfigs = new Configs();
 
   const bot = new Knub(client, {
-    guildPlugins: availableGuildPlugins.map(obj => obj.plugin),
-    globalPlugins: availableGlobalPlugins.map(obj => obj.plugin),
+    guildPlugins: availableGuildPlugins.map((obj) => obj.plugin),
+    globalPlugins: availableGlobalPlugins.map((obj) => obj.plugin),
 
     options: {
       canLoadGuild(guildId): Promise<boolean> {
@@ -303,7 +303,7 @@ connect().then(async () => {
         }
 
         const configuredPlugins = ctx.config.plugins;
-        const autoloadPluginNames = availableGuildPlugins.filter(obj => obj.autoload).map(obj => obj.plugin.name);
+        const autoloadPluginNames = availableGuildPlugins.filter((obj) => obj.autoload).map((obj) => obj.plugin.name);
 
         return Array.from(plugins.keys()).filter((pluginName) => {
           if (autoloadPluginNames.includes(pluginName)) return true;
