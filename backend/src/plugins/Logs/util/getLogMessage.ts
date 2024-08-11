@@ -25,7 +25,7 @@ import {
   TemplateSafeUser,
 } from "../../../utils/templateSafeObjects.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
-import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types.js";
+import { ILogTypeData, LogsPluginType, TLogChannel } from "../types.js";
 
 export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   pluginData: GuildPluginData<LogsPluginType>,

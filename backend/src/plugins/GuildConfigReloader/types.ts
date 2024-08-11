@@ -1,7 +1,7 @@
 import { BasePluginType } from "knub";
+import { z } from "zod";
 import { Configs } from "../../data/Configs.js";
 import Timeout = NodeJS.Timeout;
-import { z } from "zod";
 
 export const zGuildConfigReloaderPlugin = z.strictObject({});
 

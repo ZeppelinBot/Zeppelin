@@ -3,7 +3,14 @@ import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { sendErrorMessage } from "../../../pluginUtils.js";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
-import { UnknownUser, chunkArray, emptyEmbedValue, renderUsername, resolveMember, resolveUser } from "../../../utils.js";
+import {
+  UnknownUser,
+  chunkArray,
+  emptyEmbedValue,
+  renderUsername,
+  resolveMember,
+  resolveUser,
+} from "../../../utils.js";
 import { asyncMap } from "../../../utils/async.js";
 import { createPaginatedMessage } from "../../../utils/createPaginatedMessage.js";
 import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
@@ -95,7 +102,7 @@ export const CasesUserCmd = modActionsCmd({
         // Compact view (= regular message with a preview of each case)
         const casesPlugin = pluginData.getPlugin(CasesPlugin);
 
-        const totalPages = Math.max(Math.ceil(cases.length / casesPerPage), 1);
+        const totalPages = Math.max(Math.ceil(casesToDisplay.length / casesPerPage), 1);
         const prefix = getGuildPrefix(pluginData);
 
         createPaginatedMessage(
@@ -103,16 +110,16 @@ export const CasesUserCmd = modActionsCmd({
           msg.channel,
           totalPages,
           async (page) => {
-            const chunkedCases = chunkArray(cases, casesPerPage)[page - 1];
+            const chunkedCases = chunkArray(casesToDisplay, casesPerPage)[page - 1];
             const lines = await asyncMap(chunkedCases, (c) => casesPlugin.getCaseSummary(c, true, msg.author.id));
 
             const isLastPage = page === totalPages;
             const firstCaseNum = (page - 1) * casesPerPage + 1;
-            const lastCaseNum = isLastPage ? cases.length : page * casesPerPage;
+            const lastCaseNum = isLastPage ? casesToDisplay.length : page * casesPerPage;
             const title =
               totalPages === 1
                 ? `Cases for ${userName} (${lines.length} total)`
-                : `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${cases.length} for ${userName}`;
+                : `Most recent cases ${firstCaseNum}-${lastCaseNum} of ${casesToDisplay.length} for ${userName}`;
 
             const embed = {
               author: {

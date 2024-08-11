@@ -3,18 +3,24 @@ import { MigrationInterface, QueryRunner, Table, TableColumn } from "typeorm";
 export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     // Create a new column for the channel's id
-    await queryRunner.addColumn("starboard_messages", new TableColumn({
-      name: "starboard_channel_id",
-      type: "bigint",
-      unsigned: true,
-    }));
+    await queryRunner.addColumn(
+      "starboard_messages",
+      new TableColumn({
+        name: "starboard_channel_id",
+        type: "bigint",
+        unsigned: true,
+      }),
+    );
 
     // Since we are removing the guild_id with the starboards table, we might want it here
-    await queryRunner.addColumn("starboard_messages", new TableColumn({
-      name: "guild_id",
-      type: "bigint",
-      unsigned: true,
-    }));
+    await queryRunner.addColumn(
+      "starboard_messages",
+      new TableColumn({
+        name: "guild_id",
+        type: "bigint",
+        unsigned: true,
+      }),
+    );
 
     // Migrate the old starboard_id to the new starboard_channel_id
     await queryRunner.query(`
@@ -43,11 +49,14 @@ export class MoveStarboardsToConfig1573248462469 implements MigrationInterface {
     await queryRunner.dropColumn("starboard_messages", "starboard_channel_id");
     await queryRunner.dropColumn("starboard_messages", "guild_id");
 
-    await queryRunner.addColumn("starboard_messages", new TableColumn({
-      name: "starboard_id",
-      type: "int",
-      unsigned: true,
-    }));
+    await queryRunner.addColumn(
+      "starboard_messages",
+      new TableColumn({
+        name: "starboard_id",
+        type: "int",
+        unsigned: true,
+      }),
+    );
 
     await queryRunner.query(`
       ALTER TABLE starboard_messages

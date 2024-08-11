@@ -1,11 +1,17 @@
-import { Embed, Invite } from "discord.js";
+import { Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash/cloneDeep.js";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { ZalgoRegex } from "../../../data/Zalgo.js";
 import { ISavedMessageEmbedData, SavedMessage } from "../../../data/entities/SavedMessage.js";
-import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils.js";
+import {
+  getInviteCodesInString,
+  getUrlsInString,
+  isGuildInvite,
+  resolveInvite,
+  resolveMember,
+} from "../../../utils.js";
 import { CensorPluginType } from "../types.js";
 import { censorMessage } from "./censorMessage.js";
 
