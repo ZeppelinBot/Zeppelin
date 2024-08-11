@@ -1,6 +1,6 @@
 import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { resolveUser } from "../../../utils.js";
 import { logMessageEdit } from "../logFunctions/logMessageEdit.js";
