@@ -1,5 +1,5 @@
 import { In, InsertResult, Repository } from "typeorm";
-import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
+import { FindOptionsWhere } from "typeorm";
 import { Queue } from "../Queue.js";
 import { chunkArray } from "../utils.js";
 import { BaseGuildRepository } from "./BaseGuildRepository.js";

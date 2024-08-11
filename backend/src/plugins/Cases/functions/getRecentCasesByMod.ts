@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
+import { FindOptionsWhere } from "typeorm";
 import { Case } from "../../../data/entities/Case.js";
 import { CasesPluginType } from "../types.js";
 
