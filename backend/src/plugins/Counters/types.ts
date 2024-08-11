@@ -33,7 +33,7 @@ export const zTrigger = z
       .optional(),
   })
   .transform((val, ctx) => {
-    const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
+    const ruleName = String(ctx.path[ctx.path.length - 1]).trim();
 
     let reverseCondition = val.reverse_condition;
     if (!reverseCondition) {
@@ -52,7 +52,7 @@ export const zTrigger = z
   });
 
 const zTriggerFromString = zBoundedCharacters(0, 100).transform((val, ctx) => {
-  const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
+  const ruleName = String(ctx.path[ctx.path.length - 1]).trim();
   const parsedCondition = parseCounterConditionString(val);
   if (!parsedCondition) {
     ctx.addIssue({
