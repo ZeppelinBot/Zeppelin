@@ -1,7 +1,7 @@
 import { Snowflake } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { isStaffPreFilter } from "../../../pluginUtils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { isStaffPreFilter } from "../../../pluginUtils.js";
+import { botControlCmd } from "../types.js";
 
 export const LeaveServerCmd = botControlCmd({
   trigger: ["leave_server", "leave_guild"],

@@ -1,5 +1,5 @@
 import { EmbedField } from "discord.js";
-import { chunkMessageLines, emptyEmbedValue } from "../utils";
+import { chunkMessageLines, emptyEmbedValue } from "../utils.js";
 
 export function getChunkedEmbedFields(name: string, value: string): EmbedField[] {
   const fields: EmbedField[] = [];

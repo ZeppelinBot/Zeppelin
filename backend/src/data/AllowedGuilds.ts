@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DBDateFormat } from "../utils";
-import { ApiPermissionTypes } from "./ApiPermissionAssignments";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { AllowedGuild } from "./entities/AllowedGuild";
+import { DBDateFormat } from "../utils.js";
+import { ApiPermissionTypes } from "./ApiPermissionAssignments.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { AllowedGuild } from "./entities/AllowedGuild.js";
 
 export class AllowedGuilds extends BaseRepository {
   private allowedGuilds: Repository<AllowedGuild>;

@@ -2,9 +2,9 @@ import photon from "@silvia-odwyer/photon-node";
 import { AttachmentBuilder } from "discord.js";
 import fs from "fs";
 import twemoji from "twemoji";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { downloadFile, isEmoji, SECONDS } from "../../../utils";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { downloadFile, isEmoji, SECONDS } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
 
 const fsp = fs.promises;
 

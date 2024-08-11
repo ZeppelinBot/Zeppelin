@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getCustomEmojiId } from "../functions/getCustomEmojiId";
-import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getCustomEmojiId } from "../functions/getCustomEmojiId.js";
+import { getEmojiInfoEmbed } from "../functions/getEmojiInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const EmojiInfoCmd = utilityCmd({
   trigger: ["emoji", "emojiinfo"],

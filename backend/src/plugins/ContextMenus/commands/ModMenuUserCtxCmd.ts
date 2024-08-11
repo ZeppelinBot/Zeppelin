@@ -10,26 +10,26 @@ import {
   User,
 } from "discord.js";
 import { GuildPluginData, guildPluginUserContextMenuCommand } from "knub";
-import { Case } from "../../../data/entities/Case";
-import { logger } from "../../../logger";
-import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils";
-import { asyncMap } from "../../../utils/async";
-import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields";
-import { getGuildPrefix } from "../../../utils/getGuildPrefix";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { getUserInfoEmbed } from "../../Utility/functions/getUserInfoEmbed";
-import { launchBanActionModal } from "../actions/ban";
-import { launchMuteActionModal } from "../actions/mute";
-import { launchNoteActionModal } from "../actions/note";
-import { launchWarnActionModal } from "../actions/warn";
+import { Case } from "../../../data/entities/Case.js";
+import { logger } from "../../../logger.js";
+import { SECONDS, UnknownUser, emptyEmbedValue, renderUserUsername, resolveUser, trimLines } from "../../../utils.js";
+import { asyncMap } from "../../../utils/async.js";
+import { getChunkedEmbedFields } from "../../../utils/getChunkedEmbedFields.js";
+import { getGuildPrefix } from "../../../utils/getGuildPrefix.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
+import { getUserInfoEmbed } from "../../Utility/functions/getUserInfoEmbed.js";
+import { launchBanActionModal } from "../actions/ban.js";
+import { launchMuteActionModal } from "../actions/mute.js";
+import { launchNoteActionModal } from "../actions/note.js";
+import { launchWarnActionModal } from "../actions/warn.js";
 import {
   ContextMenuPluginType,
   LoadModMenuPageFn,
   ModMenuActionOpts,
   ModMenuActionType,
   ModMenuNavigationType,
-} from "../types";
+} from "../types.js";
 
 export const MODAL_TIMEOUT = 60 * SECONDS;
 const MOD_MENU_TIMEOUT = 60 * SECONDS;

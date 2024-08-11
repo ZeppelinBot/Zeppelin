@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { error } from "./responses";
+import { error } from "./responses.js";
 
 const lastRequestsByKey: Map<string, number> = new Map();
 

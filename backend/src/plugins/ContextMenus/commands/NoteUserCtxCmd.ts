@@ -1,6 +1,6 @@
 import { PermissionFlagsBits } from "discord.js";
 import { guildPluginUserContextMenuCommand } from "knub";
-import { launchNoteActionModal } from "../actions/note";
+import { launchNoteActionModal } from "../actions/note.js";
 
 export const NoteCmd = guildPluginUserContextMenuCommand({
   name: "Note",

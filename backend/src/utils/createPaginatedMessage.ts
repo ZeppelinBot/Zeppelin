@@ -9,9 +9,9 @@ import {
   PartialUser,
   User,
 } from "discord.js";
-import { sendContextResponse } from "../pluginUtils";
-import { MINUTES, noop } from "../utils";
-import { Awaitable } from "./typeUtils";
+import { sendContextResponse } from "../pluginUtils.js";
+import { MINUTES, noop } from "../utils.js";
+import { Awaitable } from "./typeUtils.js";
 import Timeout = NodeJS.Timeout;
 
 export type LoadPageFn = (page: number) => Awaitable<MessageCreateOptions & MessageEditOptions>;

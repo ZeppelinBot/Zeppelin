@@ -1,6 +1,6 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
+import { ModActionsPluginType } from "../types.js";
 
 export async function hasNotePermission(
   pluginData: GuildPluginData<ModActionsPluginType>,

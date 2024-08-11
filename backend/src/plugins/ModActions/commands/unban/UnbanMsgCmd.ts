@@ -1,8 +1,8 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { hasPermission } from "../../../../pluginUtils";
-import { resolveUser } from "../../../../utils";
-import { modActionsMsgCmd } from "../../types";
-import { actualUnbanCmd } from "./actualUnbanCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { resolveUser } from "../../../../utils.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualUnbanCmd } from "./actualUnbanCmd.js";
 
 const opts = {
   mod: ct.member({ option: true }),

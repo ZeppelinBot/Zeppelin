@@ -1,10 +1,10 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission } from "../../../../pluginUtils";
-import { errorMessage, resolveMember, resolveUser } from "../../../../utils";
-import { isBanned } from "../../functions/isBanned";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsMsgCmd } from "../../types";
-import { actualWarnCmd } from "./actualWarnCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { errorMessage, resolveMember, resolveUser } from "../../../../utils.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualWarnCmd } from "./actualWarnCmd.js";
 
 export const WarnMsgCmd = modActionsMsgCmd({
   trigger: "warn",

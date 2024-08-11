@@ -1,11 +1,11 @@
 import { Snowflake } from "discord.js";
 import { createChunkedMessage, disableCodeBlocks } from "knub/helpers";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory";
-import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory";
-import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames";
-import { DAYS, renderUsername } from "../../../utils";
-import { nameHistoryCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { MAX_NICKNAME_ENTRIES_PER_USER } from "../../../data/GuildNicknameHistory.js";
+import { MAX_USERNAME_ENTRIES_PER_USER } from "../../../data/UsernameHistory.js";
+import { NICKNAME_RETENTION_PERIOD } from "../../../data/cleanup/nicknames.js";
+import { DAYS, renderUsername } from "../../../utils.js";
+import { nameHistoryCmd } from "../types.js";
 
 export const NamesCmd = nameHistoryCmd({
   trigger: "names",

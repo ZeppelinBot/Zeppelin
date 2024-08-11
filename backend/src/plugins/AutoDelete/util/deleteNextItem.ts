@@ -1,14 +1,14 @@
 import { ChannelType, PermissionsBitField, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
-import { resolveUser, verboseChannelMention } from "../../../utils";
-import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { AutoDeletePluginType } from "../types";
-import { scheduleNextDeletion } from "./scheduleNextDeletion";
+import { LogType } from "../../../data/LogType.js";
+import { logger } from "../../../logger.js";
+import { resolveUser, verboseChannelMention } from "../../../utils.js";
+import { hasDiscordPermissions } from "../../../utils/hasDiscordPermissions.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { AutoDeletePluginType } from "../types.js";
+import { scheduleNextDeletion } from "./scheduleNextDeletion.js";
 
 export async function deleteNextItem(pluginData: GuildPluginData<AutoDeletePluginType>) {
   const [itemToDelete] = pluginData.state.deletionQueue.splice(0, 1);

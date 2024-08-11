@@ -1,7 +1,7 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zMessageSaverConfig = z.strictObject({
   can_manage: z.boolean(),

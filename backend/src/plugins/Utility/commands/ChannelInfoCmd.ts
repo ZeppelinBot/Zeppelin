@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getChannelInfoEmbed } from "../functions/getChannelInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const ChannelInfoCmd = utilityCmd({
   trigger: ["channel", "channelinfo"],

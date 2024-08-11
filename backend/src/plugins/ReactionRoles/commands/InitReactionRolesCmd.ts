@@ -1,9 +1,9 @@
 import { Snowflake } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils";
-import { canReadChannel } from "../../../utils/canReadChannel";
-import { TReactionRolePair, reactionRolesCmd } from "../types";
-import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { canUseEmoji, isDiscordAPIError, isValidEmoji, noop, trimPluginDescription } from "../../../utils.js";
+import { canReadChannel } from "../../../utils/canReadChannel.js";
+import { TReactionRolePair, reactionRolesCmd } from "../types.js";
+import { applyReactionRoleReactionsToMessage } from "../util/applyReactionRoleReactionsToMessage.js";
 
 const CLEAR_ROLES_EMOJI = "❌";
 

@@ -1,8 +1,8 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission } from "../../../../pluginUtils";
-import { resolveMember, resolveUser } from "../../../../utils";
-import { modActionsMsgCmd } from "../../types";
-import { actualUnmuteCmd } from "../unmute/actualUnmuteCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { resolveMember, resolveUser } from "../../../../utils.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualUnmuteCmd } from "../unmute/actualUnmuteCmd.js";
 
 const opts = {
   mod: ct.member({ option: true }),

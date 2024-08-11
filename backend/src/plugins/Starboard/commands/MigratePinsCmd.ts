@@ -1,7 +1,7 @@
 import { Snowflake, TextChannel } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { starboardCmd } from "../types";
-import { saveMessageToStarboard } from "../util/saveMessageToStarboard";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { starboardCmd } from "../types.js";
+import { saveMessageToStarboard } from "../util/saveMessageToStarboard.js";
 
 export const MigratePinsCmd = starboardCmd({
   trigger: "starboard migrate_pins",

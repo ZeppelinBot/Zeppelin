@@ -1,9 +1,9 @@
 import { CooldownManager, PluginOptions, guildPlugin } from "knub";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { RoleAddCmd } from "./commands/RoleAddCmd";
-import { RoleHelpCmd } from "./commands/RoleHelpCmd";
-import { RoleRemoveCmd } from "./commands/RoleRemoveCmd";
-import { SelfGrantableRolesPluginType, zSelfGrantableRolesConfig } from "./types";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { RoleAddCmd } from "./commands/RoleAddCmd.js";
+import { RoleHelpCmd } from "./commands/RoleHelpCmd.js";
+import { RoleRemoveCmd } from "./commands/RoleRemoveCmd.js";
+import { SelfGrantableRolesPluginType, zSelfGrantableRolesConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<SelfGrantableRolesPluginType> = {
   config: {

@@ -1,14 +1,14 @@
 import { MessageCreateOptions } from "discord.js";
 import { GuildPluginData } from "knub";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { LogType } from "../../../data/LogType";
-import { logger } from "../../../logger";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { LogType } from "../../../data/LogType.js";
+import { logger } from "../../../logger.js";
 import {
   renderTemplate,
   TemplateParseError,
   TemplateSafeValueContainer,
   TypedTemplateSafeValueContainer,
-} from "../../../templateFormatter";
+} from "../../../templateFormatter.js";
 import {
   messageSummary,
   renderRecursively,
@@ -17,15 +17,15 @@ import {
   verboseChannelMention,
   verboseUserMention,
   verboseUserName,
-} from "../../../utils";
+} from "../../../utils.js";
 import {
   getTemplateSafeMemberLevel,
   memberToTemplateSafeMember,
   TemplateSafeMember,
   TemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types";
+} from "../../../utils/templateSafeObjects.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { FORMAT_NO_TIMESTAMP, ILogTypeData, LogsPluginType, TLogChannel } from "../types.js";
 
 export async function getLogMessage<TLogType extends keyof ILogTypeData>(
   pluginData: GuildPluginData<LogsPluginType>,

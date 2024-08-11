@@ -1,14 +1,14 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { canActOn, hasPermission } from "../../../../pluginUtils";
-import { convertDelayStringToMS, resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { isBanned } from "../../functions/isBanned";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualUnmuteCmd } from "./actualUnmuteCmd";
+import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { convertDelayStringToMS, resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
+import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualUnmuteCmd } from "./actualUnmuteCmd.js";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the unmute", required: false }),

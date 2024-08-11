@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { Case } from "../../../data/entities/Case";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ContextMenuPluginType } from "../types";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { Case } from "../../../data/entities/Case.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ContextMenuPluginType } from "../types.js";
 
 export async function updateAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { CaseNote } from "./CaseNote";
+import { CaseNote } from "./CaseNote.js";
 
 @Entity("cases")
 export class Case {

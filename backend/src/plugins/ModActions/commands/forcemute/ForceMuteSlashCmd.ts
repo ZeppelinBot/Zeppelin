@@ -1,12 +1,12 @@
 import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualMuteCmd } from "../mute/actualMuteCmd";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualMuteCmd } from "../mute/actualMuteCmd.js";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the mute", required: false }),

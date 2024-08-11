@@ -11,8 +11,8 @@ import {
 } from "discord.js";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import { isContextInteraction } from "../pluginUtils";
-import { noop } from "../utils";
+import { isContextInteraction } from "../pluginUtils.js";
+import { noop } from "../utils.js";
 
 export async function waitForButtonConfirm(
   context: Message | User | ChatInputCommandInteraction,

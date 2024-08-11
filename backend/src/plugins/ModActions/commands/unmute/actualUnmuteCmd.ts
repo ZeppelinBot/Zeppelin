@@ -1,11 +1,11 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils";
-import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
-import { ModActionsPluginType } from "../../types";
+import { UnknownUser, asSingleLine, renderUsername } from "../../../../utils.js";
+import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualUnmuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

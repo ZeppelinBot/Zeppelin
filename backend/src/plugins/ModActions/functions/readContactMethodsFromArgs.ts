@@ -1,5 +1,5 @@
 import { GuildTextBasedChannel } from "discord.js";
-import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils";
+import { disableUserNotificationStrings, UserNotificationMethod } from "../../../utils.js";
 
 export function readContactMethodsFromArgs(args: {
   notify?: string | null;

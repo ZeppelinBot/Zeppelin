@@ -1,4 +1,4 @@
-import { ZeppelinPluginInfo } from "../../types";
+import { ZeppelinPluginInfo } from "../../types.js";
 
 export const autoDeletePluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

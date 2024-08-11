@@ -8,10 +8,10 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { logger } from "../../../logger";
-import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType, ModMenuActionType } from "../types";
+import { logger } from "../../../logger.js";
+import { UtilityPlugin } from "../../../plugins/Utility/UtilityPlugin.js";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd.js";
+import { ContextMenuPluginType, ModMenuActionType } from "../types.js";
 
 export async function cleanAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

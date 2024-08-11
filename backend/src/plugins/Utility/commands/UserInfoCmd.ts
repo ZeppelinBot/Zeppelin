@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getUserInfoEmbed } from "../functions/getUserInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getUserInfoEmbed } from "../functions/getUserInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const UserInfoCmd = utilityCmd({
   trigger: ["user", "userinfo", "whois"],

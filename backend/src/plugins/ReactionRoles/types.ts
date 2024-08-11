@@ -1,9 +1,9 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { GuildReactionRoles } from "../../data/GuildReactionRoles";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { Queue } from "../../Queue.js";
+import { GuildReactionRoles } from "../../data/GuildReactionRoles.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zReactionRolesConfig = z.strictObject({
   auto_refresh_interval: z.number(),

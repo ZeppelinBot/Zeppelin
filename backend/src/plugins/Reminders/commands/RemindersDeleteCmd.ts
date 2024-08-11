@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { clearUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop";
-import { sorter } from "../../../utils";
-import { remindersCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { clearUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop.js";
+import { sorter } from "../../../utils.js";
+import { remindersCmd } from "../types.js";
 
 export const RemindersDeleteCmd = remindersCmd({
   trigger: ["reminders delete", "reminders d"],

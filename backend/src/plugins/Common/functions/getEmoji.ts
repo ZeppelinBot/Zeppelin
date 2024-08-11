@@ -1,5 +1,5 @@
 import { GuildPluginData } from "knub";
-import { CommonPluginType } from "../types";
+import { CommonPluginType } from "../types.js";
 
 export function getSuccessEmoji(pluginData: GuildPluginData<CommonPluginType>) {
   return pluginData.config.get().success_emoji ?? "✅";

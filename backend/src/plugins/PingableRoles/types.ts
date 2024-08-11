@@ -1,8 +1,8 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
-import { PingableRole } from "../../data/entities/PingableRole";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
+import { PingableRole } from "../../data/entities/PingableRole.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zPingableRolesConfig = z.strictObject({
   can_manage: z.boolean(),

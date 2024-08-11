@@ -1,9 +1,9 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildPingableRoles } from "../../data/GuildPingableRoles";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd";
-import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd";
-import { PingableRolesPluginType, zPingableRolesConfig } from "./types";
+import { GuildPingableRoles } from "../../data/GuildPingableRoles.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { PingableRoleDisableCmd } from "./commands/PingableRoleDisableCmd.js";
+import { PingableRoleEnableCmd } from "./commands/PingableRoleEnableCmd.js";
+import { PingableRolesPluginType, zPingableRolesConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<PingableRolesPluginType> = {
   config: {

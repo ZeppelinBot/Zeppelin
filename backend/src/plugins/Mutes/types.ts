@@ -2,15 +2,15 @@ import { GuildMember } from "discord.js";
 import { EventEmitter } from "events";
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildMutes } from "../../data/GuildMutes";
-import { Case } from "../../data/entities/Case";
-import { Mute } from "../../data/entities/Mute";
-import { UserNotificationMethod, UserNotificationResult, zSnowflake } from "../../utils";
-import { CaseArgs } from "../Cases/types";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildMutes } from "../../data/GuildMutes.js";
+import { Case } from "../../data/entities/Case.js";
+import { Mute } from "../../data/entities/Mute.js";
+import { UserNotificationMethod, UserNotificationResult, zSnowflake } from "../../utils.js";
+import { CaseArgs } from "../Cases/types.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zMutesConfig = z.strictObject({
   mute_role: zSnowflake.nullable(),

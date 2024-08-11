@@ -1,9 +1,9 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { GuildNicknameHistory } from "../../data/GuildNicknameHistory";
-import { UsernameHistory } from "../../data/UsernameHistory";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { Queue } from "../../Queue.js";
+import { GuildNicknameHistory } from "../../data/GuildNicknameHistory.js";
+import { UsernameHistory } from "../../data/UsernameHistory.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zNameHistoryConfig = z.strictObject({
   can_view: z.boolean(),

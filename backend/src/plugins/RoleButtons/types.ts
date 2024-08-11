@@ -1,11 +1,11 @@
 import { ButtonStyle } from "discord.js";
 import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
-import { GuildRoleButtons } from "../../data/GuildRoleButtons";
-import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { TooManyComponentsError } from "./functions/TooManyComponentsError";
-import { createButtonComponents } from "./functions/createButtonComponents";
+import { GuildRoleButtons } from "../../data/GuildRoleButtons.js";
+import { zBoundedCharacters, zBoundedRecord, zMessageContent, zSnowflake } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { TooManyComponentsError } from "./functions/TooManyComponentsError.js";
+import { createButtonComponents } from "./functions/createButtonComponents.js";
 
 const zRoleButtonOption = z.strictObject({
   role_id: zSnowflake,

@@ -3,11 +3,11 @@ import humanizeDuration from "humanize-duration";
 import LCL from "last-commit-log";
 import { shuffle } from "lodash";
 import moment from "moment-timezone";
-import { rootDir } from "../../../paths";
-import { getCurrentUptime } from "../../../uptime";
-import { resolveMember, sorter } from "../../../utils";
-import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin";
-import { utilityCmd } from "../types";
+import { rootDir } from "../../../paths.js";
+import { getCurrentUptime } from "../../../uptime.js";
+import { resolveMember, sorter } from "../../../utils.js";
+import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";
+import { utilityCmd } from "../types.js";
 
 export const AboutCmd = utilityCmd({
   trigger: "about",

@@ -1,11 +1,11 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { CensorPluginType, zCensorConfig } from "./types";
-import { onMessageCreate } from "./util/onMessageCreate";
-import { onMessageUpdate } from "./util/onMessageUpdate";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { discardRegExpRunner, getRegExpRunner } from "../../regExpRunners.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { CensorPluginType, zCensorConfig } from "./types.js";
+import { onMessageCreate } from "./util/onMessageCreate.js";
+import { onMessageUpdate } from "./util/onMessageUpdate.js";
 
 const defaultOptions: PluginOptions<CensorPluginType> = {
   config: {

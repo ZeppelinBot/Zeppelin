@@ -1,5 +1,5 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { autoReactionsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { autoReactionsCmd } from "../types.js";
 
 export const DisableAutoReactionsCmd = autoReactionsCmd({
   trigger: "auto_reactions disable",

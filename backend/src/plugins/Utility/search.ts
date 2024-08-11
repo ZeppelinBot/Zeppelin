@@ -12,8 +12,8 @@ import {
 import escapeStringRegexp from "escape-string-regexp";
 import { ArgsFromSignatureOrArray, GuildPluginData } from "knub";
 import moment from "moment-timezone";
-import { RegExpRunner, allowTimeout } from "../../RegExpRunner";
-import { getBaseUrl } from "../../pluginUtils";
+import { RegExpRunner, allowTimeout } from "../../RegExpRunner.js";
+import { getBaseUrl } from "../../pluginUtils.js";
 import {
   InvalidRegexError,
   MINUTES,
@@ -22,14 +22,14 @@ import {
   renderUsername,
   sorter,
   trimLines,
-} from "../../utils";
-import { asyncFilter } from "../../utils/async";
-import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions";
-import { banSearchSignature } from "./commands/BanSearchCmd";
-import { searchCmdSignature } from "./commands/SearchCmd";
-import { getUserInfoEmbed } from "./functions/getUserInfoEmbed";
-import { refreshMembersIfNeeded } from "./refreshMembers";
-import { UtilityPluginType } from "./types";
+} from "../../utils.js";
+import { asyncFilter } from "../../utils/async.js";
+import { hasDiscordPermissions } from "../../utils/hasDiscordPermissions.js";
+import { banSearchSignature } from "./commands/BanSearchCmd.js";
+import { searchCmdSignature } from "./commands/SearchCmd.js";
+import { getUserInfoEmbed } from "./functions/getUserInfoEmbed.js";
+import { refreshMembersIfNeeded } from "./refreshMembers.js";
+import { UtilityPluginType } from "./types.js";
 import Timeout = NodeJS.Timeout;
 
 const SEARCH_RESULTS_PER_PAGE = 15;

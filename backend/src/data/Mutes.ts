@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
 import { Repository } from "typeorm";
-import { DAYS, DBDateFormat } from "../utils";
-import { BaseRepository } from "./BaseRepository";
-import { MuteTypes } from "./MuteTypes";
-import { dataSource } from "./dataSource";
-import { Mute } from "./entities/Mute";
+import { DAYS, DBDateFormat } from "../utils.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { MuteTypes } from "./MuteTypes.js";
+import { dataSource } from "./dataSource.js";
+import { Mute } from "./entities/Mute.js";
 
 const OLD_EXPIRED_MUTE_THRESHOLD = 7 * DAYS;
 

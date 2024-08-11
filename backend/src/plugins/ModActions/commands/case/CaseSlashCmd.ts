@@ -1,6 +1,6 @@
 import { slashOptions } from "knub";
-import { modActionsSlashCmd } from "../../types";
-import { actualCaseCmd } from "./actualCaseCmd";
+import { modActionsSlashCmd } from "../../types.js";
+import { actualCaseCmd } from "./actualCaseCmd.js";
 
 const opts = [
   slashOptions.boolean({ name: "show", description: "To make the result visible to everyone", required: false }),

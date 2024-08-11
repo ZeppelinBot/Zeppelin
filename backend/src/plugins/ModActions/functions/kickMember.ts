@@ -1,15 +1,15 @@
 import { GuildMember } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { LogType } from "../../../data/LogType";
-import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter";
-import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types";
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
-import { ignoreEvent } from "./ignoreEvent";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { LogType } from "../../../data/LogType.js";
+import { renderTemplate, TemplateParseError, TemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { createUserNotificationError, notifyUser, resolveUser, ucfirst, UserNotificationResult } from "../../../utils.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { IgnoredEventType, KickOptions, KickResult, ModActionsPluginType } from "../types.js";
+import { getDefaultContactMethods } from "./getDefaultContactMethods.js";
+import { ignoreEvent } from "./ignoreEvent.js";
 
 /**
  * Kick the specified server member. Generates a case.

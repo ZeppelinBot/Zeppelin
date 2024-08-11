@@ -1,7 +1,7 @@
 import { APIEmbed, Awaitable } from "discord.js";
 import { BasePluginType } from "knub";
 import z from "zod";
-import { GuildCases } from "../../data/GuildCases";
+import { GuildCases } from "../../data/GuildCases.js";
 
 export const zContextMenusConfig = z.strictObject({
   can_use: z.boolean(),

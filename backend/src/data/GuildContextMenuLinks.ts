@@ -1,7 +1,7 @@
 import { DeleteResult, InsertResult, Repository } from "typeorm";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { dataSource } from "./dataSource";
-import { ContextMenuLink } from "./entities/ContextMenuLink";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { dataSource } from "./dataSource.js";
+import { ContextMenuLink } from "./entities/ContextMenuLink.js";
 
 export class GuildContextMenuLinks extends BaseGuildRepository {
   private contextLinks: Repository<ContextMenuLink>;

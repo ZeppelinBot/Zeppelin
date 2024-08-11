@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canReadChannel } from "../../../utils/canReadChannel";
-import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { canReadChannel } from "../../../utils/canReadChannel.js";
+import { getMessageInfoEmbed } from "../functions/getMessageInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const MessageInfoCmd = utilityCmd({
   trigger: ["message", "messageinfo"],

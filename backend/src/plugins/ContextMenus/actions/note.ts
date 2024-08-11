@@ -8,15 +8,15 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { logger } from "../../../logger";
-import { canActOn } from "../../../pluginUtils";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { renderUserUsername } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType, ModMenuActionType } from "../types";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { logger } from "../../../logger.js";
+import { canActOn } from "../../../pluginUtils.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { renderUserUsername } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd.js";
+import { ContextMenuPluginType, ModMenuActionType } from "../types.js";
 
 async function noteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

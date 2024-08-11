@@ -1,9 +1,9 @@
 import { hasPermission } from "knub/helpers";
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { resolveUser } from "../../../../utils";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsMsgCmd } from "../../types";
-import { actualKickCmd } from "./actualKickCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveUser } from "../../../../utils.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualKickCmd } from "./actualKickCmd.js";
 
 const opts = {
   mod: ct.member({ option: true }),

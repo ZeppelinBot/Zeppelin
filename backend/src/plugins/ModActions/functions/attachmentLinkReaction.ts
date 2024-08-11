@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Message, TextBasedChannel } from "discord.js";
 import { AnyPluginData, GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../types";
+import { ModActionsPluginType } from "../types.js";
 
 export function shouldReactToAttachmentLink(pluginData: GuildPluginData<ModActionsPluginType>) {
   const config = pluginData.config.get();

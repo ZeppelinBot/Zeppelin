@@ -1,5 +1,5 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { mutesCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { mutesCmd } from "../types.js";
 
 export const ClearMutesCmd = mutesCmd({
   trigger: "clear_mutes",

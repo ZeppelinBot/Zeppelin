@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { resolveUser } from "../../../../utils";
-import { modActionsMsgCmd } from "../../types";
-import { actualNoteCmd } from "./actualNoteCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveUser } from "../../../../utils.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualNoteCmd } from "./actualNoteCmd.js";
 
 export const NoteMsgCmd = modActionsMsgCmd({
   trigger: "note",

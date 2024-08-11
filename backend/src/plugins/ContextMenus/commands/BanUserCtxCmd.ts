@@ -1,6 +1,6 @@
 import { PermissionFlagsBits } from "discord.js";
 import { guildPluginUserContextMenuCommand } from "knub";
-import { launchBanActionModal } from "../actions/ban";
+import { launchBanActionModal } from "../actions/ban.js";
 
 export const BanCmd = guildPluginUserContextMenuCommand({
   name: "Ban",

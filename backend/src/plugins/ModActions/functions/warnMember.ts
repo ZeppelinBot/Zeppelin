@@ -1,14 +1,14 @@
 import { GuildMember, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter";
-import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils";
-import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects";
-import { waitForButtonConfirm } from "../../../utils/waitForInteraction";
-import { CasesPlugin } from "../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ModActionsPluginType, WarnOptions, WarnResult } from "../types";
-import { getDefaultContactMethods } from "./getDefaultContactMethods";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
+import { UserNotificationResult, createUserNotificationError, notifyUser, resolveUser, ucfirst } from "../../../utils.js";
+import { userToTemplateSafeUser } from "../../../utils/templateSafeObjects.js";
+import { waitForButtonConfirm } from "../../../utils/waitForInteraction.js";
+import { CasesPlugin } from "../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ModActionsPluginType, WarnOptions, WarnResult } from "../types.js";
+import { getDefaultContactMethods } from "./getDefaultContactMethods.js";
 
 export async function warnMember(
   pluginData: GuildPluginData<ModActionsPluginType>,

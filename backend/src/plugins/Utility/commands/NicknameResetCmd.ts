@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { canActOn } from "../../../pluginUtils";
-import { errorMessage } from "../../../utils";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { canActOn } from "../../../pluginUtils.js";
+import { errorMessage } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
 
 export const NicknameResetCmd = utilityCmd({
   trigger: ["nickname reset", "nick reset"],

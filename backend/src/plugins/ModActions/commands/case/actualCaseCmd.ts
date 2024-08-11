@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { sendContextResponse } from "../../../../pluginUtils";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { ModActionsPluginType } from "../../types";
+import { sendContextResponse } from "../../../../pluginUtils.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

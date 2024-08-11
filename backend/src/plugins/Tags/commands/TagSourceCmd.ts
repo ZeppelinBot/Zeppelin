@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getBaseUrl } from "../../../pluginUtils";
-import { tagsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getBaseUrl } from "../../../pluginUtils.js";
+import { tagsCmd } from "../types.js";
 
 export const TagSourceCmd = tagsCmd({
   trigger: "tag",

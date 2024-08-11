@@ -1,12 +1,12 @@
 import { ChatInputCommandInteraction, GuildMember, Message } from "discord.js";
 import { GuildPluginData, helpers } from "knub";
-import { Case } from "../../../../data/entities/Case";
-import { getContextChannel, sendContextResponse } from "../../../../pluginUtils";
-import { SECONDS, renderUsername } from "../../../../utils";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { TimeAndDatePlugin } from "../../../TimeAndDate/TimeAndDatePlugin";
-import { ModActionsPluginType } from "../../types";
+import { Case } from "../../../../data/entities/Case.js";
+import { getContextChannel, sendContextResponse } from "../../../../pluginUtils.js";
+import { SECONDS, renderUsername } from "../../../../utils.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { TimeAndDatePlugin } from "../../../TimeAndDate/TimeAndDatePlugin.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualDeleteCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

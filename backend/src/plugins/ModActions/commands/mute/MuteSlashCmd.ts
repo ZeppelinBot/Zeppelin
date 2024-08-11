@@ -1,14 +1,14 @@
 import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { canActOn, hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { isBanned } from "../../functions/isBanned";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualMuteCmd } from "./actualMuteCmd";
+import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { UserNotificationMethod, convertDelayStringToMS, resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualMuteCmd } from "./actualMuteCmd.js";
 
 const opts = [
   slashOptions.string({ name: "time", description: "The duration of the mute", required: false }),

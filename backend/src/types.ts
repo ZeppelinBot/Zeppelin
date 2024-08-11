@@ -1,6 +1,6 @@
 import { Knub } from "knub";
 import z, { ZodTypeAny } from "zod";
-import { zSnowflake } from "./utils";
+import { zSnowflake } from "./utils.js";
 
 export const zZeppelinGuildConfig = z.strictObject({
   // From BaseConfig

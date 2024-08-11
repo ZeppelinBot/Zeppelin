@@ -1,5 +1,5 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { zLogsConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { zLogsConfig } from "./types.js";
 
 export const logsPluginInfo: ZeppelinPluginInfo = {
   prettyName: "Logs",

@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { reactionRolesCmd } from "../types";
-import { refreshReactionRoles } from "../util/refreshReactionRoles";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { reactionRolesCmd } from "../types.js";
+import { refreshReactionRoles } from "../util/refreshReactionRoles.js";
 
 export const RefreshReactionRolesCmd = reactionRolesCmd({
   trigger: "reaction_roles refresh",

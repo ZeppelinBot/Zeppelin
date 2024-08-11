@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualMassMuteCmd } from "./actualMassMuteCmd";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualMassMuteCmd } from "./actualMassMuteCmd.js";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),

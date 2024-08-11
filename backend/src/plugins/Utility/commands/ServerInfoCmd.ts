@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getServerInfoEmbed } from "../functions/getServerInfoEmbed";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getServerInfoEmbed } from "../functions/getServerInfoEmbed.js";
+import { utilityCmd } from "../types.js";
 
 export const ServerInfoCmd = utilityCmd({
   trigger: ["server", "serverinfo"],

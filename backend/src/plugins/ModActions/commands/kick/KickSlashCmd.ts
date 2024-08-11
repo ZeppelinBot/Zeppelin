@@ -1,12 +1,12 @@
 import { ChannelType, GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualKickCmd } from "./actualKickCmd";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { UserNotificationMethod, resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualKickCmd } from "./actualKickCmd.js";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),

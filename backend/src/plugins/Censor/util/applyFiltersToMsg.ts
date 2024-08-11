@@ -2,12 +2,12 @@ import { Embed, Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
 import cloneDeep from "lodash.clonedeep";
-import { allowTimeout } from "../../../RegExpRunner";
-import { ZalgoRegex } from "../../../data/Zalgo";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils";
-import { CensorPluginType } from "../types";
-import { censorMessage } from "./censorMessage";
+import { allowTimeout } from "../../../RegExpRunner.js";
+import { ZalgoRegex } from "../../../data/Zalgo.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils.js";
+import { CensorPluginType } from "../types.js";
+import { censorMessage } from "./censorMessage.js";
 
 export async function applyFiltersToMsg(
   pluginData: GuildPluginData<CensorPluginType>,

@@ -1,8 +1,8 @@
 import { BaseConfig, ConfigValidationError, GuildPluginBlueprint, PluginConfigManager } from "knub";
 import { ZodError } from "zod";
-import { guildPlugins } from "./plugins/availablePlugins";
-import { zZeppelinGuildConfig } from "./types";
-import { formatZodIssue } from "./utils/formatZodIssue";
+import { guildPlugins } from "./plugins/availablePlugins.js";
+import { zZeppelinGuildConfig } from "./types.js";
+import { formatZodIssue } from "./utils/formatZodIssue.js";
 
 const pluginNameToPlugin = new Map<string, GuildPluginBlueprint<any, any>>();
 for (const plugin of guildPlugins) {

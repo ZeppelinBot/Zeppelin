@@ -1,7 +1,7 @@
 import { BasePluginType, CooldownManager, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { zBoundedCharacters, zBoundedRecord } from "../../utils";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { zBoundedCharacters, zBoundedRecord } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 const zRoleMap = z.record(
   zBoundedCharacters(1, 100),

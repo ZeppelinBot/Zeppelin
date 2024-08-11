@@ -1,12 +1,12 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin";
-import { AutoDeletePluginType, zAutoDeleteConfig } from "./types";
-import { onMessageCreate } from "./util/onMessageCreate";
-import { onMessageDelete } from "./util/onMessageDelete";
-import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { TimeAndDatePlugin } from "../TimeAndDate/TimeAndDatePlugin.js";
+import { AutoDeletePluginType, zAutoDeleteConfig } from "./types.js";
+import { onMessageCreate } from "./util/onMessageCreate.js";
+import { onMessageDelete } from "./util/onMessageDelete.js";
+import { onMessageDeleteBulk } from "./util/onMessageDeleteBulk.js";
 
 const defaultOptions: PluginOptions<AutoDeletePluginType> = {
   config: {

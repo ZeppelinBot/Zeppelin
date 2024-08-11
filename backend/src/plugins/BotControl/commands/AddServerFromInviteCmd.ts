@@ -1,9 +1,9 @@
-import { ApiPermissions } from "@zeppelinbot/shared";
+import { ApiPermissions } from "@zeppelinbot/shared.js";
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils";
-import { isEligible } from "../functions/isEligible";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { DBDateFormat, isGuildInvite, resolveInvite } from "../../../utils.js";
+import { isEligible } from "../functions/isEligible.js";
+import { botControlCmd } from "../types.js";
 
 export const AddServerFromInviteCmd = botControlCmd({
   trigger: ["add_server_from_invite", "allow_server_from_invite", "adv"],

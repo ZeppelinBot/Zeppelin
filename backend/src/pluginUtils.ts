@@ -13,9 +13,9 @@ import {
   User,
 } from "discord.js";
 import { AnyPluginData, BasePluginData, CommandContext, ExtendedMatchParams, GuildPluginData, helpers } from "knub";
-import { isStaff } from "./staff";
-import { TZeppelinKnub } from "./types";
-import { Tail } from "./utils/typeUtils";
+import { isStaff } from "./staff.js";
+import { TZeppelinKnub } from "./types.js";
+import { Tail } from "./utils/typeUtils.js";
 
 const { getMemberLevel } = helpers;
 

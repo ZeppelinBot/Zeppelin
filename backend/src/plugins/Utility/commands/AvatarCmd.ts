@@ -1,7 +1,7 @@
 import { APIEmbed, ImageFormat } from "discord.js";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { UnknownUser, renderUsername } from "../../../utils";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { UnknownUser, renderUsername } from "../../../utils.js";
+import { utilityCmd } from "../types.js";
 
 export const AvatarCmd = utilityCmd({
   trigger: ["avatar", "av"],

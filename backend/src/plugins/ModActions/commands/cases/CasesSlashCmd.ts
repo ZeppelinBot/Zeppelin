@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { modActionsSlashCmd } from "../../types";
-import { actualCasesCmd } from "./actualCasesCmd";
+import { modActionsSlashCmd } from "../../types.js";
+import { actualCasesCmd } from "./actualCasesCmd.js";
 
 const opts = [
   slashOptions.user({ name: "user", description: "The user to show cases for", required: false }),

@@ -1,17 +1,17 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../../data/CaseTypes";
-import { LogType } from "../../../../data/LogType";
-import { DAYS, MINUTES, UnknownUser } from "../../../../utils";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { CaseTypes } from "../../../../data/CaseTypes.js";
+import { LogType } from "../../../../data/LogType.js";
+import { DAYS, MINUTES, UnknownUser } from "../../../../utils.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
 import {
   formatReasonWithAttachments,
   formatReasonWithMessageLinkForAttachments,
-} from "../../functions/formatReasonForAttachments";
-import { ignoreEvent } from "../../functions/ignoreEvent";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
+} from "../../functions/formatReasonForAttachments.js";
+import { ignoreEvent } from "../../functions/ignoreEvent.js";
+import { IgnoredEventType, ModActionsPluginType } from "../../types.js";
 
 export async function actualForceBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

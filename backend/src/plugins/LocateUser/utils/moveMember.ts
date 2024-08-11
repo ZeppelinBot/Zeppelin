@@ -1,6 +1,6 @@
 import { GuildMember, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LocateUserPluginType } from "../types";
+import { LocateUserPluginType } from "../types.js";
 
 export async function moveMember(
   pluginData: GuildPluginData<LocateUserPluginType>,

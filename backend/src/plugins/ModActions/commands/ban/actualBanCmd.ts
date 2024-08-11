@@ -2,22 +2,22 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } f
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
 import { getMemberLevel } from "knub/helpers";
-import { CaseTypes } from "../../../../data/CaseTypes";
-import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop";
-import { canActOn, getContextChannel } from "../../../../pluginUtils";
-import { UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
-import { banLock } from "../../../../utils/lockNameHelpers";
-import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { banUserId } from "../../functions/banUserId";
+import { CaseTypes } from "../../../../data/CaseTypes.js";
+import { clearExpiringTempban, registerExpiringTempban } from "../../../../data/loops/expiringTempbansLoop.js";
+import { canActOn, getContextChannel } from "../../../../pluginUtils.js";
+import { UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils.js";
+import { banLock } from "../../../../utils/lockNameHelpers.js";
+import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
+import { banUserId } from "../../functions/banUserId.js";
 import {
   formatReasonWithAttachments,
   formatReasonWithMessageLinkForAttachments,
-} from "../../functions/formatReasonForAttachments";
-import { isBanned } from "../../functions/isBanned";
-import { ModActionsPluginType } from "../../types";
+} from "../../functions/formatReasonForAttachments.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

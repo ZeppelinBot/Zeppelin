@@ -1,9 +1,9 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { hasPermission } from "../../../../pluginUtils";
-import { UserNotificationMethod, resolveUser } from "../../../../utils";
-import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs";
-import { modActionsMsgCmd } from "../../types";
-import { actualBanCmd } from "./actualBanCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { UserNotificationMethod, resolveUser } from "../../../../utils.js";
+import { readContactMethodsFromArgs } from "../../functions/readContactMethodsFromArgs.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualBanCmd } from "./actualBanCmd.js";
 
 const opts = {
   mod: ct.member({ option: true }),

@@ -1,17 +1,17 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
-import { makePublicFn } from "../../pluginUtils";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd";
-import { SetTimezoneCmd } from "./commands/SetTimezoneCmd";
-import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd";
-import { defaultDateFormats } from "./defaultDateFormats";
-import { getDateFormat } from "./functions/getDateFormat";
-import { getGuildTz } from "./functions/getGuildTz";
-import { getMemberTz } from "./functions/getMemberTz";
-import { inGuildTz } from "./functions/inGuildTz";
-import { inMemberTz } from "./functions/inMemberTz";
-import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types";
+import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
+import { makePublicFn } from "../../pluginUtils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { ResetTimezoneCmd } from "./commands/ResetTimezoneCmd.js";
+import { SetTimezoneCmd } from "./commands/SetTimezoneCmd.js";
+import { ViewTimezoneCmd } from "./commands/ViewTimezoneCmd.js";
+import { defaultDateFormats } from "./defaultDateFormats.js";
+import { getDateFormat } from "./functions/getDateFormat.js";
+import { getGuildTz } from "./functions/getGuildTz.js";
+import { getMemberTz } from "./functions/getMemberTz.js";
+import { inGuildTz } from "./functions/inGuildTz.js";
+import { inMemberTz } from "./functions/inMemberTz.js";
+import { TimeAndDatePluginType, zTimeAndDateConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<TimeAndDatePluginType> = {
   config: {

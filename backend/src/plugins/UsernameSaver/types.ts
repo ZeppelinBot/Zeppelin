@@ -1,7 +1,7 @@
 import { BasePluginType, guildPluginEventListener } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { UsernameHistory } from "../../data/UsernameHistory";
+import { Queue } from "../../Queue.js";
+import { UsernameHistory } from "../../data/UsernameHistory.js";
 
 export const zUsernameSaverConfig = z.strictObject({});
 

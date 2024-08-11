@@ -1,8 +1,8 @@
 import { Repository } from "typeorm";
-import { decrypt, encrypt } from "../utils/crypt";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { Webhook } from "./entities/Webhook";
+import { decrypt, encrypt } from "../utils/crypt.js";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Webhook } from "./entities/Webhook.js";
 
 export class Webhooks extends BaseRepository {
   repository: Repository<Webhook> = dataSource.getRepository(Webhook);

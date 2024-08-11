@@ -1,12 +1,12 @@
 import { In, InsertResult, Repository } from "typeorm";
 import { FindOptionsWhere } from "typeorm/find-options/FindOptionsWhere";
-import { Queue } from "../Queue";
-import { chunkArray } from "../utils";
-import { BaseGuildRepository } from "./BaseGuildRepository";
-import { CaseTypes } from "./CaseTypes";
-import { dataSource } from "./dataSource";
-import { Case } from "./entities/Case";
-import { CaseNote } from "./entities/CaseNote";
+import { Queue } from "../Queue.js";
+import { chunkArray } from "../utils.js";
+import { BaseGuildRepository } from "./BaseGuildRepository.js";
+import { CaseTypes } from "./CaseTypes.js";
+import { dataSource } from "./dataSource.js";
+import { Case } from "./entities/Case.js";
+import { CaseNote } from "./entities/CaseNote.js";
 
 export class GuildCases extends BaseGuildRepository {
   private cases: Repository<Case>;

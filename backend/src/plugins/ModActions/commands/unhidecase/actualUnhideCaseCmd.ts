@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { ModActionsPluginType } from "../../types";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualUnhideCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

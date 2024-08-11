@@ -1,8 +1,8 @@
 import moment from "moment-timezone";
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { getBaseUrl } from "../../../pluginUtils";
-import { canReadChannel } from "../../../utils/canReadChannel";
-import { utilityCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { getBaseUrl } from "../../../pluginUtils.js";
+import { canReadChannel } from "../../../utils/canReadChannel.js";
+import { utilityCmd } from "../types.js";
 
 export const SourceCmd = utilityCmd({
   trigger: "source",

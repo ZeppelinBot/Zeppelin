@@ -1,11 +1,11 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { canActOn, hasPermission } from "../../../../pluginUtils";
-import { resolveMember, resolveUser } from "../../../../utils";
-import { waitForButtonConfirm } from "../../../../utils/waitForInteraction";
-import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { isBanned } from "../../functions/isBanned";
-import { modActionsMsgCmd } from "../../types";
-import { actualUnmuteCmd } from "./actualUnmuteCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { canActOn, hasPermission } from "../../../../pluginUtils.js";
+import { resolveMember, resolveUser } from "../../../../utils.js";
+import { waitForButtonConfirm } from "../../../../utils/waitForInteraction.js";
+import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualUnmuteCmd } from "./actualUnmuteCmd.js";
 
 const opts = {
   mod: ct.member({ option: true }),

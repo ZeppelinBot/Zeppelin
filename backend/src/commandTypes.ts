@@ -24,9 +24,9 @@ import {
   resolveUserId,
   roleMentionRegex,
   UnknownUser,
-} from "./utils";
-import { isValidTimezone } from "./utils/isValidTimezone";
-import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget";
+} from "./utils.js";
+import { isValidTimezone } from "./utils/isValidTimezone.js";
+import { MessageTarget, resolveMessageTarget } from "./utils/resolveMessageTarget.js";
 
 export const commandTypes = {
   ...messageCommandBaseTypeConverters,

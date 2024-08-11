@@ -1,9 +1,9 @@
 import { Message } from "discord.js";
-import { noop } from "../../../utils";
-import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions";
-import { missingPermissionError } from "../../../utils/missingPermissionError";
-import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions";
-import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel";
+import { noop } from "../../../utils.js";
+import { getMissingChannelPermissions } from "../../../utils/getMissingChannelPermissions.js";
+import { missingPermissionError } from "../../../utils/missingPermissionError.js";
+import { BOT_SLOWMODE_DISABLE_PERMISSIONS } from "../requiredPermissions.js";
+import { disableBotSlowmodeForChannel } from "./disableBotSlowmodeForChannel.js";
 
 export async function actualDisableSlowmodeCmd(msg: Message, args, pluginData) {
   const botSlowmode = await pluginData.state.slowmodes.getChannelSlowmode(args.channel.id);

@@ -1,14 +1,14 @@
 import { BasePluginType, pluginUtils } from "knub";
 import z from "zod";
-import { zBoundedCharacters, zBoundedRecord } from "../../utils";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { zAddRoleAction } from "./actions/addRoleAction";
-import { zCreateCaseAction } from "./actions/createCaseAction";
-import { zMakeRoleMentionableAction } from "./actions/makeRoleMentionableAction";
-import { zMakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAction";
-import { zMessageAction } from "./actions/messageAction";
-import { zMoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction";
-import { zSetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides";
+import { zBoundedCharacters, zBoundedRecord } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { zAddRoleAction } from "./actions/addRoleAction.js";
+import { zCreateCaseAction } from "./actions/createCaseAction.js";
+import { zMakeRoleMentionableAction } from "./actions/makeRoleMentionableAction.js";
+import { zMakeRoleUnmentionableAction } from "./actions/makeRoleUnmentionableAction.js";
+import { zMessageAction } from "./actions/messageAction.js";
+import { zMoveToVoiceChannelAction } from "./actions/moveToVoiceChannelAction.js";
+import { zSetChannelPermissionOverridesAction } from "./actions/setChannelPermissionOverrides.js";
 
 const zCommandTrigger = z.strictObject({
   type: z.literal("command"),

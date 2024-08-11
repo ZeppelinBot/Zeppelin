@@ -1,7 +1,7 @@
 import { Attachment, ChatInputCommandInteraction, Message } from "discord.js";
 import { GuildPluginData } from "knub";
-import { isContextMessage } from "../../../pluginUtils";
-import { ModActionsPluginType } from "../types";
+import { isContextMessage } from "../../../pluginUtils.js";
+import { ModActionsPluginType } from "../types.js";
 
 export async function formatReasonWithMessageLinkForAttachments(
   pluginData: GuildPluginData<ModActionsPluginType>,

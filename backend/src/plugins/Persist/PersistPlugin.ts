@@ -1,11 +1,11 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildPersistedData } from "../../data/GuildPersistedData";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { LoadDataEvt } from "./events/LoadDataEvt";
-import { StoreDataEvt } from "./events/StoreDataEvt";
-import { PersistPluginType, zPersistConfig } from "./types";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildPersistedData } from "../../data/GuildPersistedData.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
+import { LoadDataEvt } from "./events/LoadDataEvt.js";
+import { StoreDataEvt } from "./events/StoreDataEvt.js";
+import { PersistPluginType, zPersistConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<PersistPluginType> = {
   config: {

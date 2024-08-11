@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { ApiUserInfo } from "./ApiUserInfo";
+import { ApiUserInfo } from "./ApiUserInfo.js";
 
 @Entity("configs")
 export class Config {

@@ -1,17 +1,17 @@
 import { GuildTextBasedChannel, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../data/LogType";
-import { SavedMessage } from "../../../data/entities/SavedMessage";
-import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter";
-import { UnknownUser } from "../../../utils";
-import { resolveChannelIds } from "../../../utils/resolveChannelIds";
+import { LogType } from "../../../data/LogType.js";
+import { SavedMessage } from "../../../data/entities/SavedMessage.js";
+import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
+import { UnknownUser } from "../../../utils.js";
+import { resolveChannelIds } from "../../../utils/resolveChannelIds.js";
 import {
   channelToTemplateSafeChannel,
   savedMessageToTemplateSafeSavedMessage,
   userToTemplateSafeUser,
-} from "../../../utils/templateSafeObjects";
-import { LogsPluginType } from "../types";
-import { log } from "../util/log";
+} from "../../../utils/templateSafeObjects.js";
+import { LogsPluginType } from "../types.js";
+import { log } from "../util/log.js";
 
 interface LogMessageEditData {
   user: User | UnknownUser;

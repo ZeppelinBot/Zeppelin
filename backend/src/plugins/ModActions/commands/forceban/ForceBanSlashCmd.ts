@@ -1,11 +1,11 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { hasPermission } from "../../../../pluginUtils";
-import { convertDelayStringToMS, resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualForceBanCmd } from "./actualForceBanCmd";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { convertDelayStringToMS, resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualForceBanCmd } from "./actualForceBanCmd.js";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),

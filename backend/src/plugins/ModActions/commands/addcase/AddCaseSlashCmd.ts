@@ -1,12 +1,12 @@
 import { GuildMember } from "discord.js";
 import { slashOptions } from "knub";
-import { CaseTypes } from "../../../../data/CaseTypes";
-import { hasPermission } from "../../../../pluginUtils";
-import { resolveMember } from "../../../../utils";
-import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions";
-import { modActionsSlashCmd } from "../../types";
-import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants";
-import { actualAddCaseCmd } from "./actualAddCaseCmd";
+import { CaseTypes } from "../../../../data/CaseTypes.js";
+import { hasPermission } from "../../../../pluginUtils.js";
+import { resolveMember } from "../../../../utils.js";
+import { generateAttachmentSlashOptions, retrieveMultipleOptions } from "../../../../utils/multipleSlashOptions.js";
+import { modActionsSlashCmd } from "../../types.js";
+import { NUMBER_ATTACHMENTS_CASE_CREATION } from "../constants.js";
+import { actualAddCaseCmd } from "./actualAddCaseCmd.js";
 
 const opts = [
   slashOptions.string({ name: "reason", description: "The reason", required: false }),

@@ -1,5 +1,5 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
 
 export const censorPluginInfo: ZeppelinPluginInfo = {
   showInDocs: true,

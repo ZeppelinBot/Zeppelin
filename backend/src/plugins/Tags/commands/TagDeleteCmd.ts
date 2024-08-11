@@ -1,5 +1,5 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { tagsCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { tagsCmd } from "../types.js";
 
 export const TagDeleteCmd = tagsCmd({
   trigger: "tag delete",

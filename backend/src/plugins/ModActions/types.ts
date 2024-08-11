@@ -9,15 +9,15 @@ import {
   pluginUtils,
 } from "knub";
 import z from "zod";
-import { Queue } from "../../Queue";
-import { GuildCases } from "../../data/GuildCases";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildMutes } from "../../data/GuildMutes";
-import { GuildTempbans } from "../../data/GuildTempbans";
-import { Case } from "../../data/entities/Case";
-import { UserNotificationMethod, UserNotificationResult } from "../../utils";
-import { CaseArgs } from "../Cases/types";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { Queue } from "../../Queue.js";
+import { GuildCases } from "../../data/GuildCases.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildMutes } from "../../data/GuildMutes.js";
+import { GuildTempbans } from "../../data/GuildTempbans.js";
+import { Case } from "../../data/entities/Case.js";
+import { UserNotificationMethod, UserNotificationResult } from "../../utils.js";
+import { CaseArgs } from "../Cases/types.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export type AttachmentLinkReactionType = "none" | "warn" | "restrict" | null;
 

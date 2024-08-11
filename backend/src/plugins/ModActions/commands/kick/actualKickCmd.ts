@@ -1,17 +1,17 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../../data/LogType";
-import { canActOn } from "../../../../pluginUtils";
-import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { LogType } from "../../../../data/LogType.js";
+import { canActOn } from "../../../../pluginUtils.js";
+import { DAYS, SECONDS, UnknownUser, UserNotificationMethod, renderUsername, resolveMember } from "../../../../utils.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
 import {
   formatReasonWithAttachments,
   formatReasonWithMessageLinkForAttachments,
-} from "../../functions/formatReasonForAttachments";
-import { ignoreEvent } from "../../functions/ignoreEvent";
-import { isBanned } from "../../functions/isBanned";
-import { kickMember } from "../../functions/kickMember";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
+} from "../../functions/formatReasonForAttachments.js";
+import { ignoreEvent } from "../../functions/ignoreEvent.js";
+import { isBanned } from "../../functions/isBanned.js";
+import { kickMember } from "../../functions/kickMember.js";
+import { IgnoredEventType, ModActionsPluginType } from "../../types.js";
 
 export async function actualKickCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

@@ -1,6 +1,6 @@
-import { ZeppelinPluginInfo } from "../../types";
-import { trimPluginDescription } from "../../utils";
-import { zContextMenusConfig } from "./types";
+import { ZeppelinPluginInfo } from "../../types.js";
+import { trimPluginDescription } from "../../utils.js";
+import { zContextMenusConfig } from "./types.js";
 
 export const contextMenuPluginInfo: ZeppelinPluginInfo = {
   showInDocs: false,

@@ -1,6 +1,6 @@
 import { Snowflake } from "discord.js";
-import { resolveMember } from "../../../utils";
-import { mutesCmd } from "../types";
+import { resolveMember } from "../../../utils.js";
+import { mutesCmd } from "../types.js";
 
 export const ClearMutesWithoutRoleCmd = mutesCmd({
   trigger: "clear_mutes_without_role",

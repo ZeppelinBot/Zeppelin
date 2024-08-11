@@ -1,19 +1,19 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../../data/CaseTypes";
-import { LogType } from "../../../../data/LogType";
-import { humanizeDurationShort } from "../../../../humanizeDurationShort";
-import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
-import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { CaseTypes } from "../../../../data/CaseTypes.js";
+import { LogType } from "../../../../data/LogType.js";
+import { humanizeDurationShort } from "../../../../humanizeDurationShort.js";
+import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
 import {
   formatReasonWithAttachments,
   formatReasonWithMessageLinkForAttachments,
-} from "../../functions/formatReasonForAttachments";
-import { ignoreEvent } from "../../functions/ignoreEvent";
-import { IgnoredEventType, ModActionsPluginType } from "../../types";
+} from "../../functions/formatReasonForAttachments.js";
+import { ignoreEvent } from "../../functions/ignoreEvent.js";
+import { IgnoredEventType, ModActionsPluginType } from "../../types.js";
 
 export async function actualMassBanCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

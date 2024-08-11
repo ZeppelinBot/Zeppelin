@@ -1,4 +1,4 @@
-import { asyncMap } from "../utils/async";
+import { asyncMap } from "../utils/async.js";
 
 export class BaseRepository<TEntity = unknown> {
   private nextRelations: string[];

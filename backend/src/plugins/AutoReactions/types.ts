@@ -1,10 +1,10 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { GuildAutoReactions } from "../../data/GuildAutoReactions";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { AutoReaction } from "../../data/entities/AutoReaction";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { GuildAutoReactions } from "../../data/GuildAutoReactions.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { AutoReaction } from "../../data/entities/AutoReaction.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zAutoReactionsConfig = z.strictObject({
   can_manage: z.boolean(),

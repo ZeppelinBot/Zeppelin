@@ -1,5 +1,5 @@
 import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export interface ChannelArchiverPluginType extends BasePluginType {
   state: {

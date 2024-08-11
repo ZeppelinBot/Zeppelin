@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { saveMessagesToDB } from "../saveMessagesToDB";
-import { messageSaverCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { saveMessagesToDB } from "../saveMessagesToDB.js";
+import { messageSaverCmd } from "../types.js";
 
 export const SavePinsToDBCmd = messageSaverCmd({
   trigger: "save_pins_to_db",

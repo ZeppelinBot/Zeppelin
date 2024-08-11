@@ -1,7 +1,7 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { resolveMember, resolveUser, UnknownUser } from "../../../../utils";
-import { modActionsMsgCmd } from "../../types";
-import { actualCasesCmd } from "./actualCasesCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { resolveMember, resolveUser, UnknownUser } from "../../../../utils.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualCasesCmd } from "./actualCasesCmd.js";
 
 const opts = {
   mod: ct.userId({ option: true }),

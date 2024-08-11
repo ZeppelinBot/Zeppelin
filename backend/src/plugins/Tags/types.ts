@@ -1,11 +1,11 @@
 import { BasePluginType, guildPluginEventListener, guildPluginMessageCommand, pluginUtils } from "knub";
 import z from "zod";
-import { GuildArchives } from "../../data/GuildArchives";
-import { GuildLogs } from "../../data/GuildLogs";
-import { GuildSavedMessages } from "../../data/GuildSavedMessages";
-import { GuildTags } from "../../data/GuildTags";
-import { zBoundedCharacters, zStrictMessageContent } from "../../utils";
-import { CommonPlugin } from "../Common/CommonPlugin";
+import { GuildArchives } from "../../data/GuildArchives.js";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
+import { GuildTags } from "../../data/GuildTags.js";
+import { zBoundedCharacters, zStrictMessageContent } from "../../utils.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
 
 export const zTag = z.union([zBoundedCharacters(0, 4000), zStrictMessageContent]);
 export type TTag = z.infer<typeof zTag>;

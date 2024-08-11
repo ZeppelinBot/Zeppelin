@@ -1,13 +1,13 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildLogs } from "../../data/GuildLogs";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin";
-import { AddRoleCmd } from "./commands/AddRoleCmd";
-import { MassAddRoleCmd } from "./commands/MassAddRoleCmd";
-import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd";
-import { RemoveRoleCmd } from "./commands/RemoveRoleCmd";
-import { RolesPluginType, zRolesConfig } from "./types";
+import { GuildLogs } from "../../data/GuildLogs.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { RoleManagerPlugin } from "../RoleManager/RoleManagerPlugin.js";
+import { AddRoleCmd } from "./commands/AddRoleCmd.js";
+import { MassAddRoleCmd } from "./commands/MassAddRoleCmd.js";
+import { MassRemoveRoleCmd } from "./commands/MassRemoveRoleCmd.js";
+import { RemoveRoleCmd } from "./commands/RemoveRoleCmd.js";
+import { RolesPluginType, zRolesConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<RolesPluginType> = {
   config: {

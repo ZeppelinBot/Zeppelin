@@ -1,17 +1,17 @@
 import { PluginOptions, guildPlugin } from "knub";
-import { GuildCases } from "../../data/GuildCases";
-import { CasesPlugin } from "../Cases/CasesPlugin";
-import { LogsPlugin } from "../Logs/LogsPlugin";
-import { ModActionsPlugin } from "../ModActions/ModActionsPlugin";
-import { MutesPlugin } from "../Mutes/MutesPlugin";
-import { UtilityPlugin } from "../Utility/UtilityPlugin";
-import { BanCmd } from "./commands/BanUserCtxCmd";
-import { CleanCmd } from "./commands/CleanMessageCtxCmd";
-import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd";
-import { MuteCmd } from "./commands/MuteUserCtxCmd";
-import { NoteCmd } from "./commands/NoteUserCtxCmd";
-import { WarnCmd } from "./commands/WarnUserCtxCmd";
-import { ContextMenuPluginType, zContextMenusConfig } from "./types";
+import { GuildCases } from "../../data/GuildCases.js";
+import { CasesPlugin } from "../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../Logs/LogsPlugin.js";
+import { ModActionsPlugin } from "../ModActions/ModActionsPlugin.js";
+import { MutesPlugin } from "../Mutes/MutesPlugin.js";
+import { UtilityPlugin } from "../Utility/UtilityPlugin.js";
+import { BanCmd } from "./commands/BanUserCtxCmd.js";
+import { CleanCmd } from "./commands/CleanMessageCtxCmd.js";
+import { ModMenuCmd } from "./commands/ModMenuUserCtxCmd.js";
+import { MuteCmd } from "./commands/MuteUserCtxCmd.js";
+import { NoteCmd } from "./commands/NoteUserCtxCmd.js";
+import { WarnCmd } from "./commands/WarnUserCtxCmd.js";
+import { ContextMenuPluginType, zContextMenusConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<ContextMenuPluginType> = {
   config: {

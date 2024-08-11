@@ -1,14 +1,14 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { CaseTypes } from "../../../../data/CaseTypes";
-import { Case } from "../../../../data/entities/Case";
-import { canActOn } from "../../../../pluginUtils";
-import { UnknownUser, renderUsername, resolveMember } from "../../../../utils";
-import { CasesPlugin } from "../../../Cases/CasesPlugin";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
-import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments";
-import { ModActionsPluginType } from "../../types";
+import { CaseTypes } from "../../../../data/CaseTypes.js";
+import { Case } from "../../../../data/entities/Case.js";
+import { canActOn } from "../../../../pluginUtils.js";
+import { UnknownUser, renderUsername, resolveMember } from "../../../../utils.js";
+import { CasesPlugin } from "../../../Cases/CasesPlugin.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
+import { formatReasonWithMessageLinkForAttachments } from "../../functions/formatReasonForAttachments.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualAddCaseCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

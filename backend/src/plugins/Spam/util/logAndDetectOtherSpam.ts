@@ -1,14 +1,14 @@
 import { GuildPluginData } from "knub";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { CaseTypes } from "../../../data/CaseTypes";
-import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin";
-import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin";
-import { convertDelayStringToMS, resolveMember } from "../../../utils";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { RecentActionType, SpamPluginType } from "../types";
-import { addRecentAction } from "./addRecentAction";
-import { clearRecentUserActions } from "./clearRecentUserActions";
-import { getRecentActionCount } from "./getRecentActionCount";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { CaseTypes } from "../../../data/CaseTypes.js";
+import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
+import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin.js";
+import { convertDelayStringToMS, resolveMember } from "../../../utils.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { RecentActionType, SpamPluginType } from "../types.js";
+import { addRecentAction } from "./addRecentAction.js";
+import { clearRecentUserActions } from "./clearRecentUserActions.js";
+import { getRecentActionCount } from "./getRecentActionCount.js";
 
 export async function logAndDetectOtherSpam(
   pluginData: GuildPluginData<SpamPluginType>,

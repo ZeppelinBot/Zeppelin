@@ -1,8 +1,8 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { AllowedGuild } from "../../../data/entities/AllowedGuild";
-import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment";
-import { renderUsername, resolveUser } from "../../../utils";
-import { botControlCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { AllowedGuild } from "../../../data/entities/AllowedGuild.js";
+import { ApiPermissionAssignment } from "../../../data/entities/ApiPermissionAssignment.js";
+import { renderUsername, resolveUser } from "../../../utils.js";
+import { botControlCmd } from "../types.js";
 
 export const ListDashboardPermsCmd = botControlCmd({
   trigger: ["list_dashboard_permissions", "list_dashboard_perms", "list_dash_permissions", "list_dash_perms"],

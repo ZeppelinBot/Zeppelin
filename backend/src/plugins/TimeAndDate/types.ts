@@ -1,11 +1,11 @@
 import { BasePluginType, guildPluginMessageCommand, pluginUtils } from "knub";
 import { U } from "ts-toolbelt";
 import z from "zod";
-import { GuildMemberTimezones } from "../../data/GuildMemberTimezones";
-import { keys } from "../../utils";
-import { zValidTimezone } from "../../utils/zValidTimezone";
-import { CommonPlugin } from "../Common/CommonPlugin";
-import { defaultDateFormats } from "./defaultDateFormats";
+import { GuildMemberTimezones } from "../../data/GuildMemberTimezones.js";
+import { keys } from "../../utils.js";
+import { zValidTimezone } from "../../utils/zValidTimezone.js";
+import { CommonPlugin } from "../Common/CommonPlugin.js";
+import { defaultDateFormats } from "./defaultDateFormats.js";
 
 const zDateFormatKeys = z.enum(keys(defaultDateFormats) as U.ListOf<keyof typeof defaultDateFormats>);
 

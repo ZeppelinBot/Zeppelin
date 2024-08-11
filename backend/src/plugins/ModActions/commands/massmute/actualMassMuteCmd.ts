@@ -1,16 +1,16 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { LogType } from "../../../../data/LogType";
-import { logger } from "../../../../logger";
-import { canActOn, isContextInteraction, sendContextResponse } from "../../../../pluginUtils";
-import { LogsPlugin } from "../../../Logs/LogsPlugin";
-import { MutesPlugin } from "../../../Mutes/MutesPlugin";
-import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction";
+import { LogType } from "../../../../data/LogType.js";
+import { logger } from "../../../../logger.js";
+import { canActOn, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
+import { LogsPlugin } from "../../../Logs/LogsPlugin.js";
+import { MutesPlugin } from "../../../Mutes/MutesPlugin.js";
+import { handleAttachmentLinkDetectionAndGetRestriction } from "../../functions/attachmentLinkReaction.js";
 import {
   formatReasonWithAttachments,
   formatReasonWithMessageLinkForAttachments,
-} from "../../functions/formatReasonForAttachments";
-import { ModActionsPluginType } from "../../types";
+} from "../../functions/formatReasonForAttachments.js";
+import { ModActionsPluginType } from "../../types.js";
 
 export async function actualMassMuteCmd(
   pluginData: GuildPluginData<ModActionsPluginType>,

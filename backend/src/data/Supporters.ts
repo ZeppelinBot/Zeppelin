@@ -1,7 +1,7 @@
 import { Repository } from "typeorm";
-import { BaseRepository } from "./BaseRepository";
-import { dataSource } from "./dataSource";
-import { Supporter } from "./entities/Supporter";
+import { BaseRepository } from "./BaseRepository.js";
+import { dataSource } from "./dataSource.js";
+import { Supporter } from "./entities/Supporter.js";
 
 export class Supporters extends BaseRepository {
   private supporters: Repository<Supporter>;

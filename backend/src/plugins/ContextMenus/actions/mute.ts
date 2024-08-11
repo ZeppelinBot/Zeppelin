@@ -9,17 +9,17 @@ import {
 } from "discord.js";
 import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
-import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError";
-import { logger } from "../../../logger";
-import { canActOn } from "../../../pluginUtils";
-import { convertDelayStringToMS } from "../../../utils";
-import { CaseArgs } from "../../Cases/types";
-import { LogsPlugin } from "../../Logs/LogsPlugin";
-import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin";
-import { MutesPlugin } from "../../Mutes/MutesPlugin";
-import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd";
-import { ContextMenuPluginType, ModMenuActionType } from "../types";
-import { updateAction } from "./update";
+import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
+import { logger } from "../../../logger.js";
+import { canActOn } from "../../../pluginUtils.js";
+import { convertDelayStringToMS } from "../../../utils.js";
+import { CaseArgs } from "../../Cases/types.js";
+import { LogsPlugin } from "../../Logs/LogsPlugin.js";
+import { ModActionsPlugin } from "../../ModActions/ModActionsPlugin.js";
+import { MutesPlugin } from "../../Mutes/MutesPlugin.js";
+import { MODAL_TIMEOUT } from "../commands/ModMenuUserCtxCmd.js";
+import { ContextMenuPluginType, ModMenuActionType } from "../types.js";
+import { updateAction } from "./update.js";
 
 async function muteAction(
   pluginData: GuildPluginData<ContextMenuPluginType>,

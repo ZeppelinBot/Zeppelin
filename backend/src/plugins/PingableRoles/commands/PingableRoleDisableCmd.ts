@@ -1,5 +1,5 @@
-import { commandTypeHelpers as ct } from "../../../commandTypes";
-import { pingableRolesCmd } from "../types";
+import { commandTypeHelpers as ct } from "../../../commandTypes.js";
+import { pingableRolesCmd } from "../types.js";
 
 export const PingableRoleDisableCmd = pingableRolesCmd({
   trigger: ["pingable_role disable", "pingable_role d"],

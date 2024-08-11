@@ -9,11 +9,11 @@ import {
   User,
 } from "discord.js";
 import { PluginOptions, guildPlugin } from "knub";
-import { logger } from "../../logger";
-import { isContextInteraction, sendContextResponse } from "../../pluginUtils";
-import { errorMessage, successMessage } from "../../utils";
-import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji";
-import { CommonPluginType, zCommonConfig } from "./types";
+import { logger } from "../../logger.js";
+import { isContextInteraction, sendContextResponse } from "../../pluginUtils.js";
+import { errorMessage, successMessage } from "../../utils.js";
+import { getErrorEmoji, getSuccessEmoji } from "./functions/getEmoji.js";
+import { CommonPluginType, zCommonConfig } from "./types.js";
 
 const defaultOptions: PluginOptions<CommonPluginType> = {
   config: {

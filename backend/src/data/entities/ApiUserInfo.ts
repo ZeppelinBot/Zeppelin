@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { ApiLogin } from "./ApiLogin";
-import { ApiPermissionAssignment } from "./ApiPermissionAssignment";
+import { ApiLogin } from "./ApiLogin.js";
+import { ApiPermissionAssignment } from "./ApiPermissionAssignment.js";
 
 export interface ApiUserInfoData {
   username: string;

@@ -1,6 +1,6 @@
-import { commandTypeHelpers as ct } from "../../../../commandTypes";
-import { modActionsMsgCmd } from "../../types";
-import { actualCaseCmd } from "./actualCaseCmd";
+import { commandTypeHelpers as ct } from "../../../../commandTypes.js";
+import { modActionsMsgCmd } from "../../types.js";
+import { actualCaseCmd } from "./actualCaseCmd.js";
 
 const opts = {
   show: ct.switchOption({ def: false, shortcut: "sh" }),
