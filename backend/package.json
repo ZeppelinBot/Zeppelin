@@ -42,7 +42,7 @@
     "dotenv": "^4.0.0",
     "emoji-regex": "^8.0.0",
     "escape-string-regexp": "^1.0.5",
-    "express": "^4.19.2",
+    "express": "^4.20.0",
     "fp-ts": "^2.0.1",
     "humanize-duration": "^3.15.0",
     "js-yaml": "^3.13.1",
