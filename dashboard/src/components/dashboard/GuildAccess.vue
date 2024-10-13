@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import { ApiPermissions, hasPermission } from "@zeppelinbot/shared";
+import { ApiPermissions, hasPermission } from "@zeppelinbot/shared/apiPermissions.js";
 import PermissionTree from "./PermissionTree.vue";
 import { mapState } from "vuex";
 import {
