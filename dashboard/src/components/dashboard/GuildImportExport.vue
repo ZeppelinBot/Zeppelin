@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { mapState } from "vuex";
-import { ApiPermissions, hasPermission } from "@zeppelinbot/shared";
+import { ApiPermissions, hasPermission } from "@zeppelinbot/shared/apiPermissions.js";
 import { AuthState, GuildState } from "../../store/types";
 import { ApiError, formPost } from "../../api";
 import moment from "moment";
