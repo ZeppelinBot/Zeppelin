@@ -42,7 +42,11 @@ export async function actualMuteUserCmd(
   }
 
   const timeUntilUnmute = args.time && humanizeDuration(args.time);
-  const reason = args.reason ? formatReasonWithAttachments(args.reason, [...msg.attachments.values()]) : undefined;
+
+  const config = pluginData.config.get();
+  const reason = args.reason
+    ? formatReasonWithAttachments(args.reason, [...msg.attachments.values()])
+    : config.default_reasons?.mute || "No reason specified";
 
   let muteResult: MuteResult;
   const mutesPlugin = pluginData.getPlugin(MutesPlugin);
