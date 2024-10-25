@@ -6,7 +6,8 @@ import { GuildSavedMessages } from "../../data/GuildSavedMessages.js";
 import { GuildTags } from "../../data/GuildTags.js";
 import { zEmbedInput } from "../../utils.js";
 
-export const zTag = z.union([z.string(), zEmbedInput]);
+const zEmbeds = z.object({embeds: z.array(zEmbedInput)})
+export const zTag = z.union([z.string(), zEmbeds]);
 export type TTag = z.infer<typeof zTag>;
 
 export const zTagCategory = z
