@@ -1,22 +1,21 @@
-import { AnyThreadChannel } from "discord.js";
+import { PublicThreadChannel } from "discord.js";
 import z from "zod";
-import { noop } from "../../../utils.js";
+import { zSnowflake } from "../../../utils.js";
 import { automodAction } from "../helpers.js";
 
-export const ArchiveThreadAction = automodAction({
+export const EditPostTagsAction = automodAction({
   configSchema: z.strictObject({
-    lock: z.boolean().optional(),
+    tags: z.array(zSnowflake),
   }),
 
   async apply({ pluginData, contexts, actionConfig }) {
     const threads = contexts
       .filter((c) => c.message?.channel_id)
       .map((c) => pluginData.guild.channels.cache.get(c.message!.channel_id))
-      .filter((c): c is AnyThreadChannel => c?.isThread() ?? false);
+      .filter((c): c is PublicThreadChannel => (c?.isThread() && c?.parent?.isThreadOnly() && c?.editable) ?? false);
 
     for (const thread of threads) {
-      actionConfig.lock ? await thread.setLocked().catch(noop) : null;
-      await thread.setArchived().catch(noop);
+      await thread.setAppliedTags(actionConfig.tags);
     }
   },
 });
