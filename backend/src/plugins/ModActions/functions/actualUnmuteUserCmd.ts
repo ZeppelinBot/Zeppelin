@@ -1,6 +1,6 @@
 import { GuildMember, Message, User } from "discord.js";
-import humanizeDuration from "humanize-duration";
 import { GuildPluginData } from "knub";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { MutesPlugin } from "../../../plugins/Mutes/MutesPlugin.js";
 import { UnknownUser, asSingleLine, renderUsername } from "../../../utils.js";

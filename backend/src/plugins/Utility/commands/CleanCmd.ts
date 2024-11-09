@@ -4,7 +4,7 @@ import { allowTimeout } from "../../../RegExpRunner.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
-import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { getBaseUrl, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { ModActionsPlugin } from "../../../plugins/ModActions/ModActionsPlugin.js";
 import { DAYS, SECONDS, chunkArray, getInviteCodesInString, noop } from "../../../utils.js";

@@ -1,5 +1,5 @@
-import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { sendErrorMessage } from "../../../pluginUtils.js";
 import { createChunkedMessage, DBDateFormat, sorter } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";

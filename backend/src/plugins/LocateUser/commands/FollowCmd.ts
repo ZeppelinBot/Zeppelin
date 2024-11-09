@@ -1,7 +1,7 @@
-import humanizeDuration from "humanize-duration";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerExpiringVCAlert } from "../../../data/loops/expiringVCAlertsLoop.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { MINUTES, SECONDS } from "../../../utils.js";
 import { locateUserCmd } from "../types.js";

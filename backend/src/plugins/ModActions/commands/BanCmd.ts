@@ -1,8 +1,8 @@
-import humanizeDuration from "humanize-duration";
 import { getMemberLevel } from "knub/helpers";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { clearExpiringTempban, registerExpiringTempban } from "../../../data/loops/expiringTempbansLoop.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { canActOn, hasPermission, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
 import { renderUsername, resolveMember, resolveUser } from "../../../utils.js";

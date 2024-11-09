@@ -28,7 +28,6 @@ import {
 import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
-import humanizeDuration from "humanize-duration";
 import isEqual from "lodash/isEqual.js";
 import { performance } from "perf_hooks";
 import tlds from "tlds" assert { type: "json" };
@@ -36,6 +35,7 @@ import tmp from "tmp";
 import { URL } from "url";
 import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
+import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";
 import { SimpleCache } from "./SimpleCache.js";
 import { sendDM } from "./utils/sendDM.js";
@@ -44,21 +44,14 @@ import { waitForButtonConfirm } from "./utils/waitForInteraction.js";
 
 const fsp = fs.promises;
 
-const delayStringMultipliers = {
-  w: 1000 * 60 * 60 * 24 * 7,
-  d: 1000 * 60 * 60 * 24,
-  h: 1000 * 60 * 60,
-  m: 1000 * 60,
-  s: 1000,
-  x: 1,
-};
-
 export const MS = 1;
 export const SECONDS = 1000 * MS;
 export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
-export const WEEKS = 7 * 24 * HOURS;
+export const WEEKS = 7 * DAYS;
+export const YEARS = (365 + 1 / 4 - 1 / 100 + 1 / 400) * DAYS;
+export const MONTHS = YEARS / 12;
 
 export const EMPTY_CHAR = "\u200b";
 
@@ -407,7 +400,7 @@ const MAX_DELAY_STRING_AMOUNT = 100 * 365 * DAYS;
  * Turns a "delay string" such as "1h30m" to milliseconds
  */
 export function convertDelayStringToMS(str, defaultUnit = "m"): number | null {
-  const regex = /^([0-9]+)\s*([wdhms])?[a-z]*\s*/;
+  const regex = /^([0-9]+)\s*((?:mo?)|[ywdhs])?[a-z]*\s*/;
   let match;
   let ms = 0;
 

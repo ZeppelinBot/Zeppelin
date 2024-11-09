@@ -4,7 +4,7 @@ import { performance } from "perf_hooks";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
-import { humanizeDurationShort } from "../../../humanizeDurationShort.js";
+import { humanizeDurationShort } from "../../../humanizeDuration.js";
 import { canActOn, sendErrorMessage, sendSuccessMessage } from "../../../pluginUtils.js";
 import { CasesPlugin } from "../../../plugins/Cases/CasesPlugin.js";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../utils.js";

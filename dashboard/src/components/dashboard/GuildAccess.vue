@@ -108,7 +108,7 @@ import {
   GuildState,
   RootState
 } from "../../store/types";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "humanize-duration";
 import moment from "moment";
 
 export default {
