@@ -1,6 +1,5 @@
 import { EmbedData, GuildTextBasedChannel, Snowflake } from "discord.js";
 import { GuildPluginData } from "knub";
-import { cloneDeep } from "lodash";
 import { SavedMessage } from "../../../data/entities/SavedMessage.js";
 import { resolveUser } from "../../../utils.js";
 import { logMessageEdit } from "../logFunctions/logMessageEdit.js";
@@ -15,12 +14,12 @@ export async function onMessageUpdate(
   let logUpdate = false;
 
   const oldEmbedsToCompare = ((oldSavedMessage.data.embeds || []) as EmbedData[])
-    .map((e) => cloneDeep(e))
-    .filter((e) => (e as EmbedData).type === "rich");
+    .map((e) => structuredClone(e))
+    .filter((e) => e.type === "rich");
 
   const newEmbedsToCompare = ((savedMessage.data.embeds || []) as EmbedData[])
-    .map((e) => cloneDeep(e))
-    .filter((e) => (e as EmbedData).type === "rich");
+    .map((e) => structuredClone(e))
+    .filter((e) => e.type === "rich");
 
   for (const embed of [...oldEmbedsToCompare, ...newEmbedsToCompare]) {
     if (embed.thumbnail) {

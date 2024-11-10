@@ -1,7 +1,6 @@
 import { Invite } from "discord.js";
 import escapeStringRegexp from "escape-string-regexp";
 import { GuildPluginData } from "knub";
-import { cloneDeep } from "lodash";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { ZalgoRegex } from "../../../data/Zalgo.js";
 import { ISavedMessageEmbedData, SavedMessage } from "../../../data/entities/SavedMessage.js";
@@ -21,7 +20,7 @@ export async function applyFiltersToMsg(
   let messageContent = savedMessage.data.content || "";
   if (savedMessage.data.attachments) messageContent += " " + JSON.stringify(savedMessage.data.attachments);
   if (savedMessage.data.embeds) {
-    const embeds = (savedMessage.data.embeds as ManipulatedEmbedData[]).map((e) => cloneDeep(e));
+    const embeds = (savedMessage.data.embeds as ManipulatedEmbedData[]).map((e) => structuredClone(e));
     for (const embed of embeds) {
       if (embed.type === "video") {
         // Ignore video descriptions as they're not actually shown on the embed
