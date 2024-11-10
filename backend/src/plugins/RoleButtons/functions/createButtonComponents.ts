@@ -4,7 +4,7 @@ import { TRoleButtonsConfigItem } from "../types.js";
 import { TooManyComponentsError } from "./TooManyComponentsError.js";
 import { convertButtonStyleStringToEnum } from "./convertButtonStyleStringToEnum.js";
 
-export function createButtonComponents(configItem: TRoleButtonsConfigItem): Array<ActionRowBuilder<ButtonBuilder>> {
+export function createButtonComponents(configItem: TRoleButtonsConfigItem, configName: string): Array<ActionRowBuilder<ButtonBuilder>> {
   const rows: Array<ActionRowBuilder<ButtonBuilder>> = [];
 
   let currentRow = new ActionRowBuilder<ButtonBuilder>();
@@ -17,7 +17,7 @@ export function createButtonComponents(configItem: TRoleButtonsConfigItem): Arra
     const button = new ButtonBuilder()
       .setLabel(option.label ?? "")
       .setStyle(convertButtonStyleStringToEnum(option.style) ?? ButtonStyle.Primary)
-      .setCustomId(buildCustomId("roleButtons", { name: configItem.name, index }));
+      .setCustomId(buildCustomId("roleButtons", { name: configName, index }));
 
     if (option.emoji) {
       button.setEmoji(option.emoji);

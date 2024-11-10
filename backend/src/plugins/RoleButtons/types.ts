@@ -34,22 +34,6 @@ export type TRoleButtonOption = z.infer<typeof zRoleButtonOption>;
 
 const zRoleButtonsConfigItem = z
   .strictObject({
-    // Typed as "never" because you are not expected to supply this directly.
-    // The transform instead picks it up from the property key and the output type is a string.
-    name: z
-      .never()
-      .optional()
-      .transform((_, ctx) => {
-        const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-        if (!ruleName) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Role buttons must have names",
-          });
-          return z.NEVER;
-        }
-        return ruleName;
-      }),
     message: z.union([
       z.strictObject({
         channel_id: zSnowflake,
@@ -66,7 +50,7 @@ const zRoleButtonsConfigItem = z
   .refine(
     (parsed) => {
       try {
-        createButtonComponents(parsed);
+        createButtonComponents(parsed, "test"); // We can use any configName here
       } catch (err) {
         if (err instanceof TooManyComponentsError) {
           return false;

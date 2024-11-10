@@ -46,22 +46,6 @@ const zActionsMap = z
 
 const zRule = z.strictObject({
   enabled: z.boolean().default(true),
-  // Typed as "never" because you are not expected to supply this directly.
-  // The transform instead picks it up from the property key and the output type is a string.
-  name: z
-    .never()
-    .optional()
-    .transform((_, ctx) => {
-      const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-      if (!ruleName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Automod rules must have names",
-        });
-        return z.NEVER;
-      }
-      return ruleName;
-    }),
   pretty_name: z.string().optional(),
   presets: z.array(z.string().max(100)).max(25).default([]),
   affects_bots: z.boolean().default(false),
@@ -69,9 +53,7 @@ const zRule = z.strictObject({
   cooldown: zDelayString.nullable().default(null),
   allow_further_rules: z.boolean().default(false),
   triggers: z.array(zTriggersMap),
-  actions: zActionsMap.refine((v) => !(v.clean && v.start_thread), {
-    message: "Cannot have both clean and start_thread active at the same time",
-  }),
+  actions: zActionsMap,
 });
 export type TRule = z.infer<typeof zRule>;
 

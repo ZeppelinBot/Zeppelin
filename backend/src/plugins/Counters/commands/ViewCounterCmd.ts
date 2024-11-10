@@ -95,16 +95,15 @@ export const ViewCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
 
     const value = await pluginData.state.counters.getCurrentValue(counterId, channel?.id ?? null, user?.id ?? null);
     const finalValue = value ?? counter.initial_value;
-    const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.send(`**${counterName}** for <@!${user.id}> in <#${channel.id}> is ${finalValue}`);
+      message.channel.send(`**${args.counterName}** for <@!${user.id}> in <#${channel.id}> is ${finalValue}`);
     } else if (channel) {
-      message.channel.send(`**${counterName}** in <#${channel.id}> is ${finalValue}`);
+      message.channel.send(`**${args.counterName}** in <#${channel.id}> is ${finalValue}`);
     } else if (user) {
-      message.channel.send(`**${counterName}** for <@!${user.id}> is ${finalValue}`);
+      message.channel.send(`**${args.counterName}** for <@!${user.id}> is ${finalValue}`);
     } else {
-      message.channel.send(`**${counterName}** is ${finalValue}`);
+      message.channel.send(`**${args.counterName}** is ${finalValue}`);
     }
   },
 });

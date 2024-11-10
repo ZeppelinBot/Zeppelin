@@ -29,10 +29,9 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
       return;
     }
 
-    const counterName = counter.name || args.counterName;
     const confirmed = await confirm(message, message.author.id, {
       content: trimMultilineString(`
-        Do you want to reset **ALL** values for counter **${counterName}**?
+        Do you want to reset **ALL** values for counter **${args.counterName}**?
         This will reset the counter for **all** users and channels.
         **Note:** This will *not* trigger any triggers or counter triggers.
       `),
@@ -43,7 +42,7 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     }
 
     const loadingMessage = await message.channel
-      .send(`Resetting counter **${counterName}**. This might take a while. Please don't reload the config.`)
+      .send(`Resetting counter **${args.counterName}**. This might take a while. Please don't reload the config.`)
       .catch(() => null);
 
     await resetAllCounterValues(pluginData, args.counterName);
@@ -51,7 +50,7 @@ export const ResetAllCounterValuesCmd = guildPluginMessageCommand<CountersPlugin
     loadingMessage?.delete().catch(noop);
     void pluginData.state.common.sendSuccessMessage(
       message,
-      `All counter values for **${counterName}** have been reset`,
+      `All counter values for **${args.counterName}** have been reset`,
     );
 
     pluginData.getKnubInstance().reloadGuild(pluginData.guild.id);

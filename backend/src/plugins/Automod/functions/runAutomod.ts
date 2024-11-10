@@ -49,7 +49,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
     }
     if (!rule.affects_self && userId && userId === pluginData.client.user?.id) continue;
 
-    if (rule.cooldown && checkCooldown(pluginData, rule, context)) {
+    if (rule.cooldown && checkCooldown(pluginData, rule, ruleName, context)) {
       continue;
     }
 
@@ -87,7 +87,7 @@ export async function runAutomod(pluginData: GuildPluginData<AutomodPluginType>,
         }
 
         if (matchResult) {
-          if (rule.cooldown) applyCooldown(pluginData, rule, context);
+          if (rule.cooldown) applyCooldown(pluginData, rule, ruleName, context);
 
           contexts = [context, ...(matchResult.extraContexts || [])];
 

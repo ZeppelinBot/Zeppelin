@@ -97,20 +97,20 @@ export const CountersPlugin = guildPlugin<CountersPluginType>()({
     // Initialize and store the IDs of each of the counters internally
     state.counterIds = {};
     const config = pluginData.config.get();
-    for (const counter of Object.values(config.counters)) {
-      const dbCounter = await state.counters.findOrCreateCounter(counter.name, counter.per_channel, counter.per_user);
-      state.counterIds[counter.name] = dbCounter.id;
+    for (const [counterName, counter] of Object.entries(config.counters)) {
+      const dbCounter = await state.counters.findOrCreateCounter(counterName, counter.per_channel, counter.per_user);
+      state.counterIds[counterName] = dbCounter.id;
 
       const thisCounterTriggers: CounterTrigger[] = [];
       state.counterTriggersByCounterId.set(dbCounter.id, thisCounterTriggers);
 
       // Initialize triggers
-      for (const trigger of values(counter.triggers)) {
+      for (const [triggerName, trigger] of Object.entries(counter.triggers)) {
         const parsedCondition = parseCounterConditionString(trigger.condition)!;
         const parsedReverseCondition = parseCounterConditionString(trigger.reverse_condition)!;
         const counterTrigger = await state.counters.initCounterTrigger(
           dbCounter.id,
-          trigger.name,
+          triggerName,
           parsedCondition[0],
           parsedCondition[1],
           parsedReverseCondition[0],

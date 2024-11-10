@@ -123,16 +123,15 @@ export const SetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
     }
 
     await setCounterValue(pluginData, args.counterName, channel?.id ?? null, user?.id ?? null, value);
-    const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.send(`Set **${counterName}** for <@!${user.id}> in <#${channel.id}> to ${value}`);
+      message.channel.send(`Set **${args.counterName}** for <@!${user.id}> in <#${channel.id}> to ${value}`);
     } else if (channel) {
-      message.channel.send(`Set **${counterName}** in <#${channel.id}> to ${value}`);
+      message.channel.send(`Set **${args.counterName}** in <#${channel.id}> to ${value}`);
     } else if (user) {
-      message.channel.send(`Set **${counterName}** for <@!${user.id}> to ${value}`);
+      message.channel.send(`Set **${args.counterName}** for <@!${user.id}> to ${value}`);
     } else {
-      message.channel.send(`Set **${counterName}** to ${value}`);
+      message.channel.send(`Set **${args.counterName}** to ${value}`);
     }
   },
 });

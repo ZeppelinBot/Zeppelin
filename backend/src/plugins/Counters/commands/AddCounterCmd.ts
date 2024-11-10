@@ -119,18 +119,17 @@ export const AddCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
 
     await changeCounterValue(pluginData, args.counterName, channel?.id ?? null, user?.id ?? null, amount);
     const newValue = await pluginData.state.counters.getCurrentValue(counterId, channel?.id ?? null, user?.id ?? null);
-    const counterName = counter.name || args.counterName;
 
     if (channel && user) {
       message.channel.send(
-        `Added ${amount} to **${counterName}** for <@!${user.id}> in <#${channel.id}>. The value is now ${newValue}.`,
+        `Added ${amount} to **${args.counterName}** for <@!${user.id}> in <#${channel.id}>. The value is now ${newValue}.`,
       );
     } else if (channel) {
-      message.channel.send(`Added ${amount} to **${counterName}** in <#${channel.id}>. The value is now ${newValue}.`);
+      message.channel.send(`Added ${amount} to **${args.counterName}** in <#${channel.id}>. The value is now ${newValue}.`);
     } else if (user) {
-      message.channel.send(`Added ${amount} to **${counterName}** for <@!${user.id}>. The value is now ${newValue}.`);
+      message.channel.send(`Added ${amount} to **${args.counterName}** for <@!${user.id}>. The value is now ${newValue}.`);
     } else {
-      message.channel.send(`Added ${amount} to **${counterName}**. The value is now ${newValue}.`);
+      message.channel.send(`Added ${amount} to **${args.counterName}**. The value is now ${newValue}.`);
     }
   },
 });

@@ -75,22 +75,6 @@ const zTriggerFromString = zBoundedCharacters(0, 100).transform((val, ctx) => {
 const zTriggerInput = z.union([zTrigger, zTriggerFromString]);
 
 export const zCounter = z.strictObject({
-  // Typed as "never" because you are not expected to supply this directly.
-  // The transform instead picks it up from the property key and the output type is a string.
-  name: z
-    .never()
-    .optional()
-    .transform((_, ctx) => {
-      const ruleName = String(ctx.path[ctx.path.length - 2]).trim();
-      if (!ruleName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Counters must have names",
-        });
-        return z.NEVER;
-      }
-      return ruleName;
-    }),
   pretty_name: zBoundedCharacters(0, 100).nullable().default(null),
   per_channel: z.boolean().default(false),
   per_user: z.boolean().default(false),

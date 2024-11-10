@@ -95,16 +95,15 @@ export const ResetCounterCmd = guildPluginMessageCommand<CountersPluginType>()({
     }
 
     await setCounterValue(pluginData, args.counterName, channel?.id ?? null, user?.id ?? null, counter.initial_value);
-    const counterName = counter.name || args.counterName;
 
     if (channel && user) {
-      message.channel.send(`Reset **${counterName}** for <@!${user.id}> in <#${channel.id}>`);
+      message.channel.send(`Reset **${args.counterName}** for <@!${user.id}> in <#${channel.id}>`);
     } else if (channel) {
-      message.channel.send(`Reset **${counterName}** in <#${channel.id}>`);
+      message.channel.send(`Reset **${args.counterName}** in <#${channel.id}>`);
     } else if (user) {
-      message.channel.send(`Reset **${counterName}** for <@!${user.id}>`);
+      message.channel.send(`Reset **${args.counterName}** for <@!${user.id}>`);
     } else {
-      message.channel.send(`Reset **${counterName}**`);
+      message.channel.send(`Reset **${args.counterName}**`);
     }
   },
 });
