@@ -1,6 +1,5 @@
 import { guildPluginEventListener } from "knub";
-import { difference } from "lodash";
-import { isEqual } from "lodash";
+import { difference, isEqual } from "lodash-es";
 import { runAutomod } from "../functions/runAutomod.js";
 import { AutomodContext, AutomodPluginType } from "../types.js";
 
