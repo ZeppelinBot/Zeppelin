@@ -29,7 +29,6 @@ import {
 import emojiRegex from "emoji-regex";
 import fs from "fs";
 import https from "https";
-import { humanizeDuration, delayStringMultipliers } from "./humanizeDuration.js";
 import isEqual from "lodash/isEqual.js";
 import { performance } from "perf_hooks";
 import tlds from "tlds" assert { type: "json" };
@@ -37,6 +36,7 @@ import tmp from "tmp";
 import { URL } from "url";
 import { z, ZodEffects, ZodError, ZodRecord, ZodString } from "zod";
 import { ISavedMessageAttachmentData, SavedMessage } from "./data/entities/SavedMessage.js";
+import { delayStringMultipliers, humanizeDuration } from "./humanizeDuration.js";
 import { getProfiler } from "./profiler.js";
 import { SimpleCache } from "./SimpleCache.js";
 import { sendDM } from "./utils/sendDM.js";
@@ -51,8 +51,8 @@ export const MINUTES = 60 * SECONDS;
 export const HOURS = 60 * MINUTES;
 export const DAYS = 24 * HOURS;
 export const WEEKS = 7 * DAYS;
-export const YEARS = (365 + 1/4 - 1/100 + 1/400) * DAYS;
-export const MONTHS = YEARS / 12
+export const YEARS = (365 + 1 / 4 - 1 / 100 + 1 / 400) * DAYS;
+export const MONTHS = YEARS / 12;
 
 export const EMPTY_CHAR = "\u200b";
 

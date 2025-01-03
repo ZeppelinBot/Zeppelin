@@ -4,7 +4,13 @@ import { GuildPluginData } from "knub";
 import { allowTimeout } from "../../../RegExpRunner.js";
 import { ZalgoRegex } from "../../../data/Zalgo.js";
 import { ISavedMessageEmbedData, SavedMessage } from "../../../data/entities/SavedMessage.js";
-import { getInviteCodesInString, getUrlsInString, isGuildInvite, resolveInvite, resolveMember } from "../../../utils.js";
+import {
+  getInviteCodesInString,
+  getUrlsInString,
+  isGuildInvite,
+  resolveInvite,
+  resolveMember,
+} from "../../../utils.js";
 import { CensorPluginType } from "../types.js";
 import { censorMessage } from "./censorMessage.js";
 

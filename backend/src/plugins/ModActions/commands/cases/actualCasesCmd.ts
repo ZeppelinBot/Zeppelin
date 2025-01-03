@@ -1,7 +1,6 @@
 import { APIEmbed, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
 import { GuildPluginData } from "knub";
-import { In } from "typeorm";
-import { FindOptionsWhere } from "typeorm";
+import { FindOptionsWhere, In } from "typeorm";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { Case } from "../../../../data/entities/Case.js";
 import { sendContextResponse } from "../../../../pluginUtils.js";

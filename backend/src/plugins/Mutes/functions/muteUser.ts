@@ -1,5 +1,4 @@
 import { Snowflake } from "discord.js";
-import { humanizeDuration } from "../../../humanizeDuration.js";
 import { GuildPluginData } from "knub";
 import { ERRORS, RecoverablePluginError } from "../../../RecoverablePluginError.js";
 import { CaseTypes } from "../../../data/CaseTypes.js";
@@ -8,6 +7,7 @@ import { MuteTypes } from "../../../data/MuteTypes.js";
 import { Case } from "../../../data/entities/Case.js";
 import { Mute } from "../../../data/entities/Mute.js";
 import { registerExpiringMute } from "../../../data/loops/expiringMutesLoop.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { LogsPlugin } from "../../../plugins/Logs/LogsPlugin.js";
 import { TemplateParseError, TemplateSafeValueContainer, renderTemplate } from "../../../templateFormatter.js";
 import {

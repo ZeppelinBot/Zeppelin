@@ -1,8 +1,8 @@
 import { GuildMember } from "discord.js";
-import { humanizeDuration } from "../../../humanizeDuration.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { LogType } from "../../../data/LogType.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { createTypedTemplateSafeValueContainer } from "../../../templateFormatter.js";
 import { memberToTemplateSafeMember } from "../../../utils/templateSafeObjects.js";
 import { LogsPluginType } from "../types.js";

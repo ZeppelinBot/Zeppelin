@@ -2,7 +2,7 @@ import humanizeduration from "humanize-duration";
 
 export const delayStringMultipliers = {
   y: 1000 * 60 * 60 * 24 * (365 + 1 / 4 - 1 / 100 + 1 / 400),
-  mo: 1000 * 60 * 60* 24 * (365 + 1 / 4 - 1 / 100 + 1 / 400) / 12,
+  mo: (1000 * 60 * 60 * 24 * (365 + 1 / 4 - 1 / 100 + 1 / 400)) / 12,
   w: 1000 * 60 * 60 * 24 * 7,
   d: 1000 * 60 * 60 * 24,
   h: 1000 * 60 * 60,
@@ -26,9 +26,9 @@ export const humanizeDurationShort = humanizeduration.humanizer({
     },
   },
   spacer: "",
-  unitMeasures: delayStringMultipliers
+  unitMeasures: delayStringMultipliers,
 });
 
 export const humanizeDuration = humanizeduration.humanizer({
-  unitMeasures: delayStringMultipliers
+  unitMeasures: delayStringMultipliers,
 });

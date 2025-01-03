@@ -1,10 +1,10 @@
 import { Snowflake } from "discord.js";
-import { humanizeDuration } from "../../../humanizeDuration.js";
 import { GuildPluginData } from "knub";
 import moment from "moment-timezone";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { LogType } from "../../../data/LogType.js";
 import { Tempban } from "../../../data/entities/Tempban.js";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { logger } from "../../../logger.js";
 import { resolveUser } from "../../../utils.js";
 import { CasesPlugin } from "../../Cases/CasesPlugin.js";
