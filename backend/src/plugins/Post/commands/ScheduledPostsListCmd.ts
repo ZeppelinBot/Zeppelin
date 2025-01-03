@@ -1,5 +1,5 @@
 import { escapeCodeBlock } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import moment from "moment-timezone";
 import { createChunkedMessage, DBDateFormat, deactivateMentions, sorter, trimLines } from "../../../utils.js";
 import { TimeAndDatePlugin } from "../../TimeAndDate/TimeAndDatePlugin.js";

@@ -1,4 +1,4 @@
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { slowmodeCmd } from "../types.js";
 

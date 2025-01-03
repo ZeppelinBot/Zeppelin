@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../data/CaseTypes.js";
 import { AddMuteParams } from "../../../data/GuildMutes.js";

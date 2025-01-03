@@ -1,5 +1,5 @@
 import { escapeInlineCode, PermissionsBitField } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { asSingleLine, DAYS, HOURS, MINUTES } from "../../../utils.js";
 import { getMissingPermissions } from "../../../utils/getMissingPermissions.js";

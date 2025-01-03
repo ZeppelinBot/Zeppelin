@@ -1,5 +1,5 @@
 import { Snowflake } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../humanizeDuration.js";
 import { PluginOptions, guildPlugin } from "knub";
 import moment from "moment-timezone";
 import { GuildArchives } from "../../data/GuildArchives.js";

@@ -2,7 +2,7 @@ import { Attachment, ChatInputCommandInteraction, GuildMember, Message, Snowflak
 import { GuildPluginData } from "knub";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
 import { LogType } from "../../../../data/LogType.js";
-import { humanizeDurationShort } from "../../../../humanizeDurationShort.js";
+import { humanizeDurationShort } from "../../../../humanizeDuration.js";
 import { canActOn, getContextChannel, isContextInteraction, sendContextResponse } from "../../../../pluginUtils.js";
 import { DAYS, MINUTES, SECONDS, noop } from "../../../../utils.js";
 import { CasesPlugin } from "../../../Cases/CasesPlugin.js";

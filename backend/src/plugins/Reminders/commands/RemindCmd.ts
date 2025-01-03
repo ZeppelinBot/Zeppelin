@@ -1,4 +1,4 @@
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../humanizeDuration.js";
 import moment from "moment-timezone";
 import { commandTypeHelpers as ct } from "../../../commandTypes.js";
 import { registerUpcomingReminder } from "../../../data/loops/upcomingRemindersLoop.js";

@@ -1,5 +1,5 @@
 import { Attachment, ChatInputCommandInteraction, GuildMember, Message, User } from "discord.js";
-import humanizeDuration from "humanize-duration";
+import { humanizeDuration } from "../../../../humanizeDuration.js";
 import { GuildPluginData } from "knub";
 import { getMemberLevel } from "knub/helpers";
 import { CaseTypes } from "../../../../data/CaseTypes.js";
